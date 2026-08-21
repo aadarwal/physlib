@@ -1,0 +1,114 @@
+/-
+Copyright (c) 2026 Aadarsh Agarwal. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Aadarsh Agarwal
+-/
+module
+
+public import Mathlib.Analysis.Calculus.Gradient.Basic
+public import Mathlib.Analysis.InnerProductSpace.Calculus
+public import Mathlib.Analysis.InnerProductSpace.PiL2
+/-!
+
+# Elementary rules for the gradient
+
+## i. Overview
+
+Mathlib defines the gradient `∇ f x` of a real-valued function on a real Hilbert space as the
+Riesz representative of its Fréchet derivative, but at present records only its value on constants.
+This file collects the elementary rules used throughout the classical mechanics of Physlib: a
+gradient is unchanged by adding a constant, it commutes with multiplication by a constant, the
+gradient of the quadratic form `⟪y, y⟫` is `2 • y`, and the gradient of a coordinate functional on
+Euclidean space is the corresponding basis vector.
+
+These are the rules needed to differentiate Lagrangians and Hamiltonians of the form
+`kinetic − potential` with respect to positions and velocities.
+
+## ii. Key results
+
+- `gradient_add_const` : `∇ (f + c) = ∇ f`.
+- `gradient_const_mul` : `∇ (c * f) = c • ∇ f` for differentiable `f`.
+- `gradient_inner_self` : `∇ (fun y => ⟪y, y⟫) x = 2 • x`.
+- `gradient_const_mul_inner_self` : `∇ (fun y => c * ⟪y, y⟫) x = (2 * c) • x`.
+- `gradient_coord` : `∇ (fun y => y i) x = EuclideanSpace.single i 1`.
+
+## iii. Table of contents
+
+- A. Gradients and constants
+- B. Gradients of quadratic forms
+- C. Coordinate functionals on Euclidean space
+
+## iv. References
+
+- Mathlib, `Mathlib.Analysis.Calculus.Gradient.Basic`.
+
+-/
+
+@[expose] public section
+
+noncomputable section
+
+open InnerProductSpace
+
+variable {F : Type*} [NormedAddCommGroup F] [InnerProductSpace ℝ F] [CompleteSpace F]
+
+/-!
+
+## A. Gradients and constants
+
+Adding a constant does not change the Fréchet derivative, hence not the gradient; multiplying by a
+constant scales both.
+
+-/
+
+lemma gradient_add_const {f : F → ℝ} (c : ℝ) (x : F) :
+    gradient (fun y => f y + c) x = gradient f x := by
+  unfold gradient
+  rw [fderiv_add_const]
+
+lemma gradient_const_mul {f : F → ℝ} {x : F} (c : ℝ) (hf : DifferentiableAt ℝ f x) :
+    gradient (fun y => c * f y) x = c • gradient f x := by
+  unfold gradient
+  rw [fderiv_const_mul hf, map_smul]
+
+/-!
+
+## B. Gradients of quadratic forms
+
+The quadratic form `y ↦ ⟪y, y⟫` has derivative `v ↦ 2 ⟪x, v⟫` at `x`, whose Riesz representative
+is `2 • x`.
+
+-/
+
+lemma gradient_inner_self (x : F) : gradient (fun y : F => ⟪y, y⟫_ℝ) x = (2 : ℝ) • x := by
+  refine ext_inner_right (𝕜 := ℝ) fun y => ?_
+  unfold gradient
+  rw [InnerProductSpace.toDual_symm_apply,
+    fderiv_inner_apply (𝕜 := ℝ) differentiableAt_fun_id differentiableAt_fun_id]
+  simp [real_inner_comm, inner_smul_right, two_mul]
+
+lemma gradient_const_mul_inner_self (c : ℝ) (x : F) :
+    gradient (fun y : F => c * ⟪y, y⟫_ℝ) x = (2 * c) • x := by
+  rw [gradient_const_mul c (differentiableAt_fun_id.inner ℝ differentiableAt_fun_id),
+    gradient_inner_self, smul_smul, mul_comm]
+
+/-!
+
+## C. Coordinate functionals on Euclidean space
+
+The coordinate functional `y ↦ y i` on `EuclideanSpace ℝ ι` is the continuous linear map
+`EuclideanSpace.proj i`, whose Riesz representative is the basis vector `EuclideanSpace.single i 1`.
+
+-/
+
+lemma gradient_coord {ι : Type*} [Fintype ι] [DecidableEq ι] (i : ι) (x : EuclideanSpace ℝ ι) :
+    gradient (fun y : EuclideanSpace ℝ ι => y i) x = EuclideanSpace.single i 1 := by
+  have h : HasFDerivAt (fun y : EuclideanSpace ℝ ι => y i)
+      (innerSL ℝ (EuclideanSpace.single i (1 : ℝ))) x :=
+    (EuclideanSpace.proj (𝕜 := ℝ) i).hasFDerivAt.congr_fderiv
+      (by ext y; simp [EuclideanSpace.inner_single_left])
+  exact h.hasGradientAt.gradient.trans ((toDual ℝ _).symm_apply_apply _)
+
+end
+
+end
