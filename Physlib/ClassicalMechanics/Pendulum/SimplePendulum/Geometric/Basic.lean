@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.SpaceAndTime.Space.Basic
+public import Physlib.SpaceAndTime.Space.Module
 public import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 public import Mathlib.Geometry.Manifold.Instances.Sphere
 /-!
@@ -36,7 +36,7 @@ points upwards.
 - `ConfigurationSpace.instChartedSpace`, `ConfigurationSpace.instIsManifold` : the analytic
   manifold structure, pulled back from `Circle`.
 - `ConfigurationSpace.ofAngle` : the angular lift `ℝ → ConfigurationSpace`, periodic with period
-  `2π`, continuous and surjective.
+  `2π`, continuous, surjective and analytic.
 - `ConfigurationSpace.toSpace` : the position of the bob in `Space 2`, with
   `toSpace_ofAngle` and the rod-length constraint `toSpace_norm`.
 
@@ -180,6 +180,160 @@ instance instIsManifold : IsManifold (𝓡 1) ω ConfigurationSpace where
         hself, OpenPartialHomeomorph.refl_trans]
     rw [hcancel]
     exact HasGroupoid.compatible he₁ he₂
+
+/-!
+
+## D. The angular lift
+
+`ofAngle θ` is the configuration at angle `θ` from the downward vertical. It is the quotient map
+`ℝ → ℝ / 2πℤ`, i.e. the universal covering of the circle: it is continuous, surjective and
+`2π`-periodic, and two angles give the same configuration exactly when they differ by a whole
+number of turns. The dynamics of the pendulum are written for a real-valued lift of the angle; this
+section is what makes different lifts describe the same motion. In the charts pulled back from the
+circle the lift is `Circle.exp`, so it is analytic.
+
+-/
+
+/-- The configuration at angle `θ` (measured from the downward vertical). -/
+def ofAngle (θ : ℝ) : ConfigurationSpace := ⟨θ⟩
+
+/-- The angle of the configuration at angle `θ` is `θ` modulo `2π`. -/
+@[simp]
+lemma ofAngle_angle (θ : ℝ) : (ofAngle θ).angle = θ := rfl
+
+/-- Adding a full turn to the angle leaves the configuration unchanged. -/
+lemma ofAngle_add_two_pi (θ : ℝ) : ofAngle (θ + 2 * Real.pi) = ofAngle θ := by
+  ext
+  simp [Real.Angle.coe_add, Real.Angle.coe_two_pi]
+
+/-- The angular lift is periodic with period `2π`. -/
+lemma ofAngle_periodic : Function.Periodic ofAngle (2 * Real.pi) := ofAngle_add_two_pi
+
+/-- Two angles describe the same configuration exactly when they differ by a whole number of
+  turns. -/
+lemma ofAngle_eq_iff (θ₁ θ₂ : ℝ) :
+    ofAngle θ₁ = ofAngle θ₂ ↔ ∃ n : ℤ, θ₂ = θ₁ + n * (2 * Real.pi) := by
+  constructor
+  · intro h
+    obtain ⟨k, hk⟩ :=
+      Real.Angle.angle_eq_iff_two_pi_dvd_sub.mp (congrArg ConfigurationSpace.angle h)
+    exact ⟨-k, by push_cast; linarith⟩
+  · rintro ⟨n, rfl⟩
+    exact ConfigurationSpace.ext
+      (Real.Angle.angle_eq_iff_two_pi_dvd_sub.mpr ⟨-n, by push_cast; ring⟩)
+
+/-- Every configuration is the configuration at some real angle: the lift is surjective. -/
+lemma ofAngle_surjective : Function.Surjective ofAngle := by
+  rintro ⟨φ⟩
+  induction φ using Real.Angle.induction_on with
+  | h θ => exact ⟨θ, rfl⟩
+
+/-- The angular lift is continuous. -/
+lemma continuous_ofAngle : Continuous ofAngle :=
+  continuous_induced_rng.mpr Real.Angle.continuous_coe
+
+/-- The configuration at angle `θ` corresponds to the point `e^{iθ}` of the unit circle. -/
+lemma toCircle_ofAngle (θ : ℝ) : (ofAngle θ).toCircle = Circle.exp θ := Real.Angle.toCircle_coe θ
+
+/-- The angular lift is analytic: read in the charts pulled back from the circle it is
+  `Circle.exp`. -/
+lemma contMDiff_ofAngle : ContMDiff 𝓘(ℝ, ℝ) (𝓡 1) ω ofAngle := by
+  rw [contMDiff_iff]
+  refine ⟨continuous_ofAngle, fun x y => ?_⟩
+  have h := (contMDiff_iff.mp (contMDiff_circleExp (m := ω))).2 x y.toCircle
+  convert h using 2
+  · rfl
+  · ext θ
+    simp [chartAt_eq, circleHomeomorph_apply, toCircle_ofAngle]
+
+/-- The cosine of the angle of a configuration. -/
+def cos (q : ConfigurationSpace) : ℝ := Real.Angle.cos q.angle
+
+/-- The sine of the angle of a configuration. -/
+def sin (q : ConfigurationSpace) : ℝ := Real.Angle.sin q.angle
+
+/-- The cosine of the configuration at angle `θ` is `cos θ`. -/
+@[simp]
+lemma cos_ofAngle (θ : ℝ) : (ofAngle θ).cos = Real.cos θ := Real.Angle.cos_coe θ
+
+/-- The sine of the configuration at angle `θ` is `sin θ`. -/
+@[simp]
+lemma sin_ofAngle (θ : ℝ) : (ofAngle θ).sin = Real.sin θ := Real.Angle.sin_coe θ
+
+/-- The Pythagorean identity for the angle of a configuration. -/
+lemma cos_sq_add_sin_sq (q : ConfigurationSpace) : q.cos ^ 2 + q.sin ^ 2 = 1 :=
+  Real.Angle.cos_sq_add_sin_sq q.angle
+
+/-!
+
+## E. Map to physical space
+
+The pivot is the origin of the plane `Space 2`, the first coordinate is horizontal and the second
+points upwards. A rod of length `ℓ` at angle `θ` from the downward vertical places the bob at
+`(ℓ sin θ, -ℓ cos θ)`; at `θ = 0` the bob hangs straight down at `(0, -ℓ)`. The image of the
+configuration space is the circle of radius `|ℓ|` about the pivot — the rod-length constraint —
+and for `ℓ ≠ 0` the map is injective, so the configuration is determined by the position.
+
+-/
+
+/-- The position of the bob in the plane, for a rod of length `ℓ`. -/
+def toSpace (ℓ : ℝ) (q : ConfigurationSpace) : Space 2 := ⟨![ℓ * q.sin, -ℓ * q.cos]⟩
+
+/-- The horizontal coordinate of the bob is `ℓ sin θ`. -/
+@[simp]
+lemma toSpace_apply_zero (ℓ : ℝ) (q : ConfigurationSpace) :
+    toSpace ℓ q 0 = ℓ * q.sin := rfl
+
+/-- The vertical coordinate of the bob is `-ℓ cos θ`. -/
+@[simp]
+lemma toSpace_apply_one (ℓ : ℝ) (q : ConfigurationSpace) :
+    toSpace ℓ q 1 = -ℓ * q.cos := rfl
+
+/-- The position of the bob for the configuration at angle `θ`. -/
+lemma toSpace_ofAngle (ℓ θ : ℝ) :
+    toSpace ℓ (ofAngle θ) = ⟨![ℓ * Real.sin θ, -ℓ * Real.cos θ]⟩ := by
+  simp [toSpace]
+
+/-- At `θ = 0` the bob hangs straight down, at `(0, -ℓ)`. -/
+lemma toSpace_ofAngle_zero (ℓ : ℝ) : toSpace ℓ (ofAngle 0) = ⟨![0, -ℓ]⟩ := by
+  simp [toSpace_ofAngle]
+
+/-- The rod-length constraint: the bob is at distance `|ℓ|` from the pivot. -/
+lemma toSpace_norm (ℓ : ℝ) (q : ConfigurationSpace) : ‖toSpace ℓ q‖ = |ℓ| := by
+  have hq : (ℓ * q.sin) ^ 2 + (-ℓ * q.cos) ^ 2 = ℓ ^ 2 := by
+    linear_combination ℓ ^ 2 * cos_sq_add_sin_sq q
+  rw [Space.norm_eq, Fin.sum_univ_two, toSpace_apply_zero, toSpace_apply_one, hq,
+    Real.sqrt_sq_eq_abs]
+
+/-- The position of the bob depends continuously on the configuration. -/
+lemma continuous_toSpace (ℓ : ℝ) : Continuous (toSpace ℓ) := by
+  have hcos : Continuous fun q : ConfigurationSpace => q.cos :=
+    Real.Angle.continuous_cos.comp continuous_induced_dom
+  have hsin : Continuous fun q : ConfigurationSpace => q.sin :=
+    Real.Angle.continuous_sin.comp continuous_induced_dom
+  have hv : Continuous fun q : ConfigurationSpace => (![ℓ * q.sin, -ℓ * q.cos] : Fin 2 → ℝ) := by
+    refine continuous_pi fun i => ?_
+    fin_cases i
+    · simpa using hsin.const_mul ℓ
+    · simpa using hcos.const_mul (-ℓ)
+  exact Space.mk_continuous.comp hv
+
+/-- For a rod of nonzero length the configuration is determined by the position of the bob. -/
+lemma toSpace_injective {ℓ : ℝ} (hℓ : ℓ ≠ 0) : Function.Injective (toSpace ℓ) := by
+  -- Equality of angles is detected by their cosine and sine.
+  have key : ∀ θ ψ : Real.Angle, θ.cos = ψ.cos → θ.sin = ψ.sin → θ = ψ := by
+    intro θ ψ hc hs
+    rcases Real.Angle.cos_eq_iff_eq_or_eq_neg.mp hc with h | h
+    · exact h
+    rcases Real.Angle.sin_eq_iff_eq_or_add_eq_pi.mp hs with h' | h'
+    · exact h'
+    rw [h, neg_add_cancel] at h'
+    exact absurd h'.symm Real.Angle.pi_ne_zero
+  intro q₁ q₂ h
+  have h0 : ℓ * q₁.sin = ℓ * q₂.sin := congrArg (fun p : Space 2 => p 0) h
+  have h1 : -ℓ * q₁.cos = -ℓ * q₂.cos := congrArg (fun p : Space 2 => p 1) h
+  exact ConfigurationSpace.ext
+    (key _ _ (mul_left_cancel₀ (neg_ne_zero.mpr hℓ) h1) (mul_left_cancel₀ hℓ h0))
 
 end ConfigurationSpace
 end SimplePendulum
