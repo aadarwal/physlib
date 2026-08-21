@@ -9,15 +9,21 @@ module
 
 # Optics
 
-This directory is currently a place holder.
-Please feel free to contribute!
+## i. Scope
 
-Some directories which are NOT currently place holders are:
-- Mathematics
-- Meta
-- Particles
-- QFT
-- Quantum Mechanics
-- Relativity
+The optics API describes reduced models of light and optical components built on the field-level
+theory in `Physlib.Electromagnetism`. Its intended scope includes monochromatic phasors,
+polarization and ray representations, optical interfaces and observables, finite-mode scattering
+models, and the composition of components into optical systems.
 
--/@[expose] public section
+## ii. Layering
+
+Generic geometry, complex linear algebra and Fourier analysis remain in Mathlib or the relevant
+mathematical Physlib APIs. Field-level electromagnetic concepts, including material constitutive
+data and energy flux, belong in `Physlib.Electromagnetism`; Optics should depend on those APIs as
+they are developed rather than introduce competing definitions. Optics owns reduced optical states,
+component laws derived from field theory, and their system-level composition.
+
+-/
+
+@[expose] public section
