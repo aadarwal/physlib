@@ -338,22 +338,11 @@ lemma differentiable_potentialEnergy : Differentiable ℝ S.potentialEnergy :=
   (S.potentialEnergy_contDiff 1).differentiable one_ne_zero
 
 /-- The gradient of the cosine of the angular coordinate on the one-dimensional Euclidean lift.
-  This is the chain rule applied to `Real.cos` and to the coordinate functional, whose gradient
-  is `gradient_coord`. It is specific to the cosine potential of the pendulum. -/
+  This is the specialization of `gradient_comp_coord` to the cosine. -/
 lemma gradient_cos_coord (x : EuclideanSpace ℝ (Fin 1)) :
     gradient (fun y : EuclideanSpace ℝ (Fin 1) => Real.cos (y 0)) x =
-      -Real.sin (x 0) • EuclideanSpace.single 0 1 := by
-  have hdiff : DifferentiableAt ℝ (fun y : EuclideanSpace ℝ (Fin 1) => y 0) x := by fun_prop
-  have hcoord : HasGradientAt (fun y : EuclideanSpace ℝ (Fin 1) => y 0)
-      (EuclideanSpace.single 0 1) x := by
-    simpa [gradient_coord] using hdiff.hasGradientAt
-  have hf : HasFDerivAt (fun y : EuclideanSpace ℝ (Fin 1) => Real.cos (y 0))
-      (toDual ℝ (EuclideanSpace ℝ (Fin 1))
-        (-Real.sin (x 0) • EuclideanSpace.single 0 1)) x := by
-    refine ((Real.hasDerivAt_cos (x 0)).hasFDerivAt.comp x hcoord.hasFDerivAt).congr_fderiv ?_
-    ext y
-    simp [toDual_apply_apply, EuclideanSpace.inner_single_left, mul_comm]
-  simpa using hf.hasGradientAt.gradient
+      -Real.sin (x 0) • EuclideanSpace.single 0 1 :=
+  gradient_comp_coord 0 x (Real.hasDerivAt_cos (x 0))
 
 /-- The gradient of the potential energy of the simple pendulum is `m g ℓ sin θ` times the unit
   vector of the angular coordinate. -/
