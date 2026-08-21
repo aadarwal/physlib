@@ -44,6 +44,10 @@ Requirements:
     done: false
     location: N/A
 
-  - description: The API shall contain the Lagrangian of the simple pendulum and its equation of motion.
+  - description: The API contains the Lagrangian of the simple pendulum and its equation of motion.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.lagrangian, SimplePendulum.torque, SimplePendulum.EquationOfMotion, SimplePendulum.equationOfMotion_iff_scalar)
+
+  - description: The API shall contain the equivalence of the equation of motion with the vanishing of the variational gradient of the action, and energy conservation.
     done: false
     location: N/A

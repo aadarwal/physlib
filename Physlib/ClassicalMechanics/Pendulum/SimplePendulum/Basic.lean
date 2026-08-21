@@ -439,6 +439,307 @@ lemma energy_deriv (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : ContDiff �
   simp only [_root_.add_apply, ← Time.deriv_eq, S.kineticEnergy_deriv θ hθ,
     S.potentialEnergy_deriv θ hθ, ← inner_add_right]
 
+/-!
+
+## D. The Lagrangian
+
+The pendulum is a conservative system, so its Lagrangian is the kinetic energy minus the potential
+energy, `L = ½ I θ̇² - m g ℓ (1 - cos θ)`. As for the harmonic oscillator, it is defined as a
+function on phase space, of the time, the angle and the angular velocity separately; that it is
+`T - V` along a lift of the angle is then a lemma rather than the definition.
+
+The Lagrangian carries no explicit time dependence, the pendulum being autonomous; the time
+argument is kept because it is the type the Euler–Lagrange operator of Physlib expects.
+
+-/
+
+/-!
+
+### D.1. The definition of the Lagrangian and equalities for it
+
+The Lagrangian is written directly in terms of the moment of inertia and the potential energy,
+so that the equalities below are the two ways of reading it: expanded in the input data, and as
+the kinetic energy minus the potential energy along a lift of the angle.
+
+-/
+
+set_option linter.unusedVariables false in
+/-- The Lagrangian of the simple pendulum, `L(t, θ, θ̇) = ½ I ‖θ̇‖² - V(θ)`, the kinetic energy
+  minus the potential energy as a function on phase space. It does not depend on the time. -/
+@[nolint unusedArguments]
+noncomputable def lagrangian (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) : ℝ :=
+  (1 / (2 : ℝ)) * S.inertia * ⟪v, v⟫_ℝ - S.potentialEnergy x
+
+/-- The Lagrangian of the simple pendulum, written out in the input data. -/
+lemma lagrangian_eq :
+    S.lagrangian = fun _ x v =>
+      (1 / (2 : ℝ)) * S.inertia * ⟪v, v⟫_ℝ - S.m * S.g * S.ℓ * (1 - Real.cos (x 0)) := by
+  funext t x v
+  rw [lagrangian, potentialEnergy_eq]
+
+/-- Along a lift of the angle the Lagrangian of the simple pendulum is the kinetic energy minus
+  the potential energy. -/
+lemma lagrangian_eq_kineticEnergy_sub_potentialEnergy (t : Time)
+    (θ : Time → EuclideanSpace ℝ (Fin 1)) :
+    S.lagrangian t (θ t) (∂ₜ θ t) = S.kineticEnergy θ t - S.potentialEnergy (θ t) := rfl
+
+/-!
+
+### D.2. Smoothness of the Lagrangian
+
+The Lagrangian is a smooth function of all of its arguments jointly. This is the hypothesis that
+the Euler–Lagrange theorem of Physlib places on a Lagrangian, so it is recorded on the uncurried
+form `↿S.lagrangian`.
+
+-/
+
+/-- The Lagrangian of the simple pendulum is a smooth function of the time, the angle and the
+  angular velocity jointly. -/
+@[fun_prop]
+lemma contDiff_lagrangian (n : WithTop ℕ∞) : ContDiff ℝ n ↿S.lagrangian := by
+  rw [lagrangian_eq]
+  fun_prop
+
+/-!
+
+### D.3. Gradients of the Lagrangian
+
+The Euler–Lagrange operator is built from the two partial gradients of the Lagrangian. The
+gradient in the angle is minus the gradient of the potential energy, that is the torque of
+section E; the gradient in the angular velocity is the angular momentum `I θ̇`.
+
+-/
+
+/-- The gradient of the Lagrangian of the simple pendulum in the angle is minus the gradient of
+  the potential energy, `-m g ℓ sin θ` times the unit vector of the angular coordinate. -/
+lemma gradient_lagrangian_position_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
+    gradient (fun x => S.lagrangian t x v) x =
+      -((S.m * S.g * S.ℓ * Real.sin (x 0)) • EuclideanSpace.single 0 1) := by
+  have h : (fun y : EuclideanSpace ℝ (Fin 1) => S.lagrangian t y v) =
+      fun y => (-1 : ℝ) * S.potentialEnergy y + (1 / (2 : ℝ)) * S.inertia * ⟪v, v⟫_ℝ := by
+    funext y
+    rw [lagrangian]
+    ring
+  rw [h, gradient_add_const, gradient_const_mul _ (S.differentiable_potentialEnergy x),
+    gradient_potentialEnergy]
+  module
+
+/-- The gradient of the Lagrangian of the simple pendulum in the angular velocity is the angular
+  momentum `I θ̇` about the pivot. -/
+lemma gradient_lagrangian_velocity_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
+    gradient (S.lagrangian t x) v = S.inertia • v := by
+  have h : S.lagrangian t x = fun y : EuclideanSpace ℝ (Fin 1) =>
+      ((1 / (2 : ℝ)) * S.inertia) * ⟪y, y⟫_ℝ + -S.potentialEnergy x := by
+    funext y
+    rw [lagrangian]
+    ring
+  rw [h, gradient_add_const, gradient_const_mul_inner_self]
+  module
+
+/-!
+
+## E. The torque and the equation of motion
+
+Gravity exerts on the bob a torque `-m g ℓ sin θ` about the pivot, the generalized force conjugate
+to the angle, and the equation of motion balances it against the rate of change `I θ̈` of the
+angular momentum.
+
+We take that pointwise relation as the definition of the equation of motion, rather than the
+vanishing of the variational derivative of the action, which is how the harmonic oscillator defines
+its own. The reason is that the variational derivative is defined to be `0` whenever no variational
+gradient exists, so its vanishing holds vacuously for every lift of the angle too rough to admit
+one; it says what it is meant to say only under a smoothness assumption. The pointwise equation
+carries no such caveat, holds of any twice differentiable lift, and is the form in which the
+equation of motion is solved and used. The two agree for smooth lifts, by
+`equationOfMotion_iff_gradLagrangian_zero`, proved in a later module; the present module goes as
+far as `gradLagrangian_eq_torque`, from which that equivalence is one rearrangement away.
+
+-/
+
+/-!
+
+### E.1. The torque
+
+The pendulum is conservative, so the generalized force conjugate to the angle is minus the
+gradient of the potential energy. It is a torque about the pivot rather than a force, the angle
+being the coordinate; this is why it is `m g ℓ sin θ` and not `m g sin θ`.
+
+-/
+
+/-- The generalized force of the simple pendulum conjugate to the angle, that is the torque about
+  the pivot, is minus the gradient of the potential energy, `τ = -∂V/∂θ`. -/
+noncomputable def torque (x : EuclideanSpace ℝ (Fin 1)) : EuclideanSpace ℝ (Fin 1) :=
+  -gradient S.potentialEnergy x
+
+/-- The torque of the simple pendulum is `-m g ℓ sin θ` times the unit vector of the angular
+  coordinate. It is restoring: it opposes the displacement from the bottom of the swing. -/
+lemma torque_eq (x : EuclideanSpace ℝ (Fin 1)) :
+    S.torque x = -((S.m * S.g * S.ℓ * Real.sin (x 0)) • EuclideanSpace.single 0 1) := by
+  rw [torque, gradient_potentialEnergy]
+
+/-- The single component of the torque of the simple pendulum is `-m g ℓ sin θ`. -/
+lemma torque_apply (x : EuclideanSpace ℝ (Fin 1)) :
+    S.torque x 0 = -(S.m * S.g * S.ℓ * Real.sin (x 0)) := by
+  rw [torque_eq]
+  simp
+
+/-!
+
+### E.2. The equation of motion
+
+The equation of motion of the simple pendulum equates the rate of change of the angular momentum
+about the pivot with the torque of gravity, at every instant.
+
+-/
+
+/-- The equation of motion of the simple pendulum: at every instant the rate of change `I θ̈` of
+  the angular momentum about the pivot equals the torque `τ(θ)` of gravity.
+
+  This pointwise relation, and not the vanishing of the variational derivative of the action, is
+  the definition of the equation of motion here; see the discussion in section E. For a smooth
+  lift of the angle the two agree, by `equationOfMotion_iff_gradLagrangian_zero` in a later
+  module. -/
+def EquationOfMotion (θ : Time → EuclideanSpace ℝ (Fin 1)) : Prop :=
+  ∀ t, S.inertia • ∂ₜ (∂ₜ θ) t = S.torque (θ t)
+
+/-- The equation of motion of the simple pendulum is Newton's second law for rotation about the
+  pivot. This holds by `Iff.rfl`, the equation of motion being defined as that law; the lemma is
+  kept for parity with the corresponding names of the harmonic oscillator and of the damped
+  harmonic oscillator, where the two statements are genuinely different. -/
+lemma equationOfMotion_iff_newtons_2nd_law (θ : Time → EuclideanSpace ℝ (Fin 1)) :
+    S.EquationOfMotion θ ↔ ∀ t, S.inertia • ∂ₜ (∂ₜ θ) t = S.torque (θ t) := Iff.rfl
+
+/-!
+
+### E.3. Classical solutions
+
+A classical solution of the equation of motion is a smooth lift of the angle satisfying it. The
+smoothness is not needed to state the equation, but it is what the variational and Hamiltonian
+descriptions of the motion require, so solutions are asked for it once and for all.
+
+-/
+
+/-- A classical solution of the simple pendulum is a smooth lift of the angle satisfying the
+  equation of motion. -/
+def IsSolution (θ : Time → EuclideanSpace ℝ (Fin 1)) : Prop :=
+  ContDiff ℝ ∞ θ ∧ S.EquationOfMotion θ
+
+/-- A classical solution of the simple pendulum is smooth. -/
+lemma IsSolution.contDiff {S : SimplePendulum} {θ : Time → EuclideanSpace ℝ (Fin 1)}
+    (h : S.IsSolution θ) : ContDiff ℝ ∞ θ := h.1
+
+/-- A classical solution of the simple pendulum satisfies the equation of motion. -/
+lemma IsSolution.equationOfMotion {S : SimplePendulum} {θ : Time → EuclideanSpace ℝ (Fin 1)}
+    (h : S.IsSolution θ) : S.EquationOfMotion θ := h.2
+
+/-!
+
+### E.4. The scalar equation and independence of the mass
+
+The angle is a single number, so the vector equation of motion is equivalent to the scalar
+equation obtained by reading off its one component. Dividing that component by the moment of
+inertia, using `ω_sq_mul_inertia`, cancels the mass and leaves `θ̈ + ω² sin θ = 0`: two pendulums
+with the same `ω = √(g/ℓ)` have exactly the same motions, whatever their masses.
+
+-/
+
+/-- The equation of motion of the simple pendulum in scalar form, `θ̈ + ω² sin θ = 0`. The mass
+  has cancelled: only the angular frequency `ω = √(g/ℓ)` survives. -/
+lemma equationOfMotion_iff_scalar (θ : Time → EuclideanSpace ℝ (Fin 1)) :
+    S.EquationOfMotion θ ↔ ∀ t, ∂ₜ (∂ₜ θ) t 0 + S.ω ^ 2 * Real.sin (θ t 0) = 0 := by
+  refine forall_congr' fun t => ?_
+  have hcomp : (S.inertia • ∂ₜ (∂ₜ θ) t = S.torque (θ t)) ↔
+      S.inertia * ∂ₜ (∂ₜ θ) t 0 = -(S.m * S.g * S.ℓ * Real.sin (θ t 0)) := by
+    rw [← S.torque_apply (θ t)]
+    constructor
+    · intro h
+      simpa using congrArg (fun y : EuclideanSpace ℝ (Fin 1) => y 0) h
+    · intro h
+      ext i
+      fin_cases i
+      simpa using h
+  rw [hcomp, ← S.ω_sq_mul_inertia]
+  constructor
+  · intro h
+    have h' : S.inertia * (∂ₜ (∂ₜ θ) t 0 + S.ω ^ 2 * Real.sin (θ t 0)) = 0 := by
+      linear_combination h
+    exact (mul_eq_zero.mp h').resolve_left S.inertia_ne_zero
+  · intro h
+    linear_combination S.inertia * h
+
+/-- Two simple pendulums with the same angular frequency have the same equation of motion, and
+  hence the same motions. In particular the motion of a pendulum does not depend on its mass. -/
+lemma equationOfMotion_iff_of_eq_ω (S' : SimplePendulum) (h : S'.ω = S.ω)
+    (θ : Time → EuclideanSpace ℝ (Fin 1)) :
+    S'.EquationOfMotion θ ↔ S.EquationOfMotion θ := by
+  rw [S'.equationOfMotion_iff_scalar, S.equationOfMotion_iff_scalar, h]
+
+/-!
+
+## F. The variational derivative of the action
+
+The action of the simple pendulum is the time integral of the Lagrangian along a lift of the
+angle. Its variational derivative is computed here, in two steps: it is the Euler–Lagrange
+operator of the Lagrangian, and that operator is the torque minus the rate of change of the
+angular momentum.
+
+-/
+
+/-!
+
+### F.1. The definition of the variational derivative
+
+The variational derivative is that of Physlib's variational calculus, applied to the action of the
+pendulum. Recall that it is defined to be `0` when no variational gradient exists, so the lemmas
+below are stated for smooth lifts of the angle.
+
+-/
+
+/-- The variational derivative of the action of the simple pendulum, the action being the time
+  integral of the Lagrangian along a lift of the angle. -/
+noncomputable def gradLagrangian (θ : Time → EuclideanSpace ℝ (Fin 1)) :
+    Time → EuclideanSpace ℝ (Fin 1) :=
+  (δ (q':=θ), ∫ t, S.lagrangian t (q' t) (fderiv ℝ q' t 1))
+
+/-!
+
+### F.2. Equality with the Euler–Lagrange operator
+
+For a smooth lift of the angle the variational derivative of the action is the Euler–Lagrange
+operator of the Lagrangian, by the general theorem `euler_lagrange_varGradient`; the hypotheses
+of that theorem are the smoothness of the lift and `contDiff_lagrangian`.
+
+-/
+
+/-- For a smooth lift of the angle the variational derivative of the action of the simple
+  pendulum is the Euler–Lagrange operator of its Lagrangian. -/
+lemma gradLagrangian_eq_eulerLagrangeOp (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (hθ : ContDiff ℝ ∞ θ) :
+    S.gradLagrangian θ = eulerLagrangeOp S.lagrangian θ := by
+  rw [gradLagrangian, euler_lagrange_varGradient _ _ hθ (S.contDiff_lagrangian _)]
+
+/-!
+
+### F.3. The variational derivative in terms of the torque
+
+Evaluating the Euler–Lagrange operator with the gradients of section D.3 gives the variational
+derivative as the torque minus the rate of change of the angular momentum. Its vanishing is
+therefore the equation of motion of section E; that equivalence,
+`equationOfMotion_iff_gradLagrangian_zero`, is proved in a later module, together with energy
+conservation, so that this module carries the model of the pendulum alone.
+
+-/
+
+/-- For a smooth lift of the angle the variational derivative of the action of the simple
+  pendulum is the torque minus the rate of change `I θ̈` of the angular momentum. -/
+lemma gradLagrangian_eq_torque (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : ContDiff ℝ ∞ θ) :
+    S.gradLagrangian θ = fun t => S.torque (θ t) - S.inertia • ∂ₜ (∂ₜ θ) t := by
+  funext t
+  rw [S.gradLagrangian_eq_eulerLagrangeOp θ hθ, eulerLagrangeOp]
+  simp [S.gradient_lagrangian_position_eq, S.gradient_lagrangian_velocity_eq, torque,
+    S.gradient_potentialEnergy,
+    Time.deriv_smul _ S.inertia (deriv_differentiable_of_contDiff θ hθ)]
+
 end SimplePendulum
 
 end ClassicalMechanics
