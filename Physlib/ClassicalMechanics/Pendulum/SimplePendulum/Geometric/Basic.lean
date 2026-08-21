@@ -26,7 +26,7 @@ the structure of a compact analytic one-dimensional manifold; we obtain it by id
 configuration space with Mathlib's unit circle `Circle` and pulling back its charts. The smooth
 identification of the configuration space with `Circle` (the analogue of the harmonic oscillator's
 `valDiffeomorph`) is deferred to the module on trajectories. The real-valued angle that is used to
-write down the dynamics is a lift of the configuration to the universal cover
+write down the dynamics is a lift of the configuration along the covering map
 `ℝ → ConfigurationSpace`; it is not a chart, and two lifts differing by `2π n` describe the same
 configuration. Finally the position of the bob in the plane is recorded by `toSpace ℓ`, which sends
 the configuration at angle `θ` to `(ℓ sin θ, -ℓ cos θ)`: the pivot is the origin and the second axis
@@ -35,13 +35,15 @@ points upwards.
 ## ii. Key results
 
 - `ConfigurationSpace` : the configuration space of the planar simple pendulum.
-- `ConfigurationSpace.circleHomeomorph` : its identification with the unit circle.
+- `ConfigurationSpace.circleHomeomorph` : its identification with the unit circle, with inverse
+  `ConfigurationSpace.ofCircle` (`toCircle_ofCircle`, `ofCircle_toCircle`).
 - `ConfigurationSpace.instChartedSpace`, `ConfigurationSpace.instIsManifold` : the analytic
-  manifold structure, pulled back from `Circle`.
+  manifold structure, pulled back from `Circle` (`chartAt_source`, `chartAt_target`).
 - `ConfigurationSpace.ofAngle` : the angular lift `ℝ → ConfigurationSpace`, periodic with period
-  `2π`, continuous, surjective and analytic.
+  `2π`, continuous, surjective, analytic, and a covering map (`isCoveringMap_ofAngle`).
 - `ConfigurationSpace.toSpace` : the position of the bob in `Space 2`, with
-  `toSpace_ofAngle` and the rod-length constraint `toSpace_norm`.
+  `toSpace_ofAngle` and the rod-length constraint `toSpace_norm`; for `ℓ ≠ 0` it is a closed
+  embedding (`toSpace_isClosedEmbedding`).
 
 ## iii. Table of contents
 
@@ -227,7 +229,7 @@ instance instIsManifold : IsManifold (𝓡 1) ω ConfigurationSpace where
 `ℝ → ℝ / 2πℤ`, a covering map of the circle: it is continuous, surjective and `2π`-periodic, and
 two angles give the same configuration exactly when they differ by a whole number of turns. The
 dynamics of the pendulum are written for a real-valued lift of the angle; this section is what
-makes different lifts describe the same motion. In the charts pulled back from the circle the lift
+makes different lifts describe the same configuration. In the charts pulled back from the circle
 is `Circle.exp`, so it is analytic.
 
 -/
@@ -281,6 +283,11 @@ lemma isCoveringMap_ofAngle : IsCoveringMap ofAngle := by
 /-- The configuration at angle `θ` corresponds to the point `e^{iθ}` of the unit circle. -/
 @[simp]
 lemma toCircle_ofAngle (θ : ℝ) : (ofAngle θ).toCircle = Circle.exp θ := Real.Angle.toCircle_coe θ
+
+/-- The configuration of a point `e^{iθ}` of the unit circle is `ofAngle θ`. -/
+@[simp]
+lemma ofCircle_circleExp (θ : ℝ) : ofCircle (Circle.exp θ) = ofAngle θ := by
+  rw [← toCircle_ofAngle, ofCircle_toCircle]
 
 /-- The angular lift is analytic: read in the charts pulled back from the circle it is
   `Circle.exp`. -/
