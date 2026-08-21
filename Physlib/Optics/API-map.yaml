@@ -1,0 +1,169 @@
+version: v0.1
+
+Title: Optics
+
+Overview: |
+    The optics API sits between field-level electromagnetism and system-level optical design.
+    It reuses geometry, dimensional quantities, complex linear algebra, Fourier analysis, the wave
+    equation, and Maxwell theory rather than duplicating them. It owns reduced monochromatic
+    descriptions of light (phasors, polarization states, rays, and finite power-normalized modes),
+    optical observables, component laws, and the semantics for composing components into systems.
+
+    Finite-mode photonic circuits use incident and outgoing mode amplitudes with scattering
+    matrices as their component interface. Power preservation and passivity are stated directly
+    in terms of modal power; lossless square scattering matrices are unitary. Network composition
+    is a separate linear-equation layer, so ordinary cascades of one-way transforms are not
+    confused with feedback interconnection of multiport scattering matrices. Jones calculus,
+    electromagnetic interfaces, ray-transfer systems, diffraction, and quantum-optical lifts are
+    connected layers sharing these definitions, not competing foundations.
+
+    After the shared mode core, development can proceed in two parallel tracks. The circuit track
+    develops typed ports, implicit behaviors, well-posed network elimination, and reusable
+    integrated-photonic components. The physical-optics track connects phasors, polarization,
+    interfaces, and energy flux to electromagnetism. End-to-end systems then reconnect the two.
+
+    The first implementation milestone prioritizes the electromagnetic-to-phasor bridge, Jones and
+    Stokes polarization, polarizers and retarders, planar dielectric interfaces, and their shared
+    power statements. The circuit, ray, Fourier, and quantum requirements are longer-term design
+    proposals. Before those tracks become upstream implementation PRs, each should be discussed
+    with maintainers and split into its own focused API map. This top-level map is therefore a
+    domain roadmap, not a claim that every requirement belongs in one PR or one foundational file.
+
+ParentAPIs:
+  - "Complex linear algebra (Mathlib/LinearAlgebra)"
+  - "Space (Physlib/SpaceAndTime/Space)"
+  - "Dimensional quantities (Physlib/Units)"
+  - "Wave equation (Physlib/ClassicalMechanics/WaveEquation)"
+  - "Electromagnetism (Physlib/Electromagnetism)"
+
+References:
+  - "U. Siddique, O. Hasan, and S. Tahar, Formal Modeling and Verification of Integrated Photonic Systems, IEEE SysCon, 2015, pp. 562-569"
+  - "U. Siddique, S. M. Beillahi, and S. Tahar, On the Formal Analysis of Photonic Signal Processing Systems, LNCS 9128, 2015, pp. 162-177"
+  - "S. Khan-Afshar, U. Siddique, M. Y. Mahmoud, V. Aravantinos, O. Seddiki, O. Hasan, and S. Tahar, Formal Analysis of Optical Systems, Mathematics in Computer Science 8(1), 2014, pp. 39-70"
+  - "Muhammad Umair Siddique, Formal Analysis of Geometrical Optics using Theorem Proving, PhD thesis, Concordia University, 2015"
+  - "B. E. A. Saleh and M. C. Teich, Fundamentals of Photonics, 3rd ed., Wiley, 2019"
+  - "Physlib Zulip archive, Interest in Optics, especially messages 506586122-506591160: https://leanprover-community.github.io/archive/stream/479953-PhysLean/topic/Interest.20in.20Optics.html"
+  - "Physlib Zulip archive, Maxwell's Equations, especially messages 514858836-516209465: https://leanprover-community.github.io/archive/stream/479953-PhysLean/topic/Maxwell%27s.20Equations.html"
+  - "Physlib Zulip archive, Vector calculus, especially messages 591063805-591468817: https://leanprover-community.github.io/archive/stream/479953-Physlib/topic/Vector.20calculus.html"
+
+Requirements:
+
+  - description: "The API shall contain complex mode amplitudes indexed by an arbitrary type and, for finite index types, their total modal power and its positivity, definiteness, scaling, and Hermitian-inner-product characterizations."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain rectangular mode transforms and semantic predicates for power preservation and passivity, prove that identity is power-preserving and that both predicates are cascade-closed, and prove that power preservation implies passivity."
+    done: false
+    location: N/A
+
+  - description: "The API shall connect the matrix isometry equation to power preservation and define lossless scattering matrices as unitary matrices, proving that lossless scattering preserves power and is passive."
+    done: false
+    location: N/A
+
+  - description: "The API shall characterize power-preserving transforms by the matrix isometry equation, characterize passive transforms by a positive-semidefinite defect matrix, and specialize the square power-preserving case to unitarity."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain parallel composition of mode transforms by finite direct sums or block matrices and prove closure of power preservation and passivity under parallel composition."
+    done: false
+    location: N/A
+
+  - description: "Using paired time-reversed channel modes and fixed reference-plane conventions, the API shall define reciprocal scattering matrices, channel relabeling and rephasing, and prove which physical predicates are invariant under these changes of convention."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain typed optical ports, channels, connections, and netlists whose well-formedness enforces compatible one-to-one channel-end matching and prevents malformed interconnections."
+    done: false
+    location: N/A
+
+  - description: "The API shall represent implicit linear optical behavior independently of matrix invertibility, embed functional mode transforms as graph behaviors, and compose behaviors in series and parallel."
+    done: false
+    location: N/A
+
+  - description: "For component law `b = S a`, internal wiring `a = C b + E u`, and external readout through the same selected channels, the API shall derive `(1 - C * S) a = E u` and the external scattering matrix obtained by eliminating the internal amplitudes."
+    done: false
+    location: N/A
+
+  - description: "The API shall define network well-posedness by unique solvability, equivalently by invertibility of the relevant finite linear operator, without making a contraction bound necessary; it shall prove that interconnection preserves passivity and, under the appropriate hypotheses and conventions, losslessness and reciprocity, and shall recover the Redheffer star product for standard two-component feedback."
+    done: false
+    location: N/A
+
+  - description: "The component library shall represent polarizers and wave plates as one-way mode transforms and matched propagation delays, attenuators, mirrors, ideal directional couplers, beam splitters, and dielectric interfaces as multiport scattering devices, with explicit physical validity conditions."
+    done: false
+    location: N/A
+
+  - description: "The API shall model a Mach-Zehnder interferometer by composing the common component definitions and prove its complex transfer amplitudes, output powers, and lossless power balance."
+    done: false
+    location: N/A
+
+  - description: "The API shall model all-pass and add-drop microring resonators as explicit feedback networks and prove their through and drop responses, power balance in the lossless case, resonance conditions, rejection ratio under explicit nondegeneracy hypotheses, and free spectral range under an explicit dispersion or group-index model."
+    done: false
+    location: N/A
+
+  - description: "For responses rational in the delay variable `q = exp (-s * τ) = z⁻¹`, the API shall connect finite-mode networks to rational transfer functions and, where a discrete-time model is intended, to difference equations and the Z-transform with explicit region-of-convergence and stability hypotheses, without assuming rationality in physical frequency."
+    done: false
+    location: N/A
+
+  - description: "The API shall extract typed signal-flow graphs from suitable scalar network models, derive Mason's gain formula as a calculation theorem, and prove agreement with the linear-equation network semantics before applying it to feedback, add-drop, coupled-ring, and double-coupled double-ring systems."
+    done: false
+    location: N/A
+
+  - description: "The API shall connect a propagating electromagnetic mode and its complex amplitude to time-averaged Poynting flux, proving the normalization theorem that identifies field power with modal power once the required Electromagnetism energy-flux API is available."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain phasors and Jones vectors for monochromatic plane waves, with a proved correspondence to the real time-harmonic plane waves in `Electromagnetism.Vacuum.HarmonicWave`; the complex representation shall complement rather than replace the real fields, and transversality results shall exclude arbitrary static backgrounds through an explicit harmonic, zero-static-component, zero-mean, or equivalent hypothesis."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain Jones matrices and their action on Jones vectors, together with the coherency matrix of a Jones vector and proofs of its Hermiticity, positive semidefiniteness, rank-at-most-one and determinant-zero properties, trace-power identity, and transformation law."
+    done: false
+    location: N/A
+
+  - description: "The API shall define an Optics-local Hermitian basis for two-dimensional polarization and use it to define Stokes parameters for positive-semidefinite coherency matrices; it shall prove invariance of pure-state Stokes data under global phase and identify normalized coherency matrices with the closed Poincare ball, nonzero rank-one states modulo global phase with its sphere, and genuinely partially polarized states with its interior."
+    done: false
+    location: N/A
+
+  - description: "The API shall derive the real Mueller action induced by a Jones matrix through conjugation of coherency matrices, with explicit hypotheses distinguishing deterministic coherent optics from general depolarizing transformations."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain ideal linear polarizers at arbitrary axes and prove Malus' law from the common Jones and power definitions."
+    done: false
+    location: N/A
+
+  - description: "The API shall contain ideal retarders, including quarter-wave and half-wave plates, and prove their effects on linear, circular, and elliptical polarization states."
+    done: false
+    location: N/A
+
+  - description: "Electromagnetism shall supply homogeneous isotropic constitutive data sufficient for Optics to derive refractive index and wave impedance; the resulting medium API shall state its nondispersive, nonconducting, and isotropic assumptions explicitly and later admit dispersive or anisotropic extensions."
+    done: false
+    location: N/A
+
+  - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
+    done: false
+    location: N/A
+
+  - description: "The API shall define incident and reflected rays at a planar interface and the transmitted propagating ray when it exists, prove reflection and Snell's laws from local boundary conditions, and characterize total internal reflection and its evanescent transmitted field."
+    done: false
+    location: N/A
+
+  - description: "The API shall derive the s- and p-polarized Fresnel amplitude coefficients from electromagnetic boundary conditions and prove lossless-interface power balance using the required normal-admittance factor multiplying the squared transmission amplitude."
+    done: false
+    location: N/A
+
+  - description: "The ray-optics API shall contain paraxial rays, interfaces, mirrors, lenses, ABCD matrices, Gaussian-beam parameters, cardinal points, imaging laws, and resonator stability, linked to physical component data where appropriate."
+    done: false
+    location: N/A
+
+  - description: "The Fourier-optics API shall connect aperture fields, propagation kernels, lenses, and diffraction observables using Physlib and Mathlib Fourier analysis."
+    done: false
+    location: N/A
+
+  - description: "A QuantumInfo-owned bridge importing Optics shall lift finite lossless mode transformations to bosonic quantum-optical evolutions and connect classical coherent amplitudes and quantum expectation values without duplicating either API."
+    done: false
+    location: N/A
+
+  - description: "The API shall provide an end-to-end example taking one monochromatic plane wave through polarization elements and a planar lossless dielectric interface, proving Malus' law, reflection, Snell's law, the Fresnel formulas, and energy-flux conservation from connected definitions."
+    done: false
+    location: N/A
