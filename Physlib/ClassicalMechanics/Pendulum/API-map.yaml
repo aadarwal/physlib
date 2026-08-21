@@ -13,10 +13,11 @@ Overview: |
     pendulum has its configuration space defined as the circle (Mathlib `Circle`)
     with a map into `Space 2`, and its dynamics on the angular chart
     `EuclideanSpace ℝ (Fin 1)` over `Time`: Lagrangian / Newton / Hamilton
-    equivalences and energy conservation. The coplanar double pendulum's
-    configuration space is declared but not yet defined. A manifold structure on
-    the configuration space and trajectories on the circle itself remain open and
-    are recorded below with location N/A.
+    equivalences, energy conservation, and the small-angle (harmonic) limit. The
+    coplanar double pendulum's configuration space is declared but not yet defined.
+    A manifold structure on the configuration space, trajectories on the circle
+    itself, and the link between the linearized and the full equation of motion
+    remain open and are recorded below with location N/A.
 
 ParentAPIs:
   - Classical mechanics Lagrangian (Physlib/ClassicalMechanics/Lagrangian)
@@ -24,6 +25,7 @@ ParentAPIs:
 
 References:
   - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 1 (The Equations of motion), Section 5 (The Lagrangian for a system of particles).
+  - Landau & Lifshitz, Mechanics, 3rd Edition, Chapter 5 (Small oscillations), Section 21 (Free oscillations in one dimension).
 
 Requirements:
 
@@ -72,3 +74,15 @@ Requirements:
       energy conservation.
     done: true
     location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum.lean (SimplePendulum.equationOfMotion_tfae, SimplePendulum.equationOfMotion_iff_newtons_2nd_law, SimplePendulum.energy_conservation_of_equationOfMotion)
+
+  - description: >
+      The API contains the small-angle (harmonic) limit of the simple pendulum,
+      including Huygens's period and the cosine motion released from rest.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SmallAngle.lean (SimplePendulum.LinearizedEquationOfMotion, SimplePendulum.smallAnglePeriod, SimplePendulum.releasedFromRest, SimplePendulum.sin_sub_id_isLittleO)
+
+  - description: >
+      The API shall contain the proof that the cosine motion satisfies the linearized
+      equation, and the relation between the linearized and the full equation of motion.
+    done: false
+    location: N/A

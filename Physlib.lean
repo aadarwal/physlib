@@ -20,6 +20,7 @@ public import Physlib.ClassicalMechanics.Pendulum.Geometric.Basic
 public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
 public import Physlib.ClassicalMechanics.Pendulum.SimplePendulum
 public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
+public import Physlib.ClassicalMechanics.Pendulum.SmallAngle
 public import Physlib.ClassicalMechanics.RigidBody.AngularMomentum
 public import Physlib.ClassicalMechanics.RigidBody.AngularVelocity
 public import Physlib.ClassicalMechanics.RigidBody.Basic
