@@ -33,8 +33,9 @@ carried by a real number, from which the configuration is recovered by
 `SimplePendulum.ConfigurationSpace.ofAngle`, and the one-dimensional Euclidean space stands in for
 both the configuration space and its tangent space, so that the Euler–Lagrange operator of Physlib
 applies verbatim. Two lifts differing by `2π n` describe the same motion, as the invariance
-theorems of section K prove; the connection of the model here with the geometric configuration
-space is made in a later module.
+theorems of section K prove; the full connection of the model here with the geometric
+configuration space is made in a later module, section K recording the one fact needed here,
+that lifts differing by whole turns describe the same configuration.
 
 ## ii. Key results
 
@@ -74,10 +75,11 @@ space is made in a later module.
   (`neg_one_lt_cos_of_energy_lt`), above it the angular velocity never vanishes
   (`deriv_ne_zero_of_energy_gt`), and at a turning point the potential energy equals the total
   energy (`potentialEnergy_eq_energy_of_deriv_eq_zero`).
-- `SimplePendulum.equationOfMotion_add_two_pi` and `SimplePendulum.isSolution_add_two_pi`, with
-  the invariance of the energies and the torque, show that the lifted dynamics is unchanged by
-  shifting the lift by a whole number of turns, and `SimplePendulum.ofAngle_add_two_pi_coord`
-  confirms that the shifted lift describes the same configuration.
+- `SimplePendulum.equationOfMotion_add_int_mul_two_pi` and
+  `SimplePendulum.isSolution_add_int_mul_two_pi`, with the invariance of the energies and the
+  torque, show that the lifted dynamics is unchanged by shifting the lift by a whole number of
+  turns, and `SimplePendulum.ofAngle_add_int_mul_two_pi_coord` confirms that the shifted lift
+  describes the same configuration.
 
 ## iii. Table of contents
 
@@ -957,7 +959,7 @@ away from it — is a statement about non-constant solutions, and is not proved 
 /-- The constant lift at the angle `π` — the bob balanced directly above the pivot — satisfies
   the equation of motion of the simple pendulum. -/
 lemma equationOfMotion_const_pi :
-    S.EquationOfMotion (fun _ => EuclideanSpace.single (0 : Fin 1) Real.pi) := by
+    S.EquationOfMotion (fun _ => EuclideanSpace.single 0 Real.pi) := by
   intro t
   have h1 : ∂ₜ (fun _ : Time => EuclideanSpace.single (0 : Fin 1) Real.pi) = fun _ => 0 := by
     funext s
@@ -967,7 +969,7 @@ lemma equationOfMotion_const_pi :
 
 /-- The inverted equilibrium is a solution of the simple pendulum: the constant lift at the
   angle `π` is smooth and satisfies the equation of motion. -/
-lemma isSolution_const_pi : S.IsSolution (fun _ => EuclideanSpace.single (0 : Fin 1) Real.pi) :=
+lemma isSolution_const_pi : S.IsSolution (fun _ => EuclideanSpace.single 0 Real.pi) :=
   ⟨contDiff_const, S.equationOfMotion_const_pi⟩
 
 /-!
@@ -982,16 +984,15 @@ inverted equilibrium, and their copies shifted by whole turns.
 -/
 
 /-- A constant lift satisfies the equation of motion of the simple pendulum if and only if the
-  sine of its angle vanishes, that is if and only if its angle is a multiple of `π`: the
+  sine of its angle vanishes — classically, the angles straight down and straight up: the
   constant solutions are exactly the equilibria. -/
 lemma equationOfMotion_const_iff (x : EuclideanSpace ℝ (Fin 1)) :
     S.EquationOfMotion (fun _ => x) ↔ Real.sin (x 0) = 0 := by
   have h1 : ∂ₜ (fun _ : Time => x) = fun _ => 0 := by
     funext s
     simp
-  have he : EuclideanSpace.single (0 : Fin 1) (1 : ℝ) ≠ 0 := by
-    intro hcon
-    simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 1) => v 0) hcon
+  have he : EuclideanSpace.single (0 : Fin 1) (1 : ℝ) ≠ 0 :=
+    fun h => one_ne_zero ((PiLp.single_eq_zero_iff 2 (0 : Fin 1)).mp h)
   have hc : S.m * S.g * S.ℓ ≠ 0 := (mul_pos (mul_pos S.m_pos S.g_pos) S.ℓ_pos).ne'
   simp only [EquationOfMotion, h1, Time.deriv_const, smul_zero, forall_const]
   rw [eq_comm, torque_eq, neg_eq_zero, smul_eq_zero, or_iff_left he, mul_eq_zero,
@@ -1004,13 +1005,15 @@ lemma equationOfMotion_const_iff (x : EuclideanSpace ℝ (Fin 1)) :
 Energy conservation divides the smooth motions of the pendulum into regimes according to the
 value of the conserved energy, the threshold being the energy `2 m g ℓ` of the inverted
 equilibrium. Below the threshold the potential energy cannot reach its value at the top of the
-swing, so the bob swings back and forth without ever reaching the top: libration. Above the
-threshold the kinetic energy can never vanish, so the bob never halts, and the pendulum
-circulates over the top: rotation. This is the phase portrait of the pendulum drawn in Arnold
-§4, whose level curves of the energy are closed ovals below the threshold and unbounded waves
-above it. This section proves the inequality defining each regime, from two elementary bounds
-relating the energies, and characterizes the turning points, the instants at which the velocity
-vanishes and the potential energy exhausts the total energy.
+swing, so the bob never reaches the top; classically this is the regime of libration, the bob
+swinging back and forth. Above the threshold the kinetic energy can never vanish, so the bob
+never halts; classically this is the regime of rotation, the pendulum circulating over the top.
+This is the phase portrait of the pendulum drawn in Arnold §4, whose level curves of the energy
+are closed ovals below the threshold and unbounded waves above it. This section proves the
+below- and above-threshold bounds characteristic of each regime, from two elementary bounds
+relating the energies — the librating and rotating motions themselves are not constructed
+here — and characterizes the turning points, the instants at which the velocity vanishes and
+the potential energy exhausts the total energy.
 
 -/
 
@@ -1030,7 +1033,10 @@ the inverted equilibrium — are not constructed here.
 /-- The separatrix energy of the simple pendulum is `2 m g ℓ`, the energy of the inverted
   equilibrium. It is the threshold separating the two regimes of the motion, libration below it
   and rotation above it. -/
-noncomputable def separatrixEnergy : ℝ := 2 * (S.m * S.g * S.ℓ)
+def separatrixEnergy : ℝ := 2 * (S.m * S.g * S.ℓ)
+
+/-- The separatrix energy of the simple pendulum, written out. -/
+lemma separatrixEnergy_eq : S.separatrixEnergy = 2 * (S.m * S.g * S.ℓ) := rfl
 
 /-- The separatrix energy of the simple pendulum is positive. -/
 lemma separatrixEnergy_pos : 0 < S.separatrixEnergy :=
@@ -1042,8 +1048,7 @@ lemma energy_const_pi :
     S.energy (fun _ => EuclideanSpace.single 0 Real.pi) = fun _ => S.separatrixEnergy := by
   funext t
   simp only [energy_eq, kineticEnergy_eq, Time.deriv_const, inner_zero_left, mul_zero,
-    zero_add, potentialEnergy_eq, separatrixEnergy]
-  simp [Real.cos_pi]
+    zero_add, potentialEnergy_eq, separatrixEnergy_eq, PiLp.single_apply, reduceIte, Real.cos_pi]
   ring
 
 /-!
@@ -1069,7 +1074,8 @@ lemma inertia_mul_inner_deriv_le (θ : Time → EuclideanSpace ℝ (Fin 1)) (t :
     S.inertia * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ ≤ 2 * S.energy θ t := by
   have hV := S.potentialEnergy_nonneg (θ t)
   have hE : S.energy θ t = (1 / (2 : ℝ)) * S.inertia * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ
-      + S.potentialEnergy (θ t) := rfl
+      + S.potentialEnergy (θ t) := by
+    rw [energy_eq, kineticEnergy_eq]
   linarith
 
 /-- The potential energy of the simple pendulum is at most the total energy along every lift of
@@ -1077,7 +1083,8 @@ lemma inertia_mul_inner_deriv_le (θ : Time → EuclideanSpace ℝ (Fin 1)) (t :
 lemma potentialEnergy_le_energy (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
     S.potentialEnergy (θ t) ≤ S.energy θ t := by
   have hK := S.kineticEnergy_nonneg θ t
-  have hE : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
+  have hE : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := by
+    rw [energy_eq]
   linarith
 
 /-!
@@ -1087,10 +1094,11 @@ lemma potentialEnergy_le_energy (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : 
 Along a smooth solution with energy below the separatrix energy, the potential energy — being
 at most the conserved total energy — stays strictly below `2 m g ℓ`, so the cosine of the angle
 stays strictly above `-1`: the bob never reaches the top of the swing, and the motion is a
-libration. Along a smooth solution with energy above the separatrix energy the angular velocity
-can never vanish, for at such an instant the whole energy would be potential, and the potential
-energy never exceeds `2 m g ℓ`; the velocity being continuous, it keeps a fixed sign, and the
-motion is a rotation over the top — though only the non-vanishing is proved here.
+libration, swinging back and forth — though only the bound is proved here. Along a smooth
+solution with energy above the separatrix energy the angular velocity can never vanish, for at
+such an instant the whole energy would be potential, and the potential energy never exceeds
+`2 m g ℓ`; the velocity being continuous, it keeps a fixed sign, and the motion is a rotation
+over the top — though only the non-vanishing is proved here.
 
 -/
 
@@ -1102,7 +1110,7 @@ lemma neg_one_lt_cos_of_energy_lt (θ : Time → EuclideanSpace ℝ (Fin 1))
     (hE : S.energy θ 0 < S.separatrixEnergy) (t : Time) : -1 < Real.cos (θ t 0) := by
   have hc : 0 < S.m * S.g * S.ℓ := mul_pos (mul_pos S.m_pos S.g_pos) S.ℓ_pos
   have hV : S.m * S.g * S.ℓ * (1 - Real.cos (θ t 0)) < 2 * (S.m * S.g * S.ℓ) := by
-    rw [← S.potentialEnergy_eq (θ t)]
+    rw [← S.potentialEnergy_eq (θ t), ← S.separatrixEnergy_eq]
     calc S.potentialEnergy (θ t) ≤ S.energy θ t := S.potentialEnergy_le_energy θ t
       _ = S.energy θ 0 := S.energy_conservation_of_equationOfMotion' θ hθ h t
       _ < S.separatrixEnergy := hE
@@ -1117,10 +1125,11 @@ lemma deriv_ne_zero_of_energy_gt (θ : Time → EuclideanSpace ℝ (Fin 1))
   have hK : S.kineticEnergy θ t = 0 := by
     simp only [kineticEnergy_eq]
     simp [h0]
-  have ht : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
+  have ht : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := by
+    rw [energy_eq]
   have hle := S.potentialEnergy_le (θ t)
   have hcons := S.energy_conservation_of_equationOfMotion' θ hθ h t
-  have hsep : S.separatrixEnergy = 2 * (S.m * S.g * S.ℓ) := rfl
+  have hsep : S.separatrixEnergy = 2 * (S.m * S.g * S.ℓ) := S.separatrixEnergy_eq
   linarith
 
 /-!
@@ -1143,7 +1152,8 @@ lemma potentialEnergy_eq_energy_of_deriv_eq_zero (θ : Time → EuclideanSpace �
   have hK : S.kineticEnergy θ t = 0 := by
     simp only [kineticEnergy_eq]
     simp [h0]
-  have ht : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
+  have ht : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := by
+    rw [energy_eq]
   have hcons := S.energy_conservation_of_equationOfMotion' θ hθ h t
   linarith
 
@@ -1153,12 +1163,13 @@ lemma potentialEnergy_eq_energy_of_deriv_eq_zero (θ : Time → EuclideanSpace �
 
 The dynamics of this file are written on a lift of the motion: the real angle `θ t 0` stands for
 the configuration `ConfigurationSpace.ofAngle (θ t 0)`, and two lifts differing by a whole
-number of turns carry the same configurations. This section proves that everything built above
-is blind to the choice between them: the potential energy, the torque, the energy, the equation
-of motion and its solutions are all invariant under shifting the lift by `2π n`. In this sense
-the lifted dynamics descends to the configuration space. The section closes by making the
-starting point precise: the shifted lift does describe the same configuration, by the
-periodicity of the angular lift of the geometric configuration space.
+number of turns carry the same configurations. This section proves that the dynamical
+quantities listed below — the energies, the torque, and the equation of motion and its
+solutions — are invariant under the deck transformations `θ ↦ θ + 2π n` of the angular lift;
+the packaging of this invariance at the level of configuration-space trajectories comes with
+the geometric bridge in a later module. The section closes by making the starting point
+precise: the shifted lift does describe the same configuration, by the periodicity of the
+angular lift of the geometric configuration space.
 
 -/
 
@@ -1174,7 +1185,7 @@ of turns.
 
 /-- The potential energy of the simple pendulum is invariant under shifting the angle by a
   whole number of turns. -/
-lemma potentialEnergy_add_two_pi (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+lemma potentialEnergy_add_int_mul_two_pi (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
     S.potentialEnergy (x + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) =
       S.potentialEnergy x := by
   have h0 : (x + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1 : EuclideanSpace ℝ (Fin 1)) 0 =
@@ -1184,7 +1195,7 @@ lemma potentialEnergy_add_two_pi (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
 
 /-- The torque of the simple pendulum is invariant under shifting the angle by a whole number
   of turns. -/
-lemma torque_add_two_pi (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+lemma torque_add_int_mul_two_pi (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
     S.torque (x + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) = S.torque x := by
   have h0 : (x + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1 : EuclideanSpace ℝ (Fin 1)) 0 =
       x 0 + n * (2 * Real.pi) := by
@@ -1196,25 +1207,31 @@ lemma torque_add_two_pi (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
 ### K.2. Invariance of the energy
 
 The shift of the lift is constant in time, so it drops out of the velocity, and the kinetic
-energy is unchanged; the potential energy is unchanged by the invariance of K.1. The lemma is
-stated for an arbitrary constant shift known to be a whole number of turns.
+energy is unchanged by any constant shift at all; the potential energy is unchanged by the
+invariance of K.1. Together the two give the invariance of the energy under shifting the lift
+by a whole number of turns.
 
 -/
 
-/-- The energy of the simple pendulum along a lift of the angle is invariant under shifting the
-  lift by a constant whole number of turns: the shift drops out of the velocity, and the
-  potential energy has period `2π` in the angle. -/
-lemma energy_add_const (θ : Time → EuclideanSpace ℝ (Fin 1)) (c : EuclideanSpace ℝ (Fin 1))
-    (n : ℤ) (hc : c = (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) :
-    S.energy (fun t => θ t + c) = S.energy θ := by
+/-- The kinetic energy of the simple pendulum along a lift of the angle is invariant under
+  shifting the lift by any constant: the shift drops out of the velocity. -/
+lemma kineticEnergy_add_const (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (c : EuclideanSpace ℝ (Fin 1)) :
+    S.kineticEnergy (fun t => θ t + c) = S.kineticEnergy θ := by
   have hd : ∂ₜ (fun t => θ t + c) = ∂ₜ θ := by
     funext s
     rw [Time.deriv_eq, Time.deriv_eq, fderiv_add_const]
   funext t
-  have h0 : (θ t + c) 0 = θ t 0 + n * (2 * Real.pi) := by
-    simp [hc]
-  simp only [energy_eq, kineticEnergy_eq, hd, potentialEnergy_eq, h0,
-    Real.cos_add_int_mul_two_pi]
+  simp only [kineticEnergy_eq, hd]
+
+/-- The energy of the simple pendulum along a lift of the angle is invariant under shifting the
+  lift by a whole number of turns: K.1 supplies the invariance of the potential energy, and the
+  velocity is unchanged by a constant shift. -/
+lemma energy_add_int_mul_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+    S.energy (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) =
+      S.energy θ := by
+  funext t
+  simp only [energy_eq, S.kineticEnergy_add_const θ _, S.potentialEnergy_add_int_mul_two_pi (θ t) n]
 
 /-!
 
@@ -1228,17 +1245,17 @@ likewise unaffected by adding a constant, so being a solution is invariant as we
 
 /-- A lift of the angle shifted by a whole number of turns satisfies the equation of motion of
   the simple pendulum if and only if the lift itself does. -/
-lemma equationOfMotion_add_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+lemma equationOfMotion_add_int_mul_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
     S.EquationOfMotion (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) ↔
       S.EquationOfMotion θ := by
   have hd : ∂ₜ (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) = ∂ₜ θ := by
     funext s
     rw [Time.deriv_eq, Time.deriv_eq, fderiv_add_const]
-  simp only [EquationOfMotion, hd, torque_add_two_pi]
+  simp only [EquationOfMotion, hd, torque_add_int_mul_two_pi]
 
 /-- A lift of the angle shifted by a whole number of turns is a solution of the simple pendulum
   if and only if the lift itself is. -/
-lemma isSolution_add_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+lemma isSolution_add_int_mul_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
     S.IsSolution (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) ↔
       S.IsSolution θ := by
   have hcd : ContDiff ℝ ∞ (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) ↔
@@ -1248,7 +1265,7 @@ lemma isSolution_add_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ)
       have h2 := h.sub (contDiff_const (c := (n * (2 * Real.pi)) • EuclideanSpace.single 0 1))
       simpa using h2
     · exact fun h => h.add contDiff_const
-  exact and_congr hcd (S.equationOfMotion_add_two_pi θ n)
+  exact and_congr hcd (S.equationOfMotion_add_int_mul_two_pi θ n)
 
 /-!
 
@@ -1262,7 +1279,7 @@ periodicity of the angular lift `ConfigurationSpace.ofAngle` with period `2π`.
 
 /-- A lift of the angle and its shift by a whole number of turns describe the same
   configuration of the simple pendulum. -/
-lemma ofAngle_add_two_pi_coord (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+lemma ofAngle_add_int_mul_two_pi_coord (x : EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
     ConfigurationSpace.ofAngle
         ((x + (n * (2 * Real.pi)) • EuclideanSpace.single (0 : Fin 1) (1 : ℝ)) 0) =
       ConfigurationSpace.ofAngle (x 0) := by
