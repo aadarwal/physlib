@@ -63,6 +63,15 @@ made in a later module.
   `SimplePendulum.energy_conservation_of_equationOfMotion'` and
   `SimplePendulum.IsSolution.energy_eq` express the conservation of energy along the motions of
   the pendulum.
+- `SimplePendulum.equationOfMotion_const_zero` and `SimplePendulum.equationOfMotion_const_pi`
+  are the hanging and the inverted equilibrium, the first explicit solutions of the pendulum,
+  and `SimplePendulum.equationOfMotion_const_iff` shows that the constant solutions are exactly
+  the equilibria.
+- `SimplePendulum.separatrixEnergy` is the energy `2 m g ℓ` of the inverted equilibrium, the
+  threshold between libration and rotation: below it the bob never reaches the top of the swing
+  (`neg_one_lt_cos_of_energy_lt`), above it the angular velocity never vanishes
+  (`deriv_ne_zero_of_energy_gt`), and at a turning point the potential energy equals the total
+  energy (`potentialEnergy_eq_energy_of_deriv_eq_zero`).
 
 ## iii. Table of contents
 
@@ -97,6 +106,15 @@ made in a later module.
   - H.1. Energy conservation in terms of time derivatives
   - H.2. Energy conservation in terms of constant energy
   - H.3. Energy conservation for solutions
+- I. Equilibria
+  - I.1. The hanging equilibrium
+  - I.2. The inverted equilibrium
+  - I.3. The constant solutions are the equilibria
+- J. Energy regimes
+  - J.1. The separatrix energy
+  - J.2. Energy bounds
+  - J.3. Libration and rotation
+  - J.4. Turning points
 
 ## iv. References
 
@@ -875,6 +893,248 @@ two components of being a solution, so for solutions conservation takes its most
 lemma IsSolution.energy_eq {S : SimplePendulum} {θ : Time → EuclideanSpace ℝ (Fin 1)}
     (h : S.IsSolution θ) (t : Time) : S.energy θ t = S.energy θ 0 :=
   S.energy_conservation_of_equationOfMotion' θ h.contDiff h.equationOfMotion t
+
+/-!
+
+## I. Equilibria
+
+The two configurations at which the torque of gravity vanishes — the bob hanging at rest below
+the pivot and the bob balanced above it — give constant solutions of the equation of motion, the
+first explicit solutions appearing in this file. This section verifies the two, and proves the
+converse: a constant lift solves the equation of motion only where the torque vanishes, that is
+only at the angles `π n`. The constant solutions are exactly the equilibria.
+
+-/
+
+/-!
+
+### I.1. The hanging equilibrium
+
+At the angle `0` the bob hangs at rest at the bottom of its swing. The lift is constant, so the
+angular momentum does not change, and the torque vanishes with `sin 0`: both sides of the
+equation of motion are zero.
+
+-/
+
+/-- The constant lift at the angle `0` — the bob hanging at rest at the bottom of its swing —
+  satisfies the equation of motion of the simple pendulum. -/
+lemma equationOfMotion_const_zero :
+    S.EquationOfMotion (fun _ => (0 : EuclideanSpace ℝ (Fin 1))) := by
+  intro t
+  have h1 : ∂ₜ (fun _ : Time => (0 : EuclideanSpace ℝ (Fin 1))) = fun _ => 0 := by
+    funext s
+    simp
+  rw [h1]
+  simp [torque_eq]
+
+/-- The hanging equilibrium is a solution of the simple pendulum: the constant lift at the angle
+  `0` is smooth and satisfies the equation of motion. It is the first explicit solution of this
+  file. -/
+lemma isSolution_const_zero : S.IsSolution (fun _ => 0) :=
+  ⟨contDiff_const, S.equationOfMotion_const_zero⟩
+
+/-!
+
+### I.2. The inverted equilibrium
+
+At the angle `π` the bob is balanced directly above the pivot, where the torque vanishes with
+`sin π`; the pendulum stays there. That this balance is unstable — neighbouring solutions run
+away from it — is a statement about non-constant solutions, and is not proved here.
+
+-/
+
+/-- The constant lift at the angle `π` — the bob balanced directly above the pivot — satisfies
+  the equation of motion of the simple pendulum. -/
+lemma equationOfMotion_const_pi :
+    S.EquationOfMotion (fun _ => EuclideanSpace.single (0 : Fin 1) Real.pi) := by
+  intro t
+  have h1 : ∂ₜ (fun _ : Time => EuclideanSpace.single (0 : Fin 1) Real.pi) = fun _ => 0 := by
+    funext s
+    simp
+  rw [h1]
+  simp [torque_eq]
+
+/-- The inverted equilibrium is a solution of the simple pendulum: the constant lift at the
+  angle `π` is smooth and satisfies the equation of motion. -/
+lemma isSolution_const_pi : S.IsSolution (fun _ => EuclideanSpace.single (0 : Fin 1) Real.pi) :=
+  ⟨contDiff_const, S.equationOfMotion_const_pi⟩
+
+/-!
+
+### I.3. The constant solutions are the equilibria
+
+For a constant lift the angular momentum does not change, so the equation of motion reduces to
+the vanishing of the torque, that is to `sin θ = 0`, which holds exactly at the multiples of
+`π`. The constant solutions are therefore exactly the equilibria: the hanging equilibrium, the
+inverted equilibrium, and their copies shifted by whole turns.
+
+-/
+
+/-- A constant lift satisfies the equation of motion of the simple pendulum if and only if the
+  sine of its angle vanishes, that is if and only if its angle is a multiple of `π`: the
+  constant solutions are exactly the equilibria. -/
+lemma equationOfMotion_const_iff (x : EuclideanSpace ℝ (Fin 1)) :
+    S.EquationOfMotion (fun _ => x) ↔ Real.sin (x 0) = 0 := by
+  have h1 : ∂ₜ (fun _ : Time => x) = fun _ => 0 := by
+    funext s
+    simp
+  have he : EuclideanSpace.single (0 : Fin 1) (1 : ℝ) ≠ 0 := by
+    intro hcon
+    simpa using congrArg (fun v : EuclideanSpace ℝ (Fin 1) => v 0) hcon
+  have hc : S.m * S.g * S.ℓ ≠ 0 := (mul_pos (mul_pos S.m_pos S.g_pos) S.ℓ_pos).ne'
+  simp only [EquationOfMotion, h1, Time.deriv_const, smul_zero, forall_const]
+  rw [eq_comm, torque_eq, neg_eq_zero, smul_eq_zero, or_iff_left he, mul_eq_zero,
+    or_iff_right hc]
+
+/-!
+
+## J. Energy regimes
+
+Energy conservation divides the smooth motions of the pendulum into regimes according to the
+value of the conserved energy, the threshold being the energy `2 m g ℓ` of the inverted
+equilibrium. Below the threshold the potential energy cannot reach its value at the top of the
+swing, so the bob swings back and forth without ever reaching the top: libration. Above the
+threshold the kinetic energy can never vanish, so the bob never halts, and the pendulum
+circulates over the top: rotation. This is the phase portrait of the pendulum drawn in Arnold
+§4, whose level curves of the energy are closed ovals below the threshold and unbounded waves
+above it. This section proves the inequality defining each regime, from two elementary bounds
+relating the energies, and characterizes the turning points, the instants at which the velocity
+vanishes and the potential energy exhausts the total energy.
+
+-/
+
+/-!
+
+### J.1. The separatrix energy
+
+The threshold between the regimes is the energy of the inverted equilibrium: no kinetic energy,
+and the potential energy `2 m g ℓ` of the top of the swing. It is called the separatrix energy
+after the curve it names in the phase portrait, the level set of the energy separating the
+closed orbits of libration from the unbounded orbits of rotation. Only the threshold value is
+used in this file: the separatrix motions themselves — the non-constant solutions asymptotic to
+the inverted equilibrium — are not constructed here.
+
+-/
+
+/-- The separatrix energy of the simple pendulum is `2 m g ℓ`, the energy of the inverted
+  equilibrium. It is the threshold separating the two regimes of the motion, libration below it
+  and rotation above it. -/
+noncomputable def separatrixEnergy : ℝ := 2 * (S.m * S.g * S.ℓ)
+
+/-- The separatrix energy of the simple pendulum is positive. -/
+lemma separatrixEnergy_pos : 0 < S.separatrixEnergy :=
+  mul_pos two_pos (mul_pos (mul_pos S.m_pos S.g_pos) S.ℓ_pos)
+
+/-- The energy of the simple pendulum along the inverted equilibrium is the separatrix energy:
+  the bob balanced at the top has no kinetic energy and the full potential energy `2 m g ℓ`. -/
+lemma energy_const_pi :
+    S.energy (fun _ => EuclideanSpace.single 0 Real.pi) = fun _ => S.separatrixEnergy := by
+  funext t
+  simp only [energy_eq, kineticEnergy_eq, Time.deriv_const, inner_zero_left, mul_zero,
+    zero_add, potentialEnergy_eq, separatrixEnergy]
+  simp [Real.cos_pi]
+  ring
+
+/-!
+
+### J.2. Energy bounds
+
+Two elementary bounds drive the regime theorems: the kinetic energy is non-negative, so the
+potential energy is at most the total energy; and the potential energy is non-negative, so
+`I θ̇²` is at most twice the total energy. None of the bounds of this subsection uses the
+equation of motion — they hold along every lift of the angle.
+
+-/
+
+/-- The kinetic energy of the simple pendulum is non-negative along every lift of the angle. -/
+lemma kineticEnergy_nonneg (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
+    0 ≤ S.kineticEnergy θ t := by
+  simp only [kineticEnergy_eq]
+  exact mul_nonneg (mul_nonneg (by norm_num) S.inertia_pos.le) real_inner_self_nonneg
+
+/-- The moment of inertia times the square of the angular speed, `I θ̇²`, is at most twice the
+  total energy, along every lift of the angle. -/
+lemma inertia_mul_inner_deriv_le (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
+    S.inertia * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ ≤ 2 * S.energy θ t := by
+  have hV := S.potentialEnergy_nonneg (θ t)
+  have hE : S.energy θ t = (1 / (2 : ℝ)) * S.inertia * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ
+      + S.potentialEnergy (θ t) := rfl
+  linarith
+
+/-- The potential energy of the simple pendulum is at most the total energy along every lift of
+  the angle. -/
+lemma potentialEnergy_le_energy (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
+    S.potentialEnergy (θ t) ≤ S.energy θ t := by
+  have hK := S.kineticEnergy_nonneg θ t
+  have hE : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
+  linarith
+
+/-!
+
+### J.3. Libration and rotation
+
+Along a smooth solution with energy below the separatrix energy, the potential energy — being
+at most the conserved total energy — stays strictly below `2 m g ℓ`, so the cosine of the angle
+stays strictly above `-1`: the bob never reaches the top of the swing, and the motion is a
+libration. Along a smooth solution with energy above the separatrix energy the angular velocity
+can never vanish, for at such an instant the whole energy would be potential, and the potential
+energy never exceeds `2 m g ℓ`; the velocity being continuous, it keeps a fixed sign, and the
+motion is a rotation over the top — though only the non-vanishing is proved here.
+
+-/
+
+/-- Libration: along a smooth lift of the angle satisfying the equation of motion, with energy
+  below the separatrix energy, the cosine of the angle stays strictly above `-1` — the bob
+  never reaches the top of the swing. -/
+lemma neg_one_lt_cos_of_energy_lt (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (hθ : ContDiff ℝ ∞ θ) (h : S.EquationOfMotion θ)
+    (hE : S.energy θ 0 < S.separatrixEnergy) (t : Time) : -1 < Real.cos (θ t 0) := by
+  have hc : 0 < S.m * S.g * S.ℓ := mul_pos (mul_pos S.m_pos S.g_pos) S.ℓ_pos
+  have hV : S.m * S.g * S.ℓ * (1 - Real.cos (θ t 0)) < 2 * (S.m * S.g * S.ℓ) := by
+    rw [← S.potentialEnergy_eq (θ t)]
+    calc S.potentialEnergy (θ t) ≤ S.energy θ t := S.potentialEnergy_le_energy θ t
+      _ = S.energy θ 0 := S.energy_conservation_of_equationOfMotion' θ hθ h t
+      _ < S.separatrixEnergy := hE
+  nlinarith [hV, hc]
+
+/-- Rotation: along a smooth lift of the angle satisfying the equation of motion, with energy
+  above the separatrix energy, the angular velocity never vanishes — the bob never halts. -/
+lemma deriv_ne_zero_of_energy_gt (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (hθ : ContDiff ℝ ∞ θ) (h : S.EquationOfMotion θ)
+    (hE : S.separatrixEnergy < S.energy θ 0) (t : Time) : ∂ₜ θ t ≠ 0 := by
+  intro h0
+  have hK : S.kineticEnergy θ t = 0 := by
+    simp only [kineticEnergy_eq]
+    simp [h0]
+  have ht : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
+  have hle := S.potentialEnergy_le (θ t)
+  have hcons := S.energy_conservation_of_equationOfMotion' θ hθ h t
+  have hsep : S.separatrixEnergy = 2 * (S.m * S.g * S.ℓ) := rfl
+  linarith
+
+/-!
+
+### J.4. Turning points
+
+At an instant where the angular velocity vanishes the kinetic energy vanishes with it, and the
+conserved total energy is purely potential. These are the turning points of the motion, where a
+librating bob halts at the extremes of its arc before swinging back; by the rotation theorem of
+J.3 they can occur only at energies not above the separatrix energy.
+
+-/
+
+/-- Turning points: along a smooth lift of the angle satisfying the equation of motion, at an
+  instant where the angular velocity vanishes, the potential energy equals the conserved total
+  energy. -/
+lemma potentialEnergy_eq_energy_of_deriv_eq_zero (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (hθ : ContDiff ℝ ∞ θ) (h : S.EquationOfMotion θ) (t : Time) (h0 : ∂ₜ θ t = 0) :
+    S.potentialEnergy (θ t) = S.energy θ 0 := by
+  have hK : S.kineticEnergy θ t = 0 := by
+    simp only [kineticEnergy_eq]
+    simp [h0]
+  have ht : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
+  have hcons := S.energy_conservation_of_equationOfMotion' θ hθ h t
+  linarith
 
 end SimplePendulum
 
