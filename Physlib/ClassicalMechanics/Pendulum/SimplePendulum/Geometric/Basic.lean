@@ -133,6 +133,54 @@ instance instCompactSpace : CompactSpace ConfigurationSpace := circleHomeomorph.
 instance instSecondCountableTopology : SecondCountableTopology ConfigurationSpace :=
   circleHomeomorph.secondCountableTopology
 
+/-!
+
+## C. Manifold structure
+
+The unit circle is an analytic one-dimensional manifold modelled on `EuclideanSpace ℝ (Fin 1)`
+(Mathlib, via stereographic projection). We pull its atlas back along `circleHomeomorph`: a chart
+of the configuration space is the identification with the circle followed by a chart of the circle.
+Since the identification cancels in every change of charts, the changes of charts are exactly those
+of the circle, hence analytic.
+
+-/
+
+/-- The charts of the configuration space: the identification with the unit circle followed by a
+  chart of the circle. -/
+instance instChartedSpace : ChartedSpace (EuclideanSpace ℝ (Fin 1)) ConfigurationSpace where
+  atlas := {circleHomeomorph.toOpenPartialHomeomorph.trans e |
+    e ∈ atlas (EuclideanSpace ℝ (Fin 1)) Circle}
+  chartAt q := circleHomeomorph.toOpenPartialHomeomorph.trans
+    (chartAt (EuclideanSpace ℝ (Fin 1)) (circleHomeomorph q))
+  mem_chart_source q := by simp
+  chart_mem_atlas q := ⟨_, chart_mem_atlas _ _, rfl⟩
+
+/-- The chart at a configuration is the identification with the unit circle followed by the chart
+  of the circle at the corresponding point. -/
+lemma chartAt_eq (q : ConfigurationSpace) :
+    chartAt (EuclideanSpace ℝ (Fin 1)) q =
+      circleHomeomorph.toOpenPartialHomeomorph.trans
+        (chartAt (EuclideanSpace ℝ (Fin 1)) q.toCircle) := rfl
+
+/-- The configuration space is an analytic manifold: every change of charts is a change of charts
+  of the unit circle. -/
+instance instIsManifold : IsManifold (𝓡 1) ω ConfigurationSpace where
+  compatible := by
+    rintro _ _ ⟨e₁, he₁, rfl⟩ ⟨e₂, he₂, rfl⟩
+    -- The identification `h` with the circle is global, so `h.symm ≫ₕ h` is the identity.
+    have hself : circleHomeomorph.toOpenPartialHomeomorph.symm.trans
+        circleHomeomorph.toOpenPartialHomeomorph = OpenPartialHomeomorph.refl Circle := by
+      rw [← Homeomorph.symm_toOpenPartialHomeomorph, ← Homeomorph.trans_toOpenPartialHomeomorph,
+        Homeomorph.symm_trans_self, Homeomorph.refl_toOpenPartialHomeomorph]
+    -- Hence it cancels in the change of charts, which is therefore that of the circle.
+    have hcancel : (circleHomeomorph.toOpenPartialHomeomorph.trans e₁).symm.trans
+        (circleHomeomorph.toOpenPartialHomeomorph.trans e₂) = e₁.symm.trans e₂ := by
+      rw [OpenPartialHomeomorph.trans_symm_eq_symm_trans_symm, OpenPartialHomeomorph.trans_assoc,
+        ← OpenPartialHomeomorph.trans_assoc circleHomeomorph.toOpenPartialHomeomorph.symm,
+        hself, OpenPartialHomeomorph.refl_trans]
+    rw [hcancel]
+    exact HasGroupoid.compatible he₁ he₂
+
 end ConfigurationSpace
 end SimplePendulum
 end ClassicalMechanics
