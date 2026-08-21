@@ -16,6 +16,7 @@ public import Physlib.ClassicalMechanics.Lagrangian.TotalDerivativeEquivalence
 public import Physlib.ClassicalMechanics.Mass.MassUnit
 public import Physlib.ClassicalMechanics.OrbitalMechanics.VisViva
 public import Physlib.ClassicalMechanics.Pendulum.CoplanarDoublePendulum
+public import Physlib.ClassicalMechanics.Pendulum.Geometric.Basic
 public import Physlib.ClassicalMechanics.Pendulum.MiscellaneousPendulumPivotMotions
 public import Physlib.ClassicalMechanics.Pendulum.SlidingPendulum
 public import Physlib.ClassicalMechanics.RigidBody.AngularMomentum

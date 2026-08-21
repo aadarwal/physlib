@@ -9,13 +9,13 @@ Overview: |
     covers the pendulum problems of Landau and Lifshitz, Mechanics, 3rd ed.,
     Chapter 1, Section 5.
 
-    At present only the sliding pendulum has a defined configuration space, with
-    the horizontal support position and the string angle as its generalized
-    coordinates. The coplanar double pendulum's configuration space is declared but
-    not yet defined, and the miscellaneous pivot-motion problems have documentation
-    only. The remaining requirements, a manifold structure on the configuration
-    space, a map into real space, trajectories, and the lagrangian, are open and
-    recorded below with location N/A.
+    The sliding pendulum has a defined configuration space, and the simple gravity
+    pendulum has its configuration space defined as the circle (Mathlib `Circle`)
+    with a map into `Space 2`. The coplanar double pendulum's configuration space is
+    declared but not yet defined, and the miscellaneous pivot-motion problems have
+    documentation only. A manifold structure on the configuration space,
+    trajectories, and the lagrangian remain open and are recorded below with
+    location N/A.
 
 ParentAPIs:
   - Classical mechanics Lagrangian (Physlib/ClassicalMechanics/Lagrangian)
@@ -31,22 +31,28 @@ Requirements:
       (chosen here as generalized coordinates, the support position and the string
       angle for the sliding pendulum).
     done: true
-    location: Physlib/ClassicalMechanics/Pendulum/SlidingPendulum.lean (ConfigurationSpace)
+    location: Physlib/ClassicalMechanics/Pendulum/SlidingPendulum.lean (SlidingPendulum.ConfigurationSpace)
+
+  - description: >
+      The API contains the configuration space of the simple gravity pendulum as the
+      circle, identified with Mathlib `Circle`, with the angular chart.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace, SimplePendulum.ConfigurationSpace.valHomeomorphism, SimplePendulum.ConfigurationSpace.ofAngle)
 
   - description: The API shall contain the structure of a manifold on the configuration space.
     done: false
-    location: "N/A"
+    location: N/A
 
   - description: >
-      The API shall contain a map from the configuration space to `Space`, giving the
-      position of the pendulum in real space.
-    done: false
-    location: "N/A"
+      The API contains a map from the configuration space of the simple pendulum to
+      `Space`, giving the position of the bob in real space.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.toSpace, SimplePendulum.ConfigurationSpace.toSpace_ofAngle)
 
   - description: The API shall contain the definition of a trajectory based on the configuration space.
     done: false
-    location: "N/A"
+    location: N/A
 
   - description: The API shall subsequently contain the definition of the lagrangian.
     done: false
-    location: "N/A"
+    location: N/A
