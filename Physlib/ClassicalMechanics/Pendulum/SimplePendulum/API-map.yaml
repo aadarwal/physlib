@@ -9,9 +9,9 @@ Overview: |
     bob in the plane is (ℓ sin θ, −ℓ cos θ). The motion is governed by θ̈ + (g/ℓ) sin θ = 0. For
     small amplitudes it is harmonic with period 2π√(ℓ/g); for librations (amplitudes below the
     inverted position) the period grows with the amplitude and is given by a complete elliptic
-    integral. This API records the configuration space with its manifold structure and its
-    embedding into physical space; the dynamics, the small-angle limit and the period follow in
-    later modules.
+    integral. This API records the configuration space and its embedding into physical space,
+    together with the lifted Lagrangian and equation of motion; the small-angle limit and the
+    period follow in later modules.
 
 ParentAPIs:
   - "Space (Physlib/SpaceAndTime/Space)"
