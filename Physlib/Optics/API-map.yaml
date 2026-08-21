@@ -48,17 +48,17 @@ References:
 
 Requirements:
 
-  - description: "The API shall contain complex mode amplitudes indexed by an arbitrary type and, for finite index types, their total modal power and its positivity, definiteness, scaling, and Hermitian-inner-product characterizations."
-    done: false
-    location: N/A
+  - description: "The API contains complex mode amplitudes indexed by an arbitrary type and, for finite index types, their total modal power and its positivity, definiteness, scaling, component-sum, and Hermitian-inner-product characterizations."
+    done: true
+    location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeAmplitude, Optics.ModeAmplitude.power, Optics.ModeAmplitude.power_eq_sum_normSq, Optics.ModeAmplitude.power_nonneg, Optics.ModeAmplitude.power_eq_zero_iff, Optics.ModeAmplitude.power_smul, Optics.ModeAmplitude.ofReal_power_eq_inner_self)"
 
-  - description: "The API shall contain rectangular mode transforms and semantic predicates for power preservation and passivity, prove that identity is power-preserving and that both predicates are cascade-closed, and prove that power preservation implies passivity."
-    done: false
-    location: N/A
+  - description: "The API contains rectangular mode transforms and semantic predicates for power preservation and passivity, proves that identity is power-preserving and that both predicates are cascade-closed, and proves that power preservation implies passivity."
+    done: true
+    location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeTransform, Optics.ModeTransform.toLinearMap, Optics.ModeTransform.IsPowerPreserving, Optics.ModeTransform.IsPassive, Optics.ModeTransform.isPowerPreserving_one, Optics.ModeTransform.IsPowerPreserving.mul, Optics.ModeTransform.IsPassive.mul, Optics.ModeTransform.IsPowerPreserving.isPassive)"
 
-  - description: "The API shall connect the matrix isometry equation to power preservation and define lossless scattering matrices as unitary matrices, proving that lossless scattering preserves power and is passive."
-    done: false
-    location: N/A
+  - description: "The API connects the matrix isometry equation to power preservation and defines lossless scattering matrices as wrapped unitary matrices without an inherited multiplication, proving that lossless scattering preserves power and is passive."
+    done: true
+    location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeTransform.isPowerPreserving_of_conjTranspose_mul_self, Optics.ScatteringMatrix, Optics.ScatteringMatrix.IsLossless, Optics.ScatteringMatrix.IsLossless.isPowerPreserving, Optics.ScatteringMatrix.IsLossless.isPassive)"
 
   - description: "The API shall characterize power-preserving transforms by the matrix isometry equation, characterize passive transforms by a positive-semidefinite defect matrix, and specialize the square power-preserving case to unitarity."
     done: false
