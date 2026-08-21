@@ -548,9 +548,11 @@ We take that pointwise relation as the definition of the equation of motion, rat
 vanishing of the variational derivative of the action, which is how the harmonic oscillator defines
 its own. The reason is that the variational derivative is defined to be `0` whenever no variational
 gradient exists, so its vanishing holds vacuously for every lift of the angle too rough to admit
-one; it says what it is meant to say only under a smoothness assumption. The pointwise equation
-carries no such caveat, holds of any twice differentiable lift, and is the form in which the
-equation of motion is solved and used. The two agree for smooth lifts, by
+one; it says what it is meant to say only under a smoothness assumption. The pointwise equation is
+totalized too — `∂ₜ` is `fderiv`, which is `0` off differentiability — but its totalization cannot
+make the equation vacuously true: a lift too rough to differentiate is handed `θ̈ = 0` and then the
+equation is a genuine, and generally false, constraint. It is also the form in which the equation
+of motion is solved and used. The two agree for smooth lifts, by
 `equationOfMotion_iff_gradLagrangian_zero`, proved in a later module; the present module goes as
 far as `gradLagrangian_eq_torque`, from which that equivalence is one rearrangement away.
 
