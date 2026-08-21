@@ -7,15 +7,16 @@ Overview: |
     configuration is set by angles and, for a moving support, the support position,
     so its configuration space is naturally a product of circles and lines. This API
     covers the pendulum problems of Landau and Lifshitz, Mechanics, 3rd ed.,
-    Chapter 1, Section 5.
+    Chapter 1, Section 5, together with the dynamics of the simple gravity pendulum.
 
-    The sliding pendulum has a defined configuration space, and the simple gravity
+    The sliding pendulum has a defined configuration space. The simple gravity
     pendulum has its configuration space defined as the circle (Mathlib `Circle`)
-    with a map into `Space 2`. The coplanar double pendulum's configuration space is
-    declared but not yet defined, and the miscellaneous pivot-motion problems have
-    documentation only. A manifold structure on the configuration space,
-    trajectories, and the lagrangian remain open and are recorded below with
-    location N/A.
+    with a map into `Space 2`, and its dynamics on the angular chart
+    `EuclideanSpace ℝ (Fin 1)` over `Time`: Lagrangian / Newton / Hamilton
+    equivalences and energy conservation. The coplanar double pendulum's
+    configuration space is declared but not yet defined. A manifold structure on
+    the configuration space and trajectories on the circle itself remain open and
+    are recorded below with location N/A.
 
 ParentAPIs:
   - Classical mechanics Lagrangian (Physlib/ClassicalMechanics/Lagrangian)
@@ -53,6 +54,21 @@ Requirements:
     done: false
     location: N/A
 
-  - description: The API shall subsequently contain the definition of the lagrangian.
-    done: false
-    location: N/A
+  - description: >
+      The API contains the input data of the simple gravity pendulum (mass, length,
+      gravity) and a trajectory type for the angular chart.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum.lean (SimplePendulum, SimplePendulum.Trajectory)
+
+  - description: >
+      The API contains the Lagrangian of the simple gravity pendulum and its equation
+      of motion as the vanishing of the variational gradient of the action.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum.lean (SimplePendulum.lagrangian, SimplePendulum.gradLagrangian, SimplePendulum.EquationOfMotion)
+
+  - description: >
+      The API contains the equivalence of the equation of motion with Newton's second
+      law, Hamilton's equations, and the two variational principles, together with
+      energy conservation.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum.lean (SimplePendulum.equationOfMotion_tfae, SimplePendulum.equationOfMotion_iff_newtons_2nd_law, SimplePendulum.energy_conservation_of_equationOfMotion)
