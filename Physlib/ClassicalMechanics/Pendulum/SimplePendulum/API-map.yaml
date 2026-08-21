@@ -7,10 +7,11 @@ Overview: |
     in a vertical plane under gravity g. Its configuration is the angle of the rod from the downward
     vertical, taken modulo a full turn, so the configuration space is a circle; the position of the
     bob in the plane is (ℓ sin θ, −ℓ cos θ). The motion is governed by θ̈ + (g/ℓ) sin θ = 0. For
-    small amplitudes it is harmonic with period 2π√(ℓ/g); in general the period grows with the
-    amplitude and is given by a complete elliptic integral. This API records the configuration
-    space with its manifold structure and its embedding into physical space; the dynamics, the
-    small-angle limit and the period follow in later modules.
+    small amplitudes it is harmonic with period 2π√(ℓ/g); for librations (amplitudes below the
+    inverted position) the period grows with the amplitude and is given by a complete elliptic
+    integral. This API records the configuration space with its manifold structure and its
+    embedding into physical space; the dynamics, the small-angle limit and the period follow in
+    later modules.
 
 ParentAPIs:
   - "Space (Physlib/SpaceAndTime/Space)"
