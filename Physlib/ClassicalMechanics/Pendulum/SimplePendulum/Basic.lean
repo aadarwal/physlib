@@ -603,8 +603,8 @@ def EquationOfMotion (θ : Time → EuclideanSpace ℝ (Fin 1)) : Prop :=
 /-- The equation of motion of the simple pendulum with all of its terms on one side: at every
   instant the rate of change `I θ̈` of the angular momentum plus the gradient of the potential
   energy vanishes. This is the rotational form of Newton's second law, in the shape in which
-  `DampedHarmonicOscillator` states its own; it is the form that the energy-conservation lemma
-  of a subsequent contribution consumes. -/
+  `DampedHarmonicOscillator` states its own; the sum on the left is exactly the combination that
+  `energy_deriv` pairs with the velocity `∂ₜ θ`. -/
 lemma equationOfMotion_iff_newtons_2nd_law (θ : Time → EuclideanSpace ℝ (Fin 1)) :
     S.EquationOfMotion θ ↔
       ∀ t, S.inertia • ∂ₜ (∂ₜ θ) t + gradient S.potentialEnergy (θ t) = 0 := by
@@ -616,10 +616,11 @@ lemma equationOfMotion_iff_newtons_2nd_law (θ : Time → EuclideanSpace ℝ (Fi
 
 A solution of the pendulum is a smooth lift satisfying the equation of motion. Smoothness is part
 of the definition because the bare pointwise equation, being totalized, admits unphysical
-solutions: a lift jumping between the equilibrium angles `0` and `π` has `∂ₜ (∂ₜ θ) = 0` and zero
-torque everywhere, so it satisfies the equation while being nowhere continuous. Demanding
-smoothness excludes such junk, and is the regularity under which the variational description of
-the motion agrees with the pointwise one.
+solutions: a lift jumping between the equilibrium angles `0` and `π` has zero torque everywhere,
+and — being locally constant wherever it is differentiable at all — it has `∂ₜ θ`, and hence
+`∂ₜ (∂ₜ θ)`, identically zero, so it satisfies the equation even when it is nowhere continuous.
+Demanding smoothness excludes such junk, and is the regularity under which the variational
+description of the motion agrees with the pointwise one.
 
 -/
 
