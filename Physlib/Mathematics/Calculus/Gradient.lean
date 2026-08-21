@@ -37,6 +37,8 @@ product space. The file is deliberately real: two of its rules (`gradient_const_
 - `gradient_inner_self` : `∇ (fun y => ⟪y, y⟫) x = 2 • x`.
 - `gradient_const_mul_inner_self` : `∇ (fun y => c * ⟪y, y⟫) x = (2 * c) • x`.
 - `gradient_coord` : `∇ (fun y => y i) x = EuclideanSpace.single i 1`.
+- `gradient_comp_coord` : `∇ (fun y => f (y i)) x = f' • EuclideanSpace.single i 1` when
+  `HasDerivAt f f' (x i)`.
 
 ## iii. Table of contents
 
@@ -120,6 +122,17 @@ lemma gradient_coord {ι : Type*} [Fintype ι] [DecidableEq ι] (i : ι) (x : Eu
       (innerSL ℝ (EuclideanSpace.single i (1 : ℝ))) x :=
     (EuclideanSpace.proj (𝕜 := ℝ) i).hasFDerivAt.congr_fderiv
       (by ext y; simp [EuclideanSpace.inner_single_left])
+  exact h.hasGradientAt.gradient.trans ((toDual ℝ _).symm_apply_apply _)
+
+/-- Chain rule for a function of one coordinate: the gradient of `y ↦ f (y i)` at `x` is
+`f' • EuclideanSpace.single i 1`, where `f'` is the derivative of `f` at `x i`. -/
+lemma gradient_comp_coord {ι : Type*} [Fintype ι] [DecidableEq ι] {f : ℝ → ℝ} {f' : ℝ}
+    (i : ι) (x : EuclideanSpace ℝ ι) (hf : HasDerivAt f f' (x i)) :
+    gradient (fun y : EuclideanSpace ℝ ι => f (y i)) x = f' • EuclideanSpace.single i 1 := by
+  have h : HasFDerivAt (fun y : EuclideanSpace ℝ ι => f (y i))
+      (innerSL ℝ (f' • EuclideanSpace.single i (1 : ℝ))) x :=
+    (hf.comp_hasFDerivAt x (EuclideanSpace.proj (𝕜 := ℝ) i).hasFDerivAt).congr_fderiv
+      (by ext y; simp [EuclideanSpace.inner_single_left, smul_eq_mul])
   exact h.hasGradientAt.gradient.trans ((toDual ℝ _).symm_apply_apply _)
 
 end
