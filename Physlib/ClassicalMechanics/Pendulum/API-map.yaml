@@ -15,7 +15,8 @@ Overview: |
     not yet defined, and the miscellaneous pivot-motion problems have documentation
     only. The remaining requirements, a manifold structure on the configuration
     space, a map into real space, trajectories, and the lagrangian, are open and
-    recorded below with location N/A.
+    recorded below with location N/A. The simple pendulum has its own API map in
+    Physlib/ClassicalMechanics/Pendulum/SimplePendulum.
 
 ParentAPIs:
   - Classical mechanics Lagrangian (Physlib/ClassicalMechanics/Lagrangian)
@@ -33,15 +34,15 @@ Requirements:
     done: true
     location: Physlib/ClassicalMechanics/Pendulum/SlidingPendulum.lean (ConfigurationSpace)
 
-  - description: The API shall contain the structure of a manifold on the configuration space.
-    done: false
-    location: "N/A"
+  - description: The API contains the structure of a manifold on the configuration space (for the simple pendulum).
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.instIsManifold)
 
   - description: >
-      The API shall contain a map from the configuration space to `Space`, giving the
+      The API contains a map from the configuration space to `Space`, giving the
       position of the pendulum in real space.
-    done: false
-    location: "N/A"
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Geometric/Basic.lean (SimplePendulum.ConfigurationSpace.toSpace)
 
   - description: The API shall contain the definition of a trajectory based on the configuration space.
     done: false
