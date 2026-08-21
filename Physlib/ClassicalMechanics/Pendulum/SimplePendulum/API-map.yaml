@@ -10,8 +10,10 @@ Overview: |
     small amplitudes it is harmonic with period 2π√(ℓ/g); for librations (amplitudes below the
     inverted position) the period grows with the amplitude and is given by a complete elliptic
     integral. This API records the configuration space with its manifold structure and its
-    embedding into physical space, together with the lifted Lagrangian and equation of motion;
-    the small-angle limit and the period follow in later modules.
+    embedding into physical space, together with the lifted Lagrangian and equation of motion,
+    the equivalence of that equation with the vanishing of the variational gradient of the
+    action, and the conservation of energy; the small-angle limit and the period follow in
+    later modules.
 
 ParentAPIs:
   - "Space (Physlib/SpaceAndTime/Space)"
@@ -48,6 +50,6 @@ Requirements:
     done: true
     location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.lagrangian, SimplePendulum.torque, SimplePendulum.EquationOfMotion, SimplePendulum.equationOfMotion_iff_scalar)
 
-  - description: The API shall contain the equivalence of the equation of motion with the vanishing of the variational gradient of the action, and energy conservation.
-    done: false
-    location: N/A
+  - description: The API contains the equivalence of the equation of motion with the vanishing of the variational gradient of the action, and energy conservation.
+    done: true
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.equationOfMotion_iff_gradLagrangian_zero, SimplePendulum.energy_conservation_of_equationOfMotion)
