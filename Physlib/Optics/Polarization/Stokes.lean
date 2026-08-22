@@ -24,7 +24,7 @@ coefficients. Thus reconstruction is
 `(S₀ σ₀ + S₁ σ₃ + S₂ σ₁ + S₃ σ₂) / 2`. The final coordinate is not assigned a right- or
 left-circular name here; that physical naming also depends on observer and handedness conventions.
 
-## ii. Main definitions
+## ii. Key results
 
 - `StokesVector`: four real Stokes coordinates with an `L²` norm.
 - `selfAdjointStokesEquiv`: the real-linear Stokes coordinates of a self-adjoint matrix.
@@ -33,7 +33,14 @@ left-circular name here; that physical naming also depends on observer and hande
 - `PhysicalStokesVector`: raw Stokes data restricted to that cone.
 - `coherencyStokesEquiv`: the equivalence between coherency matrices and physical Stokes data.
 
-## iii. Scope
+## iii. Table of contents
+
+- A. Raw Stokes coordinates
+- B. Reconstruction and observables
+- C. The physical Stokes cone
+- D. Physical Stokes data and coherency matrices
+
+## iv. References
 
 Every raw Stokes vector reconstructs a self-adjoint matrix, but only physical Stokes data
 reconstructs a positive-semidefinite coherency matrix. The physical cone is not a vector subspace,
@@ -49,7 +56,11 @@ open scoped ComplexOrder
 
 noncomputable section
 
-/-! ## A. Raw Stokes coordinates -/
+/-!
+
+## A. Raw Stokes coordinates
+
+-/
 
 /-- The index type separating Stokes intensity from the three polarization coordinates. -/
 abbrev StokesIndex := Fin 1 ⊕ Fin 3
@@ -201,7 +212,11 @@ lemma selfAdjointStokesEquiv_pauliSelfAdjoint_inr_two :
 
 namespace StokesVector
 
-/-! ## B. Reconstruction and observables -/
+/-!
+
+## B. Reconstruction and observables
+
+-/
 
 /-- Reconstruct the self-adjoint `2 × 2` matrix represented by arbitrary raw Stokes data. -/
 noncomputable def toSelfAdjoint (S : StokesVector) :
@@ -252,6 +267,32 @@ def polarization (S : StokesVector) : EuclideanSpace ℝ (Fin 3) :=
 @[simp]
 lemma polarization_apply (S : StokesVector) (i : Fin 3) :
     S.polarization i = S (Sum.inr i) := rfl
+
+/-- Construct Stokes data from its total intensity and three polarization coordinates. -/
+def ofIntensityPolarization (s₀ : ℝ) (p : EuclideanSpace ℝ (Fin 3)) : StokesVector :=
+  WithLp.toLp 2 (Sum.elim (fun _ => s₀) p)
+
+/-- The intensity of Stokes data constructed from separate observables is the supplied intensity. -/
+@[simp]
+lemma intensity_ofIntensityPolarization (s₀ : ℝ) (p : EuclideanSpace ℝ (Fin 3)) :
+    (ofIntensityPolarization s₀ p).intensity = s₀ := rfl
+
+/-- The polarization of Stokes data constructed from separate observables is the supplied vector. -/
+@[simp]
+lemma polarization_ofIntensityPolarization (s₀ : ℝ) (p : EuclideanSpace ℝ (Fin 3)) :
+    (ofIntensityPolarization s₀ p).polarization = p := by
+  ext i
+  rfl
+
+/-- Reassembling a Stokes vector from its intensity and polarization returns the original data. -/
+@[simp]
+lemma ofIntensityPolarization_intensity_polarization (S : StokesVector) :
+    ofIntensityPolarization S.intensity S.polarization = S := by
+  ext μ
+  rcases μ with μ | μ
+  · fin_cases μ
+    rfl
+  · rfl
 
 /-- The intensity of self-adjoint Stokes coordinates is twice the scalar Pauli coefficient. -/
 @[simp]
@@ -333,7 +374,11 @@ lemma det_toSelfAdjoint (S : StokesVector) :
   push_cast
   ring
 
-/-! ## C. The physical Stokes cone -/
+/-!
+
+## C. The physical Stokes cone
+
+-/
 
 /-- A Stokes vector is physical when the polarization norm does not exceed total intensity. -/
 def IsPhysical (S : StokesVector) : Prop :=
@@ -391,7 +436,11 @@ lemma posSemidef_iff_selfAdjointStokesEquiv_isPhysical
 /-- Physical Stokes vectors, namely the closed cone `‖polarization‖ ≤ intensity`. -/
 abbrev PhysicalStokesVector := {S : StokesVector // S.IsPhysical}
 
-/-! ## D. Physical Stokes data and coherency matrices -/
+/-!
+
+## D. Physical Stokes data and coherency matrices
+
+-/
 
 namespace PolarizationCoherency
 

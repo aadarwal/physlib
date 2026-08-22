@@ -2127,6 +2127,7 @@ point
 pointing
 points
 pointwise
+poincare
 polarization
 polarizations
 polarized
