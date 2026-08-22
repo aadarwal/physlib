@@ -249,6 +249,10 @@ Ownership rules:
 - [x] The existing pointwise, potential-derived three-dimensional Maxwell laws with free-space
   constants and allowed sources are available through ordinary imports, with their declarations
   and proofs unchanged and their scope recorded.
+- [x] Homogeneous isotropic material data now separates the semantic `E`, `D`, `B`, and `H` roles;
+  provides positive real permittivity and permeability, linear constitutive maps, wave speed,
+  impedance, explicitly relative refractive indices, and their algebra; and embeds `FreeSpace`
+  one way without promoting the legacy unconstrained `EMSystem`.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -261,6 +265,9 @@ Ownership rules:
   equations for potential-derived fields with free-space constants and allowed sources. E0 exposes
   those declarations through the public module surface; it does not supply material constitutive
   laws, integral laws, or boundary conditions.
+- `Electromagnetism.Media.HomogeneousIsotropic` supplies E1a's narrow material constants,
+  constitutive relations, wave parameters, and one-way `FreeSpace` specialization. Its raw-real
+  fixed-unit convention and definitionally equal field-role abbreviations are explicit limitations.
 - `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure.
 - `SpaceAndTime.Space` supplies Euclidean geometry, derivatives, volume integration, and cross
   products, but not yet the complete oriented-surface and trace API needed for generic interface
@@ -272,7 +279,8 @@ Ownership rules:
 ### D.3. Not yet present
 
 - [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
-- [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
+- [ ] macroscopic material Maxwell equations, Poynting flux, boundary laws, Snell, Fresnel, and
+  total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
@@ -1035,18 +1043,21 @@ Exit achieved: E1 and its vacuum bridge can reuse the already-proved differentia
 an ordinary import of `Physlib.Electromagnetism.ThreeDimension.MaxwellEquations` or `Physlib`; the
 namespace content from the first declaration onward is byte-for-byte unchanged from the E0 base.
 
-#### E1. Homogeneous isotropic media
+#### E1. Homogeneous isotropic media — in progress
 
 Owner: Electromagnetism.
 
-- positive scalar permittivity and permeability with explicit linear, homogeneous, isotropic,
+- [x] positive scalar permittivity and permeability with explicit linear, homogeneous, isotropic,
   nonconducting, nondispersive scope;
-- `D = ε E`, `B = μ H`, wave speed, wave impedance, and refractive-index conventions;
-- a macroscopic Maxwell predicate using `E`, `D`, `B`, `H`, free charge, and free current, rather
+- [x] `D = ε E`, `B = μ H`, wave speed, wave impedance, and explicitly relative refractive-index
+  conventions, with zero, addition, and scalar closure of the separate constitutive predicate;
+- [ ] a differentiability-aware macroscopic Maxwell predicate using `E`, `D`, `B`, `H`, free
+  charge, and free current, rather
   than treating the constitutive equations as Maxwell's equations;
-- source-free specialization and linear-superposition lemmas;
-- positivity and nonzero lemmas needed by divisions and square roots; and
-- vacuum as a specialization or proved bridge to `FreeSpace`.
+- [ ] source-free specialization and linear-superposition lemmas;
+- [x] positivity and nonzero lemmas needed by divisions and square roots;
+- [x] one-way specialization of `FreeSpace` constants to the material data; and
+- [ ] one-way bridge from E0's potential-derived laws to the macroscopic predicate.
 
 Exit: medium parameters are sufficient to state material plane waves and interface coefficients
 without ad hoc real tuples, and the governing equations distinguish free from bound sources.
@@ -1828,7 +1839,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
-| E1 media/macroscopic Maxwell | blocked | E0, Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
+| E1 media/macroscopic Maxwell | in progress | E0, E1a complete | differentiability prerequisite, field predicate, source-free/superposition API, and vacuum bridge |
 | E2 material plane waves | blocked | E1 | real Maxwell field and Optics phasor theorems |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
@@ -1944,9 +1955,10 @@ human verification recorded in `tbd.md`.
    has relative phase `exp (-I * retardance)`, `M.comp N` applies `N` first, and neither Jones
    unitarity nor fixed Stokes intensity implies electromagnetic power. Keep P6b-3's
    field/irradiance portion blocked on P5b/E3b.
-5. Preserve E0's exposure-only public Maxwell repair and start E1's medium and
-   macroscopic-Maxwell layer so the harmonic bridge can later acquire Poynting-flux normalization
-   and meet the material-interface track.
+5. Preserve E0's exposure-only public Maxwell repair and E1a's narrow raw-real medium layer. Add
+   the missing reusable magnetic-field differentiability theorem in Kinematics, then complete
+   E1b's unbundled macroscopic-Maxwell predicate, source-free/superposition API, and one-way E0
+   vacuum bridge so the harmonic layer can later acquire Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -1957,5 +1969,5 @@ human verification recorded in `tbd.md`.
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies. With E0 complete, the next physical-optics front is E1,
-while the independent circuit front remains N2a/N3.
+medium, boundary, and flux dependencies. With E0 and E1a complete, the next physical-optics front
+is E1b, while the independent circuit front remains N2a/N3.

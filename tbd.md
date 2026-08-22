@@ -75,8 +75,22 @@ PR unless maintainers explicitly ask to retain it.
   field foundation.
 - [ ] State a harmonic, zero-static-component, zero-mean, or equivalent hypothesis wherever a
   transversality result would otherwise admit an arbitrary constant background.
-- [ ] Add homogeneous isotropic constitutive data in Electromagnetism with explicit assumptions
-  about dispersion, conductivity, and anisotropy; do not present the first model as universal.
+- [ ] Human-check E1a's homogeneous isotropic constitutive data and its explicit exclusions for
+  dispersion, conductivity, anisotropy, inhomogeneity, nonlinearity, and material loss; do not
+  present the first model as universal.
+- [ ] Confirm E1a's temporary raw-real convention: all constants and fields use one fixed coherent
+  rationalized unit system, physical dimensions are not encoded, and the `E`/`D`/`B`/`H` role
+  abbreviations are definitionally equal rather than type-safe field kinds. Confirm that `ε` and
+  `μ` denote absolute material constants rather than relative permittivity and permeability. A
+  later dimensional refactor must not be described as already enforced here.
+- [ ] Preserve `FreeSpace` as the authoritative vacuum constants API and use only its one-way
+  specialization to `HomogeneousIsotropicMedium`. Do not promote the unconstrained legacy
+  `EMSystem`, extend a material medium from `FreeSpace`, or revive the deleted bundled
+  `OpticalMedium`/`ChargedMedium` architecture.
+- [ ] Split E1a before an upstream proposal: semantic field roles, medium constants, constitutive
+  maps, and `IsConstitutive` first; wave speed, impedance, refractive indices, and the `FreeSpace`
+  parameter specialization second. Stack the macroscopic predicate and the E0 vacuum bridge as
+  separate later PR concepts.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
 - [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged
@@ -170,6 +184,9 @@ PR unless maintainers explicitly ask to retain it.
   time sign, chain direction and port ordering, `z` versus `q = z⁻¹`, dB/logarithm conventions,
   rejection-ratio parentheses, and strict versus non-strict stability inequalities.
 - [ ] Record every source hypothesis strengthened, corrected, or rejected by a Lean theorem.
+- [ ] Repair or independently reverify the vector-calculus Zulip reference in
+  `Physlib/Optics/API-map.yaml`: its current `Physlib` archive path is stale and the cited message
+  range was not recovered from the older `PhysLean` archive during the E1 audit.
 - [ ] Replace source decimal examples by exact values or certified intervals before using them as
   regression evidence.
 

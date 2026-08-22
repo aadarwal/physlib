@@ -73,6 +73,7 @@ public import Physlib.Electromagnetism.Kinematics.GaugeTransformation
 public import Physlib.Electromagnetism.Kinematics.MagneticField
 public import Physlib.Electromagnetism.Kinematics.ScalarPotential
 public import Physlib.Electromagnetism.Kinematics.VectorPotential
+public import Physlib.Electromagnetism.Media.HomogeneousIsotropic
 public import Physlib.Electromagnetism.PointParticle.OneDimension
 public import Physlib.Electromagnetism.PointParticle.ThreeDimension
 public import Physlib.Electromagnetism.ThreeDimension.Basic

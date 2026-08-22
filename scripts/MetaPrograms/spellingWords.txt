@@ -1,3 +1,13 @@
+anisotropic
+conducting
+dispersive
+inhomogeneous
+loss
+macroscopic
+nonconducting
+nondispersive
+refractive
+rationalized
 anticommutator
 antidiagonal
 admissibility
