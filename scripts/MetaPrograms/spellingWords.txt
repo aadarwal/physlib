@@ -1608,6 +1608,7 @@ log
 logarithm
 lohitsiri
 long
+longitudinal
 look
 looked
 looking
