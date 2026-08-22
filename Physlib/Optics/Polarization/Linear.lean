@@ -27,12 +27,14 @@ product with the selected linear axis.
 - `JonesVector.intensity_linearPolarization`: normalization.
 - `JonesVector.linearComponent_linearPolarization`: the signed cosine overlap.
 - `JonesVector.linearPolarization_add_pi`: the half-turn global-sign law.
+- `JonesVector.ofLinearComponents`: construction in a rotated orthonormal linear basis.
 
 ## iii. Table of contents
 
 - A. Linear axes
 - B. Analyzer amplitudes
 - C. Angle and coordinate regressions
+- D. Rotated linear-basis coordinates
 
 ## iv. References
 
@@ -165,6 +167,121 @@ lemma linearPolarization_neg_pi_div_four :
     rw [show -Real.pi / 4 = -(Real.pi / 4) by ring, Real.sin_neg,
       Real.sin_pi_div_four]
     rfl
+
+/-!
+
+## D. Rotated linear-basis coordinates
+-/
+
+/-- Construct a Jones vector from complex amplitudes along the linear axes `axis` and
+`axis + π / 2`. -/
+def ofLinearComponents (axis : Real.Angle) (axial orthogonal : ℂ) : JonesVector :=
+  ofComponents
+    (axial * Real.Angle.cos axis - orthogonal * Real.Angle.sin axis)
+    (axial * Real.Angle.sin axis + orthogonal * Real.Angle.cos axis)
+
+/-- The first coordinate of a Jones vector constructed in a rotated linear basis. -/
+@[simp]
+lemma ofLinearComponents_components_zero (axis : Real.Angle) (axial orthogonal : ℂ) :
+    (ofLinearComponents axis axial orthogonal).components 0 =
+      axial * Real.Angle.cos axis - orthogonal * Real.Angle.sin axis := rfl
+
+/-- The second coordinate of a Jones vector constructed in a rotated linear basis. -/
+@[simp]
+lemma ofLinearComponents_components_one (axis : Real.Angle) (axial orthogonal : ℂ) :
+    (ofLinearComponents axis axial orthogonal).components 1 =
+      axial * Real.Angle.sin axis + orthogonal * Real.Angle.cos axis := rfl
+
+/-- Data supported only on the axial rotated coordinate is a scaled linear-polarization state. -/
+@[simp]
+lemma ofLinearComponents_axial (axis : Real.Angle) (axial : ℂ) :
+    ofLinearComponents axis axial 0 = scale axial (linearPolarization axis) := by
+  ext i
+  fin_cases i <;> simp [ofLinearComponents, scale, linearPolarization]
+
+/-- Data supported only on the orthogonal rotated coordinate is a scaled orthogonal
+linear-polarization state. -/
+lemma ofLinearComponents_orthogonal (axis : Real.Angle) (orthogonal : ℂ) :
+    ofLinearComponents axis 0 orthogonal =
+      scale orthogonal
+        (linearPolarization (axis + ((Real.pi / 2 : ℝ) : Real.Angle))) := by
+  ext i
+  fin_cases i <;>
+    simp [ofLinearComponents, scale, linearPolarization,
+      Real.Angle.cos_add_pi_div_two, Real.Angle.sin_add_pi_div_two]
+
+/-- Extracting the axial component of rotated linear-basis data recovers its axial amplitude. -/
+@[simp]
+lemma linearComponent_ofLinearComponents (axis : Real.Angle) (axial orthogonal : ℂ) :
+    (ofLinearComponents axis axial orthogonal).linearComponent axis = axial := by
+  rw [linearComponent_eq]
+  simp only [ofLinearComponents_components_zero, ofLinearComponents_components_one]
+  have haxis : ((Real.Angle.cos axis : ℂ) ^ 2 +
+      (Real.Angle.sin axis : ℂ) ^ 2) = 1 := by
+    norm_cast
+    exact Real.Angle.cos_sq_add_sin_sq axis
+  linear_combination axial * haxis
+
+/-- Extracting the orthogonal component of rotated linear-basis data recovers its orthogonal
+amplitude. -/
+@[simp]
+lemma linearComponent_ofLinearComponents_orthogonal (axis : Real.Angle)
+    (axial orthogonal : ℂ) :
+    (ofLinearComponents axis axial orthogonal).linearComponent
+        (axis + ((Real.pi / 2 : ℝ) : Real.Angle)) = orthogonal := by
+  rw [linearComponent_eq]
+  simp only [ofLinearComponents_components_zero, ofLinearComponents_components_one]
+  simp [Real.Angle.cos_add, Real.Angle.sin_add]
+  have haxis : ((Real.Angle.cos axis : ℂ) ^ 2 +
+      (Real.Angle.sin axis : ℂ) ^ 2) = 1 := by
+    norm_cast
+    exact Real.Angle.cos_sq_add_sin_sq axis
+  linear_combination orthogonal * haxis
+
+/-- Reconstruct a Jones vector from its amplitudes along an orthonormal pair of linear axes. -/
+lemma ofLinearComponents_linearComponents (axis : Real.Angle) (J : JonesVector) :
+    ofLinearComponents axis (J.linearComponent axis)
+      (J.linearComponent (axis + ((Real.pi / 2 : ℝ) : Real.Angle))) = J := by
+  ext i
+  fin_cases i <;>
+    simp [ofLinearComponents, linearComponent_eq, Real.Angle.cos_add,
+      Real.Angle.sin_add]
+  · have haxis : ((Real.Angle.cos axis : ℂ) ^ 2 +
+        (Real.Angle.sin axis : ℂ) ^ 2) = 1 := by
+      norm_cast
+      exact Real.Angle.cos_sq_add_sin_sq axis
+    linear_combination J.components 0 * haxis
+  · have haxis : ((Real.Angle.cos axis : ℂ) ^ 2 +
+        (Real.Angle.sin axis : ℂ) ^ 2) = 1 := by
+      norm_cast
+      exact Real.Angle.cos_sq_add_sin_sq axis
+    linear_combination J.components 1 * haxis
+
+/-- Express a linear-polarization state in an arbitrary rotated linear basis. -/
+lemma linearPolarization_eq_ofLinearComponents (axis input : Real.Angle) :
+    linearPolarization input =
+      ofLinearComponents axis (Real.Angle.cos (input - axis))
+        (Real.Angle.sin (input - axis)) := by
+  have haxis : ((Real.Angle.cos axis : ℂ) ^ 2 +
+      (Real.Angle.sin axis : ℂ) ^ 2) = 1 := by
+    norm_cast
+    exact Real.Angle.cos_sq_add_sin_sq axis
+  ext i
+  fin_cases i
+  · simp [linearPolarization, ofLinearComponents, sub_eq_add_neg,
+      Real.Angle.cos_add, Real.Angle.sin_add]
+    calc
+      (Real.Angle.cos input : ℂ) =
+          Real.Angle.cos input * ((Real.Angle.cos axis : ℂ) ^ 2 +
+            (Real.Angle.sin axis : ℂ) ^ 2) := by rw [haxis]; ring
+      _ = _ := by ring
+  · simp [linearPolarization, ofLinearComponents, sub_eq_add_neg,
+      Real.Angle.cos_add, Real.Angle.sin_add]
+    calc
+      (Real.Angle.sin input : ℂ) =
+          Real.Angle.sin input * ((Real.Angle.cos axis : ℂ) ^ 2 +
+            (Real.Angle.sin axis : ℂ) ^ 2) := by rw [haxis]; ring
+      _ = _ := by ring
 
 end JonesVector
 

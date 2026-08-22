@@ -191,6 +191,7 @@ public import Physlib.Optics.Polarization.Mueller.Regression
 public import Physlib.Optics.Polarization.Mueller.Trace
 public import Physlib.Optics.Polarization.Mueller.Unitary
 public import Physlib.Optics.Polarization.Poincare
+public import Physlib.Optics.Polarization.RelativePhase
 public import Physlib.Optics.Polarization.Stokes
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
