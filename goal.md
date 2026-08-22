@@ -1347,13 +1347,16 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
   proved zero exactly when the electric amplitude is zero using the medium's nonzero permittivity,
   referenced at the affine plane's stored point by the nonvanishing spatial carrier, and connected
   to the actual ordinary-real plane data by exact boundary-exponent factorization;
+- [x] the exact signed three-wave joint electric coefficient map, aggregated by boundary exponent,
+  and its vanishing under a zero-free-surface-charge local boundary with arbitrary free surface
+  current;
 - [x] the oriented-hyperplane result converting vanishing against every tangent
   displacement into an explicit normal-vector multiple, to be used to identify tangential
   projections;
-- a three-wave collision result deriving incident/transmitted rate equality under the nonzero joint
-  trace guard and the disjunction that the reflected electric amplitude is zero or its rate equals
-  the incident rate, followed by equality of frequency and tangential wave-vector components under
-  exactly those branches;
+- a guarded three-wave collision result deriving incident/transmitted rate equality under the
+  nonzero joint trace aggregate and the disjunction that the reflected electric amplitude is zero
+  or its rate equals the incident rate, followed by equality of frequency and tangential
+  wave-vector components under exactly those branches;
 - a reduced fixed-frequency complex-amplitude boundary problem introduced only after those
   conservation results; and
 - a theorem relating its amplitude equations to the primitive physical trace problem under the
@@ -2067,7 +2070,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness, the primitive independent-frequency boundary configuration, the single-wave boundary exponent/carrier and joint E/D factorizations, the zero-free-charge three-wave boundary-character equality, and finite-sum joint E/D harmonic noncancellation complete; exact three-wave coefficient collision, guarded label matching, frequency/tangential-K conservation, and fixed-frequency reduction remain |
+| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness, the primitive independent-frequency boundary configuration, the single-wave boundary exponent/carrier and joint E/D factorizations, the zero-free-charge three-wave boundary-character equality, finite-sum joint E/D harmonic noncancellation, and exact signed coefficient aggregation complete; guarded label matching, frequency/tangential-K conservation, and fixed-frequency reduction remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |

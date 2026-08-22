@@ -268,6 +268,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Interfaces/PlanarDielectric/WaveBoundary.lean (Optics.PlanarDielectricWaveConfiguration, Optics.PlanarDielectricWaveConfiguration.negativeTrace, Optics.PlanarDielectricWaveConfiguration.positiveTrace, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary, Optics.PlanarDielectricWaveConfiguration.IsSourceFreeLocalBoundary, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricFieldData, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryCharacter_sum_eq)"
 
+  - description: "Optics packages the incident and reflected stored-point-referenced joint tangential-E/normal-D amplitudes with positive sign and negative-side material data, and the transmitted amplitude with negative sign and positive-side material data, in a Finsupp keyed by exact boundary exponent. A local boundary with zero free surface charge and arbitrary free surface current forces this entire signed, exponent-aggregated coefficient map to vanish: the boundary-character identity gives all-parameter ordinary-real vanishing, and the waves' positive angular frequencies supply one common positive-rate probe. Equal exponents deliberately aggregate, and a key is absent from support exactly when its aggregate coefficient is zero, so this result makes no labelwise amplitude, frequency, tangential-wave-vector, propagation, Fresnel, observable, or power conclusion."
+    done: true
+    location: "Physlib/Optics/Interfaces/PlanarDielectric/ElectricCollision.lean (Optics.PlanarDielectricWaveConfiguration.jointElectricBoundaryCoefficients, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryCoefficients_eq_zero)"
+
   - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
     done: false
     location: N/A
