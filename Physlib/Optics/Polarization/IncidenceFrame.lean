@@ -18,7 +18,7 @@ non-normal propagation direction. For interface-normal vector `n` and unit propa
 the convention is
 
 ```text
-s = normalize (n × k),    p = k × s,    Jones order = (s, p).
+s = normalize (n × k), p = k × s, Jones order = (s, p).
 ```
 
 Consequently `s × p = k`, so the frame has the orientation required by `PolarizationFrame`.
