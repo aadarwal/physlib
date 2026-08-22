@@ -32,6 +32,13 @@ PR unless maintainers explicitly ask to retain it.
   equivalences first, determinant/rank boundary-versus-interior classification second, and the
   unit-Jones global-phase quotient third. The combined fork history is intentionally broader than
   any single proposed upstream PR.
+- [ ] Split the 583-line fork-side `JonesPoincare` implementation before an upstream proposal:
+  normalized unit-Jones action, coherency, and exact phase fibers first; constructive sphere
+  representatives, quotient equivalence, and canonical-axis regressions second. Keep the private
+  algebraic charts out of the public API.
+- [ ] Treat a topological upgrade of the Jones phase quotient as a separate design and proof
+  package. Do not call the algebraic equivalence a homeomorphism or assert a continuously varying
+  global Jones representative without the required quotient-topology and continuity theorems.
 - [ ] Decide with maintainers whether the scattering wrapper belongs with modal foundations or in
   a separate typed-port PR. It intentionally has no multiplication instance.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the

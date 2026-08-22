@@ -224,6 +224,10 @@ Ownership rules:
   open interior is exactly the rank-two/positive-definite class. This cross-section excludes zero
   coherency without assigning it a polarization direction, while the unnormalized classification
   treats the zero-intensity cone apex separately.
+- [x] Unit-intensity Jones vectors carry the actual `Circle` scaling action, and their orbit
+  quotient is algebraically equivalent to the Poincare sphere through the existing
+  Jones--coherency--Stokes chain. Exact phase fibers, rank-one coherency factorization, and the six
+  canonical axes are proved without making a topological or physical-power claim.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -245,8 +249,8 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] Complete the unit-Jones phase-quotient classification and the Mueller API; the closed-ball,
-  determinant/rank boundary, strict-interior, raw Stokes, and physical coherency results are
+- [ ] Complete the deterministic Mueller API; the closed-ball, determinant/rank boundary,
+  strict-interior, unit-Jones phase quotient, raw Stokes, and physical coherency results are
   present;
 - [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
@@ -796,9 +800,10 @@ coordinate states in `Polarization.Basic` use equal amplitudes `sqrt 2 / 2`; ful
 H/V as `(1, ±1, 0, 0)`, D/A as `(1, 0, ±1, 0)`, and positive/negative-`I` quadrature as
 `(1, 0, 0, ±1)`. The API deliberately assigns no right/left circular name.
 
-#### P3c. Poincare classification — active
+#### P3c. Poincare classification — complete
 
-Candidate location: `Physlib/Optics/Polarization/Poincare.lean`.
+Candidate locations: `Physlib/Optics/Polarization/Poincare.lean` and
+`Physlib/Optics/Polarization/JonesPoincare.lean`.
 
 Deliverables:
 
@@ -814,13 +819,17 @@ Deliverables:
 Exit: normalized physical coherency matrices correspond to the closed ball and pure unit-intensity
 Jones states modulo unit phase correspond to the sphere.
 
-Current evidence: `Physlib.Optics.Polarization.Poincare` defines the closed ball and proves exact
+Completion evidence: `Physlib.Optics.Polarization.Poincare` defines the closed ball and proves exact
 equivalences from unit-intensity physical Stokes data and unit-trace coherency data to it. The ball
 center is therefore the unit-trace unpolarized state, not zero coherency. The same file proves that
 the sphere is equivalent to determinant zero and rank one, that the open interior is equivalent to
 positive definiteness and rank two, and that the unnormalized cone apex has trace and rank zero.
-Remaining work is the algebraic quotient of unit Jones vectors by the `Circle` action together with
-its canonical boundary regressions.
+`Physlib.Optics.Polarization.JonesPoincare` defines the actual `Circle` action on unit Jones
+vectors, proves exact coherency and sphere fibers, constructs a representative of every sphere
+point, factors every unit-trace rank-one coherency through a unit Jones vector, and identifies the
+orbit quotient algebraically with the sphere. Its H/V/D/A and positive/negative-`I` regressions fix
+all three coordinate signs. It intentionally makes no topological equivalence or physical-power
+claim.
 
 Jones matrices induce deterministic coherency and Mueller maps but do not describe depolarizers.
 A later general depolarizing layer needs positive, and where physically appropriate completely
@@ -1699,7 +1708,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P3b-0 neutral positive cone | done | P3a | determinant identity, PSD/radius criterion, and zero-radius-safe construction |
 | P3b-1 Stokes/coherency cone | done | P2a, P3b-0 | raw linear reconstruction, exact PSD cone, coherency equivalence, and round-trip suite |
 | P3b-2 Jones--Stokes bridge | done | P2b, P3b-1 | coherency-derived components, scaling/phase laws, and normalized canonical-state suite |
-| P3c Poincare classification | active | P3b-1, P3b-2 | closed-ball and determinant/rank boundary/interior classifications complete; unit-Jones phase quotient underway |
+| P3c Poincare classification | done | P3b-1, P3b-2 | closed-ball, boundary/interior, exact phase-fiber, rank-one factorization, orbit-quotient, and canonical-axis suites |
 | P4 deterministic Mueller | ready | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
 | P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
@@ -1802,7 +1811,7 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, and P3b-2 are complete, independently reviewed,
+1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, P3b-2, and P3c are complete, independently reviewed,
    validated, and integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
@@ -1813,19 +1822,19 @@ human verification recorded in `tbd.md`.
    relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
    the distinction between incident and outgoing channel ends and do not encode feedback as
    ordinary matrix multiplication.
-3. Finish P3c's final reviewable layer. Positive-intensity normalization, the closed-ball
-   equivalences, determinant-zero/rank-one boundary, rank-two/positive-definite interior, and the
-   zero-intensity cone apex are complete. Now define the `Circle` action on unit-intensity Jones
-   vectors and prove that its orbit quotient is algebraically equivalent to the Poincare sphere,
-   including exact fibers and convention-sensitive canonical regressions. Do not replace the
-   quotient requirement with an informal phase-invariance lemma or claim a topological equivalence
-   without separately proving the needed continuity and quotient-topology results.
-4. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
+3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
+   not a topological equivalence or a continuous choice of representatives; any topology upgrade
+   must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
+   raw electric-amplitude-squared normalization, not irradiance or modal power.
+4. Build P4's deterministic Mueller action through the existing Jones--coherency--Stokes chain.
+   Prove reality, action agreement, identity, composition, phase invariance, and the unitary sphere
+   consequences without presenting deterministic Jones optics as a general depolarizing theory.
+5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
-5. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
+6. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
    PR concepts and do not translate Jones intensity into physical power before E3b.
-6. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
+7. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
