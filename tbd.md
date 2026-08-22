@@ -246,12 +246,31 @@ PR unless maintainers explicitly ask to retain it.
   direct cross products must give `K cross B0 = -9 E0`; the TM Hermitian pairing must instead be
   `40`. This is exact attenuating algebra only: do not assign the fixture an incident,
   transmitted, outgoing, or evanescent-wave role and do not infer Maxwell satisfaction or power.
+- [ ] Human-check the exact complex-Maxwell regressions independently of their Lean proofs. With
+  `A = exp (-4 x_2)` and `theta = t - 5 x_0`, confirm
+  `E_TE = (0, A cos theta, 0)`, `B_TE = (-4 A sin theta, 0, 5 A cos theta)`,
+  `E_TM = (4 A cos theta, 0, 5 A sin theta)`, and
+  `B_TM = (0, -9 A sin theta, 0)`, and confirm both source-free Maxwell endpoints. At the origin,
+  the TM third amplitude `-5 I` must realize as zero at time zero and positive five at time
+  `pi / 2`. In the unit medium, confirm that `K = E0 = 0` solves Maxwell but is off shell; that
+  `K = E0 = (1, 0, 0)` gives electric-displacement divergence zero at time zero but one at
+  `pi / 2` and is not transverse; and that `K = E0 = (1, 0, -I)` has bilinear square zero,
+  Hermitian pairing two, `B0 = 0`, satisfies magnetic Gauss, Faraday, and electric Gauss, but at
+  the origin has `curl H = 0` and `partial_t D = (0, 0, 1)`, so Ampere--Maxwell fails. The concrete
+  real embedding checks only the embedded image of both guarded converses; it does not validate
+  the genuinely complex fixtures. Assign none of these data an interface, evanescent-wave,
+  irradiance, or power role.
+- [ ] Decide during upstream regression review whether to add two optional converse-boundary
+  fixtures: `K = 0` with nonzero `E0`, which makes the spatial phase constant while Ampere--Maxwell
+  fails, and a purely decaying `q = 0` carrier, which makes temporal rather than spatial sampling
+  essential. The present one-phase and complex-null fixtures already cover the required failure
+  modes, so neither optional fixture should enlarge the first PR without reviewer demand.
 - [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
   algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
   the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
   dispersion and its phase/attenuation decomposition fourth; forward Maxwell fifth; the guarded
-  converse sixth; and exact propagating, evanescent TE/TM, and zero-amplitude falsification
-  regressions last. Keep square-root branch choice, interface roles, and power out of these PRs.
+  converse sixth; and exact algebraic plus ordinary-field TE/TM and converse-boundary regressions
+  last. Keep square-root branch choice, interface roles, and power out of these PRs.
 - [ ] Correctly layer E4a/E5a/E5b: the primitive time-domain boundary configuration must give
   incident, reflected, and transmitted waves independent positive frequencies and wave vectors,
   then compare ordinary real traces for every boundary point and time. Prove harmonic uniqueness,
@@ -406,7 +425,7 @@ PR unless maintainers explicitly ask to retain it.
   complex-dispersion regression reported `despite`, `exercise`, `guards`, and `te`; the ordinary
   words were reworded and only the transverse-electric abbreviation `te` was added to both the
   Lean spelling dictionary and the separate CI codespell ignore list. The exact real-wave
-  nonzero-amplitude bridge introduced no new spelling vocabulary.
+  nonzero-amplitude bridge and complex-Maxwell regression introduced no new spelling vocabulary.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 

@@ -317,6 +317,11 @@ Ownership rules:
   of the forward theorem: `K = (5, 0, -4 I)` has bilinear square `9` but Hermitian squared norm
   `41`; the TM amplitude is bilinearly transverse but has Hermitian pairing `40`; and both exact
   magnetic amplitudes satisfy the signed `K cross B0 = -9 E0` relation by coordinate calculation.
+- [x] Exact ordinary-real-field Maxwell regressions now realize that TE/TM data, verify both
+  source-free endpoints and guarded characterizations, pin the TM quadrature sign at two phases,
+  and falsify unguarded dispersion, one-phase amplitude recovery, Hermitian transversality, and
+  three-laws-imply-four reasoning with zero-amplitude and complex-null fixtures. A concrete real
+  embedding separately checks real/complex guarded-converse coherence on the embedded image.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -378,6 +383,9 @@ Ownership rules:
   quarter-period carrier samples to prove that ordinary-real-field Maxwell satisfaction forces
   bilinear transversality and, for nonzero electric amplitude, material dispersion; it also proves
   the zero-amplitude degeneracy and the guarded characterization.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexMaxwellRegression` supplies the
+  exact TE/TM ordinary real fields and Maxwell endpoints, the zero-amplitude, one-phase, and
+  complex-null falsification fixtures, and a concrete embedded-real coherence check.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -1231,8 +1239,9 @@ sources.
 - [x] an exact attenuating `K = (5, 0, -4 I)` algebraic regression with TE/TM amplitudes,
   bilinear-versus-Hermitian distinctions, dispersion, magnetic amplitudes, and signed cross
   relations; and
-- [ ] exact ordinary-real-field and degenerate-case falsification regressions, followed by an
-  interface-oriented outgoing/decaying branch for evanescent fields.
+- [x] exact ordinary-real-field TE/TM, zero-amplitude, one-phase, complex-null, and embedded-real
+  guarded-converse regressions; and
+- [ ] an interface-oriented outgoing/decaying branch for evanescent fields.
 
 Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
 
@@ -2018,7 +2027,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, and exact TE/TM dispersion regression complete; ordinary-field falsification regressions and interface-selected outgoing branch remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, and exact algebraic and ordinary-field falsification regressions complete; the interface-selected outgoing branch remains |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
@@ -2158,10 +2167,10 @@ human verification recorded in `tbd.md`.
    magnetic Gauss and Faraday laws and the stronger hypotheses used only by electric Gauss and
    Ampere--Maxwell. Preserve the now-complete guarded converse, especially its two-time amplitude
    recovery, the nonzero electric-amplitude guard needed only for dispersion, and the explicit
-   zero-amplitude off-shell degeneracy. Preserve the exact algebraic decay regression, especially
-   its bilinear-versus-Hermitian distinction and direct signed cross calculations. Proceed next to
-   ordinary-real-field TE/TM, one-phase, null-vector, zero-amplitude, and real-bridge regressions,
-   and only then the interface-oriented outgoing/decaying layer. Withhold power claims until
+   zero-amplitude off-shell degeneracy. Preserve the exact algebraic and ordinary-field regression
+   suite, especially its bilinear-versus-Hermitian distinction, direct signed cross calculations,
+   two-phase sampling, zero-amplitude guard, complex-null failure, and embedded-image limitation.
+   Proceed next to the interface-oriented outgoing/decaying layer. Withhold power claims until
    Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
@@ -2176,9 +2185,8 @@ P6b-3's physical observables and all Fresnel work must still follow the named el
 medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, oriented
 Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell complex
 carrier, exact real-wave bridge, generic carrier calculus, and bilinear material dispersion now
-connected with forward and converse ordinary-real-field Maxwell and an exact algebraic TE/TM decay
-regression, the next physical-optics front is the ordinary-real-field TE/TM, one-phase,
-null-vector, zero-amplitude, and real-bridge falsification suite. The interface-oriented
-outgoing/decaying branch follows on that shared carrier. The interface must start from
+connected with forward and converse ordinary-real-field Maxwell and exact algebraic plus
+ordinary-real-field falsification regressions, the next physical-optics front is the
+interface-oriented outgoing/decaying branch on that shared carrier. The interface must start from
 independent-frequency time-domain traces and derive frequency conservation before it uses a
 fixed-frequency Fresnel reduction. The independent circuit front remains N2a/N3.
