@@ -228,6 +228,11 @@ Ownership rules:
   quotient is algebraically equivalent to the Poincare sphere through the existing
   Jones--coherency--Stokes chain. Exact phase fibers, rank-one coherency factorization, and the six
   canonical axes are proved without making a topological or physical-power claim.
+- [x] Rectangular congruence on self-adjoint complex matrices is a neutral real-linear
+  construction shared by Optics and the existing Relativity compatibility API. Jones matrices
+  induce wrapped real Mueller matrices through that construction, with proved Jones/coherency/
+  Stokes commuting squares, the audited Pauli trace formula, physical-cone preservation,
+  identity/cascade/scalar laws, algebraic-unitary consequences, and sign-sensitive regressions.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -249,9 +254,6 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] Complete the deterministic Mueller API; the closed-ball, determinant/rank boundary,
-  strict-interior, unit-Jones phase quotient, raw Stokes, and physical coherency results are
-  present;
 - [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -835,9 +837,10 @@ Jones matrices induce deterministic coherency and Mueller maps but do not descri
 A later general depolarizing layer needs positive, and where physically appropriate completely
 positive, maps on coherency data; it must not be smuggled into the Jones API.
 
-#### P4. Deterministic Mueller action
+#### P4. Deterministic Mueller action — complete
 
-Candidate location: `Physlib/Optics/Polarization/Mueller.lean`.
+Locations: `Physlib/Optics/Polarization/Mueller.lean` and
+`Physlib/Optics/Polarization/Mueller/`.
 
 Deliverables:
 
@@ -852,6 +855,21 @@ Deliverables:
 
 Exit: Jones, coherency, Stokes, and deterministic Mueller calculations are four proved views of the
 same transformation.
+
+Completion evidence: `Matrix.selfAdjointCongruence` supplies the rectangular neutral real-linear
+map `C ↦ A C Aᴴ`, with identity, cascade, and arbitrary complex-scaling laws; the prior
+`Lorentz.SL2C.toSelfAdjointMap'` remains a compatibility alias rather than becoming an Optics
+dependency. `JonesMatrix.mueller` transports this map through `selfAdjointStokesEquiv` into a
+wrapped real `4 × 4` carrier. The implementation proves both Jones/coherency commuting squares,
+preservation of the entire physical Stokes cone, entry reality, and the exact half-trace formula in
+audited Stokes order `(σ₀, σ₃, σ₁, σ₂)`. Identity, cascade, arbitrary-scalar, and unit-phase laws
+are connected to the same construction. Algebraic Jones unitarity preserves raw Jones
+intensity, coherency trace, raw Stokes intensity, the unpolarized axis, polarization norm, and
+Poincare-sphere membership without claiming electromagnetic power or `SO(3)`. The algebraically
+named `diag(1, I)` regression proves
+`(S₀, S₁, S₂, S₃) ↦ (S₀, S₁, -S₃, S₂)` and connects the corresponding canonical Jones states.
+The raw Mueller wrapper explicitly certifies neither physical admissibility nor Jones
+inducibility, and no general depolarizing-map claim is made.
 
 #### P5a. Jones polarizer and Malus core
 
@@ -1709,7 +1727,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P3b-1 Stokes/coherency cone | done | P2a, P3b-0 | raw linear reconstruction, exact PSD cone, coherency equivalence, and round-trip suite |
 | P3b-2 Jones--Stokes bridge | done | P2b, P3b-1 | coherency-derived components, scaling/phase laws, and normalized canonical-state suite |
 | P3c Poincare classification | done | P3b-1, P3b-2 | closed-ball, boundary/interior, exact phase-fiber, rank-one factorization, orbit-quotient, and canonical-axis suites |
-| P4 deterministic Mueller | ready | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
+| P4 deterministic Mueller | done | P1a, P2a, P3a, P3b-1 | transported real action, Pauli trace/reality, cone, algebra, unitary, and regression suites |
 | P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
 | P6a retarder core | ready | P1a | unitary Jones action and canonical-state suite |
@@ -1811,8 +1829,8 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, P3b-2, and P3c are complete, independently reviewed,
-   validated, and integrated.
+1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, P3b-2, P3c, and P4 are complete, independently
+   reviewed, validated, and integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
    carries no Jones-purity assumption, the Pauli coordinates remain basis-fixed but independent of
@@ -1826,14 +1844,16 @@ human verification recorded in `tbd.md`.
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
    raw electric-amplitude-squared normalization, not irradiance or modal power.
-4. Build P4's deterministic Mueller action through the existing Jones--coherency--Stokes chain.
-   Prove reality, action agreement, identity, composition, phase invariance, and the unitary sphere
-   consequences without presenting deterministic Jones optics as a general depolarizing theory.
+4. Build P5a's ideal linear polarizer as a normalized rank-one Jones projection and prove its
+   self-adjointness, idempotence, axis transmission, orthogonal extinction, intensity contraction,
+   and Malus law from the existing raw Jones definitions. Connect its coherency, Stokes, and P4
+   Mueller views, but retain the explicit boundary that Jones intensity is not yet irradiance or
+   modal power.
 5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
-6. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
-   PR concepts and do not translate Jones intensity into physical power before E3b.
+6. P6a retarders are also unblocked after P4, but keep polarizers and retarders as separate
+   component PR concepts and do not translate Jones intensity into physical power before E3b.
 7. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.

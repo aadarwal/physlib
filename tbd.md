@@ -28,6 +28,10 @@ PR unless maintainers explicitly ask to retain it.
   then one coherent component or representation per PR.
 - [ ] Propose `Physlib.Mathematics.MatrixRank` as a neutral prerequisite PR, independently of
   Optics. Its finite-rank criteria support the Poincare classification but are not optical facts.
+- [ ] Propose `Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint` as a neutral prerequisite PR,
+  independently of deterministic Mueller optics. Preserve
+  `Lorentz.SL2C.toSelfAdjointMap'` as a compatibility alias and do not introduce a Relativity
+  import into Optics.
 - [ ] Preserve the Poincare work as reviewable stacked concepts: normalized closed-ball
   equivalences first, determinant/rank boundary-versus-interior classification second, and the
   unit-Jones global-phase quotient third. The combined fork history is intentionally broader than
@@ -36,6 +40,11 @@ PR unless maintainers explicitly ask to retain it.
   normalized unit-Jones action, coherency, and exact phase fibers first; constructive sphere
   representatives, quotient equivalence, and canonical-axis regressions second. Keep the private
   algebraic charts out of the public API.
+- [ ] Preserve deterministic Mueller work as reviewable stacked concepts: neutral self-adjoint
+  congruence; Jones scaling/unitarity and minimal Pauli/Stokes/coherency bridges; transported raw
+  Mueller action and commuting squares; trace/reality; identity/cascade/scalar algebra; unitary
+  consequences; and convention regressions. The combined fork milestone is intentionally larger
+  than one upstream PR.
 - [ ] Treat a topological upgrade of the Jones phase quotient as a separate design and proof
   package. Do not call the algebraic equivalence a homeomorphism or assert a continuously varying
   global Jones representative without the required quotient-topology and continuity theorems.
@@ -67,6 +76,9 @@ PR unless maintainers explicitly ask to retain it.
   right/left circular names. Until then use only “positive/negative third Stokes coordinate.”
 - [ ] Verify which algebraic positive/negative-`I` quadrature Jones state receives each right/left
   circular name, using reconstructed real-field rotation, before completing regression P-04b.
+- [ ] Human-check the P4 trace factor, Stokes-ordered Pauli permutation, Jones cascade direction,
+  and `diag(1, I)` regression before proposing any deterministic Mueller PR. Keep the current
+  algebraic names until the observer and retarder-axis conventions are certified.
 
 ## Modal and network semantics
 
@@ -124,6 +136,10 @@ PR unless maintainers explicitly ask to retain it.
   searches, import-order checks, and spelling checks.
 - [ ] Add new physics vocabulary to `scripts/MetaPrograms/spellingWords.txt` only when the spelling
   checker actually reports it.
+- [ ] Repair or update `scripts/MetaPrograms/spelling.lean` for the repository's Lean 4.33 string
+  API before relying on the official spelling executable. It currently fails at
+  `Char.isWhitespace`/`String.Slice`; P4 used an exact differential emulation and added only the
+  resulting new vocabulary.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
