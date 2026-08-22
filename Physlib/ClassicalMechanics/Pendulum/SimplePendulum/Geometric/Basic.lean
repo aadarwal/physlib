@@ -362,13 +362,10 @@ lemma toSpace_apply_one (ℓ : ℝ) (q : ConfigurationSpace) :
     toSpace ℓ q 1 = -(ℓ * q.cos) := neg_mul ℓ q.cos
 
 /-- The position of the bob for the configuration at angle `θ`. -/
+@[simp]
 lemma toSpace_ofAngle (ℓ θ : ℝ) :
     toSpace ℓ (ofAngle θ) = ⟨![ℓ * Real.sin θ, -ℓ * Real.cos θ]⟩ := by
   simp [toSpace]
-
-/-- At `θ = 0` the bob hangs straight down, at `(0, -ℓ)`. -/
-lemma toSpace_ofAngle_zero (ℓ : ℝ) : toSpace ℓ (ofAngle 0) = ⟨![0, -ℓ]⟩ := by
-  simp [toSpace_ofAngle]
 
 /-- The rod-length constraint: the bob is at distance `|ℓ|` from the pivot. -/
 @[simp]
