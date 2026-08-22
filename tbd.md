@@ -188,7 +188,12 @@ PR unless maintainers explicitly ask to retain it.
   absence of a positive-side incoming slot does not establish one-sided illumination. The local
   predicates stipulate rather than derive the macroscopic laws. If
   `reflected.electricAmplitude = 0`, its frequency and wave vector remain unconstrained dummy data,
-  so every later reflected-conservation result must retain the zero-amplitude disjunction.
+  so every later reflected-conservation result must retain the zero-amplitude disjunction. Confirm
+  that the zero-free-surface-charge joint electric consequence combines exactly tangential `E` and
+  scalar normal `D`, with incident plus reflected in the negative medium equal to transmitted in
+  the positive medium. The free surface current remains arbitrary because neither magnetic law is
+  used. Its boundary-character form must use each wave's independent exponent and stored-point
+  referenced amplitude; it proves no noncancellation, exponent equality, or conservation by itself.
 - [ ] Human-check the neutral oriented-affine-hyperplane convention before assigning media. Its
   stored normal points from the geometric negative side toward the positive side; the positive
   side normal is `n`, the negative side normal is `-n`; signed normal coordinate is positive on
