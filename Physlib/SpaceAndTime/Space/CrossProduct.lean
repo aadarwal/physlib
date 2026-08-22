@@ -21,6 +21,7 @@ and prove various properties about it related to time derivatives and inner prod
 - `⨯ₑ₃` : The cross product on `EuclideanSpace ℝ (Fin 3)`.
 - `cross_add`, `add_cross`, `cross_smul`, `smul_cross` : Bilinearity of the cross product.
 - `cross_cross_eq_smul_sub_smul` : The vector triple-product identity.
+- `inner_cross_cross` : The inner product of two cross products as a Gram determinant.
 - `time_deriv_cross_commute` : Time derivatives move out of cross products.
 - `inner_cross_self` : Inner product of a vector with the cross product of another vector
   and itself is zero.
@@ -100,6 +101,18 @@ lemma cross_cross_eq_smul_sub_smul' (u v w : EuclideanSpace ℝ (Fin 3)) :
   fin_cases i <;>
     simp [crossProduct, PiLp.inner_apply, Fin.sum_univ_three, RCLike.inner_apply] <;>
     ring
+
+/-- The inner product of two cross products is the determinant of their pairwise
+inner products. -/
+lemma inner_cross_cross (u v w x : EuclideanSpace ℝ (Fin 3)) :
+    inner ℝ (u ⨯ₑ₃ v) (w ⨯ₑ₃ x) =
+      inner ℝ u w * inner ℝ v x - inner ℝ u x * inner ℝ v w := by
+  cases u using WithLp.rec with | _ u =>
+  cases v using WithLp.rec with | _ v =>
+  cases w using WithLp.rec with | _ w =>
+  cases x using WithLp.rec with | _ x =>
+  simpa [PiLp.inner_apply, RCLike.inner_apply, dotProduct, mul_comm] using
+    cross_dot_cross u v w x
 
 /-!
 

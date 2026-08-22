@@ -70,7 +70,7 @@ Requirements:
 
   - description: "The API contains the cross product on `EuclideanSpace ℝ (Fin 3)` with properties relating it to time derivatives and inner products."
     done: true
-    location: "Physlib/SpaceAndTime/Space/CrossProduct.lean (⨯ₑ₃, time_deriv_cross_commute, inner_cross_self)"
+    location: "Physlib/SpaceAndTime/Space/CrossProduct.lean (⨯ₑ₃, inner_cross_cross, time_deriv_cross_commute, inner_cross_self)"
 
   - description: "The API contains the derivatives of functions from `Space` to normed spaces."
     done: true
