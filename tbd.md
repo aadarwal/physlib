@@ -167,6 +167,17 @@ PR unless maintainers explicitly ask to retain it.
   transmitted medium 2, and independently confirm whether every public Fresnel `p` coefficient
   scales a full electric-vector axis or a tangential component. The present incidence-frame API
   fixes neither interface-side roles nor a tangential-amplitude conversion.
+- [ ] Human-check E2e's complex-wavevector convention: the carrier uses
+  `exp (I * (ω t - K·x))`, the pairing `K·x` and dispersion square `K·K` are complex-bilinear
+  rather than Hermitian, `K = q - I a`, and `a = α n` with `α > 0` gives amplitude decay
+  `exp (-α u)` at increasing positive-normal depth. With `q ⊥ n`, confirm that the bilinear
+  square is `K·K = ‖q‖² - α²`, and independently check that the exact
+  `(waveNumber, 0, -I * decayRate)` regression pins the intended sign.
+- [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
+  geometry only. It does not choose an interface half-space or square-root branch, label a field
+  transmitted or outgoing, prove complex Maxwell equations, or assign power flow. Split a future
+  upstream stack into complex-vector/bilinear foundations, phase--attenuation spatial factors,
+  positive-normal decay, and coordinate regressions.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
@@ -301,8 +312,9 @@ PR unless maintainers explicitly ask to retain it.
   checker actually reports it.
 - [ ] Repair or update `scripts/MetaPrograms/spelling.lean` for the repository's Lean 4.33 string
   API before relying on the official spelling executable. It currently fails at
-  `Char.isWhitespace`/`String.Slice`; P4 used an exact differential emulation and added only the
-  resulting new vocabulary.
+  `Char.isWhitespace`/`String.Slice`; P4 and E2e used exact differential emulations and added only
+  the resulting new vocabulary. E2e's differential added `alpha`, `attenuation`,
+  `attenuationvector`, `decayrate`, `envelope`, `kappa`, `omega`, `phasevector`, and `wavenumber`.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
