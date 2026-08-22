@@ -120,9 +120,9 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The API shall construct the pure coherency matrix of a Jones vector and prove its Hermiticity, positive semidefiniteness, rank-at-most-one and determinant-zero properties, trace-intensity identity, unit-phase invariance, and transformation law under Jones matrices."
-    done: false
-    location: N/A
+  - description: "The API constructs the pure coherency matrix of a Jones vector and proves its Hermiticity, positive semidefiniteness, rank-at-most-one and determinant-zero properties, trace-intensity identity, unit-phase invariance, and transformation law under Jones matrices."
+    done: true
+    location: "Physlib/Optics/Polarization/JonesCoherency.lean (Optics.JonesVector.coherency, Optics.JonesVector.coherency_rank_le_one, Optics.JonesVector.coherency_det_eq_zero, Optics.JonesVector.coherency_trace, Optics.JonesVector.coherency_scale_toMatrix, Optics.JonesVector.coherency_scale_of_norm_eq_one, Optics.JonesVector.coherency_phaseShift, Optics.JonesMatrix.act_coherency)"
 
   - description: "The API contains generic positive-semidefinite coherency matrices independent of Jones purity, with Hermiticity, nonnegative diagonal and trace observables, conjugation by rectangular amplitude maps, cascade compatibility, and joint mode-polarization specializations that retain cross-mode coherence."
     done: true
