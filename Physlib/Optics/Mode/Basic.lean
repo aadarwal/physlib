@@ -35,10 +35,12 @@ spaces.
 
 - `ModeAmplitude`: a complex Euclidean space of power-normalized mode amplitudes.
 - `ModeAmplitude.power`: the total modal power.
+- `ModeAmplitude.directSum`: the parallel concatenation of two mode-amplitude families.
 - `ModeTransform`: a matrix mapping input mode amplitudes to output mode amplitudes.
 - `ModeTransform.toLinearMap`: the induced linear map between mode-amplitude spaces.
 - `ModeTransform.IsPowerPreserving`: a transform preserves total modal power.
 - `ModeTransform.IsPassive`: a transform does not increase total modal power.
+- `ModeTransform.directSum`: the block-diagonal parallel composition of two transforms.
 - `ScatteringMatrix`: a wrapped square transform from incident to outgoing amplitudes.
 - `ScatteringMatrix.IsLossless`: a scattering matrix is unitary.
 
@@ -97,6 +99,64 @@ lemma ModeAmplitude.ofReal_power_eq_inner_self {ι : Type*} [Fintype ι]
     (a : ModeAmplitude ι) : Complex.ofReal a.power = inner ℂ a a := by
   simp [ModeAmplitude.power, inner_self_eq_norm_sq_to_K]
 
+/-- The parallel concatenation of two disjoint families of mode amplitudes. -/
+def ModeAmplitude.directSum {ι μ : Type*} (a : ModeAmplitude ι) (b : ModeAmplitude μ) :
+    ModeAmplitude (ι ⊕ μ) :=
+  WithLp.toLp 2 (Sum.elim (WithLp.ofLp a) (WithLp.ofLp b))
+
+/-- A direct-sum amplitude restricts to its first family on the left summand. -/
+@[simp]
+lemma ModeAmplitude.directSum_apply_inl {ι μ : Type*} (a : ModeAmplitude ι)
+    (b : ModeAmplitude μ) (i : ι) : a.directSum b (Sum.inl i) = a i := rfl
+
+/-- A direct-sum amplitude restricts to its second family on the right summand. -/
+@[simp]
+lemma ModeAmplitude.directSum_apply_inr {ι μ : Type*} (a : ModeAmplitude ι)
+    (b : ModeAmplitude μ) (i : μ) : a.directSum b (Sum.inr i) = b i := rfl
+
+/-- The restriction of a direct-sum amplitude to its left index family. -/
+def ModeAmplitude.restrictInl {ι μ : Type*} (a : ModeAmplitude (ι ⊕ μ)) : ModeAmplitude ι :=
+  WithLp.toLp 2 (WithLp.ofLp a ∘ Sum.inl)
+
+/-- The restriction of a direct-sum amplitude to its right index family. -/
+def ModeAmplitude.restrictInr {ι μ : Type*} (a : ModeAmplitude (ι ⊕ μ)) : ModeAmplitude μ :=
+  WithLp.toLp 2 (WithLp.ofLp a ∘ Sum.inr)
+
+/-- Restriction to the left summand evaluates at the corresponding sum index. -/
+@[simp]
+lemma ModeAmplitude.restrictInl_apply {ι μ : Type*} (a : ModeAmplitude (ι ⊕ μ)) (i : ι) :
+    a.restrictInl i = a (Sum.inl i) := rfl
+
+/-- Restriction to the right summand evaluates at the corresponding sum index. -/
+@[simp]
+lemma ModeAmplitude.restrictInr_apply {ι μ : Type*} (a : ModeAmplitude (ι ⊕ μ)) (i : μ) :
+    a.restrictInr i = a (Sum.inr i) := rfl
+
+/-- Restriction to the left summand recovers the first direct-sum amplitude. -/
+@[simp]
+lemma ModeAmplitude.restrictInl_directSum {ι μ : Type*} (a : ModeAmplitude ι)
+    (b : ModeAmplitude μ) : (a.directSum b).restrictInl = a := rfl
+
+/-- Restriction to the right summand recovers the second direct-sum amplitude. -/
+@[simp]
+lemma ModeAmplitude.restrictInr_directSum {ι μ : Type*} (a : ModeAmplitude ι)
+    (b : ModeAmplitude μ) : (a.directSum b).restrictInr = b := rfl
+
+/-- Every amplitude on a sum-indexed family is the direct sum of its two restrictions. -/
+@[simp]
+lemma ModeAmplitude.directSum_restrict {ι μ : Type*} (a : ModeAmplitude (ι ⊕ μ)) :
+    a.restrictInl.directSum a.restrictInr = a := by
+  apply WithLp.ofLp_injective 2
+  funext i
+  rcases i with i | i <;> rfl
+
+/-- The power of two disjoint mode-amplitude families is the sum of their powers. -/
+lemma ModeAmplitude.power_directSum {ι μ : Type*} [Fintype ι] [Fintype μ]
+    (a : ModeAmplitude ι) (b : ModeAmplitude μ) :
+    (a.directSum b).power = a.power + b.power := by
+  simp only [ModeAmplitude.power_eq_sum_normSq, Fintype.sum_sum_type,
+    ModeAmplitude.directSum_apply_inl, ModeAmplitude.directSum_apply_inr]
+
 /-! ## B. Mode transforms -/
 
 /-- A complex matrix mapping mode amplitudes indexed by `ι` to amplitudes indexed by `κ`.
@@ -119,6 +179,28 @@ def ModeTransform.IsPowerPreserving {ι κ : Type*} [Fintype ι] [DecidableEq ι
 def ModeTransform.IsPassive {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     (T : ModeTransform ι κ) : Prop :=
   ∀ a : ModeAmplitude ι, ModeAmplitude.power (T.toLinearMap a) ≤ a.power
+
+/-- The block-diagonal parallel composition of transforms on disjoint input and output modes.
+
+This operation places two independent transforms side by side. It is not a summing junction or a
+feedback interconnection. -/
+def ModeTransform.directSum {ι κ μ ν : Type*} (T : ModeTransform ι κ)
+    (U : ModeTransform μ ν) : ModeTransform (ι ⊕ μ) (κ ⊕ ν) :=
+  Matrix.fromBlocks T 0 0 U
+
+/-- A block-diagonal transform acts independently on the two direct-sum amplitude families. -/
+lemma ModeTransform.directSum_apply {ι κ μ ν : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype μ] [DecidableEq μ] (T : ModeTransform ι κ) (U : ModeTransform μ ν)
+    (a : ModeAmplitude ι) (b : ModeAmplitude μ) :
+    (T.directSum U).toLinearMap (a.directSum b) =
+      (T.toLinearMap a).directSum (U.toLinearMap b) := by
+  apply WithLp.ofLp_injective 2
+  funext i
+  rcases i with i | i
+  · simp [ModeTransform.directSum, ModeAmplitude.directSum, Matrix.toLpLin_apply,
+      Matrix.fromBlocks_mulVec]
+  · simp [ModeTransform.directSum, ModeAmplitude.directSum, Matrix.toLpLin_apply,
+      Matrix.fromBlocks_mulVec]
 
 /- The ambient norm inherited by the matrix alias is an entrywise norm, not the induced
 operator norm on mode amplitudes. Consequently, passivity should not be rewritten as `‖T‖ ≤ 1`
@@ -154,6 +236,26 @@ lemma ModeTransform.IsPowerPreserving.isPassive {ι κ : Type*} [Fintype ι] [De
     [Fintype κ]
     {T : ModeTransform ι κ} (hT : T.IsPowerPreserving) : T.IsPassive :=
   fun a => (hT a).le
+
+/-- Parallel composition preserves power when each independent transform preserves power. -/
+lemma ModeTransform.IsPowerPreserving.directSum {ι κ μ ν : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [Fintype μ] [DecidableEq μ] [Fintype ν]
+    {T : ModeTransform ι κ} {U : ModeTransform μ ν} (hT : T.IsPowerPreserving)
+    (hU : U.IsPowerPreserving) : (T.directSum U).IsPowerPreserving := by
+  intro x
+  rw [← ModeAmplitude.directSum_restrict x, ModeTransform.directSum_apply]
+  simpa only [ModeAmplitude.power_directSum] using
+    congrArg₂ (· + ·) (hT x.restrictInl) (hU x.restrictInr)
+
+/-- Parallel composition is passive when each independent transform is passive. -/
+lemma ModeTransform.IsPassive.directSum {ι κ μ ν : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [Fintype μ] [DecidableEq μ] [Fintype ν]
+    {T : ModeTransform ι κ} {U : ModeTransform μ ν} (hT : T.IsPassive)
+    (hU : U.IsPassive) : (T.directSum U).IsPassive := by
+  intro x
+  rw [← ModeAmplitude.directSum_restrict x, ModeTransform.directSum_apply]
+  simpa only [ModeAmplitude.power_directSum] using
+    add_le_add (hT x.restrictInl) (hU x.restrictInr)
 
 /-- A mode transform satisfying the isometry equation `Tᴴ * T = 1` preserves power. -/
 lemma ModeTransform.isPowerPreserving_of_conjTranspose_mul_self {ι κ : Type*}
@@ -276,6 +378,19 @@ lemma ScatteringMatrix.isLossless_iff_isPowerPreserving {ι : Type*}
     S.IsLossless ↔ ModeTransform.IsPowerPreserving S.toModeTransform := by
   rw [ModeTransform.isPowerPreserving_iff_mem_unitaryGroup]
   rfl
+
+/-- The independent parallel composition of two scattering matrices on disjoint channels. -/
+def ScatteringMatrix.directSum {ι μ : Type*} (S : ScatteringMatrix ι)
+    (R : ScatteringMatrix μ) : ScatteringMatrix (ι ⊕ μ) where
+  toModeTransform := S.toModeTransform.directSum R.toModeTransform
+
+/-- The independent parallel composition of lossless scattering matrices is lossless. -/
+lemma ScatteringMatrix.IsLossless.directSum {ι μ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype μ] [DecidableEq μ]
+    {S : ScatteringMatrix ι} {R : ScatteringMatrix μ} (hS : S.IsLossless)
+    (hR : R.IsLossless) : (S.directSum R).IsLossless := by
+  rw [ScatteringMatrix.isLossless_iff_isPowerPreserving]
+  exact hS.isPowerPreserving.directSum hR.isPowerPreserving
 
 end
 

@@ -64,9 +64,9 @@ Requirements:
     done: true
     location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeTransform.isPowerPreserving_iff_conjTranspose_mul_self, Optics.ModeTransform.re_inner_one_sub_conjTranspose_mul_self, Optics.ModeTransform.isPassive_iff_posSemidef_one_sub_conjTranspose_mul_self, Optics.ModeTransform.isPowerPreserving_iff_mem_unitaryGroup, Optics.ScatteringMatrix.isLossless_iff_isPowerPreserving)"
 
-  - description: "The API shall contain parallel composition of mode transforms by finite direct sums or block matrices and prove closure of power preservation and passivity under parallel composition."
-    done: false
-    location: N/A
+  - description: "The API contains parallel composition of mode transforms by binary direct sums and proves closure of power preservation and passivity under parallel composition."
+    done: true
+    location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeAmplitude.directSum, Optics.ModeAmplitude.restrictInl, Optics.ModeAmplitude.restrictInr, Optics.ModeAmplitude.directSum_restrict, Optics.ModeAmplitude.power_directSum, Optics.ModeTransform.directSum, Optics.ModeTransform.directSum_apply, Optics.ModeTransform.IsPowerPreserving.directSum, Optics.ModeTransform.IsPassive.directSum, Optics.ScatteringMatrix.directSum, Optics.ScatteringMatrix.IsLossless.directSum)"
 
   - description: "Using paired time-reversed channel modes and fixed reference-plane conventions, the API shall define reciprocal scattering matrices, channel relabeling and rephasing, and prove which physical predicates are invariant under these changes of convention."
     done: false
