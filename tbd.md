@@ -179,6 +179,16 @@ PR unless maintainers explicitly ask to retain it.
   or material response. `PlanarMacroscopicTrace` is pointwise carrier data obtained honestly from
   globally defined fields, not yet an analytic one-sided trace, and these local laws are stipulated
   rather than derived from integral Maxwell equations until E4b.
+- [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
+  complex-carrier candidates are off shell and retain independent positive frequencies and complex
+  wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined
+  incident-plus-reflected fields, with `D` and `H` formed in the negative medium;
+  `positiveTrace` is the corresponding transmitted trace in the positive medium. These are not
+  half-space restrictions or analytic one-sided traces. The role words are labels only, and the
+  absence of a positive-side incoming slot does not establish one-sided illumination. The local
+  predicates stipulate rather than derive the macroscopic laws. If
+  `reflected.electricAmplitude = 0`, its frequency and wave vector remain unconstrained dummy data,
+  so every later reflected-conservation result must retain the zero-amplitude disjunction.
 - [ ] Human-check the neutral oriented-affine-hyperplane convention before assigning media. Its
   stored normal points from the geometric negative side toward the positive side; the positive
   side normal is `n`, the negative side normal is `-n`; signed normal coordinate is positive on
@@ -302,6 +312,13 @@ PR unless maintainers explicitly ask to retain it.
   noncancellation hypotheses before introducing the reduced fixed-frequency complex-amplitude
   problem used for Snell and Fresnel calculations. Never assume common frequency in a premise
   whose conclusion is meant to establish frequency conservation.
+- [ ] Human-check E5a's aggregate-collision guard. If the reflected boundary exponent equals the
+  incident exponent, harmonic uniqueness sees the combined referenced amplitude `A_i + A_r`, not
+  `A_i` alone. A nonzero incident amplitude therefore cannot force the transmitted rate: choosing
+  `A_r = -A_i` at the same exponent and zero transmitted amplitude leaves its exponent arbitrary.
+  The three-wave collision theorem must require the exact combined referenced joint-trace amplitude
+  to be nonzero together with `A_r = 0` or equality of the reflected and incident rates, or an
+  equivalent condition that preserves the zero-reflection branch.
 - [ ] Use finite exponential-character independence for E5a rather than assuming a Fourier
   transform or common period. The neutral layer now proves both uniqueness for finite complex sums
   indexed by complex-valued real-linear functionals and its ordinary-real-sum consequence when all
