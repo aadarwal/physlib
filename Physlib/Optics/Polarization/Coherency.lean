@@ -21,6 +21,7 @@ between optical modes.
 ## ii. Main definitions
 
 - `CoherencyMatrix`: a complex matrix together with positive semidefiniteness.
+- `CoherencyMatrix.toSelfAdjoint`: coherency data as a bundled self-adjoint matrix.
 - `CoherencyMatrix.trace`: the real, nonnegative trace of finite coherency data.
 - `CoherencyMatrix.map`: the transformation `C ↦ A * C * Aᴴ` induced by a linear amplitude map.
 - `PolarizationCoherency`: coherency data on two polarization coordinates.
@@ -61,6 +62,16 @@ namespace CoherencyMatrix
 /-- A coherency matrix is Hermitian. -/
 lemma isHermitian {ι : Type*} (C : CoherencyMatrix ι) : C.toMatrix.IsHermitian :=
   C.posSemidef.isHermitian
+
+/-- Bundle a coherency matrix as a self-adjoint matrix. -/
+def toSelfAdjoint {ι : Type*} (C : CoherencyMatrix ι) :
+    selfAdjoint (Matrix ι ι ℂ) :=
+  ⟨C.toMatrix, C.isHermitian⟩
+
+/-- The matrix underlying the self-adjoint form of coherency data is unchanged. -/
+@[simp]
+lemma toSelfAdjoint_val {ι : Type*} (C : CoherencyMatrix ι) :
+    C.toSelfAdjoint.val = C.toMatrix := rfl
 
 /-! ## B. Diagonal and trace observables -/
 
