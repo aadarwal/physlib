@@ -301,6 +301,19 @@ lemma intensity_selfAdjointStokesEquiv
     (selfAdjointStokesEquiv A).intensity = 2 * PauliMatrix.scalarCoeff A :=
   selfAdjointStokesEquiv_inl_zero A
 
+/-- Casting Stokes intensity to `ℂ` gives the trace of its reconstructed self-adjoint matrix. -/
+lemma coe_intensity_eq_trace_toSelfAdjoint (S : StokesVector) :
+    (S.intensity : ℂ) = Matrix.trace S.toSelfAdjoint.val := by
+  have h := intensity_selfAdjointStokesEquiv S.toSelfAdjoint
+  rw [StokesVector.toSelfAdjoint, selfAdjointStokesEquiv.apply_symm_apply] at h
+  calc
+    (S.intensity : ℂ) = ((2 * PauliMatrix.scalarCoeff S.toSelfAdjoint : ℝ) : ℂ) := by
+      exact congrArg Complex.ofReal h
+    _ = Matrix.trace S.toSelfAdjoint.val := by
+      rw [PauliMatrix.trace_eq_two_mul_scalarCoeff]
+      push_cast
+      rfl
+
 /-- The polarization norm of self-adjoint Stokes coordinates is twice the Pauli radius. -/
 lemma polarization_norm_selfAdjointStokesEquiv
     (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
@@ -425,6 +438,32 @@ lemma StokesVector.toSelfAdjoint_selfAdjointStokesEquiv
     (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
     (selfAdjointStokesEquiv A).toSelfAdjoint = A :=
   selfAdjointStokesEquiv.symm_apply_apply A
+
+namespace StokesVector
+
+/-- A standard Stokes-coordinate basis vector reconstructs as one half of its reordered Pauli
+matrix. -/
+lemma toSelfAdjoint_single (j : StokesIndex) :
+    StokesVector.toSelfAdjoint (EuclideanSpace.single j 1 : StokesVector) =
+      (1 / 2 : ℝ) • PauliMatrix.pauliSelfAdjoint (stokesPauliIndexEquiv j) := by
+  apply selfAdjointStokesEquiv.injective
+  rw [selfAdjointStokesEquiv_toSelfAdjoint, LinearEquiv.map_smul,
+    selfAdjointStokesEquiv_pauliSelfAdjoint]
+  ext i
+  by_cases h : j = i
+  · subst h
+    simp
+  · simp [h]
+
+/-- Stokes data with zero polarization reconstructs as a scalar multiple of the identity matrix. -/
+lemma toSelfAdjoint_ofIntensityPolarization_zero (s : ℝ) :
+    (StokesVector.ofIntensityPolarization s 0).toSelfAdjoint.val =
+      (s / 2 : ℂ) • (1 : Matrix (Fin 2) (Fin 2) ℂ) := by
+  rw [StokesVector.toSelfAdjoint_val_eq_matrix]
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [StokesVector.ofIntensityPolarization]
+
+end StokesVector
 
 /-- Positive semidefiniteness is exactly physicality of the corresponding Stokes coordinates. -/
 lemma posSemidef_iff_selfAdjointStokesEquiv_isPhysical
