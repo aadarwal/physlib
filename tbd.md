@@ -26,6 +26,12 @@ PR unless maintainers explicitly ask to retain it.
   tracks upstream.
 - [ ] Keep upstream PRs small and stackable: roadmap documentation first, modal foundations next,
   then one coherent component or representation per PR.
+- [ ] Propose `Physlib.Mathematics.MatrixRank` as a neutral prerequisite PR, independently of
+  Optics. Its finite-rank criteria support the Poincare classification but are not optical facts.
+- [ ] Preserve the Poincare work as reviewable stacked concepts: normalized closed-ball
+  equivalences first, determinant/rank boundary-versus-interior classification second, and the
+  unit-Jones global-phase quotient third. The combined fork history is intentionally broader than
+  any single proposed upstream PR.
 - [ ] Decide with maintainers whether the scattering wrapper belongs with modal foundations or in
   a separate typed-port PR. It intentionally has no multiplication instance.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
