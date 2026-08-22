@@ -287,13 +287,16 @@ PR unless maintainers explicitly ask to retain it.
   problem used for Snell and Fresnel calculations. Never assume common frequency in a premise
   whose conclusion is meant to establish frequency conservation.
 - [ ] Use finite exponential-character independence for E5a rather than assuming a Fourier
-  transform or common period. The neutral theorem now proves uniqueness for finite complex sums
-  indexed by complex-valued real-linear functionals; it does not by itself turn equality of real
-  fields into complex-amplitude equality. Its `Multiplicative V` source is only the type-level
-  presentation of addition as multiplication required by Mathlib's character theorem, not extra
-  structure on `V`. Human-check that the next bridge uses strictly positive frequencies to
-  separate every character from its conjugate negative-frequency character and aggregates
-  repeated functionals before invoking independence. Before upstream, also confirm whether these
+  transform or common period. The neutral layer now proves both uniqueness for finite complex sums
+  indexed by complex-valued real-linear functionals and its ordinary-real-sum consequence when all
+  supported functionals have strictly positive imaginary rate in one common direction. Its
+  `Multiplicative V` source is only the type-level presentation of addition as multiplication
+  required by Mathlib's character theorem, not extra structure on `V`. Human-check that the
+  physical specialization evaluates the project carrier convention on a unit time translation to
+  obtain exactly the positive angular frequency. Strict positivity is essential: a zero functional
+  with imaginary coefficient has zero real realization, while conjugate positive/negative-rate
+  terms can cancel. Repeated functionals are deliberately aggregated by the `Finsupp` key; the
+  theorem does not claim labelwise uniqueness. Before upstream, also confirm whether these
   Mathlib-candidate declarations should continue to extend the `Complex` namespace or move under
   `Physlib` to avoid possible future name collisions. A nonzero electromagnetic boundary amplitude
   should bundle tangential `E` with normal `D` (or an equivalently injective joint trace), because

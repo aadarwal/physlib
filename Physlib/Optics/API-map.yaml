@@ -240,6 +240,10 @@ Requirements:
     done: true
     location: "Physlib/Mathematics/ComplexExponentialCharacter.lean (Complex.forall_exp_real_smul_eq_one_iff, Complex.realLinearExponentialCharacter, Complex.realLinearExponentialCharacter_apply, Complex.realLinearExponentialCharacter_injective, Complex.linearIndependent_realLinearExponentialCharacter, Complex.finsupp_sum_mul_exp_eq_zero_iff)"
 
+  - description: "The neutral mathematics layer proves that a finite sum of ordinary real parts of complex exponential characters, whose supported exponent functionals all have strictly positive imaginary rate in one common direction, vanishes everywhere exactly when every complex coefficient aggregated by equal exponent functional vanishes. The positive-rate hypothesis excludes both zero-rate terms with purely imaginary coefficients and conjugate positive/negative-frequency cancellation. The result assumes no topology, norm, common period, electromagnetic trace, or labelwise exponent injectivity, and it does not by itself prove interface noncancellation or frequency conservation."
+    done: true
+    location: "Physlib/Mathematics/ComplexExponentialCharacter.lean (Complex.finsupp_sum_re_mul_exp_eq_zero_iff_of_im_pos)"
+
   - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
     done: false
     location: N/A
