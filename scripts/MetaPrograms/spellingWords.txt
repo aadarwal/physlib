@@ -3277,3 +3277,8 @@ spine
 theta
 epsilon
 te
+boundaries
+hyperplane
+hyperplanes
+intersection
+waveguides
