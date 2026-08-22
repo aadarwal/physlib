@@ -132,7 +132,19 @@ Requirements:
     done: true
     location: "Physlib/Optics/Polarization/Coherency.lean (Optics.CoherencyMatrix, Optics.CoherencyMatrix.isHermitian, Optics.CoherencyMatrix.diagonal_nonneg, Optics.CoherencyMatrix.diagonal_re_nonneg, Optics.CoherencyMatrix.diagonal_im_eq_zero, Optics.CoherencyMatrix.trace, Optics.CoherencyMatrix.trace_nonneg, Optics.CoherencyMatrix.coe_trace, Optics.CoherencyMatrix.map, Optics.CoherencyMatrix.map_one, Optics.CoherencyMatrix.map_map, Optics.PolarizationCoherency, Optics.MultimodePolarizationCoherency)"
 
-  - description: "The API shall define an Optics-local Hermitian basis for two-dimensional polarization and use it to define Stokes parameters for positive-semidefinite coherency matrices; it shall prove invariance of pure-state Stokes data under global phase and identify normalized coherency matrices with the closed Poincare ball, nonzero rank-one states modulo global phase with its sphere, and genuinely partially polarized states with its interior."
+  - description: "The neutral mathematics layer provides the real Pauli basis of self-adjoint two-by-two complex matrices, half-trace coordinate extraction, a bundled real-linear coordinate equivalence, reconstruction, basis-coordinate orthogonality, and scalar-vector/radius identities without importing Relativity or Optics; the established Relativity import paths and public declaration names remain compatible wrappers or extensions."
+    done: true
+    location: "Physlib/Mathematics/PauliMatrices/SelfAdjoint.lean (PauliMatrix.pauliSelfAdjoint, PauliMatrix.trace_pauliMatrix_mul_pauliMatrix, PauliMatrix.pauliCoeff, PauliMatrix.sum_pauliCoeff, PauliMatrix.pauliBasis, PauliMatrix.pauliCoeffEquiv, PauliMatrix.pauliCoeffEquiv_apply, PauliMatrix.pauliCoeff_add, PauliMatrix.pauliCoeff_smul, PauliMatrix.pauliCoeff_zero, PauliMatrix.pauliCoeffEquiv_symm_apply, PauliMatrix.pauliCoeff_pauliSelfAdjoint, PauliMatrix.scalarCoeff, PauliMatrix.vectorCoeff, PauliMatrix.vectorPart, PauliMatrix.pauliRadius, PauliMatrix.matrix_eq_scalar_add_vector, PauliMatrix.trace_eq_two_mul_scalarCoeff, PauliMatrix.vectorPart_sq)"
+
+  - description: "The Optics API shall use the neutral Pauli-coordinate layer to define raw Stokes vectors with an audited basis order, factor of two, and third-coordinate sign; every raw vector shall reconstruct a self-adjoint matrix, while positive-semidefinite polarization coherency matrices shall be equivalent exactly to the physical Stokes cone rather than to all raw vectors."
+    done: false
+    location: N/A
+
+  - description: "The API shall derive Stokes data of a Jones vector through pure coherency, prove its four explicit component formulas and equality of Jones and Stokes intensity, and prove invariance under unit-modulus global phase without assigning right/left circular names before the handedness convention is human-verified."
+    done: false
+    location: N/A
+
+  - description: "The API shall identify normalized nonzero physical coherency matrices with the closed Poincare ball, characterize its boundary by determinant zero and its nonzero boundary by rank one, characterize a precise genuinely mixed class by the interior, and identify unit-intensity Jones vectors modulo unit global phase with the sphere."
     done: false
     location: N/A
 
