@@ -402,6 +402,18 @@ PR unless maintainers explicitly ask to retain it.
   phasors or full electromagnetic amplitudes. Decode matched exponents only into frequency and
   tangent-pairing equality; full wave-vector equality, propagation roles, Maxwell/on-shellness,
   Fresnel data, and power remain absent.
+- [ ] Human-check E5a's electric boundary conservation corollaries before upstreaming. Under the
+  same zero-free-charge local boundary and exact aggregate guard, confirm in both reflected
+  branches that the aggregate equals the transmitted stored-point-referenced joint electric
+  coefficient; its nonvanishing therefore forces the transmitted electric amplitude to be
+  nonzero. This establishes only electric activity, not outward propagation, on-shellness, or
+  positive power. Confirm that no common frequency appears among the premises. Decode transmitted
+  exponent equality into incident/transmitted angular-frequency equality and equality of the
+  complex-bilinear wave-vector pairing against every real tangent displacement. Preserve the
+  reflected conclusion as zero electric amplitude or the analogous two equalities, since its zero
+  branch retains arbitrary dummy frequency and wave-vector data. The complex pairing equality
+  captures both tangential phase and attenuation data but constrains no normal component; do not
+  call it full wave-vector equality or claim Snell, Fresnel, irradiance, or power.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.

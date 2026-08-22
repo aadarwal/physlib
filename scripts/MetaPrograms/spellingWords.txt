@@ -207,6 +207,7 @@ acted
 acting
 action
 actions
+activity
 acts
 actual
 actually
@@ -826,6 +827,7 @@ deciseconds
 declaration
 declarations
 decoded
+decodes
 decompose
 decomposed
 decomposes
@@ -1021,6 +1023,7 @@ elaborate
 elaboration
 elaborator
 electric
+electrically
 electromagnetic
 electromagneticpotential
 electromagnetism
@@ -2278,6 +2281,7 @@ previous
 previously
 primarily
 prime
+primitive
 principal
 principals
 principle
@@ -2656,6 +2660,7 @@ smoother
 smoothly
 smoothness
 snd
+snell
 so
 sobolev
 solar
