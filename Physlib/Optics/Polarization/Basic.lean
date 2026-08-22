@@ -5,7 +5,7 @@ Authors: Zhi Kai Pong, Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.InnerProductSpace.PiL2
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 /-!
 # Jones polarization foundations
@@ -34,6 +34,8 @@ interpretations require later impedance, field-profile, and Poynting-flux normal
   `minusIQuadrature`: normalized canonical coordinate states without circular-handedness names.
 - `JonesMatrix`: a wrapped `2 x 2` complex matrix.
 - `JonesMatrix.act`: the action of a Jones matrix on a Jones vector.
+- `JonesMatrix.scale`: common complex scaling of every Jones-matrix entry.
+- `JonesMatrix.IsUnitary`: algebraic unitarity in the selected Jones coordinate basis.
 
 ## iii. Scope
 
@@ -47,6 +49,9 @@ the existing real harmonic Maxwell solution belongs in a later Optics module imp
 namespace Optics
 
 noncomputable section
+
+open Matrix
+open scoped ComplexConjugate
 
 /-! ## A. Phasors and the realization convention -/
 
@@ -255,6 +260,21 @@ lemma act_components (M : JonesMatrix) (J : JonesVector) (i : Fin 2) :
     (M.act J).components i = ∑ j, M.entries i j * J.components j := by
   rfl
 
+/-- Multiply every Jones-matrix entry by a common complex scalar. -/
+def scale (z : ℂ) (M : JonesMatrix) : JonesMatrix :=
+  ⟨z • M.entries⟩
+
+/-- The entries of a scaled Jones matrix are scaled entrywise. -/
+@[simp]
+lemma scale_entries (z : ℂ) (M : JonesMatrix) :
+    (M.scale z).entries = z • M.entries := rfl
+
+/-- Common scaling of a Jones matrix commutes with its action on Jones vectors. -/
+lemma scale_act (z : ℂ) (M : JonesMatrix) (J : JonesVector) :
+    (M.scale z).act J = JonesVector.scale z (M.act J) := by
+  ext i
+  simp [scale, act, JonesVector.scale, Matrix.mulVec]
+
 /-- The identity Jones matrix. -/
 def identity : JonesMatrix :=
   ⟨1⟩
@@ -262,6 +282,44 @@ def identity : JonesMatrix :=
 /-- Compose two Jones matrices, with `M.comp N` acting first by `N` and then by `M`. -/
 def comp (M N : JonesMatrix) : JonesMatrix :=
   ⟨M.entries * N.entries⟩
+
+/-- Algebraic unitarity of a Jones matrix in the selected orthonormal coordinate basis.
+
+This predicate concerns the squared norm of the raw Jones amplitudes. On its own it makes no
+claim about electromagnetic irradiance, Poynting flux, or normalized modal power. -/
+def IsUnitary (M : JonesMatrix) : Prop :=
+  M.entries ∈ Matrix.unitaryGroup (Fin 2) ℂ
+
+/-- The identity Jones matrix is unitary. -/
+@[simp]
+lemma isUnitary_identity : identity.IsUnitary := by
+  simp [IsUnitary, identity]
+
+/-- A cascade of unitary Jones matrices is unitary. -/
+lemma IsUnitary.comp {M N : JonesMatrix} (hM : M.IsUnitary) (hN : N.IsUnitary) :
+    (M.comp N).IsUnitary :=
+  mul_mem hM hN
+
+/-- A unitary Jones matrix preserves squared raw Jones amplitude. -/
+lemma IsUnitary.act_intensity {M : JonesMatrix} (hM : M.IsUnitary) (J : JonesVector) :
+    (M.act J).intensity = J.intensity := by
+  have hunit : M.entriesᴴ * M.entries = 1 := by
+    rw [← Matrix.star_eq_conjTranspose]
+    exact Matrix.mem_unitaryGroup_iff'.mp hM
+  have hcomp : (Matrix.toLpLin 2 2 M.entries).adjoint.comp
+      (Matrix.toLpLin 2 2 M.entries) = LinearMap.id := by
+    rw [← Matrix.toEuclideanLin_conjTranspose_eq_adjoint,
+      ← Matrix.toLpLin_mul_same, hunit, Matrix.toLpLin_one]
+  rw [JonesVector.intensity, JonesVector.intensity,
+    norm_sq_eq_re_inner (𝕜 := ℂ), norm_sq_eq_re_inner (𝕜 := ℂ)]
+  apply congrArg Complex.re
+  calc
+    inner ℂ ((Matrix.toLpLin 2 2 M.entries) J.components)
+        ((Matrix.toLpLin 2 2 M.entries) J.components) =
+        inner ℂ (((Matrix.toLpLin 2 2 M.entries).adjoint.comp
+          (Matrix.toLpLin 2 2 M.entries)) J.components) J.components := by
+      rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
+    _ = inner ℂ J.components J.components := by rw [hcomp, LinearMap.id_apply]
 
 /-- The identity Jones matrix acts as the identity on Jones vectors. -/
 @[simp]

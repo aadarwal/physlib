@@ -6,7 +6,7 @@ Authors: Gordon Hsu
 module
 
 public import Physlib.Mathematics.SchurTriangulation
-public import Mathlib.LinearAlgebra.Matrix.Hermitian
+public import Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint
 /-! # Extra lemmas regarding `Lorentz.SL2C.toSelfAdjointMap`
 
 This file redefines `Lorentz.SL2C.toSelfAdjointMap` by dropping the special linear condition for its
@@ -42,11 +42,8 @@ namespace SL2C
 
 /-- Definitionally equal to `Lorentz.SL2C.toSelfAdjointMap` but dropping the requirement that `M` be
 special linear. -/
-noncomputable def toSelfAdjointMap' (M : ℂ²ˣ²) : ℍ₂ →ₗ[ℝ] ℍ₂ where
-  toFun | ⟨A, hA⟩ => ⟨M * A * Mᴴ, hA.conjugate M⟩
-  map_add' | ⟨A, _⟩, ⟨B, _⟩ => Subtype.ext <|
-    show M * (A + B) * Mᴴ = M * A * Mᴴ + M * B * Mᴴ by noncomm_ring
-  map_smul' | r, ⟨A, _⟩ => Subtype.ext <| by simp
+noncomputable def toSelfAdjointMap' (M : ℂ²ˣ²) : ℍ₂ →ₗ[ℝ] ℍ₂ :=
+  Matrix.selfAdjointCongruence M
 
 /-! ## Showing `Lorentz.SL2C.toSelfAdjointMap` has determinant 1
 
@@ -188,8 +185,7 @@ noncomputable def toSelfAdjointEquiv (M : ℂ²ˣ²) [Invertible M] : ℍ₂ ≃
 
 lemma toSelfAdjointMap_mul (M N : ℂ²ˣ²) :
     toSelfAdjointMap' (M * N) = toSelfAdjointMap' M ∘ₗ toSelfAdjointMap' N :=
-  LinearMap.ext fun A => Subtype.ext <|
-    show M * N * A * (M * N)ᴴ = M * (N * A * Nᴴ) * Mᴴ by noncomm_ring [Matrix.conjTranspose_mul]
+  Matrix.selfAdjointCongruence_mul N M
 
 lemma toSelfAdjointMap_similar_det (M N : ℂ²ˣ²) [Invertible M] :
     LinearMap.det (toSelfAdjointMap' (M * N * M⁻¹)) = LinearMap.det (toSelfAdjointMap' N) :=

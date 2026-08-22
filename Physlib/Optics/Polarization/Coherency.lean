@@ -7,6 +7,7 @@ module
 
 public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.LinearAlgebra.Matrix.PosDef
+public import Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint
 
 /-!
 # Optical coherency matrices
@@ -118,6 +119,14 @@ def map {ι κ : Type*} [Fintype ι] [Finite κ]
 lemma map_toMatrix {ι κ : Type*} [Fintype ι] [Finite κ]
     (C : CoherencyMatrix ι) (A : Matrix κ ι ℂ) :
     (C.map A).toMatrix = A * C.toMatrix * Aᴴ := rfl
+
+/-- The self-adjoint form of coherency transport is the common self-adjoint congruence map. -/
+@[simp]
+lemma map_toSelfAdjoint {ι κ : Type*} [Fintype ι] [Finite κ]
+    (C : CoherencyMatrix ι) (A : Matrix κ ι ℂ) :
+    (C.map A).toSelfAdjoint = Matrix.selfAdjointCongruence A C.toSelfAdjoint := by
+  apply Subtype.ext
+  rfl
 
 /-- The identity amplitude map leaves coherency data unchanged. -/
 @[simp]

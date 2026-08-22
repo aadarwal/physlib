@@ -130,6 +130,12 @@ noncomputable def pauliCoeff
   | Sum.inr 1 => 1 / 2 * (Matrix.trace (σ2 * A.1)).re
   | Sum.inr 2 => 1 / 2 * (Matrix.trace (σ3 * A.1)).re
 
+/-- A Pauli coefficient is half the real trace pairing with the corresponding Pauli matrix. -/
+lemma pauliCoeff_eq_half_trace_re
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) (μ : Fin 1 ⊕ Fin 3) :
+    pauliCoeff A μ = 1 / 2 * (Matrix.trace (pauliMatrix μ * A.val)).re := by
+  rcases μ with μ | μ <;> fin_cases μ <;> rfl
+
 /-- Every self-adjoint `2 × 2` matrix is its Pauli decomposition. -/
 lemma sum_pauliCoeff
     (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :

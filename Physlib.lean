@@ -124,6 +124,7 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Mathematics.KroneckerDelta.Contraction
 public import Physlib.Mathematics.LeviCivita.Basic
+public import Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint
 public import Physlib.Mathematics.LinearMaps
 public import Physlib.Mathematics.LinearPMap
 public import Physlib.Mathematics.List
@@ -175,6 +176,12 @@ public import Physlib.Optics.Polarization.HarmonicWave
 public import Physlib.Optics.Polarization.JonesCoherency
 public import Physlib.Optics.Polarization.JonesPoincare
 public import Physlib.Optics.Polarization.JonesStokes
+public import Physlib.Optics.Polarization.Mueller
+public import Physlib.Optics.Polarization.Mueller.Algebra
+public import Physlib.Optics.Polarization.Mueller.Basic
+public import Physlib.Optics.Polarization.Mueller.Regression
+public import Physlib.Optics.Polarization.Mueller.Trace
+public import Physlib.Optics.Polarization.Mueller.Unitary
 public import Physlib.Optics.Polarization.Poincare
 public import Physlib.Optics.Polarization.Stokes
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
