@@ -25,7 +25,7 @@ sliding pendulum does (`Physlib.ClassicalMechanics.Pendulum.SlidingPendulum`). T
 the structure of a compact analytic one-dimensional manifold; we obtain it by identifying the
 configuration space with Mathlib's unit circle `Circle` and pulling back its charts. The smooth
 identification of the configuration space with `Circle` (the analogue of the harmonic oscillator's
-`valDiffeomorph`) is deferred to the module on trajectories. The real-valued angle that is used to
+`valDiffeomorph`) is deferred to a later module. The real-valued angle that is used to
 write down the dynamics is a lift of the configuration along the covering map
 `ℝ → ConfigurationSpace`; it is not a chart, and two lifts differing by `2π n` describe the same
 configuration. Finally the position of the bob in the plane is recorded by `toSpace ℓ`, which sends
