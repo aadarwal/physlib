@@ -223,6 +223,18 @@ PR unless maintainers explicitly ask to retain it.
   predicate. Zero electric amplitude is allowed by the forward theorem but in fact solves Maxwell
   even for a mismatched shell, so neither this theorem nor its endpoint is a converse. It assigns
   no interface, outgoing, evanescent-wave, power, potential, or gauge role.
+- [ ] Human-check the guarded complex-carrier converse and its degeneracies. Confirm that at every
+  fixed spatial point the positive-frequency carrier satisfies
+  `C(pi / (2 omega), x) = I C(0, x)` and never vanishes, so the real parts at time zero and one
+  quarter-period determine an arbitrary complex scalar. One time sample alone is insufficient.
+  Gauss--electric must recover `K dot E0 = 0`; Ampere--Maxwell must recover
+  `K cross B0 = -(epsilon * mu * omega) E0`; and, only after assuming `E0 != 0`, vector-scalar
+  cancellation may recover `K dot K = epsilon * mu * omega ^ 2`. Confirm that no nonzero `K`,
+  propagation, or attenuation hypothesis is used. When `E0 = 0`, all four ordinary real fields
+  vanish and solve source-free Maxwell for every positive frequency and complex wave vector, so
+  the nonzero guard is necessary for dispersion. The resulting iff characterizes only this
+  candidate family; it is not a completeness theorem and makes no interface, outgoing,
+  evanescent-wave, power, potential, or gauge claim.
 - [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
   algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
   the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
@@ -378,7 +390,8 @@ PR unless maintainers explicitly ask to retain it.
   only `requested`; rewording the two affected docstrings leaves that slice with no dictionary
   delta. The complex-dispersion differential reported `epsilon` and `imposes`; the ordinary verb
   was reworded and only the physics term `epsilon` was added. The forward complex-Maxwell
-  differential reported no new vocabulary.
+  differential reported no new vocabulary. The guarded-converse differential initially reported
+  only `nonvanishing`; rewording that sentence with existing dictionary words leaves no delta.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
