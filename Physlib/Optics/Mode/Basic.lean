@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Mathlib.Analysis.InnerProductSpace.Adjoint
-public import Mathlib.LinearAlgebra.UnitaryGroup
 
 /-!
 # Power-normalized optical modes
