@@ -164,6 +164,7 @@ public import Physlib.Meta.TODO.Global
 public import Physlib.Meta.TransverseTactics
 public import Physlib.Optics.Basic
 public import Physlib.Optics.Mode.Basic
+public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
 public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
