@@ -1,3 +1,15 @@
+admittance
+antiparallel
+assert
+callers
+completing
+fixture
+fresnel
+grazing
+refraction
+reversing
+semantics
+tangential
 admits
 anticipates
 branches
