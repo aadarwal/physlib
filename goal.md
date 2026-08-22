@@ -154,6 +154,9 @@ Ownership rules:
   unitarity implies power preservation and passivity under the stated normalization.
 - [x] Power preservation is equivalent to `Tᴴ * T = 1`, passivity is equivalent to positivity of
   the defect `1 - Tᴴ * T`, and square power preservation is equivalent to unitarity.
+- [x] Binary direct sums concatenate and recover disjoint mode-amplitude families, add their modal
+  powers, act block-diagonally on transforms, and preserve power preservation, passivity, and
+  scattering losslessness under independent parallel composition.
 - [x] Fixed-carrier phasors, distinct raw-field `JonesVector` and `JonesMatrix` wrappers,
   amplitude-phase realization, squared Jones intensity, global-phase invariance, and matrix action
   are present without importing Electromagnetism or identifying raw fields with normalized modes.
@@ -559,7 +562,7 @@ gate pass.
 - [x] characterize power preservation by `Tᴴ * T = I`;
 - [x] characterize passivity by a positive-semidefinite defect matrix;
 - [x] specialize square power preservation to unitarity;
-- add finite direct-sum/parallel composition and preservation lemmas; and
+- [x] add binary direct-sum/parallel composition and preservation lemmas; and
 - add reindexing/rephasing invariance before reciprocity.
 
 Exit: the modal predicates can be used bidirectionally by later component and network proofs.
@@ -1346,7 +1349,7 @@ current integration base; a designed package whose prerequisite is merely active
 |---|---|---|---|
 | O0 roadmap | done | upstream base | Optics API map and scope module |
 | O1 mode core | done | Mathlib complex linear algebra | mode branch and integration build |
-| O2 modal algebra | active | O1 | converse characterizations complete; parallel/reindex/rephase suite remains |
+| O2 modal algebra | active | O1 | characterizations and binary parallel composition complete; reindex/rephase remain |
 | P1a Jones foundations | done | complex algebra | scalar realization, raw Jones action, and intensity suite |
 | P1b harmonic bridge | done | P1a, existing harmonic wave | named-frame electric/magnetic field reconstruction |
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
@@ -1366,7 +1369,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4 boundary laws | blocked | E1, surface/integral design decision | Maxwell-to-local-boundary theorem |
 | E5 reflection/Snell/TIR | blocked | E2, E4 | phase-matching geometry suite |
 | E6 Fresnel/flux | blocked | E3b, E5 | amplitude, admittance-normalized scattering, and flux suite |
-| N1 modal completion | active | O1 | remaining O2 parallel/reindex/rephase suite |
+| N1 modal completion | active | O1 | remaining O2 reindex/rephase suite |
 | N2a ports/routing | blocked | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
@@ -1439,8 +1442,8 @@ human verification recorded in `tbd.md`.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
    carries no Jones-purity assumption, and zero Jones data has no polarization direction.
-2. The O2 predicate characterizations are complete. Finish its direct-sum/parallel,
-   reindexing, and rephasing suite before starting N2a typed ports/routing.
+2. The O2 predicate characterizations and binary direct-sum/parallel suite are complete. Finish
+   reindexing and rephasing before starting N2a typed ports/routing.
 3. Audit and develop P3a's neutral Hermitian basis, then use it with P2a and P2b for the physical
    Stokes cone and Poincare classification without identifying mixed states with Jones vectors.
 4. Start E1's medium and macroscopic-Maxwell layer independently so the new harmonic bridge can
