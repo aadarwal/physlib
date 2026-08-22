@@ -92,7 +92,7 @@ private lemma spatialPairing_contDiff (k : ComplexWaveVector 3) (n : WithTop ℕ
   rw [spatialPairing_eq_clm]
   fun_prop
 
-/-- The complex carrier is jointly smooth in time and space to every requested order. -/
+/-- The complex carrier is jointly smooth in time and space to every order. -/
 lemma carrier_contDiff (wave : ComplexMonochromaticPlaneWave) (n : WithTop ℕ∞) :
     ContDiff ℝ n ↿fun tx : Time × Space ↦ wave.carrier tx.1 tx.2 := by
   have htimeReal : ContDiff ℝ n fun tx : Time × Space ↦
@@ -117,7 +117,7 @@ lemma carrier_contDiff (wave : ComplexMonochromaticPlaneWave) (n : WithTop ℕ�
   exact htemporal.mul hspatialFactor
 
 /-- Every ordinary real field constructed from the carrier and a constant complex amplitude is
-jointly smooth in time and space to every requested order. -/
+jointly smooth in time and space to every order. -/
 lemma realFieldOfAmplitude_contDiff (wave : ComplexMonochromaticPlaneWave)
     (amplitude : EuclideanSpace ℂ (Fin 3)) (n : WithTop ℕ∞) :
     ContDiff ℝ n ↿(wave.realFieldOfAmplitude amplitude) := by

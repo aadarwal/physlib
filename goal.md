@@ -291,6 +291,12 @@ Ownership rules:
   wave vector, frequency, complex electric amplitude, carrier, transversality, magnetic amplitude,
   and all four ordinary real fields agree, without introducing a second hidden electromagnetic
   state or claiming equality of potentials, gauges, or power normalizations.
+- [x] The complex carrier now has a separate calculus layer proving joint smoothness of the carrier
+  and all ordinary real fields, exact temporal and coordinate carrier factors, and generic
+  ordinary-real-field time and coordinate derivatives, divergence expressed through the
+  complex-bilinear pairing, and curl identities through the shared realization spine. These
+  results remain off shell and make no claim about Maxwell equations, interface roles,
+  evanescent-wave roles, or power.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -334,6 +340,10 @@ Ownership rules:
 - `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge` proves exact compatibility
   with the existing real-quadrature plane-wave carrier, transversality predicate, magnetic
   amplitude, and ordinary real `E`/`D`/`B`/`H` fields.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexCalculus` supplies joint
+  regularity, exact `partial_t C = I omega C` and `partial_j C = -I K_j C` carrier laws, and the
+  generic ordinary-real-field time, coordinate, divergence, and curl identities required by the
+  remaining Maxwell layer.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -347,9 +357,9 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] complex-carrier calculus, bilinear material dispersion and its real decomposition,
-  real-field macroscopic-Maxwell and honest converse results, falsification regressions, and an
-  interface-selected outgoing/decaying branch;
+- [ ] bilinear material dispersion and its real decomposition, real-field macroscopic-Maxwell and
+  honest converse results, falsification regressions, and an interface-selected outgoing/decaying
+  branch;
 - [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
 - [ ] Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -1170,11 +1180,14 @@ sources.
   magnetic amplitude, bilinear electric transversality, structural magnetic transversality,
   positive-normal field decay, and constitutive satisfaction;
 - [x] an exact bridge from every existing real-quadrature plane wave to the complex carrier,
-  including carrier, transversality, magnetic amplitude, and all four ordinary real fields; and
-- [ ] generic complex-carrier calculus, bilinear material dispersion and its phase/attenuation
-  decomposition, forward real-field Maxwell laws, an honest nonzero-amplitude converse, exact
-  propagating/evanescent falsification regressions, and an interface-oriented outgoing/decaying
-  branch for evanescent fields.
+  including carrier, transversality, magnetic amplitude, and all four ordinary real fields;
+- [x] generic complex-carrier joint regularity, exact carrier time and coordinate derivatives, and
+  generic realized-field time and coordinate derivatives, divergence expressed through the
+  complex-bilinear pairing, and curl identities through the shared ordinary-real-field realization
+  spine; and
+- [ ] bilinear material dispersion and its phase/attenuation decomposition, forward real-field
+  Maxwell laws, an honest nonzero-amplitude converse, exact propagating/evanescent falsification
+  regressions, and an interface-oriented outgoing/decaying branch for evanescent fields.
 
 Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
 
@@ -1960,7 +1973,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, and exact real-wave bridge complete; complex calculus, bilinear dispersion, Maxwell/converse, falsification regressions, and interface-selected outgoing branch remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, and complex calculus complete; bilinear dispersion, Maxwell/converse, falsification regressions, and interface-selected outgoing branch remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
@@ -2091,9 +2104,11 @@ human verification recorded in `tbd.md`.
    now-complete off-shell complex carrier and exact real-wave bridge: physical fields remain
    ordinary real fields, transversality and material dispersion remain separate, amplitudes are
    relative to a selected origin/carrier phase rather than intrinsically power-normalized, and no
-   interface role is inferred from positive decay alone. Proceed next to a separate generic
-   complex-carrier calculus layer, then bilinear material dispersion, forward real-field Maxwell,
-   the guarded converse and exact TE/TM/zero-amplitude regressions, and only then the
+   interface role is inferred from positive decay alone. Preserve the now-complete separate
+   calculus layer and its exact `partial_t C = I omega C`, `partial_j C = -I K_j C`, divergence
+   through the complex-bilinear pairing, and `K cross A` curl signs. Proceed next to bilinear
+   material dispersion and its real phase/attenuation decomposition, then forward real-field
+   Maxwell, the guarded converse and exact TE/TM/zero-amplitude regressions, and only then the
    interface-oriented outgoing/decaying layer. Withhold power claims until Poynting-flux
    normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
@@ -2108,9 +2123,9 @@ P6b-2 now connects the completed polarizer and retarder stacks in all reduced re
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
 medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, oriented
 Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell complex
-carrier, and exact real-wave bridge now connected, the next physical-optics front is generic
-carrier calculus. Bilinear material dispersion, real-field Maxwell and its guarded converse,
-falsification regressions, and the interface-oriented outgoing/decaying branch follow on that
-shared carrier. The interface must start from independent-frequency time-domain traces and derive
-frequency conservation before it uses a fixed-frequency Fresnel reduction. The independent
-circuit front remains N2a/N3.
+carrier, exact real-wave bridge, and generic carrier calculus now connected, the next
+physical-optics front is bilinear material dispersion and its phase/attenuation decomposition.
+Real-field Maxwell and its guarded converse, falsification regressions, and the interface-oriented
+outgoing/decaying branch follow on that shared carrier. The interface must start from
+independent-frequency time-domain traces and derive frequency conservation before it uses a
+fixed-frequency Fresnel reduction. The independent circuit front remains N2a/N3.
