@@ -119,15 +119,27 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check that E2a builds in the propagating candidate
   `B = (κ / ω) • (n × E)` and must not later describe that relation as independently derived from
   Maxwell equations. Electric transversality is a separate predicate, magnetic transversality is
-  structural, zero electric amplitude remains allowed, and a converse dispersion theorem will
-  require an explicit nonzero-amplitude hypothesis.
-- [ ] Split the 409-line fork-side E2a implementation before an upstream proposal: carrier data,
+  structural, zero electric amplitude remains allowed, and the converse dispersion theorem uses
+  an explicit nonzero-amplitude hypothesis.
+- [ ] Human-check E2b's positive material branch and constructor: `IsDispersionMatched` means
+  exactly `ω = κ * medium.waveSpeed`, `inMedium` treats angular frequency as primary and defines
+  `κ = ω / medium.waveSpeed`, and the positivity hypotheses—not an unsigned square-root
+  convention—select the positive branch.
+- [ ] Human-check E2b's differential signs and cross-product order: magnetic induction remains the
+  built-in `B = (κ / ω) n × E`; Faraday and magnetic Gauss are structural; electric Gauss requires
+  transversality; Ampère--Maxwell additionally requires material dispersion; and the derived
+  on-shell relations are `B = v⁻¹ n × E` and `H = Z⁻¹ n × E`.
+- [ ] Human-check the E2b converse boundary: Maxwell forces transversality even when both electric
+  quadratures vanish, but it forces dispersion only under
+  `electricReal ≠ 0 ∨ electricImag ≠ 0`. With both quadratures zero, all constructed fields vanish
+  and solve Maxwell for arbitrary positive `ω` and `κ`, so no stronger converse is valid.
+- [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
-  Stack dispersion, the fixed-medium constructor, Maxwell satisfaction, and converse results in a
-  later Maxwell file, then complex phasor/Jones realization in an Optics-owned bridge. Do not add
-  physical-power, handedness, evanescence, finite-beam, group-velocity, potential, or gauge claims
-  to E2a.
+  Preserve E2b's fork-side split into `Dispersion`, forward `Maxwell`, and `Converse`; propose those
+  as separate upstream concepts after the intrinsic profile-calculus additions to `Basic`. Then
+  place complex phasor/Jones realization in an Optics-owned bridge. Do not add physical-power,
+  handedness, evanescence, finite-beam, group-velocity, potential, or gauge claims to E2a/E2b.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
 - [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged

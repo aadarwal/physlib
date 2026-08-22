@@ -281,6 +281,15 @@ Ownership rules:
   off-shell real harmonic carrier with independent positive frequency and wave number, compatible
   `E` and `B` candidates, medium-supplied `D` and `H`, separate transversality, regularity, wave
   equations at phase velocity, and constitutive satisfaction without assuming Maxwell dispersion.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Dispersion` supplies E2b's positive
+  material branch, fixed-angular-frequency constructor, squared-dispersion equivalence, and exact
+  on-shell `B/E` and `H/E` impedance relations.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Maxwell` supplies exact differential
+  field identities, the four individual source-free laws with their honest hypotheses, and the
+  canonical homogeneous-medium solution.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Converse` proves that Maxwell forces
+  transversality and, under the necessary nonzero-electric-amplitude condition, positive-branch
+  dispersion; it also gives the resulting nonzero-carrier characterization.
 - `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
@@ -1084,9 +1093,9 @@ sources.
   angular frequency and wave number, two electric quadratures, compatible `E` and `B` candidates,
   medium-supplied `D` and `H`, separate transversality, regularity, phase-velocity wave equations,
   and constitutive satisfaction;
-- [ ] positive-branch material dispersion, a canonical fixed-medium constructor, source-free
+- [x] positive-branch material dispersion, a canonical fixed-medium constructor, source-free
   Maxwell satisfaction under transversality and dispersion, the honest nonzero-amplitude
-  converse, and on-shell `E`/`B`/`H` relations;
+  converse, the nonzero-candidate characterization, and on-shell `E`/`B`/`H` relations;
 - [ ] an Optics-owned complex-harmonic/phasor representation importing the real field theorem and
   a fixed-vacuum regression against the existing representation bridge;
 - [ ] polarization-basis decomposition into `s` and `p` modes for oblique incidence, with an
@@ -1860,7 +1869,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | off-shell real carrier complete; material Maxwell, converse, phasor, frame, and evanescent layers remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, and honest converse complete; phasor, frame, and evanescent layers remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
@@ -1975,11 +1984,12 @@ human verification recorded in `tbd.md`.
    has relative phase `exp (-I * retardance)`, `M.comp N` applies `N` first, and neither Jones
    unitarity nor fixed Stokes intensity implies electromagnetic power. Keep P6b-3's
    field/irradiance portion blocked on P5b/E3b.
-5. Preserve E0's exposure-only public Maxwell repair, the completed E1 material layer, and E2a's
+5. Preserve E0's exposure-only public Maxwell repair, the completed E1 material layer, E2a's
    off-shell harmonic carrier: positive frequency and wave number remain independent, the built-in
    `B = (κ / ω) n × E` candidate is not described as Maxwell-derived, and transversality and
-   material dispersion are separate. Complete E2b's Maxwell, positive-branch dispersion, honest
-   nonzero-amplitude converse, and on-shell `E`/`H` relations before adding an Optics phasor view or
+   material dispersion are separate; and E2b's completed positive-branch dispersion, exact
+   differential laws, source-free Maxwell solution, honest nonzero-amplitude converse, and
+   on-shell `B`/`H` relations. Proceed to the Optics-owned phasor/Jones realization before
    Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
@@ -1991,5 +2001,6 @@ human verification recorded in `tbd.md`.
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies. With E0 and E1 complete, the next physical-optics front
-is E2, while the independent circuit front remains N2a/N3.
+medium, boundary, and flux dependencies. With E0, E1, and E2's real material-Maxwell layer
+complete, the next physical-optics front is the E2 complex phasor/Jones bridge, while the
+independent circuit front remains N2a/N3.

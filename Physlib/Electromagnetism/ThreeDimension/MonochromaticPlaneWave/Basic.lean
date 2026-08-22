@@ -17,7 +17,8 @@ public import Physlib.Electromagnetism.Media.HomogeneousIsotropic
 This module defines a purely harmonic real plane-wave candidate in three spatial dimensions. Its
 positive angular frequency and positive scalar wave number are independent data, while its
 propagation sign is carried by a unit `Space.Direction`. Thus the candidate is off shell: it does
-not assume a material dispersion relation or satisfy Maxwell equations merely by construction.
+not assume a material dispersion relation or satisfy the full Maxwell system merely by
+construction.
 
 Two real electric quadratures represent a general complex electric amplitude. With carrier phase
 `θ = ω t - κ ⟪x, n⟫`, the field convention is
@@ -254,6 +255,21 @@ lemma electricField_apply (wave : MonochromaticPlaneWave) (t : Time) (x : Space)
   rw [electricField, planeWave_eq]
   exact wave.electricProfile_travellingCoordinate t x
 
+/-- The derivative of the electric profile exposes the two quadratures with the phase shifted by
+one quarter cycle. -/
+lemma electricProfile_fderiv (wave : MonochromaticPlaneWave) (u : ℝ) :
+    fderiv ℝ wave.electricProfile u 1 =
+      (wave.waveNumber * Real.sin (-wave.waveNumber * u)) • wave.electricReal +
+      (wave.waveNumber * Real.cos (-wave.waveNumber * u)) • wave.electricImag := by
+  unfold electricProfile
+  rw [fderiv_fun_sub (by fun_prop) (by fun_prop),
+    fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop),
+    fderiv_cos (by fun_prop), fderiv_sin (by fun_prop)]
+  simp only [neg_mul, Real.sin_neg, neg_neg, Real.cos_neg, _root_.sub_apply,
+    ContinuousLinearMap.smulRight_apply, _root_.smul_apply, fderiv_eq_smul_deriv,
+    deriv_const_mul_id', smul_eq_mul, mul_neg, one_mul, neg_smul]
+  simp [mul_comm]
+
 /-- The magnetic profile is `(κ / ω) n × E` at every travelling coordinate. -/
 lemma magneticProfile_eq_cross_electricProfile (wave : MonochromaticPlaneWave) (u : ℝ) :
     wave.magneticProfile u = (wave.waveNumber / wave.angularFrequency) •
@@ -270,6 +286,24 @@ lemma magneticProfile_eq_cross_electricProfile (wave : MonochromaticPlaneWave) (
     simp
   rw [magneticProfile, magneticReal, magneticImag, hcross]
   simp [smul_smul, mul_comm]
+
+/-- Differentiating the magnetic profile preserves its built-in cross-product relation to the
+electric profile. -/
+lemma magneticProfile_fderiv_eq_cross_electricProfile_fderiv
+    (wave : MonochromaticPlaneWave) (u : ℝ) :
+    fderiv ℝ wave.magneticProfile u 1 =
+      (wave.waveNumber / wave.angularFrequency) •
+        (wave.propagationVector ⨯ₑ₃ fderiv ℝ wave.electricProfile u 1) := by
+  rw [wave.electricProfile_fderiv]
+  unfold magneticProfile
+  rw [fderiv_fun_sub (by fun_prop) (by fun_prop),
+    fderiv_smul_const (by fun_prop), fderiv_smul_const (by fun_prop),
+    fderiv_cos (by fun_prop), fderiv_sin (by fun_prop)]
+  ext i
+  fin_cases i <;>
+    simp [magneticReal, magneticImag, propagationVector, crossProduct,
+      fderiv_eq_smul_deriv, deriv_const_mul_id'] <;>
+    ring
 
 /-- The magnetic induction has the same carrier with its compatible magnetic quadratures. -/
 lemma magneticInduction_apply (wave : MonochromaticPlaneWave) (t : Time) (x : Space) :
@@ -314,6 +348,14 @@ lemma electricProfile (wave : MonochromaticPlaneWave) (h : wave.IsTransverse) (u
     inner_smul_right, inner_smul_right, h.1, h.2]
   simp
 
+/-- The derivative of a transverse electric profile remains transverse. -/
+lemma electricProfile_fderiv (wave : MonochromaticPlaneWave)
+    (h : wave.IsTransverse) (u : ℝ) :
+    ⟪wave.propagationVector, fderiv ℝ wave.electricProfile u 1⟫_ℝ = 0 := by
+  rw [wave.electricProfile_fderiv, inner_add_right,
+    inner_smul_right, inner_smul_right, h.1, h.2]
+  simp
+
 /-- A transverse wave has pointwise transverse electric field. -/
 lemma electricField (wave : MonochromaticPlaneWave) (h : wave.IsTransverse)
     (t : Time) (x : Space) :
@@ -322,6 +364,21 @@ lemma electricField (wave : MonochromaticPlaneWave) (h : wave.IsTransverse)
   exact electricProfile wave h _
 
 end IsTransverse
+
+/-- Crossing a transverse vector twice with the unit propagation vector negates it. -/
+lemma propagationVector_cross_cross (wave : MonochromaticPlaneWave)
+    (v : EuclideanSpace ℝ (Fin 3)) (hv : ⟪wave.propagationVector, v⟫_ℝ = 0) :
+    wave.propagationVector ⨯ₑ₃ (wave.propagationVector ⨯ₑ₃ v) = -v := by
+  rw [Space.cross_cross_eq_smul_sub_smul', hv, zero_smul,
+    real_inner_self_eq_norm_sq, wave.propagationVector_norm,
+    one_pow, one_smul, zero_sub]
+
+/-- The derivative of the magnetic profile is transverse for every electric amplitude. -/
+lemma magneticProfile_fderiv_transverse (wave : MonochromaticPlaneWave) (u : ℝ) :
+    ⟪wave.propagationVector, fderiv ℝ wave.magneticProfile u 1⟫_ℝ = 0 := by
+  rw [wave.magneticProfile_fderiv_eq_cross_electricProfile_fderiv,
+    inner_smul_right, Space.inner_self_cross]
+  simp
 
 /-- The constructed magnetic induction is transverse for every electric amplitude. -/
 lemma magneticInduction_transverse (wave : MonochromaticPlaneWave)
