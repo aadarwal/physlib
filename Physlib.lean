@@ -28,6 +28,7 @@ public import Physlib.ClassicalMechanics.Scattering.RigidSphere
 public import Physlib.ClassicalMechanics.Vibrations.LinearTriatomic
 public import Physlib.ClassicalMechanics.WaveEquation.Basic
 public import Physlib.ClassicalMechanics.WaveEquation.HarmonicWave
+public import Physlib.ClassicalMechanics.WaveEquation.VectorCalculus
 public import Physlib.CondensedMatter.BandTheory.Basic
 public import Physlib.CondensedMatter.Basic
 public import Physlib.CondensedMatter.Crystal.Basic
