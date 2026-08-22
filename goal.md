@@ -157,6 +157,10 @@ Ownership rules:
 - [x] Binary direct sums concatenate and recover disjoint mode-amplitude families, add their modal
   powers, act block-diagonally on transforms, and preserve power preservation, passivity, and
   scattering losslessness under independent parallel composition.
+- [x] Equivalence-based relabeling and unit-complex coordinate rephasing act isometrically on mode
+  amplitudes and covariantly on transforms and scattering matrices; preserve and reflect modal
+  predicates; and commute with cascade and independent parallel composition. The rephasing API is
+  explicitly a coordinate change, not a physical phase-shifting component or a reciprocity law.
 - [x] Fixed-carrier phasors, distinct raw-field `JonesVector` and `JonesMatrix` wrappers,
   amplitude-phase realization, squared Jones intensity, global-phase invariance, and matrix action
   are present without importing Electromagnetism or identifying raw fields with normalized modes.
@@ -557,13 +561,13 @@ gate pass.
   matrices;
 - cascade closure and the forward implication from matrix isometry to power preservation.
 
-#### O2. Complete the modal algebra — active
+#### O2. Complete the modal algebra — complete
 
 - [x] characterize power preservation by `Tᴴ * T = I`;
 - [x] characterize passivity by a positive-semidefinite defect matrix;
 - [x] specialize square power preservation to unitarity;
 - [x] add binary direct-sum/parallel composition and preservation lemmas; and
-- add reindexing/rephasing invariance before reciprocity.
+- [x] add reindexing/rephasing invariance before reciprocity.
 
 Exit: the modal predicates can be used bidirectionally by later component and network proofs.
 
@@ -867,11 +871,12 @@ definitions.
 
 ### H.3. Typed finite-network milestone
 
-#### N1. Modal algebra completion
+#### N1. Modal algebra completion — complete
 
-Complete O2 before relying on converse characterizations or parallel closure.
+O2 now supplies the converse characterizations, parallel closure, and convention-free coordinate
+changes required by the network layer.
 
-#### N2a. Ports, channels, and convention-free routing
+#### N2a. Ports, channels, and convention-free routing — ready
 
 - a finite `PortModeFamily` and dependent flattened channel type `Σ p, Mode p`;
 - distinct incident and outgoing channel-end types;
@@ -1349,7 +1354,7 @@ current integration base; a designed package whose prerequisite is merely active
 |---|---|---|---|
 | O0 roadmap | done | upstream base | Optics API map and scope module |
 | O1 mode core | done | Mathlib complex linear algebra | mode branch and integration build |
-| O2 modal algebra | active | O1 | characterizations and binary parallel composition complete; reindex/rephase remain |
+| O2 modal algebra | done | O1 | predicate characterizations, binary parallel composition, relabeling, and rephasing suites |
 | P1a Jones foundations | done | complex algebra | scalar realization, raw Jones action, and intensity suite |
 | P1b harmonic bridge | done | P1a, existing harmonic wave | named-frame electric/magnetic field reconstruction |
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
@@ -1369,8 +1374,8 @@ current integration base; a designed package whose prerequisite is merely active
 | E4 boundary laws | blocked | E1, surface/integral design decision | Maxwell-to-local-boundary theorem |
 | E5 reflection/Snell/TIR | blocked | E2, E4 | phase-matching geometry suite |
 | E6 Fresnel/flux | blocked | E3b, E5 | amplitude, admittance-normalized scattering, and flux suite |
-| N1 modal completion | active | O1 | remaining O2 reindex/rephase suite |
-| N2a ports/routing | blocked | O2 reindex/direct-sum support | typed convention-free connection API |
+| N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
+| N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
@@ -1442,8 +1447,10 @@ human verification recorded in `tbd.md`.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
    carries no Jones-purity assumption, and zero Jones data has no polarization direction.
-2. The O2 predicate characterizations and binary direct-sum/parallel suite are complete. Finish
-   reindexing and rephasing before starting N2a typed ports/routing.
+2. O2/N1 is complete, including predicate characterizations, binary parallel composition,
+   relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
+   the distinction between incident and outgoing channel ends and do not encode feedback as
+   ordinary matrix multiplication.
 3. Audit and develop P3a's neutral Hermitian basis, then use it with P2a and P2b for the physical
    Stokes cone and Poincare classification without identifying mixed states with Jones vectors.
 4. Start E1's medium and macroscopic-Maxwell layer independently so the new harmonic bridge can

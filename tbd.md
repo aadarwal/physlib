@@ -53,8 +53,11 @@ PR unless maintainers explicitly ask to retain it.
 - [x] Keep one-way `ModeTransform` cascade separate from reflective multiport interconnection.
 - [x] Wrap `ScatteringMatrix` without a coercion or multiplication instance, preventing accidental
   use of matrix multiplication as physical feedback composition.
-- [ ] Define typed incident and outgoing channels, time-reversed channel pairing, port reference
-  planes, relabeling, and rephasing before defining reciprocity.
+- [x] Define convention-free modal relabeling and unit-complex coordinate rephasing, including
+  covariance and preservation of modal power, passivity, and losslessness.
+- [ ] Define typed incident and outgoing channels, time-reversed channel pairing, and port
+  reference planes before defining reciprocity; coordinate rephasing alone does not supply these
+  physical conventions.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
 - [ ] Supply an induced operator-norm bridge before expressing passivity as a matrix norm bound;
