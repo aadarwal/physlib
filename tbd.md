@@ -211,11 +211,23 @@ PR unless maintainers explicitly ask to retain it.
   recovers the existing branch only because that representation already carries positive
   frequency and wave number. No square-root, propagation, interface, evanescent-wave, or power
   role is selected.
+- [ ] Human-check the forward complex-carrier Maxwell layer against the selected carrier signs.
+  For any realized amplitude `F_A = Re(C A)`, confirm
+  `partial_t F_A = F_(I omega A)`,
+  `div F_A = Re(-I C (K dot A))`, and
+  `curl F_A = F_(-I (K cross A))`. Magnetic Gauss and Faraday must remain off-shell structural
+  laws; electric Gauss must use only bilinear electric transversality; Ampere--Maxwell must use
+  transversality and material dispersion. Confirm the positive Ampere sign from
+  `(-I) * (-epsilon * mu * omega) = I * epsilon * mu * omega`, the real constitutive scalings
+  `D = epsilon E` and `H = mu^-1 B`, and all four joint differentiability fields in the bundled
+  predicate. Zero electric amplitude is allowed by the forward theorem but in fact solves Maxwell
+  even for a mismatched shell, so neither this theorem nor its endpoint is a converse. It assigns
+  no interface, outgoing, evanescent-wave, power, potential, or gauge role.
 - [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
   algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
   the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
-  dispersion and its phase/attenuation decomposition fourth; forward Maxwell and the guarded
-  converse fifth; and exact propagating, evanescent TE/TM, and zero-amplitude falsification
+  dispersion and its phase/attenuation decomposition fourth; forward Maxwell fifth; the guarded
+  converse sixth; and exact propagating, evanescent TE/TM, and zero-amplitude falsification
   regressions last. Keep square-root branch choice, interface roles, and power out of these PRs.
 - [ ] Correctly layer E4a/E5a/E5b: the primitive time-domain boundary configuration must give
   incident, reflected, and transmitted waves independent positive frequencies and wave vectors,
@@ -365,7 +377,8 @@ PR unless maintainers explicitly ask to retain it.
   `normalizations`, `spine`, and `theta`. The complex-calculus differential initially reported
   only `requested`; rewording the two affected docstrings leaves that slice with no dictionary
   delta. The complex-dispersion differential reported `epsilon` and `imposes`; the ordinary verb
-  was reworded and only the physics term `epsilon` was added.
+  was reworded and only the physics term `epsilon` was added. The forward complex-Maxwell
+  differential reported no new vocabulary.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
