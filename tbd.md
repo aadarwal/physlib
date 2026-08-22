@@ -200,6 +200,17 @@ PR unless maintainers explicitly ask to retain it.
   ordinary-real-field realization spine. Joint smoothness and these off-shell identities do not
   by themselves imply transversality, dispersion, any Maxwell equation, an interface or
   evanescent-wave role, or a power normalization.
+- [ ] Human-check the complex material shell and all coefficient signs. The definition is the
+  complex-bilinear equality `K dot K = epsilon * mu * omega ^ 2`, never the Hermitian norm square.
+  For `K = q - I a`, confirm that its real decomposition is exactly `q dot a = 0` and
+  `‖q‖ ^ 2 - ‖a‖ ^ 2 = epsilon * mu * omega ^ 2`; the imaginary mixed term is
+  `-2 I (q dot a)`. Under electric transversality, confirm
+  `K cross (K cross E0) = -(epsilon * mu * omega ^ 2) E0` and, because
+  `B0 = omega^-1 (K cross E0)`, `K cross B0 = -(epsilon * mu * omega) E0` with only one remaining
+  frequency factor. Matching forces `K` nonzero but permits `E0 = 0`. The exact real-wave bridge
+  recovers the existing branch only because that representation already carries positive
+  frequency and wave number. No square-root, propagation, interface, evanescent-wave, or power
+  role is selected.
 - [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
   algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
   the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
@@ -353,7 +364,8 @@ PR unless maintainers explicitly ask to retain it.
   the complex-carrier and exact-bridge differential added `attenuating`, `bilinearly`, `hidden`,
   `normalizations`, `spine`, and `theta`. The complex-calculus differential initially reported
   only `requested`; rewording the two affected docstrings leaves that slice with no dictionary
-  delta.
+  delta. The complex-dispersion differential reported `epsilon` and `imposes`; the ordinary verb
+  was reworded and only the physics term `epsilon` was added.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
