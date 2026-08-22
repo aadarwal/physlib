@@ -350,6 +350,20 @@ PR unless maintainers explicitly ask to retain it.
   yet give full wave-vector equality, tangential projection equality, phase matching, Snell, or
   conservation. The wave remains off shell and the hyperplane receives no medium, interface-side,
   propagation-role, branch, or power semantics.
+- [ ] Human-check E5a's joint electric calculation-amplitude convention before upstreaming. For a
+  real unit normal `n`, confirm that the complex coefficient is
+  `(E0 - (n dot E0) n, ε * (n dot E0))`, with the first entry stored in ambient complex
+  three-space but proved normal-free, and that unit-normal decomposition plus `ε ≠ 0` makes it zero
+  exactly when `E0 = 0`. Confirm that stored-point referencing multiplies by
+  `spatialFactor K plane.point` and preserves zero because this factor never vanishes. For complex
+  `K` this multiplier can change modulus, so it is not pure phase and the referenced coefficient
+  is neither canonical nor reference-point independent. Confirm that the ordinary-real plane data
+  is componentwise `Re (exp (boundaryExponent) • referencedAmplitude)`. This complex coefficient
+  is calculation data, not a physical complex field, full `PlanarMacroscopicTrace`, or observable;
+  a nonzero coefficient need not give a nonzero single real sample and does not prevent
+  cancellation among equal exponents. The medium supplies `D = ε E` only and assigns no interface
+  side or on-shell/Maxwell semantics. Later all-parameter harmonic uniqueness and the exact
+  aggregate guard must establish multiwave noncancellation.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
