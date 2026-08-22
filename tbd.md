@@ -108,8 +108,14 @@ PR unless maintainers explicitly ask to retain it.
   do not replace it by a determinant-one half-angle formula on `Real.Angle`, whose half is not
   globally canonical.
 - [ ] Do not rename P6a's `axis` to `fastAxis` or `slowAxis` until material birefringence,
-  propagation direction, and sign conventions are human-certified. In P6b, independently check
-  the expected Stokes rotation sign before documenting any Poincare-sphere rotation.
+  propagation direction, and sign conventions are human-certified. Independently check P6b-1's
+  algebraic polarization block: at zero axis, positive retardance must send
+  `(S₁, S₂, S₃)` to
+  `(S₁, cos δ * S₂ + sin δ * S₃, -sin δ * S₂ + cos δ * S₃)`;
+  positive quarter-wave retardance must give `(S₁, S₃, -S₂)`; and the negative
+  quarter-wave plate must agree with the established `diag(1, I)` Mueller regression. The Lean
+  API records these coordinates but deliberately withholds an observer-oriented
+  Poincare-sphere rotation claim until this gate is certified.
 
 ## Modal and network semantics
 

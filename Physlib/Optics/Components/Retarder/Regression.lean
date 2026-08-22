@@ -53,13 +53,6 @@ namespace JonesMatrix
 ## A. Canonical Jones matrices
 -/
 
-/-- A zero-axis retarder is diagonal in the declared Jones coordinate basis. -/
-lemma linearRetarder_zero_axis_entries (retardance : Real.Angle) :
-    (linearRetarder 0 retardance).entries =
-      !![1, 0; 0, linearRetarderPhase retardance] := by
-  ext i j
-  fin_cases i <;> fin_cases j <;> simp
-
 /-- The positive zero-axis quarter-wave plate is `diag(1, -I)`. -/
 lemma quarterWavePlate_zero_entries :
     (quarterWavePlate 0).entries = !![1, 0; 0, -Complex.I] := by
