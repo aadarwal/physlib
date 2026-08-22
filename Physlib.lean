@@ -199,6 +199,7 @@ public import Physlib.Optics.Components.Retarder.Mueller
 public import Physlib.Optics.Components.Retarder.MuellerRegression
 public import Physlib.Optics.Components.Retarder.Regression
 public import Physlib.Optics.Components.Retarder.WavePlate
+public import Physlib.Optics.Interfaces.PlanarDielectric.Basic
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase

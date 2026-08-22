@@ -163,10 +163,12 @@ PR unless maintainers explicitly ask to retain it.
   incidence, forward and backward propagation share `s` while their `p` axes are negatives. A
   later full-vector Fresnel convention therefore generally has the normal-incidence scalar sign
   `r_p = -r_s` even though the physical reflected tangential vectors have the same sign.
-- [ ] Before E4a/E5b, confirm that the planar-interface normal points from incident medium 1 toward
-  transmitted medium 2, and independently confirm whether every public Fresnel `p` coefficient
-  scales a full electric-vector axis or a tangential component. The present incidence-frame API
-  fixes neither interface-side roles nor a tangential-amplitude conversion.
+- [ ] Human-check E4a's fork-side planar-interface convention before upstreaming:
+  `PlanarDielectricInterface` assigns medium 1 to the geometric negative side and medium 2 to the
+  geometric positive side, so the stored normal points from medium 1 toward medium 2; equal media
+  are allowed. Independently confirm whether every later public Fresnel `p` coefficient scales a
+  full electric-vector axis or a tangential component. The interface type intentionally fixes only
+  medium-side assignment, not wave roles, boundary laws, or a tangential-amplitude conversion.
 - [ ] Human-check the neutral oriented-affine-hyperplane convention before assigning media. Its
   stored normal points from the geometric negative side toward the positive side; the positive
   side normal is `n`, the negative side normal is `-n`; signed normal coordinate is positive on

@@ -1291,7 +1291,7 @@ mode family covered by the theorem.
   neutral positive and negative sides, open and closed half-spaces, tangential projection, a
   bundled tangent submodule and linear retraction, exact normal-vector characterization, and
   carrier parameterization;
-- [ ] a planar dielectric interface assigning medium 1 to the negative side, medium 2 to the
+- [x] a planar dielectric interface assigning medium 1 to the negative side, medium 2 to the
   positive side, and the stored normal from medium 1 toward medium 2;
 - a primitive time-domain configuration whose incident, reflected, and transmitted waves have
   independent positive frequencies and wave vectors, with total incident-plus-reflected and
@@ -2052,7 +2052,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
-| E4a local boundary semantics | in progress | E1, E2 | neutral oriented-hyperplane geometry, bundled tangent submodule, linear projection, and normal-vector characterization complete; planar medium assignment, primitive independent-frequency physical traces, and explicit conditional local laws remain |
+| E4a local boundary semantics | in progress | E1, E2 | neutral oriented-hyperplane geometry, bundled tangent submodule, linear projection, normal-vector characterization, and planar medium assignment complete; primitive independent-frequency physical traces and explicit conditional local laws remain |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | in progress | E2, E4a | neutral finite exponential-character independence and positive-frequency real-harmonic uniqueness complete; electromagnetic noncancellation, derived frequency/tangential-K conservation, and fixed-frequency reduction remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
