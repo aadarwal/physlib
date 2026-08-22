@@ -339,6 +339,17 @@ PR unless maintainers explicitly ask to retain it.
   tangential wave vector, so Brewster and other zero-reflection cases retain unconstrained dummy
   labels. After conservation, reference reduced complex amplitudes at the interface point using
   the spatial factor; do not compare raw origin-referenced amplitudes across the interface.
+- [ ] Human-check E5a's single-wave boundary-exponent convention before upstreaming. For the
+  carrier `exp (I * omega * t) * exp (-I * K dot x)` and a real tangent displacement `v`, confirm
+  that the exponent is `((omega * t : ℝ) : ℂ) * I - I * (K dot ofReal v)`, that `(1, 0)` has
+  imaginary rate exactly the positive angular frequency, and that the carrier at
+  `v +ᵥ plane.point` factors as `exp (boundaryExponent (t, v))` times the spatial factor at
+  `plane.point`. The affine-point term must remain in the coefficient rather than the real-linear
+  exponent, and the pairing must be complex-bilinear rather than Hermitian. Exponent equality gives
+  only frequency equality and pairing equality against every real tangent displacement; it does not
+  yet give full wave-vector equality, tangential projection equality, phase matching, Snell, or
+  conservation. The wave remains off shell and the hyperplane receives no medium, interface-side,
+  propagation-role, branch, or power semantics.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.

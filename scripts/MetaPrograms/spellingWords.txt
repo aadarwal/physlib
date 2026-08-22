@@ -3312,3 +3312,8 @@ labeled
 labelwise
 nonvanishing
 stipulated
+captures
+conclude
+factorization
+noncancellation
+probe

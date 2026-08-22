@@ -1335,9 +1335,10 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
   from every conjugate negative-frequency character;
 - [ ] electromagnetic noncancellation lemmas connecting that neutral scalar result to the joint
   ordinary real boundary traces used below;
-- the interface exponent functional on time paired with the hyperplane tangent submodule, so
-  equality of exponent functionals separates equality of angular frequency from equality of the
-  wave-vector pairing against every tangent displacement;
+- [x] the single-wave boundary exponent on time paired with the hyperplane tangent submodule, with
+  the unit-time probe recovering positive angular frequency, equality of exponent functionals
+  separating angular frequency from complex-bilinear wave-vector pairing against every tangent
+  displacement, and exact carrier factorization isolating the affine-point spatial factor;
 - joint electric trace amplitudes containing tangential `E` and normal `D`, proved zero exactly
   when the electric amplitude is zero under the medium's nonzero permittivity, and referenced at
   the affine interface point by the nonvanishing spatial carrier factor;
@@ -2061,7 +2062,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness and the primitive independent-frequency boundary configuration complete; boundary exponents, joint E/D noncancellation, conditional reflected collision, frequency/tangential-K conservation, and fixed-frequency reduction remain |
+| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness, the primitive independent-frequency boundary configuration, and the single-wave boundary exponent/carrier factorization complete; joint E/D noncancellation, conditional reflected collision, frequency/tangential-K conservation, and fixed-frequency reduction remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
