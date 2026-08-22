@@ -31,6 +31,8 @@ states, potentials, gauges, power normalizations, or any interface interpretatio
 ## ii. Key results
 
 - `ComplexMonochromaticPlaneWave.ofReal`: embed an existing real-quadrature wave.
+- `ComplexMonochromaticPlaneWave.ofReal_electricAmplitude_ne_zero_iff`: the embedded complex
+  amplitude is nonzero exactly when at least one real quadrature is nonzero.
 - `ComplexMonochromaticPlaneWave.ofReal_carrier`: exact carrier-phase agreement.
 - `ComplexMonochromaticPlaneWave.ofReal_electricField`: exact electric-field agreement.
 - `ComplexMonochromaticPlaneWave.isTransverse_ofReal_iff`: exact agreement of the real and
@@ -95,6 +97,29 @@ lemma ofReal_angularFrequency (wave : MonochromaticPlaneWave) :
 lemma ofReal_electricAmplitude (wave : MonochromaticPlaneWave) :
     (ofReal wave).electricAmplitude = ComplexWaveVector.ofReal wave.electricReal +
       Complex.I • ComplexWaveVector.ofReal wave.electricImag := rfl
+
+private lemma ofReal_electricAmplitude_eq_zero_iff (wave : MonochromaticPlaneWave) :
+    (ofReal wave).electricAmplitude = 0 ↔
+      wave.electricReal = 0 ∧ wave.electricImag = 0 := by
+  rw [ofReal_electricAmplitude]
+  constructor
+  · intro h
+    constructor
+    · ext i
+      have hi := congrArg (fun v : EuclideanSpace ℂ (Fin 3) ↦ (v i).re) h
+      simpa using hi
+    · ext i
+      have hi := congrArg (fun v : EuclideanSpace ℂ (Fin 3) ↦ (v i).im) h
+      simpa using hi
+  · rintro ⟨hReal, hImag⟩
+    simp [hReal, hImag]
+
+/-- The embedded complex electric amplitude is nonzero exactly when at least one real quadrature
+is nonzero. -/
+lemma ofReal_electricAmplitude_ne_zero_iff (wave : MonochromaticPlaneWave) :
+    (ofReal wave).electricAmplitude ≠ 0 ↔
+      wave.electricReal ≠ 0 ∨ wave.electricImag ≠ 0 := by
+  rw [ne_eq, ofReal_electricAmplitude_eq_zero_iff, not_and_or]
 
 /-- The embedded bilinear electric pairing packages the real pairings of both quadratures. -/
 lemma bilinearDot_ofReal_electricAmplitude (wave : MonochromaticPlaneWave) :
