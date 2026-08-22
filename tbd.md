@@ -189,9 +189,12 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check the exact real-wave bridge: `K` is the componentwise complexification of the real
   wave vector, `E0 = electricReal + I * electricImag`, the componentwise-real realization has the
   existing cosine-minus-sine sign, complex-bilinear transversality is equivalent to both existing
-  real-quadrature conditions, and the derived magnetic amplitude recovers both magnetic
-  quadratures. Confirm exact equality of ordinary real `E`/`D`/`B`/`H`, but no equality claim about
-  potentials, gauges, power normalization, interface roles, or hidden complex states.
+  real-quadrature conditions, the complex amplitude is nonzero exactly when at least one real
+  quadrature is nonzero, and the derived magnetic amplitude recovers both magnetic quadratures.
+  Confirm exact equality of ordinary real `E`/`D`/`B`/`H`, but no equality claim about potentials,
+  gauges, power normalization, interface roles, or hidden complex states. Treat the embedded-image
+  Maxwell parity as a composition of these primitive bridges, not as evidence that attenuating or
+  complex-null-vector modes have been cross-validated against the real carrier.
 - [ ] Human-check the complex-carrier calculus signs against the selected convention:
   `partial_t C = I omega C`, `partial_j C = -I K_j C`,
   `div Re(C A) = Re(-I C (K dot A))`, and
@@ -402,7 +405,8 @@ PR unless maintainers explicitly ask to retain it.
   only `nonvanishing`; rewording that sentence with existing dictionary words leaves no delta. The
   complex-dispersion regression reported `despite`, `exercise`, `guards`, and `te`; the ordinary
   words were reworded and only the transverse-electric abbreviation `te` was added to both the
-  Lean spelling dictionary and the separate CI codespell ignore list.
+  Lean spelling dictionary and the separate CI codespell ignore list. The exact real-wave
+  nonzero-amplitude bridge introduced no new spelling vocabulary.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
