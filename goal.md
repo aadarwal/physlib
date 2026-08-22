@@ -160,6 +160,8 @@ Ownership rules:
 - [x] Generic positive-semidefinite `CoherencyMatrix` data supplies Hermiticity, real nonnegative
   diagonal and trace results, `A * C * Aᴴ` transport, cascade compatibility, and combined
   mode-polarization specializations without assuming Jones purity.
+- [x] Jones outer-product coherency embeds coherent polarization into the general coherency type,
+  with rank-at-most-one, determinant-zero, trace-intensity, unit-phase, and Jones-action laws.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -182,7 +184,7 @@ Ownership rules:
 ### D.3. Not yet present
 
 - [ ] phasor and Jones reconstruction of the real harmonic electromagnetic field;
-- [ ] coherency, Stokes, Poincare, and Mueller APIs;
+- [ ] Stokes, Poincare, and Mueller APIs;
 - [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -616,7 +618,7 @@ Deliverables:
 Exit: partially polarized states have a general positive-semidefinite representation independent
 of Jones purity and independent of Electromagnetism.
 
-#### P2b. Pure coherency embedding
+#### P2b. Pure coherency embedding — complete
 
 Deliverables:
 
@@ -1346,7 +1348,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P1a Jones foundations | done | complex algebra | scalar realization, raw Jones action, and intensity suite |
 | P1b harmonic bridge | ready | P1a, existing harmonic wave | real electric/magnetic field reconstruction |
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
-| P2b pure coherency | ready | P1a, P2a | outer-product/rank/trace/phase suite |
+| P2b pure coherency | done | P1a, P2a | outer-product/rank/trace/phase/conjugation suite |
 | P3a neutral Hermitian basis | ready | matrix API audit | coordinate extraction/reconstruction suite |
 | P3b Stokes cone | blocked | P2a, P3a | physical-cone equivalence and canonical coordinates |
 | P3c Poincare classification | blocked | P2b, P3b | ball/sphere/mixed-state suite |
@@ -1431,18 +1433,18 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a and P2a are complete, independently reviewed, validated, and integrated. Preserve their
-   type boundary: raw Jones intensity is still neither irradiance nor modal power, and general
-   coherency still carries no Jones-purity assumption.
+1. P1a, P2a, and P2b are complete, independently reviewed, validated, and integrated. Preserve
+   their type boundary: raw Jones intensity is still neither irradiance nor modal power, general
+   coherency still carries no Jones-purity assumption, and zero Jones data has no polarization
+   direction.
 2. The O2 predicate characterizations are complete. Finish its direct-sum/parallel,
    reindexing, and rephasing suite before starting N2a typed ports/routing.
 3. Develop P1b as a separate bridge PR: prove transverse electric reconstruction for
    `harmonicWaveX`, then the longitudinal-zero and compatible-magnetic-field results under the
    named frame/carrier/medium assumptions. Do not claim reconstruction of a potential without a
    gauge theorem.
-4. Develop P2b pure coherency independently of P1b, using the P1a Jones and P2a general coherency
-   APIs. Its rank, determinant, trace, phase, and conjugation theorems must not weaken P2a's mixed
-   state representation.
+4. Audit and develop P3a's neutral Hermitian basis, then use it with P2a and P2b for the physical
+   Stokes cone and Poincare classification without identifying mixed states with Jones vectors.
 5. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
    PR concepts and do not translate Jones intensity into physical power before E3b.
 6. Audit E1 against the existing electromagnetic constant structures and prepare a focused
