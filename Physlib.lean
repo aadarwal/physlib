@@ -120,6 +120,7 @@ public import Physlib.Mathematics.Calculus.Divergence
 public import Physlib.Mathematics.Calculus.ParametricIntegration
 public import Physlib.Mathematics.Calculus.Wirtinger.Basic
 public import Physlib.Mathematics.Calculus.Wirtinger.Coordinate
+public import Physlib.Mathematics.ComplexExponentialCharacter
 public import Physlib.Mathematics.ConjModule
 public import Physlib.Mathematics.CrossProduct
 public import Physlib.Mathematics.CrossProductMatrix

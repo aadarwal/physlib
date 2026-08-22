@@ -287,14 +287,22 @@ PR unless maintainers explicitly ask to retain it.
   problem used for Snell and Fresnel calculations. Never assume common frequency in a premise
   whose conclusion is meant to establish frequency conservation.
 - [ ] Use finite exponential-character independence for E5a rather than assuming a Fourier
-  transform or common period. A nonzero electromagnetic boundary amplitude should bundle
-  tangential `E` with normal `D` (or an equivalently injective joint trace), because tangential
-  `E` alone can vanish for a nonzero field. State incident/transmitted conservation under the
-  primitive time-domain noncancellation condition. State reflected conservation conditionally as
-  zero reflected amplitude or common frequency and tangential wave vector, so Brewster and other
-  zero-reflection cases retain unconstrained dummy labels. After conservation, reference reduced
-  complex amplitudes at the interface point using the spatial factor; do not compare raw
-  origin-referenced amplitudes across the interface.
+  transform or common period. The neutral theorem now proves uniqueness for finite complex sums
+  indexed by complex-valued real-linear functionals; it does not by itself turn equality of real
+  fields into complex-amplitude equality. Its `Multiplicative V` source is only the type-level
+  presentation of addition as multiplication required by Mathlib's character theorem, not extra
+  structure on `V`. Human-check that the next bridge uses strictly positive frequencies to
+  separate every character from its conjugate negative-frequency character and aggregates
+  repeated functionals before invoking independence. Before upstream, also confirm whether these
+  Mathlib-candidate declarations should continue to extend the `Complex` namespace or move under
+  `Physlib` to avoid possible future name collisions. A nonzero electromagnetic boundary amplitude
+  should bundle tangential `E` with normal `D` (or an equivalently injective joint trace), because
+  tangential `E` alone can vanish for a nonzero field. State
+  incident/transmitted conservation under the primitive time-domain noncancellation condition.
+  State reflected conservation conditionally as zero reflected amplitude or common frequency and
+  tangential wave vector, so Brewster and other zero-reflection cases retain unconstrained dummy
+  labels. After conservation, reference reduced complex amplitudes at the interface point using
+  the spatial factor; do not compare raw origin-referenced amplitudes across the interface.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
