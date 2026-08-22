@@ -65,6 +65,11 @@ PR unless maintainers explicitly ask to retain it.
 
 ## Electromagnetic prerequisites
 
+- [ ] Human-check that E0 changes only the public exposure boundary: the existing
+  `gaussLawElectric`, `gaussLawMagnetic`, `ampereLaw`, and `faradayLaw` declarations and proofs
+  remain unchanged. Certify their present scope as pointwise, potential-derived, three-dimensional
+  laws with free-space constants and allowed sources, not material-medium, integral, or boundary
+  equations.
 - [ ] Preserve the existing real electromagnetic fields and potentials as foundational. Add a
   proved real harmonic wave to phasor to Jones correspondence instead of an alternative complex
   field foundation.

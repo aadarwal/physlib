@@ -172,6 +172,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Systems/PolarizerRetarder.lean (Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_act, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_map_coherency, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_mueller_act, Optics.JonesMatrix.quarterWavePlate_zero_comp_linearPolarizer_pi_div_four_act_horizontal)"
 
+  - description: "The public Electromagnetism API exposes the existing potential-derived, pointwise, three-dimensional Gauss-electric, Gauss-magnetic, Ampere, and Faraday laws with free-space constants and allowed sources through ordinary direct and root imports, without treating them as material, integral, or boundary equations."
+    done: true
+    location: "Physlib/Electromagnetism/ThreeDimension/MaxwellEquations.lean (Electromagnetism.ThreeDimension.gaussLawElectric, Electromagnetism.ThreeDimension.gaussLawMagnetic, Electromagnetism.ThreeDimension.ampereLaw, Electromagnetism.ThreeDimension.faradayLaw)"
+
   - description: "Electromagnetism shall supply homogeneous isotropic constitutive data sufficient for Optics to derive refractive index and wave impedance; the resulting medium API shall state its nondispersive, nonconducting, and isotropic assumptions explicitly and later admit dispersive or anisotropic extensions."
     done: false
     location: N/A
