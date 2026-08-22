@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.InnerProductSpace.Positive
 
 /-!
 # Power-normalized optical modes
@@ -56,7 +56,7 @@ preservation as a theorem about physical electromagnetic energy flux.
 namespace Optics
 
 open Matrix
-open scoped ComplexConjugate
+open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
 
@@ -174,6 +174,69 @@ lemma ModeTransform.isPowerPreserving_of_conjTranspose_mul_self {ι κ : Type*}
       rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
     _ = inner ℂ a a := by rw [hcomp, LinearMap.id_apply]
 
+/-- A finite mode transform preserves power exactly when its columns satisfy the isometry equation
+`Tᴴ * T = 1`. -/
+lemma ModeTransform.isPowerPreserving_iff_conjTranspose_mul_self {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) : T.IsPowerPreserving ↔ Tᴴ * T = 1 := by
+  constructor
+  · intro hT
+    have hnorm : ∀ a : ModeAmplitude ι, ‖T.toLinearMap a‖ = ‖a‖ := by
+      intro a
+      apply (sq_eq_sq₀ (norm_nonneg _) (norm_nonneg _)).mp
+      simpa only [ModeAmplitude.power] using hT a
+    have hinner : ∀ a b : ModeAmplitude ι,
+        inner ℂ (T.toLinearMap a) (T.toLinearMap b) = inner ℂ a b :=
+      (LinearMap.norm_map_iff_inner_map_map T.toLinearMap).mp hnorm
+    apply Matrix.toEuclideanLin.injective
+    rw [Matrix.toLpLin_mul_same, Matrix.toEuclideanLin_conjTranspose_eq_adjoint,
+      Matrix.toLpLin_one]
+    apply LinearMap.ext
+    intro a
+    apply ext_inner_right ℂ
+    intro b
+    rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left, LinearMap.id_apply]
+    exact hinner a b
+  · exact ModeTransform.isPowerPreserving_of_conjTranspose_mul_self
+
+/-- The quadratic form of the passivity defect `1 - Tᴴ * T` is input power minus output power. -/
+lemma ModeTransform.re_inner_one_sub_conjTranspose_mul_self {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (a : ModeAmplitude ι) :
+    RCLike.re (inner ℂ (Matrix.toEuclideanLin (1 - Tᴴ * T) a) a) =
+      a.power - (T.toLinearMap a).power := by
+  simp only [map_sub, Matrix.toLpLin_one, LinearMap.sub_apply, LinearMap.id_apply,
+    Matrix.toLpLin_mul_same, LinearMap.comp_apply,
+    Matrix.toEuclideanLin_conjTranspose_eq_adjoint]
+  rw [inner_sub_left, LinearMap.adjoint_inner_left, inner_self_eq_norm_sq_to_K,
+    inner_self_eq_norm_sq_to_K]
+  norm_cast
+
+/-- A finite mode transform is passive exactly when its input-side defect matrix
+`1 - Tᴴ * T` is positive semidefinite. -/
+lemma ModeTransform.isPassive_iff_posSemidef_one_sub_conjTranspose_mul_self {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) : T.IsPassive ↔ (1 - Tᴴ * T).PosSemidef := by
+  rw [← Matrix.isPositive_toEuclideanLin_iff]
+  constructor
+  · intro hT
+    refine ⟨Matrix.isSymmetric_toEuclideanLin_iff.mpr
+      (Matrix.isHermitian_one.sub (Matrix.isHermitian_conjTranspose_mul_self T)), ?_⟩
+    intro a
+    rw [ModeTransform.re_inner_one_sub_conjTranspose_mul_self]
+    exact sub_nonneg.mpr (hT a)
+  · intro hT a
+    have ha := hT.re_inner_nonneg_left a
+    rw [ModeTransform.re_inner_one_sub_conjTranspose_mul_self] at ha
+    exact sub_nonneg.mp ha
+
+/-- A square finite mode transform preserves power exactly when it belongs to the unitary group. -/
+lemma ModeTransform.isPowerPreserving_iff_mem_unitaryGroup {ι : Type*}
+    [Fintype ι] [DecidableEq ι] (T : ModeTransform ι ι) :
+    T.IsPowerPreserving ↔ T ∈ Matrix.unitaryGroup ι ℂ := by
+  rw [ModeTransform.isPowerPreserving_iff_conjTranspose_mul_self,
+    Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
+
 /-! ## C. Scattering matrices -/
 
 /-- A scattering matrix from incident to outgoing amplitudes on channels indexed by `ι`.
@@ -206,6 +269,13 @@ lemma ScatteringMatrix.IsLossless.isPowerPreserving {ι : Type*}
 lemma ScatteringMatrix.IsLossless.isPassive {ι : Type*}
     [Fintype ι] [DecidableEq ι] {S : ScatteringMatrix ι} (hS : S.IsLossless) :
     ModeTransform.IsPassive S.toModeTransform := hS.isPowerPreserving.isPassive
+
+/-- A scattering matrix is lossless exactly when its underlying mode transform preserves power. -/
+lemma ScatteringMatrix.isLossless_iff_isPowerPreserving {ι : Type*}
+    [Fintype ι] [DecidableEq ι] (S : ScatteringMatrix ι) :
+    S.IsLossless ↔ ModeTransform.IsPowerPreserving S.toModeTransform := by
+  rw [ModeTransform.isPowerPreserving_iff_mem_unitaryGroup]
+  rfl
 
 end
 
