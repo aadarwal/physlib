@@ -157,6 +157,9 @@ Ownership rules:
 - [x] Fixed-carrier phasors, distinct raw-field `JonesVector` and `JonesMatrix` wrappers,
   amplitude-phase realization, squared Jones intensity, global-phase invariance, and matrix action
   are present without importing Electromagnetism or identifying raw fields with normalized modes.
+- [x] The explicit three-dimensional `harmonicWaveX` solution has a named positive-frequency,
+  positive-first-coordinate Jones frame with complete electric- and magnetic-field realization and
+  a direct `B = c⁻¹ k̂ × E` theorem, without a static-background, gauge, or power claim.
 - [x] Generic positive-semidefinite `CoherencyMatrix` data supplies Hermiticity, real nonnegative
   diagonal and trace results, `A * C * Aᴴ` transport, cascade compatibility, and combined
   mode-polarization specializations without assuming Jones purity.
@@ -183,7 +186,6 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] phasor and Jones reconstruction of the real harmonic electromagnetic field;
 - [ ] Stokes, Poincare, and Mueller APIs;
 - [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
@@ -582,7 +584,7 @@ Deliverables:
 Exit: Jones calculations have a small field-amplitude API whose units and normalization claims are
 honest and which can be reviewed without importing the electromagnetic stack.
 
-#### P1b. Harmonic electromagnetic bridge
+#### P1b. Harmonic electromagnetic bridge — complete
 
 Candidate location: `Physlib/Optics/Polarization/HarmonicWave.lean`.
 
@@ -1346,7 +1348,7 @@ current integration base; a designed package whose prerequisite is merely active
 | O1 mode core | done | Mathlib complex linear algebra | mode branch and integration build |
 | O2 modal algebra | active | O1 | converse characterizations complete; parallel/reindex/rephase suite remains |
 | P1a Jones foundations | done | complex algebra | scalar realization, raw Jones action, and intensity suite |
-| P1b harmonic bridge | ready | P1a, existing harmonic wave | real electric/magnetic field reconstruction |
+| P1b harmonic bridge | done | P1a, existing harmonic wave | named-frame electric/magnetic field reconstruction |
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
 | P2b pure coherency | done | P1a, P2a | outer-product/rank/trace/phase/conjugation suite |
 | P3a neutral Hermitian basis | ready | matrix API audit | coordinate extraction/reconstruction suite |
@@ -1433,18 +1435,16 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P2a, and P2b are complete, independently reviewed, validated, and integrated. Preserve
-   their type boundary: raw Jones intensity is still neither irradiance nor modal power, general
-   coherency still carries no Jones-purity assumption, and zero Jones data has no polarization
-   direction.
+1. P1a, P1b, P2a, and P2b are complete, independently reviewed, validated, and integrated.
+   Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
+   the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
+   carries no Jones-purity assumption, and zero Jones data has no polarization direction.
 2. The O2 predicate characterizations are complete. Finish its direct-sum/parallel,
    reindexing, and rephasing suite before starting N2a typed ports/routing.
-3. Develop P1b as a separate bridge PR: prove transverse electric reconstruction for
-   `harmonicWaveX`, then the longitudinal-zero and compatible-magnetic-field results under the
-   named frame/carrier/medium assumptions. Do not claim reconstruction of a potential without a
-   gauge theorem.
-4. Audit and develop P3a's neutral Hermitian basis, then use it with P2a and P2b for the physical
+3. Audit and develop P3a's neutral Hermitian basis, then use it with P2a and P2b for the physical
    Stokes cone and Poincare classification without identifying mixed states with Jones vectors.
+4. Start E1's medium and macroscopic-Maxwell layer independently so the new harmonic bridge can
+   later acquire Poynting-flux normalization and meet the material-interface track.
 5. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
    PR concepts and do not translate Jones intensity into physical power before E3b.
 6. Audit E1 against the existing electromagnetic constant structures and prepare a focused
