@@ -175,9 +175,10 @@ PR unless maintainers explicitly ask to retain it.
   `(waveNumber, 0, -I * decayRate)` regression pins the intended sign.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
-  transmitted or outgoing, prove complex Maxwell equations, or assign power flow. Split a future
-  upstream stack into complex-vector/bilinear foundations, phase--attenuation spatial factors,
-  positive-normal decay, and coordinate regressions.
+  transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
+  Maxwell predicate, or assign power flow. Split a future upstream stack into
+  complex-vector/bilinear foundations, phase--attenuation spatial factors, positive-normal decay,
+  and coordinate regressions.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.

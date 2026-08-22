@@ -161,8 +161,9 @@ Ownership rules:
 
 - General complex, matrix, graph, topology, integration, and Fourier results belong in Mathlib or
   an existing mathematical Physlib namespace.
-- Dimension-generic complex-wavevector geometry, its complex-bilinear dispersion pairing, and
-  phase/attenuation decay laws belong in `Physlib/ClassicalMechanics/WaveEquation`.
+- Dimension-generic complex-wavevector geometry, its complex-bilinear pairing needed by later
+  dispersion laws, and phase/attenuation decay belong in
+  `Physlib/ClassicalMechanics/WaveEquation`.
 - Real electromagnetic fields remain foundational. Optics adds fixed-frequency reduced
   representations and proves how they reconstruct the real fields; it does not introduce a second
   competing Maxwell theory.
@@ -274,8 +275,9 @@ Ownership rules:
   and the normal-incidence reversal of the derived `p` axis without assigning incoming/outgoing,
   Fresnel, irradiance, or power semantics.
 - [x] WaveEquation now supplies dimension-generic complex wave vectors, their real
-  phase/attenuation decomposition, the non-Hermitian complex-bilinear dispersion pairing, exact
-  spatial-factor phase and decay laws, and proof-bearing positive-normal exponential decay. A
+  phase/attenuation decomposition, the non-Hermitian complex-bilinear pairing needed by later
+  dispersion laws, exact spatial-factor phase and decay laws, and proof-bearing positive-normal
+  exponential decay. A
   coordinate regression pins `K = (waveNumber, 0, -I * decayRate)` without assigning an interface,
   square-root branch, transmitted/outgoing role, Maxwell solution, evanescent-wave role, or power.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
@@ -328,8 +330,9 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] the complex electromagnetic carrier, exact real-wave bridge, complex
-  transversality/dispersion/Maxwell stack, and interface-selected outgoing/decaying branch;
+- [ ] the complex electromagnetic carrier, exact real-wave bridge, bilinear-amplitude
+  transversality/dispersion results, real-field macroscopic-Maxwell bridge, and interface-selected
+  outgoing/decaying branch;
 - [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
 - [ ] Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
