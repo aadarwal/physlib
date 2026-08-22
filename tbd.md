@@ -133,6 +133,25 @@ PR unless maintainers explicitly ask to retain it.
   quadratures vanish, but it forces dispersion only under
   `electricReal ≠ 0 ∨ electricImag ≠ 0`. With both quadratures zero, all constructed fields vanish
   and solve Maxwell for arbitrary positive `ω` and `κ`, so no stronger converse is valid.
+- [ ] Human-check E2c's proof-bearing frame orientation: for propagation vector `n`, the ordered
+  axes satisfy `axis 0 × axis 1 = n`, hence `n × axis 0 = axis 1` and
+  `n × axis 1 = -axis 0`. Confirm that this is only mathematical orientation and does not assign
+  observer-dependent right/left circular names.
+- [ ] Human-check E2c's complex-amplitude convention and coherent phase law:
+  `A = electricReal + I * electricImag`, realization is
+  `Re (A * exp (I * θ)) = cos θ • electricReal - sin θ • electricImag`, and multiplying every
+  Jones coordinate by `exp (I * φ)` translates all realized fields by time `φ / ω`. Check the
+  positive/negative-`I` algebraic sign regressions against the existing provisional third-Stokes
+  convention before assigning handedness names.
+- [ ] Human-check E2c's material field formulas: `B = v⁻¹ n × E` is represented by Jones
+  coordinates `(-J₁, J₀)`, `H = Z⁻¹ n × E`, and the connected constructor proves the
+  complete source-free macroscopic Maxwell predicate for the supplied homogeneous isotropic
+  medium without a nonzero-amplitude hypothesis.
+- [ ] Human-check E2c's fixed-vacuum regression frame and signs: propagation is coordinate zero,
+  Jones axes are coordinates one and two, the material wave number reduces to the supplied
+  positive `κ`, carrier phases agree, and the complete `E` and `B` fields equal the existing
+  potential-derived `harmonicWaveX` fields. The comparison intentionally proves field equality,
+  not equality of potentials or gauges.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
@@ -140,6 +159,13 @@ PR unless maintainers explicitly ask to retain it.
   as separate upstream concepts after the intrinsic profile-calculus additions to `Basic`. Then
   place complex phasor/Jones realization in an Optics-owned bridge. Do not add physical-power,
   handedness, evanescence, finite-beam, group-velocity, potential, or gauge claims to E2a/E2b.
+- [ ] Split E2c into reviewable upstream concepts: scalar coherent-phase realization laws in
+  `Polarization.Basic`; oriented local frame geometry and Jones embedding in `Polarization.Frame`;
+  the material-wave connector and its Maxwell endpoint; then the fixed-vacuum regression. Decide
+  with maintainers whether the larger frame file should be split again. Do not add a global
+  continuously varying frame over the direction sphere, inverse coordinate extraction, frame
+  rotation covariance, electromagnetic power, gauge reconstruction, evanescence, or circular
+  handedness to this upstream slice; design each as a separate follow-up where needed.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
 - [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged
