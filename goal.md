@@ -212,6 +212,10 @@ Ownership rules:
 - [x] The neutral Pauli layer characterizes the positive-semidefinite cone by
   `pauliRadius A ≤ scalarCoeff A`, with determinant, Hermiticity, and zero-radius support lemmas and
   no eigenvalue-ordering assumption.
+- [x] Raw Stokes coordinates are a real-linear reordering and doubling of the neutral Pauli
+  coordinates; reconstruction, intensity, polarization norm, determinant, physical-cone, and
+  coherency-equivalence laws are proved with the provisional third-coordinate sign but without
+  assigning circular-polarization names.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -233,7 +237,7 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] Stokes, Poincare, and Mueller APIs;
+- [ ] Poincare and Mueller APIs; raw and physical Stokes/coherency APIs are present;
 - [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -727,7 +731,7 @@ Pauli-vector part, the determinant/radius identity, the zero-radius vanishing le
 uses trace and determinant nonnegativity in one direction and an explicit PSD decomposition in the
 other, with the zero-radius case separated before inverse scaling.
 
-#### P3b-1. Stokes coordinates and coherency cone
+#### P3b-1. Stokes coordinates and coherency cone — complete
 
 Candidate location: `Physlib/Optics/Polarization/Stokes.lean`.
 
@@ -749,6 +753,13 @@ Deliverables:
 Every raw real Stokes vector reconstructs a self-adjoint matrix. Only a physical Stokes vector may
 reconstruct a `PolarizationCoherency`; the physical cone is not a vector subspace and must not be
 given a linear-equivalence or module API.
+
+Completion evidence: `Physlib.Optics.Polarization.Stokes` supplies the explicit real-linear
+Pauli/Stokes coordinate equivalence, all four basis-order/factor regressions, raw reconstruction and
+round trips, the entrywise reconstruction matrix, intensity and polarization observables, the
+determinant identity, the exact PSD/physical-cone criterion, and an ordinary equivalence between
+`PolarizationCoherency` and `PhysicalStokesVector`. The algebraic convention is
+`S₀ = 2c₀`, `S₁ = 2c₃`, `S₂ = 2c₁`, and `S₃ = 2c₂`; right/left circular naming remains withheld.
 
 #### P3b-2. Jones--Stokes bridge
 
@@ -1459,7 +1470,8 @@ universal continuous-frequency property.
 | P-01 | Jones realization equals each `harmonicWaveX` transverse electric component | phase/cast/index mismatch |
 | P-02 | squared Jones intensity equals the sum of squared real electric amplitudes | raw-field normalization mismatch |
 | P-03 | pure coherency and Stokes data are invariant under unit-modulus global phase | missing phase hypothesis or incorrect conjugation |
-| P-04 | canonical H/V/D/A/R/L states have the documented Stokes vectors | handedness and `S₃` sign errors |
+| P-04a | canonical H/V/D/A and algebraically named positive/negative-quadrature Jones states have the documented Stokes vectors | basis order, factor-of-two, conjugation, and `S₃` sign errors |
+| P-04b | after the human convention gate, named R/L Jones states agree with reconstructed real-field rotation and their documented Stokes vectors | observer-direction and circular-handedness errors |
 | P-05 | normalized nonzero coherency lies in the Poincare ball, reaches its boundary exactly at rank one, and rank-two/positive-definite data is strictly interior | invalid mixed-state classification |
 | P-06 | induced Mueller action agrees with Jones conjugation and composes correctly | basis/factor/conjugation mismatch |
 | P-07 | extracting Stokes coordinates after reconstruction returns the original raw Stokes vector | wrong basis order or factor of two |
@@ -1657,10 +1669,10 @@ current integration base; a designed package whose prerequisite is merely active
 | P2b pure coherency | done | P1a, P2a | outer-product/rank/trace/phase/conjugation suite |
 | P3a neutral Hermitian basis | done | matrix API audit | neutral basis, bundled coordinate equivalence, compatibility wrappers, and full downstream build |
 | P3b-0 neutral positive cone | done | P3a | determinant identity, PSD/radius criterion, and zero-radius-safe construction |
-| P3b-1 Stokes/coherency cone | ready | P2a, P3b-0 | raw linear reconstruction and physical-cone equivalence |
-| P3b-2 Jones--Stokes bridge | blocked | P2b, P3b-1 | explicit components and phase-invariance suite |
+| P3b-1 Stokes/coherency cone | done | P2a, P3b-0 | raw linear reconstruction, exact PSD cone, coherency equivalence, and round-trip suite |
+| P3b-2 Jones--Stokes bridge | ready | P2b, P3b-1 | explicit components and phase-invariance suite |
 | P3c Poincare classification | blocked | P3b-1, P3b-2 | ball/sphere/mixed-state suite |
-| P4 deterministic Mueller | blocked | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
+| P4 deterministic Mueller | ready | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
 | P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
 | P6a retarder core | ready | P1a | unitary Jones action and canonical-state suite |
@@ -1762,8 +1774,8 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, P2b, P3a, and P3b-0 are complete, independently reviewed, validated, and
-   integrated.
+1. P1a, P1b, P2a, P2b, P3a, P3b-0, and P3b-1 are complete, independently reviewed, validated,
+   and integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
    carries no Jones-purity assumption, the Pauli coordinates remain basis-fixed but independent of
@@ -1773,9 +1785,10 @@ human verification recorded in `tbd.md`.
    relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
    the distinction between incident and outgoing channel ends and do not encode feedback as
    ordinary matrix multiplication.
-3. Build P3b-1's raw/physical Stokes and coherency equivalence on the completed neutral Pauli cone.
-   Add the P3b-2 Jones bridge only through pure coherency and withhold right/left circular names
-   until the human handedness gate is resolved.
+3. Build P3b-2's Jones--Stokes bridge only through pure coherency: prove intensity, unit-scaling and
+   phase invariance, all four explicit component formulas, and the algebraically named H/V/D/A and
+   positive/negative-quadrature regressions. Withhold right/left circular names until the human
+   handedness gate is resolved; P3c becomes ready only after this bridge is complete.
 4. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
