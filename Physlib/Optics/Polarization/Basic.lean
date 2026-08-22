@@ -275,6 +275,12 @@ lemma scale_act (z : ℂ) (M : JonesMatrix) (J : JonesVector) :
   ext i
   simp [scale, act, JonesVector.scale, Matrix.mulVec]
 
+/-- Jones-matrix action commutes with common scaling of the input Jones vector. -/
+lemma act_scale (M : JonesMatrix) (z : ℂ) (J : JonesVector) :
+    M.act (JonesVector.scale z J) = JonesVector.scale z (M.act J) := by
+  ext i
+  simp [act, JonesVector.scale, Matrix.mulVec]
+
 /-- The identity Jones matrix. -/
 def identity : JonesMatrix :=
   ⟨1⟩
