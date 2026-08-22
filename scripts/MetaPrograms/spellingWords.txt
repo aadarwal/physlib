@@ -894,6 +894,7 @@ diagram
 diagrams
 diamond
 dictates
+dielectric
 diffeomorphic
 diffeomorphism
 differ

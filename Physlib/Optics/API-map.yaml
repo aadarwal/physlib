@@ -244,6 +244,10 @@ Requirements:
     done: true
     location: "Physlib/Mathematics/ComplexExponentialCharacter.lean (Complex.finsupp_sum_re_mul_exp_eq_zero_iff_of_im_pos)"
 
+  - description: "Optics assigns homogeneous isotropic medium 1 to the negative side and medium 2 to the positive side of an oriented affine plane, so the stored normal points from medium 1 toward medium 2. The interface permits equal media and supplies a side-indexed medium lookup, but stores no wave roles, boundary condition, common frequency, phase matching, propagation or decay branch, Fresnel coefficient, irradiance, or power normalization."
+    done: true
+    location: "Physlib/Optics/Interfaces/PlanarDielectric/Basic.lean (Optics.PlanarDielectricInterface, Optics.PlanarDielectricInterface.medium, Optics.PlanarDielectricInterface.medium_negative, Optics.PlanarDielectricInterface.medium_positive)"
+
   - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
     done: false
     location: N/A
