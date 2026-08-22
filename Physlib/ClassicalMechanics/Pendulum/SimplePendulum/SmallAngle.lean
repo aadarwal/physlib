@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.ClassicalMechanics.HarmonicOscillator.Basic
+public import Physlib.ClassicalMechanics.HarmonicOscillator.Solution
 public import Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Basic
 /-!
 
@@ -39,6 +39,17 @@ small oscillations of the pendulum.
   `θ̈ + ω² θ = 0`. Its rotational Newton form is `linearizedEquationOfMotion_iff_newton`, and
   `linearizedEquationOfMotion_iff` identifies it, for smooth lifts of the angle, with the
   equation of motion of the associated harmonic oscillator.
+- `SimplePendulum.smallAngleTrajectory` is the small-angle motion determined by a choice of
+  initial conditions, the trajectory of the associated harmonic oscillator: it is smooth
+  (`smallAngleTrajectory_contDiff`), it assumes its initial data at time `0`
+  (`smallAngleTrajectory_at_zero`, `smallAngleTrajectory_velocity_at_zero`), and it satisfies
+  the linearized equation of motion (`smallAngleTrajectory_linearizedEquationOfMotion`).
+- `SimplePendulum.linearized_unique`: a smooth solution of the linearized equation of motion
+  with the initial data of `IC` is `smallAngleTrajectory IC`. Together with the previous point,
+  this is the existence and uniqueness of the small-angle motions.
+- `SimplePendulum.releasedFromRest` is the motion released from rest at angle `θ₀`, the cosine
+  `θ₀ cos (ω t)`; `releasedFromRest_eq` identifies it with the small-angle trajectory of the
+  initial conditions with initial angle `θ₀` and zero initial angular velocity.
 
 ## iii. Table of contents
 
@@ -48,6 +59,10 @@ small oscillations of the pendulum.
 - B. The linearized equation of motion
   - B.1. The linearized equation
   - B.2. Equivalence with the equation of motion of the oscillator
+- C. Small-angle trajectories
+  - C.1. The trajectory of given initial conditions
+  - C.2. Existence and uniqueness
+  - C.3. Release from rest
 
 ## iv. References
 
@@ -188,6 +203,124 @@ lemma linearizedEquationOfMotion_iff (θ : Time → EuclideanSpace ℝ (Fin 1))
     S.LinearizedEquationOfMotion θ ↔ S.toHarmonicOscillator.EquationOfMotion θ := by
   rw [S.toHarmonicOscillator.equationOfMotion_iff_newtons_2nd_law θ hθ]
   exact S.linearizedEquationOfMotion_iff_newton θ
+
+/-!
+
+## C. Small-angle trajectories
+
+For small angles the pendulum is its associated harmonic oscillator, and the solution theory
+of the oscillator transfers verbatim: every choice of initial angle and initial angular
+velocity determines a smooth motion, unique among the smooth solutions of the linearized
+equation of motion. This section performs the transfer, and specializes it to the classical
+motion released from rest at a given angle.
+
+-/
+
+/-!
+
+### C.1. The trajectory of given initial conditions
+
+The small-angle motion determined by an initial angle `IC.x₀` and an initial angular velocity
+`IC.v₀` is the trajectory of the associated harmonic oscillator for the same initial
+conditions. It is smooth in time and assumes the prescribed initial data at time `0`.
+
+-/
+
+/-- The small-angle motion of the simple pendulum with initial angle `IC.x₀` and initial
+  angular velocity `IC.v₀`: the trajectory of the associated harmonic oscillator with the same
+  initial conditions. -/
+noncomputable def smallAngleTrajectory (IC : HarmonicOscillator.InitialConditions) :
+    Time → EuclideanSpace ℝ (Fin 1) :=
+  IC.trajectory S.toHarmonicOscillator
+
+/-- The small-angle trajectories of the simple pendulum are smooth in time. -/
+lemma smallAngleTrajectory_contDiff (IC : HarmonicOscillator.InitialConditions)
+    {n : WithTop ℕ∞} : ContDiff ℝ n (S.smallAngleTrajectory IC) :=
+  HarmonicOscillator.InitialConditions.trajectory_contDiff S.toHarmonicOscillator IC
+
+/-- At time `0` the small-angle trajectory passes through its initial angle. -/
+lemma smallAngleTrajectory_at_zero (IC : HarmonicOscillator.InitialConditions) :
+    S.smallAngleTrajectory IC 0 = IC.x₀ := by
+  simp [smallAngleTrajectory]
+
+/-- At time `0` the small-angle trajectory moves with its initial angular velocity. -/
+lemma smallAngleTrajectory_velocity_at_zero (IC : HarmonicOscillator.InitialConditions) :
+    ∂ₜ (S.smallAngleTrajectory IC) 0 = IC.v₀ := by
+  simp [smallAngleTrajectory]
+
+/-!
+
+### C.2. Existence and uniqueness
+
+The small-angle trajectories solve the linearized equation of motion, and they are the only
+smooth solutions: a smooth solution with the initial data of `IC` is the small-angle
+trajectory of `IC`. Both statements are the corresponding statements for the associated
+harmonic oscillator, read through the equivalence `linearizedEquationOfMotion_iff` of the two
+equations of motion.
+
+-/
+
+/-- The small-angle trajectories satisfy the linearized equation of motion: for every choice
+  of initial conditions the linearized equation has a smooth solution assuming them. -/
+lemma smallAngleTrajectory_linearizedEquationOfMotion
+    (IC : HarmonicOscillator.InitialConditions) :
+    S.LinearizedEquationOfMotion (S.smallAngleTrajectory IC) :=
+  (S.linearizedEquationOfMotion_iff _ (S.smallAngleTrajectory_contDiff IC)).mpr
+    (HarmonicOscillator.InitialConditions.trajectory_equationOfMotion S.toHarmonicOscillator IC)
+
+/-- Uniqueness of the small-angle motions: a smooth solution of the linearized equation of
+  motion is determined by its initial angle and initial angular velocity, being the
+  small-angle trajectory of those initial conditions. This is the uniqueness theorem for the
+  associated harmonic oscillator, transferred through `linearizedEquationOfMotion_iff`. -/
+lemma linearized_unique (IC : HarmonicOscillator.InitialConditions)
+    (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : ContDiff ℝ ∞ θ)
+    (h : S.LinearizedEquationOfMotion θ) (h0 : θ 0 = IC.x₀) (hv : ∂ₜ θ 0 = IC.v₀) :
+    θ = S.smallAngleTrajectory IC :=
+  HarmonicOscillator.InitialConditions.trajectories_unique S.toHarmonicOscillator IC θ hθ
+    ⟨(S.linearizedEquationOfMotion_iff θ hθ).mp h, h0, hv⟩
+
+/-!
+
+### C.3. Release from rest
+
+The classical small-angle experiment: the pendulum is displaced to an angle `θ₀` and released
+from rest. Its motion is the cosine `θ₀ cos (ω t)`, the small-angle trajectory of the initial
+conditions with initial angle `θ₀` and zero initial angular velocity; it starts at the angle
+`θ₀` with vanishing angular velocity, and satisfies the linearized equation of motion.
+
+-/
+
+/-- The small-angle motion of the pendulum released from rest at initial angle `θ₀`: the
+  cosine `θ₀ cos (ω t)` of angular frequency `ω`. -/
+noncomputable def releasedFromRest (θ₀ : ℝ) : Time → EuclideanSpace ℝ (Fin 1) :=
+  fun t => Real.cos (S.ω * t.val) • EuclideanSpace.single (0 : Fin 1) θ₀
+
+/-- The motion released from rest at angle `θ₀` is the small-angle trajectory of the initial
+  conditions with initial angle `θ₀` and zero initial angular velocity. -/
+lemma releasedFromRest_eq (θ₀ : ℝ) :
+    S.releasedFromRest θ₀ = S.smallAngleTrajectory ⟨EuclideanSpace.single 0 θ₀, 0⟩ := by
+  funext t
+  ext i
+  simp [releasedFromRest, smallAngleTrajectory,
+    HarmonicOscillator.InitialConditions.trajectory, toHarmonicOscillator_ω]
+
+/-- At time `0` the motion released from rest at angle `θ₀` is at the angle `θ₀`. -/
+lemma releasedFromRest_at_zero (θ₀ : ℝ) :
+    S.releasedFromRest θ₀ 0 = EuclideanSpace.single 0 θ₀ := by
+  simp [releasedFromRest]
+
+/-- The motion released from rest at angle `θ₀` is genuinely released from rest: its angular
+  velocity at time `0` vanishes. -/
+lemma releasedFromRest_velocity_at_zero (θ₀ : ℝ) : ∂ₜ (S.releasedFromRest θ₀) 0 = 0 := by
+  rw [S.releasedFromRest_eq θ₀]
+  exact S.smallAngleTrajectory_velocity_at_zero ⟨EuclideanSpace.single 0 θ₀, 0⟩
+
+/-- The motion released from rest at angle `θ₀` satisfies the linearized equation of
+  motion. -/
+lemma releasedFromRest_linearizedEquationOfMotion (θ₀ : ℝ) :
+    S.LinearizedEquationOfMotion (S.releasedFromRest θ₀) := by
+  rw [S.releasedFromRest_eq θ₀]
+  exact S.smallAngleTrajectory_linearizedEquationOfMotion ⟨EuclideanSpace.single 0 θ₀, 0⟩
 
 end SimplePendulum
 
