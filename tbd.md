@@ -107,6 +107,27 @@ PR unless maintainers explicitly ask to retain it.
   potential-derived vacuum result in `MacroscopicMaxwellBridge`.
 - [ ] Independently verify the Jackson, *Classical Electrodynamics*, third edition, section 6.6
   citation used by the E1b module docs before any upstream PR, as required by `AI-POLICY.md`.
+- [ ] Human-check E2a's off-shell carrier design: angular frequency `ω > 0` and scalar wave number
+  `κ > 0` are independent, propagation sign is represented only by `direction`, phase velocity is
+  `ω / κ`, and the classical wave-equation results are at that phase velocity rather than at the
+  supplied medium's wave speed. Material dispersion is deliberately a later predicate.
+- [ ] Human-check the E2a phase and quadrature convention:
+  `θ = ω t - κ ⟪x, direction.unit⟫`,
+  `E = cos θ • electricReal - sin θ • electricImag`, and therefore a later complex amplitude is
+  `electricReal + I * electricImag` under `Re (z * exp (I * θ))`. Confirm that omitting a separate
+  phase offset is intentional because it is redundant with a rotation of the two quadratures.
+- [ ] Human-check that E2a builds in the propagating candidate
+  `B = (κ / ω) • (n × E)` and must not later describe that relation as independently derived from
+  Maxwell equations. Electric transversality is a separate predicate, magnetic transversality is
+  structural, zero electric amplitude remains allowed, and a converse dispersion theorem will
+  require an explicit nonzero-amplitude hypothesis.
+- [ ] Split the 409-line fork-side E2a implementation before an upstream proposal: carrier data,
+  geometry, and electric realization first; compatible magnetic induction and transversality
+  second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
+  Stack dispersion, the fixed-medium constructor, Maxwell satisfaction, and converse results in a
+  later Maxwell file, then complex phasor/Jones realization in an Optics-owned bridge. Do not add
+  physical-power, handedness, evanescence, finite-beam, group-velocity, potential, or gauge claims
+  to E2a.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
 - [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged
