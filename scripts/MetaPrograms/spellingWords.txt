@@ -1,4 +1,11 @@
 admits
+anticipates
+branches
+converses
+impose
+isdispersionmatched
+isolate
+sampling
 profile
 beams
 candidate
