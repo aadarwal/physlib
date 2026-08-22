@@ -825,6 +825,7 @@ decidable
 deciseconds
 declaration
 declarations
+decoded
 decompose
 decomposed
 decomposes
@@ -935,6 +936,7 @@ discussed
 discussing
 discussion
 disjoint
+disjunction
 displaced
 displacements
 display
@@ -991,6 +993,7 @@ duals
 due
 duplicate
 duplicates
+dummy
 dx
 dynamics
 e
@@ -1553,6 +1556,7 @@ insertionsort
 insertionsortdropminpos
 inside
 inspired
+insufficient
 instance
 instances
 instantaneous
@@ -3012,6 +3016,7 @@ unbounded
 unbundled
 unchanged
 unclear
+unconditionally
 uncontracted
 uncontractedfieldopequiv
 uncontractedindexequiv

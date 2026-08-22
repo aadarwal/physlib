@@ -321,10 +321,13 @@ PR unless maintainers explicitly ask to retain it.
   incident exponent, harmonic uniqueness sees the combined referenced amplitude `A_i + A_r`, not
   `A_i` alone. A nonzero incident amplitude therefore cannot force the transmitted rate: choosing
   `A_r = -A_i` at the same exponent and zero transmitted amplitude leaves its exponent arbitrary.
-  The guarded label-matching theorem must require the exact combined referenced joint-trace
-  amplitude to be nonzero together with `A_r = 0` or equality of the reflected and incident rates,
-  or an equivalent condition that preserves the zero-reflection branch. The preceding signed
-  exponent-keyed coefficient identity is unconditional under its local-boundary hypothesis.
+  The exact guard is `G_i := A_i + if L_r = L_i then A_r else 0`, the negative-side coefficient at
+  the incident exponent. The signed exponent-keyed coefficient identity is unconditional under its
+  local-boundary hypothesis; from that identity and `G_i ≠ 0`, label matching derives both
+  `L_t = L_i` and `A_r = 0 ∨ L_r = L_i` rather than assuming the latter disjunction. The literal
+  guard `A_i + A_r ≠ 0` is unsound when `L_i ≠ L_r = L_t`, `A_i = 0`, and
+  `A_r = A_t ≠ 0`: the signed coefficients cancel but the transmitted exponent does not equal the
+  incident one.
 - [ ] Use finite exponential-character independence for E5a rather than assuming a Fourier
   transform or common period. The neutral layer now proves both uniqueness for finite complex sums
   indexed by complex-valued real-linear functionals and its ordinary-real-sum consequence when all
@@ -389,6 +392,16 @@ PR unless maintainers explicitly ask to retain it.
   labels, while coincident exponent contributions may cancel. Guarded label matching,
   conservation, propagation roles, Fresnel data, and the fixed-frequency converse remain later
   work.
+- [ ] Human-check E5a's guarded electric label matching before upstreaming. Confirm that its only
+  noncancellation premise is the exact conditional incident-key aggregate `G_i ≠ 0`; the reflected
+  zero-or-equal-exponent alternative is derived. Confirm the full five-case exponent partition:
+  the guard permits only `L_i = L_t ≠ L_r`, forcing `A_r = 0` and `A_t = A_i`, or
+  `L_i = L_r = L_t`, forcing `A_t = A_i + A_r`. In particular, a zero reflected electric
+  amplitude leaves its dummy exponent unconstrained. The final equality concerns stored-point-
+  referenced, medium-dependent joint tangential-`E`/normal-`D` coefficients, not raw electric
+  phasors or full electromagnetic amplitudes. Decode matched exponents only into frequency and
+  tangent-pairing equality; full wave-vector equality, propagation roles, Maxwell/on-shellness,
+  Fresnel data, and power remain absent.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
