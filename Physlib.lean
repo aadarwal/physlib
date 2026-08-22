@@ -201,6 +201,7 @@ public import Physlib.Optics.Polarization.Poincare
 public import Physlib.Optics.Polarization.RelativePhase
 public import Physlib.Optics.Polarization.RelativePhaseStokes
 public import Physlib.Optics.Polarization.Stokes
+public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
 public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic
