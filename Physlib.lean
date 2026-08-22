@@ -166,6 +166,7 @@ public import Physlib.Optics.Basic
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
+public import Physlib.Optics.Polarization.HarmonicWave
 public import Physlib.Optics.Polarization.JonesCoherency
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
