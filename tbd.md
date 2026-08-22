@@ -50,6 +50,11 @@ PR unless maintainers explicitly ask to retain it.
   contraction, sequential action, and Malus' law; then coherency/Stokes/Mueller connections and
   convention regressions. The combined fork milestone is intentionally larger than one upstream
   PR, and the neutral `MatrixRank` prerequisite should land first.
+- [ ] Preserve ideal-retarder work as a reviewable stack: rotated linear-basis coordinates and the
+  equal-amplitude relative-phase family; raw Jones retarder phase, spectral matrix, algebra,
+  unitarity, and action; wave-plate specializations; canonical regressions; then a separate
+  coherency/Stokes/Mueller bridge. Do not import the sibling polarizer implementation merely to
+  reuse its private projector proof structure.
 - [ ] Treat a topological upgrade of the Jones phase quotient as a separate design and proof
   package. Do not call the algebraic equivalence a homeomorphism or assert a continuously varying
   global Jones representative without the required quotient-topology and continuity theorems.
@@ -91,6 +96,20 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check the signed coherent factor `cos (input - analyzer)`, the `M.comp N` cascade order,
   the doubled Stokes direction `(cos (2θ), sin (2θ), 0)`, the induced Mueller factor `1 / 2`,
   and the exact `π / 4` half-intensity regression before proposing any polarizer PR.
+- [ ] Human-check P6a's retarder convention against a page-verified optics source and the existing
+  carrier realization: `axis` is a reference principal axis with eigenvalue one, its orthogonal
+  axis has `linearRetarderPhase retardance = exp (-I * retardance)`, and positive retardance is a
+  lag because realization changes `carrierPhase` to `carrierPhase - retardance`.
+- [ ] Human-check that `quarterWavePlate` means positive retardance `π / 2` and therefore gives
+  `diag(1, -I)` at zero axis, while `negativeQuarterWavePlate` gives `diag(1, I)`; retain the
+  positive/negative-`I` quadrature names until the observer convention assigns handedness.
+- [ ] Decide with maintainers whether the common-phase gauge with reference-axis eigenvalue one is
+  the desired public Jones API. It deliberately omits physical propagation/reference-plane phase;
+  do not replace it by a determinant-one half-angle formula on `Real.Angle`, whose half is not
+  globally canonical.
+- [ ] Do not rename P6a's `axis` to `fastAxis` or `slowAxis` until material birefringence,
+  propagation direction, and sign conventions are human-certified. In P6b, independently check
+  the expected Stokes rotation sign before documenting any Poincare-sphere rotation.
 
 ## Modal and network semantics
 

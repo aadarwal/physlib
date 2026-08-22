@@ -237,6 +237,12 @@ Ownership rules:
   projections with half-turn invariance, axis transmission, orthogonal extinction, exact
   squared-Jones-intensity contraction, coherent and intensity forms of Malus' law, canonical
   matrix regressions, coherency transport, and an exact Jones-induced arbitrary-Stokes action.
+- [x] Ideal linear retarders use a reference-principal-axis spectral decomposition and the
+  convention-locked relative phase `exp (-I * retardance)`; they have exact entry, determinant,
+  composition, inverse, unitarity, eigenaxis, linear-input, and raw-intensity laws. Positive and
+  negative quarter-wave plates and half-wave plates have canonical matrix and state regressions,
+  including a normalized equal-amplitude relative-phase family whose zero-axis phase transforms
+  by `relativePhase - retardance`, without circular-handedness or physical-power claims.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -258,7 +264,7 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] retarders, the physical Malus power bridge, and wave-plate calculations;
+- [ ] the physical Malus power bridge and the cross-representation retarder chain;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
@@ -923,17 +929,23 @@ Exit: physical Malus power is a corollary of P5a plus E3b rather than a second i
 
 #### P6a. Retarder and wave-plate core
 
-Candidate location: `Components/Retarder.lean`.
+Status: complete on the fork. Candidate export location: `Components/Retarder.lean`, with semantic
+modules under `Components/Retarder/` and the supporting relative-phase Jones family under
+`Polarization/RelativePhase.lean`.
 
 Deliverables:
 
-- rotated ideal retarder at arbitrary fast-axis angle and retardance;
-- unitarity and squared-Jones-intensity preservation without depending on Stokes theory;
-- quarter-wave and half-wave specializations;
-- proved Jones actions on the canonical linear, circular, and selected elliptical states.
+- [x] rotated ideal retarder at an arbitrary reference principal-axis angle and retardance;
+- [x] phase-sign realization, determinant, composition, inverse, unitarity, and
+  squared-Jones-intensity preservation without depending on Stokes theory;
+- [x] positive and negative quarter-wave and half-wave specializations; and
+- [x] proved Jones actions on canonical linear and algebraic quadrature states and on a selected
+  normalized equal-amplitude relative-phase family, while deferring circular handedness.
 
-Exit: retarder and wave-plate calculations are complete in raw Jones coordinates without waiting
-for Stokes or the electromagnetic bridge.
+Exit achieved: retarder and wave-plate calculations are complete in raw Jones coordinates without
+waiting for Stokes or the electromagnetic bridge. The omitted common propagation phase,
+fast/slow-axis material naming, Stokes/Mueller rotation, irradiance, and modal-power interpretations
+remain explicit later gates rather than implicit claims of the Jones core.
 
 #### P6b. Cross-representation polarization chain
 
@@ -1752,7 +1764,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P4 deterministic Mueller | done | P1a, P2a, P3a, P3b-1 | transported real action, Pauli trace/reality, cone, algebra, unitary, and regression suites |
 | P5a Jones polarizer/Malus | done | P1a, P2b, P3b-2, P4 | projection, contraction, coherent/intensity Malus, coherency, arbitrary-Stokes Mueller, and convention-regression suites |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
-| P6a retarder core | ready | P1a | unitary Jones action and canonical-state suite |
+| P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b polarization chain | blocked | P1b, P2b, P3b-2, P4, P5a/P5b, P6a, E3b | cross-representation connected example |
 | E0 Maxwell public API | ready | existing three-dimensional Maxwell module | exported vacuum-law declarations and downstream build |
 | E1 media/macroscopic Maxwell | blocked | E0, Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
@@ -1866,20 +1878,21 @@ human verification recorded in `tbd.md`.
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
    raw electric-amplitude-squared normalization, not irradiance or modal power.
-4. Build P6a's retarder core next, reusing `JonesVector.linearPolarization` for arbitrary axes and
-   keeping its unitary Jones action separate from the singular polarizer projector. Prove general
-   retardance composition and the quarter-wave and half-wave canonical-state regressions before
-   adding its coherency, Stokes, and Mueller views.
+4. Preserve the completed P6a retarder core as a raw-Jones layer: its reference axis has eigenvalue
+   one, the orthogonal axis has relative phase `exp (-I * retardance)`, and its unitarity still does
+   not imply electromagnetic power. Build the P6b coherency, Stokes, and Mueller views next from
+   this public action, with the physical field/irradiance portion remaining blocked on E3b.
 5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
-   P5a Malus law is complete.
+   P5a Malus law and P6a retarder intensity preservation are complete.
 7. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
-P6a can proceed on the completed polarization stack; Fresnel work must still follow the named
-electromagnetic medium, boundary, and flux dependencies.
+P6b's reduced-representation work can proceed from the completed polarization and retarder stack;
+its physical observables and all Fresnel work must still follow the named electromagnetic medium,
+boundary, and flux dependencies.
