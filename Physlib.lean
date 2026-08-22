@@ -124,6 +124,7 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Mathematics.KroneckerDelta.Contraction
 public import Physlib.Mathematics.LeviCivita.Basic
+public import Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint
 public import Physlib.Mathematics.LinearMaps
 public import Physlib.Mathematics.LinearPMap
 public import Physlib.Mathematics.List
