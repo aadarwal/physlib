@@ -28,7 +28,10 @@ interpretations require later impedance, field-profile, and Poynting-flux normal
 - `Phasor.realize`: the real signal associated with a phasor and carrier phase.
 - `Phasor.ofAmplitudePhase`: a phasor constructed from a real amplitude and phase.
 - `JonesVector`: two raw transverse electric-field phasors.
+- `JonesVector.ofComponents`: a Jones vector constructed from two complex components.
 - `JonesVector.intensity`: the squared Euclidean norm of a Jones vector.
+- `JonesVector.horizontal`, `vertical`, `diagonal`, `antidiagonal`, `plusIQuadrature`, and
+  `minusIQuadrature`: normalized canonical coordinate states without circular-handedness names.
 - `JonesMatrix`: a wrapped `2 x 2` complex matrix.
 - `JonesMatrix.act`: the action of a Jones matrix on a Jones vector.
 
@@ -85,6 +88,20 @@ structure JonesVector where
   components : EuclideanSpace ℂ (Fin 2)
 
 namespace JonesVector
+
+/-- Construct a Jones vector from its first and second complex components. -/
+def ofComponents (first second : ℂ) : JonesVector :=
+  ⟨WithLp.toLp 2 ![first, second]⟩
+
+/-- The first component of a Jones vector constructed from two complex amplitudes. -/
+@[simp]
+lemma ofComponents_zero (first second : ℂ) :
+    (ofComponents first second).components 0 = first := rfl
+
+/-- The second component of a Jones vector constructed from two complex amplitudes. -/
+@[simp]
+lemma ofComponents_one (first second : ℂ) :
+    (ofComponents first second).components 1 = second := rfl
 
 /-- Construct a Jones vector from a real amplitude and phase for each transverse component. -/
 def ofAmplitudePhase (amplitude phase : Fin 2 → ℝ) : JonesVector :=
@@ -165,6 +182,54 @@ lemma intensity_ofAmplitudePhase (amplitude phase : Fin 2 → ℝ) :
   rw [ofAmplitudePhase_components, Phasor.ofAmplitudePhase, Complex.normSq_mul,
     Complex.normSq_ofReal, ← Complex.sq_norm, Complex.norm_exp_ofReal_mul_I]
   ring
+
+/-! ### B.1. Canonical normalized coordinate states -/
+
+/-- The real amplitude for each component of a unit-intensity equal-amplitude Jones state. -/
+noncomputable def unitEqualAmplitude : ℝ :=
+  Real.sqrt 2 / 2
+
+/-- The squared equal-component amplitude is one half. -/
+lemma unitEqualAmplitude_sq : unitEqualAmplitude ^ 2 = 1 / 2 := by
+  rw [unitEqualAmplitude, div_pow, Real.sq_sqrt (by norm_num)]
+  norm_num
+
+/-- Multiplying the equal-component amplitude by itself gives one half. -/
+@[simp]
+lemma unitEqualAmplitude_mul_self : unitEqualAmplitude * unitEqualAmplitude = 1 / 2 := by
+  rw [← pow_two, unitEqualAmplitude_sq]
+
+/-- The unit Jones state in the first declared transverse coordinate, called horizontal relative
+to the chosen coordinate frame. -/
+def horizontal : JonesVector :=
+  ofComponents 1 0
+
+/-- The unit Jones state in the second declared transverse coordinate, called vertical relative
+to the chosen coordinate frame. -/
+def vertical : JonesVector :=
+  ofComponents 0 1
+
+/-- The unit Jones state with equal positive real components, called diagonal relative to the
+chosen coordinate frame. -/
+noncomputable def diagonal : JonesVector :=
+  ofComponents unitEqualAmplitude unitEqualAmplitude
+
+/-- The unit Jones state with equal-magnitude opposite real components, called antidiagonal
+relative to the chosen coordinate frame. -/
+noncomputable def antidiagonal : JonesVector :=
+  ofComponents unitEqualAmplitude (-unitEqualAmplitude)
+
+/-- The unit quadrature Jones state whose second component is `I` times its first component.
+
+No circular-polarization handedness name is assigned by this algebraic definition. -/
+noncomputable def plusIQuadrature : JonesVector :=
+  ofComponents unitEqualAmplitude (Complex.I * unitEqualAmplitude)
+
+/-- The unit quadrature Jones state whose second component is `-I` times its first component.
+
+No circular-polarization handedness name is assigned by this algebraic definition. -/
+noncomputable def minusIQuadrature : JonesVector :=
+  ofComponents unitEqualAmplitude (-Complex.I * unitEqualAmplitude)
 
 end JonesVector
 
