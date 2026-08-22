@@ -1320,8 +1320,11 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
 
 #### E5a. Conservation and fixed-frequency reduction
 
-- harmonic-uniqueness and noncancellation lemmas strong enough to distinguish unequal positive
-  frequencies in ordinary real time-domain fields;
+- [x] neutral finite exponential-character independence for complex-valued real-linear
+  functionals, including finite-support uniqueness without topology or a common period;
+- [ ] positive-frequency harmonic-uniqueness and noncancellation lemmas connecting that neutral
+  result to ordinary real time-domain fields and distinguishing each positive-frequency character
+  from every conjugate negative-frequency character;
 - the deferred oriented-hyperplane annihilator lemma converting vanishing against every tangent
   displacement into an explicit normal-vector multiple, used to identify tangential projections;
 - equality of frequency and tangential wave-vector components derived from primitive boundary
@@ -2039,7 +2042,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
 | E4a local boundary semantics | in progress | E1, E2 | neutral oriented-hyperplane geometry complete; planar medium assignment, primitive independent-frequency physical traces, and explicit conditional local laws remain |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5a conservation/reduction | blocked | E2, E4a | harmonic uniqueness, derived frequency/tangential-K conservation, and fixed-frequency reduction theorem |
+| E5a conservation/reduction | in progress | E2, E4a | neutral finite exponential-character independence complete; positive-frequency real-harmonic uniqueness, derived frequency/tangential-K conservation, and fixed-frequency reduction remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
@@ -2179,7 +2182,8 @@ human verification recorded in `tbd.md`.
    Preserve the completed neutral oriented-affine-hyperplane layer: its normal points from the
    geometric negative side toward the positive side, its closed half-spaces both contain the
    carrier, and its side names have no medium, wave-role, outgoing, or power meaning. Proceed next
-   through finite exponential-character independence and then the interface-oriented
+   from the completed neutral finite exponential-character independence layer to its
+   positive-frequency ordinary-real-field consequence, then the interface-oriented
    outgoing/decaying layer. Withhold power claims until Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
@@ -2196,7 +2200,8 @@ Jones/phasor realization, incidence frames, complex-wavevector decay geometry, o
 carrier, exact real-wave bridge, generic carrier calculus, and bilinear material dispersion now
 connected with forward and converse ordinary-real-field Maxwell and exact algebraic plus
 ordinary-real-field falsification regressions, and neutral oriented-affine-hyperplane geometry, the
-next physical-optics front is finite exponential-character independence followed by the
+next physical-optics front is the positive-frequency ordinary-real-field consequence of the
+completed neutral finite exponential-character independence theorem, followed by the
 interface-oriented outgoing/decaying branch on that shared carrier. The interface must start from
 independent-frequency time-domain traces and derive frequency conservation before it uses a
 fixed-frequency Fresnel reduction. The reflected conservation result must allow zero reflection,

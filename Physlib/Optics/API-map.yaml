@@ -236,6 +236,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Polarization/Frame.lean (Optics.PolarizationFrame.ofAxisZero, Optics.PolarizationFrame.ofAxisZero_axis_zero, Optics.PolarizationFrame.ofAxisZero_axis_one); Physlib/Optics/Polarization/IncidenceFrame.lean (Optics.IsNonNormalIncidence, Optics.sPolarizationAxis, Optics.sPolarizationAxis_norm, Optics.inner_interfaceNormal_sPolarizationAxis, Optics.inner_propagation_sPolarizationAxis, Optics.pPolarizationAxis, Optics.incidencePolarizationFrame, Optics.incidencePolarizationFrame_axis_zero, Optics.incidencePolarizationFrame_axis_one, Optics.incidencePolarizationFrame_realizeJones_eq); Physlib/Optics/Polarization/IncidenceFrameRegression.lean (Optics.incidenceRegression_sPolarizationAxis, Optics.incidenceRegression_pPolarizationAxis, Optics.normalIncidenceRegressionFrames_axis_zero_eq, Optics.normalIncidenceRegressionFrames_axis_one_neg)"
 
+  - description: "The neutral mathematics layer bundles the complex exponential of a complex-valued real-linear functional as a multiplicative character, proves that equality of such characters determines the functional despite the exponential's pointwise periodicity, proves linear independence of the full character family over the complex numbers, and exposes the corresponding finite-support uniqueness theorem. It assumes no topology, norm, common period, optical frequency, boundary trace, or noncancellation condition."
+    done: true
+    location: "Physlib/Mathematics/ComplexExponentialCharacter.lean (Complex.forall_exp_real_smul_eq_one_iff, Complex.realLinearExponentialCharacter, Complex.realLinearExponentialCharacter_apply, Complex.realLinearExponentialCharacter_injective, Complex.linearIndependent_realLinearExponentialCharacter, Complex.finsupp_sum_mul_exp_eq_zero_iff)"
+
   - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
     done: false
     location: N/A
