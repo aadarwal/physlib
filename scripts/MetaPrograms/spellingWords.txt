@@ -3260,3 +3260,12 @@ retardance
 retardances
 retarders
 suite
+alpha
+attenuation
+attenuationvector
+decayrate
+envelope
+kappa
+omega
+phasevector
+wavenumber

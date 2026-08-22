@@ -161,9 +161,15 @@ Ownership rules:
 
 - General complex, matrix, graph, topology, integration, and Fourier results belong in Mathlib or
   an existing mathematical Physlib namespace.
+- Dimension-generic complex-wavevector geometry, its complex-bilinear pairing needed by later
+  dispersion laws, and phase/attenuation decay belong in
+  `Physlib/ClassicalMechanics/WaveEquation`.
 - Real electromagnetic fields remain foundational. Optics adds fixed-frequency reduced
   representations and proves how they reconstruct the real fields; it does not introduce a second
   competing Maxwell theory.
+- Electromagnetism may use complex coefficients as calculation data when it constructs and proves
+  laws about real fields, but it does not introduce competing phasor, Jones, coherency, or modal
+  normalization state APIs.
 - Constitutive laws, electromagnetic energy density and flux, and field boundary laws belong in
   `Physlib/Electromagnetism`.
 - Phasors, Jones/Stokes/Mueller data, optical components, rays, interfaces, observables, and
@@ -268,6 +274,12 @@ Ownership rules:
   choice explicit at normal incidence. Exact coordinate regressions pin both the non-normal axes
   and the normal-incidence reversal of the derived `p` axis without assigning incoming/outgoing,
   Fresnel, irradiance, or power semantics.
+- [x] WaveEquation now supplies dimension-generic complex wave vectors, their real
+  phase/attenuation decomposition, the non-Hermitian complex-bilinear pairing needed by later
+  dispersion laws, exact spatial-factor phase and decay laws, and proof-bearing positive-normal
+  exponential decay. A
+  coordinate regression pins `K = (waveNumber, 0, -I * decayRate)` without assigning an interface,
+  square-root branch, transmitted/outgoing role, Maxwell solution, evanescent-wave role, or power.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -301,7 +313,10 @@ Ownership rules:
 - `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Converse` proves that Maxwell forces
   transversality and, under the necessary nonzero-electric-amplitude condition, positive-branch
   dispersion; it also gives the resulting nonzero-carrier characterization.
-- `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure.
+- `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure;
+  `ClassicalMechanics.WaveEquation.ComplexWaveVector` supplies the generic complex-vector,
+  bilinear-pairing, spatial-factor, and positive-normal decay foundation needed by the remaining
+  E2 work.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -315,6 +330,9 @@ Ownership rules:
 
 ### D.3. Not yet present
 
+- [ ] the complex electromagnetic carrier, exact real-wave bridge, bilinear-amplitude
+  transversality/dispersion results, real-field macroscopic-Maxwell bridge, and interface-selected
+  outgoing/decaying branch;
 - [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
 - [ ] Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -1115,8 +1133,13 @@ sources.
   claim;
 - [x] a polarization-frame constructor from an independently selected unit transverse axis for
   normal incidence, with an exact regression proving that reversing propagation preserves the
-  selected `s` axis and negates the derived `p` axis; and
-- [ ] a complex-wavevector representation and outgoing/decaying branch for evanescent fields.
+  selected `s` axis and negates the derived `p` axis;
+- [x] a dimension-generic complex-wavevector representation with a complex-bilinear pairing,
+  phase/attenuation decomposition, spatial-factor laws, and proof-bearing positive-normal
+  exponential decay, including an exact coordinate sign regression; and
+- [ ] a complex electromagnetic carrier, exact bridge from the real plane-wave API, material
+  dispersion and Maxwell laws, and an interface-oriented outgoing/decaying branch for evanescent
+  fields.
 
 Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
 
@@ -1683,6 +1706,7 @@ universal continuous-frequency property.
 | C-01 | ideal polarizer is self-adjoint, idempotent, and Jones-intensity nonincreasing | wrong projector/component law |
 | C-02 | sequential ideal polarizers on a linear input prove Malus' law | overgeneralized input class or disconnected intensity |
 | C-03 | quarter- and half-wave plates produce named canonical states and preserve Jones intensity | axis/retardance convention errors |
+| E-00 | `K = q - I * alpha * n` has bilinear square `norm q ^ 2 - alpha ^ 2`, and positive-normal displacement multiplies its spatial factor by `exp (-alpha * u)` | Hermitian/bilinear confusion or attenuation-sign error |
 | E-01 | interface at normal incidence specializes consistently using a selected tangent frame | hidden `s`/`p` degeneracy or normal-direction errors |
 | E-02 | reflection and Snell laws follow from phase matching | assumed rather than derived geometry |
 | E-03 | Fresnel boundary equations imply the amplitude formulas | sign and impedance errors |
@@ -1885,7 +1909,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, oriented Jones/phasor frame, phase coherence, vacuum regression, and non-normal/selected-tangent s/p incidence complete; complex-wavevector and evanescent layers remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, oriented Jones/phasor frame, phase coherence, vacuum regression, non-normal/selected-tangent s/p incidence, and neutral complex-wavevector decay geometry complete; complex electromagnetic carrier, real-wave bridge, outgoing branch, and evanescent-field layers remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
@@ -2009,9 +2033,12 @@ human verification recorded in `tbd.md`.
    quadrature and `E`/`B`/`H` realizations, coherent-phase time translation, complete material
    Maxwell endpoint, fixed-vacuum field regression, and proof-bearing incidence geometry:
    `s = normalize (n × k)`, `p = k × s`, Jones order `(s, p)`, explicit tangent selection at
-   normal incidence, and exact orientation regressions. Proceed next to the complex-wavevector and
-   outgoing/decaying evanescent layer while withholding power claims until Poynting-flux
-   normalization.
+   normal incidence, and exact orientation regressions. Preserve E2e's dimension-generic
+   complex-wavevector geometry, non-Hermitian bilinear pairing, convention
+   `K = q - I a`, exact positive-normal spatial decay, and interface/power exclusions. Proceed next
+   to the complex electromagnetic carrier and exact real-wave bridge, then its dispersion,
+   Maxwell, and interface-oriented outgoing/decaying layers, while withholding power claims until
+   Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -2023,6 +2050,8 @@ The next session should not jump directly to a microring formula or stored Fresn
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
 medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, oriented
-Jones/phasor realization, and non-normal plus selected-tangent incidence frames now connected, the
-next physical-optics front is the complex-wavevector and outgoing/decaying-branch model for
-evanescent fields. The independent circuit front remains N2a/N3.
+Jones/phasor realization, incidence frames, and neutral complex-wavevector decay geometry now
+connected, the next physical-optics front is the complex electromagnetic carrier and exact bridge
+from existing real material waves; dispersion, Maxwell, and the interface-oriented
+outgoing/decaying branch follow on that shared carrier. The independent circuit front remains
+N2a/N3.
