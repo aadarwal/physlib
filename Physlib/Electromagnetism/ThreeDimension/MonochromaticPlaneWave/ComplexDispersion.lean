@@ -38,6 +38,8 @@ evanescent-wave interpretation. Maxwell equations and electromagnetic power rema
   triple-product identity.
 - `IsDispersionMatched.waveVector_cross_magneticAmplitude`: its built-in magnetic-amplitude
   consequence with the exact single-frequency factor.
+- `ComplexMonochromaticPlaneWave.isDispersionMatched_of_waveVector_cross_magneticAmplitude`: the
+  guarded converse from the transverse magnetic-amplitude relation.
 - `ComplexMonochromaticPlaneWave.isDispersionMatched_ofReal_iff`: exact agreement with the
   existing positive-branch predicate on embedded real waves.
 
@@ -174,6 +176,38 @@ lemma waveVector_cross_magneticAmplitude
   field_simp [wave.angularFrequency_ne_zero]
 
 end IsDispersionMatched
+
+/-- A nonzero transverse amplitude satisfying the material magnetic-amplitude relation lies on
+the complex-bilinear material shell. -/
+lemma isDispersionMatched_of_waveVector_cross_magneticAmplitude
+    (wave : ComplexMonochromaticPlaneWave) (medium : HomogeneousIsotropicMedium)
+    (hTransverse : wave.IsTransverse)
+    (hAmpere : complexCross wave.waveVector wave.magneticAmplitude =
+      -((medium.ε * medium.μ * wave.angularFrequency : ℝ) : ℂ) •
+        wave.electricAmplitude)
+    (hNonzero : wave.electricAmplitude ≠ 0) :
+    wave.IsDispersionMatched medium := by
+  rw [magneticAmplitude, complexCross_smul_right,
+    complexCross_complexCross] at hAmpere
+  change ComplexWaveVector.bilinearDot wave.waveVector wave.electricAmplitude = 0
+    at hTransverse
+  rw [hTransverse] at hAmpere
+  simp only [zero_smul, zero_sub, smul_neg, smul_smul] at hAmpere
+  rw [← neg_smul] at hAmpere
+  have hCoefficient :
+      (wave.angularFrequency : ℂ)⁻¹ *
+          ComplexWaveVector.bilinearDot wave.waveVector wave.waveVector =
+        ((medium.ε * medium.μ * wave.angularFrequency : ℝ) : ℂ) := by
+    exact neg_inj.mp ((smul_left_inj hNonzero).mp hAmpere)
+  rw [IsDispersionMatched]
+  field_simp [wave.angularFrequency_ne_zero] at hCoefficient
+  calc
+    ComplexWaveVector.bilinearDot wave.waveVector wave.waveVector =
+        (wave.angularFrequency : ℂ) *
+          ((medium.ε * medium.μ * wave.angularFrequency : ℝ) : ℂ) := hCoefficient
+    _ = ((medium.ε * medium.μ * wave.angularFrequency ^ 2 : ℝ) : ℂ) := by
+      push_cast
+      ring
 
 /-!
 

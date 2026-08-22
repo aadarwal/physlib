@@ -87,6 +87,7 @@ public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Bas
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBasic
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexCalculus
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexConverse
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexDispersion
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexMaxwell
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Converse
