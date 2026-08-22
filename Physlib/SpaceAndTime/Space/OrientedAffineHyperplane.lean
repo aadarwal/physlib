@@ -21,9 +21,11 @@ The normal points from the geometric negative side toward the geometric positive
 names carry no material-medium, incident, reflected, transmitted, outgoing, or power meaning.
 Later interface structures may assign such roles explicitly.
 
-Vectors are split into their scalar normal component and their tangential projection. The
-construction is dimension-generic and uses the coordinate vector space acting on `Space d`, so it
-can be reused by planar boundaries, waveguides, and phase-matching arguments.
+Vectors are split into their scalar normal component and their tangential projection. Tangent
+vectors are also bundled as the kernel submodule of the normal-component linear map, and the
+explicit projection is bundled as a linear map into that submodule. The construction is
+dimension-generic and uses the coordinate vector space acting on `Space d`, so it can be reused by
+planar boundaries, waveguides, and phase-matching arguments.
 
 ## ii. Key results
 
@@ -31,6 +33,9 @@ can be reused by planar boundaries, waveguides, and phase-matching arguments.
 - `OrientedAffineHyperplane.normalComponent_tangentialProjection`: the tangential projection is
   tangent.
 - `OrientedAffineHyperplane.tangentialProjection_add_normal`: exact vector decomposition.
+- `OrientedAffineHyperplane.tangentSubmodule`: tangent displacements as a real submodule.
+- `OrientedAffineHyperplane.eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent`:
+  a vector pairing to zero with every tangent vector is its explicit normal projection.
 - `OrientedAffineHyperplane.exists_tangent_vadd_eq_of_mem_carrier`: every carrier point is a
   tangential displacement of the stored point.
 - `OrientedAffineHyperplane.signedNormalCoordinate_sideRay`: exact side-normal parameterization.
@@ -40,7 +45,7 @@ can be reused by planar boundaries, waveguides, and phase-matching arguments.
 - A. Oriented hyperplanes and sides
 - B. Signed normal geometry
 - C. Half-spaces
-- D. Tangential projection and carrier parameterization
+- D. Tangent submodule, projection, and carrier parameterization
 
 ## iv. References
 
@@ -139,6 +144,16 @@ def signedNormalCoordinate (plane : OrientedAffineHyperplane d) (x : Space d) : 
 def normalComponent (plane : OrientedAffineHyperplane d)
     (v : EuclideanSpace ℝ (Fin d)) : ℝ :=
   inner ℝ plane.normalVector v
+
+/-- The scalar normal component as a real-linear map. -/
+def normalComponentLinearMap (plane : OrientedAffineHyperplane d) :
+    EuclideanSpace ℝ (Fin d) →ₗ[ℝ] ℝ :=
+  (innerSL ℝ plane.normalVector).toLinearMap
+
+@[simp]
+lemma normalComponentLinearMap_apply (plane : OrientedAffineHyperplane d)
+    (v : EuclideanSpace ℝ (Fin d)) :
+    plane.normalComponentLinearMap v = plane.normalComponent v := rfl
 
 /-- The unit coordinate normal pointing into a selected geometric side. -/
 def sideNormalVector (plane : OrientedAffineHyperplane d) (side : Side) :
@@ -271,7 +286,7 @@ lemma sideRay_mem_openHalfSpace (plane : OrientedAffineHyperplane d)
 
 /-!
 
-## D. Tangential projection and carrier parameterization
+## D. Tangent submodule, projection, and carrier parameterization
 
 -/
 
@@ -285,6 +300,17 @@ vanishes. -/
 def IsTangent (plane : OrientedAffineHyperplane d)
     (v : EuclideanSpace ℝ (Fin d)) : Prop :=
   plane.normalComponent v = 0
+
+/-- The real submodule of displacement vectors tangent to an oriented affine hyperplane. -/
+def tangentSubmodule (plane : OrientedAffineHyperplane d) :
+    Submodule ℝ (EuclideanSpace ℝ (Fin d)) :=
+  plane.normalComponentLinearMap.ker
+
+@[simp]
+lemma mem_tangentSubmodule (plane : OrientedAffineHyperplane d)
+    (v : EuclideanSpace ℝ (Fin d)) :
+    v ∈ plane.tangentSubmodule ↔ plane.IsTangent v := by
+  rfl
 
 /-- A tangent vector is orthogonal to the unit normal pointing into either side. -/
 lemma inner_sideNormalVector_eq_zero_of_isTangent (plane : OrientedAffineHyperplane d)
@@ -334,6 +360,56 @@ lemma tangentialProjection_eq_self_of_isTangent (plane : OrientedAffineHyperplan
   change plane.normalComponent v = 0 at h
   rw [tangentialProjection, h]
   simp
+
+/-- The real-linear projection from displacement vectors to the tangent submodule. -/
+def projectionToTangent (plane : OrientedAffineHyperplane d) :
+    EuclideanSpace ℝ (Fin d) →ₗ[ℝ] plane.tangentSubmodule where
+  toFun v := ⟨plane.tangentialProjection v, plane.isTangent_tangentialProjection v⟩
+  map_add' u v := Subtype.ext (plane.tangentialProjection_add u v)
+  map_smul' c v := Subtype.ext (plane.tangentialProjection_smul c v)
+
+@[simp]
+lemma coe_projectionToTangent (plane : OrientedAffineHyperplane d)
+    (v : EuclideanSpace ℝ (Fin d)) :
+    (plane.projectionToTangent v : EuclideanSpace ℝ (Fin d)) =
+      plane.tangentialProjection v := rfl
+
+@[simp]
+lemma projectionToTangent_coe (plane : OrientedAffineHyperplane d)
+    (v : plane.tangentSubmodule) :
+    plane.projectionToTangent (v : EuclideanSpace ℝ (Fin d)) = v := by
+  apply Subtype.ext
+  exact plane.tangentialProjection_eq_self_of_isTangent v
+    ((plane.mem_tangentSubmodule v).mp v.property)
+
+/-- A real vector pairing to zero with every tangent vector is its own normal component times
+the oriented unit normal. -/
+lemma eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent
+    (plane : OrientedAffineHyperplane d) (w : EuclideanSpace ℝ (Fin d))
+    (h : ∀ v : plane.tangentSubmodule,
+      inner ℝ w (v : EuclideanSpace ℝ (Fin d)) = 0) :
+    w = plane.normalComponent w • plane.normalVector := by
+  have hproj := h (plane.projectionToTangent w)
+  simp only [coe_projectionToTangent] at hproj
+  have hinner : inner ℝ (plane.tangentialProjection w)
+      (plane.tangentialProjection w) = 0 := by
+    have htangent := plane.normalComponent_tangentialProjection w
+    simp only [normalComponent] at htangent
+    calc
+      inner ℝ (plane.tangentialProjection w) (plane.tangentialProjection w) =
+          inner ℝ (w - plane.normalComponent w • plane.normalVector)
+            (plane.tangentialProjection w) := rfl
+      _ = inner ℝ w (plane.tangentialProjection w) -
+          inner ℝ (plane.normalComponent w • plane.normalVector)
+            (plane.tangentialProjection w) := by rw [inner_sub_left]
+      _ = 0 := by rw [hproj, inner_smul_left, conj_trivial, htangent, mul_zero, sub_zero]
+  have hprojection : plane.tangentialProjection w = 0 :=
+    inner_self_eq_zero.mp hinner
+  calc
+    w = plane.tangentialProjection w +
+        plane.normalComponent w • plane.normalVector :=
+      (plane.tangentialProjection_add_normal w).symm
+    _ = plane.normalComponent w • plane.normalVector := by rw [hprojection, zero_add]
 
 /-- A tangent displacement of the stored point belongs to the hyperplane carrier. -/
 lemma tangent_vadd_point_mem_carrier (plane : OrientedAffineHyperplane d)
