@@ -1297,9 +1297,10 @@ mode family covered by the theorem.
   independent positive frequencies and wave vectors, with total incident-plus-reflected and
   transmitted ordinary real fields and their half-space restrictions/traces compared for every
   boundary point and time;
-- tangential `E` and `H` and normal `D` and `B` boundary laws with free surface sources;
-- zero-free-surface-charge/current specializations, without claiming bound polarization charge is
-  absent; and
+- [x] tangential `E` and `H` and normal `D` and `B` boundary laws with free electric surface
+  sources, using the negative-to-positive jump convention;
+- [x] zero-free-surface-charge/current specializations, without claiming bound polarization
+  charge is absent; and
 - a clearly named local boundary predicate whose use is visible in every conditional reflection,
   Snell, and Fresnel result.
 
@@ -2052,7 +2053,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
-| E4a local boundary semantics | in progress | E1, E2 | neutral oriented-hyperplane geometry, bundled tangent submodule, linear projection, normal-vector characterization, and planar medium assignment complete; primitive independent-frequency physical traces and explicit conditional local laws remain |
+| E4a local boundary semantics | in progress | E1, E2 | oriented-hyperplane geometry, planar medium assignment, ordinary-real pointwise E/D/B/H data, signed four-law boundary predicate, and zero-free-surface-source continuity complete; the primitive independent-frequency three-wave configuration and its explicit local predicate remain |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | in progress | E2, E4a | neutral finite exponential-character independence and positive-frequency real-harmonic uniqueness complete; electromagnetic noncancellation, derived frequency/tangential-K conservation, and fixed-frequency reduction remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
