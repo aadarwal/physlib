@@ -246,6 +246,9 @@ Ownership rules:
 - [x] Retarder actions have exact pure-coherency and arbitrary raw-Stokes/Mueller descriptions,
   and ordered Jones composition now connects a linear polarizer followed by a retarder through
   exact Jones, pure-coherency, and induced Mueller results with a quarter-wave sign regression.
+- [x] The existing pointwise, potential-derived three-dimensional Maxwell laws with free-space
+  constants and allowed sources are available through ordinary imports, with their declarations
+  and proofs unchanged and their scope recorded.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -254,9 +257,10 @@ Ownership rules:
   free space. In three spatial dimensions its two transverse electric components are
   `E₀ i * cos (k * c * t - k * x₀ + φ i)` when `k ≠ 0`.
 - `Electromagnetism.Vacuum.IsPlaneWave` supplies the existing real plane-wave predicate.
-- `Electromagnetism.ThreeDimension.MaxwellEquations` contains pointwise differential vacuum
-  Maxwell equations, but E0 must first expose those declarations through the public module surface;
-  it does not yet supply material constitutive laws, integral laws, or boundary conditions.
+- `Electromagnetism.ThreeDimension.MaxwellEquations` contains pointwise differential Maxwell
+  equations for potential-derived fields with free-space constants and allowed sources. E0 exposes
+  those declarations through the public module surface; it does not supply material constitutive
+  laws, integral laws, or boundary conditions.
 - `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure.
 - `SpaceAndTime.Space` supplies Euclidean geometry, derivatives, volume integration, and cross
   products, but not yet the complete oriented-surface and trace API needed for generic interface
@@ -1016,18 +1020,20 @@ observables agree through named normalization bridge theorems.
 
 ### H.2. Electromagnetic-interface milestone
 
-#### E0. Public three-dimensional Maxwell API
+#### E0. Public three-dimensional Maxwell API — complete
 
 Owner: Electromagnetism.
 
-- expose the existing `gaussLawElectric`, `gaussLawMagnetic`, `ampereLaw`, and `faradayLaw`
+- [x] expose the existing `gaussLawElectric`, `gaussLawMagnetic`, `ampereLaw`, and `faradayLaw`
   declarations through the public module surface;
-- preserve their statements and proofs; and
-- compile every present downstream consumer to show that this is an export repair rather than a
+- [x] preserve their statements and proofs; and
+- [x] confirm there are no present theorem-name consumers, compile the sole root importer, and
+  smoke-test ordinary direct and root imports to show that this is an export repair rather than a
   second Maxwell theory.
 
-Exit: E1 and its vacuum bridge can reuse the already-proved differential laws through a direct
-public import.
+Exit achieved: E1 and its vacuum bridge can reuse the already-proved differential laws through
+an ordinary import of `Physlib.Electromagnetism.ThreeDimension.MaxwellEquations` or `Physlib`; the
+namespace content from the first declaration onward is byte-for-byte unchanged from the E0 base.
 
 #### E1. Homogeneous isotropic media
 
@@ -1821,7 +1827,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
-| E0 Maxwell public API | ready | existing three-dimensional Maxwell module | exported vacuum-law declarations and downstream build |
+| E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | blocked | E0, Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
 | E2 material plane waves | blocked | E1 | real Maxwell field and Optics phasor theorems |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
@@ -1938,9 +1944,9 @@ human verification recorded in `tbd.md`.
    has relative phase `exp (-I * retardance)`, `M.comp N` applies `N` first, and neither Jones
    unitarity nor fixed Stokes intensity implies electromagnetic power. Keep P6b-3's
    field/irradiance portion blocked on P5b/E3b.
-5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
-   the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
-   track.
+5. Preserve E0's exposure-only public Maxwell repair and start E1's medium and
+   macroscopic-Maxwell layer so the harmonic bridge can later acquire Poynting-flux normalization
+   and meet the material-interface track.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -1951,5 +1957,5 @@ human verification recorded in `tbd.md`.
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies. The next physical-optics front is therefore E0 followed
-by E1, while the independent circuit front remains N2a/N3.
+medium, boundary, and flux dependencies. With E0 complete, the next physical-optics front is E1,
+while the independent circuit front remains N2a/N3.
