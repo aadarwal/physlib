@@ -23,7 +23,9 @@ The module first proves that a complex rate is zero if all of its real rescaling
 to one. This removes the periodic ambiguity of the complex exponential because every real
 rescaling is tested, rather than a single value. It then shows that the exponential character
 determines its real-linear exponent functional and concludes linear independence of distinct
-such characters.
+such characters. Finally, a positive-rate hypothesis separates supported characters from their
+complex conjugates, allowing an ordinary-real-part uniqueness result to follow from the complex
+linear-independence theorem.
 
 ## ii. Key results
 
@@ -35,17 +37,21 @@ such characters.
   characters are linearly independent over `ℂ`.
 - `Complex.finsupp_sum_mul_exp_eq_zero_iff`: a finite sum of exponential characters vanishes
   everywhere exactly when every aggregated coefficient vanishes.
+- `Complex.finsupp_sum_re_mul_exp_eq_zero_iff_of_im_pos`: a finite positive-rate sum of ordinary
+  real parts vanishes everywhere exactly when every aggregated complex coefficient vanishes.
 
 ## iii. Table of contents
 
 - A. Real rescalings of one complex rate
 - B. Characters of real-linear functionals
 - C. Linear independence
+- D. Positive-rate real exponential sums
 
 ## iv. References
 
-The final result is an application of Mathlib's `linearIndependent_monoidHom`, the Dedekind
-linear-independence theorem for monoid characters.
+The complex-character independence result applies Mathlib's `linearIndependent_monoidHom`, the
+Dedekind linear-independence theorem for monoid characters. The positive-rate real-part result is
+then derived by adding the conjugate exponential sum.
 -/
 
 @[expose] public section
@@ -146,6 +152,92 @@ lemma finsupp_sum_mul_exp_eq_zero_iff (a : (V →ₗ[ℝ] ℂ) →₀ ℂ) :
     induction v using Multiplicative.rec with
     | _ v =>
       simpa [Finsupp.linearCombination_apply, Finsupp.sum, smul_eq_mul] using h v
+  · rintro rfl
+    simp
+
+/-!
+
+## D. Positive-rate real exponential sums
+
+-/
+
+/-- Conjugation of the values of a complex-valued real-linear functional. -/
+private def conjugateExponent (L : V →ₗ[ℝ] ℂ) : V →ₗ[ℝ] ℂ :=
+  conjAe.toLinearMap.comp L
+
+@[simp]
+private lemma conjugateExponent_apply (L : V →ₗ[ℝ] ℂ) (v : V) :
+    conjugateExponent L v = (starRingEnd ℂ) (L v) := rfl
+
+@[simp]
+private lemma conjugateExponent_conjugateExponent (L : V →ₗ[ℝ] ℂ) :
+    conjugateExponent (conjugateExponent L) = L := by
+  ext v
+  simp
+
+private lemma conjugateExponent_injective :
+    Function.Injective (conjugateExponent (V := V)) := by
+  intro L M h
+  rw [← conjugateExponent_conjugateExponent L,
+    ← conjugateExponent_conjugateExponent M, h]
+
+/-- Conjugation of both exponents and coefficients in a finite exponential sum. -/
+private def conjugateCoefficients (a : (V →ₗ[ℝ] ℂ) →₀ ℂ) :
+    (V →ₗ[ℝ] ℂ) →₀ ℂ :=
+  Finsupp.mapDomain conjugateExponent
+    (Finsupp.mapRange (starRingEnd ℂ) (map_zero (starRingEnd ℂ)) a)
+
+@[simp]
+private lemma conjugateCoefficients_apply
+    (a : (V →ₗ[ℝ] ℂ) →₀ ℂ) (L : V →ₗ[ℝ] ℂ) :
+    conjugateCoefficients a L =
+      (starRingEnd ℂ) (a (conjugateExponent L)) := by
+  rw [conjugateCoefficients]
+  conv_lhs => rw [← conjugateExponent_conjugateExponent L]
+  rw [Finsupp.mapDomain_apply conjugateExponent_injective]
+  exact Finsupp.mapRange_apply
+
+private lemma conjugateCoefficients_sum_mul_exp
+    (a : (V →ₗ[ℝ] ℂ) →₀ ℂ) (v : V) :
+    (conjugateCoefficients a).sum (fun L c => c * exp (L v)) =
+      (starRingEnd ℂ) (a.sum (fun L c => c * exp (L v))) := by
+  rw [conjugateCoefficients,
+    Finsupp.sum_mapDomain_index (by simp) (by simp [add_mul]),
+    Finsupp.sum_mapRange_index (by simp)]
+  simp only [conjugateExponent_apply, exp_conj, map_mul, Finsupp.sum, map_sum]
+
+/-- A finite sum of real parts of positive-rate exponential characters vanishes everywhere
+exactly when every aggregated complex coefficient vanishes. -/
+lemma finsupp_sum_re_mul_exp_eq_zero_iff_of_im_pos
+    (a : (V →ₗ[ℝ] ℂ) →₀ ℂ) (probe : V)
+    (hPositive : ∀ L ∈ a.support, 0 < (L probe).im) :
+    (∀ v : V, a.sum (fun L c => (c * exp (L v)).re) = 0) ↔ a = 0 := by
+  constructor
+  · intro h
+    let b := a + conjugateCoefficients a
+    have hb : b = 0 := by
+      rw [← finsupp_sum_mul_exp_eq_zero_iff]
+      intro v
+      rw [Finsupp.sum_add_index' (by simp) (by simp [add_mul]),
+        conjugateCoefficients_sum_mul_exp, Complex.add_conj]
+      have hre : (a.sum (fun L c => c * exp (L v))).re = 0 := by
+        simpa only [Finsupp.sum, Complex.re_sum] using h v
+      simp [hre]
+    ext L
+    by_contra hL
+    have hLmem : L ∈ a.support := Finsupp.mem_support_iff.mpr hL
+    have hconj : a (conjugateExponent L) = 0 := by
+      by_contra hconj
+      have hconjmem : conjugateExponent L ∈ a.support :=
+        Finsupp.mem_support_iff.mpr hconj
+      have hLpos := hPositive L hLmem
+      have hconjpos := hPositive (conjugateExponent L) hconjmem
+      simp only [conjugateExponent_apply, conj_im] at hconjpos
+      linarith
+    have hbL : a L + (starRingEnd ℂ) (a (conjugateExponent L)) = 0 := by
+      simpa [b] using DFunLike.congr_fun hb L
+    simp only [hconj, map_zero, add_zero] at hbL
+    exact hL hbL
   · rintro rfl
     simp
 
