@@ -219,6 +219,9 @@ Ownership rules:
 - [x] Jones-derived Stokes data is defined through pure coherency, with arbitrary complex-scaling
   covariance, unit-phase invariance, all four component formulas, and normalized full-vector
   checks for the H/V/D/A and positive/negative-`I` quadrature coordinate states.
+- [x] Unit-intensity physical Stokes data and unit-trace polarization coherency are each equivalent
+  to the closed Poincare ball; this cross-section excludes zero coherency without assigning it a
+  polarization direction.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -240,7 +243,8 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] Poincare and Mueller APIs; raw and physical Stokes/coherency APIs are present;
+- [ ] Complete the Poincare boundary/rank/phase-quotient classification and the Mueller API; the
+  closed-ball, raw Stokes, and physical coherency equivalences are present;
 - [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -789,7 +793,7 @@ coordinate states in `Polarization.Basic` use equal amplitudes `sqrt 2 / 2`; ful
 H/V as `(1, ±1, 0, 0)`, D/A as `(1, 0, ±1, 0)`, and positive/negative-`I` quadrature as
 `(1, 0, 0, ±1)`. The API deliberately assigns no right/left circular name.
 
-#### P3c. Poincare classification
+#### P3c. Poincare classification — active
 
 Candidate location: `Physlib/Optics/Polarization/Poincare.lean`.
 
@@ -806,6 +810,12 @@ Deliverables:
 
 Exit: normalized physical coherency matrices correspond to the closed ball and pure unit-intensity
 Jones states modulo unit phase correspond to the sphere.
+
+Current evidence: `Physlib.Optics.Polarization.Poincare` defines the closed ball and proves exact
+equivalences from unit-intensity physical Stokes data and unit-trace coherency data to it. The ball
+center is therefore the unit-trace unpolarized state, not zero coherency. Remaining work is the
+determinant/boundary/interior and rank classification, canonical boundary regressions, and the
+algebraic quotient of unit Jones vectors by the `Circle` action.
 
 Jones matrices induce deterministic coherency and Mueller maps but do not describe depolarizers.
 A later general depolarizing layer needs positive, and where physically appropriate completely
@@ -1684,7 +1694,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P3b-0 neutral positive cone | done | P3a | determinant identity, PSD/radius criterion, and zero-radius-safe construction |
 | P3b-1 Stokes/coherency cone | done | P2a, P3b-0 | raw linear reconstruction, exact PSD cone, coherency equivalence, and round-trip suite |
 | P3b-2 Jones--Stokes bridge | done | P2b, P3b-1 | coherency-derived components, scaling/phase laws, and normalized canonical-state suite |
-| P3c Poincare classification | ready | P3b-1, P3b-2 | ball/sphere/mixed-state suite |
+| P3c Poincare classification | active | P3b-1, P3b-2 | closed-ball equivalences complete; determinant/rank boundary and unit-Jones phase quotient underway |
 | P4 deterministic Mueller | ready | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
 | P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
