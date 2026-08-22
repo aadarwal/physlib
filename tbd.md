@@ -369,6 +369,14 @@ PR unless maintainers explicitly ask to retain it.
   cancellation among equal exponents. The medium supplies `D = ε E` only and assigns no interface
   side or on-shell/Maxwell semantics. Later all-parameter harmonic uniqueness and the exact
   aggregate guard must establish multiwave noncancellation.
+- [ ] Human-check E5a's joint-amplitude uniqueness lift before upstreaming. Confirm that it tests
+  all three coordinates of the ambient complex vector slot used to store tangential electric
+  amplitudes and the scalar normal-`D` coordinate, applies the scalar theorem only after
+  componentwise ordinary-real equality for every parameter, and transports the common
+  positive-imaginary-rate hypothesis from the original `Finsupp` support to each coordinate
+  projection. The generic theorem has no plane and therefore proves no tangency. A nonzero complex
+  coefficient may vanish at one real sample; exact repeated exponent functionals are already
+  aggregated, and no labelwise, interface, or conservation claim follows.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
