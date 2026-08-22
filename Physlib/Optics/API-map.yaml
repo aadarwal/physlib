@@ -68,7 +68,11 @@ Requirements:
     done: true
     location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeAmplitude.directSum, Optics.ModeAmplitude.restrictInl, Optics.ModeAmplitude.restrictInr, Optics.ModeAmplitude.directSum_restrict, Optics.ModeAmplitude.power_directSum, Optics.ModeTransform.directSum, Optics.ModeTransform.directSum_apply, Optics.ModeTransform.IsPowerPreserving.directSum, Optics.ModeTransform.IsPassive.directSum, Optics.ScatteringMatrix.directSum, Optics.ScatteringMatrix.IsLossless.directSum)"
 
-  - description: "Using paired time-reversed channel modes and fixed reference-plane conventions, the API shall define reciprocal scattering matrices, channel relabeling and rephasing, and prove which physical predicates are invariant under these changes of convention."
+  - description: "The API contains convention-free mode relabeling and unit-complex rephasing for amplitudes, transforms, and scattering matrices, and proves that modal power, power preservation, passivity, and losslessness are invariant under these coordinate changes."
+    done: true
+    location: "Physlib/Optics/Mode/Reindex.lean (Optics.ModeAmplitude.reindex, Optics.ModeAmplitude.power_reindex, Optics.ModeTransform.reindex, Optics.ModeTransform.toLinearMap_reindex_apply, Optics.ModeTransform.isPowerPreserving_reindex_iff, Optics.ModeTransform.isPassive_reindex_iff, Optics.ModeTransform.reindex_mul, Optics.ScatteringMatrix.reindex, Optics.ScatteringMatrix.isLossless_reindex_iff); Physlib/Optics/Mode/Rephase.lean (Optics.ModePhaseGauge, Optics.ModeAmplitude.rephase, Optics.ModeAmplitude.power_rephase, Optics.ModeTransform.rephase, Optics.ModeTransform.toLinearMap_rephase_apply, Optics.ModeTransform.isPowerPreserving_rephase_iff, Optics.ModeTransform.isPassive_rephase_iff, Optics.ModeTransform.rephase_mul, Optics.ScatteringMatrix.rephase, Optics.ScatteringMatrix.isLossless_rephase_iff)"
+
+  - description: "Using paired time-reversed channel modes and fixed reference-plane conventions, the API shall define reciprocal scattering matrices and prove covariance of reciprocity under the allowed convention changes."
     done: false
     location: N/A
 
