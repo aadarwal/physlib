@@ -112,11 +112,15 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The API shall contain phasors and Jones vectors for monochromatic plane waves, with a proved correspondence to the real time-harmonic plane waves in `Electromagnetism.Vacuum.HarmonicWave`; the complex representation shall complement rather than replace the real fields, and transversality results shall exclude arbitrary static backgrounds through an explicit harmonic, zero-static-component, zero-mean, or equivalent hypothesis."
+  - description: "The API contains fixed-carrier phasors and distinct raw-electric-field Jones vectors and matrices, with amplitude-phase realization, squared Jones intensity, unit-modulus global-phase invariance, and identity/composition/action laws, while explicitly withholding irradiance and normalized modal-power interpretations until their electromagnetic bridges are proved."
+    done: true
+    location: "Physlib/Optics/Polarization/Basic.lean (Optics.Phasor, Optics.Phasor.realize, Optics.Phasor.ofAmplitudePhase, Optics.Phasor.realize_ofAmplitudePhase, Optics.JonesVector, Optics.JonesVector.ofAmplitudePhase, Optics.JonesVector.realize, Optics.JonesVector.intensity, Optics.JonesVector.intensity_eq_sum_normSq, Optics.JonesVector.intensity_scale, Optics.JonesVector.intensity_phaseShift, Optics.JonesVector.intensity_ofAmplitudePhase, Optics.JonesMatrix, Optics.JonesMatrix.act, Optics.JonesMatrix.identity, Optics.JonesMatrix.comp, Optics.JonesMatrix.identity_act, Optics.JonesMatrix.comp_act)"
+
+  - description: "The API shall prove a correspondence from its phasor and Jones data to the real time-harmonic plane waves in `Electromagnetism.Vacuum.HarmonicWave`; the complex representation shall complement rather than replace the real fields, and transversality results shall exclude arbitrary static backgrounds through an explicit harmonic, zero-static-component, zero-mean, or equivalent hypothesis."
     done: false
     location: N/A
 
-  - description: "The API shall contain Jones matrices and their action on Jones vectors, together with the coherency matrix of a Jones vector and proofs of its Hermiticity, positive semidefiniteness, rank-at-most-one and determinant-zero properties, trace-power identity, and transformation law."
+  - description: "The API shall construct the pure coherency matrix of a Jones vector and prove its Hermiticity, positive semidefiniteness, rank-at-most-one and determinant-zero properties, trace-intensity identity, unit-phase invariance, and transformation law under Jones matrices."
     done: false
     location: N/A
 

@@ -152,6 +152,14 @@ Ownership rules:
 - [x] Matrix isometry implies modal power preservation.
 - [x] `Optics.ScatteringMatrix` wraps a square transform without inheriting multiplication;
   unitarity implies power preservation and passivity under the stated normalization.
+- [x] Power preservation is equivalent to `Tᴴ * T = 1`, passivity is equivalent to positivity of
+  the defect `1 - Tᴴ * T`, and square power preservation is equivalent to unitarity.
+- [x] Fixed-carrier phasors, distinct raw-field `JonesVector` and `JonesMatrix` wrappers,
+  amplitude-phase realization, squared Jones intensity, global-phase invariance, and matrix action
+  are present without importing Electromagnetism or identifying raw fields with normalized modes.
+- [x] Generic positive-semidefinite `CoherencyMatrix` data supplies Hermiticity, real nonnegative
+  diagonal and trace results, `A * C * Aᴴ` transport, cascade compatibility, and combined
+  mode-polarization specializations without assuming Jones purity.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -542,11 +550,11 @@ gate pass.
   matrices;
 - cascade closure and the forward implication from matrix isometry to power preservation.
 
-#### O2. Complete the modal algebra — open, but not on the immediate P1a critical path
+#### O2. Complete the modal algebra — active
 
-- characterize power preservation by `Tᴴ * T = I`;
-- characterize passivity by a positive-semidefinite defect matrix;
-- specialize square power preservation to unitarity;
+- [x] characterize power preservation by `Tᴴ * T = I`;
+- [x] characterize passivity by a positive-semidefinite defect matrix;
+- [x] specialize square power preservation to unitarity;
 - add finite direct-sum/parallel composition and preservation lemmas; and
 - add reindexing/rephasing invariance before reciprocity.
 
@@ -554,7 +562,7 @@ Exit: the modal predicates can be used bidirectionally by later component and ne
 
 ### H.1. Polarization milestone
 
-#### P1a. Jones and scalar-phasor foundations
+#### P1a. Jones and scalar-phasor foundations — complete
 
 Candidate location: `Physlib/Optics/Polarization/Basic.lean`.
 
@@ -591,7 +599,7 @@ Deliverables:
 Exit: the existing real Maxwell field solution, but not an unqualified potential, is reconstructed
 from Jones data under named geometric and carrier assumptions.
 
-#### P2a. General coherency data
+#### P2a. General coherency data — complete
 
 Candidate location: `Physlib/Optics/Polarization/Coherency.lean`.
 
@@ -1334,18 +1342,18 @@ current integration base; a designed package whose prerequisite is merely active
 |---|---|---|---|
 | O0 roadmap | done | upstream base | Optics API map and scope module |
 | O1 mode core | done | Mathlib complex linear algebra | mode branch and integration build |
-| O2 modal algebra | ready | O1 | converse/parallel/reindex theorem suite |
-| P1a Jones foundations | active | complex algebra | scalar realization, raw Jones action, and intensity suite |
-| P1b harmonic bridge | blocked | P1a, existing harmonic wave | real electric/magnetic field reconstruction |
-| P2a general coherency | ready | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
-| P2b pure coherency | blocked | P1a, P2a | outer-product/rank/trace/phase suite |
+| O2 modal algebra | active | O1 | converse characterizations complete; parallel/reindex/rephase suite remains |
+| P1a Jones foundations | done | complex algebra | scalar realization, raw Jones action, and intensity suite |
+| P1b harmonic bridge | ready | P1a, existing harmonic wave | real electric/magnetic field reconstruction |
+| P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
+| P2b pure coherency | ready | P1a, P2a | outer-product/rank/trace/phase suite |
 | P3a neutral Hermitian basis | ready | matrix API audit | coordinate extraction/reconstruction suite |
 | P3b Stokes cone | blocked | P2a, P3a | physical-cone equivalence and canonical coordinates |
 | P3c Poincare classification | blocked | P2b, P3b | ball/sphere/mixed-state suite |
 | P4 deterministic Mueller | blocked | P1a, P2a, P3a, P3b | real induced action and composition suite |
-| P5a Jones polarizer/Malus | blocked | P1a | projection, intensity contraction, and linear-input Malus suite |
+| P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
-| P6a retarder core | blocked | P1a | unitary Jones action and canonical-state suite |
+| P6a retarder core | ready | P1a | unitary Jones action and canonical-state suite |
 | P6b polarization chain | blocked | P1b, P2b, P3b, P4, P5a/P5b, P6a, E3b | cross-representation connected example |
 | E1 media/macroscopic Maxwell | ready | Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
 | E2 material plane waves | blocked | E1 | real Maxwell field and Optics phasor theorems |
@@ -1354,7 +1362,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4 boundary laws | blocked | E1, surface/integral design decision | Maxwell-to-local-boundary theorem |
 | E5 reflection/Snell/TIR | blocked | E2, E4 | phase-matching geometry suite |
 | E6 Fresnel/flux | blocked | E3b, E5 | amplitude, admittance-normalized scattering, and flux suite |
-| N1 modal completion | ready | O1 | O2 completion |
+| N1 modal completion | active | O1 | remaining O2 parallel/reindex/rephase suite |
 | N2a ports/routing | blocked | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
@@ -1423,24 +1431,20 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. Finish only P1a on `optics/jones-foundations`, based on `optics/mode-foundations`:
-   - fix `Re (z * exp (I*theta))` locally as the candidate convention;
-   - prove the scalar amplitude/phase reconstruction identity;
-   - define the distinct two-component raw-field Jones representation and matrix action;
-   - prove that its squared intensity is the sum of squared component amplitudes; and
-   - document explicitly that neither irradiance nor modal power has yet been obtained.
-2. Obtain an independent mathematics/API and phase-convention review of P1a before its names
-   spread, then validate, commit, merge it into `optics/development`, push to the user's fork, and
-   update this ledger and the API map.
+1. P1a and P2a are complete, independently reviewed, validated, and integrated. Preserve their
+   type boundary: raw Jones intensity is still neither irradiance nor modal power, and general
+   coherency still carries no Jones-purity assumption.
+2. The O2 predicate characterizations are complete. Finish its direct-sum/parallel,
+   reindexing, and rephasing suite before starting N2a typed ports/routing.
 3. Develop P1b as a separate bridge PR: prove transverse electric reconstruction for
    `harmonicWaveX`, then the longitudinal-zero and compatible-magnetic-field results under the
    named frame/carrier/medium assumptions. Do not claim reconstruction of a potential without a
    gauge theorem.
-4. Start P2a general coherency and N2a typed ports/routing as independent branches. P2a does not
-   wait for P1b; N2a opens the system-composition path without waiting for the electromagnetic
-   interface or the N2b reciprocity convention decision.
-5. In parallel, audit O2/N1 because N4 needs direct-sum assembly, reindexing, and rephasing before
-   its typed block equations can be trusted.
+4. Develop P2b pure coherency independently of P1b, using the P1a Jones and P2a general coherency
+   APIs. Its rank, determinant, trace, phase, and conjugation theorems must not weaken P2a's mixed
+   state representation.
+5. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
+   PR concepts and do not translate Jones intensity into physical power before E3b.
 6. Audit E1 against the existing electromagnetic constant structures and prepare a focused
    medium API proposal. Do not merge E1 until its dimensional and ownership choices receive human
    confirmation.
