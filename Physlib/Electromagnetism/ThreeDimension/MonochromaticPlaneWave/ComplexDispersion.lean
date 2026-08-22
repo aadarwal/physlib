@@ -1,0 +1,205 @@
+/-
+Copyright (c) 2026 Aadarsh Agarwal. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Aadarsh Agarwal
+-/
+module
+
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Dispersion
+
+/-!
+# Material dispersion for complex-amplitude plane waves
+
+## i. Overview
+
+This module states the homogeneous-isotropic material dispersion shell for a
+`ComplexMonochromaticPlaneWave`. The defining square is the complex-bilinear pairing
+`K dot K = epsilon * mu * omega ^ 2`; it is not the Hermitian square norm of `K`.
+The name describes matching a carrier to the nondispersive material model; it does not assert
+frequency-dependent material response.
+
+For the convention `K = q - I * a`, matching is equivalent to the two real conditions
+`q dot a = 0` and `‖q‖ ^ 2 - ‖a‖ ^ 2 = epsilon * mu * omega ^ 2`. Thus attenuating solutions use a
+signed difference of phase and attenuation squares. The predicate permits a zero electric
+amplitude and does not impose transversality.
+
+Unlike the existing real carrier's positive-branch predicate, the complex square does not select
+a propagation direction, square-root branch, interface side, transmitted or outgoing role, or
+evanescent-wave interpretation. Maxwell equations and electromagnetic power remain later layers.
+
+## ii. Key results
+
+- `ComplexMonochromaticPlaneWave.IsDispersionMatched`: the complex-bilinear material shell.
+- `ComplexMonochromaticPlaneWave.isDispersionMatched_iff_phase_attenuation`: its exact real
+  phase--attenuation decomposition.
+- `IsDispersionMatched.waveVector_ne_zero`: material matching forces a nonzero wave vector.
+- `IsDispersionMatched.waveVector_cross_cross_electricAmplitude`: the transverse on-shell vector
+  triple-product identity.
+- `IsDispersionMatched.waveVector_cross_magneticAmplitude`: its built-in magnetic-amplitude
+  consequence with the exact single-frequency factor.
+- `ComplexMonochromaticPlaneWave.isDispersionMatched_ofReal_iff`: exact agreement with the
+  existing positive-branch predicate on embedded real waves.
+
+## iii. Table of contents
+
+- A. Complex material dispersion
+- B. Phase and attenuation decomposition
+- C. On-shell algebra
+- D. Exact real-wave bridge
+
+## iv. References
+
+This file extends Physlib's existing real material-dispersion definition and complex-wave-vector
+algebra. No external formal-development source is copied or translated here.
+-/
+
+@[expose] public section
+
+namespace Electromagnetism
+namespace ThreeDimension
+
+open Space Time InnerProductSpace Matrix ClassicalMechanics
+
+noncomputable section
+
+namespace ComplexMonochromaticPlaneWave
+
+/-!
+
+## A. Complex material dispersion
+
+-/
+
+/-- A complex-amplitude plane-wave candidate is dispersion matched to a homogeneous isotropic
+medium when the complex-bilinear square of its wave vector equals
+`epsilon * mu * omega ^ 2`.
+
+This condition selects a material shell only. It requires neither electric transversality nor a
+square-root or interface branch. -/
+def IsDispersionMatched (wave : ComplexMonochromaticPlaneWave)
+    (medium : HomogeneousIsotropicMedium) : Prop :=
+  ComplexWaveVector.bilinearDot wave.waveVector wave.waveVector =
+    ((medium.ε * medium.μ * wave.angularFrequency ^ 2 : ℝ) : ℂ)
+
+/-!
+
+## B. Phase and attenuation decomposition
+
+-/
+
+private lemma bilinearDot_ofPhaseAttenuation_self_eq_ofReal_iff
+    (q a : WaveVector 3) (s : ℝ) :
+    ComplexWaveVector.bilinearDot (ComplexWaveVector.ofPhaseAttenuation q a)
+        (ComplexWaveVector.ofPhaseAttenuation q a) = (s : ℂ) ↔
+      ⟪q, a⟫_ℝ = 0 ∧ ‖q‖ ^ 2 - ‖a‖ ^ 2 = s := by
+  rw [ComplexWaveVector.bilinearDot_ofPhaseAttenuation_self,
+    real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq]
+  constructor
+  · intro h
+    have hre := congrArg Complex.re h
+    have him := congrArg Complex.im h
+    norm_num [← Complex.ofReal_pow, ← Complex.ofReal_mul] at hre him
+    constructor
+    · linarith
+    · exact hre
+  · rintro ⟨horthogonal, hnorm⟩
+    apply Complex.ext
+    · norm_num [← Complex.ofReal_pow, ← Complex.ofReal_mul]
+      exact hnorm
+    · norm_num [← Complex.ofReal_pow, ← Complex.ofReal_mul, horthogonal]
+
+/-- Complex material dispersion is equivalent to orthogonality of phase and attenuation vectors
+together with their signed squared-norm relation. -/
+lemma isDispersionMatched_iff_phase_attenuation (wave : ComplexMonochromaticPlaneWave)
+    (medium : HomogeneousIsotropicMedium) :
+    wave.IsDispersionMatched medium ↔
+      ⟪wave.waveVector.phaseVector, wave.waveVector.attenuationVector⟫_ℝ = 0 ∧
+        ‖wave.waveVector.phaseVector‖ ^ 2 -
+            ‖wave.waveVector.attenuationVector‖ ^ 2 =
+          medium.ε * medium.μ * wave.angularFrequency ^ 2 := by
+  unfold IsDispersionMatched
+  conv_lhs =>
+    rw [← ComplexWaveVector.ofPhaseAttenuation_phaseVector_attenuationVector wave.waveVector]
+  exact bilinearDot_ofPhaseAttenuation_self_eq_ofReal_iff _ _ _
+
+/-!
+
+## C. On-shell algebra
+
+-/
+
+namespace IsDispersionMatched
+
+variable {wave : ComplexMonochromaticPlaneWave} {medium : HomogeneousIsotropicMedium}
+
+/-- The bilinear square of a dispersion-matched wave vector is nonzero. -/
+lemma bilinearDot_waveVector_self_ne_zero (h : wave.IsDispersionMatched medium) :
+    ComplexWaveVector.bilinearDot wave.waveVector wave.waveVector ≠ 0 := by
+  rw [h]
+  exact_mod_cast ne_of_gt (mul_pos (mul_pos medium.ε_pos medium.μ_pos)
+    (sq_pos_of_pos wave.angularFrequency_pos))
+
+/-- A dispersion-matched complex wave vector is nonzero. -/
+lemma waveVector_ne_zero (h : wave.IsDispersionMatched medium) :
+    wave.waveVector ≠ 0 := by
+  intro hzero
+  apply h.bilinearDot_waveVector_self_ne_zero
+  rw [hzero, ComplexWaveVector.bilinearDot_zero_left]
+
+/-- For a transverse dispersion-matched amplitude,
+`K cross (K cross E0) = -(epsilon * mu * omega ^ 2) E0`. -/
+lemma waveVector_cross_cross_electricAmplitude
+    (h : wave.IsDispersionMatched medium) (hTransverse : wave.IsTransverse) :
+    complexCross wave.waveVector
+        (complexCross wave.waveVector wave.electricAmplitude) =
+      -((medium.ε * medium.μ * wave.angularFrequency ^ 2 : ℝ) : ℂ) •
+        wave.electricAmplitude := by
+  rw [complexCross_complexCross]
+  change ComplexWaveVector.bilinearDot wave.waveVector wave.electricAmplitude = 0 at hTransverse
+  rw [hTransverse, h]
+  simp
+
+/-- For a transverse dispersion-matched amplitude,
+`K cross B0 = -(epsilon * mu * omega) E0`. -/
+lemma waveVector_cross_magneticAmplitude
+    (h : wave.IsDispersionMatched medium) (hTransverse : wave.IsTransverse) :
+    complexCross wave.waveVector wave.magneticAmplitude =
+      -((medium.ε * medium.μ * wave.angularFrequency : ℝ) : ℂ) •
+        wave.electricAmplitude := by
+  rw [magneticAmplitude, complexCross_smul_right,
+    h.waveVector_cross_cross_electricAmplitude hTransverse, smul_smul]
+  congr 1
+  push_cast
+  field_simp [wave.angularFrequency_ne_zero]
+
+end IsDispersionMatched
+
+/-!
+
+## D. Exact real-wave bridge
+
+-/
+
+/-- An embedded real-quadrature wave satisfies the complex material shell exactly when it
+satisfies the existing positive-branch real dispersion predicate. -/
+lemma isDispersionMatched_ofReal_iff (wave : MonochromaticPlaneWave)
+    (medium : HomogeneousIsotropicMedium) :
+    (ofReal wave).IsDispersionMatched medium ↔ wave.IsDispersionMatched medium := by
+  constructor
+  · intro h
+    apply MonochromaticPlaneWave.isDispersionMatched_of_waveNumber_sq wave medium
+    rw [IsDispersionMatched, ofReal_waveVector,
+      ComplexWaveVector.bilinearDot_ofReal, real_inner_self_eq_norm_sq,
+      wave.waveVector_norm] at h
+    exact_mod_cast h
+  · intro h
+    rw [IsDispersionMatched, ofReal_waveVector,
+      ComplexWaveVector.bilinearDot_ofReal, real_inner_self_eq_norm_sq,
+      wave.waveVector_norm]
+    exact_mod_cast MonochromaticPlaneWave.IsDispersionMatched.waveNumber_sq h
+
+end ComplexMonochromaticPlaneWave
+end
+end ThreeDimension
+end Electromagnetism
