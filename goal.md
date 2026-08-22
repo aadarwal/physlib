@@ -318,7 +318,9 @@ polarization
   P3b-1 + P3b-2 --> P3c Poincare classification
   P1a + P2a + P3a + P3b-1 --> P4 deterministic Mueller
   P5a + E3b --> P5b physical Malus bridge
-  P1b + P2b + P3b-2/P4 + P5a/P5b + P6a + E3b --> P6b connected polarization chain
+  P2b + P3b-2/P4 + P6a --> P6b-1 reduced retarder representations
+  P5a + P6b-1 --> P6b-2 connected reduced polarizer--retarder example
+  P1b + P5b + P6b-2 + E3b --> P6b-3 physical polarization observables
 
 electromagnetic v0.1
   E0 public Maxwell API --> E1 media/macroscopic Maxwell
@@ -353,11 +355,11 @@ ray and beam foundations
 ```
 
 P1a, P2a, P3a, O2/N1, N3, E1, and the mathematical audit for S5 are independent starting fronts.
-P2a/P3a do not wait for P1b; P5a/P6a core Jones calculations do not wait for Stokes, although P6b's
-comparison chain does. E0--E6 is the deepest physical prerequisite chain and must not be bypassed
-by assuming Fresnel coefficients. R1--R5 is a later foundational track; it should reuse E-track
-medium and interface data where that does not force a false equivalence between exact wave optics
-and the paraxial approximation.
+P2a/P3a do not wait for P1b; P5a/P6a core Jones calculations do not wait for Stokes. P6b-1 likewise
+does not wait for the electromagnetic normalization bridge, while P6b-3 does. E0--E6 is the deepest
+physical prerequisite chain and must not be bypassed by assuming Fresnel coefficients. R1--R5 is a
+later foundational track; it should reuse E-track medium and interface data where that does not
+force a false equivalence between exact wave optics and the paraxial approximation.
 
 ## G. Intended Lean representations
 
@@ -943,23 +945,65 @@ Deliverables:
   normalized equal-amplitude relative-phase family, while deferring circular handedness.
 
 Exit achieved: retarder and wave-plate calculations are complete in raw Jones coordinates without
-waiting for Stokes or the electromagnetic bridge. The omitted common propagation phase,
-fast/slow-axis material naming, Stokes/Mueller rotation, irradiance, and modal-power interpretations
-remain explicit later gates rather than implicit claims of the Jones core.
+waiting for Stokes or the electromagnetic bridge. P6b-1 now supplies the reduced coherency,
+Stokes, and deterministic Mueller views. The omitted common propagation phase, fast/slow-axis
+material naming, observer-oriented Poincare interpretation, irradiance, and modal-power
+interpretations remain explicit later gates rather than implicit claims of the Jones core.
 
 #### P6b. Cross-representation polarization chain
 
+This umbrella is split so the reduced representation theorem is not falsely blocked by physical
+power normalization, and the single-component retarder PR is not enlarged into a system example.
+
+##### P6b-1. Reduced retarder representations
+
+Status: complete on the fork. Export locations:
+`Polarization/RelativePhaseStokes.lean`, `Components/Retarder/Coherency.lean`, and
+`Components/Retarder/Mueller*.lean`.
+
 Deliverables:
 
-- agreement of P6a Jones actions with the P2b/P3b-2 coherency and Stokes descriptions;
-- induced P4 Mueller calculations;
+- [x] exact Stokes coordinates `(0, cos relativePhase, sin relativePhase)` for the normalized
+  equal-amplitude Jones family;
+- [x] exact pure-coherency outputs for arbitrary linear input and the zero-axis relative-phase
+  family;
+- [x] the explicit arbitrary-axis `3 x 3` polarization block and the induced block-diagonal
+  deterministic Mueller matrix;
+- [x] arbitrary raw-Stokes, Jones-derived Stokes, and coherency-derived Stokes action theorems; and
+- [x] zero-axis and `pi / 4` quarter-wave sign regressions tied to the existing `diag(1, I)`
+  deterministic Mueller oracle.
+
+Exit achieved: P6a Jones actions agree exactly with coherency, Stokes, and deterministic Mueller
+descriptions. The coordinate formula records the algebraic sign without claiming observer-based
+handedness or electromagnetic power.
+
+##### P6b-2. Connected reduced polarizer--retarder example
+
+Status: ready after P5a and P6b-1; keep this as a separate optical-system concept.
+
+Deliverables:
+
+- a connected reduced example passing an arbitrary Jones input through a P5a polarizer and P6a
+  wave plate;
+- exact agreement of the Jones, pure-coherency, Stokes, and induced Mueller calculations; and
+- canonical analyzer/wave-plate regressions which reuse, rather than restate, the single-component
+  laws.
+
+Exit: one system-level polarization chain commutes in all four reduced representations.
+
+##### P6b-3. Physical polarization observables
+
+Status: blocked on P5b and E3b.
+
+Deliverables:
+
 - a connected example starting at P1b's `harmonicWaveX` bridge and passing through a P5a polarizer
   and P6a wave plate; and
-- raw Jones, coherency, Stokes, Mueller, field-realization, irradiance, and normalized-power
-  observables, using P5b/E3b only where physical power is claimed.
+- field realization, irradiance, and normalized-power observables, using P5b/E3b before any
+  physical-power claim.
 
-Exit: the connected polarization chain has all four reduced descriptions and its physical
-observables agree through named bridge theorems.
+Exit: the reduced connected chain is realized as electromagnetic fields and its physical
+observables agree through named normalization bridge theorems.
 
 ### H.2. Electromagnetic-interface milestone
 
@@ -1765,7 +1809,9 @@ current integration base; a designed package whose prerequisite is merely active
 | P5a Jones polarizer/Malus | done | P1a, P2b, P3b-2, P4 | projection, contraction, coherent/intensity Malus, coherency, arbitrary-Stokes Mueller, and convention-regression suites |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
-| P6b polarization chain | blocked | P1b, P2b, P3b-2, P4, P5a/P5b, P6a, E3b | cross-representation connected example |
+| P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
+| P6b-2 reduced polarization chain | ready | P5a, P6b-1 | connected polarizer--retarder Jones/coherency/Stokes/Mueller example |
+| P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | ready | existing three-dimensional Maxwell module | exported vacuum-law declarations and downstream build |
 | E1 media/macroscopic Maxwell | blocked | E0, Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
 | E2 material plane waves | blocked | E1 | real Maxwell field and Optics phasor theorems |
@@ -1878,10 +1924,11 @@ human verification recorded in `tbd.md`.
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
    raw electric-amplitude-squared normalization, not irradiance or modal power.
-4. Preserve the completed P6a retarder core as a raw-Jones layer: its reference axis has eigenvalue
-   one, the orthogonal axis has relative phase `exp (-I * retardance)`, and its unitarity still does
-   not imply electromagnetic power. Build the P6b coherency, Stokes, and Mueller views next from
-   this public action, with the physical field/irradiance portion remaining blocked on E3b.
+4. Preserve the completed P6a raw-Jones layer and completed P6b-1 reduced representation bridge:
+   the reference axis has eigenvalue one, the orthogonal axis has relative phase
+   `exp (-I * retardance)`, and neither Jones unitarity nor fixed Stokes intensity implies
+   electromagnetic power. Build P6b-2 as a separate connected polarizer--retarder system example;
+   keep P6b-3's field/irradiance portion blocked on P5b/E3b.
 5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
@@ -1893,6 +1940,6 @@ human verification recorded in `tbd.md`.
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
-P6b's reduced-representation work can proceed from the completed polarization and retarder stack;
-its physical observables and all Fresnel work must still follow the named electromagnetic medium,
-boundary, and flux dependencies.
+P6b-2 can now connect the completed polarizer and retarder stacks in all reduced representations;
+P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
+medium, boundary, and flux dependencies.
