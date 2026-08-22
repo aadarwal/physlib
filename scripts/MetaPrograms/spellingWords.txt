@@ -569,6 +569,7 @@ coherence
 coherences
 coherency
 coincide
+coincident
 collapse
 collectaxioms
 collecting
@@ -744,6 +745,7 @@ converted
 converts
 coordinate
 coordinates
+coordinatewise
 copied
 copies
 copyright
@@ -1646,6 +1648,7 @@ kelvin
 kernel
 ket
 key
+keys
 kg
 kilogram
 kilograms
@@ -2527,6 +2530,7 @@ say
 saying
 says
 scalar
+scalarization
 scalars
 scale
 scaled
