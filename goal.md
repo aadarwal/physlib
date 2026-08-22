@@ -243,6 +243,9 @@ Ownership rules:
   negative quarter-wave plates and half-wave plates have canonical matrix and state regressions,
   including a normalized equal-amplitude relative-phase family whose zero-axis phase transforms
   by `relativePhase - retardance`, without circular-handedness or physical-power claims.
+- [x] Retarder actions have exact pure-coherency and arbitrary raw-Stokes/Mueller descriptions,
+  and ordered Jones composition now connects a linear polarizer followed by a retarder through
+  exact Jones, pure-coherency, and induced Mueller results with a quarter-wave sign regression.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -264,7 +267,7 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] the physical Malus power bridge and the cross-representation retarder chain;
+- [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
@@ -979,17 +982,23 @@ handedness or electromagnetic power.
 
 ##### P6b-2. Connected reduced polarizer--retarder example
 
-Status: ready after P5a and P6b-1; keep this as a separate optical-system concept.
+Status: complete on the fork. Export location: `Optics/Systems/PolarizerRetarder.lean`.
 
 Deliverables:
 
-- a connected reduced example passing an arbitrary Jones input through a P5a polarizer and P6a
-  wave plate;
-- exact agreement of the Jones, pure-coherency, Stokes, and induced Mueller calculations; and
-- canonical analyzer/wave-plate regressions which reuse, rather than restate, the single-component
-  laws.
+- [x] use ordered `JonesMatrix.comp`, without a second system carrier, to pass an arbitrary Jones
+  input first through a P5a polarizer and then through a P6a linear retarder;
+- [x] derive the exact Jones output and the coherency of that same output through the shared
+  Jones/coherency commuting law;
+- [x] derive the arbitrary raw-Stokes action from induced Mueller composition and the two public
+  component actions, with the generic Jones and coherency commuting squares remaining reusable;
+  and
+- [x] pin the cascade order, analyzer amplitude, and positive-quarter-wave sign on the canonical
+  horizontal--`pi / 4` analyzer--zero-axis plate regression.
 
-Exit: one system-level polarization chain commutes in all four reduced representations.
+Exit achieved: one ordered system-level polarization chain has exact Jones, pure-coherency, raw
+Stokes, and induced Mueller descriptions. Its scalar remains a raw Stokes coordinate and its
+quadrature output remains algebraically named, without electromagnetic-power or handedness claims.
 
 ##### P6b-3. Physical polarization observables
 
@@ -1810,7 +1819,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
-| P6b-2 reduced polarization chain | ready | P5a, P6b-1 | connected polarizer--retarder Jones/coherency/Stokes/Mueller example |
+| P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | ready | existing three-dimensional Maxwell module | exported vacuum-law declarations and downstream build |
 | E1 media/macroscopic Maxwell | blocked | E0, Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
@@ -1924,11 +1933,11 @@ human verification recorded in `tbd.md`.
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
    raw electric-amplitude-squared normalization, not irradiance or modal power.
-4. Preserve the completed P6a raw-Jones layer and completed P6b-1 reduced representation bridge:
-   the reference axis has eigenvalue one, the orthogonal axis has relative phase
-   `exp (-I * retardance)`, and neither Jones unitarity nor fixed Stokes intensity implies
-   electromagnetic power. Build P6b-2 as a separate connected polarizer--retarder system example;
-   keep P6b-3's field/irradiance portion blocked on P5b/E3b.
+4. Preserve the completed P6a raw-Jones layer, P6b-1 reduced representation bridge, and P6b-2
+   ordered polarizer--retarder system: the reference axis has eigenvalue one, the orthogonal axis
+   has relative phase `exp (-I * retardance)`, `M.comp N` applies `N` first, and neither Jones
+   unitarity nor fixed Stokes intensity implies electromagnetic power. Keep P6b-3's
+   field/irradiance portion blocked on P5b/E3b.
 5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
@@ -1940,6 +1949,7 @@ human verification recorded in `tbd.md`.
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
-P6b-2 can now connect the completed polarizer and retarder stacks in all reduced representations;
+P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies.
+medium, boundary, and flux dependencies. The next physical-optics front is therefore E0 followed
+by E1, while the independent circuit front remains N2a/N3.

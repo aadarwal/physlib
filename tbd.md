@@ -116,6 +116,11 @@ PR unless maintainers explicitly ask to retain it.
   quarter-wave plate must agree with the established `diag(1, I)` Mueller regression. The Lean
   API records these coordinates but deliberately withholds an observer-oriented
   Poincare-sphere rotation claim until this gate is certified.
+- [ ] Human-check P6b-2's ordered system convention: in `M.comp N`, `N` acts first, so
+  `(quarterWavePlate 0).comp (linearPolarizer (pi / 4))` sends the horizontal unit Jones input to
+  `unitEqualAmplitude` times `minusIQuadrature`. This simultaneously checks the positive analyzer
+  amplitude and negative third Stokes coordinate; it is not yet a circular-handedness, irradiance,
+  detector-power, or modal-power statement.
 
 ## Modal and network semantics
 
