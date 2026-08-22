@@ -84,6 +84,8 @@ public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellBridge
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellEquations
 public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Basic
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBasic
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Converse
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Dispersion
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Maxwell
