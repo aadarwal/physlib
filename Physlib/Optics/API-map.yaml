@@ -276,6 +276,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Interfaces/PlanarDielectric/ElectricLabelMatching.lean (Optics.PlanarDielectricWaveConfiguration.incidentExponentJointElectricAggregate, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryLabelMatching)"
 
+  - description: "Optics derives the immediate activity and conservation consequences of guarded electric label matching without assuming a common frequency. The exact nonzero incident-key aggregate forces the transmitted electric amplitude to be nonzero. It also gives equality of transmitted and incident angular frequencies and of their complex-bilinear wave-vector pairings against every real tangent displacement. For the reflected label, the same frequency and tangent-pairing equalities hold unless its electric amplitude is zero, in which case its frequency and wave vector remain unconstrained dummy data. These conclusions retain tangential phase and attenuation information but assert no full wave-vector or normal-component equality, propagation role, Maxwell/on-shell condition, material dispersion, Snell or Fresnel law, observable, or power result."
+    done: true
+    location: "Physlib/Optics/Interfaces/PlanarDielectric/ElectricConservation.lean (Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.transmitted_electricAmplitude_ne_zero, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.transmitted_angularFrequency_tangentPairing_eq_incident, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_incident)"
+
   - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
     done: false
     location: N/A

@@ -205,6 +205,7 @@ public import Physlib.Optics.Components.Retarder.Regression
 public import Physlib.Optics.Components.Retarder.WavePlate
 public import Physlib.Optics.Interfaces.PlanarDielectric.Basic
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
+public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
