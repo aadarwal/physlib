@@ -7,6 +7,7 @@ module
 
 public import Physlib.Electromagnetism.ThreeDimension.Basic
 public import Physlib.Electromagnetism.Dynamics.IsExtrema
+
 /-!
 
 # A. Maxwell's equations in three dimensions
@@ -40,6 +41,9 @@ boundary conditions, and constitutive laws for material media are outside the cu
 module.
 
 -/
+
+@[expose] public section
+
 namespace Electromagnetism
 namespace ThreeDimension
 
