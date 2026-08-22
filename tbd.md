@@ -91,6 +91,22 @@ PR unless maintainers explicitly ask to retain it.
   maps, and `IsConstitutive` first; wave speed, impedance, refractive indices, and the `FreeSpace`
   parameter specialization second. Stack the macroscopic predicate and the E0 vacuum bridge as
   separate later PR concepts.
+- [ ] Human-check E1b's rationalized macroscopic equations and signs: `div D = ρFree`, `div B = 0`,
+  `curl H = JFree + ∂ₜ D`, and `curl E = -∂ₜ B`. Confirm that free sources are the only explicit
+  right-hand-side material sources, while bound polarization and magnetization response remains
+  absorbed into `D` and `H`; source-free means only that the free sources vanish.
+- [ ] Human-check that joint field differentiability is intentionally part of
+  `IsMacroscopicMaxwell`: Physlib's differential operators are totalized, and the hypotheses are
+  what justify the proved divergence, curl, and time-derivative superposition laws.
+- [ ] Human-check the one-way E0 bridge and its scaling: `D = ε₀ E`, `H = μ₀⁻¹ B`,
+  `ε₀ (ρ / ε₀) = ρ`, and `μ₀⁻¹ (μ₀ J + μ₀ ε₀ ∂ₜ E) = J + ∂ₜ (ε₀ E)`. Confirm that E0's Lorentz
+  current is being interpreted as the free source in this specialization and that no converse,
+  global-potential reconstruction, gauge reconstruction, or free/bound decomposition is claimed.
+- [ ] Keep E1b's upstream concepts separate: magnetic-field regularity in Kinematics, the generic
+  macroscopic predicate and fixed-medium connector in `MacroscopicMaxwellEquations`, and the
+  potential-derived vacuum result in `MacroscopicMaxwellBridge`.
+- [ ] Independently verify the Jackson, *Classical Electrodynamics*, third edition, section 6.6
+  citation used by the E1b module docs before any upstream PR, as required by `AI-POLICY.md`.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
 - [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged
