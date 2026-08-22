@@ -61,8 +61,8 @@ Requirements:
     location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeTransform.isPowerPreserving_of_conjTranspose_mul_self, Optics.ScatteringMatrix, Optics.ScatteringMatrix.IsLossless, Optics.ScatteringMatrix.IsLossless.isPowerPreserving, Optics.ScatteringMatrix.IsLossless.isPassive)"
 
   - description: "The API shall characterize power-preserving transforms by the matrix isometry equation, characterize passive transforms by a positive-semidefinite defect matrix, and specialize the square power-preserving case to unitarity."
-    done: false
-    location: N/A
+    done: true
+    location: "Physlib/Optics/Mode/Basic.lean (Optics.ModeTransform.isPowerPreserving_iff_conjTranspose_mul_self, Optics.ModeTransform.re_inner_one_sub_conjTranspose_mul_self, Optics.ModeTransform.isPassive_iff_posSemidef_one_sub_conjTranspose_mul_self, Optics.ModeTransform.isPowerPreserving_iff_mem_unitaryGroup, Optics.ScatteringMatrix.isLossless_iff_isPowerPreserving)"
 
   - description: "The API shall contain parallel composition of mode transforms by finite direct sums or block matrices and prove closure of power preservation and passivity under parallel composition."
     done: false
