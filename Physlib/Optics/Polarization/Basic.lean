@@ -81,6 +81,34 @@ lemma Phasor.realize_ofAmplitudePhase (amplitude phase carrierPhase : ℝ) :
   rw [hphase, Complex.mul_re, Complex.exp_ofReal_mul_I_re]
   simp
 
+/-- Phasor realization is the cosine-weighted real part minus the sine-weighted imaginary part. -/
+lemma Phasor.realize_eq_re_cos_sub_im_sin (z : Phasor) (carrierPhase : ℝ) :
+    z.realize carrierPhase =
+      z.re * Real.cos carrierPhase - z.im * Real.sin carrierPhase := by
+  rw [Phasor.realize, Complex.mul_re, Complex.exp_ofReal_mul_I_re,
+    Complex.exp_ofReal_mul_I_im]
+
+/-- Multiplying a phasor by a positive-exponential phase advances its realized carrier phase. -/
+lemma Phasor.realize_exp_mul (z : Phasor) (phase carrierPhase : ℝ) :
+    Phasor.realize (Complex.exp ((phase : ℂ) * Complex.I) * z) carrierPhase =
+      Phasor.realize z (carrierPhase + phase) := by
+  rw [Phasor.realize, Phasor.realize]
+  have hphase : (phase : ℂ) * Complex.I + (carrierPhase : ℂ) * Complex.I =
+      ((carrierPhase + phase : ℝ) : ℂ) * Complex.I := by
+    push_cast
+    ring
+  apply congrArg Complex.re
+  calc
+    Complex.exp ((phase : ℂ) * Complex.I) * z *
+        Complex.exp ((carrierPhase : ℂ) * Complex.I) =
+      z * (Complex.exp ((phase : ℂ) * Complex.I) *
+        Complex.exp ((carrierPhase : ℂ) * Complex.I)) := by ring
+    _ = z * Complex.exp
+        ((phase : ℂ) * Complex.I + (carrierPhase : ℂ) * Complex.I) := by
+      rw [Complex.exp_add]
+    _ = z * Complex.exp (((carrierPhase + phase : ℝ) : ℂ) * Complex.I) := by
+      rw [hphase]
+
 /-! ## B. Jones vectors and squared intensity -/
 
 /-- Two raw complex electric-field amplitudes in a fixed transverse polarization basis.
@@ -169,6 +197,14 @@ lemma intensity_scale_of_norm_eq_one {z : ℂ} (hz : ‖z‖ = 1) (J : JonesVect
 /-- Apply the same phase shift to both Jones components. -/
 def phaseShift (phase : ℝ) (J : JonesVector) : JonesVector :=
   scale (Complex.exp ((phase : ℂ) * Complex.I)) J
+
+/-- A common Jones phase shift advances the realized carrier phase without discarding coherent
+field information. -/
+lemma realize_phaseShift (phase carrierPhase : ℝ) (J : JonesVector) :
+    (phaseShift phase J).realize carrierPhase = J.realize (carrierPhase + phase) := by
+  ext i
+  rw [realize_apply, realize_apply]
+  exact Phasor.realize_exp_mul (J.components i) phase carrierPhase
 
 /-- A global phase shift leaves squared Jones intensity unchanged. -/
 @[simp]
