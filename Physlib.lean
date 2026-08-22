@@ -173,6 +173,10 @@ public import Physlib.Optics.Components.Polarizer.Coherency
 public import Physlib.Optics.Components.Polarizer.Malus
 public import Physlib.Optics.Components.Polarizer.Mueller
 public import Physlib.Optics.Components.Polarizer.Regression
+public import Physlib.Optics.Components.Retarder
+public import Physlib.Optics.Components.Retarder.Basic
+public import Physlib.Optics.Components.Retarder.Regression
+public import Physlib.Optics.Components.Retarder.WavePlate
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
@@ -191,6 +195,7 @@ public import Physlib.Optics.Polarization.Mueller.Regression
 public import Physlib.Optics.Polarization.Mueller.Trace
 public import Physlib.Optics.Polarization.Mueller.Unitary
 public import Physlib.Optics.Polarization.Poincare
+public import Physlib.Optics.Polarization.RelativePhase
 public import Physlib.Optics.Polarization.Stokes
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
