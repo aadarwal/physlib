@@ -45,6 +45,11 @@ PR unless maintainers explicitly ask to retain it.
   Mueller action and commuting squares; trace/reality; identity/cascade/scalar algebra; unitary
   consequences; and convention regressions. The combined fork milestone is intentionally larger
   than one upstream PR.
+- [ ] Preserve ideal-linear-polarizer work as reviewable stacked concepts: angle-parametrized
+  linear Jones states and overlap; rank-one Jones projection and transmission/extinction;
+  contraction, sequential action, and Malus' law; then coherency/Stokes/Mueller connections and
+  convention regressions. The combined fork milestone is intentionally larger than one upstream
+  PR, and the neutral `MatrixRank` prerequisite should land first.
 - [ ] Treat a topological upgrade of the Jones phase quotient as a separate design and proof
   package. Do not call the algebraic equivalence a homeomorphism or assert a continuously varying
   global Jones representative without the required quotient-topology and continuity theorems.
@@ -79,6 +84,13 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check the P4 trace factor, Stokes-ordered Pauli permutation, Jones cascade direction,
   and `diag(1, I)` regression before proposing any deterministic Mueller PR. Keep the current
   algebraic names until the observer and retarder-axis conventions are certified.
+- [ ] Human-check the P5a convention that a linear Jones axis is
+  `(cos θ, sin θ)`, positive angle runs from the first declared Jones coordinate toward the
+  second without an observer-direction claim, the raw Jones state changes sign under `θ + π`,
+  and its projector is `π`-periodic.
+- [ ] Human-check the signed coherent factor `cos (input - analyzer)`, the `M.comp N` cascade order,
+  the doubled Stokes direction `(cos (2θ), sin (2θ), 0)`, the induced Mueller factor `1 / 2`,
+  and the exact `π / 4` half-intensity regression before proposing any polarizer PR.
 
 ## Modal and network semantics
 
@@ -94,6 +106,9 @@ PR unless maintainers explicitly ask to retain it.
   physical conventions.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
+- [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
+  raw Stokes coordinates. No irradiance, Poynting-flux, normalized-modal-power, or electromagnetic
+  passivity corollary exists until P5b/E3b supplies the field-normalization bridge.
 - [ ] Supply an induced operator-norm bridge before expressing passivity as a matrix norm bound;
   the ambient norm inherited by the raw matrix alias is not that operator norm.
 - [ ] Represent component behavior independently of invertibility. For network equations

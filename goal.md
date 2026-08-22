@@ -233,6 +233,10 @@ Ownership rules:
   induce wrapped real Mueller matrices through that construction, with proved Jones/coherency/
   Stokes commuting squares, the audited Pauli trace formula, physical-cone preservation,
   identity/cascade/scalar laws, algebraic-unitary consequences, and sign-sensitive regressions.
+- [x] Normalized linear Jones axes use `Real.Angle`; ideal linear polarizers are rank-one star
+  projections with half-turn invariance, axis transmission, orthogonal extinction, exact
+  squared-Jones-intensity contraction, coherent and intensity forms of Malus' law, canonical
+  matrix regressions, coherency transport, and an exact Jones-induced arbitrary-Stokes action.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -254,7 +258,7 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] polarizers, retarders, Malus' law, and wave-plate calculations;
+- [ ] retarders, the physical Malus power bridge, and wave-plate calculations;
 - [ ] material media, Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
@@ -871,9 +875,11 @@ named `diag(1, I)` regression proves
 The raw Mueller wrapper explicitly certifies neither physical admissibility nor Jones
 inducibility, and no general depolarizing-map claim is made.
 
-#### P5a. Jones polarizer and Malus core
+#### P5a. Jones polarizer and Malus core — complete
 
-Candidate locations: `Components/Polarizer.lean` and a small shared Jones-component file if needed.
+Locations: `Physlib/Optics/Polarization/Linear.lean`,
+`Physlib/Optics/Polarization/LinearStokes.lean`, and
+`Physlib/Optics/Components/Polarizer.lean` with its `Polarizer/` subtree.
 
 Deliverables:
 
@@ -882,10 +888,26 @@ Deliverables:
 - self-adjointness, idempotence, contraction for squared Jones intensity, axis transmission, and
   orthogonal extinction;
 - sequential-polarizer amplitude and squared-Jones-intensity laws;
-- Malus' law for a linearly polarized input, with the input/output axis angle made explicit.
+- Malus' law for a linearly polarized input, with the input/output axis angle made explicit; and
+- coherency, Stokes, and induced Mueller formulas derived through the existing commuting squares.
 
 Exit: a linearly polarized input sent through an arbitrary ideal linear polarizer has transmitted
-Jones intensity `I * cos²(delta)` without making a physical-power claim.
+Jones intensity equal to its actual input intensity times `cos²(delta)`, without making a
+physical-power claim.
+
+Completion evidence: `JonesVector.linearPolarization` uses `Real.Angle`, so full-turn duplication is
+removed while the half-turn Jones sign and half-turn projector invariance are both explicit.
+`JonesMatrix.linearPolarizer` is the outer product of that normalized axis with itself; it is
+Hermitian, idempotent, a bundled star projection, exactly rank one, algebraically nonunitary, and
+contractive for every raw Jones input by Cauchy--Schwarz. The coherent action retains the signed
+angle-difference cosine, while the single-input and sequential-polarizer intensity results derive
+the squared cosine from the existing `JonesVector.intensity`. Exact zero, `π / 2`, and `π / 4`
+matrices, crossed-axis extinction, and the `π / 4` half-intensity result pin the conventions.
+Coherency transport is proved through `JonesMatrix.act_coherency`. The induced Mueller matrix is
+proved through the shared Pauli trace formula to be one half of the transmitted Stokes state's
+outer product, yielding the arbitrary raw-Stokes output
+`q (1, cos (2θ), sin (2θ), 0)` and the zero-polarization factor-of-two regression. No irradiance,
+Poynting-flux, modal-power, or electromagnetic-passivity theorem is included; those remain P5b.
 
 #### P5b. Physical Malus bridge
 
@@ -1728,7 +1750,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P3b-2 Jones--Stokes bridge | done | P2b, P3b-1 | coherency-derived components, scaling/phase laws, and normalized canonical-state suite |
 | P3c Poincare classification | done | P3b-1, P3b-2 | closed-ball, boundary/interior, exact phase-fiber, rank-one factorization, orbit-quotient, and canonical-axis suites |
 | P4 deterministic Mueller | done | P1a, P2a, P3a, P3b-1 | transported real action, Pauli trace/reality, cone, algebra, unitary, and regression suites |
-| P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
+| P5a Jones polarizer/Malus | done | P1a, P2b, P3b-2, P4 | projection, contraction, coherent/intensity Malus, coherency, arbitrary-Stokes Mueller, and convention-regression suites |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
 | P6a retarder core | ready | P1a | unitary Jones action and canonical-state suite |
 | P6b polarization chain | blocked | P1b, P2b, P3b-2, P4, P5a/P5b, P6a, E3b | cross-representation connected example |
@@ -1829,7 +1851,7 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, P3b-2, P3c, and P4 are complete, independently
+1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, P3b-2, P3c, P4, and P5a are complete, independently
    reviewed, validated, and integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
@@ -1844,20 +1866,20 @@ human verification recorded in `tbd.md`.
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
    raw electric-amplitude-squared normalization, not irradiance or modal power.
-4. Build P5a's ideal linear polarizer as a normalized rank-one Jones projection and prove its
-   self-adjointness, idempotence, axis transmission, orthogonal extinction, intensity contraction,
-   and Malus law from the existing raw Jones definitions. Connect its coherency, Stokes, and P4
-   Mueller views, but retain the explicit boundary that Jones intensity is not yet irradiance or
-   modal power.
+4. Build P6a's retarder core next, reusing `JonesVector.linearPolarization` for arbitrary axes and
+   keeping its unitary Jones action separate from the singular polarizer projector. Prove general
+   retardance composition and the quarter-wave and half-wave canonical-state regressions before
+   adding its coherency, Stokes, and Mueller views.
 5. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
-6. P6a retarders are also unblocked after P4, but keep polarizers and retarders as separate
-   component PR concepts and do not translate Jones intensity into physical power before E3b.
+6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
+   intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
+   P5a Malus law is complete.
 7. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
-The first session should not jump directly to a polarizer, microring formula, or Fresnel
-coefficient. Those would be easy isolated calculations but would evade the dependency structure
-this goal is intended to establish.
+The next session should not jump directly to a microring formula or stored Fresnel coefficient.
+P6a can proceed on the completed polarization stack; Fresnel work must still follow the named
+electromagnetic medium, boundary, and flux dependencies.

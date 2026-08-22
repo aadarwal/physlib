@@ -167,6 +167,12 @@ public import Physlib.Meta.TODO.Basic
 public import Physlib.Meta.TODO.Global
 public import Physlib.Meta.TransverseTactics
 public import Physlib.Optics.Basic
+public import Physlib.Optics.Components.Polarizer
+public import Physlib.Optics.Components.Polarizer.Basic
+public import Physlib.Optics.Components.Polarizer.Coherency
+public import Physlib.Optics.Components.Polarizer.Malus
+public import Physlib.Optics.Components.Polarizer.Mueller
+public import Physlib.Optics.Components.Polarizer.Regression
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
@@ -176,6 +182,8 @@ public import Physlib.Optics.Polarization.HarmonicWave
 public import Physlib.Optics.Polarization.JonesCoherency
 public import Physlib.Optics.Polarization.JonesPoincare
 public import Physlib.Optics.Polarization.JonesStokes
+public import Physlib.Optics.Polarization.Linear
+public import Physlib.Optics.Polarization.LinearStokes
 public import Physlib.Optics.Polarization.Mueller
 public import Physlib.Optics.Polarization.Mueller.Algebra
 public import Physlib.Optics.Polarization.Mueller.Basic
