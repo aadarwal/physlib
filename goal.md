@@ -257,6 +257,12 @@ Ownership rules:
   bound response inside `D` and `H`; supplies source-free and linear-superposition APIs; connects
   the field equations to a fixed medium's constitutive equations; and derives the canonical
   free-space instance one way from the existing potential-derived laws.
+- [x] Direction-indexed oriented polarization frames now embed Jones data as complex spatial
+  electric phasors, recover exact real quadratures and transverse fields, and construct
+  positive-branch homogeneous-material plane waves with exact `E`/`B`/`H`, coherent phase-shift,
+  and complete source-free Maxwell results. A fixed-vacuum regression proves full electric-field
+  and magnetic-induction agreement with the existing potential-derived `harmonicWaveX`
+  construction.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -1096,7 +1102,7 @@ sources.
 - [x] positive-branch material dispersion, a canonical fixed-medium constructor, source-free
   Maxwell satisfaction under transversality and dispersion, the honest nonzero-amplitude
   converse, the nonzero-candidate characterization, and on-shell `E`/`B`/`H` relations;
-- [ ] an Optics-owned complex-harmonic/phasor representation importing the real field theorem and
+- [x] an Optics-owned complex-harmonic/phasor representation importing the real field theorem and
   a fixed-vacuum regression against the existing representation bridge;
 - [ ] polarization-basis decomposition into `s` and `p` modes for oblique incidence, with an
   independently chosen tangent frame for normal incidence; and
@@ -1655,7 +1661,7 @@ universal continuous-frequency property.
 
 | ID | Required regression theorem | What it detects |
 |---|---|---|
-| P-01 | Jones realization equals each `harmonicWaveX` transverse electric component | phase/cast/index mismatch |
+| P-01 | framed material-Jones realization equals the complete `harmonicWaveX` electric field and magnetic induction | phase/cast/index/cross-product mismatch |
 | P-02 | squared Jones intensity equals the sum of squared real electric amplitudes | raw-field normalization mismatch |
 | P-03 | pure coherency and Stokes data are invariant under unit-modulus global phase | missing phase hypothesis or incorrect conjugation |
 | P-04a | canonical H/V/D/A and algebraically named positive/negative-quadrature Jones states have the documented Stokes vectors | basis order, factor-of-two, conjugation, and `S₃` sign errors |
@@ -1869,7 +1875,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, and honest converse complete; phasor, frame, and evanescent layers remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, oriented Jones/phasor frame, phase coherence, and vacuum regression complete; s/p incidence and evanescent layers remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
@@ -1989,8 +1995,11 @@ human verification recorded in `tbd.md`.
    `B = (κ / ω) n × E` candidate is not described as Maxwell-derived, and transversality and
    material dispersion are separate; and E2b's completed positive-branch dispersion, exact
    differential laws, source-free Maxwell solution, honest nonzero-amplitude converse, and
-   on-shell `B`/`H` relations. Proceed to the Optics-owned phasor/Jones realization before
-   Poynting-flux normalization.
+   on-shell `B`/`H` relations. Preserve E2c's local oriented-frame Jones embedding, exact
+   quadrature and `E`/`B`/`H` realizations, coherent-phase time translation, complete material
+   Maxwell endpoint, and fixed-vacuum field regression. Proceed next to the oblique-incidence
+   `s`/`p` frame, keeping normal incidence explicitly dependent on selected tangent data and
+   withholding power claims until Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -2001,6 +2010,7 @@ human verification recorded in `tbd.md`.
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies. With E0, E1, and E2's real material-Maxwell layer
-complete, the next physical-optics front is the E2 complex phasor/Jones bridge, while the
-independent circuit front remains N2a/N3.
+medium, boundary, and flux dependencies. With E2's real material-Maxwell layer and its oriented
+Jones/phasor realization now connected, the next physical-optics front is the oblique-incidence
+`s`/`p` geometry needed by planar interfaces, followed separately by the complex-wavevector and
+decaying-branch model for evanescent fields. The independent circuit front remains N2a/N3.

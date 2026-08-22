@@ -193,12 +193,15 @@ public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
 public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
+public import Physlib.Optics.Polarization.Frame
 public import Physlib.Optics.Polarization.HarmonicWave
 public import Physlib.Optics.Polarization.JonesCoherency
 public import Physlib.Optics.Polarization.JonesPoincare
 public import Physlib.Optics.Polarization.JonesStokes
 public import Physlib.Optics.Polarization.Linear
 public import Physlib.Optics.Polarization.LinearStokes
+public import Physlib.Optics.Polarization.MaterialWave
+public import Physlib.Optics.Polarization.MaterialWaveRegression
 public import Physlib.Optics.Polarization.Mueller
 public import Physlib.Optics.Polarization.Mueller.Algebra
 public import Physlib.Optics.Polarization.Mueller.Basic
