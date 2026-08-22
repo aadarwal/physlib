@@ -192,6 +192,14 @@ PR unless maintainers explicitly ask to retain it.
   real-quadrature conditions, and the derived magnetic amplitude recovers both magnetic
   quadratures. Confirm exact equality of ordinary real `E`/`D`/`B`/`H`, but no equality claim about
   potentials, gauges, power normalization, interface roles, or hidden complex states.
+- [ ] Human-check the complex-carrier calculus signs against the selected convention:
+  `partial_t C = I omega C`, `partial_j C = -I K_j C`,
+  `div Re(C A) = Re(-I C (K dot A))`, and
+  `curl Re(C A) = Re(-I C (K cross A))`. Confirm that the dot product is complex-bilinear, the
+  cross-product order is `K cross A`, and the public curl theorem is expressed through the same
+  ordinary-real-field realization spine. Joint smoothness and these off-shell identities do not
+  by themselves imply transversality, dispersion, any Maxwell equation, an interface or
+  evanescent-wave role, or a power normalization.
 - [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
   algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
   the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
@@ -341,7 +349,11 @@ PR unless maintainers explicitly ask to retain it.
   API before relying on the official spelling executable. It currently fails at
   `Char.isWhitespace`/`String.Slice`; P4 and E2e used exact differential emulations and added only
   the resulting new vocabulary. E2e's differential added `alpha`, `attenuation`,
-  `attenuationvector`, `decayrate`, `envelope`, `kappa`, `omega`, `phasevector`, and `wavenumber`.
+  `attenuationvector`, `decayrate`, `envelope`, `kappa`, `omega`, `phasevector`, and `wavenumber`;
+  the complex-carrier and exact-bridge differential added `attenuating`, `bilinearly`, `hidden`,
+  `normalizations`, `spine`, and `theta`. The complex-calculus differential initially reported
+  only `requested`; rewording the two affected docstrings leaves that slice with no dictionary
+  delta.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
