@@ -173,6 +173,7 @@ public import Physlib.Optics.Polarization.Coherency
 public import Physlib.Optics.Polarization.HarmonicWave
 public import Physlib.Optics.Polarization.JonesCoherency
 public import Physlib.Optics.Polarization.JonesStokes
+public import Physlib.Optics.Polarization.Poincare
 public import Physlib.Optics.Polarization.Stokes
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
