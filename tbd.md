@@ -52,8 +52,8 @@ PR unless maintainers explicitly ask to retain it.
   existing `Re (z * exp (I * (ωt - kx)))` carrier convention, and Jones coordinate order.
 - [ ] Record whether the observer looks along propagation or into the beam before assigning
   right/left circular names. Until then use only “positive/negative third Stokes coordinate.”
-- [ ] Verify the exact H/V/D/A and positive/negative circular Jones vectors and reconstructed real
-  field rotation before completing regression P-04.
+- [ ] Verify which algebraic positive/negative-`I` quadrature Jones state receives each right/left
+  circular name, using reconstructed real-field rotation, before completing regression P-04b.
 
 ## Modal and network semantics
 

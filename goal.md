@@ -216,6 +216,9 @@ Ownership rules:
   coordinates; reconstruction, intensity, polarization norm, determinant, physical-cone, and
   coherency-equivalence laws are proved with the provisional third-coordinate sign but without
   assigning circular-polarization names.
+- [x] Jones-derived Stokes data is defined through pure coherency, with arbitrary complex-scaling
+  covariance, unit-phase invariance, all four component formulas, and normalized full-vector
+  checks for the H/V/D/A and positive/negative-`I` quadrature coordinate states.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -761,7 +764,7 @@ determinant identity, the exact PSD/physical-cone criterion, and an ordinary equ
 `PolarizationCoherency` and `PhysicalStokesVector`. The algebraic convention is
 `S₀ = 2c₀`, `S₁ = 2c₃`, `S₂ = 2c₁`, and `S₃ = 2c₂`; right/left circular naming remains withheld.
 
-#### P3b-2. Jones--Stokes bridge
+#### P3b-2. Jones--Stokes bridge — complete
 
 Candidate location: `Physlib/Optics/Polarization/JonesStokes.lean`.
 
@@ -777,6 +780,15 @@ For the provisional Pauli-positive `S₃`, the component formulas are
 Do not name right/left circular states until the observer and handedness convention is source-checked
 by the human author.
 
+Completion evidence: `Physlib.Optics.Polarization.JonesStokes` defines `JonesVector.stokes` only
+through the P2b outer-product coherency and the P3b-1 coherency/Stokes equivalence. It proves
+physicality, equality of Jones and Stokes intensity, covariance by `Complex.normSq z` under an
+arbitrary common complex scale, invariance under unit-modulus scale and common phase, the exact
+four component formulas above, and the cross-coherence reconstruction identity. Normalized
+coordinate states in `Polarization.Basic` use equal amplitudes `sqrt 2 / 2`; full-vector checks give
+H/V as `(1, ±1, 0, 0)`, D/A as `(1, 0, ±1, 0)`, and positive/negative-`I` quadrature as
+`(1, 0, 0, ±1)`. The API deliberately assigns no right/left circular name.
+
 #### P3c. Poincare classification
 
 Candidate location: `Physlib/Optics/Polarization/Poincare.lean`.
@@ -786,7 +798,8 @@ Deliverables:
 - the closed-Poincare-ball theorem for normalized nonzero physical coherency;
 - sphere equality for rank-one states and a strict interior theorem for a precisely stated mixed
   class such as rank two or positive definite;
-- canonical horizontal, vertical, diagonal, antidiagonal, right-circular, and left-circular cases;
+- canonical horizontal, vertical, diagonal, antidiagonal, and positive/negative-`I` quadrature
+  cases, with right/left circular aliases deferred until the human convention check;
 - explicit handling of the zero-intensity case; and
 - the pure-state correspondence stated for unit-intensity Jones vectors modulo the `U(1)` action,
   not for arbitrary nonzero Jones vectors modulo phase alone.
@@ -1670,8 +1683,8 @@ current integration base; a designed package whose prerequisite is merely active
 | P3a neutral Hermitian basis | done | matrix API audit | neutral basis, bundled coordinate equivalence, compatibility wrappers, and full downstream build |
 | P3b-0 neutral positive cone | done | P3a | determinant identity, PSD/radius criterion, and zero-radius-safe construction |
 | P3b-1 Stokes/coherency cone | done | P2a, P3b-0 | raw linear reconstruction, exact PSD cone, coherency equivalence, and round-trip suite |
-| P3b-2 Jones--Stokes bridge | ready | P2b, P3b-1 | explicit components and phase-invariance suite |
-| P3c Poincare classification | blocked | P3b-1, P3b-2 | ball/sphere/mixed-state suite |
+| P3b-2 Jones--Stokes bridge | done | P2b, P3b-1 | coherency-derived components, scaling/phase laws, and normalized canonical-state suite |
+| P3c Poincare classification | ready | P3b-1, P3b-2 | ball/sphere/mixed-state suite |
 | P4 deterministic Mueller | ready | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
 | P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
@@ -1774,8 +1787,8 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, P2b, P3a, P3b-0, and P3b-1 are complete, independently reviewed, validated,
-   and integrated.
+1. P1a, P1b, P2a, P2b, P3a, P3b-0, P3b-1, and P3b-2 are complete, independently reviewed,
+   validated, and integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
    carries no Jones-purity assumption, the Pauli coordinates remain basis-fixed but independent of
@@ -1785,10 +1798,12 @@ human verification recorded in `tbd.md`.
    relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
    the distinction between incident and outgoing channel ends and do not encode feedback as
    ordinary matrix multiplication.
-3. Build P3b-2's Jones--Stokes bridge only through pure coherency: prove intensity, unit-scaling and
-   phase invariance, all four explicit component formulas, and the algebraically named H/V/D/A and
-   positive/negative-quadrature regressions. Withhold right/left circular names until the human
-   handedness gate is resolved; P3c becomes ready only after this bridge is complete.
+3. Build P3c in reviewable layers. First define normalization only for positive Stokes intensity
+   and prove the closed-ball inequality directly from `StokesVector.IsPhysical`. Then characterize
+   the boundary by determinant zero, connect the nonzero boundary to rank one, and characterize a
+   precise interior class by rank two or positive definiteness. Handle zero intensity separately.
+   Only after that algebraic classification should the unit-Jones-modulo-`U(1)` sphere statement be
+   designed; do not replace the quotient requirement with an informal phase-invariance lemma.
 4. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
