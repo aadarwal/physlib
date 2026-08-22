@@ -171,7 +171,11 @@ PR unless maintainers explicitly ask to retain it.
   stored normal points from the geometric negative side toward the positive side; the positive
   side normal is `n`, the negative side normal is `-n`; signed normal coordinate is positive on
   the positive side; the carrier is contained in both closed half-spaces and neither open half-space.
-  The geometry itself assigns no incident, reflected, transmitted, outgoing, decay, or power role.
+  The tangent submodule is exactly the kernel of the real-linear normal component, and its bundled
+  projection agrees definitionally with the existing explicit tangential projection. The geometry
+  itself assigns no incident, reflected, transmitted, outgoing, decay, or power role. Its immediate
+  E5a consumer uses `Time × plane.tangentSubmodule` as the real module underlying an interface
+  exponent functional, with the time probe `(1, 0)` recovering the positive angular frequency.
   Add a Mathlib `AffineSubspace`/surface-measure bridge only when an actual trace or integration
   consumer needs it; the present carrier is deliberately the exact zero set used by pointwise
   boundary laws.
