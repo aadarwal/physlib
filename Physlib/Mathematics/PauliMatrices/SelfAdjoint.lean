@@ -5,6 +5,7 @@ Authors: Joseph Tooby-Smith
 -/
 module
 
+public import Mathlib.Analysis.Matrix.PosDef
 public import Physlib.Mathematics.PauliMatrices.Basic
 /-!
 
@@ -21,6 +22,7 @@ such matrices.
 - `pauliCoeffEquiv`: the real-linear coordinate equivalence induced by that basis.
 - `pauliCoeff`, `scalarCoeff`, and `vectorCoeff`: explicit coordinates in that basis.
 - `vectorPart` and `pauliRadius`: the spatial Pauli part and its Euclidean length.
+- `posSemidef_iff_pauliRadius_le_scalarCoeff`: the positive-semidefinite Pauli cone.
 -/
 
 @[expose] public section
@@ -30,6 +32,7 @@ noncomputable section
 namespace PauliMatrix
 
 open Matrix Module KroneckerDelta
+open scoped ComplexOrder
 
 /-! ## A. The real Pauli basis -/
 
@@ -325,5 +328,119 @@ lemma vectorPart_sq
     vectorPart A * vectorPart A =
       (pauliRadius A ^ 2 : ℝ) • 1 := by
   rw [vectorPart, vectorMatrix_sq, ← pauliRadius_sq]
+
+/-! ## C. Positive semidefinite Pauli coordinates -/
+
+/-- The Pauli-vector part of a self-adjoint matrix is Hermitian. -/
+lemma vectorPart_isHermitian
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    (vectorPart A).IsHermitian := by
+  have hself : IsSelfAdjoint (scalarCoeff A : ℂ) := by
+    rw [isSelfAdjoint_iff]
+    exact Complex.conj_ofReal _
+  have hscalar :
+      (((scalarCoeff A : ℂ) • (1 : Matrix (Fin 2) (Fin 2) ℂ))).IsHermitian :=
+    Matrix.isHermitian_one.smul hself
+  have hV : vectorPart A = A.val - (scalarCoeff A : ℂ) • 1 := by
+    rw [matrix_eq_scalar_add_vector]
+    abel
+  rw [hV]
+  exact A.property.sub hscalar
+
+/-- The determinant of a self-adjoint `2 × 2` matrix is the squared scalar Pauli coefficient
+minus the squared Pauli radius. -/
+lemma det_eq_scalarCoeff_sq_sub_pauliRadius_sq
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    Matrix.det A.val =
+      ((scalarCoeff A ^ 2 - pauliRadius A ^ 2 : ℝ) : ℂ) := by
+  have hr : (pauliRadius A : ℂ) ^ 2 =
+      ∑ i : Fin 3, (vectorCoeff A i : ℂ) ^ 2 := by
+    rw [← Complex.ofReal_pow, pauliRadius_sq]
+    simp only [Complex.ofReal_sum, Complex.ofReal_pow]
+  rw [matrix_eq_scalar_add_vector, Matrix.det_fin_two]
+  push_cast
+  rw [hr]
+  simp [vectorPart, vectorMatrix, Fin.sum_univ_three, pauliMatrix]
+  ring_nf
+  rw [Complex.I_sq]
+  ring
+
+/-- A zero Pauli radius forces the Pauli-vector part to vanish. -/
+lemma vectorPart_eq_zero_of_pauliRadius_eq_zero
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ))
+    (h : pauliRadius A = 0) : vectorPart A = 0 := by
+  apply Matrix.conjTranspose_mul_self_eq_zero.mp
+  rw [(vectorPart_isHermitian A).eq, vectorPart_sq, h]
+  simp
+
+/-- The Pauli radius times the identity plus the Pauli-vector part is positive semidefinite. -/
+lemma pauliRadius_one_add_vectorPart_posSemidef
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    ((pauliRadius A : ℂ) • 1 + vectorPart A).PosSemidef := by
+  let r : ℝ := pauliRadius A
+  let V : Matrix (Fin 2) (Fin 2) ℂ := vectorPart A
+  have hr : 0 ≤ r := pauliRadius_nonneg A
+  change ((r : ℂ) • 1 + V).PosSemidef
+  by_cases hr0 : r = 0
+  · have hV0 : V = 0 := vectorPart_eq_zero_of_pauliRadius_eq_zero A hr0
+    rw [hr0, Complex.ofReal_zero, zero_smul, hV0, add_zero]
+    exact Matrix.PosSemidef.zero
+  · have hrpos : 0 < r := lt_of_le_of_ne hr (Ne.symm hr0)
+    let B : Matrix (Fin 2) (Fin 2) ℂ := (r : ℂ) • 1 + V
+    have hBherm : B.IsHermitian := by
+      apply Matrix.IsHermitian.add
+      · apply Matrix.isHermitian_one.smul
+        rw [isSelfAdjoint_iff]
+        exact Complex.conj_ofReal _
+      · exact vectorPart_isHermitian A
+    have hB_sq : B * B = (2 * r : ℝ) • B := by
+      dsimp [B, V]
+      rw [add_mul, mul_add, mul_add, vectorPart_sq]
+      simp only [Matrix.smul_mul, Matrix.mul_smul, one_mul, mul_one, smul_add]
+      module
+    have hBB : (Bᴴ * B).PosSemidef :=
+      Matrix.posSemidef_conjTranspose_mul_self B
+    rw [hBherm.eq, hB_sq] at hBB
+    have hs := hBB.smul (show (0 : ℝ) ≤ (2 * r)⁻¹ by positivity)
+    have htwo : (2 * r : ℝ) ≠ 0 := mul_ne_zero two_ne_zero hr0
+    have heq : (2 * r : ℝ)⁻¹ • ((2 * r : ℝ) • B) = B := by
+      rw [smul_smul, inv_mul_cancel₀ htwo, one_smul]
+    change B.PosSemidef
+    rw [← heq]
+    exact hs
+
+/-- A self-adjoint `2 × 2` complex matrix is positive semidefinite exactly when its Pauli radius
+is at most its scalar Pauli coefficient. -/
+lemma posSemidef_iff_pauliRadius_le_scalarCoeff
+    (A : selfAdjoint (Matrix (Fin 2) (Fin 2) ℂ)) :
+    A.val.PosSemidef ↔ pauliRadius A ≤ scalarCoeff A := by
+  constructor
+  · intro hA
+    have htrace := hA.trace_nonneg
+    rw [trace_eq_two_mul_scalarCoeff] at htrace
+    have h2c : 0 ≤ 2 * scalarCoeff A := Complex.zero_le_real.mp (by
+      simpa only [Complex.ofReal_mul, Complex.ofReal_ofNat] using htrace)
+    have hc : 0 ≤ scalarCoeff A := by linarith
+    have hdet := hA.det_nonneg
+    rw [det_eq_scalarCoeff_sq_sub_pauliRadius_sq] at hdet
+    have hsq : pauliRadius A ^ 2 ≤ scalarCoeff A ^ 2 := by
+      have hreal : 0 ≤ scalarCoeff A ^ 2 - pauliRadius A ^ 2 :=
+        Complex.zero_le_real.mp hdet
+      linarith
+    nlinarith [pauliRadius_nonneg A]
+  · intro hrc
+    let c : ℝ := scalarCoeff A
+    let r : ℝ := pauliRadius A
+    let V : Matrix (Fin 2) (Fin 2) ℂ := vectorPart A
+    rw [matrix_eq_scalar_add_vector]
+    change ((c : ℂ) • 1 + V).PosSemidef
+    have hdecomp :
+        (c : ℂ) • 1 + V = ((c - r : ℝ) : ℂ) • 1 + ((r : ℂ) • 1 + V) := by
+      module
+    rw [hdecomp]
+    apply Matrix.PosSemidef.add
+    · apply Matrix.PosSemidef.one.smul
+      exact Complex.zero_le_real.mpr (sub_nonneg.mpr hrc)
+    · exact pauliRadius_one_add_vectorPart_posSemidef A
 
 end PauliMatrix
