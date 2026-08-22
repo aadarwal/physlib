@@ -39,6 +39,10 @@ lift of the angle they are equivalent to the equation of motion of `SimplePendul
   is Hamilton's equations, and `SimplePendulum.equationOfMotion_iff_hamiltonEqOp_eq_zero`
   proves that, for a smooth lift of the angle, Hamilton's equations are equivalent to the
   equation of motion.
+- `SimplePendulum.equationOfMotion_tfae` gathers the formulations into a single equivalence:
+  for a smooth lift of the angle the equation of motion, its scalar form `θ̈ + ω² sin θ = 0`,
+  Hamilton's equations, and the Lagrangian and Hamiltonian variational principles are all
+  equivalent.
 
 ## iii. Table of contents
 
@@ -52,6 +56,7 @@ lift of the angle they are equivalent to the equation of motion of `SimplePendul
   - A.3. Relation between Hamiltonian and energy
   - A.4. Hamilton equation operator
   - A.5. Equation of motion if and only if Hamilton's equations
+- B. Equivalences between the formulations
 
 ## iv. References
 
@@ -278,6 +283,58 @@ lemma equationOfMotion_iff_hamiltonEqOp_eq_zero (θ : Time → EuclideanSpace �
     ne_eq, S.inertia_ne_zero, not_false_eq_true, inv_mul_cancel₀, one_smul, implies_true,
     Time.deriv_smul _ S.inertia (deriv_differentiable_of_contDiff θ hθ),
     gradient_hamiltonian_position_eq, true_and, eq_neg_iff_add_eq_zero]
+
+/-!
+
+## B. Equivalences between the formulations
+
+We gather the formulations of the dynamics of the simple pendulum into a single equivalence.
+For a smooth lift of the angle the equation of motion, its scalar form, Hamilton's equations,
+the Lagrangian variational principle and the Hamiltonian variational principle are all
+equivalent. The equation of motion is itself the Newtonian formulation: the pointwise law is
+the rotational form of Newton's second law, so, unlike for the harmonic oscillator, no
+separate entry restates it. The equivalence of the equation of motion with the vanishing of
+the variational derivative of the action lives in section G.1 of the `Basic` module; the
+fourth entry states the same variational principle through the variational calculus directly.
+
+-/
+
+/-- For a smooth lift of the angle the following formulations of the dynamics of the simple
+  pendulum are equivalent:
+  1. the equation of motion, the pointwise rotational Newton law balancing the rate of change
+    of the angular momentum against the torque;
+  2. the scalar mass-independent form `θ̈ + ω² sin θ = 0` of the equation of motion;
+  3. Hamilton's equations for the lift and its canonical momentum, as the vanishing of the
+    Hamilton-equations operator;
+  4. the Lagrangian variational principle, the vanishing of the variational gradient of the
+    action integral of the Lagrangian, written through the variational calculus directly; the
+    same principle, through the variational derivative of the action, is recorded standalone
+    as `equationOfMotion_iff_gradLagrangian_zero` in the `Basic` module;
+  5. the Hamiltonian variational principle, the vanishing of the variational gradient of the
+    phase-space action on the pair of the canonical momentum and the lift. -/
+lemma equationOfMotion_tfae (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : ContDiff ℝ ∞ θ) :
+    List.TFAE [S.EquationOfMotion θ,
+      ∀ t, ∂ₜ (∂ₜ θ) t 0 + S.ω ^ 2 * Real.sin (θ t 0) = 0,
+      S.hamiltonEqOp (fun t => S.toCanonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0,
+      (δ (q':=θ), ∫ t, S.lagrangian t (q' t) (fderiv ℝ q' t 1)) = 0,
+      (δ (pq':= fun t => (S.toCanonicalMomentum t (θ t) (∂ₜ θ t), θ t)),
+        ∫ t, ⟪(pq' t).1, ∂ₜ (Prod.snd ∘ pq') t⟫_ℝ -
+          S.hamiltonian t (pq' t).1 (pq' t).2) = 0] := by
+  rw [← S.equationOfMotion_iff_hamiltonEqOp_eq_zero θ hθ,
+    ← S.equationOfMotion_iff_scalar θ]
+  rw [hamiltons_equations_varGradient, euler_lagrange_varGradient]
+  simp only [List.tfae_cons_self]
+  rw [← S.gradLagrangian_eq_eulerLagrangeOp θ hθ,
+    ← S.equationOfMotion_iff_gradLagrangian_zero θ hθ]
+  simp only [List.tfae_cons_self]
+  show List.TFAE [S.EquationOfMotion θ,
+    S.hamiltonEqOp (fun t => S.toCanonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0]
+  rw [← S.equationOfMotion_iff_hamiltonEqOp_eq_zero θ hθ]
+  simp only [List.tfae_cons_self, List.tfae_singleton]
+  · exact hθ
+  · exact S.contDiff_lagrangian _
+  · simp only [S.toCanonicalMomentum_eq]; fun_prop
+  · exact S.hamiltonian_contDiff _
 
 end SimplePendulum
 
