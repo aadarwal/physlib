@@ -272,6 +272,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Interfaces/PlanarDielectric/ElectricCollision.lean (Optics.PlanarDielectricWaveConfiguration.jointElectricBoundaryCoefficients, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryCoefficients_eq_zero)"
 
+  - description: "Optics defines the exact negative-side referenced joint tangential-E/normal-D coefficient carried at the incident boundary exponent: the incident coefficient plus the reflected coefficient only when their exponents coincide. Under a zero-free-surface-charge local boundary with arbitrary free surface current, nonvanishing of this conditional aggregate forces the transmitted boundary exponent to equal the incident exponent, derives the alternative that the reflected electric amplitude is zero or its exponent also equals the incident exponent, and proves the stored-point-referenced medium-dependent balance A_t = A_i + A_r. The reflected alternative is a conclusion, not another hypothesis. Raw incident nonvanishing and the unconditional sum A_i + A_r are both insufficient guards. Boundary-exponent equality can be decoded into frequency and tangent-pairing equality, but no full wave-vector, propagation, on-shell, Fresnel, observable, or power conclusion is asserted."
+    done: true
+    location: "Physlib/Optics/Interfaces/PlanarDielectric/ElectricLabelMatching.lean (Optics.PlanarDielectricWaveConfiguration.incidentExponentJointElectricAggregate, Optics.PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryLabelMatching)"
+
   - description: "SpaceAndTime and Electromagnetism shall supply the local domains, oriented surfaces, traces or restrictions, integral vector calculus, and electromagnetic boundary laws required to state interfaces without encoding boundary conclusions as hypotheses inside Optics."
     done: false
     location: N/A
