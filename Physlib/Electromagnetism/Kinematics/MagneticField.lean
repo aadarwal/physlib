@@ -32,7 +32,9 @@ field strength matrix. This is an antisymmetric matrix.
 
 - A. The magnetic field
   - A.1. Relation between the magnetic field and the field strength matrix
-  - A.2. Divergence of the magnetic field
+  - A.2. Smoothness and differentiability of the magnetic field
+  - A.3. Divergence of the magnetic field
+  - A.4. The magnetic field on constructors
 - B. The field strength matrix in terms of the electric and magnetic fields
 - C. Magnetic field matrix
   - C.1. Antisymmetry of the magnetic field matrix
@@ -107,7 +109,36 @@ lemma magneticField_coord_eq_fieldStrengthMatrix {i : Fin 3} {c : SpeedOfLight}
 
 /-!
 
-### A.2. Divergence of the magnetic field
+### A.2. Smoothness and differentiability of the magnetic field
+
+-/
+
+/-- The magnetic field is `n` times continuously differentiable when its potential is `n + 1`
+times continuously differentiable. -/
+lemma magneticField_contDiff {n} {c : SpeedOfLight} {A : ElectromagneticPotential}
+    (hA : ContDiff ℝ (n + 1) A) : ContDiff ℝ n ↿(A.magneticField c) := by
+  rw [contDiff_euclidean]
+  intro i
+  change ContDiff ℝ n (fun tx : Time × Space => A.magneticField c tx.1 tx.2 i)
+  have heq : (fun tx : Time × Space => A.magneticField c tx.1 tx.2 i) = fun tx =>
+      - A.fieldStrengthMatrix ((toTimeAndSpace c).symm tx)
+        (Sum.inr (i + 1), Sum.inr (i + 2)) := by
+    funext tx
+    exact magneticField_coord_eq_fieldStrengthMatrix A tx.1 tx.2
+      (hA.differentiable (by simp))
+  rw [heq]
+  exact ((fieldStrengthMatrix_contDiff hA).comp
+    (ContinuousLinearEquiv.contDiff (toTimeAndSpace c).symm)).neg
+
+/-- The magnetic field is differentiable when its potential is twice continuously
+differentiable. -/
+lemma magneticField_differentiable {c : SpeedOfLight} {A : ElectromagneticPotential}
+    (hA : ContDiff ℝ 2 A) : Differentiable ℝ ↿(A.magneticField c) :=
+  (magneticField_contDiff (n := 1) hA).differentiable one_ne_zero
+
+/-!
+
+### A.3. Divergence of the magnetic field
 
 -/
 
