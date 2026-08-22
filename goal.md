@@ -95,6 +95,39 @@ For each capability, completion requires all of the following:
 A tuple of parameters plus a formula does not meet this criterion. A proof that merely unfolds a
 formula assumed in the definition also does not meet it.
 
+### B.4. Separate parity claims
+
+The project has three independently auditable completion claims. None implies either of the
+others.
+
+1. **Physical Optics v0.1 parity:** the connected electromagnetic, polarization, interface, and
+   observable slice in section A.1.
+2. **Integrated-photonics parity:** the component, chain, network, recurrence, Z-transform,
+   signal-flow, microring, cascade, and lattice capabilities in sections H.3 and H.4.
+3. **Extended HOL optical-suite parity:** the geometrical-, Gaussian-, and resonator-optics work in
+   section H.5 and any later named case studies explicitly added to its parity ledger.
+
+Integrated-photonics parity does not wait for the stronger Maxwell-to-boundary derivation in E4b;
+physical v0.1 does. Conversely, a completed physical v0.1 does not establish the transfer-system,
+Z-transform, or signal-flow capabilities of the integrated-photonics sources.
+
+### B.5. Source-to-Lean parity ledger
+
+Before any parity claim is made, `tbd.md` must point to a human-verified ledger whose mandatory rows
+record:
+
+- the primary source, definition or theorem number, and page;
+- the target public Lean declaration and import path;
+- the source and target port ordering, propagation direction, phase, attenuation, `z`/`q`, and dB
+  conventions;
+- every source hypothesis retained, strengthened, corrected, or deliberately rejected;
+- the proof status and exact symbolic regression ID; and
+- whether the result is a source-parity requirement, a stronger Physlib theorem, or contextual
+  evidence only.
+
+Parity means that every mandatory ledger row is proved through the named public APIs. Broad topic
+coverage, a formula stored in a definition, or a numerical plot is not parity evidence.
+
 ## C. Ownership and import layering
 
 The intended dependency direction is:
@@ -172,6 +205,10 @@ Ownership rules:
   mode-polarization specializations without assuming Jones purity.
 - [x] Jones outer-product coherency embeds coherent polarization into the general coherency type,
   with rank-at-most-one, determinant-zero, trace-intensity, unit-phase, and Jones-action laws.
+- [x] Relativity-independent Pauli matrices and the real basis of self-adjoint `2 × 2` complex matrices
+  live under Mathematics, with half-trace coefficients, a bundled real-linear equivalence,
+  reconstruction and scalar-vector identities, and compatibility imports for the former
+  Relativity API.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -180,9 +217,9 @@ Ownership rules:
   free space. In three spatial dimensions its two transverse electric components are
   `E₀ i * cos (k * c * t - k * x₀ + φ i)` when `k ≠ 0`.
 - `Electromagnetism.Vacuum.IsPlaneWave` supplies the existing real plane-wave predicate.
-- `Electromagnetism.ThreeDimension.MaxwellEquations` proves pointwise differential vacuum Maxwell
-  equations, but explicitly does not yet supply material constitutive laws, integral laws, or
-  boundary conditions.
+- `Electromagnetism.ThreeDimension.MaxwellEquations` contains pointwise differential vacuum
+  Maxwell equations, but E0 must first expose those declarations through the public module surface;
+  it does not yet supply material constitutive laws, integral laws, or boundary conditions.
 - `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure.
 - `SpaceAndTime.Space` supplies Euclidean geometry, derivatives, volume integration, and cross
   products, but not yet the complete oriented-surface and trace API needed for generic interface
@@ -242,43 +279,50 @@ polarization
   Mathlib --> P2a general coherency
   Mathlib --> P3a neutral Hermitian basis
   P1a --> P1b harmonic bridge, P2b pure coherency, P5a Malus, P6a retarder core
-  P2a --> P2b pure coherency, P3b Stokes cone
-  P3a --> P3b Stokes cone
-  P2b + P3b --> P3c Poincare classification
-  P1a + P2a + P3a + P3b --> P4 deterministic Mueller
+  P2a --> P2b pure coherency, P3b-1 Stokes/coherency cone
+  P3a --> P3b-0 neutral positive cone --> P3b-1 Stokes/coherency cone
+  P2b + P3b-1 --> P3b-2 Jones--Stokes bridge
+  P3b-1 + P3b-2 --> P3c Poincare classification
+  P1a + P2a + P3a + P3b-1 --> P4 deterministic Mueller
   P5a + E3b --> P5b physical Malus bridge
-  P1b + P2b + P3b/P4 + P5a/P5b + P6a + E3b --> P6b connected polarization chain
+  P1b + P2b + P3b-2/P4 + P5a/P5b + P6a + E3b --> P6b connected polarization chain
 
 electromagnetic v0.1
-  E1 media/macroscopic Maxwell --> E2 material waves, E3a real energy/Poynting, E4 boundary laws
+  E0 public Maxwell API --> E1 media/macroscopic Maxwell
+  E1 + E3s Space identity --> E3a real energy/Poynting
+  E1 --> E2 material waves, E4a local boundary semantics
   O1 + P1a + E2 + E3a --> E3b harmonic-flux and mode-normalization bridge
-  E2 + E4 --> E5 reflection/Snell/TIR
+  E2 + E4a --> E5 reflection/Snell/TIR
+  oriented surfaces/integral Maxwell + E4a --> E4b derived boundary laws
   E3b + E5 --> E6 Fresnel amplitudes/flux
-  P1b + P2b + P3b/P4 + P5b/P6b + E3b/E6 --> Optics v0.1
+  P1b + P2b + P3b-2/P4 + P5b/P6b + E3b/E4b/E6 --> Optics v0.1
 
 finite networks and integrated photonics
   O1 mode core --> O2/N1 modal completion --> N2a ports/routing
   O1 mode core --> N3 relational behaviors
-  O2/N1 + N2a + N3 --> N4 flat relational semantics --> N5 well-posed elimination
+  N3 --> N3T two-port chain semantics
+  O2/N1 + N2a + N3 --> N4 flat relational semantics --> N4C certified compiler
+  N4 + N4C --> N5 well-posed elimination
   N4 --> relational N5H flattening; N5 --> functional N5H subsystem packaging
   N2a + O2/N1 --> N7 behavior-specified components
   N5 + N7 --> N5F parameterized response domains
   N2a + N5 --> N6a conservation
   N2b reciprocity metadata + N6a --> N6b reciprocity
-  N5/N5F + N6a + N7 --> S1--S4 systems
+  P2a + N5 + N6a --> N6c coherent/incoherent network observables
+  N3T + N5/N5F + N6a + N7 --> S0--S4 systems
   Mathlib analysis --> S5 Z-transform
   N5 + finite graph API --> S6 Mason
-  N5H + S1--S6 --> S7 HOL case suite
+  N5H + S0--S6 --> S7 HOL case suite and cross-semantics oracle
 
-ray and beam parity
+ray and beam foundations
   E1/E5 --> R1 physical/paraxial rays --> R2 systems --> R3 imaging --> R4 Gaussian beams
   R4 --> R5 resonators
 ```
 
 P1a, P2a, P3a, O2/N1, N3, E1, and the mathematical audit for S5 are independent starting fronts.
 P2a/P3a do not wait for P1b; P5a/P6a core Jones calculations do not wait for Stokes, although P6b's
-comparison chain does. E1--E6 is the deepest physical prerequisite chain and must not be bypassed by
-assuming Fresnel coefficients. R1--R5 is a later functional-parity track; it should reuse E-track
+comparison chain does. E0--E6 is the deepest physical prerequisite chain and must not be bypassed
+by assuming Fresnel coefficients. R1--R5 is a later foundational track; it should reuse E-track
 medium and interface data where that does not force a false equivalence between exact wave optics
 and the paraxial approximation.
 
@@ -640,7 +684,7 @@ Deliverables:
 
 Exit: coherent and partially polarized states are represented without conflation.
 
-#### P3a. Neutral Hermitian/Pauli coordinates
+#### P3a. Neutral Hermitian/Pauli coordinates — complete
 
 Candidate location: an existing neutral matrix module, or a new neutral mathematical module only
 if the audit proves one is necessary.
@@ -654,19 +698,64 @@ Deliverables:
   the existing Relativity Pauli API re-exporting or delegating to it so current downstream imports
   and public names are preserved.
 
-#### P3b. Stokes coordinates and the physical cone
+Completion evidence: `Physlib.Mathematics.PauliMatrices.Basic` and `.SelfAdjoint` own the neutral
+matrix algebra and bundled real-linear coefficient equivalence; the former Relativity paths remain
+public compatibility/extension modules, and a full downstream build preserves every pre-existing
+declaration name.
+
+#### P3b-0. Neutral positive Pauli cone
+
+Owner: Mathematics.
+
+- Hermiticity of the Pauli-vector part;
+- `det A = scalarCoeff A ^ 2 - pauliRadius A ^ 2`; and
+- positive semidefiniteness exactly when `pauliRadius A ≤ scalarCoeff A`.
+
+The proof must not assume an eigenvalue ordering. A robust construction derives the forward
+inequality from trace and determinant nonnegativity and proves the converse from the Hermitian
+square of `pauliRadius A * I + vectorPart A`, handling zero radius separately.
+
+Exit: Optics can obtain the physical Stokes cone from reusable matrix mathematics rather than
+placing a general positivity theorem in a polarization namespace.
+
+#### P3b-1. Stokes coordinates and coherency cone
 
 Candidate location: `Physlib/Optics/Polarization/Stokes.lean`.
 
 Deliverables:
 
-- the audited Stokes reordering/factors relative to P3a and the convention-dependent `S₃` sign;
-- reality of all coordinates, explicit intensity, and three-dimensional polarization projection;
-- linear reconstruction for every raw real Stokes vector;
-- positive semidefiniteness exactly when intensity is nonnegative and polarization norm is at most
-  intensity; and
-- a physical-Stokes subtype bundling that cone condition rather than an unconditional inverse into
-  coherency data.
+- `StokesIndex := Fin 1 ⊕ Fin 3` and `StokesVector := EuclideanSpace ℝ StokesIndex`;
+- an explicit signed/reordered real-linear equivalence from P3a coordinates, with the provisional
+  Pauli-positive order `S₀ ↦ σ₀`, `S₁ ↦ σ₃`, `S₂ ↦ σ₁`, `S₃ ↦ σ₂`;
+- the reconstruction
+  `C(S) = 1/2 * (S₀ σ₀ + S₁ σ₃ + S₂ σ₁ + S₃ σ₂)`, or the version with the last sign negated if
+  the human convention gate selects the opposite optical `S₃` convention;
+- explicit intensity and three-dimensional polarization projection;
+- `IsPhysical S := ‖S.polarization‖ ≤ S.intensity`, with nonnegative intensity proved rather than
+  stored redundantly;
+- positive semidefiniteness of the reconstructed self-adjoint matrix exactly for physical Stokes
+  vectors; and
+- a plain equivalence between `PolarizationCoherency` and the physical-Stokes subtype.
+
+Every raw real Stokes vector reconstructs a self-adjoint matrix. Only a physical Stokes vector may
+reconstruct a `PolarizationCoherency`; the physical cone is not a vector subspace and must not be
+given a linear-equivalence or module API.
+
+#### P3b-2. Jones--Stokes bridge
+
+Candidate location: `Physlib/Optics/Polarization/JonesStokes.lean`.
+
+- define Jones-derived Stokes data through the already-proved pure coherency embedding;
+- prove Stokes intensity equals Jones intensity;
+- prove invariance under unit-modulus scaling and phase shift; and
+- prove all four explicit Jones-component formulas, which are the mandatory order, factor,
+  conjugation, and sign regressions.
+
+For the provisional Pauli-positive `S₃`, the component formulas are
+`S₀ = |E₀|² + |E₁|²`, `S₁ = |E₀|² - |E₁|²`,
+`S₂ = 2 re (E₀ conj E₁)`, and `S₃ = -2 im (E₀ conj E₁)`.
+Do not name right/left circular states until the observer and handedness convention is source-checked
+by the human author.
 
 #### P3c. Poincare classification
 
@@ -753,7 +842,7 @@ for Stokes or the electromagnetic bridge.
 
 Deliverables:
 
-- agreement of P6a Jones actions with the P2b/P3b coherency and Stokes descriptions;
+- agreement of P6a Jones actions with the P2b/P3b-2 coherency and Stokes descriptions;
 - induced P4 Mueller calculations;
 - a connected example starting at P1b's `harmonicWaveX` bridge and passing through a P5a polarizer
   and P6a wave plate; and
@@ -764,6 +853,19 @@ Exit: the connected polarization chain has all four reduced descriptions and its
 observables agree through named bridge theorems.
 
 ### H.2. Electromagnetic-interface milestone
+
+#### E0. Public three-dimensional Maxwell API
+
+Owner: Electromagnetism.
+
+- expose the existing `gaussLawElectric`, `gaussLawMagnetic`, `ampereLaw`, and `faradayLaw`
+  declarations through the public module surface;
+- preserve their statements and proofs; and
+- compile every present downstream consumer to show that this is an export repair rather than a
+  second Maxwell theory.
+
+Exit: E1 and its vacuum bridge can reuse the already-proved differential laws through a direct
+public import.
 
 #### E1. Homogeneous isotropic media
 
@@ -794,6 +896,17 @@ without ad hoc real tuples, and the governing equations distinguish free from bo
 
 Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
 
+#### E3s. Cross-product divergence identity
+
+Owner: SpaceAndTime.
+
+- prove `div (E × H) = H · curl E - E · curl H` for three-dimensional fields;
+- state only the differentiability hypotheses actually used by the derivative API; and
+- keep the result independent of electromagnetic field aliases and constitutive laws.
+
+Exit: E3a can derive energy balance from Maxwell equations without reproving general vector
+calculus inside Electromagnetism.
+
 #### E3a. Electromagnetic energy and Poynting flux
 
 Owner: Electromagnetism.
@@ -823,7 +936,7 @@ Owner: Optics, importing E3a.
 Exit: “lossless” and “power balance” can be interpreted as electromagnetic statements for the
 mode family covered by the theorem.
 
-#### E4. Planar interface and boundary laws
+#### E4a. Planar interface and local boundary semantics
 
 - oriented affine plane, tangential projection, two half-spaces, and incident-side convention;
 - total incident-plus-reflected and transmitted fields, their half-space restrictions/traces, and
@@ -831,11 +944,24 @@ mode family covered by the theorem.
 - tangential `E` and `H` and normal `D` and `B` boundary laws with free surface sources;
 - zero-free-surface-charge/current specializations, without claiming bound polarization charge is
   absent; and
-- derivation from integral Maxwell laws, or an explicitly tracked intermediate status if the first
-  PR only packages the local boundary predicate.
+- a clearly named local boundary predicate whose use is visible in every conditional reflection,
+  Snell, and Fresnel result.
 
-Exit: boundary equations are physical theorems or clearly named hypotheses, never disguised
-Fresnel formulas.
+Exit: exact plane-wave boundary calculations can proceed honestly from explicit local laws, at the
+same abstraction level as the audited HOL interface work.
+
+#### E4b. Maxwell derivation of the boundary laws
+
+Owner: SpaceAndTime and Electromagnetism.
+
+- local domains, oriented surfaces, traces or restrictions, and the required regularity API;
+- integral curl and divergence laws with orientation and boundary hypotheses;
+- integral Maxwell equations with volume and surface sources; and
+- derivation that E4a's tangential and normal boundary predicates hold under the corresponding
+  thin-loop and pillbox limits.
+
+Exit: the local laws used by E5/E6 become physical theorems from Maxwell equations. Physical
+Optics v0.1 requires this stronger exit; integrated-photonics work does not.
 
 #### E5. Reflection, refraction, and total internal reflection
 
@@ -878,10 +1004,16 @@ changes required by the network layer.
 
 #### N2a. Ports, channels, and convention-free routing — ready
 
-- a finite `PortModeFamily` and dependent flattened channel type `Σ p, Mode p`;
-- distinct incident and outgoing channel-end types;
-- compatible one-to-one connections, represented in the flat finite case by a fixed-point-free
-  involution on internal channels;
+- a `PortModeFamily` with dependent flattened channel type `Σ p, Mode p`, with finiteness required
+  only by finite operations;
+- nominally distinct incident and outgoing channel-end types with explicit canonical equivalences
+  and no coercion erasing the boundary;
+- a typed connection between distinct ports carrying an explicit equivalence between their mode
+  fibers;
+- the local mate permutation, fixed-point-free involution, and global no-endpoint-reuse property
+  derived from those typed connections rather than accepted as unstructured flat data;
+- ideal unit-gain routing obtained by reindexing identity, with its endpoint action and power
+  preservation proved;
 - channel relabeling and rephasing; and
 - power, passivity, and losslessness predicates that do not require choosing time-reversal data.
 
@@ -912,6 +1044,20 @@ package remains blocked on the decision in section L; it does not block N2a--N6a
 Exit: transfer matrices are derived views of suitable behavior, not the only possible component
 definition.
 
+#### N3T. Two-port chain semantics
+
+- typed left/right travelling-wave variables and an independently stated two-port behavior;
+- a chain-matrix view only when the behavior determines the required outputs;
+- scattering-to-chain and chain-to-scattering conversions with the exact transmission-block
+  invertibility hypotheses visible in their types or theorem statements;
+- behavioral equivalence and round trips for both conversions;
+- series connection as chain-matrix multiplication, proved from relational composition;
+- agreement with N5 netlist elimination and Redheffer feedback wherever both are defined; and
+- terminated-load reflection and transmission formulas.
+
+Exit: the transfer/chain calculations used by the audited cascade and microring sources are
+derived views of the same component behavior, not illicit multiplication of scattering matrices.
+
 #### N4. Scattering netlists and equations
 
 - disjoint-sum assembly of component incident and outgoing channel spaces;
@@ -927,6 +1073,20 @@ definition.
 - invariance under internal-channel reordering.
 
 Exit: network equations come from a typed netlist rather than being supplied independently.
+
+#### N4C. Certified finite-netlist compiler
+
+- finite executable data for ports, directed channel endpoints, component incidences, and gains;
+- decidable well-formedness checking for endpoint direction, mode compatibility, self-wiring,
+  reuse, and fan-out;
+- executable construction of `S`, `C`, `E_in`, and `E_out`;
+- a soundness theorem equating compiled equations with N4's flat relational semantics;
+- an algebraic backend over an appropriate field, with exact rational-function instantiation for
+  finite-delay responses; and
+- evaluation into `ℂ` away from every required denominator, proved to commute with compilation.
+
+Exit: exact executable fixtures test an implementation that is proved correct with respect to the
+kernel semantics; a noncomputable complex matrix inverse is not the sole oracle.
 
 #### N5. Well-posed elimination
 
@@ -1000,6 +1160,17 @@ Exit: system-level conservation is a theorem from component properties and wirin
 
 Exit: reciprocity is available without blocking the convention-free conservation and system work.
 
+#### N6c. Coherent and incoherent network observables
+
+- modal coherency transport `Γ_out = H * Γ_in * Hᴴ` for a well-posed response `H`;
+- output powers from diagonal entries or trace, connected to N6a's normalization conventions;
+- rank-one coherent inputs and diagonal incoherent inputs;
+- the vanishing of interference cross terms under the stated decorrelation hypothesis; and
+- passivity and conservation corollaries for coherency transport.
+
+Exit: coherent and incoherent system claims are represented by explicit second-order data rather
+than by silently deleting phase-sensitive cross terms from complex amplitudes.
+
 #### N7. Reusable finite-mode components
 
 - basic component definitions may start after N2a and the O2 direct-sum/reindexing support, before
@@ -1019,6 +1190,21 @@ lemma, parameter validity, and intensity/power classification suitable for autom
 proofs. Reciprocity extensions are added only after N2b/N6b conventions are available.
 
 ### H.4. Integrated-photonic system milestone
+
+#### S0. Physical microring realization
+
+- ring parameters for through/cross amplitude coefficients, optical path length, field attenuation,
+  effective index or propagation constant, and wavelength/frequency;
+- validity predicates distinguishing field from power attenuation and amplitude from power
+  coupling coefficients;
+- one-bus/all-pass and two-bus/add-drop typed port topologies;
+- an independent relation between internal and external travelling fields;
+- realization from N7 couplers and propagation delays; and
+- proofs that each realization satisfies its field relation and induces the source-level
+  transfer/chain matrices under their actual nondegeneracy hypotheses.
+
+Exit: microring formulas are consequences of a physically parameterized component realization,
+not the defining fields of a formula container.
 
 #### S1. Mach-Zehnder interferometer
 
@@ -1061,16 +1247,42 @@ proofs. Reciprocity extensions are added only after N2b/N6b conventions are avai
   out input/output cancellation or hidden unreachable/unobservable singular modes; and
 - no claim of rational dependence on physical frequency without the required model.
 
+#### S4P. Poles, zeros, stability, and frequency response
+
+- reduced rational responses and their evaluation domains;
+- zeros and transfer-function poles after cancellation, distinct from candidate singularities of
+  the internal network operator;
+- degree and finiteness bounds;
+- a reachability/observability or explicit no-cancellation criterion connecting internal
+  singularities to actual poles;
+- discrete-time Schur stability and BIBO equivalence only for a stated proper causal rational
+  class;
+- frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention; and
+- group delay and dispersion through a local logarithmic derivative or another branch-audited
+  construction, not an unqualified global complex argument.
+
+Names must state literal mathematical content. In particular, source terminology that calls all
+zeros inside the unit disk a “resonance condition” is not adopted without a separate physical
+resonance theorem.
+
 #### S5. Difference equations and Z-transform
 
 - causal complex sequences with zero extension;
 - finite convolution and linear recurrences with initial conditions;
-- analytic unilateral Z-transform and region of convergence;
-- linearity and correctly stated delay/advance laws;
+- analytic unilateral Z-transform with conditional and absolute convergence regions kept
+  distinct;
+- linearity, causal right-delay, and left-shift laws with their startup terms;
+- first differences, `z`-domain scaling, and any complex-differentiation law required by a
+  mandatory source-ledger row;
 - recurrence-to-transfer theorem under summability and initial-condition hypotheses;
+- general IIR and frequency-response theorems, including the audited second-order low-pass
+  regression;
 - absolute-summability/BIBO stability results and their relation to poles and the region of
   convergence for the selected causal rational class; and
 - connection between coefficient recurrences and the formal power-series view.
+
+Inverse-transform uniqueness is not required for source parity unless a later mandatory ledger row
+needs it.
 
 #### S6. Signal-flow graphs and Mason's rule
 
@@ -1084,6 +1296,11 @@ proofs. Reciprocity extensions are added only after N2b/N6b conventions are avai
 - equality with the corresponding entry of `(I - A)⁻¹`; and
 - extraction from suitable scalar network models.
 
+The graph representation must support executable and proved-correct enumeration of simple forward
+paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
+families, and parallel edges as distinct branches. A simple digraph that collapses parallel edges
+does not meet this milestone.
+
 The ordinary commutative Mason formula is applied only after expanding a multimode network into
 scalar channel nodes. Matrix-valued edge gains do not commute and require a different theorem; do
 not claim the scalar formula for them.
@@ -1091,15 +1308,43 @@ not claim the scalar formula for them.
 #### S7. HOL-equivalence case suite
 
 - one-port/all-pass and four-port/add-drop ring;
-- coupled and double-coupled ring examples after the single-ring API stabilizes;
+- a source-mapped double-coupled double-ring example;
 - transfer amplitude, spectral power, resonance, and rejection-ratio results;
 - at least one difference-equation/Z-transform derivation; and
-- at least one signal-flow/Mason derivation proved equal to network elimination.
+- at least one signal-flow/Mason derivation proved equal to network elimination; and
+- for an eligible ring and the DCDR case, a cross-semantics theorem equating relational behavior,
+  compiled elimination, chain response, feedback algebra, Mason gain, and recurrence/Z response on
+  the intersection of their domains.
+
+The cross-semantics theorem keeps three conditions distinct: algebraic feedback requires an
+invertible internal operator; an infinite round-trip series requires contraction or summability;
+and a Z-transform identity additionally requires causality and a stated convergence region.
+
+#### S7D. DCDR parity suite
+
+- the human-audited eight-node, eleven-edge topology with parallel edges retained;
+- the transfer result by N5 elimination and independently by S6 Mason gain;
+- active/passive, unit-delay, and multiple-delay specializations;
+- coherent and incoherent interpretations through N6c;
+- poles, zeros, and stability results; and
+- an exact or interval-certified, human-audited version of the source's reported unstable passive
+  parameter case.
+
+#### S7C. Periodic cascade and lattice parity suite
+
+- arbitrary heterogeneous microring cascades;
+- an identical-`N` cascade as a chain-matrix power;
+- a Sylvester/Chebyshev closed form with its actual determinant and trace-domain assumptions;
+- terminated reflection and transmission;
+- coupled and uncoupled row/column decompositions;
+- the mandatory `M × N` lattice theorem; and
+- the source-mapped add-drop and quadruple-ring cases.
 
 Exit for H.4: the integrated-photonics results in the cited HOL program can be reproduced as
-instances of a more general typed system API.
+instances of a more general typed system API, and every mandatory row in the integrated-photonics
+parity ledger is discharged by a public declaration and regression.
 
-### H.5. Ray, imaging, Gaussian-beam, and resonator milestone
+### H.5. Foundational ray, imaging, Gaussian-beam, and resonator milestone
 
 #### R1. Physical and paraxial rays
 
@@ -1137,8 +1382,13 @@ instances of a more general typed system API.
 - Fabry-Perot, ring, and selected phase-conjugate resonators; and
 - agreement between ray-stability and Gaussian fixed-point views where applicable.
 
-Exit for H.5: the principal ray- and Gaussian-optics theorem classes and representative system
-analyses of the broader HOL work are available through reusable Physlib definitions.
+Exit for H.5: the principal reusable ray-, Gaussian-, and resonator-optics foundations and their
+representative system analyses are available through Physlib definitions. This is not by itself a
+claim of full extended-suite parity. Such a claim additionally requires mandatory ledger rows for
+the selected source case studies, potentially including corrective-eye and thick-lens examples,
+Gaussian intensity and output-waist formulas, arbitrary-`N` resonator unfolding, receiver and
+fiber-rod-lens analyses, phase-conjugated rings, and any nonlinear-map or chaos results retained
+after a separate scope and physics review.
 
 ### H.6. Later connected extensions
 
@@ -1226,12 +1476,33 @@ universal continuous-frequency property.
 | N-09 | external response is a transform and specializes to scattering only under paired complete ports | false square-port identification |
 | N-10 | parameter evaluation commutes with compilation and N5 elimination on the well-posed domain | disconnected frequency-response model |
 | N-11 | singular flat-netlist behavior still equals relational component composition | solver accidentally defines semantics |
+| H-01 | independently stated two- and four-port ring behaviors imply their chain matrices | formula stored as behavior or wrong travelling-wave orientation |
+| H-02 | scattering/chain conversion round trips under the exact transmission-block hypotheses | illicit inverse or port-order error |
+| H-03 | arbitrary cascade behavior equals the folded chain matrix | multiplication-order or behavior/matrix mismatch |
+| H-04 | an identical-`N` cascade equals the corresponding matrix power | incorrect finite-fold specialization |
+| H-05 | the Sylvester/Chebyshev cascade form holds with its determinant and trace-domain assumptions | overgeneralized closed form |
+| H-06 | terminated-cascade reflection and transmission agree with relational termination | load-orientation or denominator error |
+| B-01 | contraction feedback series converges to the algebraic inverse response | unjustified geometric series |
+| B-02 | a noncontractive but invertible feedback example remains well posed | contraction treated as necessary |
+| B-03 | the source-mapped nested feedback/sum/pickoff identity follows from common behavior semantics | block-algebra orientation error |
 | S-01 | balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
 | S-02 | microring elimination and convergent round-trip series agree | feedback orientation errors |
 | S-03 | microring transfer, power, resonance, and rejection specializations | hidden nondegeneracy assumptions |
+| S-04 | physical add-drop realization yields the exact transfer response | disconnected ring formula |
+| S-05 | add-drop power and rejection ratio satisfy their positivity and logarithm domains | amplitude/power or dB-convention error |
+| S-06 | the audited eight-node DCDR response agrees between elimination and Mason gain | graph topology or path/loop error |
+| S-07 | DCDR pole/zero/stability theorems include the audited unstable parameter case | cancellation or strictness error |
+| S-08 | the `M × N` lattice flattening agrees with its row/column decomposition | hierarchy or cascade-index error |
 | T-01 | Z-transform delay law records ROC and initial conditions | false signal-processing identity |
 | T-02 | recurrence, rational transfer function, and network response agree | domain-model mismatch |
+| T-03 | conditional and absolute convergence regions are not identified | overstated ROC or BIBO theorem |
+| T-04 | general IIR and audited second-order low-pass responses follow from recurrence semantics | formula-only Z-transform development |
+| T-05 | the selected `q = z⁻¹` translation commutes with evaluation | reversed delay/frequency convention |
 | G-01 | Mason gain equals the matrix-inverse transfer for representative graphs | path/loop enumeration errors |
+| G-02 | distinct parallel branches remain distinct in compilation and Mason enumeration | digraph edge collapse |
+| G-03 | self-loops, touching loops, and non-touching loop families have the audited gains/signs | cycle quotient or determinant error |
+| G-04 | DCDR Mason response equals the independently compiled elimination response | same-formula circularity |
+| X-01 | one ring and one DCDR satisfy the full relational/compiled/chain/feedback/Mason/Z cross-semantics equality on the common domain | abstraction layers disagree despite local proofs |
 | R-01 | arbitrary valid system transports a ray by the folded component matrix | multiplication-order errors |
 | R-02 | cardinal-point formulas satisfy their behavioral specifications | formula-only definitions |
 | R-03 | Gaussian beam satisfies the paraxial equation and ABCD law | unconnected beam algebra |
@@ -1297,7 +1568,7 @@ upstream ownership decision, record the exact decision needed and work on an ind
 ## L. Decision gates requiring explicit human confirmation
 
 - [ ] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
-  circular and `S₃` sign.
+  circular and `S₃` sign, including whether the observer looks along propagation or into the beam.
 - [ ] Confirm whether the first material-medium API should use current raw real field values or wait
   for a stronger dimensional-units refactor.
 - [ ] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
@@ -1307,6 +1578,17 @@ upstream ownership decision, record the exact decision needed and work on an ind
   coefficients scale full electric-vector amplitudes or tangential components.
 - [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
+- [ ] Confirm chain-matrix port ordering, travelling-wave direction, and scattering-to-chain block
+  convention before N3T source-parity names are fixed.
+- [ ] Confirm that every ring model distinguishes field from power attenuation and amplitude from
+  power coupling coefficients.
+- [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
+  startup term before S4/S5 identities are named.
+- [ ] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
+- [ ] Confirm whether each stability condition is strict or non-strict and whether it concerns
+  poles, zeros, an internal operator, BIBO behavior, or a source-specific named condition.
+- [ ] Replace source decimal examples by human-audited exact data or certified intervals and record
+  every source assumption that the Lean statement strengthens, corrects, or rejects.
 - [ ] Confirm the exact HOL source licenses before adapting any source implementation.
 - [ ] Independently verify every bibliography item, URL, page range, and physics claim used in a PR.
 - [ ] Conduct all maintainer/reviewer communication and certify every contributed line.
@@ -1321,6 +1603,8 @@ upstream ownership decision, record the exact decision needed and work on an ind
 | Jones vectors are used for partially polarized light | mathematically excludes intended states | general PSD coherency type and explicit pure embedding |
 | Matrix inverse is used at a resonance/singularity | false physical transfer formula | well-posedness first; inverse only under determinant/unique-solution proof |
 | Feedback is represented by ordinary matrix multiplication | wrong reflective-network semantics | wrapped scattering matrices and equation-based elimination |
+| Scattering matrices are multiplied as source chain matrices | wrong two-port cascade semantics | N3T behavioral chain view and proved scattering/chain conversions |
+| A numerical or noncomputable solver is treated as an executable verification oracle | fixtures can agree with an unverified compiler | N4C decidable compilation plus semantic soundness theorem |
 | Incident/output exposure maps are collapsed to one untyped matrix | ill-shaped equations and silent port-identification errors | distinct channel wrappers, `E_in`/`E_out`, and projection/completeness proofs |
 | A rectangular external response is called a scattering matrix | unproved identification of input and output ports | retain `ModeTransform U Y` until pairing and completeness specialize it |
 | The inverse solver is used as the network's definition | singular but meaningful implicit behaviors disappear | define flat relational semantics before well-posed elimination |
@@ -1330,12 +1614,15 @@ upstream ownership decision, record the exact decision needed and work on an ind
 | Transmission power is treated as `normSq t` alone | incorrect oblique-interface balance | prove normal-admittance flux factor |
 | Geometric series contraction is treated as necessary | excludes well-posed resonators | distinguish algebraic inversion from convergent round-trip expansion |
 | Z-transform delay law ignores startup terms | false recurrence result | causal zero extension, ROC, and initial-condition hypotheses |
+| Conditional convergence is called absolute convergence | false ROC, product, or BIBO conclusions | distinct convergence predicates and regression T-03 |
 | Rationality in delay is confused with rationality in frequency | invalid dispersive model | typed variables and explicit evaluation map |
 | Every internal singularity is labeled a transfer-function pole | false poles survive despite input/output cancellation or hidden modes | call them candidate poles until reachability/observability or no-cancellation is proved |
 | `s`/`p` coordinates are used at normal incidence without a tangent-frame choice | undefined basis disguised as a canonical formula | require oblique incidence or carry an independently selected tangent frame |
 | Signed wavenumber silently changes temporal frequency and circular handedness | inconsistent R/L and `S₃` results | positive carrier frequency with propagation direction represented separately |
 | Fresnel `p` amplitudes mix tangential and full-vector conventions | sign and admittance factors disagree across layers | oriented per-wave bases and one explicit coefficient convention |
 | A component is only a stored formula with a property label | formula-to-itself proofs provide no behavioral verification | independent behavior specification plus realization theorem |
+| Field attenuation or coupling amplitude is used as a power fraction | squared-factor errors in ring observables | distinct parameter documentation, validity predicates, and S-05 |
+| Incoherent power is modeled by deleting amplitude cross terms | phase-sensitive behavior is silently changed | N6c coherency transport and explicit decorrelation hypotheses |
 | Reciprocity conventions block ordinary routing/conservation | unnecessary critical-path stall | isolate N2b/N6b from convention-free N2a/N6a |
 | Ray, wave, and Gaussian models are silently identified | abstraction error | bridge theorems or explicit approximation assumptions |
 | Mason's scalar formula is applied to matrix-valued gains | invalid reordering of noncommuting products | scalarize to channel nodes before graph extraction |
@@ -1359,39 +1646,51 @@ current integration base; a designed package whose prerequisite is merely active
 | P1b harmonic bridge | done | P1a, existing harmonic wave | named-frame electric/magnetic field reconstruction |
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
 | P2b pure coherency | done | P1a, P2a | outer-product/rank/trace/phase/conjugation suite |
-| P3a neutral Hermitian basis | ready | matrix API audit | coordinate extraction/reconstruction suite |
-| P3b Stokes cone | blocked | P2a, P3a | physical-cone equivalence and canonical coordinates |
-| P3c Poincare classification | blocked | P2b, P3b | ball/sphere/mixed-state suite |
-| P4 deterministic Mueller | blocked | P1a, P2a, P3a, P3b | real induced action and composition suite |
+| P3a neutral Hermitian basis | done | matrix API audit | neutral basis, bundled coordinate equivalence, compatibility wrappers, and full downstream build |
+| P3b-0 neutral positive cone | ready | P3a | determinant and PSD/radius criterion |
+| P3b-1 Stokes/coherency cone | blocked | P2a, P3b-0 | raw linear reconstruction and physical-cone equivalence |
+| P3b-2 Jones--Stokes bridge | blocked | P2b, P3b-1 | explicit components and phase-invariance suite |
+| P3c Poincare classification | blocked | P3b-1, P3b-2 | ball/sphere/mixed-state suite |
+| P4 deterministic Mueller | blocked | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
 | P5a Jones polarizer/Malus | ready | P1a | projection, intensity contraction, and linear-input Malus suite |
 | P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
 | P6a retarder core | ready | P1a | unitary Jones action and canonical-state suite |
-| P6b polarization chain | blocked | P1b, P2b, P3b, P4, P5a/P5b, P6a, E3b | cross-representation connected example |
-| E1 media/macroscopic Maxwell | ready | Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
+| P6b polarization chain | blocked | P1b, P2b, P3b-2, P4, P5a/P5b, P6a, E3b | cross-representation connected example |
+| E0 Maxwell public API | ready | existing three-dimensional Maxwell module | exported vacuum-law declarations and downstream build |
+| E1 media/macroscopic Maxwell | blocked | E0, Electromagnetism/FreeSpace review | medium API, field predicate, and vacuum bridge |
 | E2 material plane waves | blocked | E1 | real Maxwell field and Optics phasor theorems |
-| E3a Poynting | blocked | E1 for material conservation | real vacuum/material energy and flux suite |
+| E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
+| E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
-| E4 boundary laws | blocked | E1, surface/integral design decision | Maxwell-to-local-boundary theorem |
-| E5 reflection/Snell/TIR | blocked | E2, E4 | phase-matching geometry suite |
+| E4a local boundary semantics | blocked | E1, local-domain design | explicit conditional boundary predicate |
+| E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
+| E5 reflection/Snell/TIR | blocked | E2, E4a | phase-matching geometry suite |
 | E6 Fresnel/flux | blocked | E3b, E5 | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
+| N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
-| N5 elimination | blocked | N4 | unique-solvability/inverse/external-map suite |
+| N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
+| N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
 | N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
 | N6a conservation | blocked | N2a, N5; E3b for physical meaning | passive/lossless composition closure suite |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
+| N6c coherent/incoherent observables | blocked | P2a, N5, N6a | coherency transport and decorrelation suite |
 | N7 components | blocked | N2a, O2; E6 only for interface specialization | specification, realization, passivity, and losslessness suite |
+| S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
 | S1 Mach-Zehnder | blocked | N5, N6a, N7 | transfer and power suite |
-| S2/S3 microrings | blocked | N5, N5F, N6a, N7 | pointwise response and observable suite |
+| S2/S3 microrings | blocked | S0, N5, N5F, N6a, N7 | pointwise response and observable suite |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
+| S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | ready | Mathlib analysis audit | recurrence/ROC suite |
 | S6 Mason | blocked | N5, finite graph audit | combinatorial/matrix equivalence |
-| S7 HOL integrated parity | blocked | N5H, S1--S6 | case-study index |
-| R1--R5 ray/beam parity | future | E1/E5 plus focused ray API map | ray, imaging, ABCD, resonator suite |
+| S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
+| S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
+| S7C cascade/lattice parity | blocked | N3T, N5H, S0, S4P | finite cascade and lattice suite |
+| R1--R5 ray/beam foundations | future | E1/E5 plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 
 ## O. Overall completion checklist
@@ -1399,12 +1698,14 @@ current integration base; a designed package whose prerequisite is merely active
 The long-running goal is complete only when:
 
 - [ ] the polarization milestone P1a--P6b, including every lettered subpackage, is complete;
-- [ ] the electromagnetic-interface milestone E1--E6, including E3a/E3b, is complete;
-- [ ] the typed finite-network milestone N1--N7, including N2a/N2b, N5F/N5H, and N6a/N6b, is
+- [ ] the electromagnetic-interface milestone E0--E6, including E3s/E3a/E3b and E4a/E4b, is
   complete;
-- [ ] the integrated-photonics milestone S1--S7 reproduces the target HOL capability classes;
-- [ ] the ray/beam milestone R1--R5 reproduces the target geometrical/quasi-optics capability
-  classes;
+- [ ] the typed finite-network milestone N1--N7, including N3T, N4C, N5F/N5H, and N6a/N6b/N6c,
+  is complete;
+- [ ] the integrated-photonics milestone S0--S7C reproduces every mandatory source-ledger row and
+  includes the cross-semantics oracle;
+- [ ] the ray/beam milestone R1--R5 is complete as a foundation, and any claim of extended HOL-suite
+  parity additionally discharges its selected named case-study ledger;
 - [ ] the cross-layer regression suite in section I passes from shared public definitions;
 - [ ] every completed public requirement is accurately reflected in focused API maps;
 - [ ] all builds and linters pass except independently reproduced and documented upstream-baseline
@@ -1421,6 +1722,15 @@ The long-running goal is complete only when:
   Systems*](https://hvg.ece.concordia.ca/Publications/Conferences/SysCon-15.pdf), IEEE SysCon 2015.
 - U. Siddique, S. M. Beillahi, and S. Tahar, [*On the Formal Analysis of Photonic Signal Processing
   Systems*](https://doi.org/10.1007/978-3-319-19458-5_11), FMICS 2015.
+- U. Siddique et al., [DATE 2014 integrated-optics system
+  analysis](https://hvg.ece.concordia.ca/Publications/Conferences/DATE14.pdf), for finite cascades,
+  matrix powers, terminated systems, and periodic lattice results.
+- U. Siddique et al., [FMICS 2015 signal-flow
+  analysis](https://hvg.ece.concordia.ca/Publications/Conferences/FMICS15_1.pdf), for directed
+  signal-flow graphs, Mason gain, DCDR, poles, zeros, group delay, and dispersion.
+- U. Siddique et al., [ITP 2014 Z-transform
+  formalization](https://hvg.ece.concordia.ca/Publications/Conferences/ITP14-1.pdf), for unilateral
+  transforms, regions of convergence, shifts, recurrence solutions, and IIR examples.
 - S. Khan-Afshar et al., [*Formal Analysis of Optical Systems*](https://arxiv.org/abs/1403.3039),
   2014.
 - M. U. Siddique, [*Formal Analysis of Geometrical Optics using Theorem
@@ -1443,23 +1753,26 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, and P2b are complete, independently reviewed, validated, and integrated.
+1. P1a, P1b, P2a, P2b, and P3a are complete, independently reviewed, validated, and integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
-   carries no Jones-purity assumption, and zero Jones data has no polarization direction.
+   carries no Jones-purity assumption, the Pauli coordinates remain basis-fixed but independent of
+   Relativity and Optics conventions, and zero Jones data has no polarization direction.
 2. O2/N1 is complete, including predicate characterizations, binary parallel composition,
    relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
    the distinction between incident and outgoing channel ends and do not encode feedback as
    ordinary matrix multiplication.
-3. Audit and develop P3a's neutral Hermitian basis, then use it with P2a and P2b for the physical
-   Stokes cone and Poincare classification without identifying mixed states with Jones vectors.
-4. Start E1's medium and macroscopic-Maxwell layer independently so the new harmonic bridge can
-   later acquire Poynting-flux normalization and meet the material-interface track.
+3. Prove P3b-0's neutral Pauli positivity criterion, then build P3b-1's raw/physical Stokes and
+   coherency equivalence. Add the P3b-2 Jones bridge only through pure coherency and withhold
+   right/left circular names until the human handedness gate is resolved.
+4. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
+   the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
+   track.
 5. P5a polarizers/Malus and P6a retarders are also unblocked, but keep them as separate component
    PR concepts and do not translate Jones intensity into physical power before E3b.
-6. Audit E1 against the existing electromagnetic constant structures and prepare a focused
-   medium API proposal. Do not merge E1 until its dimensional and ownership choices receive human
-   confirmation.
+6. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
+   infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
+   compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
 The first session should not jump directly to a polarizer, microring formula, or Fresnel
 coefficient. Those would be easy isolated calculations but would evade the dependency structure

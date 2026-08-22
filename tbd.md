@@ -46,6 +46,15 @@ PR unless maintainers explicitly ask to retain it.
   Poynting flux. Until then, modal power and losslessness are terms internal to the stated
   power-normalization convention, not field-level energy theorems.
 
+## Polarization conventions
+
+- [ ] Human-check the third Stokes-coordinate sign against the selected optics reference, the
+  existing `Re (z * exp (I * (ωt - kx)))` carrier convention, and Jones coordinate order.
+- [ ] Record whether the observer looks along propagation or into the beam before assigning
+  right/left circular names. Until then use only “positive/negative third Stokes coordinate.”
+- [ ] Verify the exact H/V/D/A and positive/negative circular Jones vectors and reconstructed real
+  field rotation before completing regression P-04.
+
 ## Modal and network semantics
 
 - [x] Use `EuclideanSpace ℂ ι` for finite power-orthogonal amplitude families so the canonical
@@ -72,6 +81,9 @@ PR unless maintainers explicitly ask to retain it.
 
 ## Source and license checks
 
+- [ ] Create and human-verify the source-to-Lean parity ledger required by `goal.md` B.5. Every
+  mandatory row must record a source theorem/definition and page, public Lean target, regression
+  ID, convention map, hypothesis delta, and proof status.
 - [ ] Confirm the license of every Concordia HOL Light script before adapting any implementation.
   Until confirmed, use those scripts only as architectural and theorem-selection references; no
   source text or proof code has been copied into this branch.
@@ -79,6 +91,12 @@ PR unless maintainers explicitly ask to retain it.
   revision, and compatible license in the relevant PR.
 - [ ] Record exact source pages for Fresnel power factors, total internal reflection, polarization
   conventions, microring dispersion, and every other nontrivial physics claim used in code.
+- [ ] Audit field versus power attenuation, amplitude versus power coupling coefficients, phasor
+  time sign, chain direction and port ordering, `z` versus `q = z⁻¹`, dB/logarithm conventions,
+  rejection-ratio parentheses, and strict versus non-strict stability inequalities.
+- [ ] Record every source hypothesis strengthened, corrected, or rejected by a Lean theorem.
+- [ ] Replace source decimal examples by exact values or certified intervals before using them as
+  regression evidence.
 
 ## Validation before an upstream proposal
 
@@ -104,7 +122,13 @@ PR unless maintainers explicitly ask to retain it.
   and lossless energy-flux balance from electromagnetic boundary conditions rather than assuming
   those conclusions.
 - [ ] Integrated-photonic circuit work receives a focused design review covering ports, behaviors,
-  well-posed network elimination, directional couplers, Mach-Zehnder interferometers, microrings,
-  transfer functions, and signal-flow calculations before promotion from the fork.
-- [ ] Ray optics, Fourier optics, and bosonic quantum-optics bridges remain later milestones with
-  separate ownership and dependency reviews.
+  two-port chain semantics, certified netlist compilation, well-posed network elimination,
+  directional couplers, Mach-Zehnder interferometers, physical microring realization, transfer
+  functions, coherent/incoherent observables, and signal-flow calculations before promotion from
+  the fork.
+- [ ] Any integrated-photonics parity claim includes the named DCDR and periodic-cascade/lattice
+  suites plus a cross-semantics theorem, not merely generic network infrastructure.
+- [ ] R1--R5 is described as a foundational ray/beam milestone unless a separately audited ledger
+  includes every named source case study required for extended HOL-suite parity. Fourier optics and
+  bosonic quantum-optics bridges remain later milestones with separate ownership and dependency
+  reviews.
