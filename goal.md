@@ -263,6 +263,11 @@ Ownership rules:
   and complete source-free Maxwell results. A fixed-vacuum regression proves full electric-field
   and magnetic-induction agreement with the existing potential-derived `harmonicWaveX`
   construction.
+- [x] Non-normal incidence now selects the proof-bearing Jones order `(s, p)` with
+  `s = normalize (n × k)` and `p = k × s`; a generic one-axis constructor keeps the tangent
+  choice explicit at normal incidence. Exact coordinate regressions pin both the non-normal axes
+  and the normal-incidence reversal of the derived `p` axis without assigning incoming/outgoing,
+  Fresnel, irradiance, or power semantics.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -299,7 +304,8 @@ Ownership rules:
 - `ClassicalMechanics.WaveEquation` supplies real plane waves and harmonic-wave infrastructure.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
-  cross-product bilinearity, and vector triple-product identities needed by E2's Maxwell proofs.
+  cross-product bilinearity, vector triple-product identities, and the inner product of two cross
+  products needed by E2's Maxwell and incidence-frame proofs.
 - `SpaceAndTime.Space` supplies Euclidean geometry, derivatives, volume integration, and cross
   products, but not yet the complete oriented-surface and trace API needed for generic interface
   derivations.
@@ -1104,8 +1110,12 @@ sources.
   converse, the nonzero-candidate characterization, and on-shell `E`/`B`/`H` relations;
 - [x] an Optics-owned complex-harmonic/phasor representation importing the real field theorem and
   a fixed-vacuum regression against the existing representation bridge;
-- [ ] polarization-basis decomposition into `s` and `p` modes for oblique incidence, with an
-  independently chosen tangent frame for normal incidence; and
+- [x] canonical `s = normalize (n × k)` and `p = k × s` full-vector polarization axes and
+  Jones decomposition for non-normal incidence, including grazing geometry but no positive-power
+  claim;
+- [x] a polarization-frame constructor from an independently selected unit transverse axis for
+  normal incidence, with an exact regression proving that reversing propagation preserves the
+  selected `s` axis and negates the derived `p` axis; and
 - [ ] a complex-wavevector representation and outgoing/decaying branch for evanescent fields.
 
 Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
@@ -1875,7 +1885,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, oriented Jones/phasor frame, phase coherence, and vacuum regression complete; s/p incidence and evanescent layers remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, oriented Jones/phasor frame, phase coherence, vacuum regression, and non-normal/selected-tangent s/p incidence complete; complex-wavevector and evanescent layers remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
@@ -1997,9 +2007,11 @@ human verification recorded in `tbd.md`.
    differential laws, source-free Maxwell solution, honest nonzero-amplitude converse, and
    on-shell `B`/`H` relations. Preserve E2c's local oriented-frame Jones embedding, exact
    quadrature and `E`/`B`/`H` realizations, coherent-phase time translation, complete material
-   Maxwell endpoint, and fixed-vacuum field regression. Proceed next to the oblique-incidence
-   `s`/`p` frame, keeping normal incidence explicitly dependent on selected tangent data and
-   withholding power claims until Poynting-flux normalization.
+   Maxwell endpoint, fixed-vacuum field regression, and proof-bearing incidence geometry:
+   `s = normalize (n × k)`, `p = k × s`, Jones order `(s, p)`, explicit tangent selection at
+   normal incidence, and exact orientation regressions. Proceed next to the complex-wavevector and
+   outgoing/decaying evanescent layer while withholding power claims until Poynting-flux
+   normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -2010,7 +2022,7 @@ human verification recorded in `tbd.md`.
 The next session should not jump directly to a microring formula or stored Fresnel coefficient.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies. With E2's real material-Maxwell layer and its oriented
-Jones/phasor realization now connected, the next physical-optics front is the oblique-incidence
-`s`/`p` geometry needed by planar interfaces, followed separately by the complex-wavevector and
-decaying-branch model for evanescent fields. The independent circuit front remains N2a/N3.
+medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, oriented
+Jones/phasor realization, and non-normal plus selected-tangent incidence frames now connected, the
+next physical-optics front is the complex-wavevector and outgoing/decaying-branch model for
+evanescent fields. The independent circuit front remains N2a/N3.

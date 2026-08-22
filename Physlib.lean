@@ -195,6 +195,8 @@ public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
 public import Physlib.Optics.Polarization.Frame
 public import Physlib.Optics.Polarization.HarmonicWave
+public import Physlib.Optics.Polarization.IncidenceFrame
+public import Physlib.Optics.Polarization.IncidenceFrameRegression
 public import Physlib.Optics.Polarization.JonesCoherency
 public import Physlib.Optics.Polarization.JonesPoincare
 public import Physlib.Optics.Polarization.JonesStokes

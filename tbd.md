@@ -152,6 +152,21 @@ PR unless maintainers explicitly ask to retain it.
   positive `κ`, carrier phases agree, and the complete `E` and `B` fields equal the existing
   potential-derived `harmonicWaveX` fields. The comparison intentionally proves field equality,
   not equality of potentials or gauges.
+- [ ] Human-check E2d's non-normal incidence convention: for oriented interface normal `n` and
+  propagation direction `k`, `IsNonNormalIncidence` means exactly `n × k ≠ 0`,
+  `s = normalize (n × k)`, `p = k × s`, and Jones axes are ordered `(s, p)`. This includes
+  grazing geometry, excludes both parallel and antiparallel normal incidence, and does not by
+  itself classify a wave as incident, reflected, or transmitted.
+- [ ] Human-check that E2d's Jones coordinates are full unit-vector electric-field amplitudes, not
+  tangential `p` amplitudes. The exact `(3/5, 0, 4/5)` regression gives
+  `s = (0, 1, 0)` and `p = (-4/5, 0, 3/5)`. With a selected `(0, 1, 0)` tangent at normal
+  incidence, forward and backward propagation share `s` while their `p` axes are negatives. A
+  later full-vector Fresnel convention therefore generally has the normal-incidence scalar sign
+  `r_p = -r_s` even though the physical reflected tangential vectors have the same sign.
+- [ ] Before E4/E5, confirm that the planar-interface normal points from incident medium 1 toward
+  transmitted medium 2, and independently confirm whether every public Fresnel `p` coefficient
+  scales a full electric-vector axis or a tangential component. The present incidence-frame API
+  fixes neither interface-side roles nor a tangential-amplitude conversion.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
@@ -166,6 +181,12 @@ PR unless maintainers explicitly ask to retain it.
   continuously varying frame over the direction sphere, inverse coordinate extraction, frame
   rotation covariance, electromagnetic power, gauge reconstruction, evanescence, or circular
   handedness to this upstream slice; design each as a separate follow-up where needed.
+- [ ] Split E2d before an upstream proposal: the neutral `Space.inner_cross_cross` identity first;
+  `PolarizationFrame.ofAxisZero` and its two projection lemmas second; the non-normal incidence
+  predicate, axes, frame, and Jones decomposition third; and exact sign regressions last. Do not
+  introduce an interface point, half-space, incoming/outgoing predicate, reflected or transmitted
+  direction, Fresnel coefficient, power claim, or canonical normal-incidence tangent choice in
+  these geometry PRs.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
 - [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged
