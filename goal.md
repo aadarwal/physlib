@@ -288,9 +288,10 @@ Ownership rules:
   decay; and constitutive satisfaction. It deliberately makes no dispersion, Maxwell, interface,
   outgoing, evanescent-role, irradiance, power, potential, or gauge claim.
 - [x] Every existing real-quadrature `MonochromaticPlaneWave` now embeds exactly into that carrier:
-  wave vector, frequency, complex electric amplitude, carrier, transversality, magnetic amplitude,
-  and all four ordinary real fields agree, without introducing a second hidden electromagnetic
-  state or claiming equality of potentials, gauges, or power normalizations.
+  wave vector, frequency, complex electric amplitude, its exact nonzero-quadrature guard, carrier,
+  transversality, magnetic amplitude, and all four ordinary real fields agree, without introducing
+  a second hidden electromagnetic state or claiming equality of potentials, gauges, or power
+  normalizations.
 - [x] The complex carrier now has a separate calculus layer proving joint smoothness of the carrier
   and all ordinary real fields, exact temporal and coordinate carrier factors, and generic
   ordinary-real-field time and coordinate derivatives, divergence expressed through the
@@ -357,8 +358,8 @@ Ownership rules:
   complex carrier, complex vector algebra, shared ordinary-real-field realization, compatible
   magnetic candidate, bilinear transversality, decay, and constitutive API.
 - `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge` proves exact compatibility
-  with the existing real-quadrature plane-wave carrier, transversality predicate, magnetic
-  amplitude, and ordinary real `E`/`D`/`B`/`H` fields.
+  with the existing real-quadrature plane-wave carrier, nonzero-amplitude guard, transversality
+  predicate, magnetic amplitude, and ordinary real `E`/`D`/`B`/`H` fields.
 - `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexCalculus` supplies joint
   regularity, exact `partial_t C = I omega C` and `partial_j C = -I K_j C` carrier laws, and the
   generic ordinary-real-field time, coordinate, divergence, and curl identities required by the
@@ -1214,7 +1215,8 @@ sources.
   magnetic amplitude, bilinear electric transversality, structural magnetic transversality,
   positive-normal field decay, and constitutive satisfaction;
 - [x] an exact bridge from every existing real-quadrature plane wave to the complex carrier,
-  including carrier, transversality, magnetic amplitude, and all four ordinary real fields;
+  including carrier, the exact nonzero-amplitude guard, transversality, magnetic amplitude, and
+  all four ordinary real fields;
 - [x] generic complex-carrier joint regularity, exact carrier time and coordinate derivatives, and
   generic realized-field time and coordinate derivatives, divergence expressed through the
   complex-bilinear pairing, and curl identities through the shared ordinary-real-field realization
