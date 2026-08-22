@@ -27,6 +27,7 @@ irradiance or power.
 
 ## ii. Key results
 
+- `PolarizationFrame.ofAxisZero`: construct a frame from one unit transverse axis.
 - `PolarizationFrame.propagationVector_cross_axis_zero` and
   `PolarizationFrame.propagationVector_cross_axis_one`: the oriented-frame quarter-turn.
 - `PolarizationFrame.embedJones_norm_sq`: preservation of squared Jones intensity.
@@ -120,6 +121,68 @@ lemma propagationVector_cross_axis_one (frame : PolarizationFrame direction) :
   have h := orthonormal_iff_ite.mp frame.orthonormal_axis
   rw [h 0 1, h 1 1]
   simp
+
+/-- Construct an oriented polarization frame from a chosen unit transverse first axis.
+
+The second axis is the cross product of the propagation vector with the supplied first axis. This
+constructor keeps the choice explicit, which is essential when incidence geometry does not select
+a canonical transverse axis. -/
+def ofAxisZero (direction : Space.Direction 3)
+    (axisZero : EuclideanSpace ℝ (Fin 3))
+    (haxisZero_norm : ‖axisZero‖ = 1)
+    (haxisZero_transverse :
+      inner ℝ (Space.basis.repr direction.unit) axisZero = 0) :
+    PolarizationFrame direction where
+  axis := ![axisZero, Space.basis.repr direction.unit ⨯ₑ₃ axisZero]
+  orthonormal_axis := by
+    rw [orthonormal_iff_ite]
+    intro i j
+    fin_cases i <;> fin_cases j
+    · change inner ℝ axisZero axisZero = 1
+      simp [haxisZero_norm]
+    · change inner ℝ axisZero
+        (Space.basis.repr direction.unit ⨯ₑ₃ axisZero) = 0
+      exact Space.inner_cross_self axisZero (Space.basis.repr direction.unit)
+    · change inner ℝ
+        (Space.basis.repr direction.unit ⨯ₑ₃ axisZero) axisZero = 0
+      rw [real_inner_comm]
+      exact Space.inner_cross_self axisZero (Space.basis.repr direction.unit)
+    · change inner ℝ (Space.basis.repr direction.unit ⨯ₑ₃ axisZero)
+          (Space.basis.repr direction.unit ⨯ₑ₃ axisZero) = 1
+      have haxisZero_transverse' :
+          inner ℝ axisZero (Space.basis.repr direction.unit) = 0 := by
+        rw [real_inner_comm]
+        exact haxisZero_transverse
+      rw [Space.inner_cross_cross, real_inner_self_eq_norm_sq,
+        real_inner_self_eq_norm_sq]
+      simp [direction.norm, haxisZero_norm, haxisZero_transverse,
+        haxisZero_transverse']
+  orientation := by
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
+    change axisZero ⨯ₑ₃ (Space.basis.repr direction.unit ⨯ₑ₃ axisZero) = _
+    rw [Space.cross_cross_eq_smul_sub_smul', real_inner_self_eq_norm_sq,
+      haxisZero_norm, haxisZero_transverse]
+    simp
+
+/-- The first axis of `ofAxisZero` is the supplied transverse axis. -/
+@[simp]
+lemma ofAxisZero_axis_zero (direction : Space.Direction 3)
+    (axisZero : EuclideanSpace ℝ (Fin 3))
+    (haxisZero_norm : ‖axisZero‖ = 1)
+    (haxisZero_transverse :
+      inner ℝ (Space.basis.repr direction.unit) axisZero = 0) :
+    (ofAxisZero direction axisZero haxisZero_norm haxisZero_transverse).axis 0 =
+      axisZero := rfl
+
+/-- The second axis of `ofAxisZero` is the propagation cross the supplied first axis. -/
+@[simp]
+lemma ofAxisZero_axis_one (direction : Space.Direction 3)
+    (axisZero : EuclideanSpace ℝ (Fin 3))
+    (haxisZero_norm : ‖axisZero‖ = 1)
+    (haxisZero_transverse :
+      inner ℝ (Space.basis.repr direction.unit) axisZero = 0) :
+    (ofAxisZero direction axisZero haxisZero_norm haxisZero_transverse).axis 1 =
+      Space.basis.repr direction.unit ⨯ₑ₃ axisZero := rfl
 
 /-!
 
