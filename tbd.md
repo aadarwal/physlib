@@ -321,9 +321,10 @@ PR unless maintainers explicitly ask to retain it.
   incident exponent, harmonic uniqueness sees the combined referenced amplitude `A_i + A_r`, not
   `A_i` alone. A nonzero incident amplitude therefore cannot force the transmitted rate: choosing
   `A_r = -A_i` at the same exponent and zero transmitted amplitude leaves its exponent arbitrary.
-  The three-wave collision theorem must require the exact combined referenced joint-trace amplitude
-  to be nonzero together with `A_r = 0` or equality of the reflected and incident rates, or an
-  equivalent condition that preserves the zero-reflection branch.
+  The guarded label-matching theorem must require the exact combined referenced joint-trace
+  amplitude to be nonzero together with `A_r = 0` or equality of the reflected and incident rates,
+  or an equivalent condition that preserves the zero-reflection branch. The preceding signed
+  exponent-keyed coefficient identity is unconditional under its local-boundary hypothesis.
 - [ ] Use finite exponential-character independence for E5a rather than assuming a Fourier
   transform or common period. The neutral layer now proves both uniqueness for finite complex sums
   indexed by complex-valued real-linear functionals and its ordinary-real-sum consequence when all
@@ -377,6 +378,17 @@ PR unless maintainers explicitly ask to retain it.
   projection. The generic theorem has no plane and therefore proves no tangency. A nonzero complex
   coefficient may vanish at one real sample; exact repeated exponent functionals are already
   aggregated, and no labelwise, interface, or conservation claim follows.
+- [ ] Human-check E5a's planar joint-electric coefficient collision before upstreaming. Confirm
+  that incident and reflected referenced amplitudes use the negative-side medium, the transmitted
+  referenced amplitude uses the positive-side medium with a negative sign, and exact equal
+  boundary exponents aggregate in the `Finsupp`. Confirm that zero free surface charge is required
+  while free surface current remains arbitrary, that the common unit-time probe is positive for
+  every supported key, and that cancellation can only shrink the support. The zero-map conclusion
+  has no nonzero guard and therefore proves no labelwise exponent or amplitude equality: zero
+  labeled contributions add no coefficient and therefore impose no constraint on their own
+  labels, while coincident exponent contributions may cancel. Guarded label matching,
+  conservation, propagation roles, Fresnel data, and the fixed-frequency converse remain later
+  work.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
