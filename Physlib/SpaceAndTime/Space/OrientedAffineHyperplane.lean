@@ -33,6 +33,7 @@ planar boundaries, waveguides, and phase-matching arguments.
 - `OrientedAffineHyperplane.normalComponent_tangentialProjection`: the tangential projection is
   tangent.
 - `OrientedAffineHyperplane.tangentialProjection_add_normal`: exact vector decomposition.
+- `OrientedAffineHyperplane.tangentialProjection_normalVector`: the unit normal projects to zero.
 - `OrientedAffineHyperplane.tangentSubmodule`: tangent displacements as a real submodule.
 - `OrientedAffineHyperplane.eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent`:
   a vector pairing to zero with every tangent vector is its explicit normal projection.
@@ -352,6 +353,15 @@ lemma tangentialProjection_smul (plane : OrientedAffineHyperplane d)
     (c : ℝ) (v : EuclideanSpace ℝ (Fin d)) :
     plane.tangentialProjection (c • v) = c • plane.tangentialProjection v := by
   simp [tangentialProjection, normalComponent, inner_smul_right, smul_sub, smul_smul]
+
+/-- The oriented unit normal has zero tangential projection. -/
+@[simp]
+lemma tangentialProjection_normalVector (plane : OrientedAffineHyperplane d) :
+    plane.tangentialProjection plane.normalVector = 0 := by
+  rw [tangentialProjection]
+  change plane.normalVector -
+    (inner ℝ plane.normalVector plane.normalVector : ℝ) • plane.normalVector = 0
+  rw [plane.inner_normalVector_self, one_smul, sub_self]
 
 /-- Tangential projection fixes vectors already tangent to the hyperplane. -/
 lemma tangentialProjection_eq_self_of_isTangent (plane : OrientedAffineHyperplane d)

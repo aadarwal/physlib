@@ -80,6 +80,7 @@ public import Physlib.Electromagnetism.Media.HomogeneousIsotropic
 public import Physlib.Electromagnetism.PointParticle.OneDimension
 public import Physlib.Electromagnetism.PointParticle.ThreeDimension
 public import Physlib.Electromagnetism.ThreeDimension.Basic
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.Planar
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellBridge
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellEquations
 public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations

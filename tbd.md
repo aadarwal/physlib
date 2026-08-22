@@ -169,6 +169,16 @@ PR unless maintainers explicitly ask to retain it.
   are allowed. Independently confirm whether every later public Fresnel `p` coefficient scales a
   full electric-vector axis or a tangential component. The interface type intentionally fixes only
   medium-side assignment, not wave roles, boundary laws, or a tangential-amplitude conversion.
+- [ ] Human-check E4a's pointwise macroscopic boundary convention before upstreaming. For the
+  stored normal `n` from the negative trace to the positive trace, the fork uses
+  `n · (D_positive - D_negative) = surfaceCharge` and
+  `n × (H_positive - H_negative) = surfaceCurrent`, with continuous tangential `E` and normal `B`.
+  The surface sources are free electric charge and an intrinsically tangent free electric current;
+  no magnetic surface sources are modeled. Setting them to zero proves continuity of tangential
+  `E` and `H` and normal `D` and `B`, but does not remove bound polarization charge, bulk sources,
+  or material response. `PlanarMacroscopicTrace` is pointwise carrier data obtained honestly from
+  globally defined fields, not yet an analytic one-sided trace, and these local laws are stipulated
+  rather than derived from integral Maxwell equations until E4b.
 - [ ] Human-check the neutral oriented-affine-hyperplane convention before assigning media. Its
   stored normal points from the geometric negative side toward the positive side; the positive
   side normal is `n`, the negative side normal is `-n`; signed normal coordinate is positive on
