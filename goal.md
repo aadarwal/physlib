@@ -209,6 +209,9 @@ Ownership rules:
   live under Mathematics, with half-trace coefficients, a bundled real-linear equivalence,
   reconstruction and scalar-vector identities, and compatibility imports for the former
   Relativity API.
+- [x] The neutral Pauli layer characterizes the positive-semidefinite cone by
+  `pauliRadius A ≤ scalarCoeff A`, with determinant, Hermiticity, and zero-radius support lemmas and
+  no eigenvalue-ordering assumption.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -703,7 +706,7 @@ matrix algebra and bundled real-linear coefficient equivalence; the former Relat
 public compatibility/extension modules, and a full downstream build preserves every pre-existing
 declaration name.
 
-#### P3b-0. Neutral positive Pauli cone
+#### P3b-0. Neutral positive Pauli cone — complete
 
 Owner: Mathematics.
 
@@ -717,6 +720,12 @@ square of `pauliRadius A * I + vectorPart A`, handling zero radius separately.
 
 Exit: Optics can obtain the physical Stokes cone from reusable matrix mathematics rather than
 placing a general positivity theorem in a polarization namespace.
+
+Completion evidence: `Physlib.Mathematics.PauliMatrices.SelfAdjoint` proves Hermiticity of the
+Pauli-vector part, the determinant/radius identity, the zero-radius vanishing lemma, positivity of
+`pauliRadius A • 1 + vectorPart A`, and the exact positive-semidefinite cone criterion. The proof
+uses trace and determinant nonnegativity in one direction and an explicit PSD decomposition in the
+other, with the zero-radius case separated before inverse scaling.
 
 #### P3b-1. Stokes coordinates and coherency cone
 
@@ -1647,8 +1656,8 @@ current integration base; a designed package whose prerequisite is merely active
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
 | P2b pure coherency | done | P1a, P2a | outer-product/rank/trace/phase/conjugation suite |
 | P3a neutral Hermitian basis | done | matrix API audit | neutral basis, bundled coordinate equivalence, compatibility wrappers, and full downstream build |
-| P3b-0 neutral positive cone | ready | P3a | determinant and PSD/radius criterion |
-| P3b-1 Stokes/coherency cone | blocked | P2a, P3b-0 | raw linear reconstruction and physical-cone equivalence |
+| P3b-0 neutral positive cone | done | P3a | determinant identity, PSD/radius criterion, and zero-radius-safe construction |
+| P3b-1 Stokes/coherency cone | ready | P2a, P3b-0 | raw linear reconstruction and physical-cone equivalence |
 | P3b-2 Jones--Stokes bridge | blocked | P2b, P3b-1 | explicit components and phase-invariance suite |
 | P3c Poincare classification | blocked | P3b-1, P3b-2 | ball/sphere/mixed-state suite |
 | P4 deterministic Mueller | blocked | P1a, P2a, P3a, P3b-1 | real induced action and composition suite |
@@ -1753,18 +1762,20 @@ human verification recorded in `tbd.md`.
 
 ## Q. Immediate queue for the next goal session
 
-1. P1a, P1b, P2a, P2b, and P3a are complete, independently reviewed, validated, and integrated.
+1. P1a, P1b, P2a, P2b, P3a, and P3b-0 are complete, independently reviewed, validated, and
+   integrated.
    Preserve their type boundary: raw Jones intensity is still neither irradiance nor modal power,
    the harmonic bridge reconstructs fields rather than a gauge potential, general coherency still
    carries no Jones-purity assumption, the Pauli coordinates remain basis-fixed but independent of
-   Relativity and Optics conventions, and zero Jones data has no polarization direction.
+   Relativity and Optics conventions, the neutral positive cone carries no optical Stokes ordering,
+   and zero Jones data has no polarization direction.
 2. O2/N1 is complete, including predicate characterizations, binary parallel composition,
    relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
    the distinction between incident and outgoing channel ends and do not encode feedback as
    ordinary matrix multiplication.
-3. Prove P3b-0's neutral Pauli positivity criterion, then build P3b-1's raw/physical Stokes and
-   coherency equivalence. Add the P3b-2 Jones bridge only through pure coherency and withhold
-   right/left circular names until the human handedness gate is resolved.
+3. Build P3b-1's raw/physical Stokes and coherency equivalence on the completed neutral Pauli cone.
+   Add the P3b-2 Jones bridge only through pure coherency and withhold right/left circular names
+   until the human handedness gate is resolved.
 4. Land E0's public Maxwell export repair, then start E1's medium and macroscopic-Maxwell layer so
    the harmonic bridge can later acquire Poynting-flux normalization and meet the material-interface
    track.
