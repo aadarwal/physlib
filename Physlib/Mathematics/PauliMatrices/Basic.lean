@@ -13,8 +13,8 @@ public import Physlib.Mathematics.KroneckerDelta.Basic
 
 # Pauli matrices
 
-This file defines the four Pauli matrices and their convention-free complex matrix algebra. The
-map `pauliMatrix : Fin 1 ⊕ Fin 3 → Matrix (Fin 2) (Fin 2) ℂ` uses the left summand for the
+This file defines the four Pauli matrices and their Relativity-independent complex matrix algebra.
+The map `pauliMatrix : Fin 1 ⊕ Fin 3 → Matrix (Fin 2) (Fin 2) ℂ` uses the left summand for the
 identity and the three right-summand indices for the standard Pauli matrices. The scoped notation
 `σ` represents this map.
 
