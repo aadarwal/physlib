@@ -1287,7 +1287,11 @@ mode family covered by the theorem.
 
 #### E4a. Planar interface and local boundary semantics
 
-- oriented affine plane, tangential projection, two half-spaces, and incident-side convention;
+- [x] dimension-generic oriented affine hyperplane geometry with signed normal coordinates,
+  neutral positive and negative sides, open and closed half-spaces, tangential projection, and
+  exact carrier parameterization;
+- [ ] a planar dielectric interface assigning medium 1 to the negative side, medium 2 to the
+  positive side, and the stored normal from medium 1 toward medium 2;
 - a primitive time-domain configuration whose incident, reflected, and transmitted waves have
   independent positive frequencies and wave vectors, with total incident-plus-reflected and
   transmitted ordinary real fields and their half-space restrictions/traces compared for every
@@ -1318,6 +1322,8 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
 
 - harmonic-uniqueness and noncancellation lemmas strong enough to distinguish unequal positive
   frequencies in ordinary real time-domain fields;
+- the deferred oriented-hyperplane annihilator lemma converting vanishing against every tangent
+  displacement into an explicit normal-vector multiple, used to identify tangential projections;
 - equality of frequency and tangential wave-vector components derived from primitive boundary
   equality along the entire plane and time axis under necessary nonzero-amplitude hypotheses;
 - a reduced fixed-frequency complex-amplitude boundary problem introduced only after those
@@ -2031,7 +2037,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
-| E4a local boundary semantics | blocked | E1, E2, local-domain design | primitive independent-frequency physical traces and explicit conditional local laws |
+| E4a local boundary semantics | in progress | E1, E2 | neutral oriented-hyperplane geometry complete; planar medium assignment, primitive independent-frequency physical traces, and explicit conditional local laws remain |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | blocked | E2, E4a | harmonic uniqueness, derived frequency/tangential-K conservation, and fixed-frequency reduction theorem |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
@@ -2170,8 +2176,11 @@ human verification recorded in `tbd.md`.
    zero-amplitude off-shell degeneracy. Preserve the exact algebraic and ordinary-field regression
    suite, especially its bilinear-versus-Hermitian distinction, direct signed cross calculations,
    two-phase sampling, zero-amplitude guard, complex-null failure, and embedded-image limitation.
-   Proceed next to the interface-oriented outgoing/decaying layer. Withhold power claims until
-   Poynting-flux normalization.
+   Preserve the completed neutral oriented-affine-hyperplane layer: its normal points from the
+   geometric negative side toward the positive side, its closed half-spaces both contain the
+   carrier, and its side names have no medium, wave-role, outgoing, or power meaning. Proceed next
+   through finite exponential-character independence and then the interface-oriented
+   outgoing/decaying layer. Withhold power claims until Poynting-flux normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -2186,7 +2195,10 @@ medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, 
 Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell complex
 carrier, exact real-wave bridge, generic carrier calculus, and bilinear material dispersion now
 connected with forward and converse ordinary-real-field Maxwell and exact algebraic plus
-ordinary-real-field falsification regressions, the next physical-optics front is the
+ordinary-real-field falsification regressions, and neutral oriented-affine-hyperplane geometry, the
+next physical-optics front is finite exponential-character independence followed by the
 interface-oriented outgoing/decaying branch on that shared carrier. The interface must start from
 independent-frequency time-domain traces and derive frequency conservation before it uses a
-fixed-frequency Fresnel reduction. The independent circuit front remains N2a/N3.
+fixed-frequency Fresnel reduction. The reflected conservation result must allow zero reflection,
+and the reduced amplitudes must be referenced to the interface point. The independent circuit
+front remains N2a/N3.

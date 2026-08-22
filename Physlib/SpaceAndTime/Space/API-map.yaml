@@ -44,6 +44,10 @@ Requirements:
     done: true
     location: "Physlib/SpaceAndTime/Space/Module.lean (basis : OrthonormalBasis (Fin d) ℝ (Space d))"
 
+  - description: "The API contains dimension-generic oriented affine hyperplanes with a stored point and unit normal, neutral positive and negative sides, open and closed half-spaces, signed normal coordinates, and exact normal--tangential vector decomposition and carrier parameterization. The geometric sides carry no material, wave-role, outgoing, or power meaning."
+    done: true
+    location: "Physlib/SpaceAndTime/Space/OrientedAffineHyperplane.lean (Space.OrientedAffineHyperplane, Space.OrientedAffineHyperplane.Side, Space.OrientedAffineHyperplane.normalVector, Space.OrientedAffineHyperplane.signedNormalCoordinate, Space.OrientedAffineHyperplane.carrier, Space.OrientedAffineHyperplane.openHalfSpace, Space.OrientedAffineHyperplane.closedHalfSpace, Space.OrientedAffineHyperplane.sideNormalVector, Space.OrientedAffineHyperplane.sideNormalDirection, Space.OrientedAffineHyperplane.normalComponent, Space.OrientedAffineHyperplane.tangentialProjection, Space.OrientedAffineHyperplane.IsTangent, Space.OrientedAffineHyperplane.signedNormalCoordinate_vadd, Space.OrientedAffineHyperplane.carrier_eq_closedHalfSpace_inter, Space.OrientedAffineHyperplane.signedNormalCoordinate_sideRay, Space.OrientedAffineHyperplane.normalComponent_tangentialProjection, Space.OrientedAffineHyperplane.tangentialProjection_add_normal, Space.OrientedAffineHyperplane.exists_tangent_vadd_eq_of_mem_carrier)"
+
   - description: "The API contains a `VSub` instance to `EuclideanSpace`."
     done: true
     location: "Physlib/SpaceAndTime/Space/Basic.lean (VSub (EuclideanSpace ℝ (Fin d)) (Space d))"

@@ -167,6 +167,14 @@ PR unless maintainers explicitly ask to retain it.
   transmitted medium 2, and independently confirm whether every public Fresnel `p` coefficient
   scales a full electric-vector axis or a tangential component. The present incidence-frame API
   fixes neither interface-side roles nor a tangential-amplitude conversion.
+- [ ] Human-check the neutral oriented-affine-hyperplane convention before assigning media. Its
+  stored normal points from the geometric negative side toward the positive side; the positive
+  side normal is `n`, the negative side normal is `-n`; signed normal coordinate is positive on
+  the positive side; the carrier is contained in both closed half-spaces and neither open half-space.
+  The geometry itself assigns no incident, reflected, transmitted, outgoing, decay, or power role.
+  Add a Mathlib `AffineSubspace`/surface-measure bridge only when an actual trace or integration
+  consumer needs it; the present carrier is deliberately the exact zero set used by pointwise
+  boundary laws.
 - [ ] Human-check E2e's complex-wavevector convention: the carrier uses
   `exp (I * (ω t - K·x))`, the pairing `K·x` and dispersion square `K·K` are complex-bilinear
   rather than Hermitian, `K = q - I a`, and `a = α n` with `α > 0` gives amplitude decay
@@ -278,6 +286,15 @@ PR unless maintainers explicitly ask to retain it.
   noncancellation hypotheses before introducing the reduced fixed-frequency complex-amplitude
   problem used for Snell and Fresnel calculations. Never assume common frequency in a premise
   whose conclusion is meant to establish frequency conservation.
+- [ ] Use finite exponential-character independence for E5a rather than assuming a Fourier
+  transform or common period. A nonzero electromagnetic boundary amplitude should bundle
+  tangential `E` with normal `D` (or an equivalently injective joint trace), because tangential
+  `E` alone can vanish for a nonzero field. State incident/transmitted conservation under the
+  primitive time-domain noncancellation condition. State reflected conservation conditionally as
+  zero reflected amplitude or common frequency and tangential wave vector, so Brewster and other
+  zero-reflection cases retain unconstrained dummy labels. After conservation, reference reduced
+  complex amplitudes at the interface point using the spatial factor; do not compare raw
+  origin-referenced amplitudes across the interface.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
