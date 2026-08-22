@@ -173,6 +173,7 @@ public import Physlib.Optics.Components.Polarizer.Coherency
 public import Physlib.Optics.Components.Polarizer.Malus
 public import Physlib.Optics.Components.Polarizer.Mueller
 public import Physlib.Optics.Components.Polarizer.Regression
+public import Physlib.Optics.Components.Retarder.Basic
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
