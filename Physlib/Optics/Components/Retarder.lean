@@ -5,7 +5,8 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Components.Retarder.Regression
+public import Physlib.Optics.Components.Retarder.Coherency
+public import Physlib.Optics.Components.Retarder.MuellerRegression
 
 /-!
 # Ideal linear retarders and wave plates
@@ -13,11 +14,13 @@ public import Physlib.Optics.Components.Retarder.Regression
 ## i. Overview
 
 This module exports the ideal linear-retarder phase convention, spectral Jones matrix, structural
-and unitarity laws, equal-amplitude relative-phase action, quarter-wave and half-wave
-specializations, and sign-sensitive canonical regressions.
+and unitarity laws, equal-amplitude relative-phase action, pure-coherency outputs, deterministic
+Mueller block and action, quarter-wave and half-wave specializations, and sign-sensitive canonical
+regressions.
 
-All intensity statements concern squared raw Jones amplitudes. The export surface assigns neither
-circular-polarization handedness nor electromagnetic irradiance or power interpretations.
+Jones and Stokes intensity statements remain reduced amplitude coordinates. The export surface
+assigns neither circular-polarization handedness nor electromagnetic irradiance or power
+interpretations.
 
 ## ii. Key results
 

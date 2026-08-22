@@ -107,6 +107,16 @@ lemma star_mul_linearRetarderPhase (retardance : Real.Angle) :
   rw [star_linearRetarderPhase, ← linearRetarderPhase_add]
   simp
 
+/-- A retarder relative phase is `cos retardance - I * sin retardance`. -/
+lemma linearRetarderPhase_eq_cos_sub_sin_mul_I (retardance : Real.Angle) :
+    linearRetarderPhase retardance =
+      (Real.Angle.cos retardance : ℂ) -
+        (Real.Angle.sin retardance : ℂ) * Complex.I := by
+  rw [linearRetarderPhase, Real.Angle.coe_toCircle,
+    Real.Angle.cos_neg, Real.Angle.sin_neg]
+  push_cast
+  ring
+
 /-- For a real retardance representative, the relative phase is `exp (-I * retardance)`. -/
 lemma linearRetarderPhase_coe (retardance : ℝ) :
     linearRetarderPhase (retardance : Real.Angle) =
@@ -236,6 +246,13 @@ lemma linearRetarder_entries_one_one (axis retardance : Real.Angle) :
     Matrix.vecMulVec, Real.Angle.cos_add_pi_div_two,
     Real.Angle.sin_add_pi_div_two]
   ring
+
+/-- A zero-axis retarder is diagonal in the declared Jones coordinate basis. -/
+lemma linearRetarder_zero_axis_entries (retardance : Real.Angle) :
+    (linearRetarder 0 retardance).entries =
+      !![1, 0; 0, linearRetarderPhase retardance] := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp
 
 /-!
 
