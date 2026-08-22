@@ -10,13 +10,13 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 
 /-!
 
-# Vector calculus of three-dimensional plane waves
+# Vector calculus of plane waves
 
 ## i. Overview
 
-This module computes the divergence and curl of a differentiable three-dimensional plane wave.
-It extends the dimension-independent derivative API in `WaveEquation.Basic` without making that
-foundational module import the specifically three-dimensional curl operator.
+This module computes the divergence of a differentiable plane wave in any finite dimension and
+the curl of one in three dimensions. It extends the derivative API in `WaveEquation.Basic` without
+making that foundational module import the specifically three-dimensional curl operator.
 
 For a profile `f₀`, propagation speed `c`, and unit direction `s`, both results express the spatial
 operator through the profile derivative at the travelling coordinate
@@ -25,7 +25,7 @@ constitutive law.
 
 ## ii. Key results
 
-- `planeWave_div`: divergence of a differentiable three-dimensional plane wave.
+- `planeWave_div`: divergence of a differentiable finite-dimensional plane wave.
 - `planeWave_curl`: curl of a differentiable three-dimensional plane wave.
 
 ## iii. Table of contents
@@ -49,10 +49,10 @@ open Space Time InnerProductSpace Matrix
 
 -/
 
-/-- The divergence of a differentiable three-dimensional plane wave is the inner product of its
+/-- The divergence of a differentiable finite-dimensional plane wave is the inner product of its
 unit propagation vector with its profile derivative. -/
-lemma planeWave_div {f₀ : ℝ → EuclideanSpace ℝ (Fin 3)} {c : ℝ}
-    {s : Direction 3} (h : Differentiable ℝ f₀) (t : Time) (x : Space) :
+lemma planeWave_div {d : ℕ} {f₀ : ℝ → EuclideanSpace ℝ (Fin d)} {c : ℝ}
+    {s : Direction d} (h : Differentiable ℝ f₀) (t : Time) (x : Space d) :
     (∇ ⬝ planeWave f₀ c s t) x =
       ⟪Space.basis.repr s.unit, fderiv ℝ f₀ (⟪x, s.unit⟫_ℝ - c * t) 1⟫_ℝ := by
   unfold Space.div
