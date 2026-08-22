@@ -17,7 +17,8 @@ Overview: |
     the separatrix energy and the below/above-threshold energy bounds, the invariance of
     the lifted dynamics under shifting the angle by whole turns, and the small-angle limit —
     the linearized dynamics as a harmonic oscillator, its period 2π√(ℓ/g), and the cubic bound
-    on the linearization error; the exact amplitude-dependent period follows in later modules.
+    on the linearization error; the classical amplitude-dependent period formula follows in
+    later modules; its identification with the nonlinear return time remains open.
 
 ParentAPIs:
   - "Space (Physlib/SpaceAndTime/Space)"

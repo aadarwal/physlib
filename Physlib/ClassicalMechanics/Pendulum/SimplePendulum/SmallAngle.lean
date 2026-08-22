@@ -28,6 +28,18 @@ that for smooth lifts of the angle it is the equation of motion of the associate
 oscillator, so that the solution theory of the harmonic oscillator applies verbatim to the
 small oscillations of the pendulum.
 
+The equivalence carries the whole solution theory of the oscillator over to the small
+oscillations. Every choice of initial angle and initial angular velocity determines a smooth
+small-angle motion, unique among the smooth solutions of the linearized equation of motion,
+with the closed form `cos (ω t) x₀ + (sin (ω t)/ω) v₀`; released from rest at the angle `θ₀`
+it is the cosine `θ₀ cos (ω t)`. Every small-angle motion is periodic with the small-angle
+period `2π √(ℓ/g)`, in which neither the mass of the bob nor the amplitude of the swing
+appears: within the linearization the pendulum is isochronous. The linearization is not exact,
+and the final section measures what it discards: the torque differs from its linearization
+`-m g ℓ θ` by exactly `m g ℓ (θ - sin θ)`, of norm at most `m g ℓ ‖θ‖³/6`, so every
+small-angle motion solves the equation of motion of the pendulum itself up to a residual
+cubically small in the angle.
+
 ## ii. Key results
 
 - `SimplePendulum.toHarmonicOscillator` is the harmonic oscillator to which the pendulum
@@ -40,7 +52,8 @@ small oscillations of the pendulum.
   `linearizedEquationOfMotion_iff` identifies it, for smooth lifts of the angle, with the
   equation of motion of the associated harmonic oscillator.
 - `SimplePendulum.smallAngleTrajectory` is the small-angle motion determined by a choice of
-  initial conditions, the trajectory of the associated harmonic oscillator: it is smooth
+  initial conditions, the trajectory of the associated harmonic oscillator: it has the closed
+  form `cos (ω t) x₀ + (sin (ω t)/ω) v₀` (`smallAngleTrajectory_eq`), it is smooth
   (`smallAngleTrajectory_contDiff`), it assumes its initial data at time `0`
   (`smallAngleTrajectory_at_zero`, `smallAngleTrajectory_velocity_at_zero`), and it satisfies
   the linearized equation of motion (`smallAngleTrajectory_linearizedEquationOfMotion`).
@@ -57,11 +70,15 @@ small oscillations of the pendulum.
   period (`smallAngleTrajectory_periodic`, `releasedFromRest_periodic`), and along each the
   energy of the associated oscillator is the constant fixed by the initial data
   (`smallAngleTrajectory_energy`).
-- `SimplePendulum.abs_torque_add_linear_le` bounds the error of the linearization: the torque
-  differs from its linearization `-m g ℓ θ` by at most `m g ℓ |θ|³/6`. The difference is
-  computed exactly by `torque_sub_toHarmonicOscillator_force`, and
-  `gradLagrangian_sub_toHarmonicOscillator` identifies the difference of the variational
+- `SimplePendulum.torque_sub_toHarmonicOscillator_force` computes the exact difference between
+  the torque and the force of the associated oscillator: the term `m g ℓ (θ - sin θ)` the
+  linearization discards. Its norm is at most `m g ℓ ‖θ‖³/6`
+  (`norm_torque_sub_toHarmonicOscillator_force_le`), in coordinates `abs_torque_add_linear_le`,
+  and `gradLagrangian_sub_toHarmonicOscillator` identifies the difference of the variational
   gradients of the two actions with the difference of torque and linearized force.
+- `SimplePendulum.norm_equationOfMotion_residual_le`: a small-angle motion nearly solves the
+  equation of motion of the pendulum itself, leaving at every instant a residual of norm at
+  most `m g ℓ ‖θ‖³/6` — the sense in which the small-angle theory approximates the pendulum.
 
 ## iii. Table of contents
 
@@ -81,10 +98,12 @@ small oscillations of the pendulum.
 - E. The error of the linearization
   - E.1. The cubic bound on the torque
   - E.2. The variational gradients
+  - E.3. The residual of the small-angle motions
 
 ## iv. References
 
 References for the small-angle motion of the simple pendulum include:
+- Huygens, Horologium Oscillatorium (1673).
 - Landau & Lifshitz, Mechanics, 3rd ed., §21.
 - The module `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.Basic`, whose equation of
   motion this module linearizes.
@@ -192,11 +211,10 @@ def LinearizedEquationOfMotion (θ : Time → EuclideanSpace ℝ (Fin 1)) : Prop
   by the nonzero factor `I`. -/
 lemma linearizedEquationOfMotion_iff_newton (θ : Time → EuclideanSpace ℝ (Fin 1)) :
     S.LinearizedEquationOfMotion θ ↔
-      ∀ t, S.toHarmonicOscillator.m • ∂ₜ (∂ₜ θ) t =
-        HarmonicOscillator.force S.toHarmonicOscillator (θ t) := by
+      ∀ t, S.inertia • ∂ₜ (∂ₜ θ) t = S.toHarmonicOscillator.force (θ t) := by
   simp only [LinearizedEquationOfMotion]
   refine forall_congr' fun t => ?_
-  rw [HarmonicOscillator.force_eq_linear, toHarmonicOscillator_m, toHarmonicOscillator_k,
+  rw [S.toHarmonicOscillator.force_eq_linear, toHarmonicOscillator_k,
     neg_smul, eq_neg_iff_add_eq_zero, ← S.ω_sq_mul_inertia, mul_comm (S.ω ^ 2) S.inertia,
     ← smul_smul, ← smul_add, smul_eq_zero, or_iff_right S.inertia_ne_zero]
 
@@ -226,11 +244,11 @@ lemma linearizedEquationOfMotion_iff (θ : Time → EuclideanSpace ℝ (Fin 1))
 
 ## C. Small-angle trajectories
 
-For small angles the pendulum is its associated harmonic oscillator, and the solution theory
-of the oscillator transfers verbatim: every choice of initial angle and initial angular
-velocity determines a smooth motion, unique among the smooth solutions of the linearized
-equation of motion. This section performs the transfer, and specializes it to the classical
-motion released from rest at a given angle.
+For small angles the pendulum is approximated by its associated harmonic oscillator, and the
+solution theory of the oscillator transfers verbatim: every choice of initial angle and
+initial angular velocity determines a smooth motion, unique among the smooth solutions of the
+linearized equation of motion. This section performs the transfer, and specializes it to the
+classical motion released from rest at a given angle.
 
 -/
 
@@ -240,7 +258,9 @@ motion released from rest at a given angle.
 
 The small-angle motion determined by an initial angle `IC.x₀` and an initial angular velocity
 `IC.v₀` is the trajectory of the associated harmonic oscillator for the same initial
-conditions. It is smooth in time and assumes the prescribed initial data at time `0`.
+conditions. It is smooth in time, it assumes the prescribed initial data at time `0`, and
+written out it is the familiar `cos (ω t) x₀ + (sin (ω t)/ω) v₀`, with the frequency of the
+oscillator read as the `ω` of the pendulum.
 
 -/
 
@@ -268,6 +288,15 @@ lemma smallAngleTrajectory_at_zero (IC : HarmonicOscillator.InitialConditions) :
 lemma smallAngleTrajectory_velocity_at_zero (IC : HarmonicOscillator.InitialConditions) :
     ∂ₜ (S.smallAngleTrajectory IC) 0 = IC.v₀ := by
   simp [smallAngleTrajectory]
+
+/-- The closed form of the small-angle motion: `cos (ω t) x₀ + (sin (ω t)/ω) v₀`, the
+  trajectory of the associated harmonic oscillator with its frequency read as the `ω` of the
+  pendulum. -/
+lemma smallAngleTrajectory_eq (IC : HarmonicOscillator.InitialConditions) :
+    S.smallAngleTrajectory IC = fun t : Time =>
+      Real.cos (S.ω * t.val) • IC.x₀ + (Real.sin (S.ω * t.val) / S.ω) • IC.v₀ := by
+  unfold smallAngleTrajectory
+  rw [HarmonicOscillator.InitialConditions.trajectory_eq, toHarmonicOscillator_ω]
 
 /-!
 
@@ -353,9 +382,8 @@ lemma releasedFromRest_linearizedEquationOfMotion (θ₀ : ℝ) :
 The associated harmonic oscillator completes one oscillation in the time `2π/ω`, and its
 angular frequency is the `ω = √(g/ℓ)` of the pendulum: the small oscillations have period
 `2π √(ℓ/g)`, independent of both the mass of the bob and the amplitude of the swing. Within
-the linearization the pendulum is isochronous — the observation of Huygens (1673) on which
-pendulum clocks rest; the dependence of the true period on the amplitude is invisible at this
-order.
+the linearization the pendulum is isochronous; the dependence of the true period on the
+amplitude is invisible at this order.
 
 -/
 
@@ -371,7 +399,7 @@ mass of the bob cancelled from the frequency, and the amplitude never entered.
 
 /-- The period `2π √(ℓ/g)` of the small oscillations of the simple pendulum: the period of the
   associated harmonic oscillator. Within the linearization it does not depend on the
-  amplitude — the small oscillations are isochronous, as first obtained by Huygens (1673). -/
+  amplitude — the small oscillations are isochronous, as derived by Huygens (1673). -/
 noncomputable def smallAnglePeriod : ℝ := HarmonicOscillator.period S.toHarmonicOscillator
 
 /-- The period of the small oscillations is `2π/ω`, one full circle of phase at the angular
@@ -409,14 +437,14 @@ lemma smallAngleTrajectory_periodic (IC : HarmonicOscillator.InitialConditions) 
   HarmonicOscillator.trajectory_periodic S.toHarmonicOscillator IC
 
 /-- The motion released from rest at angle `θ₀` is periodic with the small-angle period: after
-  each time `2π √(ℓ/g)` the pendulum returns to the angle `θ₀` and is again at rest. -/
+  each time `2π √(ℓ/g)` the motion returns to the angle `θ₀` with zero angular velocity. -/
 lemma releasedFromRest_periodic (θ₀ : ℝ) :
     Function.Periodic (S.releasedFromRest θ₀) (S.smallAnglePeriod : Time) := by
   rw [S.releasedFromRest_eq θ₀]
   exact S.smallAngleTrajectory_periodic ⟨EuclideanSpace.single 0 θ₀, 0⟩
 
 /-- Along a small-angle trajectory the energy of the associated harmonic oscillator is the
-  constant `½ (I ‖v₀‖² + m g ℓ ‖θ₀‖²)` fixed by the initial data: the rotational kinetic term
+  constant `½ (I ‖v₀‖² + m g ℓ ‖IC.x₀‖²)` fixed by the initial data: the rotational kinetic term
   of the initial angular velocity plus the potential term of the initial angle. -/
 lemma smallAngleTrajectory_energy (IC : HarmonicOscillator.InitialConditions) :
     S.toHarmonicOscillator.energy (S.smallAngleTrajectory IC) =
@@ -429,9 +457,10 @@ lemma smallAngleTrajectory_energy (IC : HarmonicOscillator.InitialConditions) :
 
 The linearization replaces the torque `-m g ℓ sin θ` by `-m g ℓ θ`. The replacement is not
 exact, and this section measures what it discards: pointwise the two differ by
-`m g ℓ (θ - sin θ)`, which the Taylor estimate for the sine bounds by `m g ℓ |θ|³/6`; and the
+`m g ℓ (θ - sin θ)`, which the Taylor estimate for the sine bounds by `m g ℓ |θ|³/6`; the
 difference of the variational gradients of the two actions is exactly this difference of the
-torques, the inertial terms cancelling.
+torques, the inertial terms cancelling; and every small-angle motion solves the equation of
+motion of the pendulum itself up to a residual of the same cubic size.
 
 -/
 
@@ -439,12 +468,39 @@ torques, the inertial terms cancelling.
 
 ### E.1. The cubic bound on the torque
 
-The single component of the torque differs from its linearization `-m g ℓ θ` by
-`m g ℓ (θ - sin θ)`, of magnitude at most `m g ℓ |θ|³/6`: for small angles the discarded term
-is cubically small. As vectors, the difference between the torque of the pendulum and the
-force of the associated oscillator is exactly this multiple of the unit angular direction.
+The difference between the torque of the pendulum and the force of the associated oscillator
+is exactly `m g ℓ (θ - sin θ)` times the unit vector of the angular direction, which the
+Taylor estimate for the sine bounds in norm by `m g ℓ ‖θ‖³/6`: for small angles the discarded
+term is cubically small. In the single coordinate of the angle the same bound reads
+`m g ℓ |θ|³/6`.
 
 -/
+
+/-- The difference between the torque of the simple pendulum and the force of its associated
+  harmonic oscillator is `m g ℓ (θ - sin θ)` times the unit vector of the angular direction:
+  exactly the term the linearization discards. -/
+lemma torque_sub_toHarmonicOscillator_force (x : EuclideanSpace ℝ (Fin 1)) :
+    S.torque x - S.toHarmonicOscillator.force x =
+      (S.m * S.g * S.ℓ * (x 0 - Real.sin (x 0))) • EuclideanSpace.single 0 1 := by
+  rw [torque_eq, S.toHarmonicOscillator.force_eq_linear, toHarmonicOscillator_k]
+  ext i
+  fin_cases i
+  simp only [Fin.isValue, neg_smul, sub_neg_eq_add, Fin.zero_eta, PiLp.add_apply,
+    PiLp.neg_apply, PiLp.smul_apply, PiLp.single_eq_same, smul_eq_mul, mul_one]
+  ring
+
+/-- The normed form of the cubic bound: the torque of the simple pendulum differs from the
+  force of its associated harmonic oscillator by at most `m g ℓ ‖θ‖³ / 6` in norm. -/
+lemma norm_torque_sub_toHarmonicOscillator_force_le (x : EuclideanSpace ℝ (Fin 1)) :
+    ‖S.torque x - S.toHarmonicOscillator.force x‖ ≤ S.m * S.g * S.ℓ * ‖x‖ ^ 3 / 6 := by
+  have hc : (0 : ℝ) < S.m * S.g * S.ℓ := by
+    have := S.m_pos; have := S.g_pos; have := S.ℓ_pos; positivity
+  have hx : ‖x‖ = |x 0| := by
+    rw [EuclideanSpace.norm_eq]
+    simp [Real.sqrt_sq_eq_abs]
+  rw [S.torque_sub_toHarmonicOscillator_force x, norm_smul, Real.norm_eq_abs, PiLp.norm_single,
+    norm_one, mul_one, abs_mul, abs_of_pos hc, hx, mul_div_assoc]
+  exact mul_le_mul_of_nonneg_left (Real.abs_sub_sin_le (x 0)) hc.le
 
 /-- The torque of the simple pendulum differs from its linearization `-m g ℓ θ` by at most
   `m g ℓ |θ|³ / 6`: the error of the small-angle approximation is cubic in the angle. -/
@@ -454,22 +510,15 @@ lemma abs_torque_add_linear_le (x : EuclideanSpace ℝ (Fin 1)) :
     have := S.m_pos; have := S.g_pos; have := S.ℓ_pos; positivity
   have key : S.torque x 0 + S.m * S.g * S.ℓ * x 0
       = S.m * S.g * S.ℓ * (x 0 - Real.sin (x 0)) := by
-    rw [torque_apply]; ring
+    calc S.torque x 0 + S.m * S.g * S.ℓ * x 0
+        = (S.torque x - S.toHarmonicOscillator.force x) 0 := by
+          rw [S.toHarmonicOscillator.force_eq_linear, toHarmonicOscillator_k]
+          simp [PiLp.smul_apply, smul_eq_mul, sub_neg_eq_add]
+      _ = S.m * S.g * S.ℓ * (x 0 - Real.sin (x 0)) := by
+          rw [S.torque_sub_toHarmonicOscillator_force x]
+          simp
   rw [key, abs_mul, abs_of_pos hc, mul_div_assoc]
   exact mul_le_mul_of_nonneg_left (Real.abs_sub_sin_le (x 0)) hc.le
-
-/-- The difference between the torque of the simple pendulum and the force of its associated
-  harmonic oscillator is `m g ℓ (θ - sin θ)` times the unit vector of the angular direction:
-  exactly the term the linearization discards. -/
-lemma torque_sub_toHarmonicOscillator_force (x : EuclideanSpace ℝ (Fin 1)) :
-    S.torque x - HarmonicOscillator.force S.toHarmonicOscillator x =
-      (S.m * S.g * S.ℓ * (x 0 - Real.sin (x 0))) • EuclideanSpace.single 0 1 := by
-  rw [torque_eq, HarmonicOscillator.force_eq_linear, toHarmonicOscillator_k]
-  ext i
-  fin_cases i
-  simp only [Fin.isValue, neg_smul, sub_neg_eq_add, Fin.zero_eta, PiLp.add_apply,
-    PiLp.neg_apply, PiLp.smul_apply, PiLp.single_eq_same, smul_eq_mul, mul_one]
-  ring
 
 /-!
 
@@ -489,12 +538,32 @@ torque.
 lemma gradLagrangian_sub_toHarmonicOscillator (θ : Time → EuclideanSpace ℝ (Fin 1))
     (hθ : ContDiff ℝ ∞ θ) :
     S.gradLagrangian θ - S.toHarmonicOscillator.gradLagrangian θ =
-      fun t => S.torque (θ t) - HarmonicOscillator.force S.toHarmonicOscillator (θ t) := by
+      fun t => S.torque (θ t) - S.toHarmonicOscillator.force (θ t) := by
   rw [S.gradLagrangian_eq_torque θ hθ,
-    HarmonicOscillator.gradLagrangian_eq_force S.toHarmonicOscillator θ hθ]
+    S.toHarmonicOscillator.gradLagrangian_eq_force θ hθ]
   funext t
   simp only [Pi.sub_apply, toHarmonicOscillator_m]
   abel
+
+/-!
+
+### E.3. The residual of the small-angle motions
+
+Combining the linearized dynamics with the cubic bound: a small-angle motion does not solve
+the equation of motion of the pendulum exactly, but the residual it leaves in it is cubically
+small in the angle — the small-angle theory solves the pendulum's own equation up to an error
+of at most `m g ℓ ‖θ‖³/6` at every instant.
+
+-/
+
+/-- A motion satisfying the linearized equation of motion nearly solves the equation of motion
+  of the pendulum itself: at every instant the residual `I θ̈ - τ(θ)` has norm at most
+  `m g ℓ ‖θ‖³ / 6`, cubically small for small angles. -/
+lemma norm_equationOfMotion_residual_le (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (h : S.LinearizedEquationOfMotion θ) (t : Time) :
+    ‖S.inertia • ∂ₜ (∂ₜ θ) t - S.torque (θ t)‖ ≤ S.m * S.g * S.ℓ * ‖θ t‖ ^ 3 / 6 := by
+  rw [(S.linearizedEquationOfMotion_iff_newton θ).mp h t, ← neg_sub, norm_neg]
+  exact S.norm_torque_sub_toHarmonicOscillator_force_le (θ t)
 
 end SimplePendulum
 
