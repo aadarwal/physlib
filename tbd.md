@@ -235,6 +235,14 @@ PR unless maintainers explicitly ask to retain it.
   the nonzero guard is necessary for dispersion. The resulting iff characterizes only this
   candidate family; it is not a completeness theorem and makes no interface, outgoing,
   evanescent-wave, power, potential, or gauge claim.
+- [ ] Human-check the exact complex-dispersion regression independently of its Lean proofs.
+  For `epsilon = mu = 3`, `omega = 1`, and `K = (5, 0, -4 I)`, confirm the bilinear square
+  `K dot K = 25 - 16 = 9` while the Hermitian squared norm is `25 + 16 = 41`. Confirm the TE data
+  `E0 = (0, 1, 0)`, `B0 = (4 I, 0, 5)` and the TM data
+  `E0 = (4, 0, -5 I)`, `B0 = (0, 9 I, 0)`. Both bilinear pairings `K dot E0` must vanish and both
+  direct cross products must give `K cross B0 = -9 E0`; the TM Hermitian pairing must instead be
+  `40`. This is exact attenuating algebra only: do not assign the fixture an incident,
+  transmitted, outgoing, or evanescent-wave role and do not infer Maxwell satisfaction or power.
 - [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
   algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
   the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
@@ -391,7 +399,10 @@ PR unless maintainers explicitly ask to retain it.
   delta. The complex-dispersion differential reported `epsilon` and `imposes`; the ordinary verb
   was reworded and only the physics term `epsilon` was added. The forward complex-Maxwell
   differential reported no new vocabulary. The guarded-converse differential initially reported
-  only `nonvanishing`; rewording that sentence with existing dictionary words leaves no delta.
+  only `nonvanishing`; rewording that sentence with existing dictionary words leaves no delta. The
+  complex-dispersion regression reported `despite`, `exercise`, `guards`, and `te`; the ordinary
+  words were reworded and only the transverse-electric abbreviation `te` was added to both the
+  Lean spelling dictionary and the separate CI codespell ignore list.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
