@@ -19,6 +19,8 @@ and prove various properties about it related to time derivatives and inner prod
 ## ii. Key results
 
 - `⨯ₑ₃` : The cross product on `EuclideanSpace ℝ (Fin 3)`.
+- `cross_add`, `add_cross`, `cross_smul`, `smul_cross` : Bilinearity of the cross product.
+- `cross_cross_eq_smul_sub_smul` : The vector triple-product identity.
 - `time_deriv_cross_commute` : Time derivatives move out of cross products.
 - `inner_cross_self` : Inner product of a vector with the cross product of another vector
   and itself is zero.
@@ -28,8 +30,9 @@ and prove various properties about it related to time derivatives and inner prod
 ## iii. Table of contents
 
 - A. The notation for the cross product
-- B. Time derivatives move out of cross products
-- C. Inner product of vectors with cross products involving themselves
+- B. Algebra of the cross product
+- C. Time derivatives move out of cross products
+- D. Inner product of vectors with cross products involving themselves
 
 ## iv. References
 
@@ -54,7 +57,53 @@ infixl:70 " ⨯ₑ₃ " => fun a b => (WithLp.equiv 2 (Fin 3 → ℝ)).symm
 
 /-!
 
-## B. Time derivatives move out of cross products
+## B. Algebra of the cross product
+
+-/
+
+/-- The cross product is additive in its second argument. -/
+lemma cross_add (u v w : EuclideanSpace ℝ (Fin 3)) :
+    u ⨯ₑ₃ (v + w) = u ⨯ₑ₃ v + u ⨯ₑ₃ w := by
+  ext i
+  fin_cases i <;> simp [crossProduct] <;> ring
+
+/-- The cross product is additive in its first argument. -/
+lemma add_cross (u v w : EuclideanSpace ℝ (Fin 3)) :
+    (u + v) ⨯ₑ₃ w = u ⨯ₑ₃ w + v ⨯ₑ₃ w := by
+  ext i
+  fin_cases i <;> simp [crossProduct]
+
+/-- The cross product commutes with scalar multiplication in its second argument. -/
+lemma cross_smul (u v : EuclideanSpace ℝ (Fin 3)) (a : ℝ) :
+    u ⨯ₑ₃ (a • v) = a • (u ⨯ₑ₃ v) := by
+  ext i
+  fin_cases i <;> simp [crossProduct]
+
+/-- The cross product commutes with scalar multiplication in its first argument. -/
+lemma smul_cross (a : ℝ) (u v : EuclideanSpace ℝ (Fin 3)) :
+    (a • u) ⨯ₑ₃ v = a • (u ⨯ₑ₃ v) := by
+  ext i
+  fin_cases i <;> simp [crossProduct]
+
+/-- The vector triple product `(u × v) × w` in Euclidean coordinates. -/
+lemma cross_cross_eq_smul_sub_smul (u v w : EuclideanSpace ℝ (Fin 3)) :
+    (u ⨯ₑ₃ v) ⨯ₑ₃ w = inner ℝ u w • v - inner ℝ v w • u := by
+  ext i
+  fin_cases i <;>
+    simp [crossProduct, PiLp.inner_apply, Fin.sum_univ_three, RCLike.inner_apply] <;>
+    ring
+
+/-- The vector triple product `u × (v × w)` in Euclidean coordinates. -/
+lemma cross_cross_eq_smul_sub_smul' (u v w : EuclideanSpace ℝ (Fin 3)) :
+    u ⨯ₑ₃ (v ⨯ₑ₃ w) = inner ℝ u w • v - inner ℝ v u • w := by
+  ext i
+  fin_cases i <;>
+    simp [crossProduct, PiLp.inner_apply, Fin.sum_univ_three, RCLike.inner_apply] <;>
+    ring
+
+/-!
+
+## C. Time derivatives move out of cross products
 
 -/
 
@@ -107,7 +156,7 @@ lemma time_deriv_cross_commute {s : EuclideanSpace ℝ (Fin 3)} {f : Time → Eu
 
 /-!
 
-## C. Inner product of vectors with cross products involving themselves
+## D. Inner product of vectors with cross products involving themselves
 
 -/
 
