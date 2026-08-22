@@ -132,6 +132,7 @@ public import Physlib.Mathematics.List.InsertionSort
 public import Physlib.Mathematics.OneParameterSubgroups.Basic
 public import Physlib.Mathematics.OneParameterSubgroups.Unitary
 public import Physlib.Mathematics.OrthogonalMatrix
+public import Physlib.Mathematics.PauliMatrices.Basic
 public import Physlib.Mathematics.PiTensorProduct
 public import Physlib.Mathematics.RatComplexNum
 public import Physlib.Mathematics.Resolvent
