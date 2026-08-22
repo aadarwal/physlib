@@ -3293,10 +3293,12 @@ hyperplane
 hyperplanes
 intersection
 waveguides
+aggregate
 aggregated
 ambiguity
 bundles
 characters
+collisions
 dedekind
 exponent
 exponentiate
