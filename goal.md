@@ -280,6 +280,17 @@ Ownership rules:
   exponential decay. A
   coordinate regression pins `K = (waveNumber, 0, -I * decayRate)` without assigning an interface,
   square-root branch, transmitted/outgoing role, Maxwell solution, evanescent-wave role, or power.
+- [x] Electromagnetism now supplies an off-shell complex-amplitude plane-wave carrier with
+  independent positive real frequency, complex wave vector, and complex electric amplitude;
+  complex-bilinear cross-product algebra; ordinary real `E`/`D`/`B`/`H` realizations through one
+  shared spine; the Faraday-compatible candidate `B0 = omega^-1 (K x E0)`; separate electric
+  transversality; structural magnetic transversality; exact positive-normal carrier and field
+  decay; and constitutive satisfaction. It deliberately makes no dispersion, Maxwell, interface,
+  outgoing, evanescent-role, irradiance, power, potential, or gauge claim.
+- [x] Every existing real-quadrature `MonochromaticPlaneWave` now embeds exactly into that carrier:
+  wave vector, frequency, complex electric amplitude, carrier, transversality, magnetic amplitude,
+  and all four ordinary real fields agree, without introducing a second hidden electromagnetic
+  state or claiming equality of potentials, gauges, or power normalizations.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
 ### D.2. Relevant upstream foundations
@@ -317,6 +328,12 @@ Ownership rules:
   `ClassicalMechanics.WaveEquation.ComplexWaveVector` supplies the generic complex-vector,
   bilinear-pairing, spatial-factor, and positive-normal decay foundation needed by the remaining
   E2 work.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBasic` supplies the off-shell
+  complex carrier, complex vector algebra, shared ordinary-real-field realization, compatible
+  magnetic candidate, bilinear transversality, decay, and constitutive API.
+- `Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge` proves exact compatibility
+  with the existing real-quadrature plane-wave carrier, transversality predicate, magnetic
+  amplitude, and ordinary real `E`/`D`/`B`/`H` fields.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -330,9 +347,9 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] the complex electromagnetic carrier, exact real-wave bridge, bilinear-amplitude
-  transversality/dispersion results, real-field macroscopic-Maxwell bridge, and interface-selected
-  outgoing/decaying branch;
+- [ ] complex-carrier calculus, bilinear material dispersion and its real decomposition,
+  real-field macroscopic-Maxwell and honest converse results, falsification regressions, and an
+  interface-selected outgoing/decaying branch;
 - [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
 - [ ] Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -393,12 +410,15 @@ polarization
 
 electromagnetic v0.1
   E0 public Maxwell API --> E1 media/macroscopic Maxwell
+  complex-wavevector geometry --> E2 complex carrier --> E2 exact real-wave bridge
+  E2 complex carrier --> E2 complex calculus --> E2 complex dispersion/Maxwell/converse
   E1 + E3s Space identity --> E3a real energy/Poynting
   E1 --> E2 material waves, E4a local boundary semantics
   O1 + P1a + E2 + E3a --> E3b harmonic-flux and mode-normalization bridge
-  E2 + E4a --> E5 reflection/Snell/TIR
+  E2 + E4a primitive independent-frequency traces --> E5a conservation/fixed-frequency reduction
+  E5a --> E5b reflection/Snell/TIR
   oriented surfaces/integral Maxwell + E4a --> E4b derived boundary laws
-  E3b + E5 --> E6 Fresnel amplitudes/flux
+  E3b + E5b --> E6 Fresnel amplitudes/flux
   P1b + P2b + P3b-2/P4 + P5b/P6b + E3b/E4b/E6 --> Optics v0.1
 
 finite networks and integrated photonics
@@ -419,7 +439,7 @@ finite networks and integrated photonics
   N5H + S0--S6 --> S7 HOL case suite and cross-semantics oracle
 
 ray and beam foundations
-  E1/E5 --> R1 physical/paraxial rays --> R2 systems --> R3 imaging --> R4 Gaussian beams
+  E1/E5b --> R1 physical/paraxial rays --> R2 systems --> R3 imaging --> R4 Gaussian beams
   R4 --> R5 resonators
 ```
 
@@ -659,16 +679,25 @@ and explicit absence of free surface charge/current; bound polarization charge m
 material description. Fresnel coefficients are conclusions of the boundary system, never fields
 stored in the interface definition.
 
-The incident plus reflected total field and the transmitted total field must be assembled on their
-respective half-spaces at a common frequency before traces are compared. `s` and `p` require either
-oblique incidence or an independently selected tangential frame at normal incidence. Total
-internal reflection requires a complex wavevector and a chosen outgoing/decaying square-root
-branch; an evanescent field is not an ordinary positive-power propagating mode. Converting Fresnel
-field amplitudes to a multiport scattering matrix uses square-root normal-admittance factors. Its
-ordinary power-unitarity theorem is restricted to the regime where every retained propagating
-channel has strictly positive normal admittance. Grazing/critical channels have singular
-normalization, and a TIR evanescent transmitted field is not placed in that ordinary positive-power
-port set; those regimes use a reduced propagating-channel set or a later generalized flux pairing.
+The interface stack has two levels. Its primitive time-domain boundary problem gives the incident,
+reflected, and transmitted candidates independent positive frequencies and wave vectors, assembles
+the incident-plus-reflected and transmitted ordinary real fields on their respective half-spaces,
+and compares traces for every boundary point and time. Harmonic-uniqueness and noncancellation
+lemmas, with explicit nonzero hypotheses, must then derive frequency conservation and tangential
+wave-vector conservation; neither fact may be stored in the premise of the theorem meant to prove
+it. Only after those results may a reduced fixed-frequency boundary problem expose complex
+amplitude equations for Snell and Fresnel calculations. The reduction theorem must state exactly
+which non-null and phase-matching hypotheses make it equivalent to the primitive problem.
+
+At either level, `s` and `p` require oblique incidence or an independently selected tangential
+frame at normal incidence. Total internal reflection requires a complex wavevector and a chosen
+outgoing/decaying square-root branch; an evanescent field is not an ordinary positive-power
+propagating mode. Converting Fresnel field amplitudes to a multiport scattering matrix uses
+square-root normal-admittance factors. Its ordinary power-unitarity theorem is restricted to the
+regime where every retained propagating channel has strictly positive normal admittance.
+Grazing/critical channels have singular normalization, and a TIR evanescent transmitted field is
+not placed in that ordinary positive-power port set; those regimes use a reduced
+propagating-channel set or a later generalized flux pairing.
 
 The Fresnel convention must orient `s` and `p` bases separately for incident, reflected, and
 transmitted directions and state whether `r_p` and `t_p` multiply full electric-vector amplitudes
@@ -1136,10 +1165,16 @@ sources.
   selected `s` axis and negates the derived `p` axis;
 - [x] a dimension-generic complex-wavevector representation with a complex-bilinear pairing,
   phase/attenuation decomposition, spatial-factor laws, and proof-bearing positive-normal
-  exponential decay, including an exact coordinate sign regression; and
-- [ ] a complex electromagnetic carrier, exact bridge from the real plane-wave API, material
-  dispersion and Maxwell laws, and an interface-oriented outgoing/decaying branch for evanescent
-  fields.
+  exponential decay, including an exact coordinate sign regression;
+- [x] an off-shell complex electromagnetic carrier with ordinary real `E`/`D`/`B`/`H`, compatible
+  magnetic amplitude, bilinear electric transversality, structural magnetic transversality,
+  positive-normal field decay, and constitutive satisfaction;
+- [x] an exact bridge from every existing real-quadrature plane wave to the complex carrier,
+  including carrier, transversality, magnetic amplitude, and all four ordinary real fields; and
+- [ ] generic complex-carrier calculus, bilinear material dispersion and its phase/attenuation
+  decomposition, forward real-field Maxwell laws, an honest nonzero-amplitude converse, exact
+  propagating/evanescent falsification regressions, and an interface-oriented outgoing/decaying
+  branch for evanescent fields.
 
 Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
 
@@ -1186,16 +1221,18 @@ mode family covered by the theorem.
 #### E4a. Planar interface and local boundary semantics
 
 - oriented affine plane, tangential projection, two half-spaces, and incident-side convention;
-- total incident-plus-reflected and transmitted fields, their half-space restrictions/traces, and
-  a common-frequency condition before boundary values are compared;
+- a primitive time-domain configuration whose incident, reflected, and transmitted waves have
+  independent positive frequencies and wave vectors, with total incident-plus-reflected and
+  transmitted ordinary real fields and their half-space restrictions/traces compared for every
+  boundary point and time;
 - tangential `E` and `H` and normal `D` and `B` boundary laws with free surface sources;
 - zero-free-surface-charge/current specializations, without claiming bound polarization charge is
   absent; and
 - a clearly named local boundary predicate whose use is visible in every conditional reflection,
   Snell, and Fresnel result.
 
-Exit: exact plane-wave boundary calculations can proceed honestly from explicit local laws, at the
-same abstraction level as the audited HOL interface work.
+Exit: the primitive independent-frequency physical trace problem is stated honestly from explicit
+local laws, at the same abstraction level as the audited HOL interface work.
 
 #### E4b. Maxwell derivation of the boundary laws
 
@@ -1207,14 +1244,25 @@ Owner: SpaceAndTime and Electromagnetism.
 - derivation that E4a's tangential and normal boundary predicates hold under the corresponding
   thin-loop and pillbox limits.
 
-Exit: the local laws used by E5/E6 become physical theorems from Maxwell equations. Physical
+Exit: the local laws used by E5a/E5b/E6 become physical theorems from Maxwell equations. Physical
 Optics v0.1 requires this stronger exit; integrated-photonics work does not.
 
-#### E5. Reflection, refraction, and total internal reflection
+#### E5a. Conservation and fixed-frequency reduction
 
-- phase matching along the entire plane;
-- equality of frequency and tangential wave-vector components under necessary nonzero-amplitude
-  assumptions;
+- harmonic-uniqueness and noncancellation lemmas strong enough to distinguish unequal positive
+  frequencies in ordinary real time-domain fields;
+- equality of frequency and tangential wave-vector components derived from primitive boundary
+  equality along the entire plane and time axis under necessary nonzero-amplitude hypotheses;
+- a reduced fixed-frequency complex-amplitude boundary problem introduced only after those
+  conservation results; and
+- a theorem relating its amplitude equations to the primitive physical trace problem under the
+  exact non-null and phase-matching hypotheses needed in both directions.
+
+Exit: every later fixed-frequency boundary calculation is connected to the independent-frequency
+physical problem, and no conservation conclusion is hidden in its own premises.
+
+#### E5b. Reflection, refraction, and total internal reflection
+
 - specular reflection and Snell's law;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;
 - critical-angle and total-internal-reflection characterization; and
@@ -1598,7 +1646,7 @@ parity ledger is discharged by a public declaration and regression.
 - physical ray, oriented interface incidence, reflection, and refraction;
 - paraxial ray coordinate with the approximation stated as a model assumption or a proved limit;
 - free-space and plane/spherical-interface behavior; and
-- relationship to E5's exact geometric directions.
+- relationship to E5b's exact geometric directions.
 
 #### R2. Ray-transfer components and systems
 
@@ -1707,6 +1755,9 @@ universal continuous-frequency property.
 | C-02 | sequential ideal polarizers on a linear input prove Malus' law | overgeneralized input class or disconnected intensity |
 | C-03 | quarter- and half-wave plates produce named canonical states and preserve Jones intensity | axis/retardance convention errors |
 | E-00 | `K = q - I * alpha * n` has bilinear square `norm q ^ 2 - alpha ^ 2`, and positive-normal displacement multiplies its spatial factor by `exp (-alpha * u)` | Hermitian/bilinear confusion or attenuation-sign error |
+| E-00a | every existing real-quadrature `MonochromaticPlaneWave` embeds with exactly equal carrier, transversality predicate, magnetic amplitude, and ordinary real `E`/`B`; for every supplied homogeneous medium its `D`/`H` fields also agree | disconnected complex state or quadrature-sign error |
+| E-00b | for `epsilon = mu = 3`, `omega = 1`, and `K = (5, 0, -4 I)`, exact TE and TM amplitudes satisfy bilinear dispersion/transversality and full real Maxwell with carrier `exp (-4 z) exp (I (t - 5 x))`, while the Hermitian norm square is `41`, not `9` | Hermitian/bilinear, attenuation, cross-order, constitutive, or quadrature-sign confusion |
+| E-00c | zero electric amplitude satisfies the real Maxwell predicate for a deliberately dispersion-mismatched carrier, while every converse that derives dispersion requires a nonzero-amplitude hypothesis | silently invalid complex converse |
 | E-01 | interface at normal incidence specializes consistently using a selected tangent frame | hidden `s`/`p` degeneracy or normal-direction errors |
 | E-02 | reflection and Snell laws follow from phase matching | assumed rather than derived geometry |
 | E-03 | Fresnel boundary equations imply the amplitude formulas | sign and impedance errors |
@@ -1909,14 +1960,15 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier, material dispersion, Maxwell, oriented Jones/phasor frame, phase coherence, vacuum regression, non-normal/selected-tangent s/p incidence, and neutral complex-wavevector decay geometry complete; complex electromagnetic carrier, real-wave bridge, outgoing branch, and evanescent-field layers remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, and exact real-wave bridge complete; complex calculus, bilinear dispersion, Maxwell/converse, falsification regressions, and interface-selected outgoing branch remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
-| E4a local boundary semantics | blocked | E1, local-domain design | explicit conditional boundary predicate |
+| E4a local boundary semantics | blocked | E1, E2, local-domain design | primitive independent-frequency physical traces and explicit conditional local laws |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5 reflection/Snell/TIR | blocked | E2, E4a | phase-matching geometry suite |
-| E6 Fresnel/flux | blocked | E3b, E5 | amplitude, admittance-normalized scattering, and flux suite |
+| E5a conservation/reduction | blocked | E2, E4a | harmonic uniqueness, derived frequency/tangential-K conservation, and fixed-frequency reduction theorem |
+| E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
+| E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
@@ -1941,7 +1993,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice parity | blocked | N3T, N5H, S0, S4P | finite cascade and lattice suite |
-| R1--R5 ray/beam foundations | future | E1/E5 plus focused ray API map | ray, imaging, ABCD, resonator suite |
+| R1--R5 ray/beam foundations | future | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 
 ## O. Overall completion checklist
@@ -2035,10 +2087,15 @@ human verification recorded in `tbd.md`.
    `s = normalize (n × k)`, `p = k × s`, Jones order `(s, p)`, explicit tangent selection at
    normal incidence, and exact orientation regressions. Preserve E2e's dimension-generic
    complex-wavevector geometry, non-Hermitian bilinear pairing, convention
-   `K = q - I a`, exact positive-normal spatial decay, and interface/power exclusions. Proceed next
-   to the complex electromagnetic carrier and exact real-wave bridge, then its dispersion,
-   Maxwell, and interface-oriented outgoing/decaying layers, while withholding power claims until
-   Poynting-flux normalization.
+   `K = q - I a`, exact positive-normal spatial decay, and interface/power exclusions. Preserve the
+   now-complete off-shell complex carrier and exact real-wave bridge: physical fields remain
+   ordinary real fields, transversality and material dispersion remain separate, amplitudes are
+   relative to a selected origin/carrier phase rather than intrinsically power-normalized, and no
+   interface role is inferred from positive decay alone. Proceed next to a separate generic
+   complex-carrier calculus layer, then bilinear material dispersion, forward real-field Maxwell,
+   the guarded converse and exact TE/TM/zero-amplitude regressions, and only then the
+   interface-oriented outgoing/decaying layer. Withhold power claims until Poynting-flux
+   normalization.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -2050,8 +2107,10 @@ The next session should not jump directly to a microring formula or stored Fresn
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
 P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
 medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, oriented
-Jones/phasor realization, incidence frames, and neutral complex-wavevector decay geometry now
-connected, the next physical-optics front is the complex electromagnetic carrier and exact bridge
-from existing real material waves; dispersion, Maxwell, and the interface-oriented
-outgoing/decaying branch follow on that shared carrier. The independent circuit front remains
-N2a/N3.
+Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell complex
+carrier, and exact real-wave bridge now connected, the next physical-optics front is generic
+carrier calculus. Bilinear material dispersion, real-field Maxwell and its guarded converse,
+falsification regressions, and the interface-oriented outgoing/decaying branch follow on that
+shared carrier. The interface must start from independent-frequency time-domain traces and derive
+frequency conservation before it uses a fixed-frequency Fresnel reduction. The independent
+circuit front remains N2a/N3.

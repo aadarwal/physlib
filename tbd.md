@@ -163,7 +163,7 @@ PR unless maintainers explicitly ask to retain it.
   incidence, forward and backward propagation share `s` while their `p` axes are negatives. A
   later full-vector Fresnel convention therefore generally has the normal-incidence scalar sign
   `r_p = -r_s` even though the physical reflected tangential vectors have the same sign.
-- [ ] Before E4/E5, confirm that the planar-interface normal points from incident medium 1 toward
+- [ ] Before E4a/E5b, confirm that the planar-interface normal points from incident medium 1 toward
   transmitted medium 2, and independently confirm whether every public Fresnel `p` coefficient
   scales a full electric-vector axis or a tangential component. The present incidence-frame API
   fixes neither interface-side roles nor a tangential-amplitude conversion.
@@ -179,6 +179,32 @@ PR unless maintainers explicitly ask to retain it.
   Maxwell predicate, or assign power flow. Split a future upstream stack into
   complex-vector/bilinear foundations, phase--attenuation spatial factors, positive-normal decay,
   and coordinate regressions.
+- [ ] Human-check the complex-carrier convention and ownership: the carrier is
+  `exp (I * omega * t) * exp (-I * K dot x)`, `K = q - I a` therefore decays as
+  `exp (-a dot x)`, and `B0 = omega^-1 * (K x E0)` uses `K x E0`, not the reversed cross product.
+  The complex amplitude is relative to the selected spatial origin and carrier phase; translating
+  an attenuating wave can change its modulus, so its norm is neither an intrinsic Jones intensity
+  nor irradiance or power. Physical `E`/`D`/`B`/`H` remain ordinary real fields, and the carrier
+  introduces no complex Maxwell-field, potential, or gauge state.
+- [ ] Human-check the exact real-wave bridge: `K` is the componentwise complexification of the real
+  wave vector, `E0 = electricReal + I * electricImag`, the componentwise-real realization has the
+  existing cosine-minus-sine sign, complex-bilinear transversality is equivalent to both existing
+  real-quadrature conditions, and the derived magnetic amplitude recovers both magnetic
+  quadratures. Confirm exact equality of ordinary real `E`/`D`/`B`/`H`, but no equality claim about
+  potentials, gauges, power normalization, interface roles, or hidden complex states.
+- [ ] Split the fork-side complex-carrier work before an upstream proposal: off-shell carrier,
+  algebra, ordinary-real-field realization, transversality, decay, and constitutive results first;
+  the exact existing-real-wave bridge second; generic carrier calculus third; bilinear material
+  dispersion and its phase/attenuation decomposition fourth; forward Maxwell and the guarded
+  converse fifth; and exact propagating, evanescent TE/TM, and zero-amplitude falsification
+  regressions last. Keep square-root branch choice, interface roles, and power out of these PRs.
+- [ ] Correctly layer E4a/E5a/E5b: the primitive time-domain boundary configuration must give
+  incident, reflected, and transmitted waves independent positive frequencies and wave vectors,
+  then compare ordinary real traces for every boundary point and time. Prove harmonic uniqueness,
+  frequency conservation, and tangential-wave-vector conservation under explicit nonzero and
+  noncancellation hypotheses before introducing the reduced fixed-frequency complex-amplitude
+  problem used for Snell and Fresnel calculations. Never assume common frequency in a premise
+  whose conclusion is meant to establish frequency conservation.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
