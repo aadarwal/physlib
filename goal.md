@@ -1293,19 +1293,25 @@ mode family covered by the theorem.
   carrier parameterization;
 - [x] a planar dielectric interface assigning medium 1 to the negative side, medium 2 to the
   positive side, and the stored normal from medium 1 toward medium 2;
-- a primitive time-domain configuration whose incident, reflected, and transmitted waves have
-  independent positive frequencies and wave vectors, with total incident-plus-reflected and
-  transmitted ordinary real fields and their half-space restrictions/traces compared for every
-  boundary point and time;
+- [x] a primitive time-domain boundary-data configuration whose incident-, reflected-, and
+  transmitted-labelled off-shell candidates retain independent positive frequencies and complex
+  wave vectors, with incident-plus-reflected negative-medium and transmitted positive-medium
+  ordinary real pointwise plane traces for every boundary point and time;
 - [x] tangential `E` and `H` and normal `D` and `B` boundary laws with free electric surface
   sources, using the negative-to-positive jump convention;
 - [x] zero-free-surface-charge/current specializations, without claiming bound polarization
   charge is absent; and
-- a clearly named local boundary predicate whose use is visible in every conditional reflection,
-  Snell, and Fresnel result.
+- [x] clearly named sourceful and zero-free-surface-source local predicates connecting those traces
+  to the generic boundary laws; every future conditional reflection, Snell, and Fresnel result must
+  expose the appropriate predicate.
 
-Exit: the primitive independent-frequency physical trace problem is stated honestly from explicit
-local laws, at the same abstraction level as the audited HOL interface work.
+This initial exact-wave slice uses pointwise restrictions of globally defined fields. It does not
+construct half-space-supported fields or analytic one-sided traces, establish genuine one-sided
+illumination, or package on-shellness; those require later propagation-role and branch hypotheses
+and E4b's analytic derivation.
+
+Exit: the primitive independent-frequency ordinary-real pointwise boundary-data problem is stated
+honestly from explicit local laws, at the same abstraction level as the audited HOL interface work.
 
 #### E4b. Maxwell derivation of the boundary laws
 
@@ -2053,9 +2059,9 @@ current integration base; a designed package whose prerequisite is merely active
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
-| E4a local boundary semantics | in progress | E1, E2 | oriented-hyperplane geometry, planar medium assignment, ordinary-real pointwise E/D/B/H data, signed four-law boundary predicate, and zero-free-surface-source continuity complete; the primitive independent-frequency three-wave configuration and its explicit local predicate remain |
+| E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5a conservation/reduction | in progress | E2, E4a | neutral finite exponential-character independence and positive-frequency real-harmonic uniqueness complete; electromagnetic noncancellation, derived frequency/tangential-K conservation, and fixed-frequency reduction remain |
+| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness and the primitive independent-frequency boundary configuration complete; boundary exponents, joint E/D noncancellation, conditional reflected collision, frequency/tangential-K conservation, and fixed-frequency reduction remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
