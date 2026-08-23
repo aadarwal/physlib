@@ -49,6 +49,8 @@ phase-matching predicate is used without its separate electric amplitude-balance
   real tangential phase and attenuation equalities.
 - `transmittedNormalRadicand`: the real candidate radicand formed from incident tangential phase
   data and the positive-side medium.
+- `hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand_of_tangentialProjection_eq`: the
+  branch-neutral vector and material-shell reduction to that radicand.
 - `transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand`: zero incident
   tangential attenuation makes the transmitted normal square equal that embedded real radicand.
 - `transmitted_normalRoot_data_of_isPhaseDirectedInto`: positive-side phase direction selects the
@@ -109,6 +111,55 @@ def transmittedNormalRadicand (configuration : PlanarDielectricWaveConfiguration
     ‖configuration.interface.plane.tangentialProjection
       configuration.incident.waveVector.phaseVector‖ ^ 2
 
+/-- A complex wave vector with the incident tangential projection and the positive-medium shell
+has normal square equal to the transmitted normal radicand whenever the incident tangential
+attenuation vanishes.
+
+This vector-level reduction selects no normal root or phase/attenuation direction. -/
+lemma hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand_of_tangentialProjection_eq
+    (configuration : PlanarDielectricWaveConfiguration) (waveVector : ComplexWaveVector 3)
+    (hTangential :
+      hyperplaneTangentialProjection configuration.interface.plane waveVector =
+        hyperplaneTangentialProjection configuration.interface.plane
+          configuration.incident.waveVector)
+    (hShell : bilinearDot waveVector waveVector =
+      ((configuration.interface.positiveMedium.ε *
+        configuration.interface.positiveMedium.μ *
+        configuration.incident.angularFrequency ^ 2 : ℝ) : ℂ))
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0) :
+    hyperplaneNormalComponent configuration.interface.plane waveVector ^ 2 =
+      (configuration.transmittedNormalRadicand : ℂ) := by
+  have hIncidentProjection :=
+    hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero
+      configuration.interface.plane configuration.incident.waveVector
+        hIncidentTangentialAttenuation
+  calc
+    hyperplaneNormalComponent configuration.interface.plane waveVector ^ 2 =
+        ((configuration.interface.positiveMedium.ε *
+          configuration.interface.positiveMedium.μ *
+          configuration.incident.angularFrequency ^ 2 : ℝ) : ℂ) -
+          bilinearDot
+            (hyperplaneTangentialProjection configuration.interface.plane waveVector)
+            (hyperplaneTangentialProjection configuration.interface.plane waveVector) := by
+      rw [← hShell, bilinearDot_self_eq_tangential_add_normal_sq]
+      ring
+    _ = ((configuration.interface.positiveMedium.ε *
+          configuration.interface.positiveMedium.μ *
+          configuration.incident.angularFrequency ^ 2 : ℝ) : ℂ) -
+          bilinearDot
+            (hyperplaneTangentialProjection configuration.interface.plane
+              configuration.incident.waveVector)
+            (hyperplaneTangentialProjection configuration.interface.plane
+              configuration.incident.waveVector) := by
+      rw [hTangential]
+    _ = (configuration.transmittedNormalRadicand : ℂ) := by
+      rw [hIncidentProjection, bilinearDot_ofReal, real_inner_self_eq_norm_sq,
+        transmittedNormalRadicand]
+      push_cast
+      ring
+
 namespace IsElectricPhaseMatched
 
 variable {configuration : PlanarDielectricWaveConfiguration}
@@ -166,21 +217,11 @@ lemma transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
         configuration.incident.waveVector.attenuationVector = 0) :
     ComplexWaveVector.hyperplaneNormalComponent configuration.interface.plane
           configuration.transmitted.waveVector ^ 2 =
-      (configuration.transmittedNormalRadicand : ℂ) := by
-  rw [h.transmitted_hyperplaneNormalComponent_sq hTransmittedDispersion]
-  have hProjection :
-      ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
-          configuration.incident.waveVector =
-        ComplexWaveVector.ofReal
-          (configuration.interface.plane.tangentialProjection
-            configuration.incident.waveVector.phaseVector) :=
-    hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero
-      configuration.interface.plane configuration.incident.waveVector
+      (configuration.transmittedNormalRadicand : ℂ) :=
+  configuration.hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand_of_tangentialProjection_eq
+    configuration.transmitted.waveVector h.1.2
+      (by simpa only [IsDispersionMatched, h.1.1] using hTransmittedDispersion)
         hIncidentTangentialAttenuation
-  rw [hProjection, ComplexWaveVector.bilinearDot_ofReal,
-    real_inner_self_eq_norm_sq, transmittedNormalRadicand]
-  push_cast
-  ring
 
 /-- Under phase matching and material dispersion on both sides, the transmitted-minus-incident
 squared complex normal components equal the material contrast times the common frequency square. -/
