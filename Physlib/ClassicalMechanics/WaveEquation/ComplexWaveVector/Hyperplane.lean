@@ -30,15 +30,16 @@ attenuation data.
 Adding an arbitrary complex multiple of the real normal leaves the tangential projection
 unchanged. Thus tangent data cannot determine a complex normal component or a full wave vector.
 Flipping the complex normal component defines hyperplane reflection. It preserves the tangential
-projection and complex-bilinear square and is involutive. On phase and attenuation vectors it has
-the familiar real formula that subtracts twice the oriented normal component. Conversely, two
-vectors with equal tangential projections and equal bilinear squares are either equal or related
-by this reflection; the alternatives coincide when their normal component vanishes.
+projection and complex-bilinear square and is involutive. On phase and attenuation vectors it is
+exactly real vector reflection across the tangent plane. Conversely, two vectors with equal
+tangential projections and equal bilinear squares are either equal or related by this reflection;
+the alternatives coincide when their normal component vanishes.
 
-Strict side-relative predicates record when the real phase or attenuation vector points into one
-geometric side. Each excludes a zero normal component of the corresponding real vector. They
-assign no medium, optical wave role, propagation, group or energy-flow direction, physical root,
-outgoing condition, or power meaning.
+A side-relative phase angle measures the real phase vector against the unit normal pointing into a
+selected geometric side. Strict side-relative predicates record when the real phase or attenuation
+vector points into one geometric side. Each excludes a zero normal component of the corresponding
+real vector. They assign no medium, optical wave role, propagation, group or energy-flow direction,
+physical root, outgoing condition, or power meaning.
 
 Normal displacement changes the spatial pairing and spatial factor through only the complex
 normal component. The factor norm scales by the real exponential of minus the attenuation normal
@@ -63,6 +64,8 @@ attenuation.
 - `ComplexWaveVector.hyperplaneReflection`: reflection across the complexified tangent plane.
 - `ComplexWaveVector.hyperplaneReflection_ofPhaseAttenuation`: reflection acts separately on
   phase and attenuation vectors by the real mirror formula.
+- `ComplexWaveVector.phaseAngleToSide_hyperplaneReflection`: complex hyperplane reflection
+  preserves the phase angle after exchanging geometric sides.
 - `eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_self_eq`:
   the exact two-root classification at fixed tangential projection and bilinear square.
 - `ComplexWaveVector.IsPhaseDirectedInto`: strict phase-vector direction into a geometric side.
@@ -81,7 +84,7 @@ attenuation.
 - B. Phase and attenuation compatibility
 - C. Tangent-pairing characterization
 - D. Complex hyperplane reflection
-- E. Strict side-relative phase and attenuation directions
+- E. Side-relative phase angles and strict phase or attenuation directions
 - F. Normal-displacement spatial scaling
 
 ## iv. References
@@ -446,6 +449,15 @@ lemma phaseVector_hyperplaneReflection
   rw [hyperplaneReflection_ofPhaseAttenuation]
   simp
 
+/-- The phase vector of a complex hyperplane reflection is the real vector reflection of the
+original phase vector. -/
+lemma phaseVector_hyperplaneReflection_eq_vectorReflection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    phaseVector (hyperplaneReflection plane z) =
+      plane.vectorReflection (phaseVector z) := by
+  rw [phaseVector_hyperplaneReflection,
+    OrientedAffineHyperplane.vectorReflection_eq_sub_two_smul_normalVector]
+
 /-- The attenuation vector of a reflected complex wave vector obeys the real hyperplane-mirror
 formula. -/
 @[simp]
@@ -457,6 +469,15 @@ lemma attenuationVector_hyperplaneReflection
   nth_rewrite 1 [← ofPhaseAttenuation_phaseVector_attenuationVector z]
   rw [hyperplaneReflection_ofPhaseAttenuation]
   simp
+
+/-- The attenuation vector of a complex hyperplane reflection is the real vector reflection of
+the original attenuation vector. -/
+lemma attenuationVector_hyperplaneReflection_eq_vectorReflection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    attenuationVector (hyperplaneReflection plane z) =
+      plane.vectorReflection (attenuationVector z) := by
+  rw [attenuationVector_hyperplaneReflection,
+    OrientedAffineHyperplane.vectorReflection_eq_sub_two_smul_normalVector]
 
 /-- Hyperplane reflection negates the oriented normal component of the real phase vector. -/
 lemma normalComponent_phaseVector_hyperplaneReflection
@@ -578,11 +599,28 @@ lemma eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_se
 
 /-!
 
-## E. Strict side-relative phase and attenuation directions
+## E. Side-relative phase angles and strict phase or attenuation directions
 
-### E.1. Phase direction
+### E.1. Phase angle and direction
 
 -/
+
+/-- The unoriented angle between a complex wave vector's real phase vector and the unit normal
+pointing into a selected geometric side.
+
+Following the underlying vector-angle convention, a zero phase vector has angle `π / 2`. This
+definition asserts no medium, propagation, group-velocity, energy-flow, or optical-wave role. -/
+noncomputable def phaseAngleToSide (z : ComplexWaveVector d)
+    (plane : OrientedAffineHyperplane d) (side : OrientedAffineHyperplane.Side) : ℝ :=
+  plane.angleToSide side z.phaseVector
+
+/-- The tangential phase-vector norm is the phase-vector norm multiplied by the sine of its
+side-relative angle. -/
+lemma sin_phaseAngleToSide_mul_norm (z : ComplexWaveVector d)
+    (plane : OrientedAffineHyperplane d) (side : OrientedAffineHyperplane.Side) :
+    Real.sin (z.phaseAngleToSide plane side) * ‖z.phaseVector‖ =
+      ‖plane.tangentialProjection z.phaseVector‖ :=
+  plane.sin_angleToSide_mul_norm side z.phaseVector
 
 /-- A complex wave vector is phase-directed strictly into a geometric side of an oriented
 hyperplane when the real part of its complex normal component has the corresponding strict sign.
@@ -604,6 +642,36 @@ lemma isPhaseDirectedInto_iff_inner_sideNormalVector
   simp only [IsPhaseDirectedInto, hyperplaneNormalComponent_re,
     OrientedAffineHyperplane.sideNormalVector, inner_smul_left,
     OrientedAffineHyperplane.normalComponent, conj_trivial]
+
+/-- Strict phase direction into a side is equivalent to the side-relative phase angle being below
+`π / 2`. -/
+lemma isPhaseDirectedInto_iff_phaseAngleToSide_lt_pi_div_two
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d)
+    (side : OrientedAffineHyperplane.Side) :
+    z.IsPhaseDirectedInto plane side ↔
+      z.phaseAngleToSide plane side < Real.pi / 2 := by
+  rw [isPhaseDirectedInto_iff_inner_sideNormalVector, phaseAngleToSide,
+    plane.angleToSide_lt_pi_div_two_iff]
+
+/-- A phase vector directed strictly into a side has side-relative angle in `[0, π / 2)`. -/
+lemma phaseAngleToSide_mem_Ico_of_isPhaseDirectedInto
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d)
+    (side : OrientedAffineHyperplane.Side) (h : z.IsPhaseDirectedInto plane side) :
+    z.phaseAngleToSide plane side ∈ Set.Ico 0 (Real.pi / 2) := by
+  apply plane.angleToSide_mem_Ico_of_inner_pos
+  exact (z.isPhaseDirectedInto_iff_inner_sideNormalVector plane side).mp h
+
+/-- Complex hyperplane reflection preserves the side-relative phase angle when the reference side
+is exchanged. -/
+@[simp]
+lemma phaseAngleToSide_hyperplaneReflection
+    (plane : OrientedAffineHyperplane d) (side : OrientedAffineHyperplane.Side)
+    (z : ComplexWaveVector d) :
+    (hyperplaneReflection plane z).phaseAngleToSide plane side.opposite =
+      z.phaseAngleToSide plane side := by
+  rw [phaseAngleToSide, phaseAngleToSide,
+    phaseVector_hyperplaneReflection_eq_vectorReflection,
+    plane.angleToSide_vectorReflection]
 
 /-- Phase direction into the positive side means a strictly positive oriented phase normal
 component. -/
