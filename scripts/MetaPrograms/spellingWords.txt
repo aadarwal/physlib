@@ -2005,6 +2005,7 @@ nonempty
 nonexclusive
 nonnegative
 nonnegativity
+nonpositive
 nonzero
 nor
 norm
@@ -2371,6 +2372,8 @@ quotient
 quotienting
 quotients
 r
+radicand
+radicands
 radius
 raising
 range
