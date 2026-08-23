@@ -360,6 +360,26 @@ PR unless maintainers explicitly ask to retain it.
   index. Neither zero attenuation nor a phase direction is inferred from phase matching, and the
   identities alone construct or select no transmitted branch and assign no ray, group-velocity,
   outgoing, critical-angle, evanescent, Fresnel, irradiance, or power meaning.
+- [ ] Human-check the critical phase-angle geometry before upstreaming. Confirm that medium 1 is
+  the negative-side incident medium, medium 2 is the positive-side transmitted medium, and the
+  strict contrast `v₁ < v₂` gives the reference-free sine threshold `v₁ / v₂ = n₂ / n₁` in
+  `(0, 1)`, with both refractive indices taken relative to one common reference medium. The
+  proof-bearing critical phase angle must remain in `(0, π / 2)`; do not use Mathlib's total
+  `arcsin` outside the proved contrast domain or silently extend that interior angle to the
+  equal-speed endpoint. Separately, confirm that the unconditional sine-critical predicate
+  deliberately includes equal-speed grazing and, under strict contrast but without an angle range,
+  can represent the supplementary obtuse branch. The three primitive incidence predicates become
+  ordinary angle comparisons only under the explicit `[0, π / 2]` incident-angle hypothesis.
+  Check that the transmitted normal-radicand factorization and sign equivalences require incident
+  negative-medium dispersion and zero whole incident attenuation, but neither phase matching nor
+  transmitted dispersion. Finally, the critical connector classifies an already supplied
+  electrically phase-matched candidate with negative-medium incident dispersion, positive-medium
+  transmitted dispersion, and zero whole incident attenuation: it forces the unique zero normal
+  root, zero whole transmitted attenuation, and a nonzero transmitted phase vector tangent to the
+  interface. It constructs no candidate and assigns no amplitude activity, outgoing, evanescent,
+  TIR, Fresnel, irradiance, or power meaning. For eventual upstream review, split this fork milestone
+  into a neutral Space prerequisite, material threshold and radicand-sign geometry, and angle
+  interpretation plus the supplied-candidate connector.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic

@@ -207,6 +207,7 @@ public import Physlib.Optics.Components.Retarder.Regression
 public import Physlib.Optics.Components.Retarder.WavePlate
 public import Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry
 public import Physlib.Optics.Interfaces.PlanarDielectric.Basic
+public import Physlib.Optics.Interfaces.PlanarDielectric.CriticalAngle
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricFixedFrequency
