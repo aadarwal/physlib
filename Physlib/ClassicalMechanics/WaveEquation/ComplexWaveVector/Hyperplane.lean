@@ -18,18 +18,19 @@ oriented affine hyperplane. Its complex normal component uses the complex-biline
 pairing, and its tangential projection subtracts that component times the complexified normal.
 The vector is recovered exactly as the sum of its tangential and normal parts.
 
-For `K = q - I a`, complex tangential projection acts separately on the real phase vector `q` and
-the real attenuation vector `a`. Consequently, two complex vectors have equal tangential
-projections exactly when their complex-bilinear pairings agree against every real tangent
-displacement. This basis-free characterization retains both tangential phase and tangential
-attenuation data.
+For `K = q - I a`, the complex normal component is the real phase normal component minus `I`
+times the real attenuation normal component. Complex tangential projection acts separately on
+`q` and `a`. Consequently, two complex vectors have equal tangential projections exactly when
+their complex-bilinear pairings agree against every real tangent displacement. This basis-free
+characterization retains both tangential phase and tangential attenuation data.
 
 Adding an arbitrary complex multiple of the real normal leaves the tangential projection
 unchanged. Thus tangent data cannot determine a complex normal component or a full wave vector.
 Flipping the complex normal component defines hyperplane reflection. It preserves the tangential
-projection and complex-bilinear square and is involutive. Conversely, two vectors with equal
-tangential projections and equal bilinear squares are either equal or related by this reflection;
-the alternatives coincide when their normal component vanishes.
+projection and complex-bilinear square and is involutive. On phase and attenuation vectors it has
+the familiar real formula that subtracts twice the oriented normal component. Conversely, two
+vectors with equal tangential projections and equal bilinear squares are either equal or related
+by this reflection; the alternatives coincide when their normal component vanishes.
 The construction assigns no medium, interface side, propagation direction, material-dispersion,
 square-root branch, evanescent-wave, observable, or power meaning.
 
@@ -39,11 +40,15 @@ square-root branch, evanescent-wave, observable, or power meaning.
   decomposition.
 - `ComplexWaveVector.hyperplaneTangentialProjection_ofPhaseAttenuation`: projection acts
   separately on phase and attenuation vectors.
+- `ComplexWaveVector.hyperplaneNormalComponent_ofPhaseAttenuation`: the complex normal component
+  separates into its real phase and attenuation components.
 - `ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent`: equality
   of complex tangential projections is exactly equality of every real-tangent pairing.
 - `ComplexWaveVector.hyperplaneTangentialProjection_add_smul_normalVector`: arbitrary complex
   normal shifts are invisible to tangential projection.
 - `ComplexWaveVector.hyperplaneReflection`: reflection across the complexified tangent plane.
+- `ComplexWaveVector.hyperplaneReflection_ofPhaseAttenuation`: reflection acts separately on
+  phase and attenuation vectors by the real mirror formula.
 - `eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_self_eq`:
   the exact two-root classification at fixed tangential projection and bilinear square.
 
@@ -117,20 +122,48 @@ lemma hyperplaneNormalComponent_hyperplaneTangentialProjection
 
 -/
 
+/-- The complex normal component of `q - I * a` consists of the real phase normal component minus
+`I` times the real attenuation normal component. -/
+@[simp]
+lemma hyperplaneNormalComponent_ofPhaseAttenuation
+    (plane : OrientedAffineHyperplane d) (q a : WaveVector d) :
+    hyperplaneNormalComponent plane (ofPhaseAttenuation q a) =
+      (plane.normalComponent q : ℂ) -
+        Complex.I * (plane.normalComponent a : ℂ) := by
+  simp only [OrientedAffineHyperplane.normalComponent]
+  rw [hyperplaneNormalComponent, bilinearDot_comm,
+    bilinearDot_ofPhaseAttenuation_ofReal,
+    real_inner_comm q plane.normalVector, real_inner_comm a plane.normalVector]
+
+/-- The real part of the complex normal component is the oriented normal component of the phase
+vector. -/
+@[simp]
+lemma hyperplaneNormalComponent_re
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    (hyperplaneNormalComponent plane z).re =
+      plane.normalComponent (phaseVector z) := by
+  rw [← ofPhaseAttenuation_phaseVector_attenuationVector z,
+    hyperplaneNormalComponent_ofPhaseAttenuation]
+  simp
+
+/-- The imaginary part of the complex normal component is minus the oriented normal component of
+the attenuation vector. -/
+@[simp]
+lemma hyperplaneNormalComponent_im
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    (hyperplaneNormalComponent plane z).im =
+      -plane.normalComponent (attenuationVector z) := by
+  rw [← ofPhaseAttenuation_phaseVector_attenuationVector z,
+    hyperplaneNormalComponent_ofPhaseAttenuation]
+  simp
+
 /-- Complex tangential projection acts separately on the phase and attenuation vectors. -/
 lemma hyperplaneTangentialProjection_ofPhaseAttenuation
     (plane : OrientedAffineHyperplane d) (q a : WaveVector d) :
     hyperplaneTangentialProjection plane (ofPhaseAttenuation q a) =
       ofPhaseAttenuation (plane.tangentialProjection q)
         (plane.tangentialProjection a) := by
-  have hnormal :
-      hyperplaneNormalComponent plane (ofPhaseAttenuation q a) =
-        (inner ℝ plane.normalVector q : ℂ) -
-          Complex.I * (inner ℝ plane.normalVector a : ℂ) := by
-    rw [hyperplaneNormalComponent, bilinearDot_comm,
-      bilinearDot_ofPhaseAttenuation_ofReal,
-      real_inner_comm q plane.normalVector, real_inner_comm a plane.normalVector]
-  rw [hyperplaneTangentialProjection, hnormal]
+  rw [hyperplaneTangentialProjection, hyperplaneNormalComponent_ofPhaseAttenuation]
   ext i
   apply Complex.ext
   · simp [ofPhaseAttenuation_apply, OrientedAffineHyperplane.tangentialProjection,
@@ -324,6 +357,68 @@ lemma hyperplaneReflection_eq_sub_two_smul_normalVector
       z - (2 * hyperplaneNormalComponent plane z) • ofReal plane.normalVector := by
   rw [hyperplaneReflection, hyperplaneTangentialProjection]
   module
+
+/-- Hyperplane reflection acts separately on the real phase and attenuation vectors, subtracting
+twice each oriented normal component. -/
+lemma hyperplaneReflection_ofPhaseAttenuation
+    (plane : OrientedAffineHyperplane d) (q a : WaveVector d) :
+    hyperplaneReflection plane (ofPhaseAttenuation q a) =
+      ofPhaseAttenuation
+        (q - (2 * plane.normalComponent q) • plane.normalVector)
+        (a - (2 * plane.normalComponent a) • plane.normalVector) := by
+  rw [hyperplaneReflection_eq_sub_two_smul_normalVector,
+    hyperplaneNormalComponent_ofPhaseAttenuation]
+  ext i
+  apply Complex.ext
+  · simp [ofPhaseAttenuation_apply]
+  · simp [ofPhaseAttenuation_apply]
+    ring
+
+/-- The phase vector of a reflected complex wave vector obeys the real hyperplane-mirror
+formula. -/
+@[simp]
+lemma phaseVector_hyperplaneReflection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    phaseVector (hyperplaneReflection plane z) =
+      phaseVector z -
+        (2 * plane.normalComponent (phaseVector z)) • plane.normalVector := by
+  nth_rewrite 1 [← ofPhaseAttenuation_phaseVector_attenuationVector z]
+  rw [hyperplaneReflection_ofPhaseAttenuation]
+  simp
+
+/-- The attenuation vector of a reflected complex wave vector obeys the real hyperplane-mirror
+formula. -/
+@[simp]
+lemma attenuationVector_hyperplaneReflection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    attenuationVector (hyperplaneReflection plane z) =
+      attenuationVector z -
+        (2 * plane.normalComponent (attenuationVector z)) • plane.normalVector := by
+  nth_rewrite 1 [← ofPhaseAttenuation_phaseVector_attenuationVector z]
+  rw [hyperplaneReflection_ofPhaseAttenuation]
+  simp
+
+/-- Hyperplane reflection negates the oriented normal component of the real phase vector. -/
+lemma normalComponent_phaseVector_hyperplaneReflection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    plane.normalComponent (phaseVector (hyperplaneReflection plane z)) =
+      -plane.normalComponent (phaseVector z) := by
+  rw [phaseVector_hyperplaneReflection,
+    OrientedAffineHyperplane.normalComponent, inner_sub_right, inner_smul_right,
+    plane.inner_normalVector_self]
+  simp [OrientedAffineHyperplane.normalComponent]
+  ring
+
+/-- Hyperplane reflection negates the oriented normal component of the real attenuation vector. -/
+lemma normalComponent_attenuationVector_hyperplaneReflection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    plane.normalComponent (attenuationVector (hyperplaneReflection plane z)) =
+      -plane.normalComponent (attenuationVector z) := by
+  rw [attenuationVector_hyperplaneReflection,
+    OrientedAffineHyperplane.normalComponent, inner_sub_right, inner_smul_right,
+    plane.inner_normalVector_self]
+  simp [OrientedAffineHyperplane.normalComponent]
+  ring
 
 /-- Hyperplane reflection preserves the complex tangential projection. -/
 @[simp]
