@@ -927,6 +927,7 @@ dimset
 diophantine
 dirac
 direct
+directed
 direction
 directions
 directly
