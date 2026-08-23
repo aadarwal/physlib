@@ -372,6 +372,15 @@ PR unless maintainers explicitly ask to retain it.
   yet give full wave-vector equality, tangential projection equality, phase matching, Snell, or
   conservation. The wave remains off shell and the hyperplane receives no medium, interface-side,
   propagation-role, branch, or power semantics.
+- [ ] Human-check E5a's electric-only boundary projection before upstreaming. Confirm that
+  `IsPlanarElectricBoundary` contains exactly tangential-`E` continuity and the signed normal-`D`
+  jump with supplied free surface charge, and contains neither magnetic law nor free surface
+  current. Confirm that every full `IsPlanarMacroscopicBoundary` projects to it, but not conversely.
+  For the three-wave dielectric traces at zero free charge, check both directions of the exact
+  equivalence with pointwise equality of the actual ordinary-real joint tangential-`E`/normal-`D`
+  field data on the plane carrier. The reverse direction must reconstruct only those two electric
+  laws. The boundary-character consequence remains confined to the affine plane and proves no
+  off-plane field equality, magnetic boundary law, noncancellation, phase matching, or conservation.
 - [ ] Human-check E5a's joint electric calculation-amplitude convention before upstreaming. For a
   real unit normal `n`, confirm that the complex coefficient is
   `(E0 - (n dot E0) n, ε * (n dot E0))`, with the first entry stored in ambient complex
