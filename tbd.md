@@ -396,6 +396,27 @@ PR unless maintainers explicitly ask to retain it.
   velocity condition, or as positive Poynting flux. For eventual upstream review, split this fork
   milestone into neutral WaveEquation coordinate replacement, vector construction/uniqueness, and
   the arbitrary-amplitude plus supplied-candidate bridge.
+- [ ] Human-check the supercritical positive-normal-decay transmitted construction before
+  upstreaming. With the carrier convention `K = q - I a`, confirm that setting the stored normal
+  component to `-I * √(-c)` gives tangent phase and the purely normal attenuation vector
+  `a = √(-c) n`, so negative `c` makes attenuation strictly positive into the geometric positive
+  side. Verify that zero incident tangential attenuation plus `c < 0` is exactly equivalent to
+  unique existence of the common-complex-tangent, positive-medium-shell, zero-tangential-
+  attenuation, positive-side-directed wave vector, and that incident negative-medium dispersion
+  plus zero whole incident attenuation are the additional premises needed to replace `c < 0` by
+  strict sine-supercritical incidence. Confirm the exact global factor
+  `exp (-√(-c) * u)` for the spatial factor, complete carrier, ordinary electric field, and ordinary
+  magnetic induction. The nonzero spatial factor and complete carrier grow in magnitude for
+  negative `u`; the ordinary fields obey the same scaling but may vanish for the arbitrary stored
+  amplitude. None of these identities supplies half-space support. Full carrier uniqueness must
+  remain conditional on fixing the otherwise arbitrary electric amplitude. The supplied-candidate
+  bridge must require phase matching, positive-medium
+  transmitted dispersion, zero incident tangential attenuation, and separately supplied
+  positive-side attenuation direction. Do not infer electric transversality, Maxwell satisfaction,
+  ray or group velocity, energy-flow direction, outgoing behavior, an evanescent-field role, TIR,
+  Fresnel data, irradiance, or power. For eventual upstream review, split the fork milestone into
+  the generic negative-imaginary normal setter, the branch-neutral normal-square reduction, the
+  vector construction/uniqueness and decay-data bridge, and the arbitrary-amplitude carrier lift.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
