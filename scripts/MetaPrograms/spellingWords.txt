@@ -1603,6 +1603,7 @@ invariants
 inverse
 inversions
 invertible
+invisible
 involution
 involutions
 involutive

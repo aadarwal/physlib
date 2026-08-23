@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.ClassicalMechanics.WaveEquation.ComplexWaveVector.Hyperplane
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryExponent
 
 /-!
@@ -12,10 +13,11 @@ public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Com
 
 ## i. Overview
 
-This file packages the tangential electric amplitude together with the scalar normal
-electric-displacement amplitude of one off-shell complex-amplitude plane-wave candidate relative
-to an oriented affine hyperplane and a homogeneous isotropic medium. This joint amplitude vanishes
-exactly when the stored electric amplitude vanishes, because the medium permittivity is nonzero.
+This file uses the neutral complex-wave-vector hyperplane decomposition to package the tangential
+electric amplitude together with the scalar normal electric-displacement amplitude of one off-shell
+complex-amplitude plane-wave candidate relative to an oriented affine hyperplane and a homogeneous
+isotropic medium. This joint amplitude vanishes exactly when the stored electric amplitude
+vanishes, because the medium permittivity is nonzero.
 It is therefore suitable for stating the electromagnetic noncancellation hypotheses needed by
 later boundary-exponent collision results; tangential `E` alone would not detect a purely normal
 electric amplitude. The zero criterion is per wave. Contributions from distinct wave labels may
@@ -53,10 +55,9 @@ macroscopic boundary laws: the magnetic and remaining electric data stay in
 
 ## iii. Table of contents
 
-- A. Complex normal and tangential amplitudes
-- B. Medium-dependent joint electric amplitudes
-- C. Ordinary real joint electric field data
-- D. Affine-plane realization
+- A. Medium-dependent joint electric amplitudes
+- B. Ordinary real joint electric field data
+- C. Affine-plane realization
 
 ## iv. References
 
@@ -77,51 +78,7 @@ namespace ComplexMonochromaticPlaneWave
 
 /-!
 
-## A. Complex normal and tangential amplitudes
-
--/
-
-/-- The complex-bilinear scalar component of a complex vector along the oriented real unit
-normal. -/
-def complexNormalComponent (plane : OrientedAffineHyperplane 3)
-    (z : EuclideanSpace ℂ (Fin 3)) : ℂ :=
-  ComplexWaveVector.bilinearDot (ComplexWaveVector.ofReal plane.normalVector) z
-
-/-- The complex tangential projection obtained by subtracting the oriented normal component.
-
-The result is stored in the ambient complex coordinate space; its normal component is proved to
-vanish below. -/
-def complexTangentialProjection (plane : OrientedAffineHyperplane 3)
-    (z : EuclideanSpace ℂ (Fin 3)) : EuclideanSpace ℂ (Fin 3) :=
-  z - complexNormalComponent plane z • ComplexWaveVector.ofReal plane.normalVector
-
-private lemma bilinearDot_complexNormal_self (plane : OrientedAffineHyperplane 3) :
-    ComplexWaveVector.bilinearDot
-        (ComplexWaveVector.ofReal plane.normalVector)
-        (ComplexWaveVector.ofReal plane.normalVector) = 1 := by
-  rw [ComplexWaveVector.bilinearDot_ofReal, plane.inner_normalVector_self]
-  norm_num
-
-/-- A complex vector is the sum of its tangential projection and oriented normal projection. -/
-lemma complexTangentialProjection_add_normal
-    (plane : OrientedAffineHyperplane 3) (z : EuclideanSpace ℂ (Fin 3)) :
-    complexTangentialProjection plane z +
-        complexNormalComponent plane z • ComplexWaveVector.ofReal plane.normalVector = z := by
-  simp [complexTangentialProjection]
-
-/-- The complex tangential projection has zero complex-bilinear normal component. -/
-@[simp]
-lemma complexNormalComponent_complexTangentialProjection
-    (plane : OrientedAffineHyperplane 3) (z : EuclideanSpace ℂ (Fin 3)) :
-    complexNormalComponent plane (complexTangentialProjection plane z) = 0 := by
-  rw [complexNormalComponent, complexTangentialProjection,
-    ComplexWaveVector.bilinearDot_sub_right,
-    ComplexWaveVector.bilinearDot_smul_right, bilinearDot_complexNormal_self]
-  simp [complexNormalComponent]
-
-/-!
-
-## B. Medium-dependent joint electric amplitudes
+## A. Medium-dependent joint electric amplitudes
 
 -/
 
@@ -136,8 +93,9 @@ amplitude of `D0 = epsilon E0` in the supplied homogeneous isotropic medium. -/
 def mediumJointElectricTraceAmplitude (plane : OrientedAffineHyperplane 3)
     (medium : HomogeneousIsotropicMedium) (wave : ComplexMonochromaticPlaneWave) :
     JointElectricTraceAmplitude :=
-  (complexTangentialProjection plane wave.electricAmplitude,
-    (medium.ε : ℂ) * complexNormalComponent plane wave.electricAmplitude)
+  (ComplexWaveVector.hyperplaneTangentialProjection plane wave.electricAmplitude,
+    (medium.ε : ℂ) *
+      ComplexWaveVector.hyperplaneNormalComponent plane wave.electricAmplitude)
 
 /-- A medium-dependent joint electric trace amplitude vanishes exactly when the electric
 amplitude vanishes. -/
@@ -148,21 +106,26 @@ lemma mediumJointElectricTraceAmplitude_eq_zero_iff
       wave.electricAmplitude = 0 := by
   constructor
   · intro h
-    have htangent : complexTangentialProjection plane wave.electricAmplitude = 0 :=
+    have htangent :
+        ComplexWaveVector.hyperplaneTangentialProjection plane wave.electricAmplitude = 0 :=
       congrArg Prod.fst h
     have hnormalScaled :
-        (medium.ε : ℂ) * complexNormalComponent plane wave.electricAmplitude = 0 :=
+        (medium.ε : ℂ) *
+            ComplexWaveVector.hyperplaneNormalComponent plane wave.electricAmplitude = 0 :=
       congrArg Prod.snd h
     have hε : (medium.ε : ℂ) ≠ 0 :=
       Complex.ofReal_ne_zero.mpr medium.ε_ne_zero
-    have hnormal : complexNormalComponent plane wave.electricAmplitude = 0 :=
+    have hnormal :
+        ComplexWaveVector.hyperplaneNormalComponent plane wave.electricAmplitude = 0 :=
       (mul_eq_zero.mp hnormalScaled).resolve_left hε
-    rw [← complexTangentialProjection_add_normal plane wave.electricAmplitude,
+    rw [← ComplexWaveVector.hyperplaneTangentialProjection_add_normal
+        plane wave.electricAmplitude,
       htangent, hnormal]
     simp
   · rintro h
-    simp [mediumJointElectricTraceAmplitude, h, complexTangentialProjection,
-      complexNormalComponent]
+    simp [mediumJointElectricTraceAmplitude, h,
+      ComplexWaveVector.hyperplaneTangentialProjection,
+      ComplexWaveVector.hyperplaneNormalComponent]
 
 /-- The medium-dependent joint electric trace amplitude referenced to the oriented hyperplane's
 stored affine point. -/
@@ -184,7 +147,7 @@ lemma referencedMediumJointElectricTraceAmplitude_eq_zero_iff
 
 /-!
 
-## C. Ordinary real joint electric field data
+## B. Ordinary real joint electric field data
 
 -/
 
@@ -209,9 +172,9 @@ def mediumJointElectricFieldData (plane : OrientedAffineHyperplane 3)
 private lemma normalComponent_realPart_smul
     (plane : OrientedAffineHyperplane 3) (c : ℂ) (z : EuclideanSpace ℂ (Fin 3)) :
     plane.normalComponent (ComplexWaveVector.realPart (c • z)) =
-      (c * complexNormalComponent plane z).re := by
+      (c * ComplexWaveVector.hyperplaneNormalComponent plane z).re := by
   rw [Space.OrientedAffineHyperplane.normalComponent, PiLp.inner_apply,
-    complexNormalComponent, ComplexWaveVector.bilinearDot, Finset.mul_sum,
+    ComplexWaveVector.hyperplaneNormalComponent, ComplexWaveVector.bilinearDot, Finset.mul_sum,
     Complex.re_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp only [ComplexWaveVector.ofReal_apply, ComplexWaveVector.realPart_apply,
@@ -222,12 +185,14 @@ private lemma normalComponent_realPart_smul
 private lemma tangentialProjection_realPart_smul
     (plane : OrientedAffineHyperplane 3) (c : ℂ) (z : EuclideanSpace ℂ (Fin 3)) :
     plane.tangentialProjection (ComplexWaveVector.realPart (c • z)) =
-      ComplexWaveVector.realPart (c • complexTangentialProjection plane z) := by
+      ComplexWaveVector.realPart
+        (c • ComplexWaveVector.hyperplaneTangentialProjection plane z) := by
   ext i
   rw [Space.OrientedAffineHyperplane.tangentialProjection, PiLp.sub_apply,
     PiLp.smul_apply, normalComponent_realPart_smul]
   simp only [ComplexWaveVector.realPart_apply, PiLp.smul_apply, smul_eq_mul,
-    complexTangentialProjection, PiLp.sub_apply, ComplexWaveVector.ofReal_apply,
+    ComplexWaveVector.hyperplaneTangentialProjection, PiLp.sub_apply,
+    ComplexWaveVector.ofReal_apply,
     Complex.mul_re, Complex.sub_re, Complex.sub_im, Complex.mul_im,
     Complex.ofReal_re, Complex.ofReal_im]
   ring
@@ -259,7 +224,7 @@ lemma mediumJointElectricFieldData_eq_realPart_smul_amplitude
 
 /-!
 
-## D. Affine-plane realization
+## C. Affine-plane realization
 
 -/
 
