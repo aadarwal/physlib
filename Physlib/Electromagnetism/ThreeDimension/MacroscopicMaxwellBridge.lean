@@ -122,36 +122,10 @@ theorem poyntingTheorem_sourceFree_of_isExtrema {𝓕 : FreeSpace}
   rw [LorentzCurrentDensity.chargeDensity_zero,
     LorentzCurrentDensity.currentDensity_zero] at hs
   have hp := hs.poyntingTheorem_sourceFree t x
-  have hu :
-      (fun s =>
-        𝓕.toHomogeneousIsotropicMedium.energyDensity
-          (V.electricField 𝓕.c)
-          (𝓕.toHomogeneousIsotropicMedium.magneticFieldStrength
-            (V.magneticField 𝓕.c)) s x) =
-        (fun s =>
-          (1 / 2) *
-            (𝓕.ε₀ * inner ℝ (V.electricField 𝓕.c s x)
-                (V.electricField 𝓕.c s x) +
-              𝓕.μ₀⁻¹ * inner ℝ (V.magneticField 𝓕.c s x)
-                (V.magneticField 𝓕.c s x))) := by
-    funext s
-    rw [hs.constitutive.energyDensity_eq_inner]
-    simp only [HomogeneousIsotropicMedium.electricDisplacement_apply,
-      HomogeneousIsotropicMedium.magneticFieldStrength_apply,
-      FreeSpace.toHomogeneousIsotropicMedium_ε,
-      FreeSpace.toHomogeneousIsotropicMedium_μ, inner_smul_right]
-  have hS :
-      poyntingVector (V.electricField 𝓕.c)
-          (𝓕.toHomogeneousIsotropicMedium.magneticFieldStrength
-            (V.magneticField 𝓕.c)) t =
-        fun y => 𝓕.μ₀⁻¹ •
-          (V.electricField 𝓕.c t y ⨯ₑ₃ V.magneticField 𝓕.c t y) := by
-    funext y
-    change V.electricField 𝓕.c t y ⨯ₑ₃
-      (𝓕.μ₀⁻¹ • V.magneticField 𝓕.c t y) = _
-    rw [Space.cross_smul]
-  rw [hu, hS] at hp
-  exact hp
+  simp_rw [HomogeneousIsotropicMedium.energyDensity_magneticFieldStrength] at hp
+  rw [HomogeneousIsotropicMedium.poyntingVector_magneticFieldStrength] at hp
+  simpa only [FreeSpace.toHomogeneousIsotropicMedium_ε,
+    FreeSpace.toHomogeneousIsotropicMedium_μ] using hp
 
 end ThreeDimension
 end Electromagnetism

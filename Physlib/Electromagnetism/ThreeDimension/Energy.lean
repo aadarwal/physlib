@@ -43,6 +43,7 @@ is represented by `D` and `H`.
 - B. Sourced local work identity
 - C. Stored energy in a fixed medium
   - C.1. Constitutive forms
+  - C.2. Canonical magnetic field strength
 - D. Local Poynting theorem
 
 ## iv. References
@@ -191,6 +192,33 @@ lemma energyDensity_timeDeriv (h : 𝓜.IsConstitutive E D B H) (t : Time) (x : 
   ring
 
 end IsConstitutive
+
+/-!
+
+### C.2. Canonical magnetic field strength
+
+-/
+
+/-- For the canonical field strength `H = μ⁻¹ B`, stored energy has the corresponding `E` and
+`B` formula. This identity uses no Maxwell equation. -/
+lemma energyDensity_magneticFieldStrength (𝓜 : HomogeneousIsotropicMedium) (E : ElectricField)
+    (B : MagneticInductionField) (t : Time) (x : Space) :
+    𝓜.energyDensity E (𝓜.magneticFieldStrength B) t x =
+      (1 / 2) *
+        (𝓜.ε * inner ℝ (E t x) (E t x) +
+          𝓜.μ⁻¹ * inner ℝ (B t x) (B t x)) := by
+  rw [(𝓜.isConstitutive_electricDisplacement_magneticFieldStrength E B).energyDensity_eq_inner]
+  simp only [electricDisplacement_apply, magneticFieldStrength_apply, inner_smul_right]
+
+/-- Substituting the canonical field strength `H = μ⁻¹ B` into `E × H` moves the inverse
+permeability outside the cross product. This identity uses no Maxwell equation. -/
+lemma poyntingVector_magneticFieldStrength (𝓜 : HomogeneousIsotropicMedium) (E : ElectricField)
+    (B : MagneticInductionField) (t : Time) :
+    ThreeDimension.poyntingVector E (𝓜.magneticFieldStrength B) t =
+      fun x => 𝓜.μ⁻¹ • (E t x ⨯ₑ₃ B t x) := by
+  funext x
+  unfold ThreeDimension.poyntingVector
+  rw [magneticFieldStrength_apply, Space.cross_smul]
 
 /-!
 
