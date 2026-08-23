@@ -8,7 +8,7 @@ module
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
 
 /-!
-# Electric boundary activity and tangent-pairing conservation
+# Electric boundary activity and tangential-projection conservation
 
 ## i. Overview
 
@@ -28,10 +28,11 @@ tangent displacement equal the incident ones. The same conclusion holds for the 
 unless its electric amplitude is zero; in that branch its frequency and wave vector remain
 unconstrained dummy data.
 
-The tangent-pairing equalities retain both tangential phase and attenuation information. They do
-not assert full wave-vector equality or constrain a normal component. This file does not package
-them as tangential-projection equalities and proves no Maxwell, material-dispersion, propagation-
-branch, Snell, Fresnel, irradiance, or power result. The free surface current remains arbitrary.
+The neutral complex-wave-vector hyperplane API packages those tangent-pairing equalities as exact
+equalities of complex tangential projections. These retain both tangential phase and attenuation
+information, but do not assert full wave-vector equality or constrain a normal component. This
+file proves no Maxwell, material-dispersion, propagation-branch, Snell, Fresnel, irradiance, or
+power result. The free surface current remains arbitrary.
 
 ## ii. Key results
 
@@ -39,8 +40,12 @@ branch, Snell, Fresnel, irradiance, or power result. The free surface current re
   activity of the transmitted electric label.
 - `transmitted_angularFrequency_tangentPairing_eq_incident`:
   transmitted frequency and tangent-pairing conservation.
+- `transmitted_angularFrequency_tangentialProjection_eq_incident`:
+  transmitted frequency and complex tangential-projection conservation.
 - `reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_incident`:
   the zero-reflection-preserving reflected conservation alternative.
+- `reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentialProjection_eq_incident`:
+  the corresponding reflected complex tangential-projection alternative.
 
 ## iii. Table of contents
 
@@ -117,6 +122,22 @@ lemma transmitted_angularFrequency_tangentPairing_eq_incident
     configuration.transmitted configuration.incident).mp
       (h.jointElectricBoundaryLabelMatching hAggregate).1
 
+/-- Conditional electric label matching makes the transmitted angular frequency and complex
+hyperplane-tangential wave vector equal to the incident ones. -/
+lemma transmitted_angularFrequency_tangentialProjection_eq_incident
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.transmitted.angularFrequency = configuration.incident.angularFrequency ∧
+      ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+          configuration.transmitted.waveVector =
+        ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+          configuration.incident.waveVector := by
+  have hConservation := h.transmitted_angularFrequency_tangentPairing_eq_incident hAggregate
+  exact ⟨hConservation.1,
+    (ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent
+      configuration.interface.plane configuration.transmitted.waveVector
+        configuration.incident.waveVector).mpr hConservation.2⟩
+
 /-!
 
 ## C. Reflected conservation
@@ -140,6 +161,26 @@ lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_
   · exact Or.inl hzero
   · exact Or.inr ((boundaryExponent_eq_iff configuration.interface.plane
       configuration.reflected configuration.incident).mp hExponent)
+
+/-- Conditional electric label matching either leaves a zero-amplitude reflected wave's frequency
+and wave vector unconstrained, or makes its angular frequency and complex hyperplane-tangential
+wave vector equal to the incident ones. -/
+lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentialProjection_eq_incident
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      (configuration.reflected.angularFrequency = configuration.incident.angularFrequency ∧
+        ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+            configuration.reflected.waveVector =
+          ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+            configuration.incident.waveVector) := by
+  rcases h.reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_incident
+      hAggregate with hzero | hConservation
+  · exact Or.inl hzero
+  · exact Or.inr ⟨hConservation.1,
+      (ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent
+        configuration.interface.plane configuration.reflected.waveVector
+          configuration.incident.waveVector).mpr hConservation.2⟩
 
 end IsLocalBoundary
 end PlanarDielectricWaveConfiguration
