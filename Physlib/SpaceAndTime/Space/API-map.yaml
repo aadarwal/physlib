@@ -80,6 +80,10 @@ Requirements:
     done: true
     location: "Physlib/SpaceAndTime/Space/CrossProduct.lean (⨯ₑ₃, inner_cross_cross, time_deriv_cross_commute, inner_cross_self)"
 
+  - description: "The real three-dimensional vector-calculus API contains the pointwise and function-level identity `div (f × g) = g · curl f - f · curl g` under pointwise and global first differentiability, respectively. This identity supplies no electromagnetic field roles, constitutive laws, complex-phasor conventions, boundary integrals, energy, flux, irradiance, or power semantics."
+    done: true
+    location: "Physlib/SpaceAndTime/Space/Derivatives/Curl.lean (Space.div_cross_apply, Space.div_cross)"
+
   - description: "The API contains the derivatives of functions from `Space` to normed spaces."
     done: true
     location: "Physlib/SpaceAndTime/Space/Derivatives/Basic.lean (Space.deriv, notation ∂[·])"
