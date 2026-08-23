@@ -406,30 +406,34 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check E5a's planar joint-electric coefficient collision before upstreaming. Confirm
   that incident and reflected referenced amplitudes use the negative-side medium, the transmitted
   referenced amplitude uses the positive-side medium with a negative sign, and exact equal
-  boundary exponents aggregate in the `Finsupp`. Confirm that zero free surface charge is required
-  while free surface current remains arbitrary, that the common unit-time probe is positive for
-  every supported key, and that cancellation can only shrink the support. The zero-map conclusion
-  has no nonzero guard and therefore proves no labelwise exponent or amplitude equality: zero
-  labeled contributions add no coefficient and therefore impose no constraint on their own
-  labels, while coincident exponent contributions may cancel. Guarded label matching,
-  conservation, propagation roles, Fresnel data, and the fixed-frequency converse remain later
-  work.
-- [ ] Human-check E5a's guarded electric label matching before upstreaming. Confirm that its only
-  noncancellation premise is the exact conditional incident-key aggregate `G_i ≠ 0`; the reflected
+  boundary exponents aggregate in the `Finsupp`. Confirm both directions between the zero-charge
+  two-law electric boundary and the zero coefficient map: the forward direction uses the
+  all-parameter boundary-character identity plus positive-rate uniqueness, while the reverse uses
+  zero harmonic data plus the exact character-to-electric-trace bridge. A full local boundary
+  supplies only the forward implication through its electric projection; its arbitrary surface
+  current and magnetic laws are not reconstructed. The zero-map equivalence has no nonzero guard
+  and proves no labelwise exponent or amplitude equality: zero labeled contributions impose no
+  constraint on their labels, while coincident exponent contributions may cancel. Guarded label
+  matching, propagation roles, Fresnel data, and the fixed-frequency reduction remain separate.
+- [ ] Human-check E5a's guarded electric label matching before upstreaming. Confirm that its weakest
+  boundary premise is the zero-charge two-law electric predicate and its only noncancellation
+  premise is the exact conditional incident-key aggregate `G_i ≠ 0`; the reflected
   zero-or-equal-exponent alternative is derived. Confirm the full five-case exponent partition:
   the guard permits only `L_i = L_t ≠ L_r`, forcing `A_r = 0` and `A_t = A_i`, or
   `L_i = L_r = L_t`, forcing `A_t = A_i + A_r`. In particular, a zero reflected electric
   amplitude leaves its dummy exponent unconstrained. The final equality concerns stored-point-
   referenced, medium-dependent joint tangential-`E`/normal-`D` coefficients, not raw electric
-  phasors or full electromagnetic amplitudes. Decode matched exponents only into frequency and
+  phasors or full electromagnetic amplitudes. A full local boundary inherits the result only
+  through its electric projection. Decode matched exponents only into frequency and
   tangent-pairing equality; full wave-vector equality, propagation roles, Maxwell/on-shellness,
   Fresnel data, and power remain absent.
 - [ ] Human-check E5a's electric boundary conservation corollaries before upstreaming. Under the
-  same zero-free-charge local boundary and exact aggregate guard, confirm in both reflected
+  same zero-charge electric predicate and exact aggregate guard, confirm in both reflected
   branches that the aggregate equals the transmitted stored-point-referenced joint electric
   coefficient; its nonvanishing therefore forces the transmitted electric amplitude to be
   nonzero. This establishes only electric activity, not outward propagation, on-shellness, or
-  positive power. Confirm that no common frequency appears among the premises. Decode transmitted
+  positive power. Confirm that a full local boundary supplies only wrapper corollaries through its
+  electric projection and that no common frequency appears among the premises. Decode transmitted
   exponent equality into incident/transmitted angular-frequency equality and equality of the
   complex-bilinear wave-vector pairing against every real tangent displacement. Preserve the
   reflected conclusion as zero electric amplitude or the analogous two equalities, since its zero

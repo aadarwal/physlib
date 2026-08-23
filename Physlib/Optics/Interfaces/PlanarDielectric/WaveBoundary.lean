@@ -60,7 +60,8 @@ boundary predicates are stipulated rather than derived from integral Maxwell equ
   specialization.
 - `PlanarDielectricWaveConfiguration.IsElectricBoundary.jointElectricFieldData_iff`: exact
   equivalence between the zero-charge electric laws and joint field-data equality.
-- `IsElectricBoundary.jointElectricBoundaryCharacter_sum_eq`: the exact boundary-character form.
+- `isElectricBoundary_iff_jointElectricBoundaryCharacter_sum_eq`: exact equivalence with the
+  all-parameter boundary-character identity.
 
 ## iii. Table of contents
 
@@ -297,6 +298,55 @@ lemma jointElectricBoundaryCharacter_sum_eq
   simpa only [mediumJointElectricFieldData_tangent_vadd_point] using hdata
 
 end IsElectricBoundary
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+
+/-- The zero-charge electric boundary laws are equivalent to the all-parameter identity of the
+three ordinary-real boundary-character realizations. -/
+lemma isElectricBoundary_iff_jointElectricBoundaryCharacter_sum_eq :
+    configuration.IsElectricBoundary 0 ↔
+      ∀ p : ComplexMonochromaticPlaneWave.BoundaryParameter
+          configuration.interface.plane,
+        realPartJointElectricTraceAmplitude
+              (Complex.exp (configuration.incident.boundaryExponent
+                  configuration.interface.plane p) •
+                referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+                  configuration.interface.negativeMedium configuration.incident) +
+            realPartJointElectricTraceAmplitude
+              (Complex.exp (configuration.reflected.boundaryExponent
+                  configuration.interface.plane p) •
+                referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+                  configuration.interface.negativeMedium configuration.reflected) =
+          realPartJointElectricTraceAmplitude
+            (Complex.exp (configuration.transmitted.boundaryExponent
+                configuration.interface.plane p) •
+              referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+                configuration.interface.positiveMedium configuration.transmitted) := by
+  constructor
+  · exact fun h ↦ h.jointElectricBoundaryCharacter_sum_eq
+  · intro h
+    apply IsElectricBoundary.jointElectricFieldData_iff.mpr
+    intro t x
+    obtain ⟨v, hv, hx⟩ :=
+      configuration.interface.plane.exists_tangent_vadd_eq_of_mem_carrier x x.property
+    let vTangent : configuration.interface.plane.tangentSubmodule :=
+      ⟨v, (configuration.interface.plane.mem_tangentSubmodule v).mpr hv⟩
+    have hCharacter := h (t, vTangent)
+    rw [hx]
+    change
+      mediumJointElectricFieldData configuration.interface.plane
+            configuration.interface.negativeMedium configuration.incident t
+              ((vTangent : EuclideanSpace ℝ (Fin 3)) +ᵥ configuration.interface.plane.point) +
+          mediumJointElectricFieldData configuration.interface.plane
+            configuration.interface.negativeMedium configuration.reflected t
+              ((vTangent : EuclideanSpace ℝ (Fin 3)) +ᵥ configuration.interface.plane.point) =
+        mediumJointElectricFieldData configuration.interface.plane
+          configuration.interface.positiveMedium configuration.transmitted t
+            ((vTangent : EuclideanSpace ℝ (Fin 3)) +ᵥ configuration.interface.plane.point)
+    rw [mediumJointElectricFieldData_tangent_vadd_point,
+      mediumJointElectricFieldData_tangent_vadd_point,
+      mediumJointElectricFieldData_tangent_vadd_point]
+    exact hCharacter
 
 namespace IsLocalBoundary
 

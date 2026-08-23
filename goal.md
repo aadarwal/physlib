@@ -1351,26 +1351,28 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
   referenced at the affine plane's stored point by the nonvanishing spatial carrier, and connected
   to the actual ordinary-real plane data by exact boundary-exponent factorization;
 - [x] the exact signed three-wave joint electric coefficient map, aggregated by boundary exponent,
-  and its vanishing under a zero-free-surface-charge local boundary with arbitrary free surface
-  current;
+  with its vanishing proved exactly equivalent to the zero-charge electric boundary predicate and
+  inherited in the forward direction by a full local boundary with arbitrary free surface current;
 - [x] the oriented-hyperplane results converting vanishing against every tangent displacement into
   an explicit normal-vector multiple and characterizing equality of tangential projections by
   equality against every tangent probe;
 - [x] dimension-generic complex-wave-vector normal--tangential decomposition, compatible with the
   phase/attenuation split, with equality of complex tangential projections characterized by all
   real-tangent complex-bilinear pairings and arbitrary complex normal shifts proved invisible;
-- [x] guarded three-wave label matching under the exact nonzero negative-side coefficient at the
-  incident boundary exponent, deriving transmitted/incident exponent equality, the disjunction
-  that the reflected electric amplitude is zero or its exponent also matches, and referenced joint
-  coefficient balance;
-- [x] transmitted electric-amplitude nonvanishing under the exact aggregate guard, together with
-  explicit conservation corollaries decoding the matched exponents into frequency and tangent
-  wave-vector pairing equality and exact complex tangential-projection equality under exactly the
-  derived branches;
+- [x] guarded three-wave label matching from the zero-charge electric predicate under the exact
+  nonzero negative-side coefficient at the incident boundary exponent, deriving
+  transmitted/incident exponent equality, the disjunction that the reflected electric amplitude
+  is zero or its exponent also matches, and referenced joint coefficient balance, with full local
+  boundaries inheriting the result;
+- [x] transmitted electric-amplitude nonvanishing from the electric predicate under the exact
+  aggregate guard, together with explicit conservation corollaries decoding the matched exponents
+  into frequency and tangent wave-vector pairing equality and exact complex tangential-projection
+  equality under exactly the derived branches, with full local boundary wrappers;
 - a reduced fixed-frequency complex-amplitude boundary problem introduced only after those
   conservation results; and
-- a theorem relating its amplitude equations to the primitive physical trace problem under the
-  exact non-null and phase-matching hypotheses needed in both directions.
+- a guarded equivalence relating its amplitude equations to the primitive two-law electric trace
+  problem, with the non-null guard used only to derive label matching in the primitive-to-reduced
+  direction and no claim of reconstructing either magnetic boundary law.
 
 Exit: every later fixed-frequency boundary calculation is connected to the independent-frequency
 physical problem, and no conservation conclusion is hidden in its own premises.
@@ -2080,7 +2082,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, the primitive independent-frequency boundary configuration, the electric projection of the four-law boundary and its exact joint-data bridge, the single-wave boundary exponent/carrier and joint E/D factorizations, the zero-free-charge three-wave boundary-character equality, finite-sum joint E/D harmonic noncancellation, exact signed coefficient aggregation, guarded label matching, transmitted activity, and explicit frequency/tangential-projection conservation complete; electric-only fixed-frequency reduction remains |
+| E5a conservation/reduction | in progress | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, the primitive independent-frequency boundary configuration, the electric projection of the four-law boundary and its exact joint-data/character/coefficient equivalences, the single-wave boundary exponent/carrier and joint E/D factorizations, finite-sum joint E/D harmonic noncancellation, electric-predicate guarded label matching, transmitted activity, and explicit frequency/tangential-projection conservation with full-boundary wrappers complete; the final electric-only fixed-frequency predicate and guarded equivalence remain |
 | E5b reflection/Snell/TIR | blocked | E2, E5a | phase-matching geometry, propagating-root, critical-angle, and outgoing-decay suite |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
