@@ -1448,8 +1448,19 @@ premises.
   no direction,
   branch-existence, critical-angle, ray, group-velocity, outgoing, Fresnel, irradiance, or power
   claim is made;
+- [x] critical phase-angle threshold geometry: the strict slower-to-faster wave-speed contrast
+  gives the reference-free threshold `v₁ / v₂ = n₂ / n₁` in `(0, 1)` and a proof-bearing critical
+  phase angle in `(0, π / 2)`; primitive subcritical, critical, and supercritical incidence
+  predicates classify the exact transmitted normal-radicand sign under incident dispersion and
+  zero whole incident attenuation, while an explicit incident-angle range gives the corresponding
+  angle ordering; the sine-critical predicate is unconditional, deliberately includes equal-speed
+  grazing without an interior critical angle, and can represent the supplementary obtuse branch
+  until that range is supplied; for an already supplied phase-matched candidate with incident and
+  transmitted material dispersion and zero whole incident attenuation, the unique zero transmitted
+  normal root gives zero transmitted attenuation and genuine transmitted phase tangency, without
+  constructing a candidate or assigning outgoing, evanescent, TIR, irradiance, or power meaning;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;
-- critical-angle and total-internal-reflection characterization; and
+- total-internal-reflection characterization from boundary amplitudes and flux; and
 - evanescent classification of the side-decaying complex transmitted branch, with any outgoing
   interpretation justified separately and kept distinct from an ordinary positive-power
   propagating mode.
