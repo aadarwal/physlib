@@ -1443,8 +1443,9 @@ premises.
   the result assigns no ray, group-velocity, energy-flux, outgoing, irradiance, or power meaning;
 - [x] the phase Snell identity from tangential phase matching alone, together with the
   wave-speed and explicitly relative-refractive-index forms for incident and transmitted carriers
-  on their respective material shells under zero whole attenuation; the common positive frequency
-  is derived from the reduced boundary predicate and cancelled explicitly, while no direction,
+  under their respective material-dispersion hypotheses and zero whole attenuation; the common
+  positive frequency is derived from the reduced boundary predicate and cancels explicitly, while
+  no direction,
   branch-existence, critical-angle, ray, group-velocity, outgoing, Fresnel, irradiance, or power
   claim is made;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;

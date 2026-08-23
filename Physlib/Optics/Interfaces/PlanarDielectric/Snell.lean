@@ -17,11 +17,11 @@ plane waves. Electric phase matching first gives a material-independent identity
 transmitted tangential phase-vector norms agree, so each full phase-vector norm multiplied by the
 sine of its label-relative phase angle agrees. Material dispersion and zero whole attenuation then
 identify each phase-vector magnitude with angular frequency divided by material wave speed. The
-matched positive frequency can be cancelled to obtain the wave-speed and relative-refractive-index
-forms of Snell's law.
+common positive frequency cancels to give the wave-speed and relative-refractive-index forms of
+Snell's law.
 
 No phase-direction hypothesis is needed for these algebraic identities. The separately proved
-acute-angle results supply the conventional optical angle range when the phase vectors point into
+acute-angle results supply the usual optical angle range when the phase vectors point into
 their selected sides. These results neither construct nor select a transmitted branch and assert
 no ray, group-velocity, outgoing, critical-angle, evanescent, Fresnel, irradiance, or power
 meaning.
@@ -35,8 +35,8 @@ attenuation forces the phase-vector magnitudes in the speed and index forms to b
 
 - `IsElectricPhaseMatched.phaseSnellIdentity`: tangential phase matching in angle--magnitude form.
 - `IsElectricPhaseMatched.snellLaw_waveSpeed`: `v₂ sin θᵢ = v₁ sin θₜ`.
-- `IsElectricPhaseMatched.snellLaw_refractiveIndex`: `n₁ sin θᵢ = n₂ sin θₜ` for indices relative
-  to any common homogeneous isotropic reference medium.
+- `IsElectricPhaseMatched.snellLaw_refractiveIndexRelativeTo`: `n₁ sin θᵢ = n₂ sin θₜ` for
+  indices relative to any common homogeneous isotropic reference medium.
 
 ## iii. Table of contents
 
@@ -102,8 +102,8 @@ lemma phaseSnellIdentity (h : configuration.IsElectricPhaseMatched) :
 
 -/
 
-/-- For zero-attenuation incident and transmitted carriers on their respective material shells,
-electric phase matching gives `v₂ sin θᵢ = v₁ sin θₜ`.
+/-- Under zero attenuation and the respective material-dispersion hypotheses for the incident and
+transmitted carriers, electric phase matching gives `v₂ sin θᵢ = v₁ sin θₜ`.
 
 The zero-attenuation hypotheses concern the whole complex wave vectors, not only their tangential
 projections. They are not consequences of phase matching. The equation remains a label-level
@@ -114,10 +114,8 @@ lemma snellLaw_waveSpeed
       configuration.interface.negativeMedium)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
       configuration.interface.positiveMedium)
-    (hIncidentAttenuation :
-      configuration.incident.waveVector.attenuationVector = 0)
-    (hTransmittedAttenuation :
-      configuration.transmitted.waveVector.attenuationVector = 0) :
+    (hIncidentAttenuation : configuration.incident.waveVector.attenuationVector = 0)
+    (hTransmittedAttenuation : configuration.transmitted.waveVector.attenuationVector = 0) :
     configuration.interface.positiveMedium.waveSpeed *
         Real.sin configuration.incidentPhaseAngle =
       configuration.interface.negativeMedium.waveSpeed *
@@ -165,20 +163,18 @@ lemma snellLaw_waveSpeed
 -/
 
 /-- For zero-attenuation incident and transmitted carriers, electric phase matching gives
-`n₁ sin θᵢ = n₂ sin θₜ` for refractive indices relative to any common homogeneous isotropic
-reference medium. The equation remains a label-level identity when either electric amplitude
-vanishes. -/
-lemma snellLaw_refractiveIndex
+`n₁ sin θᵢ = n₂ sin θₜ` for refractive indices relative to any common homogeneous
+isotropic reference medium. The equation remains a label-level identity when either electric
+amplitude vanishes. -/
+lemma snellLaw_refractiveIndexRelativeTo
     (h : configuration.IsElectricPhaseMatched)
     (reference : HomogeneousIsotropicMedium)
     (hIncidentDispersion : configuration.incident.IsDispersionMatched
       configuration.interface.negativeMedium)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
       configuration.interface.positiveMedium)
-    (hIncidentAttenuation :
-      configuration.incident.waveVector.attenuationVector = 0)
-    (hTransmittedAttenuation :
-      configuration.transmitted.waveVector.attenuationVector = 0) :
+    (hIncidentAttenuation : configuration.incident.waveVector.attenuationVector = 0)
+    (hTransmittedAttenuation : configuration.transmitted.waveVector.attenuationVector = 0) :
     configuration.interface.negativeMedium.refractiveIndexRelativeTo reference *
         Real.sin configuration.incidentPhaseAngle =
       configuration.interface.positiveMedium.refractiveIndexRelativeTo reference *
