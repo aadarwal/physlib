@@ -225,6 +225,14 @@ PR unless maintainers explicitly ask to retain it.
   that `K` and `K + c ofReal(n)` have identical tangential projections for arbitrary complex `c`;
   tangent data cannot imply full wave-vector or normal-component equality. Assign no medium,
   interface side, propagation, dispersion, square-root branch, observable, or power meaning here.
+- [ ] Human-check the neutral complex hyperplane-reflection API before upstreaming. Confirm that
+  its square decomposition uses the complex-bilinear pairing, never the Hermitian norm; reflection
+  negates the oriented complex normal component while preserving the complex tangential projection
+  and bilinear square; and applying reflection twice recovers the original vector. Confirm that
+  equal tangential projections and bilinear squares imply exactly the nonexclusive alternative of
+  equal vectors or reflected vectors. At zero normal component, including grazing real geometry,
+  both alternatives coincide. Do not interpret this algebraic classification as selecting an
+  incident, reflected, outgoing, decaying, medium-specific, or positive-power root.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
