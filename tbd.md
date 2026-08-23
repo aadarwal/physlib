@@ -215,6 +215,16 @@ PR unless maintainers explicitly ask to retain it.
   `exp (-α u)` at increasing positive-normal depth. With `q ⊥ n`, confirm that the bilinear
   square is `K·K = ‖q‖² - α²`, and independently check that the exact
   `(waveNumber, 0, -I * decayRate)` regression pins the intended sign.
+- [ ] Human-check the neutral complex-wave-vector hyperplane decomposition before using it for
+  interface phase matching. Confirm that the normal scalar is the complex-bilinear pairing
+  `ofReal(n) dot K`, the tangential projection is `K - (ofReal(n) dot K) ofReal(n)`, and their sum
+  recovers `K`. For `K = q - I a`, confirm that projection produces the complexification of the
+  real tangential projection of `q` minus `I` times that of `a`. Confirm that equality against
+  every real tangent displacement is equivalent to equality of these complex tangential
+  projections and therefore carries both tangential phase and attenuation data. Finally verify
+  that `K` and `K + c ofReal(n)` have identical tangential projections for arbitrary complex `c`;
+  tangent data cannot imply full wave-vector or normal-component equality. Assign no medium,
+  interface side, propagation, dispersion, square-root branch, observable, or power meaning here.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
