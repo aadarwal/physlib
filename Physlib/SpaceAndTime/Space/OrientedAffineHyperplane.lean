@@ -27,6 +27,10 @@ explicit projection is bundled as a linear map into that submodule. The construc
 dimension-generic and uses the coordinate vector space acting on `Space d`, so it can be reused by
 planar boundaries, waveguides, and phase-matching arguments.
 
+Two vectors have the same tangential projection exactly when their real inner products against
+every tangent vector agree. This describes the projection without choosing a tangent basis and
+makes explicit that tangent probes cannot distinguish normal components.
+
 ## ii. Key results
 
 - `OrientedAffineHyperplane.signedNormalCoordinate_vadd`: signed-coordinate translation.
@@ -37,6 +41,8 @@ planar boundaries, waveguides, and phase-matching arguments.
 - `OrientedAffineHyperplane.tangentSubmodule`: tangent displacements as a real submodule.
 - `OrientedAffineHyperplane.eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent`:
   a vector pairing to zero with every tangent vector is its explicit normal projection.
+- `OrientedAffineHyperplane.tangentialProjection_eq_iff_inner_eq_on_tangent`: equality of
+  tangential projections is characterized by equality against every tangent probe.
 - `OrientedAffineHyperplane.exists_tangent_vadd_eq_of_mem_carrier`: every carrier point is a
   tangential displacement of the stored point.
 - `OrientedAffineHyperplane.signedNormalCoordinate_sideRay`: exact side-normal parameterization.
@@ -420,6 +426,41 @@ lemma eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent
         plane.normalComponent w • plane.normalVector :=
       (plane.tangentialProjection_add_normal w).symm
     _ = plane.normalComponent w • plane.normalVector := by rw [hprojection, zero_add]
+
+private lemma inner_tangentialProjection_eq_of_mem_tangent
+    (plane : OrientedAffineHyperplane d) (u : EuclideanSpace ℝ (Fin d))
+    (v : plane.tangentSubmodule) :
+    inner ℝ (plane.tangentialProjection u) (v : EuclideanSpace ℝ (Fin d)) =
+      inner ℝ u (v : EuclideanSpace ℝ (Fin d)) := by
+  have hv : inner ℝ plane.normalVector (v : EuclideanSpace ℝ (Fin d)) = 0 :=
+    ((plane.mem_tangentSubmodule v).mp v.property)
+  rw [tangentialProjection, inner_sub_left, inner_smul_left, conj_trivial, hv]
+  simp
+
+/-- Two real vectors have the same tangential projection exactly when they pair equally with every
+tangent vector. -/
+lemma tangentialProjection_eq_iff_inner_eq_on_tangent
+    (plane : OrientedAffineHyperplane d) (u w : EuclideanSpace ℝ (Fin d)) :
+    plane.tangentialProjection u = plane.tangentialProjection w ↔
+      ∀ v : plane.tangentSubmodule,
+        inner ℝ u (v : EuclideanSpace ℝ (Fin d)) =
+          inner ℝ w (v : EuclideanSpace ℝ (Fin d)) := by
+  constructor
+  · intro hprojection v
+    rw [← inner_tangentialProjection_eq_of_mem_tangent plane u v,
+      hprojection, inner_tangentialProjection_eq_of_mem_tangent]
+  · intro h
+    have hnormal := plane.eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent
+      (u - w) (fun v ↦ by simpa [inner_sub_left] using sub_eq_zero.mpr (h v))
+    calc
+      plane.tangentialProjection u =
+          plane.tangentialProjection ((u - w) + w) := by rw [sub_add_cancel]
+      _ = plane.tangentialProjection (u - w) + plane.tangentialProjection w :=
+        plane.tangentialProjection_add (u - w) w
+      _ = plane.tangentialProjection w := by
+        rw [hnormal, plane.tangentialProjection_smul,
+          plane.tangentialProjection_normalVector]
+        simp
 
 /-- A tangent displacement of the stored point belongs to the hyperplane carrier. -/
 lemma tangent_vadd_point_mem_carrier (plane : OrientedAffineHyperplane d)
