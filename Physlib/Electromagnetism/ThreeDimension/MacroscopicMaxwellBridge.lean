@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellEquations
+public import Physlib.Electromagnetism.ThreeDimension.Energy
 public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
 
 /-!
@@ -21,15 +21,19 @@ with the charge and current extracted from the same Lorentz current.
 
 The bridge is intentionally one-way. The existing laws start from a potential; no converse claim
 that every macroscopic solution admits a global potential, gauge choice, or `IsExtrema` witness is
-made here.
+made here. For a source-free extremum, the bridge also gives the explicit local vacuum Poynting
+theorem in terms of `ε₀`, `μ₀`, `E`, and `B`.
 
 ## ii. Key results
 
 - `isMacroscopicMaxwellSolution_of_isExtrema`: the connected free-space material solution.
+- `poyntingTheorem_sourceFree_of_isExtrema`: the explicit local source-free vacuum energy
+  equation.
 
 ## iii. Table of contents
 
 - A. Free-space solution bridge
+- B. Source-free vacuum energy
 
 ## iv. References
 
@@ -42,7 +46,7 @@ made here.
 namespace Electromagnetism
 namespace ThreeDimension
 
-open Time Space ElectromagneticPotential ContDiff
+open Time Space Matrix ElectromagneticPotential ContDiff
 
 /-!
 
@@ -91,6 +95,63 @@ lemma isMacroscopicMaxwellSolution_of_isExtrema {𝓕 : FreeSpace}
     · exact hE.comp (f := fun s => (s, x)) (by fun_prop)
   · intro t x
     exact ThreeDimension.faradayLaw V t x hV
+
+/-!
+
+## B. Source-free vacuum energy
+
+-/
+
+/-- A smooth source-free potential extremum obeys the explicit local vacuum Poynting theorem.
+
+The stored density is `1 / 2 * (ε₀ E · E + μ₀⁻¹ B · B)` and the Poynting vector is
+`μ₀⁻¹ • (E × B)`. No factor of the speed of light occurs in this rationalized convention.
+This is an instantaneous pointwise differential equation, not an integrated, time-averaged,
+irradiance, or modal-power statement. -/
+theorem poyntingTheorem_sourceFree_of_isExtrema {𝓕 : FreeSpace}
+    (V : ElectromagneticPotential 3) (h : IsExtrema 𝓕 V 0)
+    (hV : ContDiff ℝ ∞ V) (t : Time) (x : Space) :
+    ∂ₜ (fun s =>
+      (1 / 2) *
+        (𝓕.ε₀ * inner ℝ (V.electricField 𝓕.c s x) (V.electricField 𝓕.c s x) +
+          𝓕.μ₀⁻¹ * inner ℝ (V.magneticField 𝓕.c s x)
+            (V.magneticField 𝓕.c s x))) t +
+      (∇ ⬝ (fun y => 𝓕.μ₀⁻¹ •
+        (V.electricField 𝓕.c t y ⨯ₑ₃ V.magneticField 𝓕.c t y))) x = 0 := by
+  have hs := isMacroscopicMaxwellSolution_of_isExtrema V 0 h hV contDiff_zero_fun
+  rw [LorentzCurrentDensity.chargeDensity_zero,
+    LorentzCurrentDensity.currentDensity_zero] at hs
+  have hp := hs.poyntingTheorem_sourceFree t x
+  have hu :
+      (fun s =>
+        𝓕.toHomogeneousIsotropicMedium.energyDensity
+          (V.electricField 𝓕.c)
+          (𝓕.toHomogeneousIsotropicMedium.magneticFieldStrength
+            (V.magneticField 𝓕.c)) s x) =
+        (fun s =>
+          (1 / 2) *
+            (𝓕.ε₀ * inner ℝ (V.electricField 𝓕.c s x)
+                (V.electricField 𝓕.c s x) +
+              𝓕.μ₀⁻¹ * inner ℝ (V.magneticField 𝓕.c s x)
+                (V.magneticField 𝓕.c s x))) := by
+    funext s
+    rw [hs.constitutive.energyDensity_eq_inner]
+    simp only [HomogeneousIsotropicMedium.electricDisplacement_apply,
+      HomogeneousIsotropicMedium.magneticFieldStrength_apply,
+      FreeSpace.toHomogeneousIsotropicMedium_ε,
+      FreeSpace.toHomogeneousIsotropicMedium_μ, inner_smul_right]
+  have hS :
+      poyntingVector (V.electricField 𝓕.c)
+          (𝓕.toHomogeneousIsotropicMedium.magneticFieldStrength
+            (V.magneticField 𝓕.c)) t =
+        fun y => 𝓕.μ₀⁻¹ •
+          (V.electricField 𝓕.c t y ⨯ₑ₃ V.magneticField 𝓕.c t y) := by
+    funext y
+    change V.electricField 𝓕.c t y ⨯ₑ₃
+      (𝓕.μ₀⁻¹ • V.magneticField 𝓕.c t y) = _
+    rw [Space.cross_smul]
+  rw [hu, hS] at hp
+  exact hp
 
 end ThreeDimension
 end Electromagnetism
