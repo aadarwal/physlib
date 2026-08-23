@@ -1418,6 +1418,12 @@ premises.
   attenuation direction forces a negative radicand, zero phase normal component, and the
   `-I * √(-c)` normal root, without constructing a candidate or assigning angle, spatial-decay,
   evanescent, outgoing, TIR, irradiance, or power meaning;
+- [x] neutral hyperplane-normal spatial scaling: displacement along the stored normal changes the
+  spatial pairing by `u * K_normal` and the spatial factor by `exp (-I * u * K_normal)`; the root
+  `K_normal = -I * α` gives the exact real factor `exp (-α * u)`, while the general norm law is
+  `‖S (x + u n)‖ = exp (-a_normal * u) * ‖S x‖`; strict positive-side attenuation makes the
+  spatial factor tend to zero without requiring zero tangential attenuation or zero phase normal
+  component and without assigning a medium, interface, evanescent, outgoing, or power role;
 - [x] strict side-relative phase direction for complex wave vectors and phase-directed reflected
   branch selection: incident phase into the positive side and guarded active reflected phase into
   the negative side exclude the continuation root and force neutral hyperplane reflection, without
@@ -2127,7 +2133,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | blocked | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand alternatives with strict direction-selected real and imaginary roots, guarded phase-matched interface consequences, transmitted real-radicand reduction and direction-selected root application under zero tangential attenuation, and strict phase-directed reflected-root selection complete; angular reflection and Snell laws, critical-angle, side-decay, and separately justified outgoing semantics remain |
+| E5b reflection/Snell/TIR | blocked | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand alternatives with strict direction-selected real and imaginary roots, guarded phase-matched interface consequences, transmitted real-radicand reduction and direction-selected root application under zero tangential attenuation, neutral hyperplane-normal spatial scaling, and strict phase-directed reflected-root selection complete; angular reflection and Snell laws, critical-angle, transmitted side-decay specialization, and separately justified outgoing semantics remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
