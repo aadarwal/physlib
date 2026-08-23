@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.ClassicalMechanics.WaveEquation.ComplexWaveVector.Hyperplane
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryExponent
 
 /-!
