@@ -239,6 +239,16 @@ PR unless maintainers explicitly ask to retain it.
   embedded from the reals while the tangential square remains complex-bilinear. This equation
   leaves the two square-root choices unresolved; assign no interface side, incident, transmitted,
   outgoing, evanescent, or power meaning until later hypotheses make that choice.
+- [ ] Human-check the phase-matched dispersion consequences before upstreaming. Confirm that they
+  use `IsElectricPhaseMatched` alone, not the referenced electric amplitude balance. Incident and
+  transmitted material shells are direct premises; the reflected shell is required only under
+  nonzero reflected electric amplitude so its zero-amplitude wave vector remains dummy data.
+  Confirm the transmitted-minus-incident squared normal-component sign and positive-minus-negative
+  material contrast. In the active reflected branch, confirm the exhaustive but nonexclusive
+  alternative `K_reflected = K_incident` or `K_reflected = reflection K_incident`. Do not remove the
+  same-vector continuation root without a separate side or outgoing condition, and do not call the
+  complex tangential equality an angular Snell law or infer a transmitted square-root, decay,
+  evanescence, irradiance, or power result.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
