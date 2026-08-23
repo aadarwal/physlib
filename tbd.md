@@ -233,6 +233,12 @@ PR unless maintainers explicitly ask to retain it.
   equal vectors or reflected vectors. At zero normal component, including grazing real geometry,
   both alternatives coincide. Do not interpret this algebraic classification as selecting an
   incident, reflected, outgoing, decaying, medium-specific, or positive-power root.
+- [ ] Human-check the complex material normal-shell identity before upstreaming. Starting from the
+  bilinear dispersion equation and the neutral hyperplane square decomposition, confirm exactly
+  `K_normal ^ 2 = epsilon * mu * omega ^ 2 - K_tangent dot K_tangent`. The material coefficient is
+  embedded from the reals while the tangential square remains complex-bilinear. This equation
+  leaves the two square-root choices unresolved; assign no interface side, incident, transmitted,
+  outgoing, evanescent, or power meaning until later hypotheses make that choice.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
