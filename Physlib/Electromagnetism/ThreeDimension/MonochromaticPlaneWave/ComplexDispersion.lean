@@ -37,6 +37,8 @@ evanescent-wave interpretation. Maxwell equations and electromagnetic power rema
 - `IsDispersionMatched.hyperplaneNormalComponent_sq`: the oriented normal-root equation at a
   chosen neutral hyperplane.
 - `IsDispersionMatched.waveVector_ne_zero`: material matching forces a nonzero wave vector.
+- `IsDispersionMatched.phaseVector_norm_mul_waveSpeed`: a matched carrier with zero attenuation
+  satisfies `‖q‖ * v = omega`.
 - `IsDispersionMatched.waveVector_cross_cross_electricAmplitude`: the transverse on-shell vector
   triple-product identity.
 - `IsDispersionMatched.waveVector_cross_magneticAmplitude`: its built-in magnetic-amplitude
@@ -166,6 +168,40 @@ lemma waveVector_ne_zero (h : wave.IsDispersionMatched medium) :
   intro hzero
   apply h.bilinearDot_waveVector_self_ne_zero
   rw [hzero, ComplexWaveVector.bilinearDot_zero_left]
+
+/-- A dispersion-matched carrier with zero attenuation has phase-vector magnitude satisfying
+`‖q‖ * v = omega`.
+
+This result selects the positive phase-magnitude root using the positivity of angular frequency
+and wave speed. It assigns no interface side, propagation direction, group velocity, or power
+role. -/
+lemma phaseVector_norm_mul_waveSpeed
+    (h : wave.IsDispersionMatched medium)
+    (hAttenuation : wave.waveVector.attenuationVector = 0) :
+    ‖wave.waveVector.phaseVector‖ * medium.waveSpeed = wave.angularFrequency := by
+  have hNormSq :
+      ‖wave.waveVector.phaseVector‖ ^ 2 =
+        medium.ε * medium.μ * wave.angularFrequency ^ 2 := by
+    have hReal :=
+      (isDispersionMatched_iff_phase_attenuation wave medium).mp h
+    simpa [hAttenuation] using hReal.2
+  have hProductSq :
+      (‖wave.waveVector.phaseVector‖ * medium.waveSpeed) ^ 2 =
+        wave.angularFrequency ^ 2 := by
+    rw [mul_pow, medium.waveSpeed_sq, hNormSq]
+    field_simp [medium.ε_ne_zero, medium.μ_ne_zero]
+  have hProductNonneg :
+      0 ≤ ‖wave.waveVector.phaseVector‖ * medium.waveSpeed :=
+    mul_nonneg (norm_nonneg _) medium.waveSpeed_nonneg
+  nlinarith [wave.angularFrequency_pos]
+
+/-- A dispersion-matched carrier with zero attenuation has phase-vector magnitude `omega / v`. -/
+lemma phaseVector_norm_eq_angularFrequency_div_waveSpeed
+    (h : wave.IsDispersionMatched medium)
+    (hAttenuation : wave.waveVector.attenuationVector = 0) :
+    ‖wave.waveVector.phaseVector‖ = wave.angularFrequency / medium.waveSpeed := by
+  rw [eq_div_iff medium.waveSpeed_ne_zero]
+  exact h.phaseVector_norm_mul_waveSpeed hAttenuation
 
 /-- For a transverse dispersion-matched amplitude,
 `K cross (K cross E0) = -(epsilon * mu * omega ^ 2) E0`. -/
