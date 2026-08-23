@@ -27,6 +27,8 @@ We also prove some basic vector-identities involving of the curl operator.
 - `curl` : The curl operator on functions from `Space 3` to `EuclideanSpace ℝ (Fin 3)`.
 - `distCurl` : The curl operator on distributions from `Space 3` to `EuclideanSpace ℝ (Fin 3)`.
 - `div_of_curl_eq_zero` : The divergence of the curl of a function is zero.
+- `div_cross_apply`, `div_cross` : The divergence of a cross product of differentiable vector
+  fields, pointwise and as a function equality.
 - `distCurl_distGrad_eq_zero` : The curl of the gradient of a distribution is zero.
 - `curl_eq_sum_leviCivitaSymbol` : The components of the curl as a contraction with the
   Levi-Civita symbol.
@@ -38,13 +40,14 @@ We also prove some basic vector-identities involving of the curl operator.
   - A.2. The curl on a constant function
   - A.3. Basic operations on curl
   - A.4. The curl of a linear map is a linear map
-  - A.5. Preliminary lemmas about second derivatives
-  - A.6. The div of a curl is zero
-  - A.7. The curl of a grad is zero
-  - A.8. The curl of a curl
-  - A.9. A divergence-free field is a curl
-  - A.10. A curl-free field is a gradient
-  - A.11. The curl in terms of the Levi-Civita symbol
+  - A.5. The divergence of a cross product
+  - A.6. Preliminary lemmas about second derivatives
+  - A.7. The div of a curl is zero
+  - A.8. The curl of a grad is zero
+  - A.9. The curl of a curl
+  - A.10. A divergence-free field is a curl
+  - A.11. A curl-free field is a gradient
+  - A.12. The curl in terms of the Levi-Civita symbol
 - B. The curl on distributions
   - B.1. The components of the curl
   - B.2. Basic equalities
@@ -167,7 +170,46 @@ lemma curl_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
 
 /-!
 
-### A.5. Preliminary lemmas about second derivatives
+### A.5. The divergence of a cross product
+
+-/
+
+section
+
+open Matrix
+
+/-- The divergence of the cross product of two vector fields at a point, under differentiability
+of both fields at that point. -/
+lemma div_cross_apply (f g : Space → EuclideanSpace ℝ (Fin 3)) (x : Space)
+    (hf : DifferentiableAt ℝ f x) (hg : DifferentiableAt ℝ g x) :
+    (∇ ⬝ (fun y => f y ⨯ₑ₃ g y)) x =
+      inner ℝ (g x) ((∇ ⨯ f) x) - inner ℝ (f x) ((∇ ⨯ g) x) := by
+  unfold div curl
+  simp only [Fin.sum_univ_three, Fin.isValue, Fin.reduceAdd,
+    PiLp.inner_apply, RCLike.inner_apply, conj_trivial]
+  simp only [crossProduct, WithLp.equiv_apply, WithLp.equiv_symm_apply,
+    LinearMap.mk₂_apply, PiLp.toLp_apply, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Matrix.cons_val_two, Matrix.head_cons, Matrix.tail_cons]
+  repeat rw [deriv_eq]
+  repeat rw [fderiv_fun_sub (by fun_prop) (by fun_prop)]
+  repeat rw [fderiv_fun_mul (by fun_prop) (by fun_prop)]
+  simp only [FunLike.coe_sub, Pi.sub_apply, FunLike.coe_add, Pi.add_apply,
+    FunLike.coe_smul, Pi.smul_apply, smul_eq_mul]
+  ring
+
+/-- The divergence of the cross product of two differentiable vector fields. -/
+lemma div_cross (f g : Space → EuclideanSpace ℝ (Fin 3))
+    (hf : Differentiable ℝ f) (hg : Differentiable ℝ g) :
+    ∇ ⬝ (fun x => f x ⨯ₑ₃ g x) =
+      fun x => inner ℝ (g x) ((∇ ⨯ f) x) - inner ℝ (f x) ((∇ ⨯ g) x) := by
+  funext x
+  exact div_cross_apply f g x (hf x) (hg x)
+
+end
+
+/-!
+
+### A.6. Preliminary lemmas about second derivatives
 
 -/
 
@@ -196,7 +238,7 @@ lemma deriv_coord_2nd_sub (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 /-!
 
-### A.6. The div of a curl is zero
+### A.7. The div of a curl is zero
 
 -/
 
@@ -218,7 +260,7 @@ lemma div_of_curl_eq_zero (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContD
 
 /-!
 
-### A.7. The curl of a grad is zero
+### A.8. The curl of a grad is zero
 
 -/
 
@@ -232,7 +274,7 @@ lemma curl_of_grad_eq_zero (f : Space → ℝ) (hf : ContDiff ℝ 2 f) :
 
 /-!
 
-### A.8. The curl of a curl
+### A.9. The curl of a curl
 
 -/
 
@@ -255,7 +297,7 @@ lemma curl_of_curl (f : Space → EuclideanSpace ℝ (Fin 3)) (hf : ContDiff ℝ
 
 /-!
 
-### A.9. A divergence-free field is a curl
+### A.10. A divergence-free field is a curl
 
 We now prove that if the divergence of a function is zero,
 then it is equal to the curl of some function.
@@ -548,7 +590,7 @@ TODO "Generalize the statement that a div-free field is a curl
 
 /-!
 
-### A.10. A curl-free field is a gradient
+### A.11. A curl-free field is a gradient
 
 We show that if the curl of a function is zero, then it is equal to the gradient of some function.
 The key lemma here is
@@ -658,7 +700,7 @@ TODO "Generalize the statement that a curl-free field is a gradient
 
 /-!
 
-### A.11. The curl in terms of the Levi-Civita symbol
+### A.12. The curl in terms of the Levi-Civita symbol
 
 -/
 

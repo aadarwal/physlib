@@ -98,6 +98,14 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check that joint field differentiability is intentionally part of
   `IsMacroscopicMaxwell`: Physlib's differential operators are totalized, and the hypotheses are
   what justify the proved divergence, curl, and time-derivative superposition laws.
+- [ ] Human-check E3s against the shared cross-product and curl orientation: for real
+  three-dimensional fields the sign is
+  `div (f × g) = g · curl f - f · curl g`, and both pointwise differentiability hypotheses are
+  needed because the derivative API is totalized. Confirm that the neutral SpaceAndTime result is
+  not itself an electromagnetic energy or flux theorem. Before upstreaming E3a, independently
+  verify that substituting the macroscopic Maxwell signs gives
+  `div (E × H) = -E · JFree - E · ∂ₜ D - H · ∂ₜ B`, with source-free conservation only as a
+  corollary after the fixed nondispersive constitutive-law step.
 - [ ] Human-check the one-way E0 bridge and its scaling: `D = ε₀ E`, `H = μ₀⁻¹ B`,
   `ε₀ (ρ / ε₀) = ρ`, and `μ₀⁻¹ (μ₀ J + μ₀ ε₀ ∂ₜ E) = J + ∂ₜ (ε₀ E)`. Confirm that E0's Lorentz
   current is being interpreted as the free source in this specialization and that no converse,
