@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.ClassicalMechanics.WaveEquation.ComplexWaveVector.NormalRoot
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexDispersion
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricFixedFrequency
 
@@ -30,11 +31,12 @@ incident vector itself or its hyperplane reflection. Strict incident phase direc
 positive side and strict active reflected phase direction into the negative side exclude the
 same-vector root.
 
-The reflected branch result selects an algebraic root only under those explicit phase-direction
-hypotheses; it neither derives them from a trace label nor identifies phase direction with group
-velocity, energy flux, or outgoing power. These results do not select a transmitted square root,
-define a propagation angle, prove Snell's law, or classify an evanescent branch. In particular,
-the phase-matching predicate is used without its separate electric amplitude-balance predicate.
+The transmitted branch results likewise select a normal root only under a separately supplied
+strict phase or attenuation direction into the positive side. At zero radicand the normal root is
+unique and no strict direction premise is needed. None of these results derives a direction from a
+trace label, identifies phase direction with group velocity or power flow, defines a propagation
+angle, proves Snell's law, or classifies an evanescent or outgoing branch. In particular, the
+phase-matching predicate is used without its separate electric amplitude-balance predicate.
 
 ## ii. Key results
 
@@ -46,6 +48,12 @@ the phase-matching predicate is used without its separate electric amplitude-bal
   data and the positive-side medium.
 - `transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand`: zero incident
   tangential attenuation makes the transmitted normal square equal that embedded real radicand.
+- `transmitted_normalRoot_data_of_isPhaseDirectedInto`: positive-side phase direction selects the
+  positive real normal root and forces zero transmitted attenuation.
+- `transmitted_normalRoot_data_of_transmittedNormalRadicand_eq_zero`: a zero transmitted radicand
+  forces the unique zero normal root and zero transmitted attenuation.
+- `transmitted_normalRoot_data_of_isAttenuationDirectedInto`: positive-side attenuation direction
+  selects the negative-imaginary normal root.
 - `transmitted_hyperplaneNormalComponent_sq_sub_incident_hyperplaneNormalComponent_sq`:
   the exact two-medium contrast of squared normal components.
 - `reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneReflection`: the
@@ -56,7 +64,8 @@ the phase-matching predicate is used without its separate electric amplitude-bal
 ## iii. Table of contents
 
 - A. Transmitted normal-root and real-radicand equations
-- B. Reflected two-root classification and phase-directed selection
+- B. Direction-selected transmitted normal roots
+- C. Reflected two-root classification and phase-directed selection
 
 ## iv. References
 
@@ -193,7 +202,145 @@ lemma transmitted_hyperplaneNormalComponent_sq_sub_incident_hyperplaneNormalComp
 
 /-!
 
-## B. Reflected two-root classification and phase-directed selection
+## B. Direction-selected transmitted normal roots
+
+-/
+
+/-- Under electric phase matching, zero incident tangential attenuation gives zero transmitted
+tangential attenuation.
+
+This statement constrains no normal attenuation component. -/
+lemma transmitted_tangentialProjection_attenuationVector_eq_zero
+    (h : configuration.IsElectricPhaseMatched)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0) :
+    configuration.interface.plane.tangentialProjection
+      configuration.transmitted.waveVector.attenuationVector = 0 :=
+  h.transmitted_tangentialPhase_attenuation_eq_incident.2.trans
+    hIncidentTangentialAttenuation
+
+/-- If the transmitted phase vector points strictly into the geometric positive side, its real
+normal radicand is positive, its whole attenuation vector vanishes, and its normal component is
+the positive real square root.
+
+The direction premise is supplied rather than derived from the transmitted label. This is an
+algebraic phase-root selection, not a group-velocity, outgoing, irradiance, or power statement. -/
+lemma transmitted_normalRoot_data_of_isPhaseDirectedInto
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0)
+    (hDirection : configuration.transmitted.waveVector.IsPhaseDirectedInto
+      configuration.interface.plane .positive) :
+    0 < configuration.transmittedNormalRadicand ∧
+      configuration.transmitted.waveVector.attenuationVector = 0 ∧
+      ComplexWaveVector.hyperplaneNormalComponent configuration.interface.plane
+          configuration.transmitted.waveVector =
+        (Real.sqrt configuration.transmittedNormalRadicand : ℂ) := by
+  have hSquare := h.transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
+    hTransmittedDispersion hIncidentTangentialAttenuation
+  obtain ⟨hRadicand, hNormalAttenuation, hRoot⟩ :=
+    normalRoot_data_of_sq_eq_real_of_isPhaseDirectedInto
+      configuration.interface.plane configuration.transmitted.waveVector
+        configuration.transmittedNormalRadicand .positive hSquare hDirection
+  refine ⟨hRadicand, ?_, ?_⟩
+  · calc
+      configuration.transmitted.waveVector.attenuationVector =
+          configuration.interface.plane.tangentialProjection
+              configuration.transmitted.waveVector.attenuationVector +
+            configuration.interface.plane.normalComponent
+                configuration.transmitted.waveVector.attenuationVector •
+              configuration.interface.plane.normalVector :=
+        (configuration.interface.plane.tangentialProjection_add_normal _).symm
+      _ = 0 := by
+        rw [h.transmitted_tangentialProjection_attenuationVector_eq_zero
+          hIncidentTangentialAttenuation, hNormalAttenuation]
+        simp
+  · simpa using hRoot
+
+/-- If the transmitted real normal radicand is zero, the normal root is uniquely zero. Under the
+same zero-tangential-attenuation premise, the transmitted attenuation vector also vanishes and
+the transmitted phase vector has zero normal component.
+
+This is an algebraic threshold result. It does not by itself define a critical angle, a grazing
+role, an outgoing condition, irradiance, or power. -/
+lemma transmitted_normalRoot_data_of_transmittedNormalRadicand_eq_zero
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0)
+    (hRadicand : configuration.transmittedNormalRadicand = 0) :
+    configuration.interface.plane.normalComponent
+          configuration.transmitted.waveVector.phaseVector = 0 ∧
+      configuration.transmitted.waveVector.attenuationVector = 0 ∧
+      ComplexWaveVector.hyperplaneNormalComponent configuration.interface.plane
+          configuration.transmitted.waveVector = 0 := by
+  have hSquare := h.transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
+    hTransmittedDispersion hIncidentTangentialAttenuation
+  have hRoot :
+      ComplexWaveVector.hyperplaneNormalComponent configuration.interface.plane
+          configuration.transmitted.waveVector = 0 :=
+    normalComponent_eq_zero_of_sq_eq_zero configuration.interface.plane
+      configuration.transmitted.waveVector (by simpa [hRadicand] using hSquare)
+  have hPhaseNormal :
+      configuration.interface.plane.normalComponent
+          configuration.transmitted.waveVector.phaseVector = 0 := by
+    simpa using congrArg Complex.re hRoot
+  have hAttenuationNormal :
+      configuration.interface.plane.normalComponent
+          configuration.transmitted.waveVector.attenuationVector = 0 := by
+    simpa using congrArg Complex.im hRoot
+  refine ⟨hPhaseNormal, ?_, hRoot⟩
+  calc
+    configuration.transmitted.waveVector.attenuationVector =
+        configuration.interface.plane.tangentialProjection
+            configuration.transmitted.waveVector.attenuationVector +
+          configuration.interface.plane.normalComponent
+              configuration.transmitted.waveVector.attenuationVector •
+            configuration.interface.plane.normalVector :=
+      (configuration.interface.plane.tangentialProjection_add_normal _).symm
+    _ = 0 := by
+      rw [h.transmitted_tangentialProjection_attenuationVector_eq_zero
+        hIncidentTangentialAttenuation, hAttenuationNormal]
+      simp
+
+/-- If the transmitted attenuation vector points strictly into the geometric positive side, its
+real normal radicand is negative, its phase normal component vanishes, and its complex normal
+component is the negative-imaginary square root.
+
+For `K = q - I a`, this is the root whose normal attenuation points into the positive side. The
+direction premise is supplied rather than derived from the transmitted label, and the result does
+not yet assert spatial decay, evanescence, an outgoing condition, irradiance, or power. -/
+lemma transmitted_normalRoot_data_of_isAttenuationDirectedInto
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0)
+    (hDirection : configuration.transmitted.waveVector.IsAttenuationDirectedInto
+      configuration.interface.plane .positive) :
+    configuration.transmittedNormalRadicand < 0 ∧
+      configuration.interface.plane.normalComponent
+          configuration.transmitted.waveVector.phaseVector = 0 ∧
+      ComplexWaveVector.hyperplaneNormalComponent configuration.interface.plane
+          configuration.transmitted.waveVector =
+        -Complex.I *
+          (Real.sqrt (-configuration.transmittedNormalRadicand) : ℂ) := by
+  have hSquare := h.transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
+    hTransmittedDispersion hIncidentTangentialAttenuation
+  simpa using normalRoot_data_of_sq_eq_real_of_isAttenuationDirectedInto
+    configuration.interface.plane configuration.transmitted.waveVector
+      configuration.transmittedNormalRadicand .positive hSquare hDirection
+
+/-!
+
+## C. Reflected two-root classification and phase-directed selection
 
 -/
 
