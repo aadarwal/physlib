@@ -1434,7 +1434,14 @@ premises.
   branch selection: incident phase into the positive side and guarded active reflected phase into
   the negative side exclude the continuation root and force neutral hyperplane reflection, without
   deriving either direction from a trace label or assigning group-velocity or power meaning;
-- angular specular-reflection corollaries and Snell's law;
+- [x] side-relative phase-angle geometry and the angular law of reflection: neutral real vector
+  reflection preserves tangential data, norm, and angle after exchanging sides; complex
+  hyperplane reflection acts by that real reflection on phase and attenuation vectors; incident,
+  reflected, and transmitted label angles use respectively the positive-, negative-, and
+  positive-side normals; and the guarded active reflected branch has equal incident and reflected
+  phase angles while retaining arbitrary dummy angle data at zero reflected electric amplitude;
+  the result assigns no ray, group-velocity, energy-flux, outgoing, irradiance, or power meaning;
+- Snell's law from tangential phase matching and material dispersion;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;
 - critical-angle and total-internal-reflection characterization; and
 - evanescent classification of the side-decaying complex transmitted branch, with any outgoing
@@ -2139,7 +2146,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand alternatives with strict direction-selected real and imaginary roots, guarded phase-matched interface consequences, transmitted real-radicand reduction and direction-selected root application under zero tangential attenuation, neutral hyperplane-normal spatial scaling, exact transmitted carrier/E/B side scaling, and strict phase-directed reflected-root selection complete; angular reflection and Snell laws, critical-angle/evanescent classification, and separately justified outgoing semantics remain |
+| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand alternatives with strict direction-selected real and imaginary roots, guarded phase-matched interface consequences, transmitted real-radicand reduction and direction-selected root application under zero tangential attenuation, neutral hyperplane-normal spatial scaling, exact transmitted carrier/E/B side scaling, strict phase-directed reflected-root selection, and the guarded phase-angle law of reflection complete; Snell's law, critical-angle/evanescent classification, and separately justified outgoing semantics remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |

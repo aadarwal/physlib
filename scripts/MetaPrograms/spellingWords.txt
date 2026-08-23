@@ -2017,6 +2017,7 @@ normalorderf
 normalorderlist
 normalorderrel
 normalordersign
+normals
 normed
 norms
 normtimeorderrel
@@ -2250,6 +2251,7 @@ position
 positions
 positive
 positivity
+possibilities
 possible
 possibly
 potential
@@ -2399,6 +2401,7 @@ reason
 reasoning
 reasons
 recall
+receives
 recognize
 recognizing
 recover
@@ -3072,6 +3075,7 @@ unless
 unlike
 unnecessarily
 unnormalized
+unoriented
 unpaired
 unquotiented
 unrelated

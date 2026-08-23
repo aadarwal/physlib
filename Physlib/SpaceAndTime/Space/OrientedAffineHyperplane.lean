@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Mathlib.Geometry.Euclidean.Angle.Unoriented.Basic
 public import Physlib.SpaceAndTime.Space.Module
 
 /-!
@@ -31,6 +32,11 @@ Two vectors have the same tangential projection exactly when their real inner pr
 every tangent vector agree. This describes the projection without choosing a tangent basis and
 makes explicit that tangent probes cannot distinguish normal components.
 
+The two geometric sides are exchanged by an explicit opposite operation. The corresponding
+side-relative vector angle is measured with Mathlib's unoriented Euclidean angle. Reflection of a
+vector across the tangent plane preserves its norm and tangential projection, negates its normal
+component, and preserves the angle when the reference side is exchanged.
+
 ## ii. Key results
 
 - `OrientedAffineHyperplane.signedNormalCoordinate_vadd`: signed-coordinate translation.
@@ -46,6 +52,12 @@ makes explicit that tangent probes cannot distinguish normal components.
 - `OrientedAffineHyperplane.exists_tangent_vadd_eq_of_mem_carrier`: every carrier point is a
   tangential displacement of the stored point.
 - `OrientedAffineHyperplane.signedNormalCoordinate_sideRay`: exact side-normal parameterization.
+- `OrientedAffineHyperplane.sin_angleToSide_mul_norm`: the tangential norm is the vector norm
+  multiplied by the sine of its side-relative angle.
+- `OrientedAffineHyperplane.angleToSide_mem_Ico_of_inner_pos`: a vector pointing into a side has
+  side-relative angle in `[0, π / 2)`.
+- `OrientedAffineHyperplane.angleToSide_vectorReflection`: vector reflection preserves the
+  side-relative angle after exchanging sides.
 
 ## iii. Table of contents
 
@@ -53,6 +65,7 @@ makes explicit that tangent probes cannot distinguish normal components.
 - B. Signed normal geometry
 - C. Half-spaces
 - D. Tangent submodule, projection, and carrier parameterization
+- E. Side-relative angles and vector reflection
 
 ## iv. References
 
@@ -94,6 +107,22 @@ inductive Side
 
 namespace Side
 
+/-- The geometric side opposite a selected hyperplane side. -/
+def opposite : Side → Side
+  | negative => positive
+  | positive => negative
+
+@[simp]
+lemma opposite_negative : negative.opposite = positive := rfl
+
+@[simp]
+lemma opposite_positive : positive.opposite = negative := rfl
+
+/-- Taking the opposite side twice returns the original side. -/
+@[simp]
+lemma opposite_opposite (side : Side) : side.opposite.opposite = side := by
+  cases side <;> rfl
+
 /-- The scalar sign of a hyperplane side relative to the stored normal. -/
 def sign : Side → ℝ
   | negative => -1
@@ -104,6 +133,11 @@ lemma sign_negative : negative.sign = -1 := rfl
 
 @[simp]
 lemma sign_positive : positive.sign = 1 := rfl
+
+/-- The opposite side has the negated sign. -/
+@[simp]
+lemma sign_opposite (side : Side) : side.opposite.sign = -side.sign := by
+  cases side <;> norm_num [opposite, sign]
 
 /-- The square of either side sign is one. -/
 lemma sign_sq (side : Side) : side.sign ^ 2 = 1 := by
@@ -178,6 +212,12 @@ lemma sideNormalVector_positive (plane : OrientedAffineHyperplane d) :
 lemma sideNormalVector_negative (plane : OrientedAffineHyperplane d) :
     plane.sideNormalVector .negative = -plane.normalVector := by
   simp [sideNormalVector]
+
+/-- Exchanging sides negates the corresponding side-normal vector. -/
+@[simp]
+lemma sideNormalVector_opposite (plane : OrientedAffineHyperplane d) (side : Side) :
+    plane.sideNormalVector side.opposite = -plane.sideNormalVector side := by
+  cases side <;> simp
 
 /-- The unit spatial direction pointing into a selected geometric side. -/
 def sideNormalDirection (plane : OrientedAffineHyperplane d) (side : Side) : Direction d where
@@ -477,6 +517,236 @@ lemma exists_tangent_vadd_eq_of_mem_carrier (plane : OrientedAffineHyperplane d)
   refine ⟨x -ᵥ plane.point, ?_, (vsub_vadd x plane.point).symm⟩
   change plane.signedNormalCoordinate x = 0
   exact (plane.mem_carrier x).mp h
+
+/-!
+
+## E. Side-relative angles and vector reflection
+
+### E.1. Orthogonal decomposition and side-relative angles
+
+-/
+
+/-- The squared tangential norm plus the squared oriented normal component equals the squared
+vector norm. -/
+lemma norm_tangentialProjection_sq_add_normalComponent_sq
+    (plane : OrientedAffineHyperplane d) (v : EuclideanSpace ℝ (Fin d)) :
+    ‖plane.tangentialProjection v‖ ^ 2 + plane.normalComponent v ^ 2 = ‖v‖ ^ 2 := by
+  have hOrthogonal :
+      inner ℝ (plane.tangentialProjection v)
+          (plane.normalComponent v • plane.normalVector) = 0 := by
+    rw [inner_smul_right, real_inner_comm]
+    change plane.normalComponent v *
+      plane.normalComponent (plane.tangentialProjection v) = 0
+    rw [plane.normalComponent_tangentialProjection, mul_zero]
+  calc
+    ‖plane.tangentialProjection v‖ ^ 2 + plane.normalComponent v ^ 2 =
+        ‖plane.tangentialProjection v‖ ^ 2 +
+          ‖plane.normalComponent v • plane.normalVector‖ ^ 2 := by
+      rw [norm_smul, plane.normalVector_norm, mul_one, Real.norm_eq_abs, sq_abs]
+    _ = ‖plane.tangentialProjection v +
+          plane.normalComponent v • plane.normalVector‖ ^ 2 := by
+      simpa only [pow_two] using
+        (norm_add_sq_eq_norm_sq_add_norm_sq_of_inner_eq_zero _ _ hOrthogonal).symm
+    _ = ‖v‖ ^ 2 := by rw [plane.tangentialProjection_add_normal]
+
+/-- The unoriented angle between a vector and the unit normal pointing into a selected geometric
+side.
+
+Following Mathlib's convention, the angle is `π / 2` when the vector is zero. This definition
+assigns no incident, reflected, transmitted, incoming, outgoing, or power role. -/
+noncomputable def angleToSide (plane : OrientedAffineHyperplane d)
+    (side : Side) (v : EuclideanSpace ℝ (Fin d)) : ℝ :=
+  InnerProductGeometry.angle v (plane.sideNormalVector side)
+
+/-- A vector's angle to a side normal is below `π / 2` exactly when it points strictly into that
+geometric side. -/
+lemma angleToSide_lt_pi_div_two_iff (plane : OrientedAffineHyperplane d)
+    (side : Side) (v : EuclideanSpace ℝ (Fin d)) :
+    plane.angleToSide side v < Real.pi / 2 ↔
+      0 < inner ℝ (plane.sideNormalVector side) v := by
+  rw [angleToSide, InnerProductGeometry.angle, Real.arccos_lt_pi_div_two,
+    plane.sideNormalVector_norm, mul_one, real_inner_comm]
+  constructor
+  · intro h
+    rcases (div_pos_iff.mp h) with hPositive | hNegative
+    · exact hPositive.1
+    · exact (not_lt_of_ge (norm_nonneg v) hNegative.2).elim
+  · intro h
+    have hv : v ≠ 0 := by
+      intro hv
+      simp [hv] at h
+    exact div_pos h (norm_pos_iff.mpr hv)
+
+/-- The side-relative angle of a vector pointing strictly into that side lies in
+`[0, π / 2)`. -/
+lemma angleToSide_mem_Ico_of_inner_pos (plane : OrientedAffineHyperplane d)
+    (side : Side) (v : EuclideanSpace ℝ (Fin d))
+    (h : 0 < inner ℝ (plane.sideNormalVector side) v) :
+    plane.angleToSide side v ∈ Set.Ico 0 (Real.pi / 2) := by
+  exact ⟨InnerProductGeometry.angle_nonneg _ _,
+    (plane.angleToSide_lt_pi_div_two_iff side v).mpr h⟩
+
+/-- The oriented normal component toward a selected side equals the vector norm multiplied by the
+cosine of its side-relative angle. -/
+lemma cos_angleToSide_mul_norm (plane : OrientedAffineHyperplane d)
+    (side : Side) (v : EuclideanSpace ℝ (Fin d)) :
+    Real.cos (plane.angleToSide side v) * ‖v‖ =
+      side.sign * plane.normalComponent v := by
+  rw [angleToSide, ← mul_one ‖v‖, ← plane.sideNormalVector_norm side,
+    InnerProductGeometry.cos_angle_mul_norm_mul_norm, sideNormalVector,
+    inner_smul_right, real_inner_comm]
+  rfl
+
+/-- The tangential norm equals the vector norm multiplied by the sine of its side-relative
+angle. -/
+lemma sin_angleToSide_mul_norm (plane : OrientedAffineHyperplane d)
+    (side : Side) (v : EuclideanSpace ℝ (Fin d)) :
+    Real.sin (plane.angleToSide side v) * ‖v‖ = ‖plane.tangentialProjection v‖ := by
+  rw [angleToSide, ← mul_one ‖v‖, ← plane.sideNormalVector_norm side,
+    InnerProductGeometry.sin_angle_mul_norm_mul_norm]
+  have hSideInner :
+      inner ℝ v (plane.sideNormalVector side) =
+        side.sign * plane.normalComponent v := by
+    rw [sideNormalVector, inner_smul_right, real_inner_comm]
+    rfl
+  rw [real_inner_self_eq_norm_sq, real_inner_self_eq_norm_sq,
+    plane.sideNormalVector_norm, one_pow, mul_one, hSideInner]
+  have hSideSquare :
+      side.sign * plane.normalComponent v *
+          (side.sign * plane.normalComponent v) =
+        plane.normalComponent v ^ 2 := by
+    calc
+      side.sign * plane.normalComponent v *
+          (side.sign * plane.normalComponent v) =
+          side.sign ^ 2 * plane.normalComponent v ^ 2 := by ring
+      _ = plane.normalComponent v ^ 2 := by rw [side.sign_sq, one_mul]
+  rw [hSideSquare]
+  have hInside :
+      ‖v‖ ^ 2 - plane.normalComponent v ^ 2 =
+        ‖plane.tangentialProjection v‖ ^ 2 := by
+    linarith [plane.norm_tangentialProjection_sq_add_normalComponent_sq v]
+  rw [hInside, Real.sqrt_sq (norm_nonneg _)]
+
+/-!
+
+### E.2. Vector reflection
+
+-/
+
+/-- Reflection of a real vector across the tangent plane, obtained by negating its oriented normal
+component. -/
+def vectorReflection (plane : OrientedAffineHyperplane d)
+    (v : EuclideanSpace ℝ (Fin d)) : EuclideanSpace ℝ (Fin d) :=
+  plane.tangentialProjection v - plane.normalComponent v • plane.normalVector
+
+/-- Vector reflection has the familiar formula `v - 2 * normalComponent v * normalVector`. -/
+lemma vectorReflection_eq_sub_two_smul_normalVector
+    (plane : OrientedAffineHyperplane d) (v : EuclideanSpace ℝ (Fin d)) :
+    plane.vectorReflection v =
+      v - (2 * plane.normalComponent v) • plane.normalVector := by
+  rw [vectorReflection, tangentialProjection]
+  module
+
+/-- Vector reflection negates the oriented normal component. -/
+@[simp]
+lemma normalComponent_vectorReflection
+    (plane : OrientedAffineHyperplane d) (v : EuclideanSpace ℝ (Fin d)) :
+    plane.normalComponent (plane.vectorReflection v) = -plane.normalComponent v := by
+  rw [vectorReflection_eq_sub_two_smul_normalVector, normalComponent,
+    inner_sub_right, inner_smul_right, plane.inner_normalVector_self]
+  change plane.normalComponent v - 2 * plane.normalComponent v * 1 =
+    -plane.normalComponent v
+  ring
+
+/-- Vector reflection preserves the tangential projection. -/
+@[simp]
+lemma tangentialProjection_vectorReflection
+    (plane : OrientedAffineHyperplane d) (v : EuclideanSpace ℝ (Fin d)) :
+    plane.tangentialProjection (plane.vectorReflection v) =
+      plane.tangentialProjection v := by
+  change plane.vectorReflection v -
+      plane.normalComponent (plane.vectorReflection v) • plane.normalVector =
+    plane.tangentialProjection v
+  rw [normalComponent_vectorReflection, vectorReflection]
+  module
+
+/-- Vector reflection is involutive. -/
+@[simp]
+lemma vectorReflection_vectorReflection
+    (plane : OrientedAffineHyperplane d) (v : EuclideanSpace ℝ (Fin d)) :
+    plane.vectorReflection (plane.vectorReflection v) = v := by
+  rw [vectorReflection_eq_sub_two_smul_normalVector,
+    normalComponent_vectorReflection,
+    vectorReflection_eq_sub_two_smul_normalVector]
+  module
+
+/-- Vector reflection is an involutive function. -/
+lemma vectorReflection_involutive (plane : OrientedAffineHyperplane d) :
+    Function.Involutive plane.vectorReflection :=
+  plane.vectorReflection_vectorReflection
+
+/-- Vector reflection preserves the Euclidean norm. -/
+@[simp]
+lemma norm_vectorReflection
+    (plane : OrientedAffineHyperplane d) (v : EuclideanSpace ℝ (Fin d)) :
+    ‖plane.vectorReflection v‖ = ‖v‖ := by
+  have hOrthogonal :
+      inner ℝ (plane.normalComponent v • plane.normalVector)
+          (plane.tangentialProjection v) = 0 := by
+    rw [inner_smul_left, conj_trivial]
+    change plane.normalComponent v *
+      plane.normalComponent (plane.tangentialProjection v) = 0
+    rw [plane.normalComponent_tangentialProjection, mul_zero]
+  rw [vectorReflection, norm_sub_eq_norm_add hOrthogonal,
+    plane.tangentialProjection_add_normal]
+
+/-- A side-normal vector reflects to the unit normal pointing into the opposite side. -/
+@[simp]
+lemma vectorReflection_sideNormalVector
+    (plane : OrientedAffineHyperplane d) (side : Side) :
+    plane.vectorReflection (plane.sideNormalVector side) =
+      plane.sideNormalVector side.opposite := by
+  cases side
+  · rw [sideNormalVector_negative, Side.opposite_negative, sideNormalVector_positive,
+      vectorReflection_eq_sub_two_smul_normalVector, normalComponent, inner_neg_right,
+      plane.inner_normalVector_self]
+    module
+  · rw [sideNormalVector_positive, Side.opposite_positive, sideNormalVector_negative,
+      vectorReflection_eq_sub_two_smul_normalVector, normalComponent,
+      plane.inner_normalVector_self]
+    module
+
+private lemma inner_vectorReflection_sideNormalVector_opposite
+    (plane : OrientedAffineHyperplane d) (side : Side)
+    (v : EuclideanSpace ℝ (Fin d)) :
+    inner ℝ (plane.vectorReflection v) (plane.sideNormalVector side.opposite) =
+      inner ℝ v (plane.sideNormalVector side) := by
+  cases side
+  · simp only [Side.opposite_negative, sideNormalVector_positive,
+      sideNormalVector_negative, inner_neg_right]
+    rw [real_inner_comm plane.normalVector (plane.vectorReflection v),
+      real_inner_comm plane.normalVector v]
+    exact plane.normalComponent_vectorReflection v
+  · simp only [Side.opposite_positive, sideNormalVector_negative,
+      sideNormalVector_positive, inner_neg_right]
+    rw [real_inner_comm plane.normalVector (plane.vectorReflection v),
+      real_inner_comm plane.normalVector v]
+    change -plane.normalComponent (plane.vectorReflection v) =
+      plane.normalComponent v
+    rw [plane.normalComponent_vectorReflection, neg_neg]
+
+/-- Vector reflection preserves the side-relative angle when the reference side is exchanged. -/
+@[simp]
+lemma angleToSide_vectorReflection
+    (plane : OrientedAffineHyperplane d) (side : Side)
+    (v : EuclideanSpace ℝ (Fin d)) :
+    plane.angleToSide side.opposite (plane.vectorReflection v) =
+      plane.angleToSide side v := by
+  rw [angleToSide, angleToSide, InnerProductGeometry.angle,
+    InnerProductGeometry.angle,
+    plane.inner_vectorReflection_sideNormalVector_opposite,
+    plane.norm_vectorReflection, plane.sideNormalVector_norm,
+    plane.sideNormalVector_norm]
 
 end OrientedAffineHyperplane
 

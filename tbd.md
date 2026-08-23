@@ -209,6 +209,16 @@ PR unless maintainers explicitly ask to retain it.
   Add a Mathlib `AffineSubspace`/surface-measure bridge only when an actual trace or integration
   consumer needs it; the present carrier is deliberately the exact zero set used by pointwise
   boundary laws.
+- [ ] Human-check the neutral side-relative angle and real vector-reflection conventions before
+  upstreaming. `Side.opposite` must exchange the positive and negative side normals, and
+  `angleToSide side v` must use Mathlib's unoriented Euclidean angle between `v` and the unit
+  normal pointing into `side`. Confirm the deliberate total convention that a zero vector has
+  angle `π / 2`; no physical direction may be inferred from that value. Verify the cosine and sine
+  identities against respectively the signed normal component and tangential-projection norm.
+  Confirm that `vectorReflection` preserves the tangential projection and norm, negates the normal
+  component, is involutive, sends each side normal to the opposite side normal, and preserves the
+  side-relative angle only after the reference side is exchanged. This neutral geometry assigns no
+  wave label, medium, ray, group velocity, energy flux, outgoing condition, irradiance, or power.
 - [ ] Human-check E2e's complex-wavevector convention: the carrier uses
   `exp (I * (ω t - K·x))`, the pairing `K·x` and dispersion square `K·K` are complex-bilinear
   rather than Hermitian, `K = q - I a`, and `a = α n` with `α > 0` gives amplitude decay
@@ -324,8 +334,19 @@ PR unless maintainers explicitly ask to retain it.
   dispersion are guarded by nonzero reflected electric amplitude, preserving arbitrary dummy
   labels at zero amplitude. In the active branch the opposite strict signs exclude equality with
   the incident wave vector, leaving exact neutral hyperplane reflection. Strictness excludes phase
-  grazing; do not replace either strict inequality by a non-strict one or call the result an
-  angular reflection law before real propagating directions and angle definitions are connected.
+  grazing; do not replace either strict inequality by a non-strict one. This theorem alone is root
+  selection; its separately audited angular interpretation is recorded immediately below.
+- [ ] Human-check the planar dielectric phase-angle conventions and guarded law of reflection
+  before upstreaming. The incident and transmitted phase vectors are measured from the
+  positive-side unit normal, while the reflected phase vector is measured from the negative-side
+  unit normal. These are total label-relative measurements, not stored propagation roles, and a
+  zero phase vector receives the Mathlib value `π / 2`. Confirm that supplied strict phase
+  direction is what places each angle in `[0, π / 2)`. In the angular reflection result, incident
+  and reflected dispersion and direction hypotheses must match the existing guarded root-selection
+  theorem exactly; nonzero reflected electric amplitude selects neutral hyperplane reflection and
+  hence equal phase angles. The zero-amplitude branch must remain explicit because its wave vector
+  and angle are arbitrary dummy data. Do not interpret this phase-angle equality as a ray,
+  group-velocity, energy-flux, outgoing, irradiance, or power theorem.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
