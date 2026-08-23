@@ -106,6 +106,27 @@ PR unless maintainers explicitly ask to retain it.
   verify that substituting the macroscopic Maxwell signs gives
   `div (E × H) = -E · JFree - E · ∂ₜ D - H · ∂ₜ B`, with source-free conservation only as a
   corollary after the fixed nondispersive constitutive-law step.
+- [ ] Human-check E3a's stored-energy convention and factors: in the fixed positive homogeneous
+  isotropic nondispersive model,
+  `u = 1 / 2 * (ε E · E + μ H · H) = 1 / 2 * (E · D + B · H)`, and therefore
+  `∂ₜ u = E · ∂ₜ D + H · ∂ₜ B`. Confirm that the nonnegativity result depends on the medium's
+  strict positivity fields and that no claim is made for lossy, conducting, dispersive,
+  anisotropic, inhomogeneous, or nonlinear media.
+- [ ] Human-check E3a's local source semantics: only `JFree t x = 0` is needed for pointwise field
+  energy conservation, while the named source-free corollary sets both free charge and free
+  current to zero. Bound material response remains represented by `D` and `H`. Neither result is
+  an integrated conservation law, boundary-flux theorem, time average, irradiance, or modal-power
+  statement.
+- [ ] Human-check the explicit real-vacuum endpoint derived from source-free `IsExtrema`:
+  `u₀ = 1 / 2 * (ε₀ E · E + μ₀⁻¹ B · B)` and `S₀ = μ₀⁻¹ (E × B)`. Confirm the inverse permeability,
+  cross-product order, positive divergence sign on the left, zero right-hand side, and absence of
+  an extra factor of `c` under the repository's rationalized convention. Zero Lorentz current is
+  interpreted as both zero free charge and zero free current.
+- [ ] Keep E3a as stacked upstream concepts even though they are integrated on the fork: first the
+  generic real-field energy module (with the Maxwell work identity and fixed-medium theorem), then
+  the single potential-derived vacuum endpoint in `MacroscopicMaxwellBridge`. Because the generic
+  module exceeds the usual 200-line review heuristic including documentation, ask whether its
+  sourced-work and constitutive-energy halves should be separate upstream PRs before opening one.
 - [ ] Human-check the one-way E0 bridge and its scaling: `D = ε₀ E`, `H = μ₀⁻¹ B`,
   `ε₀ (ρ / ε₀) = ρ`, and `μ₀⁻¹ (μ₀ J + μ₀ ε₀ ∂ₜ E) = J + ∂ₜ (ε₀ E)`. Confirm that E0's Lorentz
   current is being interpreted as the free source in this specialization and that no converse,

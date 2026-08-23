@@ -1261,20 +1261,25 @@ Owner: SpaceAndTime.
 Exit achieved: E3a can derive energy balance from Maxwell equations without reproving general
 vector calculus inside Electromagnetism.
 
-#### E3a. Electromagnetic energy and Poynting flux
+#### E3a. Electromagnetic energy and Poynting flux — complete
 
 Owner: Electromagnetism.
 
-- instantaneous energy density and Poynting vector;
-- the sourced local Maxwell work identity
+- [x] instantaneous energy density and Poynting vector;
+- [x] the sourced local Maxwell work identity
   `div S = -E · JFree - E · ∂ₜ D - H · ∂ₜ B` for `S = E × H`, using the differentiability already
   carried by `IsMacroscopicMaxwell`;
-- the fixed time-independent nondispersive-medium Poynting theorem
+- [x] the fixed time-independent nondispersive-medium Poynting theorem
   `∂ₜ u + div S = -E · JFree`;
-- source-free and real-vacuum energy-conservation corollaries; and
-- material energy conservation only from E1's stated constitutive laws.
+- [x] the conventional constitutive form `u = 1 / 2 * (E · D + B · H)`, nonnegativity, and the
+  exact storage-term time derivative under E1's fixed-medium constitutive laws;
+- [x] the pointwise zero-free-current and source-free local conservation corollaries; and
+- [x] the explicit potential-derived real-vacuum equation
+  `∂ₜ [1 / 2 * (ε₀ E · E + μ₀⁻¹ B · B)] + div [μ₀⁻¹ (E × B)] = 0`, with no extra factor of `c`.
 
-Exit: electromagnetic energy flow exists independently of Jones or finite-mode conventions.
+Exit achieved: instantaneous real electromagnetic energy flow exists independently of Jones or
+finite-mode conventions. The results are pointwise differential laws; harmonic averaging,
+integrated boundary flux, irradiance, and modal power remain E3b.
 
 #### E3b. Harmonic flux and Optics normalization
 
@@ -2191,7 +2196,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, and interface-oriented side-decaying carrier geometry complete; Maxwell-qualified evanescent/outgoing semantics remain |
 | E3s cross-product divergence | done | Space derivative API | pointwise and function-level real three-dimensional div-cross identity under first differentiability |
-| E3a Poynting | ready | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/vacuum conservation |
+| E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
@@ -2341,7 +2346,7 @@ human verification recorded in `tbd.md`.
    reduction, reflection/Snell/critical geometry, and the positive-phase subcritical plus
    positive-normal-decay supercritical carrier constructions. The latter is interface-oriented
    decay geometry only: Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and
-   Fresnel power claims remain. With E3s complete, proceed through E3a/E3b before making those
+   Fresnel power claims remain. With E3s and E3a complete, proceed through E3b before making those
    power claims.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
@@ -2361,9 +2366,9 @@ connected with forward and converse ordinary-real-field Maxwell and exact algebr
   positive-frequency ordinary-real-sum uniqueness, primitive interface traces and
   noncancellation, guarded fixed-frequency reduction, reflection/Snell/critical geometry, both
   canonical transmitted carrier branches, and the reusable real three-dimensional cross-product
-  divergence identity now connected, the next physical-optics front is E3a/E3b's Poynting,
-  irradiance, and modal-power normalization. Those layers can then support Maxwell-qualified
-  evanescent/outgoing semantics,
-  flux-based TIR, and Fresnel balance without retroactively treating carrier decay as power flow.
+  divergence identity and real Poynting theorem now connected, the next physical-optics front is
+  E3b's harmonic flux, irradiance, and modal-power normalization. That layer can then support
+  Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and Fresnel balance without
+  retroactively treating carrier decay as power flow.
   The reflected conservation result must continue to allow zero reflection, and reduced amplitudes
   remain referenced to the interface point. The independent circuit front remains N2a/N3.
