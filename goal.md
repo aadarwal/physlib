@@ -1459,7 +1459,17 @@ premises.
   transmitted material dispersion and zero whole incident attenuation, the unique zero transmitted
   normal root gives zero transmitted attenuation and genuine transmitted phase tangency, without
   constructing a candidate or assigning outgoing, evanescent, TIR, irradiance, or power meaning;
-- existence/uniqueness of a propagating transmitted direction below the critical angle;
+- [x] existence and uniqueness of the positive real transmitted phase root below the critical
+  sine threshold: a neutral normal-component replacement preserves complex tangential data; the
+  canonical construction retains the incident tangential phase vector and uses `+√c` along the
+  stored normal; under incident negative-medium dispersion and zero whole attenuation,
+  sine-subcritical incidence is equivalent to unique existence of the positive-medium-shell,
+  zero-attenuation, positive-phase-directed wave vector; an arbitrary-amplitude plane-wave family
+  is unique only after its electric amplitude is fixed; and a supplied phase-matched,
+  positive-medium-dispersive, positive-phase-directed transmitted candidate with zero incident
+  tangential attenuation is identified with that family member, without calling phase direction
+  outgoing or assigning ray, group-velocity, Maxwell, boundary-amplitude, irradiance, or power
+  meaning;
 - total-internal-reflection characterization from boundary amplitudes and flux; and
 - evanescent classification of the side-decaying complex transmitted branch, with any outgoing
   interpretation justified separately and kept distinct from an ordinary positive-power
@@ -2163,7 +2173,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand alternatives with strict direction-selected real and imaginary roots, guarded phase-matched interface consequences, transmitted real-radicand reduction and direction-selected root application under zero tangential attenuation, neutral hyperplane-normal spatial scaling, exact transmitted carrier/E/B side scaling, strict phase-directed reflected-root selection, and the guarded phase-angle law of reflection complete; Snell's law, critical-angle/evanescent classification, and separately justified outgoing semantics remain |
+| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, and unique positive-real subcritical transmitted phase-root construction with arbitrary-amplitude carrier lift complete; the supercritical side-decaying construction, separately justified outgoing semantics, and flux-based TIR remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
