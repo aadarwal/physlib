@@ -209,35 +209,9 @@ the real transmitted normal radicand. -/
 lemma hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
     (h : configuration.IsPositivePhaseTransmittedWaveVector waveVector) :
     hyperplaneNormalComponent configuration.interface.plane waveVector ^ 2 =
-      (configuration.transmittedNormalRadicand : ℂ) := by
-  have hIncidentProjection :=
-    hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero
-      configuration.interface.plane configuration.incident.waveVector
-        h.incidentTangentialAttenuation_eq_zero
-  calc
-    hyperplaneNormalComponent configuration.interface.plane waveVector ^ 2 =
-        ((configuration.interface.positiveMedium.ε *
-          configuration.interface.positiveMedium.μ *
-          configuration.incident.angularFrequency ^ 2 : ℝ) : ℂ) -
-          bilinearDot
-            (hyperplaneTangentialProjection configuration.interface.plane waveVector)
-            (hyperplaneTangentialProjection configuration.interface.plane waveVector) := by
-      rw [← h.2.1, bilinearDot_self_eq_tangential_add_normal_sq]
-      ring
-    _ = ((configuration.interface.positiveMedium.ε *
-          configuration.interface.positiveMedium.μ *
-          configuration.incident.angularFrequency ^ 2 : ℝ) : ℂ) -
-          bilinearDot
-            (hyperplaneTangentialProjection configuration.interface.plane
-              configuration.incident.waveVector)
-            (hyperplaneTangentialProjection configuration.interface.plane
-              configuration.incident.waveVector) := by
-      rw [h.1]
-    _ = (configuration.transmittedNormalRadicand : ℂ) := by
-      rw [hIncidentProjection, bilinearDot_ofReal, real_inner_self_eq_norm_sq,
-        transmittedNormalRadicand]
-      push_cast
-      ring
+      (configuration.transmittedNormalRadicand : ℂ) :=
+  configuration.hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand_of_tangentialProjection_eq
+    waveVector h.1 h.2.1 h.incidentTangentialAttenuation_eq_zero
 
 /-- Every specified positive-phase transmitted wave vector forces a positive radicand and has
 the selected positive real normal root. -/

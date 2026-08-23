@@ -190,6 +190,21 @@ lemma replaceHyperplaneNormalComponent_ofReal
     OrientedAffineHyperplane.normalComponent]
   ring
 
+/-- Setting the normal component of a real-embedded vector to `-I * attenuationComponent` gives
+the phase--attenuation representation with tangential phase and purely normal attenuation. -/
+lemma replaceHyperplaneNormalComponent_ofReal_neg_I_mul
+    (plane : OrientedAffineHyperplane d) (q : WaveVector d)
+    (attenuationComponent : ℝ) :
+    replaceHyperplaneNormalComponent plane (ofReal q)
+        (-Complex.I * (attenuationComponent : ℂ)) =
+      ofPhaseAttenuation (plane.tangentialProjection q)
+        (attenuationComponent • plane.normalVector) := by
+  ext i
+  simp [replaceHyperplaneNormalComponent, hyperplaneNormalComponent,
+    bilinearDot_ofReal, OrientedAffineHyperplane.tangentialProjection,
+    OrientedAffineHyperplane.normalComponent, ofPhaseAttenuation_apply]
+  ring
+
 /-- Complex wave vectors are equal when both their hyperplane-tangential projections and oriented
 normal components are equal. -/
 lemma eq_of_hyperplaneTangentialProjection_eq_of_hyperplaneNormalComponent_eq

@@ -399,8 +399,8 @@ Ownership rules:
 
 ### D.3. Not yet present
 
-- [ ] complex-carrier Maxwell falsification regressions and an interface-selected
-  outgoing/decaying branch;
+- [ ] Maxwell-qualified evanescent and outgoing semantics for the constructed interface-oriented
+  side-decaying carrier branch;
 - [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
 - [ ] Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
@@ -1241,9 +1241,12 @@ sources.
   relations; and
 - [x] exact ordinary-real-field TE/TM, zero-amplitude, one-phase, complex-null, and embedded-real
   guarded-converse regressions; and
-- [ ] an interface-oriented outgoing/decaying branch for evanescent fields.
+- [x] an interface-oriented carrier branch with tangent phase, strictly positive normal
+  attenuation, and exact positive-side decay under a negative transmitted normal radicand; and
+- [ ] Maxwell-qualified evanescent-field and outgoing semantics for that carrier geometry.
 
-Exit: incident, reflected, transmitted, and evanescent candidate fields share one field API.
+Exit: incident, reflected, transmitted, and side-decaying candidate carriers share one field API;
+the evanescent-field label remains conditional on the stated Maxwell semantics.
 
 #### E3s. Cross-product divergence identity
 
@@ -1470,9 +1473,23 @@ premises.
   tangential attenuation is identified with that family member, without calling phase direction
   outgoing or assigning ray, group-velocity, Maxwell, boundary-amplitude, irradiance, or power
   meaning;
-- total-internal-reflection characterization from boundary amplitudes and flux; and
-- evanescent classification of the side-decaying complex transmitted branch, with any outgoing
-  interpretation justified separately and kept distinct from an ordinary positive-power
+- [x] existence and uniqueness of the positive-normal-decay transmitted branch above the critical
+  sine threshold: the canonical normal component is `-I * √(-c)` and the phase is tangent while
+  attenuation is a strictly positive multiple of the stored normal; under zero incident
+  tangential attenuation, negative radicand is equivalent to unique existence of the exact common-
+  tangent, positive-medium-shell, purely-normal-attenuation, positive-side-directed vector;
+  incident negative-medium dispersion and zero whole attenuation specialize this to strict
+  sine-supercritical incidence. The branch lifts to an arbitrary-amplitude carrier family that is
+  unique after fixing the electric amplitude, and its spatial factor, complete carrier, ordinary
+  electric field, and ordinary magnetic induction have exact `exp (-√(-c) * u)` scaling. The
+  carrier is global and grows at negative depth. A supplied phase-matched, positive-medium-
+  dispersive, attenuation-directed candidate with zero incident tangential attenuation is
+  identified with the canonical family member. None of this supplies transversality, Maxwell,
+  one-sided support, ray, group-velocity, energy-flow, outgoing, evanescent-field, TIR, Fresnel,
+  irradiance, or power semantics;
+- [ ] total-internal-reflection characterization from boundary amplitudes and flux; and
+- [ ] Maxwell-qualified evanescent classification and any outgoing interpretation of the
+  side-decaying complex transmitted branch, kept distinct from an ordinary positive-power
   propagating mode.
 
 Exit: the geometric laws follow from the field and boundary setup.
@@ -2166,14 +2183,14 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, and exact algebraic and ordinary-field falsification regressions complete; the interface-selected outgoing branch remains |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, and interface-oriented side-decaying carrier geometry complete; Maxwell-qualified evanescent/outgoing semantics remain |
 | E3s cross-product divergence | ready | Space derivative API review | reusable vector-calculus identity |
 | E3a Poynting | blocked | E1, E3s for material conservation | real vacuum/material energy and flux suite |
 | E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, and unique positive-real subcritical transmitted phase-root construction with arbitrary-amplitude carrier lift complete; the supercritical side-decaying construction, separately justified outgoing semantics, and flux-based TIR remain |
+| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, and unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts complete; Maxwell-qualified evanescent/outgoing semantics and flux-based TIR remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
@@ -2313,9 +2330,12 @@ human verification recorded in `tbd.md`.
    geometric negative side toward the positive side, its closed half-spaces both contain the
    carrier, and its side names have no medium, wave-role, outgoing, or power meaning. Preserve also
    the completed neutral finite exponential-character independence and positive-frequency
-   ordinary-real-sum uniqueness layers. Proceed next to primitive independent-frequency interface
-   traces and their electromagnetic noncancellation bridge, then the interface-oriented
-   outgoing/decaying layer. Withhold power claims until Poynting-flux normalization.
+   ordinary-real-sum uniqueness layers. Preserve the now-complete primitive independent-frequency
+   interface traces, electromagnetic noncancellation, guarded label matching, fixed-frequency
+   reduction, reflection/Snell/critical geometry, and the positive-phase subcritical plus
+   positive-normal-decay supercritical carrier constructions. The latter is interface-oriented
+   decay geometry only: Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and
+   Fresnel power claims remain. Proceed through E3s/E3a/E3b before making those power claims.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
    P5a Malus law and P6a retarder intensity preservation are complete.
@@ -2330,10 +2350,12 @@ medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, 
 Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell complex
 carrier, exact real-wave bridge, generic carrier calculus, and bilinear material dispersion now
 connected with forward and converse ordinary-real-field Maxwell and exact algebraic plus
-ordinary-real-field falsification regressions, neutral oriented-affine-hyperplane geometry, and
-positive-frequency ordinary-real-sum uniqueness now connected, the next physical-optics front is
-the primitive independent-frequency time-domain interface trace and its electromagnetic
-noncancellation bridge, followed by the interface-oriented outgoing/decaying branch on that shared
-carrier. The interface must derive frequency conservation before it uses a fixed-frequency Fresnel
-reduction. The reflected conservation result must allow zero reflection, and the reduced amplitudes
-must be referenced to the interface point. The independent circuit front remains N2a/N3.
+  ordinary-real-field falsification regressions, neutral oriented-affine-hyperplane geometry,
+  positive-frequency ordinary-real-sum uniqueness, primitive interface traces and
+  noncancellation, guarded fixed-frequency reduction, reflection/Snell/critical geometry, and both
+  canonical transmitted carrier branches now connected, the next physical-optics front is E3s's
+  reusable cross-product divergence identity and E3a/E3b's Poynting, irradiance, and modal-power
+  normalization. Those layers can then support Maxwell-qualified evanescent/outgoing semantics,
+  flux-based TIR, and Fresnel balance without retroactively treating carrier decay as power flow.
+  The reflected conservation result must continue to allow zero reflection, and reduced amplitudes
+  remain referenced to the interface point. The independent circuit front remains N2a/N3.
