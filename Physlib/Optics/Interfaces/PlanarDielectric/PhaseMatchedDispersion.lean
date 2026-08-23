@@ -20,11 +20,15 @@ data only when the reflected electric amplitude is nonzero; the zero-amplitude c
 arbitrary dummy labels.
 
 For transmission, material matching gives the exact squared complex normal component in the
-positive-side medium and its difference from the incident squared normal component. For an active
-reflected wave, equal frequency, equal tangential projection, and the common negative-side material
-shell leave only two possibly coincident algebraic alternatives: the incident vector itself or its
-hyperplane reflection. Strict incident phase direction into the positive side and strict active
-reflected phase direction into the negative side exclude the same-vector root.
+positive-side medium and its difference from the incident squared normal component. When the
+incident tangential attenuation vanishes, this equation becomes an explicitly real radicand built
+from the positive-side material data, incident frequency, and squared norm of the incident
+tangential phase vector. This hypothesis does not require the incident normal attenuation to
+vanish. For an active reflected wave, equal frequency, equal tangential projection, and the common
+negative-side material shell leave only two possibly coincident algebraic alternatives: the
+incident vector itself or its hyperplane reflection. Strict incident phase direction into the
+positive side and strict active reflected phase direction into the negative side exclude the
+same-vector root.
 
 The reflected branch result selects an algebraic root only under those explicit phase-direction
 hypotheses; it neither derives them from a trace label nor identifies phase direction with group
@@ -36,6 +40,12 @@ the phase-matching predicate is used without its separate electric amplitude-bal
 
 - `transmitted_hyperplaneNormalComponent_sq`: the transmitted normal-root equation in incident
   tangential and frequency data.
+- `transmitted_tangentialPhase_attenuation_eq_incident`: complex phase matching decoded into its
+  real tangential phase and attenuation equalities.
+- `transmittedNormalRadicand`: the real candidate radicand formed from incident tangential phase
+  data and the positive-side medium.
+- `transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand`: zero incident
+  tangential attenuation makes the transmitted normal square equal that embedded real radicand.
 - `transmitted_hyperplaneNormalComponent_sq_sub_incident_hyperplaneNormalComponent_sq`:
   the exact two-medium contrast of squared normal components.
 - `reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneReflection`: the
@@ -45,7 +55,7 @@ the phase-matching predicate is used without its separate electric amplitude-bal
 
 ## iii. Table of contents
 
-- A. Transmitted normal-root equations
+- A. Transmitted normal-root and real-radicand equations
 - B. Reflected two-root classification and phase-directed selection
 
 ## iv. References
@@ -66,15 +76,48 @@ open Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave
 noncomputable section
 
 namespace PlanarDielectricWaveConfiguration
+
+/-!
+
+## A. Transmitted normal-root and real-radicand equations
+
+-/
+
+/-- The real candidate for the squared transmitted normal component when the incident complex
+tangential projection has zero attenuation.
+
+This expression alone has no propagation, critical-angle, evanescence, transmitted-root,
+side-decay, outgoing, or power meaning. -/
+def transmittedNormalRadicand (configuration : PlanarDielectricWaveConfiguration) : ℝ :=
+  configuration.interface.positiveMedium.ε *
+      configuration.interface.positiveMedium.μ *
+      configuration.incident.angularFrequency ^ 2 -
+    ‖configuration.interface.plane.tangentialProjection
+      configuration.incident.waveVector.phaseVector‖ ^ 2
+
 namespace IsElectricPhaseMatched
 
 variable {configuration : PlanarDielectricWaveConfiguration}
 
-/-!
+/-- Electric phase matching preserves the real tangential phase and attenuation projections from
+the incident wave to the transmitted wave.
 
-## A. Transmitted normal-root equations
-
--/
+These equalities constrain no normal component and assign no propagation role. -/
+lemma transmitted_tangentialPhase_attenuation_eq_incident
+    (h : configuration.IsElectricPhaseMatched) :
+    configuration.interface.plane.tangentialProjection
+          configuration.transmitted.waveVector.phaseVector =
+        configuration.interface.plane.tangentialProjection
+          configuration.incident.waveVector.phaseVector ∧
+      configuration.interface.plane.tangentialProjection
+          configuration.transmitted.waveVector.attenuationVector =
+        configuration.interface.plane.tangentialProjection
+          configuration.incident.waveVector.attenuationVector := by
+  constructor
+  · simpa only [phaseVector_hyperplaneTangentialProjection] using
+      congrArg ComplexWaveVector.phaseVector h.1.2
+  · simpa only [attenuationVector_hyperplaneTangentialProjection] using
+      congrArg ComplexWaveVector.attenuationVector h.1.2
 
 /-- Phase matching and positive-medium material dispersion express the squared transmitted complex
 normal component using the incident frequency and complex tangential projection. -/
@@ -94,6 +137,36 @@ lemma transmitted_hyperplaneNormalComponent_sq
             configuration.incident.waveVector) := by
   simpa only [h.1.1, h.1.2] using
     hTransmittedDispersion.hyperplaneNormalComponent_sq configuration.interface.plane
+
+/-- If the incident attenuation has zero tangential projection, the squared transmitted normal
+component equals the explicitly real transmitted radicand.
+
+The premise does not require zero incident normal attenuation. This result selects no root and
+assigns no propagation, critical-angle, evanescence, side-decay, outgoing, or power meaning. -/
+lemma transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0) :
+    ComplexWaveVector.hyperplaneNormalComponent configuration.interface.plane
+          configuration.transmitted.waveVector ^ 2 =
+      (configuration.transmittedNormalRadicand : ℂ) := by
+  rw [h.transmitted_hyperplaneNormalComponent_sq hTransmittedDispersion]
+  have hProjection :
+      ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+          configuration.incident.waveVector =
+        ComplexWaveVector.ofReal
+          (configuration.interface.plane.tangentialProjection
+            configuration.incident.waveVector.phaseVector) :=
+    hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero
+      configuration.interface.plane configuration.incident.waveVector
+        hIncidentTangentialAttenuation
+  rw [hProjection, ComplexWaveVector.bilinearDot_ofReal,
+    real_inner_self_eq_norm_sq, transmittedNormalRadicand]
+  push_cast
+  ring
 
 /-- Under phase matching and material dispersion on both sides, the transmitted-minus-incident
 squared complex normal components equal the material contrast times the common frequency square. -/
