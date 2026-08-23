@@ -25,7 +25,8 @@ n × (H_positive - H_negative) = surfaceCurrent.
 
 Tangential `E` and normal `B` are continuous. The surface current is intrinsically tangent to the
 plane. Only free electric surface charge and current are represented; there is no magnetic surface
-charge or current.
+charge or current. The two electric laws are also exposed as their own predicate so an
+electric-amplitude reduction cannot be mistaken for a reconstruction of the magnetic laws.
 
 These declarations state local boundary conditions but do not derive them from integral Maxwell
 equations. `PlanarMacroscopicTrace` contains pointwise restriction data, not an analytic one-sided
@@ -37,6 +38,7 @@ response.
 
 - `PlanarMacroscopicTrace`: pointwise boundary values of the four macroscopic fields.
 - `PlanarMacroscopicTrace.ofFields`: restriction of four globally defined fields to a plane.
+- `IsPlanarElectricBoundary`: the tangential-`E` and normal-`D` laws alone.
 - `IsPlanarMacroscopicBoundary`: the four local laws with free electric surface sources.
 - `IsSourceFreePlanarMacroscopicBoundary`: the specialization with zero free surface sources.
 - `IsSourceFreePlanarMacroscopicBoundary.tangentialMagneticFieldStrength`: continuity of
@@ -45,7 +47,7 @@ response.
 ## iii. Table of contents
 
 - A. Pointwise planar field data
-- B. Local boundary laws
+- B. Electric and full local boundary laws
 - C. Zero free surface sources
 
 ## iv. References
@@ -109,9 +111,47 @@ abbrev PlanarFreeSurfaceCurrentDensity (plane : OrientedAffineHyperplane 3) :=
 
 /-!
 
-## B. Local boundary laws
+## B. Electric and full local boundary laws
 
 -/
+
+/-- The two pointwise electric boundary laws across an oriented affine plane.
+
+The normal points from the negative trace toward the positive trace. Tangential `E` is continuous,
+and the normal electric-displacement jump uses the positive-minus-negative convention. This
+predicate deliberately contains no magnetic law or free surface current. -/
+def IsPlanarElectricBoundary {plane : OrientedAffineHyperplane 3}
+    (negativeTrace positiveTrace : PlanarMacroscopicTrace plane)
+    (surfaceCharge : PlanarFreeSurfaceChargeDensity plane) : Prop :=
+  ∀ t x,
+    plane.projectionToTangent (negativeTrace.electricField t x) =
+        plane.projectionToTangent (positiveTrace.electricField t x) ∧
+      plane.normalComponent (positiveTrace.electricDisplacement t x) -
+        plane.normalComponent (negativeTrace.electricDisplacement t x) = surfaceCharge t x
+
+namespace IsPlanarElectricBoundary
+
+variable {plane : OrientedAffineHyperplane 3}
+  {negativeTrace positiveTrace : PlanarMacroscopicTrace plane}
+  {surfaceCharge : PlanarFreeSurfaceChargeDensity plane}
+
+/-- The tangential electric-field law of an electric planar boundary. -/
+lemma tangentialElectricField
+    (h : IsPlanarElectricBoundary negativeTrace positiveTrace surfaceCharge)
+    (t : Time) (x : plane.carrier) :
+    plane.projectionToTangent (negativeTrace.electricField t x) =
+      plane.projectionToTangent (positiveTrace.electricField t x) :=
+  (h t x).1
+
+/-- The normal electric-displacement jump law of an electric planar boundary. -/
+lemma normalElectricDisplacement
+    (h : IsPlanarElectricBoundary negativeTrace positiveTrace surfaceCharge)
+    (t : Time) (x : plane.carrier) :
+    plane.normalComponent (positiveTrace.electricDisplacement t x) -
+        plane.normalComponent (negativeTrace.electricDisplacement t x) = surfaceCharge t x :=
+  (h t x).2
+
+end IsPlanarElectricBoundary
 
 /-- The four pointwise macroscopic boundary laws across an oriented affine plane.
 
@@ -141,6 +181,13 @@ variable {plane : OrientedAffineHyperplane 3}
   {negativeTrace positiveTrace : PlanarMacroscopicTrace plane}
   {surfaceCharge : PlanarFreeSurfaceChargeDensity plane}
   {surfaceCurrent : PlanarFreeSurfaceCurrentDensity plane}
+
+/-- Every full macroscopic planar boundary satisfies its two-law electric projection. -/
+lemma isPlanarElectricBoundary
+    (h : IsPlanarMacroscopicBoundary negativeTrace positiveTrace
+      surfaceCharge surfaceCurrent) :
+    IsPlanarElectricBoundary negativeTrace positiveTrace surfaceCharge :=
+  fun t x ↦ ⟨(h t x).1, (h t x).2.1⟩
 
 /-- The tangential electric-field boundary law. -/
 lemma tangentialElectricField

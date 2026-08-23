@@ -1156,6 +1156,7 @@ explore
 exponential
 exponentials
 exponentiates
+exposed
 express
 expressed
 expresses
@@ -1618,6 +1619,7 @@ isanomalyfree
 isbounded
 iscomplete
 isdimensionallycorrect
+iselectricboundary
 ising
 isinternal
 ismanifold
@@ -1891,6 +1893,7 @@ minkowskiproduct
 minor
 minus
 minutes
+mistaken
 mixed
 mk
 mode

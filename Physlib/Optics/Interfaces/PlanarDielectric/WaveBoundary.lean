@@ -23,12 +23,13 @@ positive side, the transmitted field values use the positive-side medium. The re
 restricted pointwise to the interface plane and connected to the generic macroscopic boundary
 laws.
 
-For a local boundary with zero free surface charge, the tangential electric and normal
-electric-displacement laws combine into equality of the joint ordinary-real field data. The free
-surface current remains arbitrary because these consequences use neither magnetic law. Restricting
-the equality to the affine plane and applying the single-wave factorization gives an exact equality
-of three positive-rate boundary-character realizations. This bridge still makes no noncancellation
-or frequency-conservation claim.
+The two electric laws are exposed separately from the full four-law boundary predicate. At zero
+free surface charge they are equivalent to equality of the joint ordinary-real tangential-`E` and
+normal-`D` field data. Restricting that equality to the affine plane and applying the single-wave
+factorization gives an exact equality of three positive-rate boundary-character realizations. A
+full local boundary projects to this electric predicate while the free surface current remains
+arbitrary. The reverse bridge reconstructs only the two electric laws, not either magnetic law,
+and makes no noncancellation or frequency-conservation claim.
 
 The incident, reflected, and transmitted names are trace-membership labels, not stored propagation
 hypotheses. The incident and reflected labels are symmetric in the negative trace. The structure
@@ -51,21 +52,22 @@ boundary predicates are stipulated rather than derived from integral Maxwell equ
   the negative-side medium.
 - `PlanarDielectricWaveConfiguration.positiveTrace`: the transmitted real trace in the
   positive-side medium.
+- `PlanarDielectricWaveConfiguration.IsElectricBoundary`: the explicit two-law electric boundary
+  predicate with supplied free surface charge.
 - `PlanarDielectricWaveConfiguration.IsLocalBoundary`: the explicit local boundary predicate with
   free electric surface sources.
 - `PlanarDielectricWaveConfiguration.IsSourceFreeLocalBoundary`: its zero-free-surface-source
   specialization.
-- `PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricFieldData`: the joint
-  tangential-`E` and normal-`D` consequence.
-- `IsLocalBoundary.jointElectricBoundaryCharacter_sum_eq`:
-  its exact boundary-character form.
+- `PlanarDielectricWaveConfiguration.IsElectricBoundary.jointElectricFieldData_iff`: exact
+  equivalence between the zero-charge electric laws and joint field-data equality.
+- `IsElectricBoundary.jointElectricBoundaryCharacter_sum_eq`: the exact boundary-character form.
 
 ## iii. Table of contents
 
 - A. Independent three-wave configurations
 - B. Ordinary real boundary traces
 - C. Local boundary predicates
-- D. Zero-charge joint electric consequences
+- D. Electric boundary projection and exact trace bridge
 
 ## iv. References
 
@@ -141,6 +143,15 @@ def positiveTrace (configuration : PlanarDielectricWaveConfiguration) :
 
 -/
 
+/-- The two electric boundary laws for the explicit three-wave dielectric configuration, with a
+supplied free electric surface charge.
+
+This predicate contains tangential-`E` continuity and the normal-`D` jump only. It does not contain
+either magnetic law or a free surface current. -/
+def IsElectricBoundary (configuration : PlanarDielectricWaveConfiguration)
+    (surfaceCharge : PlanarFreeSurfaceChargeDensity configuration.interface.plane) : Prop :=
+  IsPlanarElectricBoundary configuration.negativeTrace configuration.positiveTrace surfaceCharge
+
 /-- The explicit local macroscopic boundary condition for a three-wave dielectric configuration
 with supplied free electric surface charge and current.
 
@@ -161,20 +172,33 @@ def IsSourceFreeLocalBoundary (configuration : PlanarDielectricWaveConfiguration
 
 namespace IsLocalBoundary
 
+variable {configuration : PlanarDielectricWaveConfiguration}
+  {surfaceCharge : PlanarFreeSurfaceChargeDensity configuration.interface.plane}
+  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
+
+/-- A full local boundary satisfies its two electric boundary laws. -/
+lemma isElectricBoundary
+    (h : configuration.IsLocalBoundary surfaceCharge surfaceCurrent) :
+    configuration.IsElectricBoundary surfaceCharge :=
+  IsPlanarMacroscopicBoundary.isPlanarElectricBoundary h
+
+end IsLocalBoundary
+
+namespace IsElectricBoundary
+
 /-!
 
-## D. Zero-charge joint electric consequences
+## D. Electric boundary projection and exact trace bridge
 
 -/
 
 variable {configuration : PlanarDielectricWaveConfiguration}
-  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
 
-/-- A zero-free-surface-charge local boundary has equal incident-plus-reflected and transmitted
+/-- A zero-free-surface-charge electric boundary has equal incident-plus-reflected and transmitted
 joint tangential-electric and normal-electric-displacement field data at every boundary point.
 
-The free surface current remains arbitrary because only the two electric boundary laws are used. -/
-lemma jointElectricFieldData (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+No magnetic boundary law or free surface current is present in the hypothesis. -/
+lemma jointElectricFieldData (h : configuration.IsElectricBoundary 0)
     (t : Time) (x : configuration.interface.plane.carrier) :
     mediumJointElectricFieldData configuration.interface.plane
           configuration.interface.negativeMedium configuration.incident t x +
@@ -184,7 +208,7 @@ lemma jointElectricFieldData (h : configuration.IsLocalBoundary 0 surfaceCurrent
         configuration.interface.positiveMedium configuration.transmitted t x := by
   apply Prod.ext
   · have he :=
-      IsPlanarMacroscopicBoundary.tangentialElectricField h t x
+      IsPlanarElectricBoundary.tangentialElectricField h t x
     have he' := congrArg Subtype.val he
     simpa only [negativeTrace, positiveTrace, PlanarMacroscopicTrace.ofFields,
       Space.OrientedAffineHyperplane.coe_projectionToTangent, Pi.add_apply,
@@ -195,17 +219,49 @@ lemma jointElectricFieldData (h : configuration.IsLocalBoundary 0 surfaceCurrent
             (configuration.negativeTrace.electricDisplacement t x) =
           configuration.interface.plane.normalComponent
             (configuration.positiveTrace.electricDisplacement t x) := by
-      have hdJump := IsPlanarMacroscopicBoundary.normalElectricDisplacement h t x
+      have hdJump := IsPlanarElectricBoundary.normalElectricDisplacement h t x
       exact (sub_eq_zero.mp (by simpa using hdJump)).symm
     simpa only [negativeTrace, positiveTrace, PlanarMacroscopicTrace.ofFields, Pi.add_apply,
       mediumJointElectricFieldData, Prod.snd_add,
       Space.OrientedAffineHyperplane.normalComponent, inner_add_right] using hd
 
-/-- A zero-free-surface-charge local boundary gives equality of the three positive-rate
+/-- The zero-charge electric boundary laws are equivalent to equality of the actual joint
+tangential-electric and normal-electric-displacement field data at every boundary point. -/
+lemma jointElectricFieldData_iff :
+    configuration.IsElectricBoundary 0 ↔
+      ∀ (t : Time) (x : configuration.interface.plane.carrier),
+        mediumJointElectricFieldData configuration.interface.plane
+              configuration.interface.negativeMedium configuration.incident t x +
+            mediumJointElectricFieldData configuration.interface.plane
+              configuration.interface.negativeMedium configuration.reflected t x =
+          mediumJointElectricFieldData configuration.interface.plane
+            configuration.interface.positiveMedium configuration.transmitted t x := by
+  constructor
+  · exact fun h ↦ h.jointElectricFieldData
+  · intro h t x
+    constructor
+    · apply Subtype.ext
+      have he := congrArg Prod.fst (h t x)
+      simpa only [negativeTrace, positiveTrace, PlanarMacroscopicTrace.ofFields,
+        Space.OrientedAffineHyperplane.coe_projectionToTangent, Pi.add_apply,
+        mediumJointElectricFieldData, Prod.fst_add,
+        Space.OrientedAffineHyperplane.tangentialProjection_add] using he
+    · have hd :
+          configuration.interface.plane.normalComponent
+              (configuration.negativeTrace.electricDisplacement t x) =
+            configuration.interface.plane.normalComponent
+              (configuration.positiveTrace.electricDisplacement t x) := by
+        simpa only [negativeTrace, positiveTrace, PlanarMacroscopicTrace.ofFields, Pi.add_apply,
+          mediumJointElectricFieldData, Prod.snd_add,
+          Space.OrientedAffineHyperplane.normalComponent, inner_add_right] using
+            congrArg Prod.snd (h t x)
+      exact sub_eq_zero.mpr hd.symm
+
+/-- A zero-free-surface-charge electric boundary gives equality of the three positive-rate
 ordinary-real boundary-character realizations, with each joint amplitude referenced to the
 interface's stored point. -/
 lemma jointElectricBoundaryCharacter_sum_eq
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (p : ComplexMonochromaticPlaneWave.BoundaryParameter configuration.interface.plane) :
     realPartJointElectricTraceAmplitude
           (Complex.exp (configuration.incident.boundaryExponent
@@ -239,6 +295,46 @@ lemma jointElectricBoundaryCharacter_sum_eq
         configuration.interface.positiveMedium configuration.transmitted t
           ((v : EuclideanSpace ℝ (Fin 3)) +ᵥ configuration.interface.plane.point) at hdata
   simpa only [mediumJointElectricFieldData_tangent_vadd_point] using hdata
+
+end IsElectricBoundary
+
+namespace IsLocalBoundary
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
+
+/-- A zero-free-surface-charge full local boundary has equal joint electric field data. -/
+lemma jointElectricFieldData (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (t : Time) (x : configuration.interface.plane.carrier) :
+    mediumJointElectricFieldData configuration.interface.plane
+          configuration.interface.negativeMedium configuration.incident t x +
+        mediumJointElectricFieldData configuration.interface.plane
+          configuration.interface.negativeMedium configuration.reflected t x =
+      mediumJointElectricFieldData configuration.interface.plane
+        configuration.interface.positiveMedium configuration.transmitted t x :=
+  h.isElectricBoundary.jointElectricFieldData t x
+
+/-- A zero-free-surface-charge full local boundary gives the joint electric boundary-character
+identity; the free surface current remains arbitrary. -/
+lemma jointElectricBoundaryCharacter_sum_eq
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (p : ComplexMonochromaticPlaneWave.BoundaryParameter configuration.interface.plane) :
+    realPartJointElectricTraceAmplitude
+          (Complex.exp (configuration.incident.boundaryExponent
+              configuration.interface.plane p) •
+            referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+              configuration.interface.negativeMedium configuration.incident) +
+        realPartJointElectricTraceAmplitude
+          (Complex.exp (configuration.reflected.boundaryExponent
+              configuration.interface.plane p) •
+            referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+              configuration.interface.negativeMedium configuration.reflected) =
+      realPartJointElectricTraceAmplitude
+        (Complex.exp (configuration.transmitted.boundaryExponent
+            configuration.interface.plane p) •
+          referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+            configuration.interface.positiveMedium configuration.transmitted) :=
+  h.isElectricBoundary.jointElectricBoundaryCharacter_sum_eq p
 
 end IsLocalBoundary
 
