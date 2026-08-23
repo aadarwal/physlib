@@ -228,11 +228,15 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check the neutral complex hyperplane-reflection API before upstreaming. Confirm that
   its square decomposition uses the complex-bilinear pairing, never the Hermitian norm; reflection
   negates the oriented complex normal component while preserving the complex tangential projection
-  and bilinear square; and applying reflection twice recovers the original vector. Confirm that
-  equal tangential projections and bilinear squares imply exactly the nonexclusive alternative of
-  equal vectors or reflected vectors. At zero normal component, including grazing real geometry,
-  both alternatives coincide. Do not interpret this algebraic classification as selecting an
-  incident, reflected, outgoing, decaying, medium-specific, or positive-power root.
+  and bilinear square; and applying reflection twice recovers the original vector. Under
+  `K = q - I a`, confirm that its normal component is `q_normal - I a_normal`, reflection applies
+  the real formula `v - 2 v_normal n` separately to `q` and `a`, and therefore negates both real
+  normal components. In particular, a positive attenuation normal component becomes negative
+  under neutral reflection, so reflection alone does not select a decaying branch.
+  Confirm that equal tangential projections and bilinear squares imply exactly the nonexclusive
+  alternative of equal vectors or reflected vectors. At zero normal component, including grazing
+  real geometry, both alternatives coincide. Do not interpret this algebraic classification as
+  selecting an incident, reflected, outgoing, decaying, medium-specific, or positive-power root.
 - [ ] Human-check the complex material normal-shell identity before upstreaming. Starting from the
   bilinear dispersion equation and the neutral hyperplane square decomposition, confirm exactly
   `K_normal ^ 2 = epsilon * mu * omega ^ 2 - K_tangent dot K_tangent`. The material coefficient is
