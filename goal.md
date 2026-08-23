@@ -1396,6 +1396,11 @@ premises.
   gives the two real roots `±√c`, a zero square forces the unique zero root, and an explicitly
   nonpositive real normal square gives the two imaginary roots `±I * √(-c)`, without preferring a
   sign or assigning propagation, grazing, evanescence, outgoing, or power meaning;
+- [x] strict side-relative attenuation direction and real-square root selection: phase direction
+  forces a positive radicand, zero attenuation normal component, and the side-signed real root;
+  attenuation direction forces a negative radicand, zero phase normal component, and the root
+  `-I` times the side-signed square root, without asserting zero tangential attenuation or assigning
+  a medium, interface wave role, evanescence, outgoing, energy-flow, or power meaning;
 - [x] phase-matched interface consequences: the transmitted positive-medium normal-root equation
   in incident frequency and tangential data, the exact two-medium contrast of transmitted and
   incident squared normal components, and the guarded reflected alternative of zero electric
@@ -1408,8 +1413,9 @@ premises.
 - angular specular-reflection corollaries and Snell's law;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;
 - critical-angle and total-internal-reflection characterization; and
-- evanescent transmitted wave with a complex wavevector and its outgoing/decaying square-root
-  branch convention, kept distinct from an ordinary positive-power propagating mode.
+- evanescent transmitted wave with a complex wavevector and its side-decaying square-root branch,
+  with any outgoing interpretation justified separately and kept distinct from an ordinary
+  positive-power propagating mode.
 
 Exit: the geometric laws follow from the field and boundary setup.
 
@@ -2109,7 +2115,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | blocked | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand normal-root alternatives, guarded phase-matched interface consequences, and strict phase-directed reflected-root selection complete; real transmitted reduction and branch selection, angular reflection and Snell laws, critical-angle, and outgoing-decay suite remain |
+| E5b reflection/Snell/TIR | blocked | E2, E5a | neutral reflection/two-root geometry with exact phase/attenuation decoding, the material normal-shell equation, real-radicand alternatives with strict direction-selected real and imaginary roots, guarded phase-matched interface consequences, and strict phase-directed reflected-root selection complete; transmitted real-radicand reduction and application, angular reflection and Snell laws, critical-angle, side-decay, and separately justified outgoing semantics remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |

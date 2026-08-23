@@ -252,6 +252,16 @@ PR unless maintainers explicitly ask to retain it.
   `-I * √(-c)`, not its positive-imaginary partner; this sign is only a future certification gate,
   not a conclusion of the neutral package. Do not call these roots propagating, grazing,
   evanescent, transmitted, outgoing, or power-carrying before their separate hypotheses land.
+- [ ] Human-check strict side-relative attenuation direction and directed normal-root selection
+  before upstreaming. For the stored normal from the negative side to the positive side, confirm
+  that attenuation direction uses the real attenuation vector `a` in `K = q - I a`, so positive-
+  side attenuation means `a_normal > 0` and therefore `Im K_normal < 0`. When `K_normal ^ 2 = c`
+  is real, strict phase direction must force `c > 0`, zero attenuation normal component, and
+  `K_normal = side.sign * √c`; strict attenuation direction must force `c < 0`, zero phase normal
+  component, and `K_normal = -I * side.sign * √(-c)`. In particular, positive-side attenuation
+  selects `-I * √(-c)` and negative-side attenuation selects `I * √(-c)`. Confirm that this proves
+  neither zero tangential attenuation nor an interface role, carrier limit, evanescence, outgoing
+  radiation condition, group velocity, Poynting-flux direction, or positive-power statement.
 - [ ] Human-check the phase-matched dispersion consequences before upstreaming. Confirm that they
   use `IsElectricPhaseMatched` alone, not the referenced electric amplitude balance. Incident and
   transmitted material shells are direct premises; the reflected shell is required only under

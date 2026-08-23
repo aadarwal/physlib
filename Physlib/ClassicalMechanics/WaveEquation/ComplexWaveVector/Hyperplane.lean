@@ -32,9 +32,10 @@ the familiar real formula that subtracts twice the oriented normal component. Co
 vectors with equal tangential projections and equal bilinear squares are either equal or related
 by this reflection; the alternatives coincide when their normal component vanishes.
 
-A strict side-relative predicate records when the real phase vector points into one geometric
-side. It excludes phase-grazing vectors and assigns no medium, optical wave role, attenuation-free
-propagation, group or energy-flow direction, physical root, or power meaning.
+Strict side-relative predicates record when the real phase or attenuation vector points into one
+geometric side. Each excludes a zero normal component of the corresponding real vector. They
+assign no medium, optical wave role, propagation, group or energy-flow direction, physical root,
+outgoing condition, or power meaning.
 
 ## ii. Key results
 
@@ -54,6 +55,8 @@ propagation, group or energy-flow direction, physical root, or power meaning.
 - `eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_self_eq`:
   the exact two-root classification at fixed tangential projection and bilinear square.
 - `ComplexWaveVector.IsPhaseDirectedInto`: strict phase-vector direction into a geometric side.
+- `ComplexWaveVector.IsAttenuationDirectedInto`: strict attenuation-vector direction into a
+  geometric side.
 
 ## iii. Table of contents
 
@@ -61,7 +64,7 @@ propagation, group or energy-flow direction, physical root, or power meaning.
 - B. Phase and attenuation compatibility
 - C. Tangent-pairing characterization
 - D. Complex hyperplane reflection
-- E. Strict side-relative phase direction
+- E. Strict side-relative phase and attenuation directions
 
 ## iv. References
 
@@ -522,7 +525,9 @@ lemma eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_se
 
 /-!
 
-## E. Strict side-relative phase direction
+## E. Strict side-relative phase and attenuation directions
+
+### E.1. Phase direction
 
 -/
 
@@ -564,6 +569,53 @@ lemma isPhaseDirectedInto_negative_iff
     z.IsPhaseDirectedInto plane .negative ↔
       plane.normalComponent z.phaseVector < 0 := by
   simp [IsPhaseDirectedInto]
+
+/-!
+
+### E.2. Attenuation direction
+
+-/
+
+/-- A complex wave vector is attenuation-directed strictly into a geometric side of an oriented
+hyperplane when its real attenuation vector has a normal component with the corresponding strict
+sign.
+
+For `K = q - I a`, the attenuation component is minus the imaginary part of the complex normal
+component. This predicate does not assert zero tangential attenuation, material dispersion, an
+optical transmitted or evanescent role, an outgoing condition, energy flux, or power meaning. The
+strict inequality deliberately excludes zero normal attenuation. -/
+def IsAttenuationDirectedInto (z : ComplexWaveVector d)
+    (plane : OrientedAffineHyperplane d) (side : OrientedAffineHyperplane.Side) : Prop :=
+  0 < side.sign * (-(hyperplaneNormalComponent plane z).im)
+
+/-- Strict side-relative attenuation direction is equivalently positivity of the attenuation
+vector paired with the unit normal pointing into that side. -/
+lemma isAttenuationDirectedInto_iff_inner_sideNormalVector
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d)
+    (side : OrientedAffineHyperplane.Side) :
+    z.IsAttenuationDirectedInto plane side ↔
+      0 < inner ℝ (plane.sideNormalVector side) z.attenuationVector := by
+  simp only [IsAttenuationDirectedInto, hyperplaneNormalComponent_im, neg_neg,
+    OrientedAffineHyperplane.sideNormalVector, inner_smul_left,
+    OrientedAffineHyperplane.normalComponent, conj_trivial]
+
+/-- Attenuation direction into the positive side means a strictly positive oriented attenuation
+normal component. -/
+@[simp]
+lemma isAttenuationDirectedInto_positive_iff
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d) :
+    z.IsAttenuationDirectedInto plane .positive ↔
+      0 < plane.normalComponent z.attenuationVector := by
+  simp [IsAttenuationDirectedInto]
+
+/-- Attenuation direction into the negative side means a strictly negative oriented attenuation
+normal component. -/
+@[simp]
+lemma isAttenuationDirectedInto_negative_iff
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d) :
+    z.IsAttenuationDirectedInto plane .negative ↔
+      plane.normalComponent z.attenuationVector < 0 := by
+  simp [IsAttenuationDirectedInto]
 
 end ComplexWaveVector
 
