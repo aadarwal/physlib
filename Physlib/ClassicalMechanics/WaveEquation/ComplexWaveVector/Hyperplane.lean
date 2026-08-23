@@ -20,9 +20,12 @@ The vector is recovered exactly as the sum of its tangential and normal parts.
 
 For `K = q - I a`, the complex normal component is the real phase normal component minus `I`
 times the real attenuation normal component. Complex tangential projection acts separately on
-`q` and `a`. Consequently, two complex vectors have equal tangential projections exactly when
-their complex-bilinear pairings agree against every real tangent displacement. This basis-free
-characterization retains both tangential phase and tangential attenuation data.
+`q` and `a`, and its phase and attenuation vectors are their respective real tangential
+projections. If the tangential attenuation vanishes, the complex tangential projection is the real
+embedding of the tangential phase vector. Consequently, two complex vectors have equal tangential
+projections exactly when their complex-bilinear pairings agree against every real tangent
+displacement. This basis-free characterization retains both tangential phase and tangential
+attenuation data.
 
 Adding an arbitrary complex multiple of the real normal leaves the tangential projection
 unchanged. Thus tangent data cannot determine a complex normal component or a full wave vector.
@@ -43,6 +46,8 @@ outgoing condition, or power meaning.
   decomposition.
 - `ComplexWaveVector.hyperplaneTangentialProjection_ofPhaseAttenuation`: projection acts
   separately on phase and attenuation vectors.
+- `hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero`:
+  zero tangential attenuation makes the complex projection an embedded real phase projection.
 - `ComplexWaveVector.hyperplaneNormalComponent_ofPhaseAttenuation`: the complex normal component
   separates into its real phase and attenuation components.
 - `ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent`: equality
@@ -178,6 +183,41 @@ lemma hyperplaneTangentialProjection_ofPhaseAttenuation
   · simp [ofPhaseAttenuation_apply, OrientedAffineHyperplane.tangentialProjection,
       OrientedAffineHyperplane.normalComponent]
     ring
+
+/-- The phase vector of a complex hyperplane-tangential projection is the real tangential
+projection of the original phase vector. -/
+@[simp]
+lemma phaseVector_hyperplaneTangentialProjection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    phaseVector (hyperplaneTangentialProjection plane z) =
+      plane.tangentialProjection (phaseVector z) := by
+  rw [← ofPhaseAttenuation_phaseVector_attenuationVector z,
+    hyperplaneTangentialProjection_ofPhaseAttenuation]
+  simp
+
+/-- The attenuation vector of a complex hyperplane-tangential projection is the real tangential
+projection of the original attenuation vector. -/
+@[simp]
+lemma attenuationVector_hyperplaneTangentialProjection
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) :
+    attenuationVector (hyperplaneTangentialProjection plane z) =
+      plane.tangentialProjection (attenuationVector z) := by
+  rw [← ofPhaseAttenuation_phaseVector_attenuationVector z,
+    hyperplaneTangentialProjection_ofPhaseAttenuation]
+  simp
+
+/-- If a complex wave vector has zero tangential attenuation, its complex tangential projection
+is the real embedding of its tangential phase vector. This does not force its normal attenuation
+component to vanish. -/
+lemma hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (hAttenuation : plane.tangentialProjection (attenuationVector z) = 0) :
+    hyperplaneTangentialProjection plane z =
+      ofReal (plane.tangentialProjection (phaseVector z)) := by
+  rw [← ofPhaseAttenuation_phaseVector_attenuationVector z,
+    hyperplaneTangentialProjection_ofPhaseAttenuation, hAttenuation]
+  ext i
+  simp [ofPhaseAttenuation_apply]
 
 /-!
 

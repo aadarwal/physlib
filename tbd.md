@@ -272,6 +272,17 @@ PR unless maintainers explicitly ask to retain it.
   same-vector continuation root without a separate side or outgoing condition, and do not call the
   complex tangential equality an angular Snell law or infer a transmitted square-root, decay,
   evanescence, irradiance, or power result.
+- [ ] Human-check the transmitted real-radicand reduction before upstreaming. Confirm that complex
+  tangential phase matching decodes into equality of both real tangential phase and attenuation
+  projections. Under the explicit hypothesis that the incident tangential attenuation projection
+  is zero, verify
+  `K_transmitted,normal ^ 2 = ε₂ μ₂ ω_incident ^ 2 - ‖q_incident,tangential‖ ^ 2`.
+  This hypothesis deliberately does not require the incident normal attenuation, or the whole
+  incident attenuation vector, to vanish. Confirm also that material dispersion alone does not
+  make the tangential bilinear square real: whole-vector phase--attenuation orthogonality can be
+  balanced between tangential and normal parts. Do not infer a radicand sign, select a transmitted
+  root, or use propagating, critical-angle, evanescent, side-decaying, outgoing, TIR, irradiance, or
+  power language until the corresponding later hypotheses and results land.
 - [ ] Human-check strict phase-directed reflected-root selection before upstreaming. For the stored
   normal from the negative to the positive side, confirm that `IsPhaseDirectedInto .positive`
   means a strictly positive phase-vector normal component and `.negative` means a strictly
