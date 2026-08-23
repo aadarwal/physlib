@@ -347,6 +347,19 @@ PR unless maintainers explicitly ask to retain it.
   hence equal phase angles. The zero-amplitude branch must remain explicit because its wave vector
   and angle are arbitrary dummy data. Do not interpret this phase-angle equality as a ray,
   group-velocity, energy-flux, outgoing, irradiance, or power theorem.
+- [ ] Human-check the phase Snell stack before upstreaming. Confirm first that complex material
+  dispersion plus zero whole attenuation gives `‖q‖ * v = omega` on the positive-frequency and
+  positive-wave-speed branches; zero tangential attenuation alone is insufficient. Confirm that
+  electric phase matching alone gives
+  `sin(theta_i) * ‖q_i‖ = sin(theta_t) * ‖q_t‖` through equality of tangential phase-vector norms,
+  including the total zero-vector angle convention. For the material laws, check that the
+  transmitted frequency is rewritten to the incident frequency before its explicit nonzero
+  cancellation, giving `v_2 sin(theta_i) = v_1 sin(theta_t)` and hence
+  `n_1 sin(theta_i) = n_2 sin(theta_t)` for both indices relative to the same supplied homogeneous
+  isotropic reference medium. The latter is explicitly relative, not an unqualified absolute
+  index. Neither zero attenuation nor a phase direction is inferred from phase matching, and the
+  identities alone construct or select no transmitted branch and assign no ray, group-velocity,
+  outgoing, critical-angle, evanescent, Fresnel, irradiance, or power meaning.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic

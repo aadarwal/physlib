@@ -1441,7 +1441,13 @@ premises.
   positive-side normals; and the guarded active reflected branch has equal incident and reflected
   phase angles while retaining arbitrary dummy angle data at zero reflected electric amplitude;
   the result assigns no ray, group-velocity, energy-flux, outgoing, irradiance, or power meaning;
-- Snell's law from tangential phase matching and material dispersion;
+- [x] the phase Snell identity from tangential phase matching alone, together with the
+  wave-speed and explicitly relative-refractive-index forms for incident and transmitted carriers
+  under their respective material-dispersion hypotheses and zero whole attenuation; the common
+  positive frequency is derived from the reduced boundary predicate and cancels explicitly, while
+  no direction,
+  branch-existence, critical-angle, ray, group-velocity, outgoing, Fresnel, irradiance, or power
+  claim is made;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;
 - critical-angle and total-internal-reflection characterization; and
 - evanescent classification of the side-decaying complex transmitted branch, with any outgoing
