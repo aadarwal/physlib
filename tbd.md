@@ -253,6 +253,17 @@ PR unless maintainers explicitly ask to retain it.
   same-vector continuation root without a separate side or outgoing condition, and do not call the
   complex tangential equality an angular Snell law or infer a transmitted square-root, decay,
   evanescence, irradiance, or power result.
+- [ ] Human-check strict phase-directed reflected-root selection before upstreaming. For the stored
+  normal from the negative to the positive side, confirm that `IsPhaseDirectedInto .positive`
+  means a strictly positive phase-vector normal component and `.negative` means a strictly
+  negative one. This predicate concerns the real phase vector only; it does not assert zero
+  attenuation, group velocity, Poynting flux, or an outgoing-power role. Confirm that the incident
+  positive-side hypothesis is unconditional while reflected negative-side direction and material
+  dispersion are guarded by nonzero reflected electric amplitude, preserving arbitrary dummy
+  labels at zero amplitude. In the active branch the opposite strict signs exclude equality with
+  the incident wave vector, leaving exact neutral hyperplane reflection. Strictness excludes phase
+  grazing; do not replace either strict inequality by a non-strict one or call the result an
+  angular reflection law before real propagating directions and angle definitions are connected.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
