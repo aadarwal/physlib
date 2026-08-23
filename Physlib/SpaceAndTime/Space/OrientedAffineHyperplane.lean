@@ -54,6 +54,8 @@ component, and preserves the angle when the reference side is exchanged.
 - `OrientedAffineHyperplane.signedNormalCoordinate_sideRay`: exact side-normal parameterization.
 - `OrientedAffineHyperplane.sin_angleToSide_mul_norm`: the tangential norm is the vector norm
   multiplied by the sine of its side-relative angle.
+- `OrientedAffineHyperplane.angleToSide_eq_pi_div_two_iff_normalComponent_eq_zero`: a vector is
+  perpendicular to either side normal exactly when its stored normal component vanishes.
 - `OrientedAffineHyperplane.angleToSide_mem_Ico_of_inner_pos`: a vector pointing into a side has
   side-relative angle in `[0, π / 2)`.
 - `OrientedAffineHyperplane.angleToSide_vectorReflection`: vector reflection preserves the
@@ -557,6 +559,17 @@ assigns no incident, reflected, transmitted, incoming, outgoing, or power role. 
 noncomputable def angleToSide (plane : OrientedAffineHyperplane d)
     (side : Side) (v : EuclideanSpace ℝ (Fin d)) : ℝ :=
   InnerProductGeometry.angle v (plane.sideNormalVector side)
+
+/-- A vector's angle to either side normal is `π / 2` exactly when its component along the stored
+normal vanishes.
+
+This includes the zero vector, consistently with Mathlib's total angle convention. -/
+lemma angleToSide_eq_pi_div_two_iff_normalComponent_eq_zero
+    (plane : OrientedAffineHyperplane d) (side : Side)
+    (v : EuclideanSpace ℝ (Fin d)) :
+    plane.angleToSide side v = Real.pi / 2 ↔ plane.normalComponent v = 0 := by
+  rw [angleToSide, ← InnerProductGeometry.inner_eq_zero_iff_angle_eq_pi_div_two]
+  cases side <;> simp [sideNormalVector, normalComponent, real_inner_comm]
 
 /-- A vector's angle to a side normal is below `π / 2` exactly when it points strictly into that
 geometric side. -/
