@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.ClassicalMechanics.WaveEquation.ComplexWaveVector.Hyperplane
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Dispersion
 
@@ -33,6 +34,8 @@ evanescent-wave interpretation. Maxwell equations and electromagnetic power rema
 - `ComplexMonochromaticPlaneWave.IsDispersionMatched`: the complex-bilinear material shell.
 - `ComplexMonochromaticPlaneWave.isDispersionMatched_iff_phase_attenuation`: its exact real
   phase--attenuation decomposition.
+- `IsDispersionMatched.hyperplaneNormalComponent_sq`: the oriented normal-root equation at a
+  chosen neutral hyperplane.
 - `IsDispersionMatched.waveVector_ne_zero`: material matching forces a nonzero wave vector.
 - `IsDispersionMatched.waveVector_cross_cross_electricAmplitude`: the transverse on-shell vector
   triple-product identity.
@@ -134,6 +137,21 @@ lemma isDispersionMatched_iff_phase_attenuation (wave : ComplexMonochromaticPlan
 namespace IsDispersionMatched
 
 variable {wave : ComplexMonochromaticPlaneWave} {medium : HomogeneousIsotropicMedium}
+
+/-- Relative to an oriented affine hyperplane, the squared complex normal component of a
+dispersion-matched wave vector is the material square minus its tangential bilinear square.
+
+This identity does not select either square root or assign an interface propagation role. -/
+lemma hyperplaneNormalComponent_sq (h : wave.IsDispersionMatched medium)
+    (plane : OrientedAffineHyperplane 3) :
+    ComplexWaveVector.hyperplaneNormalComponent plane wave.waveVector ^ 2 =
+      ((medium.ε * medium.μ * wave.angularFrequency ^ 2 : ℝ) : ℂ) -
+        ComplexWaveVector.bilinearDot
+          (ComplexWaveVector.hyperplaneTangentialProjection plane wave.waveVector)
+          (ComplexWaveVector.hyperplaneTangentialProjection plane wave.waveVector) := by
+  rw [← h, ComplexWaveVector.bilinearDot_self_eq_tangential_add_normal_sq
+    plane wave.waveVector]
+  ring
 
 /-- The bilinear square of a dispersion-matched wave vector is nonzero. -/
 lemma bilinearDot_waveVector_self_ne_zero (h : wave.IsDispersionMatched medium) :
