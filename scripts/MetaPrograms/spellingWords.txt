@@ -2268,6 +2268,7 @@ preimage
 preliminaries
 preliminary
 preludes
+premise
 preprint
 presence
 presences

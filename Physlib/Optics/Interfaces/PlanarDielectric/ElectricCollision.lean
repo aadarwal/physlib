@@ -20,11 +20,12 @@ amplitudes use the interface's negative-side medium, while the transmitted ampli
 positive-side medium. Equal exponents are aggregated by the map, and keys whose aggregate
 coefficient is zero are absent from its support.
 
-A local boundary with zero free surface charge makes the corresponding ordinary-real harmonic sum
-vanish at every boundary parameter. Every stored wave has strictly positive temporal rate on the
-same unit-time probe, so finite harmonic uniqueness makes the entire aggregated coefficient map
-zero. The free surface current remains arbitrary because only tangential-electric and
-normal-electric-displacement boundary data are used.
+A two-law electric boundary with zero free surface charge makes the corresponding ordinary-real
+harmonic sum vanish at every boundary parameter. Every stored wave has strictly positive temporal
+rate on the same unit-time probe, so finite harmonic uniqueness makes the entire aggregated
+coefficient map zero. In the reverse direction, a zero coefficient map gives the all-parameter
+character identity and therefore reconstructs exactly the electric boundary laws. A full local
+boundary projects to this result while its free surface current remains arbitrary.
 
 The zero-map conclusion is not a labelwise amplitude identity or an exponent-conservation result.
 For example, waves with the same exponent may cancel at that key, and a zero electric amplitude
@@ -37,8 +38,8 @@ needed for fixed-frequency reduction are separate.
 
 - `PlanarDielectricWaveConfiguration.jointElectricBoundaryCoefficients`: the signed,
   exponent-aggregated coefficient map.
-- `PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryCoefficients_eq_zero`:
-  its vanishing under a zero-free-surface-charge local boundary.
+- `isElectricBoundary_iff_jointElectricBoundaryCoefficients_eq_zero`:
+  exact equivalence between the zero-charge electric boundary and zero coefficient map.
 
 ## iii. Table of contents
 
@@ -162,15 +163,35 @@ private lemma jointElectricBoundaryCoefficients_im_pos
   apply Finsupp.mem_support_iff.mp hL
   simp [jointElectricBoundaryCoefficients, hi, hr, ht]
 
-private lemma jointElectricHarmonicSum_boundaryCoefficients_eq_zero
-    {configuration : PlanarDielectricWaveConfiguration}
-    {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+private lemma jointElectricHarmonicSum_boundaryCoefficients
+    (configuration : PlanarDielectricWaveConfiguration)
     (p : BoundaryParameter configuration.interface.plane) :
-    jointElectricHarmonicSum configuration.jointElectricBoundaryCoefficients p = 0 := by
+    jointElectricHarmonicSum configuration.jointElectricBoundaryCoefficients p =
+      realPartJointElectricTraceAmplitude
+            (Complex.exp (configuration.incident.boundaryExponent
+                configuration.interface.plane p) •
+              referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+                configuration.interface.negativeMedium configuration.incident) +
+          realPartJointElectricTraceAmplitude
+            (Complex.exp (configuration.reflected.boundaryExponent
+                configuration.interface.plane p) •
+              referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+                configuration.interface.negativeMedium configuration.reflected) -
+        realPartJointElectricTraceAmplitude
+          (Complex.exp (configuration.transmitted.boundaryExponent
+              configuration.interface.plane p) •
+            referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+              configuration.interface.positiveMedium configuration.transmitted) := by
   rw [jointElectricBoundaryCoefficients, jointElectricHarmonicSum_sub,
     jointElectricHarmonicSum_add, jointElectricHarmonicSum_single,
     jointElectricHarmonicSum_single, jointElectricHarmonicSum_single]
+
+private lemma jointElectricHarmonicSum_boundaryCoefficients_eq_zero
+    {configuration : PlanarDielectricWaveConfiguration}
+    (h : configuration.IsElectricBoundary 0)
+    (p : BoundaryParameter configuration.interface.plane) :
+    jointElectricHarmonicSum configuration.jointElectricBoundaryCoefficients p = 0 := by
+  rw [jointElectricHarmonicSum_boundaryCoefficients]
   exact sub_eq_zero.mpr (h.jointElectricBoundaryCharacter_sum_eq p)
 
 /-!
@@ -179,25 +200,59 @@ private lemma jointElectricHarmonicSum_boundaryCoefficients_eq_zero
 
 -/
 
-namespace IsLocalBoundary
+namespace IsElectricBoundary
 
 variable {configuration : PlanarDielectricWaveConfiguration}
-  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
 
-/-- A local planar boundary with zero free surface charge has zero signed,
+/-- An electric planar boundary with zero free surface charge has zero signed,
 exponent-aggregated joint electric coefficient map.
 
-The free surface current remains arbitrary. This is an aggregated coefficient identity: it does
-not assert that the incident, reflected, and transmitted exponents or labeled amplitudes vanish
-or agree separately. -/
+This is an aggregated coefficient identity: it does not assert that the incident, reflected, and
+transmitted exponents or labeled amplitudes vanish or agree separately. -/
 lemma jointElectricBoundaryCoefficients_eq_zero
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent) :
+    (h : configuration.IsElectricBoundary 0) :
     configuration.jointElectricBoundaryCoefficients = 0 := by
   apply (jointElectricHarmonicSum_eq_zero_iff_of_im_pos
     configuration.jointElectricBoundaryCoefficients
     (boundaryTimeProbe configuration.interface.plane)
     (jointElectricBoundaryCoefficients_im_pos configuration)).mp
   exact jointElectricHarmonicSum_boundaryCoefficients_eq_zero h
+
+end IsElectricBoundary
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+
+/-- The zero-charge electric planar boundary laws hold exactly when the signed,
+exponent-aggregated joint electric coefficient map vanishes. -/
+lemma isElectricBoundary_iff_jointElectricBoundaryCoefficients_eq_zero :
+    configuration.IsElectricBoundary 0 ↔
+      configuration.jointElectricBoundaryCoefficients = 0 := by
+  constructor
+  · exact fun h ↦ h.jointElectricBoundaryCoefficients_eq_zero
+  · intro hCoefficients
+    apply isElectricBoundary_iff_jointElectricBoundaryCharacter_sum_eq.mpr
+    have hHarmonic :
+        ∀ p : BoundaryParameter configuration.interface.plane,
+          jointElectricHarmonicSum configuration.jointElectricBoundaryCoefficients p = 0 := by
+      intro p
+      rw [hCoefficients]
+      simp [jointElectricHarmonicSum]
+    intro p
+    have hp := hHarmonic p
+    rw [jointElectricHarmonicSum_boundaryCoefficients] at hp
+    exact sub_eq_zero.mp hp
+
+namespace IsLocalBoundary
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
+
+/-- A full local boundary with zero free surface charge has zero signed,
+exponent-aggregated joint electric coefficient map; the free surface current remains arbitrary. -/
+lemma jointElectricBoundaryCoefficients_eq_zero
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent) :
+    configuration.jointElectricBoundaryCoefficients = 0 :=
+  h.isElectricBoundary.jointElectricBoundaryCoefficients_eq_zero
 
 end IsLocalBoundary
 
