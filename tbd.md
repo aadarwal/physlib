@@ -293,8 +293,9 @@ PR unless maintainers explicitly ask to retain it.
   positive side, verify that the radicand is forced negative, the phase normal component is zero,
   and the normal root is `-I * √(-c)` for the convention `K = q - I a`. Neither direction follows
   from the transmitted label, and these results classify only an already supplied candidate. Do
-  not infer existence, an angle or critical angle, spatial decay, evanescence, outgoing behavior,
-  TIR, irradiance, or power until their later results land.
+  not infer existence, an angle or critical angle, evanescence, outgoing behavior, TIR,
+  irradiance, or power from these root statements. Spatial scaling is supplied only by the
+  separately named carrier and field results below.
 - [ ] Human-check the neutral hyperplane-normal spatial-scaling laws before upstreaming. For the
   carrier convention `exp (-I * K dot x)` and `K = q - I a`, confirm that displacement by `u` in
   the stored-normal direction multiplies the spatial factor by `exp (-I * u * K_normal)`, that
@@ -305,6 +306,15 @@ PR unless maintainers explicitly ask to retain it.
   `u → +∞`. These are global spatial-factor statements based at an arbitrary point, not a
   half-space support condition. Do not infer a medium, transmitted or evanescent role, outgoing
   behavior, TIR, irradiance, or power.
+- [ ] Human-check the hyperplane-normal carrier and transmitted real-field scaling before
+  upstreaming. Confirm that the complete carrier inherits the spatial-factor multiplier and that a
+  normal root `K_normal = -I * α` gives `exp (-α * u)` under displacement by `u` times the stored
+  normal. Because this multiplier is real, verify that taking componentwise real parts gives the
+  same exact scalar law for every constructed real field, including the transmitted `E` and `B`
+  fields at `α = √(-c)`. The supplied positive-side attenuation direction forces `c < 0`, hence a
+  strictly positive rate. The identities hold at an arbitrary base point and for every real `u`;
+  negative `u` gives growth. They do not impose one-sided support or prove a nonzero field,
+  evanescent/outgoing status, TIR, irradiance, or power decay.
 - [ ] Human-check strict phase-directed reflected-root selection before upstreaming. For the stored
   normal from the negative to the positive side, confirm that `IsPhaseDirectedInto .positive`
   means a strictly positive phase-vector normal component and `.negative` means a strictly

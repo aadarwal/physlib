@@ -33,9 +33,12 @@ same-vector root.
 
 The transmitted branch results likewise select a normal root only under a separately supplied
 strict phase or attenuation direction into the positive side. At zero radicand the normal root is
-unique and no strict direction premise is needed. None of these results derives a direction from a
-trace label, identifies phase direction with group velocity or power flow, defines a propagation
-angle, proves Snell's law, or classifies an evanescent or outgoing branch. In particular, the
+unique and no strict direction premise is needed. The attenuation-directed root gives the exact
+positive-side exponential factor for the complete transmitted carrier and its ordinary real
+electric and magnetic-induction fields. These are global field identities based at an arbitrary
+point, not one-sided support conditions. None of these results derives a direction from a trace
+label, identifies phase direction with group velocity or power flow, defines a propagation angle,
+proves Snell's law, or classifies an evanescent or outgoing branch or its power. In particular, the
 phase-matching predicate is used without its separate electric amplitude-balance predicate.
 
 ## ii. Key results
@@ -54,6 +57,8 @@ phase-matching predicate is used without its separate electric amplitude-balance
   forces the unique zero normal root and zero transmitted attenuation.
 - `transmitted_normalRoot_data_of_isAttenuationDirectedInto`: positive-side attenuation direction
   selects the negative-imaginary normal root.
+- `transmitted_electricField_vadd_normalVector_of_isAttenuationDirectedInto`: the selected root
+  gives the transmitted electric field its exact positive-side exponential scaling.
 - `transmitted_hyperplaneNormalComponent_sq_sub_incident_hyperplaneNormalComponent_sq`:
   the exact two-medium contrast of squared normal components.
 - `reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneReflection`: the
@@ -337,6 +342,77 @@ lemma transmitted_normalRoot_data_of_isAttenuationDirectedInto
   simpa using normalRoot_data_of_sq_eq_real_of_isAttenuationDirectedInto
     configuration.interface.plane configuration.transmitted.waveVector
       configuration.transmittedNormalRadicand .positive hSquare hDirection
+
+/-- The attenuation-directed transmitted root gives the complete carrier its exact
+positive-side exponential scaling at the square-root rate.
+
+The base point is arbitrary, the carrier remains globally defined, and negative displacement gives
+the inverse growth direction. This result is neither a half-space support condition nor an
+outgoing, total-internal-reflection, irradiance, or power statement. -/
+lemma transmitted_carrier_vadd_normalVector_of_isAttenuationDirectedInto
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0)
+    (hDirection : configuration.transmitted.waveVector.IsAttenuationDirectedInto
+      configuration.interface.plane .positive) (u : ℝ) (t : Time) (x : Space) :
+    configuration.transmitted.carrier t
+        (u • configuration.interface.plane.normalVector +ᵥ x) =
+      (Real.exp
+          (-Real.sqrt (-configuration.transmittedNormalRadicand) * u) : ℂ) *
+        configuration.transmitted.carrier t x := by
+  have hNormal :=
+    (h.transmitted_normalRoot_data_of_isAttenuationDirectedInto
+      hTransmittedDispersion hIncidentTangentialAttenuation hDirection).2.2
+  exact carrier_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    configuration.transmitted configuration.interface.plane
+      (Real.sqrt (-configuration.transmittedNormalRadicand)) hNormal u t x
+
+/-- The attenuation-directed transmitted root gives the ordinary electric field exact
+positive-side exponential scaling at the square-root rate. -/
+lemma transmitted_electricField_vadd_normalVector_of_isAttenuationDirectedInto
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0)
+    (hDirection : configuration.transmitted.waveVector.IsAttenuationDirectedInto
+      configuration.interface.plane .positive) (u : ℝ) (t : Time) (x : Space) :
+    configuration.transmitted.electricField t
+        (u • configuration.interface.plane.normalVector +ᵥ x) =
+      Real.exp (-Real.sqrt (-configuration.transmittedNormalRadicand) * u) •
+        configuration.transmitted.electricField t x := by
+  have hNormal :=
+    (h.transmitted_normalRoot_data_of_isAttenuationDirectedInto
+      hTransmittedDispersion hIncidentTangentialAttenuation hDirection).2.2
+  exact electricField_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    configuration.transmitted configuration.interface.plane
+      (Real.sqrt (-configuration.transmittedNormalRadicand)) hNormal u t x
+
+/-- The attenuation-directed transmitted root gives the ordinary magnetic induction exact
+positive-side exponential scaling at the square-root rate. -/
+lemma transmitted_magneticInduction_vadd_normalVector_of_isAttenuationDirectedInto
+    (h : configuration.IsElectricPhaseMatched)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentTangentialAttenuation :
+      configuration.interface.plane.tangentialProjection
+        configuration.incident.waveVector.attenuationVector = 0)
+    (hDirection : configuration.transmitted.waveVector.IsAttenuationDirectedInto
+      configuration.interface.plane .positive) (u : ℝ) (t : Time) (x : Space) :
+    configuration.transmitted.magneticInduction t
+        (u • configuration.interface.plane.normalVector +ᵥ x) =
+      Real.exp (-Real.sqrt (-configuration.transmittedNormalRadicand) * u) •
+        configuration.transmitted.magneticInduction t x := by
+  have hNormal :=
+    (h.transmitted_normalRoot_data_of_isAttenuationDirectedInto
+      hTransmittedDispersion hIncidentTangentialAttenuation hDirection).2.2
+  exact magneticInduction_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    configuration.transmitted configuration.interface.plane
+      (Real.sqrt (-configuration.transmittedNormalRadicand)) hNormal u t x
 
 /-!
 

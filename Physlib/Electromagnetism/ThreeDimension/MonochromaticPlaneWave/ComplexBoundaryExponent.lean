@@ -26,6 +26,11 @@ both tangential phase and tangential attenuation data. This is an algebraic char
 a conservation law: it assumes no boundary condition or noncancellation hypothesis and does not
 conclude that two wave vectors are equal.
 
+The same hyperplane geometry also lifts exact normal-displacement scaling from the complex spatial
+factor to the complete carrier and every ordinary real field constructed from it. A supplied
+normal root `K_normal = -I * alpha` produces the real factor `exp (-alpha * u)`; no positivity of
+`alpha` or interface-wave role is obtained here.
+
 The construction assumes no transversality, material dispersion, Maxwell equation, interface
 medium, wave role, half-space support, incoming or outgoing direction, decay branch, Fresnel
 coefficient, irradiance, or power normalization.
@@ -40,12 +45,16 @@ coefficient, irradiance, or power normalization.
   the same equality packaged by the complex hyperplane-tangential projection.
 - `ComplexMonochromaticPlaneWave.carrier_tangent_vadd_point`: exact factorization of the carrier on
   the affine plane into its boundary exponential and stored-point spatial factor.
+- `realFieldOfAmplitude_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul`:
+  a purely negative-imaginary normal root gives exact real exponential scaling to every realized
+  field.
 
 ## iii. Table of contents
 
 - A. Boundary exponent functional
 - B. Equality and positive rate
 - C. Affine-plane carrier factorization
+- D. Hyperplane-normal carrier and field scaling
 
 ## iv. References
 
@@ -215,6 +224,81 @@ lemma carrier_tangent_vadd_point
   congr 1
   simp only [boundaryExponent_apply]
   ring_nf
+
+/-!
+
+## D. Hyperplane-normal carrier and field scaling
+
+-/
+
+/-- Displacement along the stored hyperplane normal multiplies the complete carrier by the
+exponential determined by the complex normal component. -/
+lemma carrier_vadd_normalVector (wave : ComplexMonochromaticPlaneWave)
+    (plane : OrientedAffineHyperplane 3) (u : ℝ) (t : Time) (x : Space) :
+    wave.carrier t (u • plane.normalVector +ᵥ x) =
+      Complex.exp (-Complex.I *
+        ((u : ℂ) * ComplexWaveVector.hyperplaneNormalComponent plane wave.waveVector)) *
+          wave.carrier t x := by
+  rw [carrier, carrier, ComplexWaveVector.spatialFactor_vadd_normalVector]
+  ring
+
+/-- A purely negative-imaginary complex normal component gives the complete carrier the exact real
+exponential scaling under displacement along the stored hyperplane normal.
+
+Positivity of `normalRate` is not assumed, and negative displacement reverses the scaling. This
+result assigns no interface medium, transmitted or evanescent role, outgoing condition, irradiance,
+or power meaning. -/
+lemma carrier_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    (wave : ComplexMonochromaticPlaneWave) (plane : OrientedAffineHyperplane 3)
+    (normalRate : ℝ)
+    (hNormal : ComplexWaveVector.hyperplaneNormalComponent plane wave.waveVector =
+      -Complex.I * (normalRate : ℂ)) (u : ℝ) (t : Time) (x : Space) :
+    wave.carrier t (u • plane.normalVector +ᵥ x) =
+      (Real.exp (-normalRate * u) : ℂ) * wave.carrier t x := by
+  rw [carrier, carrier,
+    ComplexWaveVector.spatialFactor_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+      plane wave.waveVector normalRate hNormal]
+  ring
+
+/-- A purely negative-imaginary complex normal component gives the same exact real scaling to
+every ordinary real field constructed from the shared carrier. -/
+lemma realFieldOfAmplitude_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    (wave : ComplexMonochromaticPlaneWave) (amplitude : EuclideanSpace ℂ (Fin 3))
+    (plane : OrientedAffineHyperplane 3) (normalRate : ℝ)
+    (hNormal : ComplexWaveVector.hyperplaneNormalComponent plane wave.waveVector =
+      -Complex.I * (normalRate : ℂ)) (u : ℝ) (t : Time) (x : Space) :
+    wave.realFieldOfAmplitude amplitude t (u • plane.normalVector +ᵥ x) =
+      Real.exp (-normalRate * u) • wave.realFieldOfAmplitude amplitude t x := by
+  ext i
+  simp only [realFieldOfAmplitude_apply, PiLp.smul_apply, smul_eq_mul]
+  rw [wave.carrier_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    plane normalRate hNormal]
+  rw [mul_assoc, Complex.mul_re]
+  simp only [Complex.ofReal_re, Complex.ofReal_im, zero_mul, sub_zero]
+
+/-- A purely negative-imaginary complex normal component gives exact real exponential scaling of
+the ordinary electric field. -/
+lemma electricField_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    (wave : ComplexMonochromaticPlaneWave) (plane : OrientedAffineHyperplane 3)
+    (normalRate : ℝ)
+    (hNormal : ComplexWaveVector.hyperplaneNormalComponent plane wave.waveVector =
+      -Complex.I * (normalRate : ℂ)) (u : ℝ) (t : Time) (x : Space) :
+    wave.electricField t (u • plane.normalVector +ᵥ x) =
+      Real.exp (-normalRate * u) • wave.electricField t x := by
+  exact wave.realFieldOfAmplitude_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    wave.electricAmplitude plane normalRate hNormal u t x
+
+/-- A purely negative-imaginary complex normal component gives exact real exponential scaling of
+the ordinary magnetic induction. -/
+lemma magneticInduction_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    (wave : ComplexMonochromaticPlaneWave) (plane : OrientedAffineHyperplane 3)
+    (normalRate : ℝ)
+    (hNormal : ComplexWaveVector.hyperplaneNormalComponent plane wave.waveVector =
+      -Complex.I * (normalRate : ℂ)) (u : ℝ) (t : Time) (x : Space) :
+    wave.magneticInduction t (u • plane.normalVector +ᵥ x) =
+      Real.exp (-normalRate * u) • wave.magneticInduction t x := by
+  exact wave.realFieldOfAmplitude_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    wave.magneticAmplitude plane normalRate hNormal u t x
 
 end ComplexMonochromaticPlaneWave
 
