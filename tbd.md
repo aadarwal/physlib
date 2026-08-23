@@ -444,6 +444,20 @@ PR unless maintainers explicitly ask to retain it.
   and-projection conjunction, needs no separate activity hypothesis, and is not exclusive. Because
   arbitrary complex normal shifts leave the projection unchanged, do not call it full wave-vector
   equality or claim Snell, propagation-root selection, Fresnel, irradiance, or power.
+- [ ] Human-check E5a's fixed-frequency electric reduction before upstreaming. Confirm that
+  `IsElectricPhaseMatched` requires incident/transmitted equality of angular frequency and the
+  full complex hyperplane-tangential wave-vector projection, while the reflected clause remains
+  the nonexclusive alternative of zero electric amplitude or those same equalities. The zero
+  branch must retain arbitrary dummy frequency and wave-vector labels. Confirm that
+  `HasReferencedJointElectricBalance` is exactly `A_t = A_i + A_r`, with `A_t` formed in the
+  positive-side medium and `A_i`, `A_r` in the negative-side medium, all referenced at the stored
+  plane point; it is not raw electric-phasor equality. Confirm that the exact incident-key
+  aggregate guard remains outside `IsFixedFrequencyElectricBoundary` and is spent only when
+  deriving the reduced predicates from `IsElectricBoundary 0`. The reverse implication must be
+  guard-free through the zero aggregated coefficient map and must reconstruct only tangential-`E`
+  and normal-`D` laws. A full local boundary may inherit the forward reduction through its electric
+  projection, but there must be no reduced-to-full implication or full-boundary equivalence:
+  normal-`B` and tangential-`H` data are absent.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.

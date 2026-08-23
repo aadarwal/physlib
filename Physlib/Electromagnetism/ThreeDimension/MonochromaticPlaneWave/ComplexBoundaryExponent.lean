@@ -5,8 +5,8 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.ClassicalMechanics.WaveEquation.ComplexWaveVector.Hyperplane
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBasic
-public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
 
 /-!
 # Boundary exponents of complex plane waves
@@ -20,10 +20,11 @@ complex-valued real-linear functional. The spatial factor at the hyperplane's st
 in the coefficient.
 
 Equality of two boundary exponents is equivalent to equality of their angular frequencies and of
-their complex wave-vector pairings against every real tangent displacement. The complex equality
-captures both tangential phase and tangential attenuation data. This is an algebraic
-characterization, not a conservation law: it assumes no boundary condition or noncancellation
-hypothesis and does not conclude that two wave vectors are equal.
+their complex wave-vector pairings against every real tangent displacement. Equivalently, their
+full complex hyperplane-tangential wave-vector projections agree. The complex equality captures
+both tangential phase and tangential attenuation data. This is an algebraic characterization, not
+a conservation law: it assumes no boundary condition or noncancellation hypothesis and does not
+conclude that two wave vectors are equal.
 
 The construction assumes no transversality, material dispersion, Maxwell equation, interface
 medium, wave role, half-space support, incoming or outgoing direction, decay branch, Fresnel
@@ -35,6 +36,8 @@ coefficient, irradiance, or power normalization.
   positive boundary-exponent rate along the common unit-time probe.
 - `ComplexMonochromaticPlaneWave.boundaryExponent_eq_iff`: equality of boundary exponents separates
   angular frequency from all tangent wave-vector pairings.
+- `boundaryExponent_eq_iff_angularFrequency_and_tangentialProjection_eq`:
+  the same equality packaged by the complex hyperplane-tangential projection.
 - `ComplexMonochromaticPlaneWave.carrier_tangent_vadd_point`: exact factorization of the carrier on
   the affine plane into its boundary exponential and stored-point spatial factor.
 
@@ -180,6 +183,18 @@ lemma boundaryExponent_eq_iff
     apply LinearMap.ext
     rintro ⟨t, v⟩
     rw [boundaryExponent_apply, boundaryExponent_apply, hfrequency, htangent]
+
+/-- Boundary exponents are equal exactly when angular frequency and complex
+hyperplane-tangential wave-vector projection are equal. -/
+lemma boundaryExponent_eq_iff_angularFrequency_and_tangentialProjection_eq
+    (plane : OrientedAffineHyperplane 3)
+    (wave₁ wave₂ : ComplexMonochromaticPlaneWave) :
+    wave₁.boundaryExponent plane = wave₂.boundaryExponent plane ↔
+      wave₁.angularFrequency = wave₂.angularFrequency ∧
+        ComplexWaveVector.hyperplaneTangentialProjection plane wave₁.waveVector =
+          ComplexWaveVector.hyperplaneTangentialProjection plane wave₂.waveVector := by
+  rw [boundaryExponent_eq_iff,
+    ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent]
 
 /-!
 
