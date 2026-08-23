@@ -425,8 +425,12 @@ PR unless maintainers explicitly ask to retain it.
   complex-bilinear wave-vector pairing against every real tangent displacement. Preserve the
   reflected conclusion as zero electric amplitude or the analogous two equalities, since its zero
   branch retains arbitrary dummy frequency and wave-vector data. The complex pairing equality
-  captures both tangential phase and attenuation data but constrains no normal component; do not
-  call it full wave-vector equality or claim Snell, Fresnel, irradiance, or power.
+  captures both tangential phase and attenuation data. Confirm that the neutral hyperplane
+  characterization packages it exactly as complex tangential-projection equality in the same
+  transmitted and reflected branches. The reflected disjunction ranges over the entire frequency-
+  and-projection conjunction, needs no separate activity hypothesis, and is not exclusive. Because
+  arbitrary complex normal shifts leave the projection unchanged, do not call it full wave-vector
+  equality or claim Snell, propagation-root selection, Fresnel, irradiance, or power.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
