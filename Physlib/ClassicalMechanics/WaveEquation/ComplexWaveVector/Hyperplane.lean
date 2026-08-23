@@ -57,6 +57,8 @@ attenuation.
   zero tangential attenuation makes the complex projection an embedded real phase projection.
 - `ComplexWaveVector.hyperplaneNormalComponent_ofPhaseAttenuation`: the complex normal component
   separates into its real phase and attenuation components.
+- `ComplexWaveVector.replaceHyperplaneNormalComponent`: set the complex normal component while
+  preserving the tangential projection.
 - `ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent`: equality
   of complex tangential projections is exactly equality of every real-tangent pairing.
 - `ComplexWaveVector.hyperplaneTangentialProjection_add_smul_normalVector`: arbitrary complex
@@ -143,6 +145,67 @@ lemma hyperplaneNormalComponent_hyperplaneTangentialProjection
     bilinearDot_sub_right, bilinearDot_smul_right,
     bilinearDot_hyperplaneNormal_self]
   simp [hyperplaneNormalComponent]
+
+/-- Set a complex wave vector's oriented hyperplane-normal component while preserving its
+complex tangential projection. -/
+def replaceHyperplaneNormalComponent (plane : OrientedAffineHyperplane d)
+    (z : ComplexWaveVector d) (normalComponent : ℂ) : ComplexWaveVector d :=
+  z + (normalComponent - hyperplaneNormalComponent plane z) •
+    ofReal plane.normalVector
+
+/-- Setting the hyperplane-normal component gives the supplied component exactly. -/
+@[simp]
+lemma hyperplaneNormalComponent_replaceHyperplaneNormalComponent
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (normalComponent : ℂ) :
+    hyperplaneNormalComponent plane
+        (replaceHyperplaneNormalComponent plane z normalComponent) = normalComponent := by
+  rw [replaceHyperplaneNormalComponent, hyperplaneNormalComponent,
+    bilinearDot_add_right, ← hyperplaneNormalComponent,
+    bilinearDot_smul_right, bilinearDot_hyperplaneNormal_self]
+  ring
+
+/-- Setting the hyperplane-normal component preserves the complex tangential projection. -/
+@[simp]
+lemma hyperplaneTangentialProjection_replaceHyperplaneNormalComponent
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (normalComponent : ℂ) :
+    hyperplaneTangentialProjection plane
+        (replaceHyperplaneNormalComponent plane z normalComponent) =
+      hyperplaneTangentialProjection plane z := by
+  rw [hyperplaneTangentialProjection,
+    hyperplaneNormalComponent_replaceHyperplaneNormalComponent,
+    replaceHyperplaneNormalComponent, hyperplaneTangentialProjection]
+  module
+
+/-- Setting the normal component of a real-embedded vector to a real scalar is the real
+embedding of the corresponding real tangential-plus-normal decomposition. -/
+lemma replaceHyperplaneNormalComponent_ofReal
+    (plane : OrientedAffineHyperplane d) (q : WaveVector d) (normalComponent : ℝ) :
+    replaceHyperplaneNormalComponent plane (ofReal q) (normalComponent : ℂ) =
+      ofReal (plane.tangentialProjection q + normalComponent • plane.normalVector) := by
+  ext i
+  simp [replaceHyperplaneNormalComponent, hyperplaneNormalComponent,
+    bilinearDot_ofReal, OrientedAffineHyperplane.tangentialProjection,
+    OrientedAffineHyperplane.normalComponent]
+  ring
+
+/-- Complex wave vectors are equal when both their hyperplane-tangential projections and oriented
+normal components are equal. -/
+lemma eq_of_hyperplaneTangentialProjection_eq_of_hyperplaneNormalComponent_eq
+    (plane : OrientedAffineHyperplane d) {z w : ComplexWaveVector d}
+    (hTangential : hyperplaneTangentialProjection plane z =
+      hyperplaneTangentialProjection plane w)
+    (hNormal : hyperplaneNormalComponent plane z = hyperplaneNormalComponent plane w) :
+    z = w := by
+  calc
+    z = hyperplaneTangentialProjection plane z +
+        hyperplaneNormalComponent plane z • ofReal plane.normalVector :=
+      (hyperplaneTangentialProjection_add_normal plane z).symm
+    _ = hyperplaneTangentialProjection plane w +
+        hyperplaneNormalComponent plane w • ofReal plane.normalVector := by
+      rw [hTangential, hNormal]
+    _ = w := hyperplaneTangentialProjection_add_normal plane w
 
 /-!
 

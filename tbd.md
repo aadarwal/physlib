@@ -380,6 +380,22 @@ PR unless maintainers explicitly ask to retain it.
   TIR, Fresnel, irradiance, or power meaning. For eventual upstream review, split this fork milestone
   into a neutral Space prerequisite, material threshold and radicand-sign geometry, and angle
   interpretation plus the supplied-candidate connector.
+- [ ] Human-check the subcritical positive-phase transmitted construction before upstreaming.
+  Confirm that the neutral setter changes only the complex normal component and that its real
+  specialization is exactly the real tangential-plus-normal decomposition. Under incident
+  negative-medium dispersion and zero whole incident attenuation, verify that strict
+  sine-subcritical incidence is equivalent to unique existence of a vector with the incident
+  complex tangential projection, the positive-medium shell at the incident frequency, zero whole
+  attenuation, and strictly positive stored-normal phase component. Check that the total
+  `Real.sqrt` construction is certified only after positivity is proved, that the zero-radicand
+  critical endpoint remains excluded by strict phase direction, and that full plane-wave
+  uniqueness is claimed only after fixing the arbitrary electric amplitude. The supplied-candidate
+  bridge must require phase matching, positive-medium transmitted dispersion, zero incident
+  tangential attenuation, and supplied positive-side phase direction; it solves no reflected or
+  boundary-amplitude data. Do not interpret positive phase direction as a ray, outgoing or group-
+  velocity condition, or as positive Poynting flux. For eventual upstream review, split this fork
+  milestone into neutral WaveEquation coordinate replacement, vector construction/uniqueness, and
+  the arbitrary-amplitude plus supplied-candidate bridge.
 - [ ] Preserve E2e's current semantic boundary: `PositiveNormalDecayWaveVector` proves local decay
   geometry only. It does not choose an interface half-space or square-root branch, label a field
   transmitted or outgoing, construct real `E`/`D`/`B`/`H` fields, prove the real macroscopic
