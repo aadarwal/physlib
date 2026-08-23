@@ -243,6 +243,15 @@ PR unless maintainers explicitly ask to retain it.
   embedded from the reals while the tangential square remains complex-bilinear. This equation
   leaves the two square-root choices unresolved; assign no interface side, incident, transmitted,
   outgoing, evanescent, or power meaning until later hypotheses make that choice.
+- [ ] Human-check the neutral real-radicand normal-root alternatives before upstreaming. Confirm
+  that a nonnegative radicand gives `K_normal = ±√c`, a zero square forces the unique zero normal
+  component, and a nonpositive radicand gives `K_normal = ±I * √(-c)`. The weak inequalities are
+  deliberate and both displayed alternatives coincide at zero. This package does not use the
+  principal complex square root, prefer either sign, or prove that an interface radicand is real.
+  With `K = q - I a`, future positive-side decay must select the negative-imaginary root
+  `-I * √(-c)`, not its positive-imaginary partner; this sign is only a future certification gate,
+  not a conclusion of the neutral package. Do not call these roots propagating, grazing,
+  evanescent, transmitted, outgoing, or power-carrying before their separate hypotheses land.
 - [ ] Human-check the phase-matched dispersion consequences before upstreaming. Confirm that they
   use `IsElectricPhaseMatched` alone, not the referenced electric amplitude balance. Incident and
   transmitted material shells are direct premises; the reflected shell is required only under
