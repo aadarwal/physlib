@@ -1387,6 +1387,9 @@ premises.
   possible normal roots at fixed tangential projection and square; the alternatives deliberately
   remain nonexclusive at zero complex normal component, including grazing real geometry, and carry
   no incident, outgoing, medium, or physical-root semantics;
+- [x] the material-shell normal-root equation expressing the squared oriented complex normal
+  component as the real material square minus the complex tangential bilinear square, without
+  selecting a square root, interface side, or propagation role;
 - specular reflection and Snell's law;
 - existence/uniqueness of a propagating transmitted direction below the critical angle;
 - critical-angle and total-internal-reflection characterization; and
@@ -2091,7 +2094,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | blocked | E2, E5a | neutral complex hyperplane reflection and two-root shell classification complete; phase-matched dispersion consequences, propagating-root selection, Snell, critical-angle, and outgoing-decay suite remain |
+| E5b reflection/Snell/TIR | blocked | E2, E5a | neutral complex hyperplane reflection, two-root classification, and the material normal-shell equation complete; phase-matched interface consequences, propagating-root selection, Snell, critical-angle, and outgoing-decay suite remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
