@@ -209,6 +209,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricFixedFrequency
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
+public import Physlib.Optics.Interfaces.PlanarDielectric.PhaseMatchedDispersion
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex
