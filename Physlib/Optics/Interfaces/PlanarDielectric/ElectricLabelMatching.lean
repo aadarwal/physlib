@@ -18,12 +18,14 @@ side coefficient carried by the incident boundary exponent:
 `Aᵢ + if Lᵣ = Lᵢ then Aᵣ else 0`. Thus it is `Aᵢ + Aᵣ` when the reflected and
 incident exponents coincide, but only `Aᵢ` when they differ.
 
-If this incident-key aggregate is nonzero, evaluating the zero coefficient map at the incident key
-forces the transmitted exponent to equal the incident exponent. Evaluation at the reflected key
-then proves that the reflected electric amplitude is zero or its exponent also equals the incident
-exponent. In exactly those branches, evaluation at the incident key gives the stored-point-
-referenced joint tangential-`E`/normal-`D` coefficient balance `Aₜ = Aᵢ + Aᵣ`. The reflected
-disjunction is a conclusion, not an additional hypothesis.
+For a zero-charge electric boundary, if this incident-key aggregate is nonzero, evaluating the
+zero coefficient map at the incident key forces the transmitted exponent to equal the incident
+exponent. Evaluation at the reflected key then proves that the reflected electric amplitude is
+zero or its exponent also equals the incident exponent. In exactly those branches, evaluation at
+the incident key gives the stored-point-referenced joint tangential-`E`/normal-`D` coefficient
+balance `Aₜ = Aᵢ + Aᵣ`. The reflected disjunction is a conclusion, not an additional
+hypothesis.
+A full local boundary inherits this result through its electric projection.
 
 The conditional guard is essential. A nonzero incident amplitude is insufficient when an
 equal-exponent reflected amplitude cancels it. The unconditional sum `Aᵢ + Aᵣ` is also
@@ -41,7 +43,7 @@ coefficient balance is not an equality of raw electric phasors or full electroma
 
 - `PlanarDielectricWaveConfiguration.incidentExponentJointElectricAggregate`: the exact
   negative-side coefficient at the incident boundary exponent.
-- `PlanarDielectricWaveConfiguration.IsLocalBoundary.jointElectricBoundaryLabelMatching`:
+- `PlanarDielectricWaveConfiguration.IsElectricBoundary.jointElectricBoundaryLabelMatching`:
   transmitted/incident exponent equality, the zero-reflection-preserving reflected alternative,
   and referenced joint-coefficient balance.
 
@@ -132,19 +134,18 @@ private lemma threeCoefficientCollision
 
 -/
 
-namespace IsLocalBoundary
+namespace IsElectricBoundary
 
 variable {configuration : PlanarDielectricWaveConfiguration}
-  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
 
-/-- A zero-free-surface-charge local boundary with a nonzero incident-key aggregate matches the
+/-- A zero-free-surface-charge electric boundary with a nonzero incident-key aggregate matches the
 transmitted boundary exponent to the incident one, and either removes the reflected electric
 amplitude or matches its exponent too.
 
 The final equality is a stored-point-referenced, medium-dependent joint tangential-`E`/normal-`D`
-coefficient balance. The free surface current remains arbitrary. -/
+coefficient balance. No surface current occurs in the premise. -/
 lemma jointElectricBoundaryLabelMatching
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
     configuration.transmitted.boundaryExponent configuration.interface.plane =
         configuration.incident.boundaryExponent configuration.interface.plane ∧
@@ -178,6 +179,31 @@ lemma jointElectricBoundaryLabelMatching
       configuration.interface.plane configuration.interface.negativeMedium
         configuration.reflected).mp (by simpa [Aᵣ] using hrzero))
   · exact Or.inr (by simpa [Lᵢ, Lᵣ] using hrexp)
+
+end IsElectricBoundary
+
+namespace IsLocalBoundary
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
+
+/-- A zero-free-surface-charge full local boundary with a nonzero incident-key aggregate matches
+the active electric boundary labels and their referenced joint coefficients. -/
+lemma jointElectricBoundaryLabelMatching
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.transmitted.boundaryExponent configuration.interface.plane =
+        configuration.incident.boundaryExponent configuration.interface.plane ∧
+      (configuration.reflected.electricAmplitude = 0 ∨
+        configuration.reflected.boundaryExponent configuration.interface.plane =
+          configuration.incident.boundaryExponent configuration.interface.plane) ∧
+      referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+          configuration.interface.positiveMedium configuration.transmitted =
+        referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+            configuration.interface.negativeMedium configuration.incident +
+          referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+            configuration.interface.negativeMedium configuration.reflected :=
+  h.isElectricBoundary.jointElectricBoundaryLabelMatching hAggregate
 
 end IsLocalBoundary
 

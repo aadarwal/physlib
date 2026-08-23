@@ -13,8 +13,9 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
 ## i. Overview
 
 This file extracts the direct physical consequences of conditional electric label matching at a
-planar dielectric boundary. The hypotheses remain the primitive local boundary law with zero free
-surface charge and the exact nonzero incident-exponent joint-electric aggregate. No common
+planar dielectric boundary. The weakest boundary hypothesis is the two-law electric predicate with
+zero free surface charge, together with the exact nonzero incident-exponent joint-electric
+aggregate. A full local boundary inherits every result through its electric projection. No common
 frequency or wave-vector matching is assumed.
 
 First, the aggregate is equal to the transmitted stored-point-referenced joint electric
@@ -52,6 +53,7 @@ power result. The free surface current remains arbitrary.
 - A. Transmitted electric activity
 - B. Transmitted conservation
 - C. Reflected conservation
+- D. Full local boundary wrappers
 
 ## iv. References
 
@@ -69,10 +71,9 @@ open Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave
 noncomputable section
 
 namespace PlanarDielectricWaveConfiguration
-namespace IsLocalBoundary
+namespace IsElectricBoundary
 
 variable {configuration : PlanarDielectricWaveConfiguration}
-  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
 
 /-!
 
@@ -83,7 +84,7 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 /-- A nonzero incident-key joint-electric aggregate at a local electric boundary forces the
 transmitted electric amplitude to be nonzero. -/
 lemma transmitted_electricAmplitude_ne_zero
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
     configuration.transmitted.electricAmplitude ≠ 0 := by
   have hMatching := h.jointElectricBoundaryLabelMatching hAggregate
@@ -110,7 +111,7 @@ lemma transmitted_electricAmplitude_ne_zero
 /-- Conditional electric label matching makes the transmitted angular frequency and every tangent
 wave-vector pairing equal to the incident ones. -/
 lemma transmitted_angularFrequency_tangentPairing_eq_incident
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
     configuration.transmitted.angularFrequency = configuration.incident.angularFrequency ∧
       ∀ v : configuration.interface.plane.tangentSubmodule,
@@ -125,7 +126,7 @@ lemma transmitted_angularFrequency_tangentPairing_eq_incident
 /-- Conditional electric label matching makes the transmitted angular frequency and complex
 hyperplane-tangential wave vector equal to the incident ones. -/
 lemma transmitted_angularFrequency_tangentialProjection_eq_incident
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
     configuration.transmitted.angularFrequency = configuration.incident.angularFrequency ∧
       ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
@@ -148,7 +149,7 @@ lemma transmitted_angularFrequency_tangentialProjection_eq_incident
 and wave vector unconstrained, or makes its angular frequency and every tangent wave-vector pairing
 equal to the incident ones. -/
 lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_incident
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
     configuration.reflected.electricAmplitude = 0 ∨
       (configuration.reflected.angularFrequency = configuration.incident.angularFrequency ∧
@@ -166,7 +167,7 @@ lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_
 and wave vector unconstrained, or makes its angular frequency and complex hyperplane-tangential
 wave vector equal to the incident ones. -/
 lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentialProjection_eq_incident
-    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (h : configuration.IsElectricBoundary 0)
     (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
     configuration.reflected.electricAmplitude = 0 ∨
       (configuration.reflected.angularFrequency = configuration.incident.angularFrequency ∧
@@ -181,6 +182,83 @@ lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentialProjecti
       (ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent
         configuration.interface.plane configuration.reflected.waveVector
           configuration.incident.waveVector).mpr hConservation.2⟩
+
+end IsElectricBoundary
+
+namespace IsLocalBoundary
+
+/-!
+
+## D. Full local boundary wrappers
+
+-/
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+  {surfaceCurrent : PlanarFreeSurfaceCurrentDensity configuration.interface.plane}
+
+/-- A full zero-free-charge local boundary with a nonzero incident-key aggregate forces the
+transmitted electric amplitude to be nonzero. -/
+lemma transmitted_electricAmplitude_ne_zero
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.transmitted.electricAmplitude ≠ 0 :=
+  h.isElectricBoundary.transmitted_electricAmplitude_ne_zero hAggregate
+
+/-- A full zero-free-charge local boundary inherits transmitted frequency and tangent-pairing
+conservation from its electric projection. -/
+lemma transmitted_angularFrequency_tangentPairing_eq_incident
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.transmitted.angularFrequency = configuration.incident.angularFrequency ∧
+      ∀ v : configuration.interface.plane.tangentSubmodule,
+        ComplexWaveVector.bilinearDot configuration.transmitted.waveVector
+            (ComplexWaveVector.ofReal (v : EuclideanSpace ℝ (Fin 3))) =
+          ComplexWaveVector.bilinearDot configuration.incident.waveVector
+            (ComplexWaveVector.ofReal (v : EuclideanSpace ℝ (Fin 3))) :=
+  h.isElectricBoundary.transmitted_angularFrequency_tangentPairing_eq_incident hAggregate
+
+/-- A full zero-free-charge local boundary inherits transmitted frequency and tangential-projection
+conservation from its electric projection. -/
+lemma transmitted_angularFrequency_tangentialProjection_eq_incident
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.transmitted.angularFrequency = configuration.incident.angularFrequency ∧
+      ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+          configuration.transmitted.waveVector =
+        ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+          configuration.incident.waveVector :=
+  h.isElectricBoundary.transmitted_angularFrequency_tangentialProjection_eq_incident hAggregate
+
+/-- A full zero-free-charge local boundary inherits the reflected zero-or-tangent-pairing
+conservation alternative from its electric projection. -/
+lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_incident
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      (configuration.reflected.angularFrequency = configuration.incident.angularFrequency ∧
+        ∀ v : configuration.interface.plane.tangentSubmodule,
+          ComplexWaveVector.bilinearDot configuration.reflected.waveVector
+              (ComplexWaveVector.ofReal (v : EuclideanSpace ℝ (Fin 3))) =
+            ComplexWaveVector.bilinearDot configuration.incident.waveVector
+              (ComplexWaveVector.ofReal (v : EuclideanSpace ℝ (Fin 3)))) := by
+  let hE := h.isElectricBoundary
+  exact hE.reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentPairing_eq_incident
+    hAggregate
+
+/-- A full zero-free-charge local boundary inherits the reflected zero-or-tangential-projection
+conservation alternative from its electric projection. -/
+lemma reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentialProjection_eq_incident
+    (h : configuration.IsLocalBoundary 0 surfaceCurrent)
+    (hAggregate : configuration.incidentExponentJointElectricAggregate ≠ 0) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      (configuration.reflected.angularFrequency = configuration.incident.angularFrequency ∧
+        ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+            configuration.reflected.waveVector =
+          ComplexWaveVector.hyperplaneTangentialProjection configuration.interface.plane
+            configuration.incident.waveVector) := by
+  let hE := h.isElectricBoundary
+  exact hE.reflected_electricAmplitude_eq_zero_or_angularFrequency_tangentialProjection_eq_incident
+    hAggregate
 
 end IsLocalBoundary
 end PlanarDielectricWaveConfiguration
