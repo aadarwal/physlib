@@ -1350,9 +1350,9 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
 - [x] the exact signed three-wave joint electric coefficient map, aggregated by boundary exponent,
   and its vanishing under a zero-free-surface-charge local boundary with arbitrary free surface
   current;
-- [x] the oriented-hyperplane result converting vanishing against every tangent
-  displacement into an explicit normal-vector multiple, to be used to identify tangential
-  projections;
+- [x] the oriented-hyperplane results converting vanishing against every tangent displacement into
+  an explicit normal-vector multiple and characterizing equality of tangential projections by
+  equality against every tangent probe;
 - [x] guarded three-wave label matching under the exact nonzero negative-side coefficient at the
   incident boundary exponent, deriving transmitted/incident exponent equality, the disjunction
   that the reflected electric amplitude is zero or its exponent also matches, and referenced joint
