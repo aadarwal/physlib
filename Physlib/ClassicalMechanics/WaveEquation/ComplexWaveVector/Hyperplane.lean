@@ -40,6 +40,12 @@ geometric side. Each excludes a zero normal component of the corresponding real 
 assign no medium, optical wave role, propagation, group or energy-flow direction, physical root,
 outgoing condition, or power meaning.
 
+Normal displacement changes the spatial pairing and spatial factor through only the complex
+normal component. The factor norm scales by the real exponential of minus the attenuation normal
+component times displacement. Strict positive-side attenuation therefore makes the spatial factor
+tend to zero along increasing positive-normal displacement, independently of tangential
+attenuation.
+
 ## ii. Key results
 
 - `ComplexWaveVector.hyperplaneTangentialProjection_add_normal`: exact complex normal--tangential
@@ -62,6 +68,12 @@ outgoing condition, or power meaning.
 - `ComplexWaveVector.IsPhaseDirectedInto`: strict phase-vector direction into a geometric side.
 - `ComplexWaveVector.IsAttenuationDirectedInto`: strict attenuation-vector direction into a
   geometric side.
+- `ComplexWaveVector.spatialFactor_vadd_normalVector`: exact spatial-factor scaling under normal
+  displacement.
+- `ComplexWaveVector.norm_spatialFactor_vadd_normalVector`: exact norm scaling through the
+  attenuation normal component.
+- `tendsto_spatialFactor_vadd_normalVector_atTop_of_isAttenuationDirectedInto`: positive-side
+  attenuation gives convergence to zero along increasing normal displacement.
 
 ## iii. Table of contents
 
@@ -70,6 +82,7 @@ outgoing condition, or power meaning.
 - C. Tangent-pairing characterization
 - D. Complex hyperplane reflection
 - E. Strict side-relative phase and attenuation directions
+- F. Normal-displacement spatial scaling
 
 ## iv. References
 
@@ -656,6 +669,104 @@ lemma isAttenuationDirectedInto_negative_iff
     z.IsAttenuationDirectedInto plane .negative ↔
       plane.normalComponent z.attenuationVector < 0 := by
   simp [IsAttenuationDirectedInto]
+
+/-!
+
+## F. Normal-displacement spatial scaling
+
+-/
+
+/-- Displacement along an oriented hyperplane's stored normal changes the spatial pairing by the
+displacement times the complex normal component. -/
+lemma spatialPairing_vadd_normalVector
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (u : ℝ) (x : Space d) :
+    z.spatialPairing (u • plane.normalVector +ᵥ x) =
+      (u : ℂ) * hyperplaneNormalComponent plane z + z.spatialPairing x := by
+  rw [spatialPairing_vadd, ofReal_smul, bilinearDot_smul_right,
+    bilinearDot_comm z (ofReal plane.normalVector)]
+  rfl
+
+/-- Displacement along an oriented hyperplane's stored normal multiplies the spatial factor by
+the exponential determined by the complex normal component. -/
+lemma spatialFactor_vadd_normalVector
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (u : ℝ) (x : Space d) :
+    z.spatialFactor (u • plane.normalVector +ᵥ x) =
+      Complex.exp
+          (-Complex.I * ((u : ℂ) * hyperplaneNormalComponent plane z)) *
+        z.spatialFactor x := by
+  rw [spatialFactor, spatialFactor, spatialPairing_vadd_normalVector,
+    mul_add, Complex.exp_add]
+
+/-- A purely negative-imaginary complex normal component gives an exact real exponential scaling
+under displacement along the stored normal.
+
+Positivity of `normalRate` is not assumed here. When it is positive, increasing positive-normal
+displacement gives decay. -/
+lemma spatialFactor_vadd_normalVector_of_hyperplaneNormalComponent_eq_neg_I_mul
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d) (normalRate : ℝ)
+    (hNormal : hyperplaneNormalComponent plane z =
+      -Complex.I * (normalRate : ℂ)) (u : ℝ) (x : Space d) :
+    z.spatialFactor (u • plane.normalVector +ᵥ x) =
+      (Real.exp (-normalRate * u) : ℂ) * z.spatialFactor x := by
+  rw [spatialFactor_vadd_normalVector, hNormal]
+  have hExponent :
+      -Complex.I * ((u : ℂ) * (-Complex.I * (normalRate : ℂ))) =
+        ((-normalRate * u : ℝ) : ℂ) := by
+    apply Complex.ext <;> simp [mul_comm]
+  rw [hExponent, ← Complex.ofReal_exp]
+
+/-- The spatial-factor norm scales under stored-normal displacement by the exponential of minus
+the attenuation normal component times the displacement.
+
+This identity is independent of tangential attenuation and does not require the phase normal
+component to vanish. -/
+lemma norm_spatialFactor_vadd_normalVector
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (u : ℝ) (x : Space d) :
+    ‖z.spatialFactor (u • plane.normalVector +ᵥ x)‖ =
+      Real.exp (-plane.normalComponent z.attenuationVector * u) *
+        ‖z.spatialFactor x‖ := by
+  rw [spatialFactor_vadd_normalVector, norm_mul, Complex.norm_exp]
+  congr 1
+  simp only [Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im,
+    Complex.I_re, Complex.I_im, Complex.ofReal_re, Complex.ofReal_im,
+    hyperplaneNormalComponent_im]
+  ring_nf
+
+/-- Strict attenuation direction into the positive geometric side makes the spatial factor tend
+to zero along increasing displacement in the stored-normal direction.
+
+This is a geometric spatial-decay result. It assigns no medium, transmitted, evanescent, outgoing,
+energy-flux, or power role. -/
+lemma tendsto_spatialFactor_vadd_normalVector_atTop_of_isAttenuationDirectedInto
+    (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
+    (hDirection : z.IsAttenuationDirectedInto plane .positive) (x : Space d) :
+    Filter.Tendsto
+      (fun u : ℝ ↦ z.spatialFactor (u • plane.normalVector +ᵥ x))
+      Filter.atTop (nhds 0) := by
+  rw [tendsto_zero_iff_norm_tendsto_zero]
+  have hRate : 0 < plane.normalComponent z.attenuationVector :=
+    (isAttenuationDirectedInto_positive_iff z plane).mp hDirection
+  have hScale :
+      Filter.Tendsto
+        (fun u : ℝ ↦ plane.normalComponent z.attenuationVector * u)
+        Filter.atTop Filter.atTop :=
+    (Filter.tendsto_const_mul_atTop_of_pos hRate).2 Filter.tendsto_id
+  have hDecayRaw := Real.tendsto_exp_neg_atTop_nhds_zero.comp hScale
+  change Filter.Tendsto
+    (fun u : ℝ ↦ Real.exp (-(plane.normalComponent z.attenuationVector * u)))
+      Filter.atTop (nhds 0) at hDecayRaw
+  have hDecay :
+      Filter.Tendsto
+        (fun u : ℝ ↦ Real.exp (-plane.normalComponent z.attenuationVector * u))
+        Filter.atTop (nhds 0) := by
+    simpa only [neg_mul] using hDecayRaw
+  have hNorm := hDecay.mul_const ‖z.spatialFactor x‖
+  simpa only [zero_mul] using hNorm.congr'
+    (Filter.Eventually.of_forall fun u ↦
+      (norm_spatialFactor_vadd_normalVector plane z u x).symm)
 
 end ComplexWaveVector
 

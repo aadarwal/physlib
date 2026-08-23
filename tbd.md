@@ -295,6 +295,16 @@ PR unless maintainers explicitly ask to retain it.
   from the transmitted label, and these results classify only an already supplied candidate. Do
   not infer existence, an angle or critical angle, spatial decay, evanescence, outgoing behavior,
   TIR, irradiance, or power until their later results land.
+- [ ] Human-check the neutral hyperplane-normal spatial-scaling laws before upstreaming. For the
+  carrier convention `exp (-I * K dot x)` and `K = q - I a`, confirm that displacement by `u` in
+  the stored-normal direction multiplies the spatial factor by `exp (-I * u * K_normal)`, that
+  `K_normal = -I * α` reduces this to `exp (-α * u)`, and that the general norm factor is
+  `exp (-a_normal * u)`. The norm identity deliberately requires neither zero tangential
+  attenuation nor zero phase normal component. Confirm that strict attenuation direction into the
+  geometric positive side is exactly the positivity needed for convergence to zero as
+  `u → +∞`. These are global spatial-factor statements based at an arbitrary point, not a
+  half-space support condition. Do not infer a medium, transmitted or evanescent role, outgoing
+  behavior, TIR, irradiance, or power.
 - [ ] Human-check strict phase-directed reflected-root selection before upstreaming. For the stored
   normal from the negative to the positive side, confirm that `IsPhaseDirectedInto .positive`
   means a strictly positive phase-vector normal component and `.negative` means a strictly
