@@ -15,12 +15,12 @@ public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellEquation
 
 This module derives the local differential balance of electromagnetic energy from the
 three-dimensional macroscopic Maxwell equations. The Poynting vector is defined as `E × H`; the
-Maxwell equations first give its divergence as the sum of free-current work and two field-storage
+Maxwell equations first give its divergence as the sum of free-current work and two field-energy
 terms. The constitutive equations of a fixed homogeneous isotropic medium then identify those
-storage terms with the time derivative of a nonnegative energy density.
+energy terms with the time derivative of a nonnegative energy density.
 
-All fields here are instantaneous real fields. The results are pointwise and do not assert an
-integrated conservation law, boundary flux, time average, irradiance, or modal power. The stored
+All fields here are instantaneous real fields. The results are pointwise and do not assert a
+global conservation law, boundary flux, harmonic mean, irradiance, or modal power. The stored
 energy formula uses the fixed positive, homogeneous, isotropic, nonconducting, and nondispersive
 medium model. Free current remains an independently supplied source, while bound material response
 is represented by `D` and `H`.
@@ -28,19 +28,17 @@ is represented by `D` and `H`.
 ## ii. Key results
 
 - `ThreeDimension.poyntingVector`: the instantaneous flux density `E × H`.
-- `ThreeDimension.IsMacroscopicMaxwell.poyntingVector_div`: the sourced local work identity.
+- `poyntingVector_div`: the local work identity with sources.
 - `HomogeneousIsotropicMedium.energyDensity`: stored field energy density in a fixed medium.
-- `HomogeneousIsotropicMedium.IsConstitutive.energyDensity_eq_inner`: the conventional
+- `energyDensity_eq_inner`: the standard
   `1 / 2 * (E · D + B · H)` form.
-- `HomogeneousIsotropicMedium.IsConstitutive.energyDensity_timeDeriv`: the constitutive time
-  derivative identity.
-- `HomogeneousIsotropicMedium.IsMacroscopicMaxwellSolution.poyntingTheorem`: the local Poynting
-  theorem.
+- `energyDensity_timeDeriv`: the constitutive time derivative identity.
+- `poyntingTheorem`: the local Poynting theorem.
 
 ## iii. Table of contents
 
 - A. Poynting vector
-- B. Sourced local work identity
+- B. Local work identity with sources
 - C. Stored energy in a fixed medium
   - C.1. Constitutive forms
   - C.2. Canonical magnetic field strength
@@ -70,13 +68,13 @@ namespace ThreeDimension
 /-- The instantaneous electromagnetic energy-flux density `E × H`.
 
 This definition fixes the cross-product order. By itself it does not assert Maxwell's equations,
-an outward direction, a boundary flux, irradiance, or power. -/
+a selected direction, a boundary flux, irradiance, or power. -/
 def poyntingVector (E : ElectricField) (H : MagneticFieldStrength) :
     Time → Space → EuclideanSpace ℝ (Fin 3) := fun t x => E t x ⨯ₑ₃ H t x
 
 /-!
 
-## B. Sourced local work identity
+## B. Local work identity with sources
 
 -/
 
@@ -86,7 +84,7 @@ variable {E : ElectricField} {D : ElectricDisplacementField}
   {B : MagneticInductionField} {H : MagneticFieldStrength}
   {ρFree : ChargeDensity} {JFree : CurrentDensity}
 
-/-- Maxwell's curl laws express the divergence of `E × H` as free-current work and field-storage
+/-- Maxwell's curl laws express the divergence of `E × H` as free-current work and field-energy
 terms. This is a local differential identity and uses no constitutive equation. -/
 lemma poyntingVector_div (h : IsMacroscopicMaxwell E D B H ρFree JFree)
     (t : Time) (x : Space) :
@@ -146,7 +144,7 @@ variable {𝓜 : HomogeneousIsotropicMedium}
   {E : ElectricField} {D : ElectricDisplacementField}
   {B : MagneticInductionField} {H : MagneticFieldStrength}
 
-/-- Under the constitutive equations, the stored energy density has the conventional symmetric
+/-- Under the constitutive equations, the stored energy density has the standard symmetric
 form `1 / 2 * (E · D + B · H)`. -/
 lemma energyDensity_eq_inner (h : 𝓜.IsConstitutive E D B H)
     (t : Time) (x : Space) :
@@ -159,7 +157,7 @@ lemma energyDensity_eq_inner (h : 𝓜.IsConstitutive E D B H)
     inner_smul_right, conj_trivial]
 
 /-- In a fixed medium, the time derivative of stored energy is the sum of the electric and
-magnetic field-storage terms. Only pointwise time differentiability of `E` and `H` is needed. -/
+magnetic field-energy terms. Only pointwise time differentiability of `E` and `H` is needed. -/
 lemma energyDensity_timeDeriv (h : 𝓜.IsConstitutive E D B H) (t : Time) (x : Space)
     (hE : DifferentiableAt ℝ (fun s => E s x) t)
     (hH : DifferentiableAt ℝ (fun s => H s x) t) :
@@ -210,8 +208,8 @@ lemma energyDensity_magneticFieldStrength (𝓜 : HomogeneousIsotropicMedium) (E
   rw [(𝓜.isConstitutive_electricDisplacement_magneticFieldStrength E B).energyDensity_eq_inner]
   simp only [electricDisplacement_apply, magneticFieldStrength_apply, inner_smul_right]
 
-/-- Substituting the canonical field strength `H = μ⁻¹ B` into `E × H` moves the inverse
-permeability outside the cross product. This identity uses no Maxwell equation. -/
+/-- For the canonical field strength `H = μ⁻¹ B`, the cross product equals
+`μ⁻¹ • (E × B)`. This identity uses no Maxwell equation. -/
 lemma poyntingVector_magneticFieldStrength (𝓜 : HomogeneousIsotropicMedium) (E : ElectricField)
     (B : MagneticInductionField) (t : Time) :
     ThreeDimension.poyntingVector E (𝓜.magneticFieldStrength B) t =
@@ -234,8 +232,8 @@ variable {𝓜 : HomogeneousIsotropicMedium}
   {ρFree : ChargeDensity} {JFree : CurrentDensity}
 
 /-- The local Poynting theorem in a fixed homogeneous isotropic medium: the increase in stored
-field energy plus outward energy-flux divergence equals minus the work density delivered to free
-current. This is a pointwise differential balance, not an integrated conservation theorem. -/
+field energy plus energy-flux divergence equals minus the work density delivered to free current.
+This is a pointwise differential balance, not a global conservation theorem. -/
 theorem poyntingTheorem
     (h : 𝓜.IsMacroscopicMaxwellSolution E D B H ρFree JFree)
     (t : Time) (x : Space) :

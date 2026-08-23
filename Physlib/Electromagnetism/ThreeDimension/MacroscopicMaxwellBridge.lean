@@ -106,7 +106,7 @@ lemma isMacroscopicMaxwellSolution_of_isExtrema {𝓕 : FreeSpace}
 
 The stored density is `1 / 2 * (ε₀ E · E + μ₀⁻¹ B · B)` and the Poynting vector is
 `μ₀⁻¹ • (E × B)`. No factor of the speed of light occurs in this rationalized convention.
-This is an instantaneous pointwise differential equation, not an integrated, time-averaged,
+This is an instantaneous pointwise differential equation, not a global, harmonic-mean,
 irradiance, or modal-power statement. -/
 theorem poyntingTheorem_sourceFree_of_isExtrema {𝓕 : FreeSpace}
     (V : ElectromagneticPotential 3) (h : IsExtrema 𝓕 V 0)
