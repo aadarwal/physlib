@@ -283,6 +283,18 @@ PR unless maintainers explicitly ask to retain it.
   balanced between tangential and normal parts. Do not infer a radicand sign, select a transmitted
   root, or use propagating, critical-angle, evanescent, side-decaying, outgoing, TIR, irradiance, or
   power language until the corresponding later hypotheses and results land.
+- [ ] Human-check the transmitted direction-selected normal-root application before upstreaming.
+  Confirm that zero incident tangential attenuation is transported by phase matching to the
+  transmitted candidate. With a separately supplied transmitted phase direction into the
+  geometric positive side, verify that the real radicand is forced positive, the entire
+  transmitted attenuation vector is zero, and the normal root is `+√c`. At zero radicand, verify
+  the unique zero normal root, zero phase normal component, and zero whole attenuation without a
+  strict direction premise. With a separately supplied transmitted attenuation direction into the
+  positive side, verify that the radicand is forced negative, the phase normal component is zero,
+  and the normal root is `-I * √(-c)` for the convention `K = q - I a`. Neither direction follows
+  from the transmitted label, and these results classify only an already supplied candidate. Do
+  not infer existence, an angle or critical angle, spatial decay, evanescence, outgoing behavior,
+  TIR, irradiance, or power until their later results land.
 - [ ] Human-check strict phase-directed reflected-root selection before upstreaming. For the stored
   normal from the negative to the positive side, confirm that `IsPhaseDirectedInto .positive`
   means a strictly positive phase-vector normal component and `.negative` means a strictly
