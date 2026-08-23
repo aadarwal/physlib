@@ -31,8 +31,10 @@ projection and complex-bilinear square and is involutive. On phase and attenuati
 the familiar real formula that subtracts twice the oriented normal component. Conversely, two
 vectors with equal tangential projections and equal bilinear squares are either equal or related
 by this reflection; the alternatives coincide when their normal component vanishes.
-The construction assigns no medium, interface side, propagation direction, material-dispersion,
-square-root branch, evanescent-wave, observable, or power meaning.
+
+A strict side-relative predicate records when the real phase vector points into one geometric
+side. It excludes phase-grazing vectors and assigns no medium, optical wave role, attenuation-free
+propagation, group or energy-flow direction, physical root, or power meaning.
 
 ## ii. Key results
 
@@ -51,6 +53,7 @@ square-root branch, evanescent-wave, observable, or power meaning.
   phase and attenuation vectors by the real mirror formula.
 - `eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_self_eq`:
   the exact two-root classification at fixed tangential projection and bilinear square.
+- `ComplexWaveVector.IsPhaseDirectedInto`: strict phase-vector direction into a geometric side.
 
 ## iii. Table of contents
 
@@ -58,6 +61,7 @@ square-root branch, evanescent-wave, observable, or power meaning.
 - B. Phase and attenuation compatibility
 - C. Tangent-pairing characterization
 - D. Complex hyperplane reflection
+- E. Strict side-relative phase direction
 
 ## iv. References
 
@@ -515,6 +519,51 @@ lemma eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_se
     rw [← hyperplaneTangentialProjection_add_normal plane z, hTangential, hNormal,
       hyperplaneReflection]
     simp only [sub_eq_add_neg, neg_smul]
+
+/-!
+
+## E. Strict side-relative phase direction
+
+-/
+
+/-- A complex wave vector is phase-directed strictly into a geometric side of an oriented
+hyperplane when the real part of its complex normal component has the corresponding strict sign.
+
+This predicate concerns only the real phase vector. It does not assert zero attenuation, material
+dispersion, group velocity, energy flux, an optical incident or outgoing role, or a physical root
+selection. The strict inequality deliberately excludes phase-grazing vectors. -/
+def IsPhaseDirectedInto (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d)
+    (side : OrientedAffineHyperplane.Side) : Prop :=
+  0 < side.sign * (hyperplaneNormalComponent plane z).re
+
+/-- Strict side-relative phase direction is equivalently positivity of the phase vector paired
+with the unit normal pointing into that side. -/
+lemma isPhaseDirectedInto_iff_inner_sideNormalVector
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d)
+    (side : OrientedAffineHyperplane.Side) :
+    z.IsPhaseDirectedInto plane side ↔
+      0 < inner ℝ (plane.sideNormalVector side) z.phaseVector := by
+  simp only [IsPhaseDirectedInto, hyperplaneNormalComponent_re,
+    OrientedAffineHyperplane.sideNormalVector, inner_smul_left,
+    OrientedAffineHyperplane.normalComponent, conj_trivial]
+
+/-- Phase direction into the positive side means a strictly positive oriented phase normal
+component. -/
+@[simp]
+lemma isPhaseDirectedInto_positive_iff
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d) :
+    z.IsPhaseDirectedInto plane .positive ↔
+      0 < plane.normalComponent z.phaseVector := by
+  simp [IsPhaseDirectedInto]
+
+/-- Phase direction into the negative side means a strictly negative oriented phase normal
+component. -/
+@[simp]
+lemma isPhaseDirectedInto_negative_iff
+    (z : ComplexWaveVector d) (plane : OrientedAffineHyperplane d) :
+    z.IsPhaseDirectedInto plane .negative ↔
+      plane.normalComponent z.phaseVector < 0 := by
+  simp [IsPhaseDirectedInto]
 
 end ComplexWaveVector
 

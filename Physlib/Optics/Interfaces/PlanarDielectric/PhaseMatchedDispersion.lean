@@ -23,12 +23,14 @@ For transmission, material matching gives the exact squared complex normal compo
 positive-side medium and its difference from the incident squared normal component. For an active
 reflected wave, equal frequency, equal tangential projection, and the common negative-side material
 shell leave only two possibly coincident algebraic alternatives: the incident vector itself or its
-hyperplane reflection. The same-vector root cannot be excluded without a side or outgoing
-condition.
+hyperplane reflection. Strict incident phase direction into the positive side and strict active
+reflected phase direction into the negative side exclude the same-vector root.
 
-These results do not select a square root, define a propagation angle, prove Snell's law, classify
-an evanescent branch, or assign energy flux or power. In particular, the phase-matching predicate
-is used without its separate electric amplitude-balance predicate.
+The reflected branch result selects an algebraic root only under those explicit phase-direction
+hypotheses; it neither derives them from a trace label nor identifies phase direction with group
+velocity, energy flux, or outgoing power. These results do not select a transmitted square root,
+define a propagation angle, prove Snell's law, or classify an evanescent branch. In particular,
+the phase-matching predicate is used without its separate electric amplitude-balance predicate.
 
 ## ii. Key results
 
@@ -38,11 +40,13 @@ is used without its separate electric amplitude-balance predicate.
   the exact two-medium contrast of squared normal components.
 - `reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneReflection`: the
   zero-amplitude or two-root reflected alternative.
+- `reflected_electricAmplitude_eq_zero_or_waveVector_eq_hyperplaneReflection_of_phaseDirections`:
+  strict opposite-side phase directions select the reflected root for an active candidate.
 
 ## iii. Table of contents
 
 - A. Transmitted normal-root equations
-- B. Reflected two-root classification
+- B. Reflected two-root classification and phase-directed selection
 
 ## iv. References
 
@@ -116,7 +120,7 @@ lemma transmitted_hyperplaneNormalComponent_sq_sub_incident_hyperplaneNormalComp
 
 /-!
 
-## B. Reflected two-root classification
+## B. Reflected two-root classification and phase-directed selection
 
 -/
 
@@ -145,6 +149,45 @@ lemma reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneRefle
       eq_or_eq_hyperplaneReflection_of_tangentialProjection_eq_of_bilinearDot_self_eq
     · exact hReflectedMatched.2
     · rw [hReflectedDispersion hReflectedZero, hIncidentDispersion, hReflectedMatched.1]
+
+/-- Strict incident and active reflected phase directions into opposite geometric sides exclude
+the same-vector reflected root.
+
+The incident phase vector is required to point into the positive side, and the active reflected
+phase vector into the negative side. The reflected direction and dispersion hypotheses remain
+conditional so a zero-amplitude candidate retains arbitrary dummy labels. This selects only the
+algebraic hyperplane-reflection branch; it does not derive either phase direction from the trace
+labels or identify phase direction with group velocity, energy flux, or outgoing power. -/
+lemma reflected_electricAmplitude_eq_zero_or_waveVector_eq_hyperplaneReflection_of_phaseDirections
+    (h : configuration.IsElectricPhaseMatched)
+    (hIncidentDispersion : configuration.incident.IsDispersionMatched
+      configuration.interface.negativeMedium)
+    (hReflectedDispersion : configuration.reflected.electricAmplitude ≠ 0 →
+      configuration.reflected.IsDispersionMatched configuration.interface.negativeMedium)
+    (hIncidentPhase : configuration.incident.waveVector.IsPhaseDirectedInto
+      configuration.interface.plane .positive)
+    (hReflectedPhase : configuration.reflected.electricAmplitude ≠ 0 →
+      configuration.reflected.waveVector.IsPhaseDirectedInto
+        configuration.interface.plane .negative) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      configuration.reflected.waveVector =
+        ComplexWaveVector.hyperplaneReflection configuration.interface.plane
+          configuration.incident.waveVector := by
+  by_cases hReflectedZero : configuration.reflected.electricAmplitude = 0
+  · exact Or.inl hReflectedZero
+  · right
+    rcases
+        h.reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneReflection
+          hIncidentDispersion hReflectedDispersion with hZero | hSame | hReflection
+    · exact (hReflectedZero hZero).elim
+    · have hIncidentNormal :=
+        (isPhaseDirectedInto_positive_iff _ _).mp hIncidentPhase
+      have hReflectedNormal :=
+        (isPhaseDirectedInto_negative_iff _ _).mp
+          (hReflectedPhase hReflectedZero)
+      rw [hSame] at hReflectedNormal
+      exact (not_lt_of_ge hIncidentNormal.le hReflectedNormal).elim
+    · exact hReflection
 
 end IsElectricPhaseMatched
 end PlanarDielectricWaveConfiguration
