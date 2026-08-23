@@ -57,7 +57,7 @@ attenuation.
   zero tangential attenuation makes the complex projection an embedded real phase projection.
 - `ComplexWaveVector.hyperplaneNormalComponent_ofPhaseAttenuation`: the complex normal component
   separates into its real phase and attenuation components.
-- `ComplexWaveVector.replaceHyperplaneNormalComponent`: replace the complex normal component while
+- `ComplexWaveVector.replaceHyperplaneNormalComponent`: set the complex normal component while
   preserving the tangential projection.
 - `ComplexWaveVector.hyperplaneTangentialProjection_eq_iff_bilinearDot_eq_on_tangent`: equality
   of complex tangential projections is exactly equality of every real-tangent pairing.
@@ -146,14 +146,14 @@ lemma hyperplaneNormalComponent_hyperplaneTangentialProjection
     bilinearDot_hyperplaneNormal_self]
   simp [hyperplaneNormalComponent]
 
-/-- Replace a complex wave vector's oriented hyperplane-normal component while preserving its
+/-- Set a complex wave vector's oriented hyperplane-normal component while preserving its
 complex tangential projection. -/
 def replaceHyperplaneNormalComponent (plane : OrientedAffineHyperplane d)
     (z : ComplexWaveVector d) (normalComponent : ℂ) : ComplexWaveVector d :=
   z + (normalComponent - hyperplaneNormalComponent plane z) •
     ofReal plane.normalVector
 
-/-- Replacing the hyperplane-normal component gives the supplied component exactly. -/
+/-- Setting the hyperplane-normal component gives the supplied component exactly. -/
 @[simp]
 lemma hyperplaneNormalComponent_replaceHyperplaneNormalComponent
     (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
@@ -165,7 +165,7 @@ lemma hyperplaneNormalComponent_replaceHyperplaneNormalComponent
     bilinearDot_smul_right, bilinearDot_hyperplaneNormal_self]
   ring
 
-/-- Replacing the hyperplane-normal component preserves the complex tangential projection. -/
+/-- Setting the hyperplane-normal component preserves the complex tangential projection. -/
 @[simp]
 lemma hyperplaneTangentialProjection_replaceHyperplaneNormalComponent
     (plane : OrientedAffineHyperplane d) (z : ComplexWaveVector d)
@@ -178,7 +178,7 @@ lemma hyperplaneTangentialProjection_replaceHyperplaneNormalComponent
     replaceHyperplaneNormalComponent, hyperplaneTangentialProjection]
   module
 
-/-- Replacing the normal component of a real-embedded vector by a real scalar is the real
+/-- Setting the normal component of a real-embedded vector to a real scalar is the real
 embedding of the corresponding real tangential-plus-normal decomposition. -/
 lemma replaceHyperplaneNormalComponent_ofReal
     (plane : OrientedAffineHyperplane d) (q : WaveVector d) (normalComponent : ℝ) :

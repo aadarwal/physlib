@@ -13,9 +13,9 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.CriticalAngle
 ## i. Overview
 
 This file constructs the positive real transmitted normal root at a planar dielectric interface.
-The construction keeps the incident tangential phase vector, replaces its normal component by the
-positive square root of the transmitted normal radicand, and embeds the resulting real vector into
-the complex wave-vector space.
+The construction keeps the incident tangential phase vector, uses the positive square root of the
+transmitted normal radicand, and embeds the resulting real vector into the complex wave-vector
+space.
 
 Under negative-medium incident dispersion, zero whole incident attenuation, and strict
 sine-subcritical incidence, the construction is the unique complex wave vector with the incident
@@ -77,8 +77,8 @@ namespace PlanarDielectricWaveConfiguration
 phase vector and the positive square root of the candidate transmitted normal radicand.
 
 This definition is total. Its positive-root, material-shell, and transmitted-role properties are
-certified only under the hypotheses of the subsequent lemmas; in particular, `Real.sqrt` alone
-does not certify a nonnegative radicand. -/
+proved only under the hypotheses of the subsequent lemmas; in particular, `Real.sqrt` alone does
+not prove that the radicand is nonnegative. -/
 noncomputable def positivePhaseTransmittedWaveVector
     (configuration : PlanarDielectricWaveConfiguration) : ComplexWaveVector 3 :=
   replaceHyperplaneNormalComponent configuration.interface.plane
@@ -281,7 +281,8 @@ end IsPositivePhaseTransmittedWaveVector
 -/
 
 /-- Zero incident tangential attenuation and a strictly positive transmitted normal radicand are
-the weakest direct hypotheses certifying the canonical positive-phase transmitted wave vector. -/
+the weakest direct hypotheses proving the canonical positive-phase transmitted wave-vector
+specification. -/
 lemma positivePhaseTransmittedWaveVector_isPositivePhaseTransmittedWaveVector_of_radicand_pos
     (configuration : PlanarDielectricWaveConfiguration)
     (hIncidentTangentialAttenuation :
@@ -391,7 +392,7 @@ lemma isSubcriticalPhaseIncidence_iff_existsUnique_isPositivePhaseTransmittedWav
 /-- A plane-wave candidate carrying the canonical positive-phase transmitted wave vector at the
 incident frequency and an arbitrary supplied electric amplitude.
 
-The amplitude is not inferred from an interface boundary equation and may be zero or
+The amplitude is not determined by an interface boundary equation and may be zero or
 nontransverse. -/
 noncomputable def positivePhaseTransmittedCandidate
     (configuration : PlanarDielectricWaveConfiguration)
@@ -497,7 +498,7 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 tangential attenuation and positive-side phase direction satisfies the positive-phase transmitted
 wave-vector specification.
 
-The direction is supplied rather than inferred from the transmitted label, and this conclusion
+The direction is supplied rather than derived from the transmitted label, and this conclusion
 has no outgoing or power-flow meaning. -/
 lemma transmitted_isPositivePhaseTransmittedWaveVector
     (h : configuration.IsElectricPhaseMatched)
