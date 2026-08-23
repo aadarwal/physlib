@@ -22,15 +22,22 @@ In this module we define and prove basic lemmas about derivatives of functions o
 
 - `deriv` : The derivative of a function `Time → M` at a given time.
 - `manifoldDeriv` : The derivative of a function from `Time` to a manifold.
+- `hasDerivAt_comp_toRealCLE_symm` : The time derivative as a `HasDerivAt` on `ℝ`, for a curve
+  reparametrised through the canonical equivalence `toRealCLE.symm : ℝ ≃L[ℝ] Time`.
+- `deriv_comp_toRealCLE_of_hasDerivAt` : Its converse, a `HasDerivAt` on `ℝ` read as the time
+  derivative of the curve pulled back to `Time` through `toRealCLE`.
+- `deriv_comp_neg` and `deriv_deriv_comp_neg` : The first and second time derivatives under the
+  reversal of time `t ↦ -t`.
 
 ## iii. Table of contents
 
 - A. The definition of the derivative
   - A.1. Derivatives of functions into vector spaces
-  - A.2. Derivatives of functions into manifolds
+  - A.2. The derivative through the canonical equivalence with `ℝ`
+  - A.3. Derivatives of functions into manifolds
 - B. Linearlity properties of the derivative
 - C. Derivative of constant functions
-- D. Smoothness properties
+- D. Smoothness properties and the reversal of time
 - E. Derivatives of components
 
 ## iv. References
@@ -68,7 +75,50 @@ lemma deriv_eq [AddCommGroup M] [Module ℝ M] [TopologicalSpace M]
 
 /-!
 
-### A.2. Derivatives of functions into manifolds
+### A.2. The derivative through the canonical equivalence with `ℝ`
+
+`Time` is identified with `ℝ` by the continuous linear equivalence `toRealCLE`. Precomposing a
+curve `w : Time → M` with `toRealCLE.symm : ℝ ≃L[ℝ] Time` gives a curve on `ℝ`, whose Mathlib
+derivative (`HasDerivAt`) at `τ` is the time derivative `∂ₜ w` evaluated at `toRealCLE.symm τ`.
+This is the bridge through which Mathlib's calculus and ODE theory on `ℝ` applies to curves on
+`Time`. Conversely, a `HasDerivAt` on `ℝ` at `toRealCLE t` is the time derivative at `t` of the
+curve pulled back to `Time` through `toRealCLE`.
+
+-/
+
+/-- The canonical equivalence `toRealCLE.symm : ℝ ≃L[ℝ] Time` sends `1 : ℝ` to `1 : Time`. -/
+lemma toRealCLE_symm_one : toRealCLE.symm (1 : ℝ) = (1 : Time) := by
+  rw [ContinuousLinearEquiv.symm_apply_eq]
+  change (1 : ℝ) = (1 : Time).val
+  rw [Time.one_val]
+
+/-- Bridge from the time derivative to `HasDerivAt`: if `w : Time → M` is differentiable at
+`toRealCLE.symm τ`, then the curve `τ ↦ w (toRealCLE.symm τ)` on `ℝ` has derivative
+`∂ₜ w (toRealCLE.symm τ)` at `τ`. -/
+lemma hasDerivAt_comp_toRealCLE_symm [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (w : Time → M) (τ : ℝ) (hw : DifferentiableAt ℝ w (toRealCLE.symm τ)) :
+    HasDerivAt (fun τ : ℝ => w (toRealCLE.symm τ)) (∂ₜ w (toRealCLE.symm τ)) τ := by
+  simpa [Function.comp_def, Time.deriv_eq, Time.toRealCLE_symm_one] using
+    hw.hasFDerivAt.comp_hasDerivAt_of_eq τ
+      (toRealCLE.symm : ℝ →L[ℝ] Time).hasFDerivAt.hasDerivAt rfl
+
+/-- The converse of the bridge `hasDerivAt_comp_toRealCLE_symm`: if the curve `γ : ℝ → M` has
+derivative `v` at `toRealCLE t`, then the curve `t ↦ γ (toRealCLE t)` on `Time` has time
+derivative `v` at `t`. -/
+lemma deriv_comp_toRealCLE_of_hasDerivAt [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (γ : ℝ → M) (t : Time) (v : M) (h : HasDerivAt γ v (toRealCLE t)) :
+    ∂ₜ (fun s => γ (toRealCLE s)) t = v := by
+  have h' : HasFDerivAt (fun s => γ (toRealCLE s))
+      (((1 : ℝ →L[ℝ] ℝ).smulRight v).comp (toRealCLE : Time →L[ℝ] ℝ)) t :=
+    h.hasFDerivAt.comp t toRealCLE.hasFDerivAt
+  rw [Time.deriv_eq, h'.fderiv]
+  change toRealCLE 1 • v = v
+  change (1 : Time).val • v = v
+  rw [Time.one_val, one_smul]
+
+/-!
+
+### A.3. Derivatives of functions into manifolds
 
 -/
 
@@ -175,7 +225,7 @@ lemma deriv_const [NormedAddCommGroup M] [NormedSpace ℝ M] (m : M) :
 
 /-!
 
-## D. Smoothness properties
+## D. Smoothness properties and the reversal of time
 
 -/
 
@@ -211,6 +261,32 @@ lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace
     ContDiff ℝ n fun (x : Space d) => (∂ₜ fun t => f t x) t := by
   unfold deriv
   fun_prop
+
+/-- The chain rule for the time derivative under the reversal of time: the derivative of
+`t ↦ f (-t)` at `t` is minus the derivative of `f` at `-t`. -/
+lemma deriv_comp_neg {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (t : Time) (hf : DifferentiableAt ℝ f (-t)) :
+    ∂ₜ (fun s => f (-s)) t = -∂ₜ f (-t) := by
+  have hneg : HasFDerivAt (fun s : Time => -s) (-ContinuousLinearMap.id ℝ Time) t :=
+    (hasFDerivAt_id t).neg
+  have h : HasFDerivAt (fun s => f (-s))
+      ((fderiv ℝ f (-t)).comp (-ContinuousLinearMap.id ℝ Time)) t :=
+    hf.hasFDerivAt.comp t hneg
+  rw [Time.deriv_eq, Time.deriv_eq, h.fderiv]
+  simp
+
+/-- The second derivative is unchanged by the reversal of time: for a smooth curve `f`, the second
+derivative of `t ↦ f (-t)` at `t` is the second derivative of `f` at `-t`, the two changes of sign
+cancelling. -/
+lemma deriv_deriv_comp_neg {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
+    (f : Time → M) (hf : ContDiff ℝ ∞ f) (t : Time) :
+    ∂ₜ (∂ₜ (fun s => f (-s))) t = ∂ₜ (∂ₜ f) (-t) := by
+  have h1 : ∂ₜ (fun s => f (-s)) = fun s => -∂ₜ f (-s) := by
+    funext s
+    exact deriv_comp_neg f s (hf.differentiable (by simp) _)
+  have h2 : ∂ₜ (fun s => -∂ₜ f (-s)) t = -∂ₜ (fun s => ∂ₜ f (-s)) t :=
+    Time.deriv_neg (fun s => ∂ₜ f (-s))
+  rw [h1, h2, deriv_comp_neg (∂ₜ f) t (deriv_differentiable_of_contDiff f hf _), neg_neg]
 
 /-!
 
