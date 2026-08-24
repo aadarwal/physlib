@@ -226,6 +226,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.PhaseMatchedDispersion
 public import Physlib.Optics.Interfaces.PlanarDielectric.Snell
 public import Physlib.Optics.Interfaces.PlanarDielectric.SubcriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalCarrier
+public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFlux
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
