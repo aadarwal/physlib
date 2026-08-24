@@ -689,7 +689,7 @@ PR unless maintainers explicitly ask to retain it.
   free surface charge and exactly zero free surface current. Its stored-point reduction needs only
   transmitted frequency equality and the reflected alternative of zero referenced tangential
   `H₀` amplitude or reflected frequency equality. The electric phase-matching wrapper maps its
-  `E₀ᵣ = 0` branch to that magnetic-zero branch; its tangential-wave-vector clauses are unused.
+  `E₀ᵣ = 0` branch to that magnetic-zero branch; its tangential-wave-vector conditions are unused.
   Check that the proof recovers the complex vector from the actual real field at time zero and at
   `π / (2 * ω)`, rather than assuming a complex boundary equation. The exact
   regression uses `K = (5, 0, -4 I)`, `E₀ = (0, 1, 0)`, `B₀ = (4 I, 0, 5)`, and `μ = 3`, giving

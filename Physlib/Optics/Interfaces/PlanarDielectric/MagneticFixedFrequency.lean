@@ -19,10 +19,10 @@ three-wave planar dielectric configuration to an equality of complex amplitudes 
 interface plane's stored point.
 
 The core result needs only transmitted frequency matching and the alternative that the reflected
-referenced tangential magnetic amplitude is zero or its frequency matches. It samples the ordinary
-real boundary law at the stored point for all times and recovers the complete complex amplitude
-from two carrier quadratures. The convenient wrapper receives the existing
-`IsElectricPhaseMatched` predicate, although its tangential wave-vector clauses are not used by
+referenced tangential magnetic amplitude is zero or its frequency matches. It evaluates the
+ordinary real boundary law at the stored point for all times and recovers the complete complex
+amplitude from two carrier quadratures. The convenient wrapper receives the existing
+`IsElectricPhaseMatched` predicate, although its tangential wave-vector conditions are not used by
 this stored-point result.
 
 Free surface charge remains arbitrary. No transversality, material dispersion, Maxwell equation,

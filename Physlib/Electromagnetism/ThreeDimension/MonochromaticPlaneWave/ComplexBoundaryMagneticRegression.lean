@@ -25,7 +25,7 @@ Relative to the parallel coordinate plane with stored normal `(0, 0, 1)` and sto
 `(4 exp (-4) I / 3, 0, 0)`. Its ordinary real value is zero at time zero and
 `(-4 exp (-4) / 3, 0, 0)` one quarter period later. These exact values distinguish `H` from `B`,
 fix the attenuation sign in the stored-point factor, and recover the imaginary phasor quadrature
-that a single real sample would miss.
+that cannot be recovered from a single real value.
 
 ## ii. Key results
 
@@ -38,7 +38,7 @@ that a single real sample would miss.
 
 - A. Coordinate plane
 - B. Referenced magnetic amplitude
-- C. Temporal quadrature samples
+- C. Temporal quadrature values
 
 ## iv. Scope
 
@@ -135,7 +135,7 @@ lemma complexBoundaryMagneticRegression_referencedAmplitude :
 
 /-!
 
-## C. Temporal quadrature samples
+## C. Temporal quadrature values
 
 -/
 
