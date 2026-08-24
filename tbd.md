@@ -1220,7 +1220,9 @@ PR unless maintainers explicitly ask to retain it.
   `conditionally`, `connectivity`, `existential`, `flow`, `hides`, `literal`, `manual`, `packages`,
   `recognition`, `role`, `roles`, and `unconditional`. The complex Fresnel/TIR differential added
   `acquires`, `arctangent`, `denominators`, `hybrid`, and `quadrant`. The connected complex-TIR
-  actual-flux differential introduced no new spelling vocabulary.
+  actual-flux differential introduced no new spelling vocabulary. The total-reflection retarder
+  differential added `accumulates`, `bounces`, `catches`, `diagonally`, `disappears`, `entrance`,
+  `errors`, `exit`, `omit`, `prism`, `reflecting`, and `unobservable`.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
