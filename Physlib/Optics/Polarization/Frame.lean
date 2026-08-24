@@ -36,6 +36,8 @@ irradiance or power.
 - `PolarizationFrame.realizeJones_eq`: exact cosine-sine realization.
 - `PolarizationFrame.realizeJones_eq_sum`: realization directly in the two frame axes.
 - `PolarizationFrame.realizeJones_propagationCross`: the oriented magnetic quarter-turn.
+- `PolarizationFrame.electricReal_propagationCross` and
+  `PolarizationFrame.electricImag_propagationCross`: the corresponding quadrature identities.
 
 ## iii. Table of contents
 
@@ -460,6 +462,23 @@ lemma realizeJones_propagationCross (frame : PolarizationFrame direction)
     frame.propagationVector_cross_axis_zero, frame.propagationVector_cross_axis_one]
   simp [JonesVector.propagationCross, Phasor.realize, Complex.mul_re]
   module
+
+/-- The real quadrature of the propagation-cross Jones state is the propagation vector crossed
+with the original real quadrature. -/
+lemma electricReal_propagationCross (frame : PolarizationFrame direction)
+    (J : JonesVector) :
+    frame.electricReal J.propagationCross =
+      frame.propagationVector ⨯ₑ₃ frame.electricReal J := by
+  simpa [realizeJones_eq] using frame.realizeJones_propagationCross J 0
+
+/-- The imaginary quadrature of the propagation-cross Jones state is the propagation vector
+crossed with the original imaginary quadrature. -/
+lemma electricImag_propagationCross (frame : PolarizationFrame direction)
+    (J : JonesVector) :
+    frame.electricImag J.propagationCross =
+      frame.propagationVector ⨯ₑ₃ frame.electricImag J := by
+  simpa [realizeJones_eq, Real.cos_neg, Real.sin_neg] using
+    frame.realizeJones_propagationCross J (-(Real.pi / 2))
 
 /-- The positive-`I` quadrature state realizes with a negative sine coefficient on the second
 oriented frame axis. This is an algebraic sign regression, not a handedness name. -/

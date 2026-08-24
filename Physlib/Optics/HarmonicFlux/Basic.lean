@@ -35,6 +35,7 @@ stored reference amplitudes would not preserve spatial decay.
 - `intervalAverage_comp_carrierPhase`: change from one time period to one carrier-phase cycle.
 - `Phasor.intervalAverage_realize_mul_realize`: the scalar coherent-product average.
 - `timeAveragedPoyntingVector`: the closed complex-phasor expression.
+- `timeAveragedPoyntingVector_eq_quadrature_cross`: its real-quadrature expansion.
 - `intervalAverage_cross_realizeEuclidean`: derivation of the vector expression.
 - `intervalAverage_poyntingVector_eq_timeAveragedPoyntingVector`: connection to the
   instantaneous electromagnetic Poynting vector.
@@ -249,6 +250,23 @@ def timeAveragedPoyntingVector
   (1 / 2 : ℝ) • ComplexWaveVector.realPart
     (ComplexMonochromaticPlaneWave.complexCross electricPhasor
       (Phasor.conjugateEuclidean magneticFieldStrengthPhasor))
+
+/-- The time-averaged Poynting vector is one half the sum of the cross products of matching real
+and imaginary phasor quadratures. -/
+lemma timeAveragedPoyntingVector_eq_quadrature_cross
+    (electricPhasor magneticFieldStrengthPhasor : EuclideanSpace ℂ (Fin 3)) :
+    timeAveragedPoyntingVector electricPhasor magneticFieldStrengthPhasor =
+      (1 / 2 : ℝ) •
+        (ComplexWaveVector.realPart electricPhasor ⨯ₑ₃
+            ComplexWaveVector.realPart magneticFieldStrengthPhasor +
+          ComplexWaveVector.imaginaryPart electricPhasor ⨯ₑ₃
+            ComplexWaveVector.imaginaryPart magneticFieldStrengthPhasor) := by
+  ext i
+  fin_cases i <;>
+    simp [timeAveragedPoyntingVector, ComplexMonochromaticPlaneWave.complexCross,
+      ComplexWaveVector.realPart, ComplexWaveVector.imaginaryPart,
+      Phasor.conjugateEuclidean, crossProduct, Complex.mul_re] <;>
+    ring
 
 /-- Averaging the cross product of two coherently realized harmonic vector phasors over one
 carrier cycle gives one half the real part of the first phasor crossed with the conjugate of the

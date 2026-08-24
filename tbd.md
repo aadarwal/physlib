@@ -725,6 +725,20 @@ PR unless maintainers explicitly ask to retain it.
   conjugation additions should be reviewed separately from `HarmonicFlux.Basic`. Keep the public
   concept local harmonic averaging either way; do not bundle material irradiance, normal flux,
   aperture integration, modal normalization, outgoing-wave, or evanescence claims into it.
+- [ ] Human-check E3b-1's propagating material-wave normalization against a page-verified optics
+  reference: peak electric phasors must give irradiance `JonesVector.intensity / (2 * impedance)`,
+  with magnetic field strength `H = impedance⁻¹ (n × E)` and no RMS reinterpretation.
+- [ ] Human-check that E3b-1's local phase offset is the complete negative spatial carrier term
+  `-waveNumber * inner x direction`, is shared by both electric and magnetic phasors, and disappears
+  only through common-phase invariance after the actual-field averaging theorem is applied.
+- [ ] Before proposing E3b-1 upstream, keep signed interface-normal flux in its own coherent
+  follow-up and decide whether the two pure frame-quadrature lemmas should travel with the
+  polarization-frame prerequisite or with the material irradiance PR.
+- [ ] Before the complex attenuating/evanescent-wave harmonic-flux connector, add and review the
+  general identity expressing `Phasor.realizeEuclidean` as the componentwise real part of a
+  complex exponential times an amplitude. Decide then whether the currently local real-scalar
+  realization and real/imaginary-part helper lemmas have enough independent consumers to become
+  public simp API.
 
 ## Polarization conventions
 
