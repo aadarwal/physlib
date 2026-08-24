@@ -1152,9 +1152,12 @@ PR unless maintainers explicitly ask to retain it.
   types, a local connection with compatible mode fibers, endpoint-presentation exchange, the
   fixed-point-free mate involution, the oriented scattering adapter, and unit-gain routing with
   relabeling covariance, normalized-power preservation, and the local `C * S` action order.
-- [ ] Extend the local connection API to finite connection families with global endpoint
-  uniqueness, internal/external channel separation, and the full partial wiring transform. Do not
-  mark the broad netlist API-map requirement complete before those invariants exist.
+- [x] Extend the local connection API to proof-carrying indexed families with physical-port
+  endpoint uniqueness, dependent connected-channel embedding, blockwise fixed-point-free mating,
+  and exact total routing on connected channels. Keep family cardinality unrestricted in the data
+  and require finiteness only for finite-dimensional action and power results.
+- [ ] Define internal/external channel separation and the full ambient partial wiring transform.
+  Do not mark the broad netlist API-map requirement complete before those invariants exist.
 - [ ] Define time-reversed channel pairing and port reference planes before defining reciprocity;
   typed endpoints and coordinate rephasing alone do not supply these physical conventions.
 - [ ] Human-check the local typed-routing semantics before upstreaming. Confirm that component
@@ -1166,6 +1169,14 @@ PR unless maintainers explicitly ask to retain it.
   `Fin 2`/`Bool` fiber fixture, both routing directions, the fixed-point-free and
   swapped-presentation regressions, and the nonsymmetric scattering entries `3` and `2` that catch
   row/column reversal.
+- [ ] Human-check the connection-family invariant before upstreaming. Confirm that uniqueness is
+  enforced on indexed physical-port ends, not inferred from aggregate channel injectivity; each
+  whole port therefore belongs to at most one wire. Recheck the opposite-order second mode
+  equivalence, composed embedding-after-mate result, cross-block zero, and both endpoint-reuse
+  counterexamples. In particular, the all-`Empty` channel map is vacuously injective while its
+  physical endpoint map is not. Treat connected-channel power preservation only as normalized
+  modal power; external complements, ambient partial routing, electromagnetic losslessness,
+  presentation covariance, and netlists remain absent.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
 - [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
@@ -1255,6 +1266,8 @@ PR unless maintainers explicitly ask to retain it.
   reworded. The typed local-routing differential added `adapter`, `bidirectional`, `combiners`,
   `east`, `elimination`, `fibers`, `flattening`, `gain`, `mate`, `mates`, `mating`, `nonsymmetric`,
   `routing`, `secondary`, `solvability`, `splitter`, `splitters`, `termination`, and `west`.
+  The indexed connection-family differential added `blockwise`, `netlists`, `south`, and
+  `vacuous`.
 - [x] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate. The 2026-08-24 typed
   local-routing run reproduced pre-existing style and transitive-import diagnostics only in
