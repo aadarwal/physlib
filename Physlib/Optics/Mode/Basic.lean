@@ -36,6 +36,8 @@ spaces.
 - `ModeAmplitude`: a complex Euclidean space of power-normalized mode amplitudes.
 - `ModeAmplitude.power`: the total modal power.
 - `ModeAmplitude.directSum`: the parallel concatenation of two mode-amplitude families.
+- `ModeAmplitude.directSumLinearEquiv`: the algebraic identification of a pair with its disjoint
+  sum.
 - `ModeTransform`: a matrix mapping input mode amplitudes to output mode amplitudes.
 - `ModeTransform.toLinearMap`: the induced linear map between mode-amplitude spaces.
 - `ModeTransform.IsPowerPreserving`: a transform preserves total modal power.
@@ -191,6 +193,40 @@ lemma ModeAmplitude.directSum_restrict {ι μ : Type*} (a : ModeAmplitude (ι �
   apply WithLp.ofLp_injective 2
   funext i
   rcases i with i | i <;> rfl
+
+/-- The complex-linear equivalence between a pair of amplitude families and their disjoint sum.
+
+This is an algebraic equivalence, not a normed equivalence: the product space carries its standard
+product norm rather than the disjoint sum's `L²` norm.
+-/
+def ModeAmplitude.directSumLinearEquiv {ι μ : Type*} :
+    (ModeAmplitude ι × ModeAmplitude μ) ≃ₗ[ℂ] ModeAmplitude (ι ⊕ μ) where
+  toFun pair := pair.1.directSum pair.2
+  invFun amplitude := (amplitude.restrictInl, amplitude.restrictInr)
+  left_inv pair := by
+    ext <;> rfl
+  right_inv := ModeAmplitude.directSum_restrict
+  map_add' first second := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rcases index with index | index <;> rfl
+  map_smul' scalar amplitude := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rcases index with index | index <;> rfl
+
+/-- The direct-sum linear equivalence joins its two input amplitude families. -/
+@[simp]
+lemma ModeAmplitude.directSumLinearEquiv_apply {ι μ : Type*}
+    (amplitudes : ModeAmplitude ι × ModeAmplitude μ) :
+    ModeAmplitude.directSumLinearEquiv amplitudes = amplitudes.1.directSum amplitudes.2 := rfl
+
+/-- The inverse direct-sum linear equivalence returns both coordinate restrictions. -/
+@[simp]
+lemma ModeAmplitude.directSumLinearEquiv_symm_apply {ι μ : Type*}
+    (amplitude : ModeAmplitude (ι ⊕ μ)) :
+    ModeAmplitude.directSumLinearEquiv.symm amplitude =
+      (amplitude.restrictInl, amplitude.restrictInr) := rfl
 
 /-- The power of two disjoint mode-amplitude families is the sum of their powers. -/
 lemma ModeAmplitude.power_directSum {ι μ : Type*} [Fintype ι] [Fintype μ]
