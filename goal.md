@@ -1310,6 +1310,8 @@ Owner: Optics, importing E3a.
 - [x] local electric and material magnetic-field-strength phasors for the off-shell complex
   carrier, with the actual one-period mean Poynting vector equal to their harmonic-flux formula
   and to the stored-reference formula scaled by the spatial factor's squared modulus;
+- [x] the plane-referenced propagating material Jones connector and its guarded zero-field form,
+  with actual one-period vector and signed-normal flux at the stored plane point;
 - [x] zero normal average flux for a bilinearly transverse, Maxwell-qualified
   positive-normal-decay transmitted wave at every point and period start;
 - [ ] an aperture or normalized transverse-mode-profile integral when total power is claimed;
@@ -1627,8 +1629,14 @@ Exit: the geometric laws follow from the field and boundary setup.
 - [ ] Brewster-angle results with the exact magnetic/nonmagnetic and positivity hypotheses needed
   for existence;
 - [ ] total-internal-reflection modulus and phase results;
-- [ ] the power transmission factor with the correct normal-admittance multiplier;
-- [ ] `R + T = 1` for lossless propagating interfaces, proved using Poynting flux; and
+- [x] the full-vector power transmission factor with the common normal-admittance multiplier
+  `(Y2 chi_t) / (Y1 chi_i)` for both polarizations;
+- [x] denominator-local unnormalized flux identities and physical `R + T = 1` for lossless real
+  propagating interfaces, including transmitted grazing, arbitrary complex Jones polarization,
+  zero input, and a connected balance of the three separate waves' actual mean normal fluxes;
+- [ ] prove incident-reflected normal-interference cancellation and a common-frequency theorem
+  identifying the separate negative-side sum with the actual mean normal Poynting flux of the
+  superposed incident-plus-reflected field; and
 - [ ] the Fresnel multiport matrix normalized by square roots of normal admittance, with unitarity
   proved in those power coordinates for strictly positive-admittance propagating channels rather
   than for raw electric-field amplitudes, grazing channels, or TIR evanescent fields.
@@ -2320,7 +2328,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, and transverse positive-medium Maxwell plus zero-normal-mean-flux consequences complete; outgoing semantics and reflected flux-based TIR remain |
-| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, guarded real propagating s/p amplitude formulas, normal/grazing/zero branches, and exact independent fixture agreement are complete; deriving the reflection guard from canonical incidence geometry, admittance-normalized scattering, and flux balance remain |
+| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, guarded real propagating s/p amplitudes, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, and connected separate-wave actual mean normal flux are complete; canonical reflection-guard derivation, common-frequency negative-side interference cancellation, TIR amplitudes, and admittance-normalized scattering remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
@@ -2465,10 +2473,10 @@ human verification recorded in `tbd.md`.
    reduction, reflection/Snell/critical geometry, and the positive-phase subcritical plus
    positive-normal-decay supercritical carrier constructions. The latter now has a separate
    transverse positive-medium Maxwell qualification and zero-normal-mean-flux theorem; outgoing
-   semantics, reflected flux-based TIR, and Fresnel power claims remain. With E3s, E3a, and E3b's
-   local harmonic-average slice complete,
-   proceed through its material-wave irradiance and normalization bridges before making those
-   power claims.
+   semantics, reflected flux-based TIR, and combined-field Fresnel flux remain. With E3s, E3a,
+   and E3b's local harmonic-average, material-wave irradiance, and separate-wave normal-flux
+   bridges complete, proceed through common-frequency incident-reflected interference and modal
+   normalization before making combined-field or port-power claims.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b's propagating material-wave irradiance and actual
    mean-flux Malus laws are now complete, while its normalized-power endpoint remains blocked on
@@ -2479,7 +2487,7 @@ human verification recorded in `tbd.md`.
 
 The next session should not jump directly to a microring formula.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
-P6b-3's physical observables and the remaining Fresnel flux work must still follow the named
+P6b-3's physical observables and the remaining Fresnel interference work must still follow the named
 electromagnetic medium, boundary, and flux dependencies. With E2's real material-Maxwell layer,
 oriented Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell
 complex carrier, exact real-wave bridge, generic carrier calculus, and bilinear material
@@ -2492,10 +2500,12 @@ oriented-affine-hyperplane geometry,
   divergence identity, real Poynting theorem, and local peak-phasor Poynting average now connected,
   E3b's material-wave irradiance, signed propagating normal-flux, and Maxwell-qualified
   positive-normal-decay zero-normal-flux bridges are now complete. The tangential magnetic
-  reduction and guarded real propagating Fresnel amplitudes are also complete. The next
-  physical-optics front is deriving the reflection guard from canonical incidence geometry and
-  proving Fresnel flux balance, while aperture and modal-power normalization remain separate E3b
-  work. That layer can support outgoing
+  reduction, guarded real propagating Fresnel amplitudes, normal-admittance power ratios,
+  arbitrary-Jones channel balance, and connected separate-wave actual mean normal flux are also
+  complete. The next physical-optics front is deriving the reflection guard from canonical
+  incidence geometry and proving common-frequency incident-reflected normal-interference
+  cancellation, while aperture and modal-power normalization remain separate E3b work. That layer
+  can support outgoing
   semantics and reflected flux-based TIR without retroactively treating carrier decay as power
   flow.
   The reflected conservation result must continue to allow zero reflection, and reduced amplitudes

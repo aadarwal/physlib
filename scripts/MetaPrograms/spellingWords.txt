@@ -3372,3 +3372,7 @@ waveimpedance
 fate
 heating
 observation
+interference
+oblique
+reflectance
+transmittance
