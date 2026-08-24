@@ -1105,6 +1105,9 @@ PR unless maintainers explicitly ask to retain it.
   `alignment`, `apart`, `assertion`, `balance`, `balanced`, `balances`, `chi`, `conclusions`,
   `converting`, `crosses`, `intentionally`, `multiplier`, `passes`, `performs`, `propagate`,
   `reconciles`, `records`, `solved`, `solver`, `specialize`, and `unavailable`.
+  The guarded canonical-role-frame differential added `accepted`, `assigning`, `canonicality`,
+  `conditionally`, `connectivity`, `existential`, `flow`, `hides`, `literal`, `manual`, `packages`,
+  `recognition`, `role`, `roles`, and `unconditional`.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
