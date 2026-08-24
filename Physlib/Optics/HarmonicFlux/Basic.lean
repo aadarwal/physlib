@@ -36,6 +36,8 @@ stored reference amplitudes would not preserve spatial decay.
 - `Phasor.intervalAverage_realize_mul_realize`: the scalar coherent-product average.
 - `timeAveragedPoyntingVector`: the closed complex-phasor expression.
 - `timeAveragedPoyntingVector_smul`: the common-carrier squared-modulus scaling law.
+- `timeAveragedPoyntingInterferenceVector`: the two coherent cross terms between phasor pairs.
+- `timeAveragedPoyntingVector_add_add`: exact self-plus-interference superposition.
 - `timeAveragedPoyntingVector_eq_quadrature_cross`: its real-quadrature expansion.
 - `intervalAverage_cross_realizeEuclidean`: derivation of the vector expression.
 - `intervalAverage_poyntingVector_eq_timeAveragedPoyntingVector`: connection to the
@@ -262,6 +264,70 @@ lemma timeAveragedPoyntingVector_zero_left
   fin_cases i <;>
     simp [timeAveragedPoyntingVector, ComplexMonochromaticPlaneWave.complexCross,
       ComplexWaveVector.realPart, Phasor.conjugateEuclidean, crossProduct]
+
+/-- A zero magnetic-field-strength phasor has zero time-averaged Poynting vector for every
+electric phasor. -/
+@[simp]
+lemma timeAveragedPoyntingVector_zero_right
+    (electricPhasor : EuclideanSpace ℂ (Fin 3)) :
+    timeAveragedPoyntingVector electricPhasor 0 = 0 := by
+  ext i
+  fin_cases i <;>
+    simp [timeAveragedPoyntingVector, ComplexMonochromaticPlaneWave.complexCross,
+      ComplexWaveVector.realPart, Phasor.conjugateEuclidean, crossProduct]
+
+/-- Time-averaged Poynting flux is additive in its electric phasor. -/
+lemma timeAveragedPoyntingVector_add_left
+    (firstElectricPhasor secondElectricPhasor magneticFieldStrengthPhasor :
+      EuclideanSpace ℂ (Fin 3)) :
+    timeAveragedPoyntingVector (firstElectricPhasor + secondElectricPhasor)
+        magneticFieldStrengthPhasor =
+      timeAveragedPoyntingVector firstElectricPhasor magneticFieldStrengthPhasor +
+        timeAveragedPoyntingVector secondElectricPhasor magneticFieldStrengthPhasor := by
+  ext i
+  fin_cases i <;>
+    simp [timeAveragedPoyntingVector, ComplexMonochromaticPlaneWave.complexCross,
+      ComplexWaveVector.realPart, Phasor.conjugateEuclidean, crossProduct,
+      Complex.mul_re] <;>
+    ring
+
+/-- Time-averaged Poynting flux is additive in its magnetic-field-strength phasor. -/
+lemma timeAveragedPoyntingVector_add_right
+    (electricPhasor firstMagneticPhasor secondMagneticPhasor :
+      EuclideanSpace ℂ (Fin 3)) :
+    timeAveragedPoyntingVector electricPhasor
+        (firstMagneticPhasor + secondMagneticPhasor) =
+      timeAveragedPoyntingVector electricPhasor firstMagneticPhasor +
+        timeAveragedPoyntingVector electricPhasor secondMagneticPhasor := by
+  ext i
+  fin_cases i <;>
+    simp [timeAveragedPoyntingVector, ComplexMonochromaticPlaneWave.complexCross,
+      ComplexWaveVector.realPart, Phasor.conjugateEuclidean, crossProduct,
+      Complex.mul_re] <;>
+    ring
+
+/-- The coherent time-averaged Poynting interference vector between two electric/magnetic phasor
+pairs. It contains both ordered cross terms and excludes the two self terms. -/
+def timeAveragedPoyntingInterferenceVector
+    (firstElectricPhasor firstMagneticPhasor secondElectricPhasor secondMagneticPhasor :
+      EuclideanSpace ℂ (Fin 3)) : EuclideanSpace ℝ (Fin 3) :=
+  timeAveragedPoyntingVector firstElectricPhasor secondMagneticPhasor +
+    timeAveragedPoyntingVector secondElectricPhasor firstMagneticPhasor
+
+/-- The mean Poynting vector of coherently superposed phasor pairs is the sum of their two self
+terms and their interference vector. -/
+lemma timeAveragedPoyntingVector_add_add
+    (firstElectricPhasor firstMagneticPhasor secondElectricPhasor secondMagneticPhasor :
+      EuclideanSpace ℂ (Fin 3)) :
+    timeAveragedPoyntingVector (firstElectricPhasor + secondElectricPhasor)
+        (firstMagneticPhasor + secondMagneticPhasor) =
+      timeAveragedPoyntingVector firstElectricPhasor firstMagneticPhasor +
+        timeAveragedPoyntingVector secondElectricPhasor secondMagneticPhasor +
+          timeAveragedPoyntingInterferenceVector firstElectricPhasor firstMagneticPhasor
+            secondElectricPhasor secondMagneticPhasor := by
+  rw [timeAveragedPoyntingVector_add_left, timeAveragedPoyntingVector_add_right,
+    timeAveragedPoyntingVector_add_right, timeAveragedPoyntingInterferenceVector]
+  abel
 
 /-- Common complex scaling of both local phasors scales the time-averaged Poynting vector by the
 squared modulus of the scalar. -/
