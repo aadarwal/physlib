@@ -1,0 +1,176 @@
+/-
+Copyright (c) 2026 Aadarsh Agarwal. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Aadarsh Agarwal
+-/
+module
+
+public import Physlib.ClassicalMechanics.WaveEquation.ComplexWaveVector.Hyperplane
+public import Physlib.Optics.Polarization.Frame
+
+/-!
+# Polarization frames resolved on an oriented plane
+
+## i. Overview
+
+This file relates a propagation-oriented polarization frame to a common frame carried by an
+oriented affine plane. The first axes are assumed exactly equal, fixing a common transverse gauge
+rather than only a common unoriented line. The plane frame has second axis `u₁ = n × u₀`, not
+`u₀ × n`. If `c` is the signed normal component of the propagation vector, tangential projection
+then sends the propagation-frame axes `(e₀, e₁)` to `(u₀, c u₁)` in the plane frame.
+
+For full-vector Jones coordinates this gives the interface-plane coordinates
+`(J₀, c J₁)`. Applying the propagation quarter-turn first gives `(-J₁, c J₀)`, the
+corresponding geometry needed for tangential magnetic-field amplitudes.
+
+The signed factor is left explicit: it distinguishes propagation toward the positive and negative
+sides of the plane and vanishes at grazing incidence. The results are purely geometric. They do
+not assign incident, reflected, or transmitted roles; impose a material model or boundary law;
+or state a Fresnel, observable, irradiance, or power result.
+
+## ii. Key results
+
+- `PolarizationFrame.tangentialProjection_axis_zero_of_axis_zero_eq`: the common first axis is
+  fixed by tangential projection.
+- `PolarizationFrame.tangentialProjection_axis_one_of_axis_zero_eq`: the second axis is multiplied
+  by the signed normal factor.
+- `PolarizationFrame.hyperplaneTangentialProjection_embedJones_of_axis_zero_eq`: the corresponding
+  full-vector Jones-coordinate formula.
+- `PolarizationFrame.hyperplaneTangentialProjection_embedJones_propagationCross_of_axis_zero_eq`:
+  the propagation-cross formula.
+
+## iii. Table of contents
+
+- A. Real planar-frame geometry
+- B. Complex Jones amplitudes
+
+## iv. References
+
+The construction is derived from the imported oriented-hyperplane, Euclidean cross-product, and
+polarization-frame APIs. No external formal development is copied or translated here.
+-/
+
+@[expose] public section
+
+namespace Optics
+
+open ClassicalMechanics Space Matrix InnerProductSpace
+
+noncomputable section
+
+namespace PolarizationFrame
+
+variable {direction : Space.Direction 3}
+
+/-!
+
+## A. Real planar-frame geometry
+
+-/
+
+/-- If a propagation frame and a plane-normal frame have the same first axis, that axis is fixed
+by tangential projection onto the plane. -/
+lemma tangentialProjection_axis_zero_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (frame : PolarizationFrame direction) (halign : frame.axis 0 = planeFrame.axis 0) :
+    plane.tangentialProjection (frame.axis 0) = planeFrame.axis 0 := by
+  rw [← halign]
+  apply plane.tangentialProjection_eq_self_of_isTangent
+  change plane.normalComponent (frame.axis 0) = 0
+  rw [OrientedAffineHyperplane.normalComponent, halign]
+  change inner ℝ planeFrame.propagationVector (planeFrame.axis 0) = 0
+  exact planeFrame.inner_propagationVector_axis 0
+
+/-- If a propagation frame and a plane-normal frame have the same first axis, tangential
+projection of the propagation frame's second axis is the plane frame's second axis multiplied by
+the signed normal component of propagation. -/
+lemma tangentialProjection_axis_one_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (frame : PolarizationFrame direction) (halign : frame.axis 0 = planeFrame.axis 0) :
+    plane.tangentialProjection (frame.axis 1) =
+      plane.normalComponent frame.propagationVector • planeFrame.axis 1 := by
+  have htangent : inner ℝ plane.normalVector (frame.axis 0) = 0 := by
+    rw [halign]
+    change inner ℝ planeFrame.propagationVector (planeFrame.axis 0) = 0
+    exact planeFrame.inner_propagationVector_axis 0
+  have hnormal : inner ℝ frame.propagationVector plane.normalVector =
+      plane.normalComponent frame.propagationVector := by
+    rw [real_inner_comm]
+    rfl
+  have hcross : plane.normalVector ⨯ₑ₃
+      (frame.propagationVector ⨯ₑ₃ frame.axis 0) =
+        -plane.normalComponent frame.propagationVector • frame.axis 0 := by
+    rw [Space.cross_cross_eq_smul_sub_smul', htangent, hnormal]
+    simp
+  calc
+    plane.tangentialProjection (frame.axis 1) =
+        -(plane.normalVector ⨯ₑ₃ (plane.normalVector ⨯ₑ₃ frame.axis 1)) := by
+      rw [Space.cross_cross_eq_smul_sub_smul', plane.inner_normalVector_self]
+      simp [OrientedAffineHyperplane.tangentialProjection,
+        OrientedAffineHyperplane.normalComponent]
+    _ = -(plane.normalVector ⨯ₑ₃
+        (plane.normalVector ⨯ₑ₃
+          (frame.propagationVector ⨯ₑ₃ frame.axis 0))) := by
+      rw [frame.propagationVector_cross_axis_zero]
+    _ = -(plane.normalVector ⨯ₑ₃
+        (-plane.normalComponent frame.propagationVector • frame.axis 0)) := by
+      rw [hcross]
+    _ = plane.normalComponent frame.propagationVector •
+        (plane.normalVector ⨯ₑ₃ planeFrame.axis 0) := by
+      rw [Space.cross_smul, halign]
+      simp
+    _ = plane.normalComponent frame.propagationVector • planeFrame.axis 1 := by
+      change _ • (planeFrame.propagationVector ⨯ₑ₃ planeFrame.axis 0) = _
+      rw [planeFrame.propagationVector_cross_axis_zero]
+
+/-!
+
+## B. Complex Jones amplitudes
+
+-/
+
+private lemma complexAxis_eq_ofReal (frame : PolarizationFrame direction) (i : Fin 2) :
+    frame.complexAxis i = ComplexWaveVector.ofReal (frame.axis i) := rfl
+
+/-- Tangential projection expresses a full-vector Jones amplitude in the common plane frame as
+`(J₀, c J₁)`, where `c` is the signed normal component of the propagation vector. -/
+lemma hyperplaneTangentialProjection_embedJones_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (frame : PolarizationFrame direction) (J : JonesVector)
+    (halign : frame.axis 0 = planeFrame.axis 0) :
+    ComplexWaveVector.hyperplaneTangentialProjection plane (frame.embedJones J) =
+      planeFrame.embedJones
+        (JonesVector.ofComponents (J.components 0)
+          ((plane.normalComponent frame.propagationVector : ℂ) * J.components 1)) := by
+  rw [embedJones, embedJones, Fin.sum_univ_two, Fin.sum_univ_two,
+    ComplexWaveVector.hyperplaneTangentialProjection_add,
+    ComplexWaveVector.hyperplaneTangentialProjection_smul,
+    ComplexWaveVector.hyperplaneTangentialProjection_smul, complexAxis_eq_ofReal,
+    complexAxis_eq_ofReal, ComplexWaveVector.hyperplaneTangentialProjection_ofReal,
+    ComplexWaveVector.hyperplaneTangentialProjection_ofReal,
+    tangentialProjection_axis_zero_of_axis_zero_eq
+      (direction := direction) plane planeFrame frame halign,
+    tangentialProjection_axis_one_of_axis_zero_eq
+      (direction := direction) plane planeFrame frame halign]
+  simp [complexAxis_eq_ofReal, ComplexWaveVector.ofReal_smul]
+  module
+
+/-- Tangential projection after the propagation quarter-turn has common plane-frame coordinates
+`(-J₁, c J₀)`, with the same signed normal factor `c`. -/
+lemma hyperplaneTangentialProjection_embedJones_propagationCross_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (frame : PolarizationFrame direction) (J : JonesVector)
+    (halign : frame.axis 0 = planeFrame.axis 0) :
+    ComplexWaveVector.hyperplaneTangentialProjection plane
+        (frame.embedJones J.propagationCross) =
+      planeFrame.embedJones
+        (JonesVector.ofComponents (-J.components 1)
+          ((plane.normalComponent frame.propagationVector : ℂ) * J.components 0)) := by
+  simpa using hyperplaneTangentialProjection_embedJones_of_axis_zero_eq
+    (direction := direction) plane planeFrame frame J.propagationCross halign
+
+end PolarizationFrame
+
+end
+
+end Optics

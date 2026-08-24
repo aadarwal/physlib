@@ -31,6 +31,7 @@ irradiance or power.
 - `PolarizationFrame.propagationVector_cross_axis_zero` and
   `PolarizationFrame.propagationVector_cross_axis_one`: the oriented-frame quarter-turn.
 - `PolarizationFrame.embedJones_norm_sq`: preservation of squared Jones intensity.
+- `PolarizationFrame.embedJones_scale`: complex scaling commutes with spatial embedding.
 - `PolarizationFrame.electricReal_norm_sq_add_electricImag_norm_sq`: the two real quadratures
   recover squared Jones intensity.
 - `PolarizationFrame.realizeJones_eq`: exact cosine-sine realization.
@@ -229,6 +230,17 @@ def embedJones (frame : PolarizationFrame direction) (J : JonesVector) :
 lemma embedJones_apply (frame : PolarizationFrame direction) (J : JonesVector) (k : Fin 3) :
     frame.embedJones J k = ∑ i : Fin 2, J.components i * frame.axis i k := by
   simp [embedJones, complexAxis]
+
+/-- Scaling all Jones coordinates multiplies the embedded complex spatial phasor by the same
+complex scalar. -/
+lemma embedJones_scale (frame : PolarizationFrame direction)
+    (z : ℂ) (J : JonesVector) :
+    frame.embedJones (JonesVector.scale z J) = z • frame.embedJones J := by
+  rw [embedJones, embedJones]
+  simp only [JonesVector.scale, Finset.smul_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  simp [smul_smul]
 
 /-- Inner product with a complexified polarization axis recovers its Jones coordinate. -/
 lemma inner_complexAxis_embedJones (frame : PolarizationFrame direction)
