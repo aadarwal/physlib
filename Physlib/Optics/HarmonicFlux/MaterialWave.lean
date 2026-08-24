@@ -150,14 +150,6 @@ end PolarizationFrame
 
 -/
 
-private lemma realizeEuclidean_ofReal_smul {d : ℕ}
-    (r : ℝ) (amplitude : EuclideanSpace ℂ (Fin d)) (phase : ℝ) :
-    Phasor.realizeEuclidean ((r : ℂ) • amplitude) phase =
-      r • Phasor.realizeEuclidean amplitude phase := by
-  ext i
-  simp [Phasor.realize, Complex.mul_re]
-  ring
-
 namespace JonesVector
 
 /-- The instantaneous Poynting vector of a framed material plane wave points along propagation,
@@ -277,7 +269,7 @@ private lemma toMaterialPlaneWave_magneticFieldStrength_eq_realize_localJones
           (J.materialPlaneWaveSpatialPhaseOffset medium frame angularFrequency hω x)
           (angularFrequency * time)).symm
     _ = _ := by
-      rw [realizeEuclidean_ofReal_smul]
+      rw [Phasor.realizeEuclidean_ofReal_smul]
       rfl
 
 /-- At every point and arbitrary period origin, the one-period average of the actual material

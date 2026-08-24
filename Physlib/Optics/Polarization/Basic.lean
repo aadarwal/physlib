@@ -125,6 +125,15 @@ lemma Phasor.realizeEuclidean_apply {d : ℕ} (amplitude : EuclideanSpace ℂ (F
     Phasor.realizeEuclidean amplitude carrierPhase i =
       Phasor.realize (amplitude i) carrierPhase := rfl
 
+/-- Real scalar multiplication commutes with componentwise Euclidean phasor realization. -/
+lemma Phasor.realizeEuclidean_ofReal_smul {d : ℕ} (r : ℝ)
+    (amplitude : EuclideanSpace ℂ (Fin d)) (carrierPhase : ℝ) :
+    Phasor.realizeEuclidean ((r : ℂ) • amplitude) carrierPhase =
+      r • Phasor.realizeEuclidean amplitude carrierPhase := by
+  ext i
+  simp [Phasor.realize, Complex.mul_re]
+  ring
+
 /-- A componentwise Euclidean phasor realization repeats after one carrier cycle. -/
 lemma Phasor.realizeEuclidean_add_two_pi {d : ℕ}
     (amplitude : EuclideanSpace ℂ (Fin d)) (carrierPhase : ℝ) :
