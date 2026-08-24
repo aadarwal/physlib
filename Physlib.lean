@@ -213,6 +213,8 @@ public import Physlib.Optics.HarmonicFlux.MaterialWave
 public import Physlib.Optics.HarmonicFlux.MaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.NormalFlux
 public import Physlib.Optics.HarmonicFlux.Polarizer
+public import Physlib.Optics.HarmonicFlux.PositiveNormalDecay
+public import Physlib.Optics.HarmonicFlux.PositiveNormalDecayRegression
 public import Physlib.Optics.HarmonicFlux.Regression
 public import Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry
 public import Physlib.Optics.Interfaces.PlanarDielectric.Basic
@@ -225,6 +227,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.PhaseMatchedDispersion
 public import Physlib.Optics.Interfaces.PlanarDielectric.Snell
 public import Physlib.Optics.Interfaces.PlanarDielectric.SubcriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalCarrier
+public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFlux
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic

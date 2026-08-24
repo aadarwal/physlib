@@ -766,6 +766,37 @@ PR unless maintainers explicitly ask to retain it.
   assumes no transversality, dispersion, Maxwell, passivity, conservation, interface role,
   outgoing condition, or evanescent-field meaning. Preserve the Maxwell-qualified zero-normal-
   flux theorem and its interface specialization as a separate follow-up.
+- [ ] Human-check the positive-normal-decay harmonic-flux cancellation before upstreaming. For
+  `K = q - I * alpha * n`, confirm that `q` is tangent, attenuation is exactly `alpha * n`, and
+  complex-bilinear `K dot E₀ = 0` makes the real part of the `n` component of
+  `E₀ cross conj (K cross E₀)` vanish. The magnetic coefficient must be real and may be zero or
+  have either sign. Material dispersion, Maxwell, nonzero amplitude, and strict positivity of the
+  coefficient are not used by this algebra.
+- [ ] Decide whether an upstream follow-up needs the critical `alpha = 0` endpoint. The current
+  public theorem receives `PositiveNormalDecayWaveVector`, whose decay rate is strictly positive,
+  even though the cancellation algebra also covers zero decay. Do not weaken the proof-bearing
+  carrier structure merely to enlarge this one theorem without a genuine critical-wave consumer.
+- [ ] Confirm the namespace placement with maintainers before upstreaming. The fork follows
+  Physlib's receiver-extension convention by placing the role-neutral theorem in
+  `ClassicalMechanics.ComplexWaveVector.PositiveNormalDecayWaveVector`, while the file/import graph
+  keeps the ClassicalMechanics base independent of Optics. If maintainers instead want every
+  Poynting-vector declaration named under `Optics`, move the public wrapper then; keep the generic
+  conjugation helpers private until a second consumer establishes their proper owner.
+- [ ] Human-check the planar positive-normal-decay flux specialization. The transmitted-candidate
+  predicate supplies the positive-medium material shell but deliberately not electric
+  transversality. Adding explicit bilinear transversality must both yield the source-free
+  positive-medium macroscopic Maxwell solution and give zero actual one-period flux through the
+  stored interface normal at every point and arbitrary period start. Do not strengthen this to
+  pointwise zero normal flux, zero tangential flux, boundary satisfaction, TIR, or outgoing power.
+- [ ] Confirm the sharp positive-normal-decay flux regressions before upstreaming. The transverse
+  TM fixture must have instantaneous vector `(15 / 2, 0, -6)` at `time = pi / 4` and the origin,
+  despite mean `(15 / 2, 0, 0)`. The on-shell fixture with the same `K = (5, 0, -4 I)` and
+  `E₀ = (1, 0, 1)` must have bilinear pairing `5 - 4 I` and mean vector
+  `(5 / 6, 0, -5 / 6)`, proving transversality cannot be dropped.
+- [ ] Split a future upstream proposal into the role-neutral positive-normal-decay harmonic-flux
+  algebra and actual-field bridge, the planar Maxwell/normal-flux specialization, and the exact
+  falsification regressions. Keep `NormalFlux.lean` restricted to its propagating material-wave
+  concept.
 
 ## Polarization conventions
 
