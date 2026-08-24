@@ -418,6 +418,11 @@ Ownership rules:
   zero-extension injection `E`. Its `C b + E u` assembly has exact connected/external action and
   additive normalized modal power. Complement outgoing coordinates omitted by `C` are not thereby
   absorbed, so the identity is not a network energy balance, source model, or feedback solution.
+- `Optics.Network.LinearBehavior` supplies singular-safe complex-linear component relations,
+  embeds linear maps and finite mode transforms as graphs, and proves identity, relational series,
+  and independent parallel composition laws. Its concrete regressions distinguish cascade order,
+  genuinely multivalued behavior, and disjoint parallel branches without assigning physical
+  realizability, causality, passivity, or losslessness.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -437,10 +442,11 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] implicit behaviors, global wiring, and well-posed network elimination; generic mode
-  restriction/zero extension, typed local connections, proof-carrying indexed connection
-  families, ambient partial routing, and the explicit external-channel complement and incident
-  injection are complete;
+- [ ] global wiring and well-posed network elimination; generic mode restriction/zero extension,
+  typed local connections, proof-carrying indexed connection families, ambient partial routing,
+  the explicit external-channel complement and incident injection, and the core implicit behavior
+  graph/identity/series/parallel layer are complete, while rectangular component behaviors and
+  proof-gated functional views remain;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1800,14 +1806,15 @@ package remains blocked on the decision in section L; it does not block N2a--N6a
 
 #### N3. Implicit linear behaviors
 
-- a relation/submodule for linear component behavior;
-- embedding of `ModeTransform` as a graph;
-- a membership characterization for the embedded graph;
-- identity, series, and parallel behavior composition;
-- rectangular summing, pickoff, splitter, and combiner behaviors, without pretending fan-out is a
-  one-to-one wire;
-- equivalence between relational and functional composition where a function exists; and
-- no invertibility requirement merely to state a component.
+- [x] a relation/submodule for linear component behavior;
+- [x] embedding of `ModeTransform` as a graph;
+- [x] a membership characterization for the embedded graph;
+- [x] identity, series, and parallel behavior composition;
+- [ ] rectangular summing, pickoff, splitter, and combiner behaviors, without pretending fan-out
+  is a one-to-one wire;
+- [x] agreement between relational composition and functional composition for graph behaviors;
+- [ ] proof-gated extraction and round trip of a total single-valued behavior as a linear map; and
+- [x] no invertibility requirement merely to state a component.
 
 Exit: transfer matrices are derived views of suitable behavior, not the only possible component
 definition.
@@ -2455,7 +2462,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
-| N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
+| N3 behaviors | in progress | O1 | relation/graph embedding and identity, series, parallel laws complete; rectangular component behaviors and proof-gated functional views remain |
 | N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
@@ -2565,9 +2572,15 @@ human verification recorded in `tbd.md`.
    action and normalized modal power equal to the power in the connected restriction of the
    outgoing amplitude plus external incident power. This is not a network energy balance. The
    empty-mode fixture proves that an unconnected physical port need not create a channel. Continue
-   toward implicit behavior and network-equation semantics without treating this expression as a
-   source model or feedback solution and without encoding feedback as ordinary scattering-matrix
-   multiplication.
+   toward network-equation semantics without treating this expression as a source model or
+   feedback solution and without encoding feedback as ordinary scattering-matrix multiplication.
+   The N3 core now represents implicit complex-linear behavior independently of invertibility,
+   embeds maps and mode transforms as graphs, and proves identity, existential series, independent
+   parallel, graph-composition, matrix-cascade, and block-diagonal laws. Its regressions distinguish
+   forward and reverse nonsymmetric cascades, a singular but functional zero graph, a genuinely
+   multivalued relation, and a rejected branch-incorrect parallel output. Continue N3 with
+   rectangular copy/sum/select/weighted junctions and proof-gated total single-valued extraction
+   before beginning two-port chain semantics.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a

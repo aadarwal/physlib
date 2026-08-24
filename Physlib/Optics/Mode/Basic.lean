@@ -132,6 +132,48 @@ lemma ModeAmplitude.restrictInl_apply {ι μ : Type*} (a : ModeAmplitude (ι ⊕
 lemma ModeAmplitude.restrictInr_apply {ι μ : Type*} (a : ModeAmplitude (ι ⊕ μ)) (i : μ) :
     a.restrictInr i = a (Sum.inr i) := rfl
 
+/-- Complex-linear restriction from a sum-indexed amplitude to its left family. -/
+def ModeAmplitude.restrictInlLinearMap {ι μ : Type*} :
+    ModeAmplitude (ι ⊕ μ) →ₗ[ℂ] ModeAmplitude ι where
+  toFun := ModeAmplitude.restrictInl
+  map_add' first second := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rfl
+  map_smul' scalar amplitude := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rfl
+
+/-- Complex-linear restriction from a sum-indexed amplitude to its right family. -/
+def ModeAmplitude.restrictInrLinearMap {ι μ : Type*} :
+    ModeAmplitude (ι ⊕ μ) →ₗ[ℂ] ModeAmplitude μ where
+  toFun := ModeAmplitude.restrictInr
+  map_add' first second := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rfl
+  map_smul' scalar amplitude := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rfl
+
+/-- Bundled left restriction agrees with coordinate restriction. -/
+@[simp]
+lemma ModeAmplitude.restrictInlLinearMap_apply {ι μ : Type*}
+    (amplitude : ModeAmplitude (ι ⊕ μ)) :
+    (ModeAmplitude.restrictInlLinearMap :
+      ModeAmplitude (ι ⊕ μ) →ₗ[ℂ] ModeAmplitude ι) amplitude =
+        amplitude.restrictInl := rfl
+
+/-- Bundled right restriction agrees with coordinate restriction. -/
+@[simp]
+lemma ModeAmplitude.restrictInrLinearMap_apply {ι μ : Type*}
+    (amplitude : ModeAmplitude (ι ⊕ μ)) :
+    (ModeAmplitude.restrictInrLinearMap :
+      ModeAmplitude (ι ⊕ μ) →ₗ[ℂ] ModeAmplitude μ) amplitude =
+        amplitude.restrictInr := rfl
+
 /-- Restriction to the left summand recovers the first direct-sum amplitude. -/
 @[simp]
 lemma ModeAmplitude.restrictInl_directSum {ι μ : Type*} (a : ModeAmplitude ι)

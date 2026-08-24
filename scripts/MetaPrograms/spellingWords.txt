@@ -1,3 +1,14 @@
+behavior
+behaviors
+directsum
+graphs
+linearbehavior
+modetransform
+multivalued
+oflinearmap
+relational
+singular
+tobehavior
 average
 averages
 averaging
