@@ -254,6 +254,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.TotalInternalReflection
 public import Physlib.Optics.Interfaces.PlanarDielectric.TotalInternalReflectionRetarderRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
+public import Physlib.Optics.Mode.Embedding
+public import Physlib.Optics.Mode.EmbeddingRegression
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
 public import Physlib.Optics.Network.ConnectionFamily

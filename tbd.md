@@ -1148,6 +1148,11 @@ PR unless maintainers explicitly ask to retain it.
   use of matrix multiplication as physical feedback composition.
 - [x] Define convention-free modal relabeling and unit-complex coordinate rephasing, including
   covariance and preservation of modal power, passivity, and losslessness.
+- [x] Define restriction and zero extension along finite mode embeddings. Prove exact selected and
+  omitted-coordinate action, `R * E = 1`, the ambient star projector `E * R`, zero-extension
+  isometry and power preservation, restriction/projector passivity, arbitrary-input action and
+  exact output power, passive zero extension of rectangular transforms, and that restriction
+  preserves ambient modal power precisely when every omitted coordinate has zero amplitude.
 - [x] Define dependent port/channel families, nominally distinct incident and outgoing endpoint
   types, a local connection with compatible mode fibers, endpoint-presentation exchange, the
   fixed-point-free mate involution, the oriented scattering adapter, and unit-gain routing with
@@ -1177,6 +1182,13 @@ PR unless maintainers explicitly ask to retain it.
   physical endpoint map is not. Treat connected-channel power preservation only as normalized
   modal power; external complements, ambient partial routing, electromagnetic losslessness,
   presentation covariance, and netlists remain absent.
+- [ ] Human-check the mode-embedding semantics before upstreaming. Recheck the non-prefix
+  `Bool ↪ Fin 3` fixture, the omitted coordinate-one amplitude of power five, strict restriction
+  loss, zero-extension isometry, the passive nonidentity ambient projector, and the genuinely
+  complex nonsymmetric zero-extended action `[3 - I, 0, 11 - I]`. Confirm that restriction is not
+  described as physical absorption, zero extension is not described as surjective or unitary,
+  `E * R` is not collapsed to the ambient identity, and the exact power-equality iff has no hidden
+  surjectivity or nonempty-family premise.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
 - [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
@@ -1267,7 +1279,9 @@ PR unless maintainers explicitly ask to retain it.
   `east`, `elimination`, `fibers`, `flattening`, `gain`, `mate`, `mates`, `mating`, `nonsymmetric`,
   `routing`, `secondary`, `solvability`, `splitter`, `splitters`, `termination`, and `west`.
   The indexed connection-family differential added `blockwise`, `netlists`, `south`, and
-  `vacuous`.
+  `vacuous`. The finite mode-embedding differential added `absorption`, `ambient`, `rectangular`,
+  and `restriction`; all other initially reported ordinary prose was reworded using the existing
+  dictionary.
 - [x] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate. The 2026-08-24 typed
   local-routing run reproduced pre-existing style and transitive-import diagnostics only in
