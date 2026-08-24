@@ -1165,9 +1165,11 @@ PR unless maintainers explicitly ask to retain it.
   Prove exact connected, omitted-row, omitted-column, arbitrary-input, and selected-input action;
   both connected range-projector Gram laws; exact output power; global normalized-modal passivity;
   and power equality precisely on inputs supported on connected outgoing channels.
-- [ ] Define the explicit external-channel complement and its typed incident injection. Preserve
-  the distinction between a channel complement and physical-port coverage when empty mode fibers
-  are allowed. Do not mark the broad netlist API-map requirement complete before the remaining
+- [x] Define the explicit external-channel complement and its typed incident injection. Prove the
+  complete connected/external channel partition, identify external channels with the dependent
+  sum of modes over unconnected ports, and prove exact injection, Gram, isometry, `C b + E u`
+  coordinate, and additive normalized-power laws. Preserve the empty-mode channel-versus-port
+  distinction. Do not mark the broad netlist API-map requirement complete before the remaining
   netlist invariants exist.
 - [ ] Define time-reversed channel pairing and port reference planes before defining reciprocity;
   typed endpoints and coordinate rephasing alone do not supply these physical conventions.
@@ -1201,6 +1203,21 @@ PR unless maintainers explicitly ask to retain it.
   preserved iff every complement outgoing amplitude vanishes. The strict-decrease witness and
   connected equality witness must not be summarized as a strict contraction. Confirm that an empty
   exposed port need not create a complement channel.
+- [ ] Human-check the external-channel complement and incident injection before upstreaming.
+  Confirm that `ExternalChannel` means external only to the selected connection-family range, not
+  spatial exterior, radiation, physical accessibility, or completeness of an electromagnetic mode
+  basis. Recheck the connected/external partition equivalence, the equivalence with the dependent
+  sum of modes over unconnected ports, and the nonempty fixture's unique exposed channel. Verify
+  the external coefficient `2 + I`, its power five before and after injection, the connected zero,
+  the `C b + E u` connected value `2 + I`, external value one, and total normalized modal power
+  six. In the empty-fiber fixture confirm simultaneously that the third physical port is
+  unconnected, the connected-channel embedding is surjective, and the external-channel type is
+  empty. Treat `E` as coordinate zero extension, not a source, termination, detector, boundary
+  condition, or feedback solution. Confirm `Eᴴ * E = 1` while `E * Eᴴ` is the external range
+  projector and generally not the ambient identity; do not call `E` unitary, surjective, or a
+  lossless device. Complement outgoing power omitted by `C b` is not absorption, and external
+  outgoing readout remains future work. The broad netlist and elimination requirements remain
+  open.
 - [ ] Human-check the mode-embedding semantics before upstreaming. Recheck the non-prefix
   `Bool ↪ Fin 3` fixture, the omitted coordinate-one amplitude of power five, strict restriction
   loss, zero-extension isometry, the passive nonidentity ambient projector, and the genuinely
