@@ -210,6 +210,7 @@ public import Physlib.Optics.HarmonicFlux.Basic
 public import Physlib.Optics.HarmonicFlux.MaterialWave
 public import Physlib.Optics.HarmonicFlux.MaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.NormalFlux
+public import Physlib.Optics.HarmonicFlux.Polarizer
 public import Physlib.Optics.HarmonicFlux.Regression
 public import Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry
 public import Physlib.Optics.Interfaces.PlanarDielectric.Basic

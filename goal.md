@@ -401,7 +401,9 @@ Ownership rules:
 
 - [ ] Maxwell-qualified evanescent and outgoing semantics for the constructed interface-oriented
   side-decaying carrier branch;
-- [ ] the physical Malus power bridge and the polarization chain's field/irradiance continuation;
+- [ ] the normalized-mode Malus power bridge and the polarization chain's remaining physical
+  observables; the propagating material-wave irradiance and actual mean-flux Malus laws are
+  complete;
 - [ ] Poynting flux, boundary laws, Snell, Fresnel, and total internal reflection;
 - [ ] typed ports, behaviors, wiring, and well-posed network elimination;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
@@ -1066,19 +1068,32 @@ Coherency transport is proved through `JonesMatrix.act_coherency`. The induced M
 proved through the shared Pauli trace formula to be one half of the transmitted Stokes state's
 outer product, yielding the arbitrary raw-Stokes output
 `q (1, cos (2θ), sin (2θ), 0)` and the zero-polarization factor-of-two regression. No irradiance,
-Poynting-flux, modal-power, or electromagnetic-passivity theorem is included; those remain P5b.
+Poynting-flux, modal-power, or electromagnetic-passivity theorem is included in the raw component
+files; the separate P5b follow-up supplies the first two for its propagating plane-wave family.
 
 #### P5b. Physical Malus bridge
 
 Candidate location: the Optics normalization bridge beside E3b, not the Jones core file.
 
+Status: in progress on the fork. The propagating material-wave irradiance and actual mean-flux
+slice is complete; normalized modal power remains blocked on E3b's flux-normalized mode family.
+
 Deliverables:
 
-- translate P5a's squared-Jones-intensity theorem to irradiance for the plane-wave family covered
+- [x] translate P5a's squared-Jones-intensity theorem to irradiance for the plane-wave family covered
   by E3b; and
-- translate it to `ModeAmplitude.power` only for the proved flux-normalized mode family.
+- [ ] translate it to `ModeAmplitude.power` only for the proved flux-normalized mode family.
 
-Exit: physical Malus power is a corollary of P5a plus E3b rather than a second intensity definition.
+The completed first slice proves single- and sequential-polarizer irradiance laws, arbitrary-input
+irradiance contraction, and Malus' law directly for the actual one-period-averaged Poynting vector.
+The field theorem constructs both waves with the same medium, propagation frame, positive
+frequency, phase convention, period origin, and observation point. It is an ideal thin-analyzer
+model: the discarded component's fate and the component's internal, reflected, absorbed, and
+thermal fields are not modeled. Local infinite-plane-wave irradiance is not aperture or modal
+power, and contraction alone is not called electromagnetic passivity.
+
+Exit pending: physical Malus power becomes a corollary of P5a plus E3b rather than a second
+intensity definition once the normalized-mode deliverable is complete.
 
 #### P6a. Retarder and wave-plate core
 
@@ -2220,7 +2235,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P3c Poincare classification | done | P3b-1, P3b-2 | closed-ball, boundary/interior, exact phase-fiber, rank-one factorization, orbit-quotient, and canonical-axis suites |
 | P4 deterministic Mueller | done | P1a, P2a, P3a, P3b-1 | transported real action, Pauli trace/reality, cone, algebra, unitary, and regression suites |
 | P5a Jones polarizer/Malus | done | P1a, P2b, P3b-2, P4 | projection, contraction, coherent/intensity Malus, coherency, arbitrary-Stokes Mueller, and convention-regression suites |
-| P5b physical Malus bridge | blocked | P5a, E3b | irradiance and normalized-power Malus corollaries |
+| P5b physical Malus bridge | in progress | P5a, E3b | propagating material-wave irradiance and actual mean-flux Malus laws complete; normalized-mode power remains |
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
@@ -2342,7 +2357,8 @@ human verification recorded in `tbd.md`.
    ordered polarizer--retarder system: the reference axis has eigenvalue one, the orthogonal axis
    has relative phase `exp (-I * retardance)`, `M.comp N` applies `N` first, and neither Jones
    unitarity nor fixed Stokes intensity implies electromagnetic power. Keep P6b-3's
-   field/irradiance portion blocked on P5b/E3b.
+   field/irradiance continuation can now use P5b's propagating material-wave Malus theorem, while
+   its normalized-power portion remains blocked on E3b's mode-normalization bridge.
 5. Preserve E0's exposure-only public Maxwell repair, the completed E1 material layer, E2a's
    off-shell harmonic carrier: positive frequency and wave number remain independent, the built-in
    `B = (κ / ω) n × E` candidate is not described as Maxwell-derived, and transversality and
@@ -2383,8 +2399,9 @@ human verification recorded in `tbd.md`.
    proceed through its material-wave irradiance and normalization bridges before making those
    power claims.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
-   intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
-   P5a Malus law and P6a retarder intensity preservation are complete.
+   intensity into physical power before E3b. P5b's propagating material-wave irradiance and actual
+   mean-flux Malus laws are now complete, while its normalized-power endpoint remains blocked on
+   E3b's flux-normalized mode family.
 7. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
