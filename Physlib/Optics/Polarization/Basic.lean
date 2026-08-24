@@ -26,6 +26,8 @@ interpretations require later impedance, field-profile, and Poynting-flux normal
 ## ii. Main definitions
 
 - `Phasor.realize`: the real signal associated with a phasor and carrier phase.
+- `Phasor.realizeEuclidean`: componentwise realization of a complex Euclidean phasor array.
+- `Phasor.conjugateEuclidean`: componentwise conjugation of a complex Euclidean phasor array.
 - `Phasor.ofAmplitudePhase`: a phasor constructed from a real amplitude and phase.
 - `JonesVector`: two raw transverse electric-field phasors.
 - `JonesVector.ofComponents`: a Jones vector constructed from two complex components.
@@ -108,6 +110,52 @@ lemma Phasor.realize_exp_mul (z : Phasor) (phase carrierPhase : ℝ) :
       rw [Complex.exp_add]
     _ = z * Complex.exp (((carrierPhase + phase : ℝ) : ℂ) * Complex.I) := by
       rw [hphase]
+
+/-! ### A.1. Euclidean phasor arrays -/
+
+/-- Realize a complex Euclidean phasor array componentwise at one common carrier phase. -/
+def Phasor.realizeEuclidean {d : ℕ} (amplitude : EuclideanSpace ℂ (Fin d))
+    (carrierPhase : ℝ) : EuclideanSpace ℝ (Fin d) :=
+  WithLp.toLp 2 fun i ↦ Phasor.realize (amplitude i) carrierPhase
+
+/-- Componentwise Euclidean realization agrees with scalar phasor realization. -/
+@[simp]
+lemma Phasor.realizeEuclidean_apply {d : ℕ} (amplitude : EuclideanSpace ℂ (Fin d))
+    (carrierPhase : ℝ) (i : Fin d) :
+    Phasor.realizeEuclidean amplitude carrierPhase i =
+      Phasor.realize (amplitude i) carrierPhase := rfl
+
+/-- A componentwise Euclidean phasor realization repeats after one carrier cycle. -/
+lemma Phasor.realizeEuclidean_add_two_pi {d : ℕ}
+    (amplitude : EuclideanSpace ℂ (Fin d)) (carrierPhase : ℝ) :
+    Phasor.realizeEuclidean amplitude (carrierPhase + 2 * Real.pi) =
+      Phasor.realizeEuclidean amplitude carrierPhase := by
+  ext i
+  simp only [Phasor.realizeEuclidean_apply,
+    Phasor.realize_eq_re_cos_sub_im_sin, Real.cos_add_two_pi, Real.sin_add_two_pi]
+
+/-- Componentwise Euclidean phasor realization depends continuously on the carrier phase. -/
+lemma Phasor.continuous_realizeEuclidean {d : ℕ}
+    (amplitude : EuclideanSpace ℂ (Fin d)) :
+    Continuous (Phasor.realizeEuclidean amplitude) := by
+  rw [continuous_iff_continuousAt]
+  intro phase
+  apply (PiLp.continuous_toLp 2 _).continuousAt.comp
+  rw [continuousAt_pi]
+  intro i
+  simp only [Phasor.realize]
+  fun_prop
+
+/-- Conjugate every component of a complex Euclidean phasor array. -/
+def Phasor.conjugateEuclidean {d : ℕ} (amplitude : EuclideanSpace ℂ (Fin d)) :
+    EuclideanSpace ℂ (Fin d) :=
+  WithLp.toLp 2 fun i ↦ star (amplitude i)
+
+/-- Componentwise Euclidean conjugation agrees with scalar complex conjugation. -/
+@[simp]
+lemma Phasor.conjugateEuclidean_apply {d : ℕ}
+    (amplitude : EuclideanSpace ℂ (Fin d)) (i : Fin d) :
+    Phasor.conjugateEuclidean amplitude i = star (amplitude i) := rfl
 
 /-! ## B. Jones vectors and squared intensity -/
 

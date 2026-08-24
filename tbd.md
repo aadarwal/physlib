@@ -701,9 +701,30 @@ PR unless maintainers explicitly ask to retain it.
   these geometry PRs.
 - [ ] Develop the local-domain, oriented-surface, trace or restriction, integral-vector-calculus,
   and electromagnetic boundary-condition APIs needed for reflection, refraction, and waveguides.
-- [ ] Prove the bridge from propagating field modes and complex amplitudes to time-averaged
-  Poynting flux. Until then, modal power and losslessness are terms internal to the stated
+- [x] Prove the local common-frequency bridge from ordinary real fields and peak phasors to the
+  one-period average of the actual instantaneous Poynting vector. This first slice deliberately
+  stops before Maxwell, propagation, impedance, normal flux, irradiance, and modal power.
+- [ ] Complete the bridge from propagating field modes and complex amplitudes to time-averaged
+  normal Poynting flux. Until then, modal power and losslessness are terms internal to the stated
   power-normalization convention, not field-level energy theorems.
+
+## Harmonic-flux conventions
+
+- [ ] Human-check the E3b-0 peak-phasor identity against a page-verified optics reference and the
+  repository carrier convention: `Phasor.realize z phase = Re (z * exp (I * phase))` must yield
+  `(1 / 2) Re (Ephasor cross conj Hphasor)`, conjugating the second phasor and using magnetic field
+  strength `H`, not magnetic induction `B`. Check also that the exact linear regression gives
+  third-coordinate flux `1 / 2` and the quadrature regression gives `1`, rather than zero.
+- [ ] Human-check that the Mathlib interval average is taken over exactly one positive-frequency
+  period, may start at an arbitrary real time, and introduces neither an RMS convention nor an
+  extra factor of two.
+- [ ] Preserve the local-phasor fence in every complex-plane-wave connector. At spatial point `x`,
+  the electric and magnetic phasors must contain the carrier's spatial factor there; a theorem in
+  terms of stored reference amplitudes must instead expose the resulting squared spatial modulus.
+- [ ] Before proposing E3b-0 upstream, decide whether the generic Euclidean phasor realization and
+  conjugation additions should be reviewed separately from `HarmonicFlux.Basic`. Keep the public
+  concept local harmonic averaging either way; do not bundle material irradiance, normal flux,
+  aperture integration, modal normalization, outgoing-wave, or evanescence claims into it.
 
 ## Polarization conventions
 
