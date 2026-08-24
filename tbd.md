@@ -808,8 +808,14 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
 - [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
-  raw Stokes coordinates. No irradiance, Poynting-flux, normalized-modal-power, or electromagnetic
-  passivity corollary exists until P5b/E3b supplies the field-normalization bridge.
+  raw Stokes coordinates. The separate P5b/E3b follow-up now supplies propagating plane-wave
+  irradiance and actual mean-flux corollaries, but no aperture power, normalized modal power, or
+  electromagnetic-passivity conclusion exists until the flux-normalized mode family is proved.
+- [ ] Human-check P5b-1's ideal-analyzer boundary: its actual-field Malus theorem constructs input
+  and output plane waves in the same medium, propagation frame, frequency, and phase convention.
+  It models no reflection, refraction, internal component field, absorption, heating, or fate of
+  the discarded orthogonal polarization, so irradiance contraction must not be presented as a
+  complete component energy balance.
 - [ ] Supply an induced operator-norm bridge before expressing passivity as a matrix norm bound;
   the ambient norm inherited by the raw matrix alias is not that operator norm.
 - [ ] Represent component behavior independently of invertibility. For network equations

@@ -3369,3 +3369,6 @@ averaged
 despite
 retaining
 waveimpedance
+fate
+heating
+observation
