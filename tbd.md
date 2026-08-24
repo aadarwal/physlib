@@ -1181,8 +1181,13 @@ PR unless maintainers explicitly ask to retain it.
   reverse-order idempotence and kernel, copy-selection, and weighted-split modal-power laws. Keep
   these algebraic junctions distinct from physical square beam splitters, termination, absorption,
   passive wiring, and quantum cloning.
-- [ ] Add proof-gated extraction and round trips for total single-valued behaviors as the remaining
-  N3 package before beginning N3T chain semantics.
+- [x] Add proof-gated extraction and round trips for total single-valued behaviors, including
+  identity, series, and independent parallel closure plus exact complex gain and cascade-order
+  regressions. N3 is complete; the human chain-convention decision remains before N3T names and
+  formulas are fixed.
+- [ ] Before an upstream functional-behavior proposal, decide whether its core extraction API and
+  adversarial regression suite should be reviewed as one coherent PR or as two stacked PRs. The
+  fork milestone keeps atomic core and regression commits while preserving end-to-end validation.
 - [ ] Before an upstream rectangular-behavior proposal, decide with maintainers whether the core
   and its extensive regression suite should be reviewed as one coherent PR or split into two
   sequential PRs. The current fork milestone intentionally keeps them together for end-to-end
@@ -1239,15 +1244,19 @@ PR unless maintainers explicitly ask to retain it.
   open.
 - [ ] Human-check the implicit linear-behavior layer before upstreaming. Confirm that membership
   orders amplitudes as `(input, output)`, `first.series second` hides one exact intermediate
-  amplitude, and its transform graph is `second * first`. Recheck the concrete forward output
-  `(1 + 2I, 3 + 7I)`, reverse output `(7 + 2I, 3 + I)`, the free-output relation containing both
-  `(0, 0)` and `(0, unitPulse)`, the singular zero transform mapping a nonzero pulse to zero while
-  still inducing a valid graph, and the independent gain-two/gain-three parallel output `(2, 3I)`
-  together with rejection of the wrong right-branch value `2I`. Treat `LinearBehavior` only as a
-  homogeneous fixed-frequency complex-linear constraint: it supplies no totality, unique
-  solvability, invertibility, causality, passivity, electromagnetic normalization, or physical
-  realizability. Parallel composition takes two independent inputs; it is not fan-out, summation,
-  or a physical splitter.
+  amplitude, and its transform graph and extracted functional map compose as `second * first` and
+  `second.comp first`, respectively. Check that totality means existence for every input and
+  single-valuedness means uniqueness at fixed input: the top and bottom relations separate the two
+  predicates, while the free-output relation is neither. Recheck the exact gain `(2 + I) *
+  (3 - I) = 7 + I`, concrete forward output `(1 + 2I, 3 + 7I)`, reverse output
+  `(7 + 2I, 3 + I)`, the free-output pairs `(0, 0)` and `(0, unitPulse)`, the singular zero
+  transform mapping a nonzero pulse to zero while still inducing a functional noninjective graph,
+  and the independent gain-two/gain-three parallel output `(2, 3I)` together with rejection of the
+  wrong right-branch value `2I`. An arbitrary `LinearBehavior` is only a homogeneous
+  fixed-frequency complex-linear constraint; a linear input-output map exists only behind explicit
+  totality and single-valuedness proofs, which imply neither invertibility, causality, passivity,
+  electromagnetic normalization, nor physical realizability. Parallel composition takes two
+  independent inputs; it is not fan-out, summation, or a physical splitter.
 - [ ] Human-check the mode-embedding semantics before upstreaming. Recheck the non-prefix
   `Bool ↪ Fin 3` fixture, the omitted coordinate-one amplitude of power five, strict restriction
   loss, zero-extension isometry, the passive nonidentity ambient projector, and the genuinely
@@ -1380,6 +1389,15 @@ PR unless maintainers explicitly ask to retain it.
   committed-state style lint, forbidden-term and whitespace checks, and the exact differential
   spelling emulation. The full linter reproduced only the known unrelated repository style and
   transitive-import baseline; neither rectangular Optics module appeared in either list.
+- [x] The 2026-08-24 functional-behavior run passed cache retrieval, the 4,690-job `Physlib`
+  build, warnings-as-errors elaboration for the core and functional regression modules, both
+  Physlib and QuantumInfo declaration linters, public-file import, illegal-import, alpha-import,
+  duplicate-tag, sorry/pseudo-attribution, API-map, whitespace, forbidden-term, and line-length
+  gates. The API map resolved 3,614 names with no missing file or declaration. The official
+  spelling executable still fails at the documented Lean 4.33 string-API incompatibility; exact
+  docstring-token emulation found no new missing word after prose rewording. The full linter
+  reproduced only the known unrelated repository style and transitive-import baselines; neither
+  functional-behavior Optics module appeared in either failure list.
 
 ## Milestone gates
 
