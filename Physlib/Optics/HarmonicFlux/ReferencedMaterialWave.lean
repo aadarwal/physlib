@@ -26,18 +26,25 @@ so both sides are zero even though the dummy carrier and propagation frame remai
 
 - `IsReferencedMaterialJonesWave.intervalAverage_poyntingVector_planePoint`: the actual mean
   Poynting vector of connected carrier data at the reference point.
+- `IsReferencedMaterialJonesWave.electricField_planePoint` and
+  `IsReferencedMaterialJonesWave.magneticFieldStrength_planePoint`: the instantaneous actual
+  fields in framed Jones form at the reference point.
 - `IsReferencedMaterialJonesWave.normalComponent_intervalAverage_poyntingVector_planePoint`:
   its signed stored-normal component.
 - `IsZeroOrReferencedMaterialJonesWave.intervalAverage_poyntingVector_planePoint`: the guarded
   vector identity, including a zero field with arbitrary carrier data.
 - `IsZeroOrReferencedMaterialJonesWave.normalComponent_intervalAverage_poyntingVector_planePoint`:
   the corresponding guarded normal-flux identity.
+- `normalComponent_intervalAverage_poyntingVector_planePoint_eq_ownPeriod` for the guarded
+  connector:
+  guarded replacement of an external period by the carrier's own period.
 
 ## iii. Table of contents
 
 - A. Connected local phasors
-- B. Connected mean flux
-- C. Guarded mean flux
+- B. Connected actual fields
+- C. Connected mean flux
+- D. Guarded actual fields and mean flux
 
 ## iv. Scope
 
@@ -96,7 +103,35 @@ lemma localMagneticFieldStrengthPhasor_planePoint
 
 /-!
 
-## B. Connected mean flux
+## B. Connected actual fields
+
+-/
+
+/-- At the plane point, the actual electric field is the framed Jones realization at the wave's
+instantaneous carrier phase. -/
+lemma electricField_planePoint
+    (h : IsReferencedMaterialJonesWave plane medium wave frame J) (time : Time) :
+    wave.electricField time plane.point =
+      frame.realizeJones J (wave.angularFrequency * (time : ℝ)) := by
+  rw [wave.electricField_eq_realize_localElectricPhasor (time : ℝ) plane.point,
+    h.localElectricPhasor_planePoint]
+  rfl
+
+/-- At the plane point, the actual magnetic field strength is inverse impedance times the framed
+realization of the propagation-quarter-turn Jones data. -/
+lemma magneticFieldStrength_planePoint
+    (h : IsReferencedMaterialJonesWave plane medium wave frame J) (time : Time) :
+    wave.magneticFieldStrength medium time plane.point =
+      medium.waveImpedance⁻¹ •
+        frame.realizeJones J.propagationCross (wave.angularFrequency * (time : ℝ)) := by
+  rw [wave.magneticFieldStrength_eq_realize_localMagneticFieldStrengthPhasor
+    medium (time : ℝ) plane.point, h.localMagneticFieldStrengthPhasor_planePoint]
+  exact Phasor.realizeEuclidean_ofReal_smul medium.waveImpedance⁻¹
+    (frame.embedJones J.propagationCross) (wave.angularFrequency * (time : ℝ))
+
+/-!
+
+## C. Connected mean flux
 
 -/
 
@@ -137,9 +172,49 @@ variable {plane : OrientedAffineHyperplane 3} {medium : HomogeneousIsotropicMedi
 
 /-!
 
-## C. Guarded mean flux
+## D. Guarded actual fields and mean flux
 
 -/
+
+/-- The guarded connector gives the same framed Jones electric-field realization at the plane
+point. Its zero-field branch vanishes for arbitrary dummy carrier data. -/
+lemma electricField_planePoint
+    (h : IsZeroOrReferencedMaterialJonesWave plane medium wave frame J) (time : Time) :
+    wave.electricField time plane.point =
+      frame.realizeJones J (wave.angularFrequency * (time : ℝ)) := by
+  rcases h with ⟨hElectric, hJones⟩ | hMaterial
+  · have hLeft : wave.electricField time plane.point = 0 := by
+      ext i
+      simp [hElectric]
+    have hRight : frame.realizeJones J (wave.angularFrequency * (time : ℝ)) = 0 := by
+      rw [frame.realizeJones_eq_sum, Fin.sum_univ_two]
+      simp [hJones, Phasor.realize]
+    rw [hLeft, hRight]
+  · exact hMaterial.electricField_planePoint time
+
+/-- The guarded connector gives the same framed Jones magnetic-field-strength realization at the
+plane point. Its zero-field branch vanishes for arbitrary dummy carrier data. -/
+lemma magneticFieldStrength_planePoint
+    (h : IsZeroOrReferencedMaterialJonesWave plane medium wave frame J) (time : Time) :
+    wave.magneticFieldStrength medium time plane.point =
+      medium.waveImpedance⁻¹ •
+        frame.realizeJones J.propagationCross (wave.angularFrequency * (time : ℝ)) := by
+  rcases h with ⟨hElectric, hJones⟩ | hMaterial
+  · have hLocal : wave.localMagneticFieldStrengthPhasor medium plane.point = 0 := by
+      simp [ComplexMonochromaticPlaneWave.localMagneticFieldStrengthPhasor,
+        ComplexMonochromaticPlaneWave.magneticAmplitude, hElectric,
+        ComplexMonochromaticPlaneWave.complexCross]
+    have hLeft : wave.magneticFieldStrength medium time plane.point = 0 := by
+      rw [wave.magneticFieldStrength_eq_realize_localMagneticFieldStrengthPhasor
+        medium (time : ℝ) plane.point, hLocal]
+      ext i
+      simp [Phasor.realizeEuclidean, Phasor.realize]
+    have hRight : medium.waveImpedance⁻¹ •
+        frame.realizeJones J.propagationCross (wave.angularFrequency * (time : ℝ)) = 0 := by
+      rw [frame.realizeJones_eq_sum, Fin.sum_univ_two]
+      simp [hJones, Phasor.realize]
+    rw [hLeft, hRight]
+  · exact hMaterial.magneticFieldStrength_planePoint time
 
 /-- The guarded referenced connector gives the same actual one-period mean Poynting vector at the
 plane point. Its zero-field branch vanishes independently of the dummy carrier data. -/
@@ -171,6 +246,37 @@ lemma normalComponent_intervalAverage_poyntingVector_planePoint
         plane.normalComponent frame.propagationVector := by
   rw [h.intervalAverage_poyntingVector_planePoint]
   simp [OrientedAffineHyperplane.normalComponent, inner_smul_right]
+
+/-- A guarded referenced wave's normal mean flux over an externally supplied carrier period
+equals its own-period normal mean flux whenever the wave is electrically zero or its frequency
+matches the supplied frequency.
+
+The zero-field branch places no positivity or equality condition on the external frequency. -/
+lemma normalComponent_intervalAverage_poyntingVector_planePoint_eq_ownPeriod
+    (h : IsZeroOrReferencedMaterialJonesWave plane medium wave frame J)
+    (referenceAngularFrequency : ℝ)
+    (hFrequency : wave.electricAmplitude = 0 ∨
+      wave.angularFrequency = referenceAngularFrequency)
+    (startTime : Time) :
+    plane.normalComponent
+        (⨍ time in startTime.val..startTime.val + 2 * Real.pi / referenceAngularFrequency,
+          ThreeDimension.poyntingVector wave.electricField (wave.magneticFieldStrength medium)
+            (time : Time) plane.point) =
+      plane.normalComponent
+        (⨍ time in startTime.val..startTime.val + 2 * Real.pi / wave.angularFrequency,
+          ThreeDimension.poyntingVector wave.electricField (wave.magneticFieldStrength medium)
+            (time : Time) plane.point) := by
+  rcases hFrequency with hZero | hFrequency
+  · have hElectricField : ∀ time : Time, wave.electricField time plane.point = 0 := by
+      intro time
+      ext i
+      simp [hZero]
+    have hJones := h.components_eq_zero_of_electricAmplitude_eq_zero hZero
+    rw [h.normalComponent_intervalAverage_poyntingVector_planePoint]
+    simp [ThreeDimension.poyntingVector, hElectricField,
+      OrientedAffineHyperplane.normalComponent, JonesVector.materialPlaneWaveIrradiance,
+      JonesVector.intensity, hJones]
+  · rw [hFrequency]
 
 end IsZeroOrReferencedMaterialJonesWave
 

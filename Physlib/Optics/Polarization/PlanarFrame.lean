@@ -125,7 +125,180 @@ lemma tangentialProjection_axis_one_of_axis_zero_eq
 
 /-!
 
-## B. Complex Jones amplitudes
+## B. Normal cross products in aligned frames
+
+-/
+
+variable {direction₁ direction₂ : Space.Direction 3}
+
+/-- The stored-normal component of the common first axis crossed with an aligned frame's second
+axis is that frame's signed propagation normal. -/
+lemma normalComponent_axis_zero_cross_axis_one_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)
+    (hFirstAlign : firstFrame.axis 0 = planeFrame.axis 0)
+    (hSecondAlign : secondFrame.axis 0 = planeFrame.axis 0) :
+    plane.normalComponent (firstFrame.axis 0 ⨯ₑ₃ secondFrame.axis 1) =
+      plane.normalComponent secondFrame.propagationVector := by
+  rw [hFirstAlign, ← hSecondAlign, secondFrame.orientation]
+  rfl
+
+/-- The stored-normal component of an aligned frame's second axis crossed with the common first
+axis is minus that frame's signed propagation normal. -/
+lemma normalComponent_axis_one_cross_axis_zero_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)
+    (hFirstAlign : firstFrame.axis 0 = planeFrame.axis 0)
+    (hSecondAlign : secondFrame.axis 0 = planeFrame.axis 0) :
+    plane.normalComponent (firstFrame.axis 1 ⨯ₑ₃ secondFrame.axis 0) =
+      -plane.normalComponent firstFrame.propagationVector := by
+  have hswap : firstFrame.axis 1 ⨯ₑ₃ secondFrame.axis 0 =
+      -(secondFrame.axis 0 ⨯ₑ₃ firstFrame.axis 1) := by
+    ext i
+    fin_cases i <;> simp [crossProduct] <;> ring
+  rw [hswap, OrientedAffineHyperplane.normalComponent, inner_neg_right,
+    hSecondAlign, ← hFirstAlign, firstFrame.orientation]
+  rfl
+
+/-- The stored-normal component of the cross product of two aligned frames' second axes
+vanishes. -/
+lemma normalComponent_axis_one_cross_axis_one_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)
+    (hFirstAlign : firstFrame.axis 0 = planeFrame.axis 0)
+    (hSecondAlign : secondFrame.axis 0 = planeFrame.axis 0) :
+    plane.normalComponent (firstFrame.axis 1 ⨯ₑ₃ secondFrame.axis 1) = 0 := by
+  have hFirstOrthogonal :
+      inner ℝ (planeFrame.axis 0) (firstFrame.axis 1) = 0 := by
+    rw [← hFirstAlign]
+    simpa using
+      (orthonormal_iff_ite.mp firstFrame.orthonormal_axis (0 : Fin 2) (1 : Fin 2))
+  have hSecondOrthogonal :
+      inner ℝ (planeFrame.axis 0) (secondFrame.axis 1) = 0 := by
+    rw [← hSecondAlign]
+    simpa using
+      (orthonormal_iff_ite.mp secondFrame.orthonormal_axis (0 : Fin 2) (1 : Fin 2))
+  change inner ℝ planeFrame.propagationVector
+    (firstFrame.axis 1 ⨯ₑ₃ secondFrame.axis 1) = 0
+  rw [show planeFrame.propagationVector =
+      planeFrame.axis 0 ⨯ₑ₃ planeFrame.axis 1 from planeFrame.orientation.symm,
+    Space.inner_cross_cross,
+    hFirstOrthogonal, hSecondOrthogonal]
+  ring
+
+/-- The stored-normal component of a cross product between Jones fields in two frames aligned to
+one plane frame, expressed in their scalar Jones realizations. -/
+lemma normalComponent_cross_realizeJones_of_axis_zero_eq
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)
+    (firstJones secondJones : JonesVector) (firstPhase secondPhase : ℝ)
+    (hFirstAlign : firstFrame.axis 0 = planeFrame.axis 0)
+    (hSecondAlign : secondFrame.axis 0 = planeFrame.axis 0) :
+    plane.normalComponent
+        (firstFrame.realizeJones firstJones firstPhase ⨯ₑ₃
+          secondFrame.realizeJones secondJones secondPhase) =
+      plane.normalComponent secondFrame.propagationVector *
+          Phasor.realize (firstJones.components 0) firstPhase *
+            Phasor.realize (secondJones.components 1) secondPhase -
+        plane.normalComponent firstFrame.propagationVector *
+          Phasor.realize (firstJones.components 1) firstPhase *
+            Phasor.realize (secondJones.components 0) secondPhase := by
+  have hZeroZero :
+      plane.normalComponent (firstFrame.axis 0 ⨯ₑ₃ secondFrame.axis 0) = 0 := by
+    rw [hFirstAlign, hSecondAlign]
+    have hcross : planeFrame.axis 0 ⨯ₑ₃ planeFrame.axis 0 = 0 := by
+      ext i
+      fin_cases i <;> simp [crossProduct] <;> ring
+    rw [hcross]
+    simp [OrientedAffineHyperplane.normalComponent]
+  rw [firstFrame.realizeJones_eq_sum, secondFrame.realizeJones_eq_sum,
+    Fin.sum_univ_two, Fin.sum_univ_two]
+  simp only [Space.add_cross, Space.cross_add, Space.smul_cross, Space.cross_smul,
+    OrientedAffineHyperplane.normalComponent, inner_add_right, inner_smul_right]
+  rw [show inner ℝ plane.normalVector (firstFrame.axis 0 ⨯ₑ₃ secondFrame.axis 0) = 0
+      from hZeroZero,
+    show inner ℝ plane.normalVector (firstFrame.axis 0 ⨯ₑ₃ secondFrame.axis 1) =
+        plane.normalComponent secondFrame.propagationVector from
+      normalComponent_axis_zero_cross_axis_one_of_axis_zero_eq
+        plane planeFrame firstFrame secondFrame hFirstAlign hSecondAlign,
+    show inner ℝ plane.normalVector (firstFrame.axis 1 ⨯ₑ₃ secondFrame.axis 0) =
+        -plane.normalComponent firstFrame.propagationVector from
+      normalComponent_axis_one_cross_axis_zero_of_axis_zero_eq
+        plane planeFrame firstFrame secondFrame hFirstAlign hSecondAlign,
+    show inner ℝ plane.normalVector (firstFrame.axis 1 ⨯ₑ₃ secondFrame.axis 1) = 0 from
+      normalComponent_axis_one_cross_axis_one_of_axis_zero_eq
+        plane planeFrame firstFrame secondFrame hFirstAlign hSecondAlign]
+  simp only [OrientedAffineHyperplane.normalComponent]
+  ring
+
+/-- The exact stored-normal interference between two instantaneous Jones realizations and their
+propagation-quarter-turn realizations in aligned frames.
+
+The two carrier phases are independent. The result is purely real frame geometry and does not
+assign incident or reflected roles to either frame. -/
+lemma normalComponent_cross_realizeJones_propagationCross_add_swap
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)
+    (firstJones secondJones : JonesVector) (firstPhase secondPhase : ℝ)
+    (hFirstAlign : firstFrame.axis 0 = planeFrame.axis 0)
+    (hSecondAlign : secondFrame.axis 0 = planeFrame.axis 0) :
+    plane.normalComponent
+        (firstFrame.realizeJones firstJones firstPhase ⨯ₑ₃
+              secondFrame.realizeJones secondJones.propagationCross secondPhase +
+          secondFrame.realizeJones secondJones secondPhase ⨯ₑ₃
+              firstFrame.realizeJones firstJones.propagationCross firstPhase) =
+      (plane.normalComponent firstFrame.propagationVector +
+          plane.normalComponent secondFrame.propagationVector) *
+        (Phasor.realize (firstJones.components 0) firstPhase *
+            Phasor.realize (secondJones.components 0) secondPhase +
+          Phasor.realize (firstJones.components 1) firstPhase *
+            Phasor.realize (secondJones.components 1) secondPhase) := by
+  rw [show plane.normalComponent
+      (firstFrame.realizeJones firstJones firstPhase ⨯ₑ₃
+            secondFrame.realizeJones secondJones.propagationCross secondPhase +
+        secondFrame.realizeJones secondJones secondPhase ⨯ₑ₃
+            firstFrame.realizeJones firstJones.propagationCross firstPhase) =
+      plane.normalComponent
+          (firstFrame.realizeJones firstJones firstPhase ⨯ₑ₃
+            secondFrame.realizeJones secondJones.propagationCross secondPhase) +
+        plane.normalComponent
+          (secondFrame.realizeJones secondJones secondPhase ⨯ₑ₃
+            firstFrame.realizeJones firstJones.propagationCross firstPhase) by
+    simp [OrientedAffineHyperplane.normalComponent, inner_add_right]]
+  rw [normalComponent_cross_realizeJones_of_axis_zero_eq
+      plane planeFrame firstFrame secondFrame firstJones secondJones.propagationCross
+        firstPhase secondPhase hFirstAlign hSecondAlign,
+    normalComponent_cross_realizeJones_of_axis_zero_eq
+      plane planeFrame secondFrame firstFrame secondJones firstJones.propagationCross
+        secondPhase firstPhase hSecondAlign hFirstAlign]
+  simp only [JonesVector.propagationCross_components_zero,
+    JonesVector.propagationCross_components_one]
+  simp [Phasor.realize]
+  ring
+
+/-- Opposite signed propagation normals make the aligned Jones normal-interference term vanish
+for arbitrary Jones data and independent carrier phases. -/
+lemma normalComponent_cross_realizeJones_propagationCross_add_swap_eq_zero
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)
+    (firstJones secondJones : JonesVector) (firstPhase secondPhase : ℝ)
+    (hFirstAlign : firstFrame.axis 0 = planeFrame.axis 0)
+    (hSecondAlign : secondFrame.axis 0 = planeFrame.axis 0)
+    (hNormal : plane.normalComponent secondFrame.propagationVector =
+      -plane.normalComponent firstFrame.propagationVector) :
+    plane.normalComponent
+        (firstFrame.realizeJones firstJones firstPhase ⨯ₑ₃
+              secondFrame.realizeJones secondJones.propagationCross secondPhase +
+          secondFrame.realizeJones secondJones secondPhase ⨯ₑ₃
+              firstFrame.realizeJones firstJones.propagationCross firstPhase) = 0 := by
+  rw [normalComponent_cross_realizeJones_propagationCross_add_swap
+    plane planeFrame firstFrame secondFrame firstJones secondJones firstPhase secondPhase
+      hFirstAlign hSecondAlign, hNormal]
+  ring
+
+/-!
+
+## C. Complex Jones amplitudes
 
 -/
 

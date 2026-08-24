@@ -230,6 +230,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelAmplitude
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelAmplitudeRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFlux
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFluxRegression
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterference
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterferenceRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.MagneticFixedFrequency

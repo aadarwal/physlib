@@ -134,6 +134,15 @@ lemma Phasor.realizeEuclidean_ofReal_smul {d : ℕ} (r : ℝ)
   simp [Phasor.realize, Complex.mul_re]
   ring
 
+/-- Componentwise Euclidean phasor realization preserves addition at one common carrier phase. -/
+lemma Phasor.realizeEuclidean_add {d : ℕ}
+    (first second : EuclideanSpace ℂ (Fin d)) (carrierPhase : ℝ) :
+    Phasor.realizeEuclidean (first + second) carrierPhase =
+      Phasor.realizeEuclidean first carrierPhase +
+        Phasor.realizeEuclidean second carrierPhase := by
+  ext i
+  simp [Phasor.realize, add_mul]
+
 /-- A componentwise Euclidean phasor realization repeats after one carrier cycle. -/
 lemma Phasor.realizeEuclidean_add_two_pi {d : ℕ}
     (amplitude : EuclideanSpace ℂ (Fin d)) (carrierPhase : ℝ) :

@@ -74,9 +74,11 @@ PR unless maintainers explicitly ask to retain it.
   the referenced complex-material-wave local flux bridge second; scalar normal-admittance power
   ratios and channel conservation third; arbitrary-Jones and irradiance balance fourth; and the
   connected separate-wave actual-flux endpoint fifth. Keep each exact regression with the concept
-  it checks rather than collecting the regressions into one combined proposal. Keep
-  incident-reflected interference cancellation and any common-frequency superposed-field theorem
-  in a later coherent proposal.
+  it checks rather than collecting the regressions into one combined proposal. Keep the now-built
+  incident-reflected interference milestone in a later coherent proposal: generic aligned-frame
+  cross geometry, instantaneous referenced-field connectors and guarded period replacement,
+  pointwise/common-interval normal cancellation, the fixed-frequency superposed-field endpoint,
+  and their exact regressions should remain reviewable in that order.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
   upstream diff.
 
@@ -776,10 +778,21 @@ PR unless maintainers explicitly ask to retain it.
   while the general arbitrary-Jones theorem proves phase independence. In the matched zero-field
   regression, confirm that the deliberately arbitrary reflected normal is `chi_r = chi_i = 1`, so
   `chi_r ≠ -chi_i`, while zero reflected Jones data still makes the signed balance hold. Confirm
-  that the final connected result balances the three waves' separate actual
-  one-period normal fluxes at the stored point. Do not describe it as the Poynting flux of the
-  superposed negative-side field until a common-frequency incident-reflected normal-interference
-  cancellation theorem is present.
+  that the final connected result in this layer balances the three waves' separate actual
+  one-period normal fluxes at the stored point. Keep its claim distinct from the later
+  superposed-field theorem even though that theorem now supplies the required bridge.
+- [ ] Human-check the Fresnel interference layer before upstreaming. Confirm directly that the two
+  ordered actual-field cross terms have stored-normal sum
+  `Y (chi_i + chi_r) (S_i S_r + P_i P_r)`, so opposite signed normals cancel pointwise with
+  independent phases and frequencies. Verify that only the normal component is additive, that the
+  active reflected branch uses the negative-side impedance, and that common frequency enters only
+  when replacing carrier-period labels. In the zero branch, confirm that both actual reflected
+  fields vanish, dummy reflected normal and frequency remain unrestricted, and the uniform
+  common-axis hypothesis is stated honestly. Recheck the independent harmonic values
+  `(-36/55, 36/55)`, their nonzero tangential vector sum `(21/55, 0, 0)`, instantaneous values
+  `(-10/11, 10/11)` and `(-2/5, 2/5)`, connected total `5304/3025`, and the unequal-frequency
+  zero-wave fixture `omega_r = 2`, `omega_i = 1`. Keep the actual superposed-field endpoint separate
+  from whole-plane, aperture/modal-power, TIR, lossy, and scattering-unitarity claims.
 - [ ] Before claiming a complete fixed-frequency reduction of the four macroscopic boundary laws,
   prove that normal-`B` continuity is redundant for fixed-frequency phase-matched Faraday waves:
   `n dot B₀ = ω⁻¹ (n cross K) dot E₀`, so only tangential `K` and tangential `E₀` enter. Keep

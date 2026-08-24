@@ -28,6 +28,8 @@ an amplitude envelope scaled by `exp (-alpha * u)` scales mean flux by `exp (-2 
   peak phasor.
 - `ComplexMonochromaticPlaneWave.intervalAverage_poyntingVector_eq_localPhasors`: the actual-field
   one-period averaging connector.
+- `ComplexMonochromaticPlaneWave.intervalAverage_poyntingVector_add_eq_localPhasors`: the
+  equal-frequency two-carrier superposition connector.
 - `ComplexMonochromaticPlaneWave.intervalAverage_poyntingVector_eq_spatialFactor_normSq_smul`:
   the stored-reference-amplitude form.
 
@@ -152,6 +154,41 @@ lemma intervalAverage_poyntingVector_eq_localPhasors
   · exact fun time ↦ wave.electricField_eq_realize_localElectricPhasor time x
   · exact fun time ↦
       wave.magneticFieldStrength_eq_realize_localMagneticFieldStrengthPhasor medium time x
+
+/-- The one-period average of the actual Poynting vector of two coherently superposed
+equal-frequency carriers is the harmonic-flux expression for the sums of their complete local
+phasors.
+
+Both magnetic field strengths use the same supplied medium. The result requires no Maxwell,
+transversality, dispersion, or nonzero-amplitude hypothesis. -/
+lemma intervalAverage_poyntingVector_add_eq_localPhasors
+    (firstWave secondWave : ComplexMonochromaticPlaneWave)
+    (medium : HomogeneousIsotropicMedium)
+    (hFrequency : secondWave.angularFrequency = firstWave.angularFrequency)
+    (startTime : Time) (x : Space) :
+    (⨍ time in startTime.val..startTime.val + 2 * Real.pi / firstWave.angularFrequency,
+      poyntingVector (firstWave.electricField + secondWave.electricField)
+        (firstWave.magneticFieldStrength medium + secondWave.magneticFieldStrength medium)
+        (time : Time) x) =
+      timeAveragedPoyntingVector
+        (firstWave.localElectricPhasor x + secondWave.localElectricPhasor x)
+        (firstWave.localMagneticFieldStrengthPhasor medium x +
+          secondWave.localMagneticFieldStrengthPhasor medium x) := by
+  apply intervalAverage_poyntingVector_eq_timeAveragedPoyntingVector
+    (firstWave.localElectricPhasor x + secondWave.localElectricPhasor x)
+    (firstWave.localMagneticFieldStrengthPhasor medium x +
+      secondWave.localMagneticFieldStrengthPhasor medium x)
+    firstWave.angularFrequency firstWave.angularFrequency_pos startTime x
+  · intro time
+    simp only [Pi.add_apply]
+    rw [firstWave.electricField_eq_realize_localElectricPhasor,
+      secondWave.electricField_eq_realize_localElectricPhasor, hFrequency,
+      Phasor.realizeEuclidean_add]
+  · intro time
+    simp only [Pi.add_apply]
+    rw [firstWave.magneticFieldStrength_eq_realize_localMagneticFieldStrengthPhasor,
+      secondWave.magneticFieldStrength_eq_realize_localMagneticFieldStrengthPhasor,
+      hFrequency, Phasor.realizeEuclidean_add]
 
 /-- The actual one-period mean Poynting vector equals the reference-amplitude harmonic flux scaled
 by the squared modulus of the complete spatial factor at the observation point.
