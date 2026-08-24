@@ -263,6 +263,7 @@ public import Physlib.Optics.Network.ConnectionFamilyRegression
 public import Physlib.Optics.Network.ExternalChannel
 public import Physlib.Optics.Network.ExternalChannelRegression
 public import Physlib.Optics.Network.LinearBehavior
+public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
 public import Physlib.Optics.Network.PartialRouting
 public import Physlib.Optics.Network.PartialRoutingRegression
