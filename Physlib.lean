@@ -221,6 +221,7 @@ public import Physlib.Optics.HarmonicFlux.ReferencedMaterialWave
 public import Physlib.Optics.HarmonicFlux.Regression
 public import Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry
 public import Physlib.Optics.Interfaces.PlanarDielectric.Basic
+public import Physlib.Optics.Interfaces.PlanarDielectric.CanonicalIncidence
 public import Physlib.Optics.Interfaces.PlanarDielectric.CriticalAngle
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation

@@ -29,13 +29,17 @@ Jones data `(1, 1)`, `(5/11, -1/5)`, and `(16/11, 8/5)`.
   at two phases.
 - `jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance`: the full connected actual-
   field endpoint.
+- `jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance_of_incidenceFrames`: the same
+  endpoint with all frame matching and reflected-normal data derived by the canonical wrapper.
 - `fresnelInterferenceRegression_superposed_normalFlux_value`: its exact value `5304/3025`.
 - `fresnelInterferenceRegression_zeroReflection_unequalFrequency`: the arbitrary-frequency dummy
   zero-reflection branch.
+- `fresnelInterferenceRegression_zeroReflection_canonicalSuperposedBalance`: the canonical
+  endpoint with unequal-frequency, zero-vector, non-canonical-frame dummy reflected data.
 
 ## iii. Table of contents
 
-- A. Fixed-frequency witness
+- A. Fixed-frequency witness and canonical frames
 - B. Harmonic and actual ordered interference values
 - C. Superposed-wave normal-flux balance
 - D. Unequal-frequency zero reflection
@@ -51,13 +55,14 @@ aperture power, total internal reflection, lossy-media behavior, or scattering u
 namespace Optics
 
 open ClassicalMechanics Electromagnetism Electromagnetism.ThreeDimension Matrix Space Time
+open Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave
 open PlanarDielectricWaveConfiguration
 
 noncomputable section
 
 /-!
 
-## A. Fixed-frequency witness
+## A. Fixed-frequency witness and canonical frames
 
 -/
 
@@ -113,6 +118,159 @@ lemma jonesBoundaryRegression_exact_isFixedFrequencyElectricBoundary :
         JonesVector.toMaterialPlaneWave_angularFrequency,
         PiLp.inner_apply, Fin.sum_univ_three, RCLike.inner_apply, Matrix.cons_val_two,
         Matrix.head_cons]
+
+/-- The exact incident direction is non-normal to the regression interface. -/
+lemma jonesBoundaryRegression_incident_isNonNormalIncidence :
+    IsNonNormalIncidence jonesBoundaryRegressionIncidentDirection
+      jonesBoundaryRegressionPlane.normal := by
+  intro h
+  have hy := congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 1) h
+  norm_num [IsNonNormalIncidence, jonesBoundaryRegressionIncidentDirection,
+    jonesBoundaryRegressionPlane, jonesBoundaryRegressionNormal, crossProduct,
+    Matrix.cons_val_two, Matrix.head_cons] at hy
+
+/-- The exact reflected direction is non-normal to the regression interface. -/
+lemma jonesBoundaryRegression_reflected_isNonNormalIncidence :
+    IsNonNormalIncidence jonesBoundaryRegressionReflectedDirection
+      jonesBoundaryRegressionPlane.normal := by
+  intro h
+  have hy := congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 1) h
+  norm_num [IsNonNormalIncidence, jonesBoundaryRegressionReflectedDirection,
+    jonesBoundaryRegressionPlane, jonesBoundaryRegressionNormal, crossProduct,
+    Matrix.cons_val_two, Matrix.head_cons] at hy
+
+/-- The exact transmitted direction is non-normal to the regression interface. -/
+lemma jonesBoundaryRegression_transmitted_isNonNormalIncidence :
+    IsNonNormalIncidence jonesBoundaryRegressionTransmittedDirection
+      jonesBoundaryRegressionPlane.normal := by
+  intro h
+  have hy := congrArg (fun v : EuclideanSpace ℝ (Fin 3) ↦ v 1) h
+  norm_num [IsNonNormalIncidence, jonesBoundaryRegressionTransmittedDirection,
+    jonesBoundaryRegressionPlane, jonesBoundaryRegressionNormal, crossProduct,
+    Matrix.cons_val_two, Matrix.head_cons] at hy
+
+private lemma jonesBoundaryRegression_incident_sPolarizationAxis :
+    sPolarizationAxis jonesBoundaryRegressionIncidentDirection
+      jonesBoundaryRegressionPlane.normal
+        jonesBoundaryRegression_incident_isNonNormalIncidence =
+      jonesBoundaryRegressionAxisZero := by
+  have hsqrt25 : Real.sqrt 25 = 5 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  have hsqrt9 : Real.sqrt 9 = 3 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  ext i
+  fin_cases i <;>
+    norm_num [sPolarizationAxis, NormedSpace.normalize,
+      jonesBoundaryRegressionIncidentDirection, jonesBoundaryRegressionPlane,
+      jonesBoundaryRegressionNormal, jonesBoundaryRegressionAxisZero, crossProduct,
+      EuclideanSpace.norm_eq, Fin.sum_univ_three, Matrix.cons_val_two, Matrix.head_cons,
+      hsqrt25, hsqrt9]
+
+private lemma jonesBoundaryRegression_reflected_sPolarizationAxis :
+    sPolarizationAxis jonesBoundaryRegressionReflectedDirection
+      jonesBoundaryRegressionPlane.normal
+        jonesBoundaryRegression_reflected_isNonNormalIncidence =
+      jonesBoundaryRegressionAxisZero := by
+  have hsqrt25 : Real.sqrt 25 = 5 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  have hsqrt9 : Real.sqrt 9 = 3 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  ext i
+  fin_cases i <;>
+    norm_num [sPolarizationAxis, NormedSpace.normalize,
+      jonesBoundaryRegressionReflectedDirection, jonesBoundaryRegressionPlane,
+      jonesBoundaryRegressionNormal, jonesBoundaryRegressionAxisZero, crossProduct,
+      EuclideanSpace.norm_eq, Fin.sum_univ_three, Matrix.cons_val_two, Matrix.head_cons,
+      hsqrt25, hsqrt9]
+
+private lemma jonesBoundaryRegression_transmitted_sPolarizationAxis :
+    sPolarizationAxis jonesBoundaryRegressionTransmittedDirection
+      jonesBoundaryRegressionPlane.normal
+        jonesBoundaryRegression_transmitted_isNonNormalIncidence =
+      jonesBoundaryRegressionAxisZero := by
+  have hsqrt25 : Real.sqrt 25 = 5 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  have hsqrt16 : Real.sqrt 16 = 4 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  ext i
+  fin_cases i <;>
+    norm_num [sPolarizationAxis, NormedSpace.normalize,
+      jonesBoundaryRegressionTransmittedDirection, jonesBoundaryRegressionPlane,
+      jonesBoundaryRegressionNormal, jonesBoundaryRegressionAxisZero, crossProduct,
+      EuclideanSpace.norm_eq, Fin.sum_univ_three, Matrix.cons_val_two, Matrix.head_cons,
+      hsqrt25, hsqrt16]
+
+/-- The manually constructed incident regression frame is its canonical incidence frame. -/
+lemma jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame :
+    jonesBoundaryRegressionIncidentFrame =
+      incidencePolarizationFrame jonesBoundaryRegressionIncidentDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_incident_isNonNormalIncidence := by
+  apply PolarizationFrame.ext
+  funext i
+  fin_cases i
+  · change jonesBoundaryRegressionIncidentFrame.axis 0 =
+      (incidencePolarizationFrame jonesBoundaryRegressionIncidentDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_incident_isNonNormalIncidence).axis 0
+    rw [incidencePolarizationFrame_axis_zero,
+      jonesBoundaryRegression_incident_sPolarizationAxis]
+    rfl
+  · change jonesBoundaryRegressionIncidentFrame.axis 1 =
+      (incidencePolarizationFrame jonesBoundaryRegressionIncidentDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_incident_isNonNormalIncidence).axis 1
+    rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
+      jonesBoundaryRegression_incident_sPolarizationAxis,
+      jonesBoundaryRegressionIncidentFrame, PolarizationFrame.ofAxisZero_axis_one]
+
+/-- The manually constructed reflected regression frame is its canonical incidence frame. -/
+lemma jonesBoundaryRegressionReflectedFrame_eq_incidencePolarizationFrame :
+    jonesBoundaryRegressionReflectedFrame =
+      incidencePolarizationFrame jonesBoundaryRegressionReflectedDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_reflected_isNonNormalIncidence := by
+  apply PolarizationFrame.ext
+  funext i
+  fin_cases i
+  · change jonesBoundaryRegressionReflectedFrame.axis 0 =
+      (incidencePolarizationFrame jonesBoundaryRegressionReflectedDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_reflected_isNonNormalIncidence).axis 0
+    rw [incidencePolarizationFrame_axis_zero,
+      jonesBoundaryRegression_reflected_sPolarizationAxis]
+    rfl
+  · change jonesBoundaryRegressionReflectedFrame.axis 1 =
+      (incidencePolarizationFrame jonesBoundaryRegressionReflectedDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_reflected_isNonNormalIncidence).axis 1
+    rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
+      jonesBoundaryRegression_reflected_sPolarizationAxis,
+      jonesBoundaryRegressionReflectedFrame, PolarizationFrame.ofAxisZero_axis_one]
+
+/-- The manually constructed transmitted regression frame is its canonical incidence frame. -/
+lemma jonesBoundaryRegressionTransmittedFrame_eq_incidencePolarizationFrame :
+    jonesBoundaryRegressionTransmittedFrame =
+      incidencePolarizationFrame jonesBoundaryRegressionTransmittedDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_transmitted_isNonNormalIncidence := by
+  apply PolarizationFrame.ext
+  funext i
+  fin_cases i
+  · change jonesBoundaryRegressionTransmittedFrame.axis 0 =
+      (incidencePolarizationFrame jonesBoundaryRegressionTransmittedDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_transmitted_isNonNormalIncidence).axis 0
+    rw [incidencePolarizationFrame_axis_zero,
+      jonesBoundaryRegression_transmitted_sPolarizationAxis]
+    rfl
+  · change jonesBoundaryRegressionTransmittedFrame.axis 1 =
+      (incidencePolarizationFrame jonesBoundaryRegressionTransmittedDirection
+        jonesBoundaryRegressionPlane.normal
+          jonesBoundaryRegression_transmitted_isNonNormalIncidence).axis 1
+    rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
+      jonesBoundaryRegression_transmitted_sPolarizationAxis,
+      jonesBoundaryRegressionTransmittedFrame, PolarizationFrame.ofAxisZero_axis_one]
 
 /-!
 
@@ -478,6 +636,44 @@ lemma jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance (startTim
       norm_num)
     startTime
 
+/-- The canonical-incidence wrapper recovers the exact fixture's superposed actual-field
+normal-flux balance without a supplied common plane frame, three common-plane axis equalities, or
+exact reflected normal relation. -/
+lemma jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance_of_incidenceFrames
+    (startTime : Time) :
+    PlanarDielectricWaveConfiguration.HasSuperposedWaveNormalFluxBalance
+      (jonesBoundaryRegressionConfiguration (5 / 11) (16 / 11) (-1 / 5) (8 / 5))
+      startTime := by
+  exact
+    PlanarDielectricWaveConfiguration.fresnel_superposedWave_normalFlux_balance_of_incidenceFrames
+      jonesBoundaryRegression_exact_isFixedFrequencyElectricBoundary
+      jonesBoundaryRegression_exact_hasReferencedTangentialMagneticFieldStrengthBalance
+      (jonesBoundaryRegression_incidentWave_isReferencedMaterialJonesWave
+        jonesBoundaryRegressionIncidentJones)
+      (Or.inr (jonesBoundaryRegression_reflectedWave_isReferencedMaterialJonesWave
+        (jonesBoundaryRegressionReflectedJones (5 / 11) (-1 / 5))))
+      (jonesBoundaryRegression_transmittedWave_isReferencedMaterialJonesWave
+        (jonesBoundaryRegressionTransmittedJones (16 / 11) (8 / 5)))
+      jonesBoundaryRegression_incident_isNonNormalIncidence
+      jonesBoundaryRegression_transmitted_isNonNormalIncidence
+      jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame
+      jonesBoundaryRegressionTransmittedFrame_eq_incidencePolarizationFrame
+      (fun _ ↦ ⟨jonesBoundaryRegression_reflected_isNonNormalIncidence,
+        jonesBoundaryRegressionReflectedFrame_eq_incidencePolarizationFrame⟩)
+      (by
+        dsimp only [jonesBoundaryRegressionConfiguration, jonesBoundaryRegressionInterface]
+        rw [jonesBoundaryRegression_incidentNormalComponent]
+        norm_num)
+      (fun _ ↦ by
+        dsimp only [jonesBoundaryRegressionConfiguration, jonesBoundaryRegressionInterface]
+        rw [jonesBoundaryRegression_reflectedNormalComponent]
+        norm_num)
+      (by
+        dsimp only [jonesBoundaryRegressionConfiguration, jonesBoundaryRegressionInterface]
+        rw [jonesBoundaryRegression_transmittedNormalComponent]
+        norm_num)
+      startTime
+
 /-- The exact superposed negative-side normal mean flux is the independently checked transmitted
 value `5304/3025`, at every period origin. -/
 lemma fresnelInterferenceRegression_superposed_normalFlux_value (startTime : Time) :
@@ -533,6 +729,107 @@ def fresnelInterferenceRegressionZeroConfiguration : PlanarDielectricWaveConfigu
   incident := jonesBoundaryRegressionIncidentWave jonesBoundaryRegressionIncidentJones
   reflected := fresnelInterferenceRegressionZeroReflectedWave
   transmitted := jonesBoundaryRegressionIncidentWave jonesBoundaryRegressionIncidentJones
+
+/-- A matched-medium configuration with the same active incident and transmitted wave and the
+unequal-frequency zero reflected dummy carrier. -/
+def fresnelInterferenceRegressionZeroMatchedConfiguration :
+    PlanarDielectricWaveConfiguration where
+  interface := fresnelAmplitudeRegressionMatchedInterface
+  incident := jonesBoundaryRegressionIncidentWave jonesBoundaryRegressionIncidentJones
+  reflected := fresnelInterferenceRegressionZeroReflectedWave
+  transmitted := jonesBoundaryRegressionIncidentWave jonesBoundaryRegressionIncidentJones
+
+/-- The matched zero-reflection fixture satisfies electric phase matching and the referenced
+joint-electric balance while leaving the reflected frequency and wave vector arbitrary. -/
+lemma fresnelInterferenceRegressionZeroMatched_isFixedFrequencyElectricBoundary :
+    fresnelInterferenceRegressionZeroMatchedConfiguration.IsFixedFrequencyElectricBoundary := by
+  constructor
+  · exact ⟨⟨rfl, rfl⟩, Or.inl rfl⟩
+  · rw [PlanarDielectricWaveConfiguration.HasReferencedJointElectricBalance]
+    dsimp only [fresnelInterferenceRegressionZeroMatchedConfiguration,
+      fresnelAmplitudeRegressionMatchedInterface]
+    have hZero :=
+      (ComplexMonochromaticPlaneWave.referencedMediumJointElectricTraceAmplitude_eq_zero_iff
+        jonesBoundaryRegressionPlane jonesBoundaryRegressionNegativeMedium
+          fresnelInterferenceRegressionZeroReflectedWave).2 rfl
+    rw [hZero]
+    simp
+
+/-- The matched zero-reflection fixture satisfies the referenced tangential magnetic balance. -/
+lemma fresnelInterferenceRegressionZeroMatched_hasMagneticBalance :
+    PlanarDielectricWaveConfiguration.HasReferencedTangentialMagneticFieldStrengthBalance
+      fresnelInterferenceRegressionZeroMatchedConfiguration := by
+  rw [PlanarDielectricWaveConfiguration.HasReferencedTangentialMagneticFieldStrengthBalance]
+  dsimp only [fresnelInterferenceRegressionZeroMatchedConfiguration,
+    fresnelAmplitudeRegressionMatchedInterface]
+  have hZero :=
+    referencedMediumTangentialMagneticFieldStrengthAmplitude_eq_zero_of_electricAmplitude_eq_zero
+      jonesBoundaryRegressionPlane jonesBoundaryRegressionNegativeMedium
+        fresnelInterferenceRegressionZeroReflectedWave rfl
+  rw [hZero]
+  simp
+
+/-- The canonical superposed-flux wrapper preserves a zero reflected carrier whose frequency is
+unequal, whose wave vector is zero, and whose supplied frame is the non-canonical plane-normal
+frame. -/
+lemma fresnelInterferenceRegression_zeroReflection_canonicalSuperposedBalance
+    (startTime : Time) :
+    fresnelInterferenceRegressionZeroMatchedConfiguration.reflected.waveVector = 0 ∧
+      ¬ IsNonNormalIncidence jonesBoundaryRegressionPlane.normal
+        jonesBoundaryRegressionPlane.normal ∧
+      fresnelInterferenceRegressionZeroMatchedConfiguration.reflected.angularFrequency ≠
+        fresnelInterferenceRegressionZeroMatchedConfiguration.incident.angularFrequency ∧
+      fresnelInterferenceRegressionZeroMatchedConfiguration.HasSuperposedWaveNormalFluxBalance
+        startTime := by
+  refine ⟨rfl, ?_, ?_, ?_⟩
+  · intro hNonNormal
+    apply hNonNormal
+    ext i
+    fin_cases i <;> simp [crossProduct] <;> ring
+  · norm_num [fresnelInterferenceRegressionZeroMatchedConfiguration,
+      fresnelInterferenceRegressionZeroReflectedWave, jonesBoundaryRegressionIncidentWave,
+      ComplexMonochromaticPlaneWave.ofReal_angularFrequency,
+      JonesVector.toMaterialPlaneWave_angularFrequency]
+  · exact
+      PlanarDielectricWaveConfiguration.fresnel_superposedWave_normalFlux_balance_of_incidenceFrames
+          (configuration := fresnelInterferenceRegressionZeroMatchedConfiguration)
+          (incidentDirection := jonesBoundaryRegressionIncidentDirection)
+          (reflectedDirection := jonesBoundaryRegressionPlane.normal)
+          (transmittedDirection := jonesBoundaryRegressionIncidentDirection)
+          (incidentFrame := jonesBoundaryRegressionIncidentFrame)
+          (reflectedFrame := jonesBoundaryRegressionPlaneFrame)
+          (transmittedFrame := jonesBoundaryRegressionIncidentFrame)
+          (incidentJones := jonesBoundaryRegressionIncidentJones)
+          (reflectedJones := JonesVector.ofComponents 0 0)
+          (transmittedJones := jonesBoundaryRegressionIncidentJones)
+          fresnelInterferenceRegressionZeroMatched_isFixedFrequencyElectricBoundary
+          fresnelInterferenceRegressionZeroMatched_hasMagneticBalance
+          (jonesBoundaryRegression_incidentWave_isReferencedMaterialJonesWave
+            jonesBoundaryRegressionIncidentJones)
+          (Or.inl ⟨rfl, by
+            ext i
+            fin_cases i <;> rfl⟩)
+          (by simpa only [fresnelInterferenceRegressionZeroMatchedConfiguration,
+              fresnelAmplitudeRegressionMatchedInterface] using
+            (jonesBoundaryRegression_incidentWave_isReferencedMaterialJonesWave
+              jonesBoundaryRegressionIncidentJones))
+          jonesBoundaryRegression_incident_isNonNormalIncidence
+          jonesBoundaryRegression_incident_isNonNormalIncidence
+          jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame
+          jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame
+          (fun hActive ↦ (hActive rfl).elim)
+          (by
+            dsimp only [fresnelInterferenceRegressionZeroMatchedConfiguration,
+              fresnelAmplitudeRegressionMatchedInterface]
+            rw [jonesBoundaryRegression_incidentNormalComponent]
+            norm_num)
+          (fun hActive ↦ (hActive rfl).elim)
+          (by
+            dsimp only [fresnelInterferenceRegressionZeroMatchedConfiguration,
+              fresnelAmplitudeRegressionMatchedInterface]
+            rw [jonesBoundaryRegression_incidentNormalComponent]
+            norm_num)
+          startTime
 
 /-- The own-period interference bridge accepts a zero reflected field with unequal dummy frequency
 and without the active opposite-normal relation. -/

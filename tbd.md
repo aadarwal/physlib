@@ -762,9 +762,23 @@ PR unless maintainers explicitly ask to retain it.
   propagation-oriented full-vector basis, so normal incidence gives `r_p = -r_s`, not equality.
   Verify that `chi_i > 0` and `chi_t >= 0` make both denominators positive, that the solver never
   divides by `chi_t`, and that a zero reflected field keeps arbitrary dummy carrier data. The
-  connected theorem assumes the reflected normal alternative; a later wrapper must derive it from
-  the selected reflection branch rather than treating a wave label as a direction law. Keep the
-  manual rational fixture solve independent of the general coefficient theorem.
+  core connected theorem assumes the reflected normal alternative. Confirm that the canonical
+  wrapper instead derives it from phase matching, referenced material dispersion, canonical
+  non-normal frames, and explicit positive-incident plus active-negative-reflected normal
+  selection rather than treating a wave label as a direction law. Keep the manual rational
+  fixture solve independent of the general coefficient theorem.
+- [ ] Human-check the canonical incidence wrapper before upstreaming. Confirm that positive scalar
+  rescaling of equal tangential phase directions preserves the oriented `s = normalize (n cross
+  k-hat)` axis; complex hyperplane reflection descends to the exact real propagation-vector
+  reflection only after equal frequency and both referenced material connectors are supplied; and
+  equality of the supplied active reflected frame with the direction-determined canonical frame
+  is an explicit conditional premise. In the zero reflected branch, verify that the proof locally
+  uses the common plane frame only with proved-zero Jones data, so the original reflected wave
+  vector, frequency, propagation-frame direction, and frame remain entirely arbitrary. Recheck
+  that the exact `3-4-5` manual frames equal the canonical incident, reflected, and transmitted
+  frames and that both the old explicit-alignment endpoint and the canonical wrapper prove the
+  same actual superposed-field normal-flux balance. Normal incidence still requires a selected
+  tangent frame.
 - [ ] Human-check the propagating Fresnel flux layer before upstreaming. Confirm that peak electric
   amplitudes give signed normal flux `(1 / 2) Y chi (abs Js squared + abs Jp squared)` and that the
   full-vector `p` coefficient uses the same transmitted-to-incident normal-admittance factor
