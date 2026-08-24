@@ -37,6 +37,8 @@ interpretation. Splitters and combiners are components rather than one-to-many c
 
 ## iii. Key results
 
+- `Incident.splitSumEquiv` and `Outgoing.splitSumEquiv`: distribute directed endpoint wrappers over
+  a binary sum of channel families.
 - `Incident.relabelEmbedding` and `Outgoing.relabelEmbedding`: lift a channel embedding without
   erasing the nominal endpoint type.
 - `PortConnection.channelEmbedding`: embeds both local mode fibers in the flattened channel type.
@@ -142,6 +144,39 @@ def relabelEquiv {ι : Type u} {κ : Type v} (e : ι ≃ κ) : Incident ι ≃ I
 lemma relabelEquiv_apply {ι : Type u} {κ : Type v} (e : ι ≃ κ) (i : ι) :
     relabelEquiv e (Incident.mk i) = Incident.mk (e i) := rfl
 
+/-- The canonical equivalence distributing incident channel ends over a binary sum. -/
+def splitSumEquiv {ι : Type u} {κ : Type v} :
+    Incident (ι ⊕ κ) ≃ Incident ι ⊕ Incident κ :=
+  channelEquiv.trans (channelEquiv.symm.sumCongr channelEquiv.symm)
+
+/-- Distributing incident ends sends a left channel to the left family. -/
+@[simp]
+lemma splitSumEquiv_apply_inl {ι : Type u} {κ : Type v} (i : ι) :
+    (splitSumEquiv : Incident (ι ⊕ κ) ≃ Incident ι ⊕ Incident κ) ⟨Sum.inl i⟩ =
+      Sum.inl ⟨i⟩ := rfl
+
+/-- Distributing incident ends sends a right channel to the right family. -/
+@[simp]
+lemma splitSumEquiv_apply_inr {ι : Type u} {κ : Type v} (i : κ) :
+    (splitSumEquiv : Incident (ι ⊕ κ) ≃ Incident ι ⊕ Incident κ) ⟨Sum.inr i⟩ =
+      Sum.inr ⟨i⟩ := rfl
+
+/-- Recombining a left incident family wraps its channel in the left summand. -/
+@[simp]
+lemma splitSumEquiv_symm_apply_inl {ι : Type u} {κ : Type v} (i : Incident ι) :
+    (splitSumEquiv : Incident (ι ⊕ κ) ≃ Incident ι ⊕ Incident κ).symm (Sum.inl i) =
+      ⟨Sum.inl i.channel⟩ := by
+  cases i
+  rfl
+
+/-- Recombining a right incident family wraps its channel in the right summand. -/
+@[simp]
+lemma splitSumEquiv_symm_apply_inr {ι : Type u} {κ : Type v} (i : Incident κ) :
+    (splitSumEquiv : Incident (ι ⊕ κ) ≃ Incident ι ⊕ Incident κ).symm (Sum.inr i) =
+      ⟨Sum.inr i.channel⟩ := by
+  cases i
+  rfl
+
 /-- An embedding of underlying labels lifted to incident channel ends. -/
 def relabelEmbedding {ι : Type u} {κ : Type v} (embedding : ι ↪ κ) :
     Incident ι ↪ Incident κ where
@@ -194,6 +229,39 @@ def relabelEquiv {ι : Type u} {κ : Type v} (e : ι ≃ κ) : Outgoing ι ≃ O
 @[simp]
 lemma relabelEquiv_apply {ι : Type u} {κ : Type v} (e : ι ≃ κ) (i : ι) :
     relabelEquiv e (Outgoing.mk i) = Outgoing.mk (e i) := rfl
+
+/-- The canonical equivalence distributing outgoing channel ends over a binary sum. -/
+def splitSumEquiv {ι : Type u} {κ : Type v} :
+    Outgoing (ι ⊕ κ) ≃ Outgoing ι ⊕ Outgoing κ :=
+  channelEquiv.trans (channelEquiv.symm.sumCongr channelEquiv.symm)
+
+/-- Distributing outgoing ends sends a left channel to the left family. -/
+@[simp]
+lemma splitSumEquiv_apply_inl {ι : Type u} {κ : Type v} (i : ι) :
+    (splitSumEquiv : Outgoing (ι ⊕ κ) ≃ Outgoing ι ⊕ Outgoing κ) ⟨Sum.inl i⟩ =
+      Sum.inl ⟨i⟩ := rfl
+
+/-- Distributing outgoing ends sends a right channel to the right family. -/
+@[simp]
+lemma splitSumEquiv_apply_inr {ι : Type u} {κ : Type v} (i : κ) :
+    (splitSumEquiv : Outgoing (ι ⊕ κ) ≃ Outgoing ι ⊕ Outgoing κ) ⟨Sum.inr i⟩ =
+      Sum.inr ⟨i⟩ := rfl
+
+/-- Recombining a left outgoing family wraps its channel in the left summand. -/
+@[simp]
+lemma splitSumEquiv_symm_apply_inl {ι : Type u} {κ : Type v} (i : Outgoing ι) :
+    (splitSumEquiv : Outgoing (ι ⊕ κ) ≃ Outgoing ι ⊕ Outgoing κ).symm (Sum.inl i) =
+      ⟨Sum.inl i.channel⟩ := by
+  cases i
+  rfl
+
+/-- Recombining a right outgoing family wraps its channel in the right summand. -/
+@[simp]
+lemma splitSumEquiv_symm_apply_inr {ι : Type u} {κ : Type v} (i : Outgoing κ) :
+    (splitSumEquiv : Outgoing (ι ⊕ κ) ≃ Outgoing ι ⊕ Outgoing κ).symm (Sum.inr i) =
+      ⟨Sum.inr i.channel⟩ := by
+  cases i
+  rfl
 
 /-- An embedding of underlying labels lifted to outgoing channel ends. -/
 def relabelEmbedding {ι : Type u} {κ : Type v} (embedding : ι ↪ κ) :

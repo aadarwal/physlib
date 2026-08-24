@@ -1213,9 +1213,10 @@ PR unless maintainers explicitly ask to retain it.
   functionality of a scattering graph by bijectivity of its right-incident to left-outgoing block,
   derive both block-conversion formulas under the exact block hypotheses, and prove behavioral and
   matrix round trips. Keep the opposite convention behind an explicit permutation.
-- [ ] Before that conversion, connect the two-port scattering type to the N2a component boundary:
-  add canonical `Incident`/`Outgoing` sum-label equivalences and a typed two-port adapter from the
-  existing oriented scattering transform, with entrywise and behavior-level agreement.
+- [x] Connect the two-port scattering type to the N2a component boundary with canonical
+  `Incident`/`Outgoing` sum-label equivalences and a typed two-port adapter from the existing
+  oriented scattering transform. Exact four-block entries, amplitude covariance, losslessness,
+  behavior membership, label round trip, and a four-distinct-nonreal-entry regression now agree.
 - [ ] Derive matched and loaded termination formulas from the relational constraint. In particular,
   do not generalize the source's scalar `1 / M11` transmission formula without the determinant-one
   hypothesis that makes it valid.

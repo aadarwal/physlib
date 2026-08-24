@@ -275,6 +275,8 @@ public import Physlib.Optics.Network.TwoPortBehavior
 public import Physlib.Optics.Network.TwoPortBehaviorRegression
 public import Physlib.Optics.Network.TwoPortChain
 public import Physlib.Optics.Network.TwoPortChainRegression
+public import Physlib.Optics.Network.TwoPortScattering
+public import Physlib.Optics.Network.TwoPortScatteringRegression
 public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
 public import Physlib.Optics.Polarization.ComplexRealization
