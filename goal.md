@@ -395,6 +395,10 @@ Ownership rules:
   consequences without assigning support or outgoing semantics.
 - `Optics.Interfaces.PlanarDielectric.SupercriticalPolarization` supplies the canonical
   negative-radicand Jones connector and its exact nonzero-data characterization.
+- `Optics.Mode.Embedding` supplies restriction and zero extension along finite mode-family
+  embeddings, their selected identity and ambient range projector, and passive zero extension of
+  rectangular transforms. It deliberately treats omitted coordinates as algebraically discarded
+  modal data rather than as physical absorption.
 - `Optics.Network.Port` supplies dependent port/channel families, nominal incident and outgoing
   endpoint types, presentation-independent local bidirectional connections, the typed scattering
   adapter, and convention-free unit-gain routing with its exact local `C * S` action order. It
@@ -423,8 +427,8 @@ Ownership rules:
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
 - [ ] external-channel partial routing, implicit behaviors, global wiring, and well-posed network
-  elimination; typed local connections and proof-carrying indexed connection families are
-  complete;
+  elimination; generic mode restriction/zero extension, typed local connections, and
+  proof-carrying indexed connection families are complete;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1727,8 +1731,14 @@ definitions.
 
 #### N1. Modal algebra completion — complete
 
-O2 now supplies the converse characterizations, parallel closure, and convention-free coordinate
-changes required by the network layer.
+O2 now supplies the converse characterizations, parallel closure, convention-free coordinate
+changes, and sparse restriction/zero-extension maps required by the network layer.
+
+- [x] restriction and zero extension along mode embeddings, with exact coordinate action,
+  `R * E = 1`, an ambient star range projector `E * R`, and the correct isometry, contraction,
+  passivity, arbitrary-input action, exact output-power, and zero-extended-transform laws;
+- [x] the exact restriction-power boundary: ambient modal power is preserved precisely when every
+  omitted coordinate has zero amplitude;
 
 #### N2a. Ports, channels, and convention-free routing — in progress
 
@@ -2396,7 +2406,7 @@ current integration base; a designed package whose prerequisite is merely active
 |---|---|---|---|
 | O0 roadmap | done | upstream base | Optics API map and scope module |
 | O1 mode core | done | Mathlib complex linear algebra | mode branch and integration build |
-| O2 modal algebra | done | O1 | predicate characterizations, binary parallel composition, relabeling, and rephasing suites |
+| O2 modal algebra | done | O1 | predicate characterizations, binary parallel composition, relabeling, rephasing, and finite mode-embedding suites |
 | P1a Jones foundations | done | complex algebra | scalar realization, raw Jones action, and intensity suite |
 | P1b harmonic bridge | done | P1a, existing harmonic wave | named-frame electric/magnetic field reconstruction |
 | P2a general coherency | done | Mathlib PSD audit | generic PSD wrapper and conjugation suite |
@@ -2424,8 +2434,8 @@ current integration base; a designed package whose prerequisite is merely active
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |
-| N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
-| N2a ports/routing | in progress | O2 reindex/direct-sum support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, and connected-channel routing are complete; external complements and ambient partial wiring remain |
+| N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
+| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, and connected-channel routing are complete; external complements and ambient partial wiring remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
 | N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
@@ -2519,13 +2529,17 @@ human verification recorded in `tbd.md`.
    Relativity and Optics conventions, the neutral positive cone carries no optical Stokes ordering,
    and zero Jones data has no polarization direction.
 2. O2/N1 is complete, including predicate characterizations, binary parallel composition,
-   relabeling, and rephasing. N2a now has the typed local port/connection seam, the oriented
+   relabeling, rephasing, and finite mode-family restriction and zero extension. The sparse maps
+   prove `R * E = 1`, retain `E * R` as the ambient range projector, and zero-extend arbitrary
+   rectangular transforms without treating omitted coordinates as absorption. N2a now has the
+   typed local port/connection seam, the oriented
    scattering adapter, presentation-independent unit routing, and the incident-space `C * S`
    action order. Proof-carrying indexed connection families now add physical-port endpoint
    uniqueness, dependent connected-channel embedding, blockwise mating, and exact total routing
-   over connected channels. Continue with the external-channel complement and ambient partial
-   routing; preserve the endpoint distinction and do not encode feedback as ordinary
-   scattering-matrix multiplication.
+   over connected channels. Continue by lifting this connected router through the new sparse maps
+   to an ambient passive partial router, with an explicit nonempty exposed-channel fixture;
+   preserve the endpoint distinction and do not encode feedback as ordinary scattering-matrix
+   multiplication.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
