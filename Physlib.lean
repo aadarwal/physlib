@@ -241,6 +241,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.Snell
 public import Physlib.Optics.Interfaces.PlanarDielectric.SubcriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalCarrier
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFlux
+public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalPolarization
+public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalPolarizationRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
@@ -268,6 +270,8 @@ public import Physlib.Optics.Polarization.Mueller.Trace
 public import Physlib.Optics.Polarization.Mueller.Unitary
 public import Physlib.Optics.Polarization.PlanarFrame
 public import Physlib.Optics.Polarization.Poincare
+public import Physlib.Optics.Polarization.PositiveNormalDecayFrame
+public import Physlib.Optics.Polarization.PositiveNormalDecayFrameRegression
 public import Physlib.Optics.Polarization.ReferencedMaterialWave
 public import Physlib.Optics.Polarization.RelativePhase
 public import Physlib.Optics.Polarization.RelativePhaseStokes

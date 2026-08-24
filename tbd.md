@@ -973,6 +973,46 @@ PR unless maintainers explicitly ask to retain it.
 
 ## Polarization conventions
 
+- [ ] Human-check the positive-normal-decay polarization-frame convention before upstreaming.
+  With `exp (I * omega * t - I * K dot x)`, verify `K = q - I * alpha * n`,
+  `s = normalize (n cross q)`, and `p = (K cross s) / beta` for positive real shell
+  wavenumber `beta`; the planar medium connector then identifies `beta` with `omega / v_2`.
+  Confirm the complex-bilinear identities `p dot p = 1`,
+  `K cross s = beta p`, and `K cross p = -beta s`; do not replace them by Hermitian
+  orthonormality or normalize `p` by its Hermitian norm.
+- [ ] Human-check the full-vector/fixed-plane `p` sign. The retained real plane axis is
+  `n cross s = -normalize q`, so the tangential multiplier of full-vector `p` is
+  `-I * alpha / beta`, while its normal coefficient is `norm q / beta`. In the exact fixture
+  `K = (5, 0, -4 I)` and `beta = 3`, this gives `p = (4 I / 3, 0, 5 / 3)`, fixed-plane
+  multiplier `-4 I / 3`, and Hermitian squared norm `41 / 9`, not one.
+- [ ] Keep `PositiveNormalDecayPolarizationFrame.embedJones` documented as raw TE/TM amplitude
+  coordinates. Standard `JonesVector.intensity` is not the Hermitian norm or physical power of
+  the embedded electric amplitude. Do not place an evanescent transmitted channel in the ordinary
+  positive-admittance port/unitarity API.
+- [ ] Decide with maintainers whether the dedicated proof-bearing
+  `PositiveNormalDecayPolarizationFrame` is the preferred upstream abstraction. If so, split the
+  fork milestone into neutral complex cross-product and hyperplane geometry, the bilinear frame
+  and fixed-plane conversion, and the planar negative-radicand constructor/Maxwell connector.
+  Keep each exact regression beside the concept it tests rather than proposing a standalone
+  regression PR. Do not fold the complex frame into the existing real `PolarizationFrame` API.
+- [ ] Human-check that the connected negative-radicand positive-normal-decay Jones carrier uses
+  zero incident tangential attenuation only to obtain the existing candidate specification. Its
+  embedded amplitude supplies bilinear transversality automatically, which yields the source-free
+  positive-medium Maxwell solution and zero stored-normal one-period mean flux. These statements
+  do not prove boundary satisfaction, a Fresnel coefficient, pointwise zero normal flux, TIR, or
+  outgoing/limiting-absorption semantics.
+- [ ] Human-check the exact planar connector regression. For stored normal `+z`, negative-side
+  `epsilon_1 = mu_1 = 13`, positive-side `epsilon_2 = mu_2 = 3`, `omega = 1`, and incident
+  `K_i = (5, 0, 12)`, verify the incident `5^2 + 12^2 = 13^2` material shell, radicand `-16`,
+  transmitted `K_t = (5, 0, -4 I)`, normalized normal factor `-4 I / 3`, raw TM data
+  `(0, -3 I)`, `B_0 = (0, 9 I, 0)`,
+  `E_tan = (4, 0, 0)`, and `H_tan = (0, 3 I, 0)`. Confirm that the regression consumes the
+  canonical constructor from an unrelated zero transmitted slot and reaches the configuration-level
+  Maxwell and zero-normal-mean-flux endpoints without asserting a boundary equation or TIR.
+- [ ] Human-confirm that no external implementation was copied or translated into the
+  positive-normal-decay frame, connector, or regressions. Separately, if the roadmap, API map, or
+  a future PR description relies on listed optics literature, independently verify every
+  bibliographic fact and physics claim under `AI-POLICY.md`.
 - [ ] Human-check the third Stokes-coordinate sign against the selected optics reference, the
   existing `Re (z * exp (I * (ωt - kx)))` carrier convention, and Jones coordinate order.
 - [ ] Record whether the observer looks along propagation or into the beam before assigning
