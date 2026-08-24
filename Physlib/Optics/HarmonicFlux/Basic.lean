@@ -252,6 +252,17 @@ def timeAveragedPoyntingVector
     (ComplexMonochromaticPlaneWave.complexCross electricPhasor
       (Phasor.conjugateEuclidean magneticFieldStrengthPhasor))
 
+/-- A zero electric phasor has zero time-averaged Poynting vector for every magnetic-field-strength
+phasor. -/
+@[simp]
+lemma timeAveragedPoyntingVector_zero_left
+    (magneticFieldStrengthPhasor : EuclideanSpace ℂ (Fin 3)) :
+    timeAveragedPoyntingVector 0 magneticFieldStrengthPhasor = 0 := by
+  ext i
+  fin_cases i <;>
+    simp [timeAveragedPoyntingVector, ComplexMonochromaticPlaneWave.complexCross,
+      ComplexWaveVector.realPart, Phasor.conjugateEuclidean, crossProduct]
+
 /-- Common complex scaling of both local phasors scales the time-averaged Poynting vector by the
 squared modulus of the scalar. -/
 lemma timeAveragedPoyntingVector_smul (z : ℂ)
