@@ -121,6 +121,24 @@ lemma complexCross_add_right (u v w : EuclideanSpace ℂ (Fin 3)) :
   ext i
   fin_cases i <;> simp [complexCross, crossProduct] <;> ring
 
+/-- The complex cross product commutes with subtraction in its second argument. -/
+lemma complexCross_sub_right (u v w : EuclideanSpace ℂ (Fin 3)) :
+    complexCross u (v - w) = complexCross u v - complexCross u w := by
+  ext i
+  fin_cases i <;> simp [complexCross, crossProduct] <;> ring
+
+/-- The complex cross product is additive in its first argument. -/
+lemma complexCross_add_left (u v w : EuclideanSpace ℂ (Fin 3)) :
+    complexCross (u + v) w = complexCross u w + complexCross v w := by
+  ext i
+  fin_cases i <;> simp [complexCross, crossProduct]
+
+/-- The complex cross product commutes with subtraction in its first argument. -/
+lemma complexCross_sub_left (u v w : EuclideanSpace ℂ (Fin 3)) :
+    complexCross (u - v) w = complexCross u w - complexCross v w := by
+  ext i
+  fin_cases i <;> simp [complexCross, crossProduct]
+
 /-- The complex cross product commutes with complex scaling in its second argument. -/
 lemma complexCross_smul_right (c : ℂ) (u v : EuclideanSpace ℂ (Fin 3)) :
     complexCross u (c • v) = c • complexCross u v := by
@@ -146,11 +164,44 @@ lemma bilinearDot_self_complexCross (u v : EuclideanSpace ℂ (Fin 3)) :
     ComplexWaveVector.bilinearDot u (complexCross u v) = 0 := by
   exact dot_self_cross u v
 
+/-- The complex-bilinear pairing of the second cross-product argument with the result is zero. -/
+lemma bilinearDot_complexCross_self (u v : EuclideanSpace ℂ (Fin 3)) :
+    ComplexWaveVector.bilinearDot v (complexCross u v) = 0 := by
+  exact dot_cross_self u v
+
+/-- The complex-bilinear pairing of two cross products is their Gram determinant. -/
+lemma bilinearDot_complexCross_complexCross
+    (u v w x : EuclideanSpace ℂ (Fin 3)) :
+    ComplexWaveVector.bilinearDot (complexCross u v) (complexCross w x) =
+      ComplexWaveVector.bilinearDot u w * ComplexWaveVector.bilinearDot v x -
+        ComplexWaveVector.bilinearDot u x * ComplexWaveVector.bilinearDot v w := by
+  exact cross_dot_cross u v w x
+
+/-- The Hermitian pairing of two complex cross products is their Hermitian Gram determinant. -/
+lemma inner_complexCross_complexCross
+    (u v w x : EuclideanSpace ℂ (Fin 3)) :
+    inner ℂ (complexCross u v) (complexCross w x) =
+      inner ℂ u w * inner ℂ v x - inner ℂ u x * inner ℂ v w := by
+  simp only [PiLp.inner_apply, RCLike.inner_apply]
+  simp [complexCross, crossProduct, Fin.sum_univ_three]
+  ring
+
 /-- The complex vector triple-product identity. -/
 lemma complexCross_complexCross (u v w : EuclideanSpace ℂ (Fin 3)) :
     complexCross u (complexCross v w) =
       ComplexWaveVector.bilinearDot u w • v -
         ComplexWaveVector.bilinearDot u v • w := by
+  ext i
+  fin_cases i <;>
+    simp [complexCross, ComplexWaveVector.bilinearDot, Fin.sum_univ_three,
+      crossProduct] <;>
+    ring
+
+/-- The left-nested complex vector triple-product identity. -/
+lemma complexCross_complexCross_left (u v w : EuclideanSpace ℂ (Fin 3)) :
+    complexCross (complexCross u v) w =
+      ComplexWaveVector.bilinearDot u w • v -
+        ComplexWaveVector.bilinearDot v w • u := by
   ext i
   fin_cases i <;>
     simp [complexCross, ComplexWaveVector.bilinearDot, Fin.sum_univ_three,
