@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryMagnetic
+public import Physlib.Optics.Evanescent
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFlux
 public import Physlib.Optics.Polarization.PositiveNormalDecayFrame
 
@@ -34,9 +35,10 @@ wave vector. The full-vector `p` axis has fixed-plane tangential coefficient
 
 A raw Jones vector can be embedded as the electric amplitude of the canonical transmitted
 carrier. The resulting candidate is automatically bilinearly transverse and dispersion matched,
-and its compatible magnetic-induction amplitude obeys the material-wavenumber quarter-turn.
-No boundary condition chooses the Jones amplitudes here, and no outgoing, total-internal-
-reflection, irradiance, or power claim is made.
+and its compatible magnetic-induction amplitude obeys the material-wavenumber quarter-turn. When
+the Jones data is nonzero, the candidate satisfies the generic positive-side half-space
+evanescence predicate. No boundary condition chooses the Jones amplitudes here, and no outgoing,
+total-internal-reflection, irradiance, or power claim is made.
 
 ## ii. Key results
 
@@ -57,6 +59,8 @@ reflection, irradiance, or power claim is made.
   rescaled to the affine interface point, with referenced electric and magnetic trace lemmas.
 - `positiveNormalDecayTransmittedJonesCandidate_isMacroscopicMaxwellSolution`:
   the negative-radicand positive-medium Maxwell solution.
+- `positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent`:
+  nonzero Jones data gives a positive-side evanescent field.
 - `positiveNormalDecayTransmittedJonesCandidate_normalMeanFlux_eq_zero`:
   zero stored-normal one-period mean flux.
 
@@ -200,6 +204,29 @@ lemma positiveNormalDecayTransmittedJonesCandidate_electricAmplitude
       (configuration.positiveNormalDecayTransmittedPolarizationFrame hRadicand).embedJones J :=
   rfl
 
+/-- The canonical negative-radicand Jones carrier has zero electric amplitude exactly when both
+raw Jones components vanish. -/
+lemma positiveNormalDecayTransmittedJonesCandidate_electricAmplitude_eq_zero_iff
+    (configuration : PlanarDielectricWaveConfiguration)
+    (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector) :
+    (configuration.positiveNormalDecayTransmittedJonesCandidate
+      hRadicand J).electricAmplitude = 0 ↔ J.components = 0 := by
+  rw [configuration.positiveNormalDecayTransmittedJonesCandidate_electricAmplitude
+    hRadicand J]
+  constructor
+  · intro hZero
+    ext i
+    rw [← (configuration.positiveNormalDecayTransmittedPolarizationFrame
+      hRadicand).bilinearDot_axis_embedJones J i, hZero]
+    simp
+  · intro hZero
+    rw [(configuration.positiveNormalDecayTransmittedPolarizationFrame
+      hRadicand).embedJones_eq]
+    have hFirst := congrArg (fun components ↦ components 0) hZero
+    have hSecond := congrArg (fun components ↦ components 1) hZero
+    rw [hFirst, hSecond]
+    simp
+
 @[simp]
 lemma positiveNormalDecayTransmittedJonesCandidate_waveVector
     (configuration : PlanarDielectricWaveConfiguration)
@@ -306,6 +333,53 @@ lemma positiveNormalDecayTransmittedJonesCandidate_spec_of_radicand_neg
       (configuration.positiveNormalDecayTransmittedJonesCandidate hRadicand J) := by
   exact configuration.positiveNormalDecayTransmittedCandidate_spec_of_radicand_neg _
     hIncidentTangentialAttenuation hRadicand
+
+/-- Nonzero Jones data makes the canonical negative-radicand transmitted carrier evanescent into
+the positive geometric half-space.
+
+This classification uses only the canonical construction; it does not require boundary matching
+or assign an outgoing, total-internal-reflection, or positive-power-port role. -/
+lemma positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent
+    (configuration : PlanarDielectricWaveConfiguration)
+    (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector)
+    (hJ : J.components ≠ 0) :
+    IsHalfSpaceEvanescent configuration.interface.plane .positive
+      configuration.interface.positiveMedium
+      (configuration.positiveNormalDecayTransmittedJonesCandidate hRadicand J) := by
+  refine ⟨?_,
+    configuration.positiveNormalDecayTransmittedJonesCandidate_isTransverse hRadicand J,
+    configuration.positiveNormalDecayTransmittedJonesCandidate_isDispersionMatched hRadicand J,
+    ?_, ?_⟩
+  · intro hZero
+    exact hJ
+      ((positiveNormalDecayTransmittedJonesCandidate_electricAmplitude_eq_zero_iff
+        configuration hRadicand J).mp hZero)
+  · rw [configuration.positiveNormalDecayTransmittedJonesCandidate_waveVector hRadicand J]
+    exact tangentialProjection_attenuationVector_positiveNormalDecayTransmittedWaveVector
+      configuration
+  · rw [configuration.positiveNormalDecayTransmittedJonesCandidate_waveVector hRadicand J]
+    exact configuration.positiveNormalDecayTransmittedWaveVector_isAttenuationDirectedInto
+      hRadicand
+
+/-- The canonical negative-radicand transmitted Jones carrier is half-space evanescent exactly
+when its raw Jones data is nonzero.
+
+This equivalence classifies the canonical carrier but does not add boundary matching, an outgoing
+condition, a total-internal-reflection role, or a power interpretation. -/
+lemma positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent_iff
+    (configuration : PlanarDielectricWaveConfiguration)
+    (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector) :
+    IsHalfSpaceEvanescent configuration.interface.plane .positive
+        configuration.interface.positiveMedium
+        (configuration.positiveNormalDecayTransmittedJonesCandidate hRadicand J) ↔
+      J.components ≠ 0 := by
+  constructor
+  · intro hEvanescent hZero
+    exact hEvanescent.electricAmplitude_ne_zero
+      ((positiveNormalDecayTransmittedJonesCandidate_electricAmplitude_eq_zero_iff
+        configuration hRadicand J).mpr hZero)
+  · exact configuration.positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent
+      hRadicand J
 
 /-- The negative-radicand Jones carrier is a source-free macroscopic Maxwell solution in the
 positive medium. -/
