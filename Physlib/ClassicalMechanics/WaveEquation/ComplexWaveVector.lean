@@ -279,6 +279,18 @@ lemma bilinearDot_ofPhaseAttenuation_self (q a : WaveVector d) :
   · simp [mul_comm]
     ring
 
+/-- The Hermitian squared norm of `q - I * a` is the sum of the squared real phase and
+attenuation norms. -/
+lemma norm_ofPhaseAttenuation_sq (q a : WaveVector d) :
+    ‖ofPhaseAttenuation q a‖ ^ 2 = ‖q‖ ^ 2 + ‖a‖ ^ 2 := by
+  rw [EuclideanSpace.norm_sq_eq, EuclideanSpace.real_norm_sq_eq,
+    EuclideanSpace.real_norm_sq_eq]
+  simp only [Complex.sq_norm, ofPhaseAttenuation_apply, Complex.normSq_apply]
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro i _
+  simp; ring
+
 /-!
 
 ## D. Spatial factors
@@ -442,6 +454,14 @@ lemma bilinearDot_waveVector_self (data : PositiveNormalDecayWaveVector normal) 
   rw [hattenuation, inner_smul_right, htangent, real_inner_self_eq_norm_sq]
   push_cast
   ring
+
+/-- The Hermitian squared norm of positive-normal-decay data adds its tangential phase and normal
+attenuation squares. -/
+lemma norm_waveVector_sq (data : PositiveNormalDecayWaveVector normal) :
+    ‖data.waveVector‖ ^ 2 =
+      ‖data.tangentialWaveVector‖ ^ 2 + data.decayRate ^ 2 := by
+  rw [waveVector, norm_ofPhaseAttenuation_sq, norm_smul, data.normalVector_norm,
+    mul_one, Real.norm_eq_abs, abs_of_pos data.decayRate_pos]
 
 /-- Displacement by `u` along the selected normal multiplies the spatial factor by
 `exp (-alpha * u)`. -/

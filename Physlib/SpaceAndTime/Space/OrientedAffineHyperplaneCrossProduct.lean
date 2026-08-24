@@ -23,6 +23,10 @@ unchanged by tangential projection or reflection across the tangent plane.
   on the tangential projection.
 - `OrientedAffineHyperplane.normalVector_cross_vectorReflection`: tangent-plane reflection
   preserves normal crossing.
+- `OrientedAffineHyperplane.norm_normalVector_cross_of_isTangent`: crossing a
+  tangent vector by the unit normal preserves its norm.
+- `OrientedAffineHyperplane.normalVector_cross_normalize_normalVector_cross`: the normalized
+  normal cross tangent axis has the expected in-plane quarter-turn.
 
 ## iii. Table of contents
 
@@ -67,6 +71,47 @@ lemma normalVector_cross_vectorReflection
   rw [← plane.normalVector_cross_tangentialProjection (plane.vectorReflection v),
     plane.tangentialProjection_vectorReflection,
     plane.normalVector_cross_tangentialProjection]
+
+/-- Crossing a tangent vector by the oriented unit normal preserves its Euclidean norm. -/
+lemma norm_normalVector_cross_of_isTangent
+    (plane : OrientedAffineHyperplane 3) (v : EuclideanSpace ℝ (Fin 3))
+    (hTangent : plane.IsTangent v) :
+    ‖plane.normalVector ⨯ₑ₃ v‖ = ‖v‖ := by
+  change inner ℝ plane.normalVector v = 0 at hTangent
+  have hSquare : ‖plane.normalVector ⨯ₑ₃ v‖ ^ 2 = ‖v‖ ^ 2 := by
+    rw [← real_inner_self_eq_norm_sq, Space.inner_cross_cross,
+      plane.inner_normalVector_self, real_inner_self_eq_norm_sq]
+    simp [hTangent]
+  nlinarith [norm_nonneg (plane.normalVector ⨯ₑ₃ v), norm_nonneg v]
+
+/-- Crossing the normal with the normalized `normal × tangent` axis gives the negative
+normalized tangent direction. -/
+lemma normalVector_cross_normalize_normalVector_cross
+    (plane : OrientedAffineHyperplane 3) (v : EuclideanSpace ℝ (Fin 3))
+    (hTangent : plane.IsTangent v) :
+    plane.normalVector ⨯ₑ₃ NormedSpace.normalize (plane.normalVector ⨯ₑ₃ v) =
+      -NormedSpace.normalize v := by
+  change inner ℝ plane.normalVector v = 0 at hTangent
+  rw [NormedSpace.normalize, NormedSpace.normalize, Space.cross_smul,
+    plane.norm_normalVector_cross_of_isTangent v hTangent,
+    Space.cross_cross_eq_smul_sub_smul', hTangent,
+    plane.inner_normalVector_self]
+  simp
+
+/-- Crossing a nonzero tangent vector with the normalized `normal × tangent` axis gives its
+norm times the oriented normal. -/
+lemma tangent_cross_normalize_normalVector_cross
+    (plane : OrientedAffineHyperplane 3) (v : EuclideanSpace ℝ (Fin 3))
+    (hv : v ≠ 0) (hTangent : plane.IsTangent v) :
+    v ⨯ₑ₃ NormedSpace.normalize (plane.normalVector ⨯ₑ₃ v) =
+      ‖v‖ • plane.normalVector := by
+  change inner ℝ plane.normalVector v = 0 at hTangent
+  rw [NormedSpace.normalize, Space.cross_smul,
+    plane.norm_normalVector_cross_of_isTangent v hTangent,
+    Space.cross_cross_eq_smul_sub_smul', real_inner_self_eq_norm_sq,
+    hTangent, zero_smul, sub_zero, smul_smul]
+  congr 1
+  field_simp [norm_ne_zero_iff.mpr hv]
 
 end OrientedAffineHyperplane
 
