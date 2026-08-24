@@ -25,6 +25,14 @@ conventions are related by `m = k²`. Mathlib knows the Weierstrass elliptic fun
 complete integral of the first kind and develops its basic theory on the domain `m < 1`, where
 the radicand `1 - m sin² φ` is positive and the integrand continuous.
 
+The integral enters physics wherever a period or a potential is computed exactly rather than in a
+small-parameter expansion. Physlib's use of it so far is the simple pendulum: released from rest
+at amplitude `θ₀`, the pendulum has period `4 √(ℓ / g) K(sin² (θ₀ / 2))` (Landau & Lifshitz §11,
+Problem 1), the consumer being `Physlib.ClassicalMechanics.Pendulum.SimplePendulum.PeriodFormula`.
+More broadly, the complete integrals of the first and second kind give the magnetic field of a
+circular current loop and the potential of a uniformly charged ring, and the second kind, `E`,
+gives the arc length of an ellipse. This file defines `K` so that such results can be stated.
+
 For `m ≥ 1` the definition still elaborates, but its value is not Legendre's. At `m = 1` the
 integrand is `1 / cos φ`, which is not interval integrable on `[0, π/2]`, so the integral is `0`
 by `intervalIntegral.integral_undef`, whereas `K(1) = ∞`. For `m > 1` the radicand is negative on
