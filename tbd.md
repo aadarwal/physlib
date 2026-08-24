@@ -1148,9 +1148,24 @@ PR unless maintainers explicitly ask to retain it.
   use of matrix multiplication as physical feedback composition.
 - [x] Define convention-free modal relabeling and unit-complex coordinate rephasing, including
   covariance and preservation of modal power, passivity, and losslessness.
-- [ ] Define typed incident and outgoing channels, time-reversed channel pairing, and port
-  reference planes before defining reciprocity; coordinate rephasing alone does not supply these
-  physical conventions.
+- [x] Define dependent port/channel families, nominally distinct incident and outgoing endpoint
+  types, a local connection with compatible mode fibers, endpoint-presentation exchange, the
+  fixed-point-free mate involution, the oriented scattering adapter, and unit-gain routing with
+  relabeling covariance, normalized-power preservation, and the local `C * S` action order.
+- [ ] Extend the local connection API to finite connection families with global endpoint
+  uniqueness, internal/external channel separation, and the full partial wiring transform. Do not
+  mark the broad netlist API-map requirement complete before those invariants exist.
+- [ ] Define time-reversed channel pairing and port reference planes before defining reciprocity;
+  typed endpoints and coordinate rephasing alone do not supply these physical conventions.
+- [ ] Human-check the local typed-routing semantics before upstreaming. Confirm that component
+  scattering has type `Incident → Outgoing`, connection routing has type `Outgoing → Incident`,
+  and the incident-space round-trip order is `C * S`. Confirm that exchanging left/right endpoint
+  presentation only relabels the local sum, and that a wire has unit gain with no nontrivial
+  coupling coefficient, attenuation, phase, delay, fan-out, termination, time-reversal,
+  reciprocity, feedback-solvability, or electromagnetic-flux claim. Recheck the dependent
+  `Fin 2`/`Bool` fiber fixture, both routing directions, the fixed-point-free and
+  swapped-presentation regressions, and the nonsymmetric scattering entries `3` and `2` that catch
+  row/column reversal.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
 - [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
@@ -1237,9 +1252,15 @@ PR unless maintainers explicitly ask to retain it.
   differential added `accumulates`, `bounces`, `catches`, `diagonally`, `disappears`, `entrance`,
   `errors`, `exit`, `omit`, `prism`, `reflecting`, and `unobservable`. The named half-space
   evanescence differential introduced no new spelling vocabulary after ordinary prose was
-  reworded.
-- [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
-  as failures introduced by Optics or claiming a completely clean gate.
+  reworded. The typed local-routing differential added `adapter`, `bidirectional`, `combiners`,
+  `east`, `elimination`, `fibers`, `flattening`, `gain`, `mate`, `mates`, `mating`, `nonsymmetric`,
+  `routing`, `secondary`, `solvability`, `splitter`, `splitters`, `termination`, and `west`.
+- [x] Reproduce and document any repository-wide baseline lint failures instead of presenting them
+  as failures introduced by Optics or claiming a completely clean gate. The 2026-08-24 typed
+  local-routing run reproduced pre-existing style and transitive-import diagnostics only in
+  unrelated files. Its build, file-import, illegal-import, alpha-import, duplicate-tag,
+  sorry/pseudo-attribution, and declaration-linter stages passed, and neither new Network file
+  appeared in a failure list.
 
 ## Milestone gates
 
