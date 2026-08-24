@@ -807,16 +807,33 @@ PR unless maintainers explicitly ask to retain it.
   `r_s = (-21 + 20 I)/29`, `t_s = (8 + 20 I)/29`,
   `r_p = (-19 + 180 I)/181`, and `t_p = (108 + 120 I)/181`. The proved Jones-intensity equality
   concerns only the incident and reflected ordinary propagating waves; it does not assign raw
-  transmitted decay-frame Jones norm the meaning of power or prove an actual flux balance.
+  transmitted decay-frame Jones norm the meaning of power. Its use in the separate actual-flux
+  module must pass through the propagating material-wave connector instead.
 - [ ] Keep positive-side decay, zero transmitted normal mean flux, and outgoing or causal
   semantics as three distinct claims. This complex Fresnel slice selects the algebraic
   positive-normal-decay boundary amplitude and proves unit reflected modulus and phase, but it
   does not establish a radiation condition, limiting-absorption prescription, half-space support,
-  an evanescent positive-power port, or the connected reflected/superposed actual-flux TIR
-  endpoint. For upstream review, split affine referenced-transmitted data, branch-neutral complex
-  coefficient algebra and real compatibility, TIR denominator/modulus/phase, connected boundary
-  elimination, and exact regressions into separately reviewable concepts; keep the later actual
-  flux theorem and any outgoing semantics in their own proposals.
+  or an evanescent positive-power port. The subsequent actual-flux module establishes only the
+  stored-normal mean-flux endpoint and still supplies no outgoing or causal semantics. For upstream
+  review, split affine referenced-transmitted data, branch-neutral complex coefficient algebra and
+  real compatibility, TIR denominator/modulus/phase, connected boundary elimination, exact
+  regressions, actual flux, and any outgoing semantics into separately reviewable concepts.
+- [ ] Human-check the connected complex-TIR actual-flux endpoint before upstreaming. Equal complex
+  Fresnel reflected Jones intensity must be converted to equal incident/reflected propagating
+  irradiance only because both carriers use the same negative-side material. In the active branch,
+  independently verify that the stored-normal factors `chi_r = -chi_i` make the reflected
+  own-period signed flux the negative of the incident flux. In the zero-reflected branch, verify
+  that proved-zero reflected Jones data plus the boundary-selected intensity equality also forces
+  zero incident flux while leaving the dummy reflected normal and frequency unrestricted. The
+  transmitted side must use the Maxwell-qualified positive-normal-decay zero-mean-flux theorem,
+  never propagating transmittance or raw decay-frame Jones intensity. Confirm that actual
+  incident-plus-reflected superposition uses pointwise normal-interference cancellation and
+  guarded reflected period reconciliation; it must not use Poynting-vector linearity or silently
+  require a frequency for the zero-field dummy. Recheck the unequal-admittance exact values
+  `F_i = 8/15`, `F_r = -8/15`, `F_t = 0`, and superposed normal mean flux zero. These are local
+  stored-normal statements at the affine interface point, except that the transmitted zero result
+  holds at every point; they do not imply pointwise zero normal flux, zero tangential flux,
+  aperture power, an evanescent port, whole-plane conservation, outgoing behavior, or causality.
 - [ ] Human-check the selected-tangent connected wrapper and regressions. The incident and
   transmitted relations use the positive side; only a nonzero reflected field requires the
   negative-side relation. In the zero branch the original reflected direction, frame, frequency,
@@ -1182,7 +1199,8 @@ PR unless maintainers explicitly ask to retain it.
   The guarded canonical-role-frame differential added `accepted`, `assigning`, `canonicality`,
   `conditionally`, `connectivity`, `existential`, `flow`, `hides`, `literal`, `manual`, `packages`,
   `recognition`, `role`, `roles`, and `unconditional`. The complex Fresnel/TIR differential added
-  `acquires`, `arctangent`, `denominators`, `hybrid`, and `quadrant`.
+  `acquires`, `arctangent`, `denominators`, `hybrid`, and `quadrant`. The connected complex-TIR
+  actual-flux differential introduced no new spelling vocabulary.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
