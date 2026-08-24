@@ -3364,3 +3364,8 @@ subcritical
 supercritical
 obtuse
 supplementary
+aperture
+averaged
+despite
+retaining
+waveimpedance
