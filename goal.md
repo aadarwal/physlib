@@ -324,7 +324,7 @@ Ownership rules:
   embedding separately checks real/complex guarded-converse coherence on the embedded image.
 - [x] `tbd.md` records the human, source-license, upstream-design, and validation gates.
 
-### D.2. Relevant upstream foundations
+### D.2. Relevant implemented foundations
 
 - `Electromagnetism.Vacuum.HarmonicWave` supplies an explicit real harmonic Maxwell solution in
   free space. In three spatial dimensions its two transverse electric components are
@@ -423,6 +423,10 @@ Ownership rules:
   and independent parallel composition laws. Its concrete regressions distinguish cascade order,
   genuinely multivalued behavior, and disjoint parallel branches without assigning physical
   realizability, causality, passivity, or losslessness.
+- `Optics.Network.RectangularBehavior` supplies algebraic copy, coherent sum, heterogeneous branch
+  selection, and direct-coefficient weighted split/combine graphs. The three-four-five regression
+  proves a one-sided identity and a nonidentity reverse-order idempotent with nonzero kernel, while
+  exact modal-power sentinels prevent interpreting copy or coherent sum as passive wiring.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -444,9 +448,9 @@ Ownership rules:
   scattering;
 - [ ] global wiring and well-posed network elimination; generic mode restriction/zero extension,
   typed local connections, proof-carrying indexed connection families, ambient partial routing,
-  the explicit external-channel complement and incident injection, and the core implicit behavior
-  graph/identity/series/parallel layer are complete, while rectangular component behaviors and
-  proof-gated functional views remain;
+  the explicit external-channel complement and incident injection, the core implicit behavior
+  graph/identity/series/parallel layer, and rectangular signal-junction behaviors are complete,
+  while proof-gated functional views remain;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1810,8 +1814,8 @@ package remains blocked on the decision in section L; it does not block N2a--N6a
 - [x] embedding of `ModeTransform` as a graph;
 - [x] a membership characterization for the embedded graph;
 - [x] identity, series, and parallel behavior composition;
-- [ ] rectangular summing, pickoff, splitter, and combiner behaviors, without pretending fan-out
-  is a one-to-one wire;
+- [x] rectangular copy, coherent-sum, branch-selection, and weighted split/combine behaviors,
+  without pretending copy is wiring or a passive square optical splitter;
 - [x] agreement between relational composition and functional composition for graph behaviors;
 - [ ] proof-gated extraction and round trip of a total single-valued behavior as a linear map; and
 - [x] no invertibility requirement merely to state a component.
@@ -2462,7 +2466,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
-| N3 behaviors | in progress | O1 | relation/graph embedding and identity, series, parallel laws complete; rectangular component behaviors and proof-gated functional views remain |
+| N3 behaviors | in progress | O1 | relation/graph embedding, identity/series/parallel, and rectangular junction behaviors complete; proof-gated functional views remain |
 | N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
@@ -2578,9 +2582,11 @@ human verification recorded in `tbd.md`.
    embeds maps and mode transforms as graphs, and proves identity, existential series, independent
    parallel, graph-composition, matrix-cascade, and block-diagonal laws. Its regressions distinguish
    forward and reverse nonsymmetric cascades, a singular but functional zero graph, a genuinely
-   multivalued relation, and a rejected branch-incorrect parallel output. Continue N3 with
-   rectangular copy/sum/select/weighted junctions and proof-gated total single-valued extraction
-   before beginning two-port chain semantics.
+   multivalued relation, and a rejected branch-incorrect parallel output. Rectangular copy,
+   coherent sum, heterogeneous selection, and weighted split/combine now have exact membership,
+   composition, kernel, idempotence, and modal-power laws with complex and three-four-five
+   regressions. Continue N3 with proof-gated total single-valued extraction before beginning
+   two-port chain semantics.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a

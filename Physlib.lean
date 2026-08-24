@@ -268,6 +268,8 @@ public import Physlib.Optics.Network.PartialRouting
 public import Physlib.Optics.Network.PartialRoutingRegression
 public import Physlib.Optics.Network.Port
 public import Physlib.Optics.Network.PortRegression
+public import Physlib.Optics.Network.RectangularBehavior
+public import Physlib.Optics.Network.RectangularBehaviorRegression
 public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
 public import Physlib.Optics.Polarization.ComplexRealization

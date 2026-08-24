@@ -1175,8 +1175,21 @@ PR unless maintainers explicitly ask to retain it.
   arbitrary complex-linear maps and finite mode transforms as graph behaviors, and prove identity,
   relational series, independent parallel, graph-composition, matrix-cascade, and block-diagonal
   direct-sum laws. Preserve `(input, output)` pair order and `first.series second = second * first`
-  for transform graphs. Keep rectangular signal-junction behaviors and proof-gated functional
-  extraction as the next N3 package.
+  for transform graphs.
+- [x] Define rectangular copy, coherent-sum, heterogeneous selection, and direct-coefficient
+  weighted split/combine graph behaviors. Prove exact membership, one-sided identity,
+  reverse-order idempotence and kernel, copy-selection, and weighted-split modal-power laws. Keep
+  these algebraic junctions distinct from physical square beam splitters, termination, absorption,
+  passive wiring, and quantum cloning.
+- [ ] Add proof-gated extraction and round trips for total single-valued behaviors as the remaining
+  N3 package before beginning N3T chain semantics.
+- [ ] Before an upstream rectangular-behavior proposal, decide with maintainers whether the core
+  and its extensive regression suite should be reviewed as one coherent PR or split into two
+  sequential PRs. The current fork milestone intentionally keeps them together for end-to-end
+  validation, but it exceeds the usual 200-line review guideline.
+- [ ] Human-check every rectangular-junction definition, theorem statement, and proof before any
+  upstream proposal as required by `AI-POLICY.md`; a successful Lean build is not certification of
+  the intended semantics.
 - [ ] Define time-reversed channel pairing and port reference planes before defining reciprocity;
   typed endpoints and coordinate rephasing alone do not supply these physical conventions.
 - [ ] Human-check the local typed-routing semantics before upstreaming. Confirm that component
@@ -1340,7 +1353,14 @@ PR unless maintainers explicitly ask to retain it.
   after ordinary prose was reworded using the existing dictionary and repository baseline. The
   implicit linear-behavior differential reworded ordinary prose and added `behavior`, `behaviors`,
   `directsum`, `graphs`, `linearbehavior`, `modetransform`, `multivalued`, `oflinearmap`,
-  `relational`, `singular`, and `tobehavior`.
+  `relational`, `singular`, and `tobehavior`. The rectangular-behavior differential added the 51
+  exact reported words `admitting`, `annihilates`, `assembly`, `asserted`, `changed`, `cloning`,
+  `coherent`, `conjugated`, `conjugating`, `copy`, `device`, `differs`, `displayed`, `doubles`,
+  `elementary`, `embedded`, `enhancement`, `establish`, `fifty`, `five`, `fixtures`, `followed`,
+  `identification`, `incorrect`, `interpret`, `invoking`, `joins`, `mechanism`, `missing`,
+  `mistakes`, `nonidentity`, `nontrivial`, `omitted`, `placing`, `plausible`, `produced`,
+  `producing`, `realizability`, `reject`, `rejects`, `requiring`, `reversed`, `selecting`,
+  `selection`, `selector`, `sentinels`, `shapes`, `ten`, `unconjugated`, `wire`, and `wrong`.
 - [x] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate. The 2026-08-24 typed
   local-routing run reproduced pre-existing style and transitive-import diagnostics only in
@@ -1353,6 +1373,13 @@ PR unless maintainers explicitly ask to retain it.
   and transitive-import baseline after the new behavior module's initially redundant direct
   Mathlib import was removed; a targeted transitive-import rerun then reported no changed Optics
   module.
+- [x] The 2026-08-24 rectangular-behavior run passed cache retrieval, the 4,689-job `Physlib`
+  build, warnings-as-errors elaboration for all three changed Lean modules, both Physlib and
+  QuantumInfo declaration linters, public-file import checks, illegal- and alpha-import checks,
+  duplicate-tag and sorry/pseudo-attribution checks, the API-map linter with 3,571 resolved names,
+  committed-state style lint, forbidden-term and whitespace checks, and the exact differential
+  spelling emulation. The full linter reproduced only the known unrelated repository style and
+  transitive-import baseline; neither rectangular Optics module appeared in either list.
 
 ## Milestone gates
 
