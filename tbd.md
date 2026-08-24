@@ -1209,10 +1209,14 @@ PR unless maintainers explicitly ask to retain it.
   `(aL, aR)` are incident and `(bL, bR)` outgoing; and the regrouping is exactly left `(bL, aL)`,
   right `(aR, bR)`. Confirm that an adjacent physical cascade identifies the entire middle
   reference-plane state or inserts an explicit propagation behavior.
-- [ ] Implement the next N3T slice without a total scattering-matrix inverse: characterize chain
-  functionality of a scattering graph by bijectivity of its right-incident to left-outgoing block,
-  derive both block-conversion formulas under the exact block hypotheses, and prove behavioral and
-  matrix round trips. Keep the opposite convention behind an explicit permutation.
+- [x] Implement the one-way N3T scattering-to-chain slice without a total scattering-matrix
+  inverse: chain functionality is exactly bijectivity of the right-incident to left-outgoing block,
+  and the behavior-derived transform has the proved block formula and exact graph equality. Its
+  regressions include a singular full scattering transform with bijective pivot, noncommuting
+  reflection blocks, and a zero-pivot negative case.
+- [ ] Derive the inverse chain-to-scattering block formula under bijectivity of the exact leading
+  chain block and prove behavioral and matrix round trips in both directions. Keep the opposite
+  convention behind an explicit permutation.
 - [x] Connect the two-port scattering type to the N2a component boundary with canonical
   `Incident`/`Outgoing` sum-label equivalences and a typed two-port adapter from the existing
   oriented scattering transform. Exact four-block entries, amplitude covariance, losslessness,
