@@ -28,12 +28,21 @@ sides of the plane and vanishes at grazing incidence. The results are purely geo
 not assign incident, reflected, or transmitted roles; impose a material model or boundary law;
 or state a Fresnel, observable, irradiance, or power result.
 
+At normal incidence the plane of incidence cannot select the common first axis. The
+`IsSelectedTangentNormalIncidence` relation instead records an independently supplied plane frame,
+exact equality of the selected first axes, and propagation along one of the two side normals. It
+then fixes the sign of the second full-vector Jones axis without introducing a canonical tangent.
+
 ## ii. Key results
 
 - `PolarizationFrame.tangentialProjection_axis_zero_of_axis_zero_eq`: the common first axis is
   fixed by tangential projection.
 - `PolarizationFrame.tangentialProjection_axis_one_of_axis_zero_eq`: the second axis is multiplied
   by the signed normal factor.
+- `PolarizationFrame.IsSelectedTangentNormalIncidence`: a propagation frame uses an independently
+  selected plane tangent and one exact side-normal direction.
+- `PolarizationFrame.normalScaledSecondComponent`: the signed-normal-scaled second Jones
+  component, which is the fixed-plane second coordinate under first-axis alignment.
 - `PolarizationFrame.hyperplaneTangentialProjection_embedJones_of_axis_zero_eq`: the corresponding
   full-vector Jones-coordinate formula.
 - `PolarizationFrame.hyperplaneTangentialProjection_embedJones_propagationCross_of_axis_zero_eq`:
@@ -42,7 +51,9 @@ or state a Fresnel, observable, irradiance, or power result.
 ## iii. Table of contents
 
 - A. Real planar-frame geometry
-- B. Complex Jones amplitudes
+- B. Selected-tangent normal incidence
+- C. Normal cross products in aligned frames
+- D. Complex Jones amplitudes
 
 ## iv. References
 
@@ -125,7 +136,55 @@ lemma tangentialProjection_axis_one_of_axis_zero_eq
 
 /-!
 
-## B. Normal cross products in aligned frames
+## B. Selected-tangent normal incidence
+
+-/
+
+/-- A propagation frame is a selected-tangent normal-incidence frame on one side of a plane when
+its first axis is exactly the independently selected first axis of the plane frame and its
+propagation vector is exactly that side's unit normal.
+
+The geometric side supplies only a sign relative to the stored normal. This relation assigns no
+incident, reflected, transmitted, incoming, outgoing, material, or power role. -/
+def IsSelectedTangentNormalIncidence (frame : PolarizationFrame direction)
+    (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
+    (side : OrientedAffineHyperplane.Side) : Prop :=
+  frame.axis 0 = planeFrame.axis 0 ∧
+    frame.propagationVector = plane.sideNormalVector side
+
+namespace IsSelectedTangentNormalIncidence
+
+/-- A selected-tangent normal-incidence frame has the side sign as its stored-plane normal
+component. -/
+lemma normalComponent_propagationVector {frame : PolarizationFrame direction}
+    {plane : OrientedAffineHyperplane 3} {planeFrame : PolarizationFrame plane.normal}
+    {side : OrientedAffineHyperplane.Side}
+    (h : frame.IsSelectedTangentNormalIncidence plane planeFrame side) :
+    plane.normalComponent frame.propagationVector = side.sign := by
+  rw [h.2, plane.normalComponent_sideNormalVector]
+
+/-- The second axis of a selected-tangent normal-incidence frame is the selected plane frame's
+second axis multiplied by the side sign. -/
+lemma axis_one_eq {frame : PolarizationFrame direction}
+    {plane : OrientedAffineHyperplane 3} {planeFrame : PolarizationFrame plane.normal}
+    {side : OrientedAffineHyperplane.Side}
+    (h : frame.IsSelectedTangentNormalIncidence plane planeFrame side) :
+    frame.axis 1 = side.sign • planeFrame.axis 1 := by
+  calc
+    frame.axis 1 = frame.propagationVector ⨯ₑ₃ frame.axis 0 :=
+      frame.propagationVector_cross_axis_zero.symm
+    _ = plane.sideNormalVector side ⨯ₑ₃ planeFrame.axis 0 := by rw [h.1, h.2]
+    _ = side.sign • (plane.normalVector ⨯ₑ₃ planeFrame.axis 0) := by
+      rw [OrientedAffineHyperplane.sideNormalVector, Space.smul_cross]
+    _ = side.sign • planeFrame.axis 1 := by
+      change side.sign • (planeFrame.propagationVector ⨯ₑ₃ planeFrame.axis 0) = _
+      rw [planeFrame.propagationVector_cross_axis_zero]
+
+end IsSelectedTangentNormalIncidence
+
+/-!
+
+## C. Normal cross products in aligned frames
 
 -/
 
@@ -298,12 +357,33 @@ lemma normalComponent_cross_realizeJones_propagationCross_add_swap_eq_zero
 
 /-!
 
-## C. Complex Jones amplitudes
+## D. Complex Jones amplitudes
 
 -/
 
 private lemma complexAxis_eq_ofReal (frame : PolarizationFrame direction) (i : Fin 2) :
     frame.complexAxis i = ComplexWaveVector.ofReal (frame.axis i) := rfl
+
+/-- The signed-normal-scaled second component of full-vector Jones data.
+
+When the propagation frame's first axis agrees with a plane-normal frame's first axis,
+tangential projection has common-plane coordinates `(J₀, chi J₁)`. This definition names the
+second coordinate `chi J₁`, where `chi` is the signed normal component of propagation. It remains
+total at grazing incidence, where it is zero, and performs no division by `chi`. Without the
+alignment hypothesis, it names only the normal-scaled original-frame component and makes no
+projection-coordinate claim. -/
+def normalScaledSecondComponent (frame : PolarizationFrame direction)
+    (plane : OrientedAffineHyperplane 3) (J : JonesVector) : ℂ :=
+  (plane.normalComponent frame.propagationVector : ℂ) * J.components 1
+
+/-- A selected-tangent normal-incidence frame's normal-scaled second component is its full-vector
+second Jones component multiplied by the side sign. -/
+lemma IsSelectedTangentNormalIncidence.normalScaledSecondComponent_eq
+    {frame : PolarizationFrame direction} {plane : OrientedAffineHyperplane 3}
+    {planeFrame : PolarizationFrame plane.normal} {side : OrientedAffineHyperplane.Side}
+    (h : frame.IsSelectedTangentNormalIncidence plane planeFrame side) (J : JonesVector) :
+    frame.normalScaledSecondComponent plane J = (side.sign : ℂ) * J.components 1 := by
+  rw [normalScaledSecondComponent, h.normalComponent_propagationVector]
 
 /-- Tangential projection expresses a full-vector Jones amplitude in the common plane frame as
 `(J₀, c J₁)`, where `c` is the signed normal component of the propagation vector. -/
@@ -312,9 +392,8 @@ lemma hyperplaneTangentialProjection_embedJones_of_axis_zero_eq
     (frame : PolarizationFrame direction) (J : JonesVector)
     (halign : frame.axis 0 = planeFrame.axis 0) :
     ComplexWaveVector.hyperplaneTangentialProjection plane (frame.embedJones J) =
-      planeFrame.embedJones
-        (JonesVector.ofComponents (J.components 0)
-          ((plane.normalComponent frame.propagationVector : ℂ) * J.components 1)) := by
+      planeFrame.embedJones (JonesVector.ofComponents (J.components 0)
+        (frame.normalScaledSecondComponent plane J)) := by
   rw [embedJones, embedJones, Fin.sum_univ_two, Fin.sum_univ_two,
     ComplexWaveVector.hyperplaneTangentialProjection_add,
     ComplexWaveVector.hyperplaneTangentialProjection_smul,
@@ -325,7 +404,7 @@ lemma hyperplaneTangentialProjection_embedJones_of_axis_zero_eq
       (direction := direction) plane planeFrame frame halign,
     tangentialProjection_axis_one_of_axis_zero_eq
       (direction := direction) plane planeFrame frame halign]
-  simp [complexAxis_eq_ofReal, ComplexWaveVector.ofReal_smul]
+  simp [normalScaledSecondComponent, complexAxis_eq_ofReal, ComplexWaveVector.ofReal_smul]
   module
 
 /-- Tangential projection after the propagation quarter-turn has common plane-frame coordinates
@@ -339,7 +418,8 @@ lemma hyperplaneTangentialProjection_embedJones_propagationCross_of_axis_zero_eq
       planeFrame.embedJones
         (JonesVector.ofComponents (-J.components 1)
           ((plane.normalComponent frame.propagationVector : ℂ) * J.components 0)) := by
-  simpa using hyperplaneTangentialProjection_embedJones_of_axis_zero_eq
+  simpa [normalScaledSecondComponent] using
+    hyperplaneTangentialProjection_embedJones_of_axis_zero_eq
     (direction := direction) plane planeFrame frame J.propagationCross halign
 
 end PolarizationFrame

@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Polarization.IncidenceFrame
+public import Physlib.Optics.Polarization.PlanarFrame
 
 /-!
 # Incidence polarization-frame sign regressions
@@ -29,6 +30,9 @@ or derive such coefficients.
 - `normalIncidenceRegressionFrames_axis_zero_eq`: forward and backward normal frames share the
   selected first axis.
 - `normalIncidenceRegressionFrames_axis_one_neg`: their derived second axes have opposite signs.
+- `normalIncidenceRegressionForwardFrame_isSelectedTangentNormalIncidence` and
+  `normalIncidenceRegressionBackwardFrame_isSelectedTangentNormalIncidence`: the same frames carry
+  the exact positive- and negative-side normal-incidence relations.
 
 ## iii. Table of contents
 
@@ -120,6 +124,11 @@ def normalIncidenceRegressionBackwardDirection : Space.Direction 3 where
 def normalIncidenceRegressionTangentAxis : EuclideanSpace ℝ (Fin 3) :=
   WithLp.toLp 2 ![0, 1, 0]
 
+/-- The oriented coordinate plane used to test the selected-tangent normal-incidence relation. -/
+def normalIncidenceRegressionPlane : OrientedAffineHyperplane 3 where
+  point := 0
+  normal := incidenceRegressionNormal
+
 /-- The selected normal-incidence tangent axis has unit norm. -/
 lemma normalIncidenceRegressionTangentAxis_norm :
     ‖normalIncidenceRegressionTangentAxis‖ = 1 := by
@@ -187,6 +196,46 @@ lemma normalIncidenceRegressionFrames_axis_one_neg :
   ext i
   fin_cases i <;>
     norm_num [Matrix.cons_val_two, Matrix.head_cons]
+
+/-- The forward exact frame uses the selected tangent and the positive side normal. -/
+lemma normalIncidenceRegressionForwardFrame_isSelectedTangentNormalIncidence :
+    normalIncidenceRegressionForwardFrame.IsSelectedTangentNormalIncidence
+      normalIncidenceRegressionPlane normalIncidenceRegressionForwardFrame .positive := by
+  constructor
+  · rfl
+  · ext i
+    fin_cases i <;>
+      norm_num [PolarizationFrame.propagationVector, normalIncidenceRegressionPlane,
+        incidenceRegressionNormal, OrientedAffineHyperplane.sideNormalVector,
+        OrientedAffineHyperplane.normalVector, Matrix.cons_val_two, Matrix.head_cons]
+
+/-- The backward exact frame uses the same selected tangent and the negative side normal. -/
+lemma normalIncidenceRegressionBackwardFrame_isSelectedTangentNormalIncidence :
+    normalIncidenceRegressionBackwardFrame.IsSelectedTangentNormalIncidence
+      normalIncidenceRegressionPlane normalIncidenceRegressionForwardFrame .negative := by
+  constructor
+  · exact normalIncidenceRegressionFrames_axis_zero_eq
+  · ext i
+    fin_cases i <;>
+      norm_num [PolarizationFrame.propagationVector, normalIncidenceRegressionPlane,
+        incidenceRegressionNormal, normalIncidenceRegressionBackwardDirection,
+        OrientedAffineHyperplane.sideNormalVector, OrientedAffineHyperplane.normalVector,
+        Matrix.cons_val_two, Matrix.head_cons]
+
+/-- The forward frame's fixed-plane `p` coordinate is its full-vector second Jones component. -/
+lemma normalIncidenceRegressionForwardFrame_normalScaledSecondComponent (J : JonesVector) :
+    normalIncidenceRegressionForwardFrame.normalScaledSecondComponent
+      normalIncidenceRegressionPlane J = J.components 1 := by
+  have h := normalIncidenceRegressionForwardFrame_isSelectedTangentNormalIncidence
+  simpa using h.normalScaledSecondComponent_eq J
+
+/-- The backward frame's fixed-plane `p` coordinate negates its full-vector second Jones
+component. -/
+lemma normalIncidenceRegressionBackwardFrame_normalScaledSecondComponent (J : JonesVector) :
+    normalIncidenceRegressionBackwardFrame.normalScaledSecondComponent
+      normalIncidenceRegressionPlane J = -J.components 1 := by
+  have h := normalIncidenceRegressionBackwardFrame_isSelectedTangentNormalIncidence
+  simpa using h.normalScaledSecondComponent_eq J
 
 end
 

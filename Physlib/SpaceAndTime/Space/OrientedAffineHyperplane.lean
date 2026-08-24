@@ -70,6 +70,8 @@ negates its normal component, and preserves the angle when the reference side is
 - C. Half-spaces
 - D. Tangent submodule, projection, and carrier parameterization
 - E. Side-relative angles and vector reflection
+  - E.1. Orthogonal decomposition and side-relative angles
+  - E.2. Vector reflection
 
 ## iv. References
 
@@ -240,6 +242,13 @@ lemma sideNormalVector_norm (plane : OrientedAffineHyperplane d) (side : Side) :
     ‖plane.sideNormalVector side‖ = 1 := by
   rw [sideNormalVector, norm_smul, plane.normalVector_norm, mul_one, Real.norm_eq_abs]
   cases side <;> norm_num [Side.sign]
+
+/-- The signed normal component of a side-normal vector is the sign of that side. -/
+@[simp]
+lemma normalComponent_sideNormalVector (plane : OrientedAffineHyperplane d) (side : Side) :
+    plane.normalComponent (plane.sideNormalVector side) = side.sign := by
+  rw [normalComponent, sideNormalVector, real_inner_smul_right, plane.inner_normalVector_self,
+    mul_one]
 
 @[simp]
 lemma signedNormalCoordinate_point (plane : OrientedAffineHyperplane d) :
