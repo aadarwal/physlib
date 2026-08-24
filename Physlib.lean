@@ -221,6 +221,7 @@ public import Physlib.Optics.HarmonicFlux.ReferencedMaterialWave
 public import Physlib.Optics.HarmonicFlux.Regression
 public import Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry
 public import Physlib.Optics.Interfaces.PlanarDielectric.Basic
+public import Physlib.Optics.Interfaces.PlanarDielectric.CanonicalIncidence
 public import Physlib.Optics.Interfaces.PlanarDielectric.CriticalAngle
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
@@ -599,6 +600,7 @@ public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
 public import Physlib.SpaceAndTime.Space.Origin
 public import Physlib.SpaceAndTime.Space.Slice
 public import Physlib.SpaceAndTime.Space.Translations

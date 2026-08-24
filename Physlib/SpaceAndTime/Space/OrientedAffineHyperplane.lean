@@ -34,8 +34,8 @@ makes explicit that tangent probes cannot distinguish normal components.
 
 The two geometric sides are exchanged by an explicit opposite operation. The corresponding
 side-relative vector angle is measured with Mathlib's unoriented Euclidean angle. Reflection of a
-vector across the tangent plane preserves its norm and tangential projection, negates its normal
-component, and preserves the angle when the reference side is exchanged.
+vector across the tangent plane is real-homogeneous, preserves its norm and tangential projection,
+negates its normal component, and preserves the angle when the reference side is exchanged.
 
 ## ii. Key results
 
@@ -60,6 +60,8 @@ component, and preserves the angle when the reference side is exchanged.
   side-relative angle in `[0, π / 2)`.
 - `OrientedAffineHyperplane.angleToSide_vectorReflection`: vector reflection preserves the
   side-relative angle after exchanging sides.
+- `OrientedAffineHyperplane.vectorReflection_smul`: vector reflection commutes with real scalar
+  multiplication.
 
 ## iii. Table of contents
 
@@ -658,6 +660,15 @@ lemma vectorReflection_eq_sub_two_smul_normalVector
     plane.vectorReflection v =
       v - (2 * plane.normalComponent v) • plane.normalVector := by
   rw [vectorReflection, tangentialProjection]
+  module
+
+/-- Vector reflection commutes with real scalar multiplication. -/
+lemma vectorReflection_smul
+    (plane : OrientedAffineHyperplane d) (c : ℝ) (v : EuclideanSpace ℝ (Fin d)) :
+    plane.vectorReflection (c • v) = c • plane.vectorReflection v := by
+  rw [vectorReflection_eq_sub_two_smul_normalVector,
+    vectorReflection_eq_sub_two_smul_normalVector]
+  simp only [normalComponent, inner_smul_right]
   module
 
 /-- Vector reflection negates the oriented normal component. -/

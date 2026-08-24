@@ -5,8 +5,8 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.Normed.Module.Normalize
 public import Physlib.Optics.Polarization.Frame
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
 
 /-!
 # Polarization frames for non-normal incidence
@@ -36,6 +36,9 @@ normal admittance separately.
 - `IsNonNormalIncidence`: the exact nondegeneracy condition for the incidence plane.
 - `sPolarizationAxis` and `pPolarizationAxis`: the ordered unit polarization axes.
 - `incidencePolarizationFrame`: the resulting oriented `s`/`p` frame.
+- `incidencePlaneFrame`: the common interface-plane frame selected by an incidence direction.
+- `incidencePolarizationFrame_axis_zero_eq_of_pos_smul_tangentialProjection_eq`: positive
+  tangential phase scaling preserves the canonical `s` axis.
 - `incidencePolarizationFrame_realizeJones_eq`: explicit `s`/`p` decomposition of a realized
   Jones amplitude.
 
@@ -43,6 +46,8 @@ normal admittance separately.
 
 - A. Non-normal incidence axes
 - B. The oriented incidence frame
+- C. Common plane frames and tangential-direction transport
+- D. Reflected incidence frames
 
 ## iv. References
 
@@ -167,6 +172,97 @@ lemma incidencePolarizationFrame_realizeJones_eq
           pPolarizationAxis propagationDirection interfaceNormal h := by
   rw [PolarizationFrame.realizeJones_eq_sum, Fin.sum_univ_two]
   rfl
+
+/-!
+
+## C. Common plane frames and tangential-direction transport
+
+-/
+
+/-- The interface-plane polarization frame selected by a non-normal propagation direction.
+
+Its first axis is the same canonical `s = normalize (n × k)` axis as the direction's incidence
+frame. Its second axis is fixed by the stored interface normal. -/
+def incidencePlaneFrame (plane : OrientedAffineHyperplane 3)
+    (direction : Space.Direction 3) (h : IsNonNormalIncidence direction plane.normal) :
+    PolarizationFrame plane.normal :=
+  PolarizationFrame.ofAxisZero plane.normal
+    (sPolarizationAxis direction plane.normal h)
+    (sPolarizationAxis_norm direction plane.normal h)
+    (inner_interfaceNormal_sPolarizationAxis direction plane.normal h)
+
+/-- The direction frame and its induced interface-plane frame have the same canonical `s` axis. -/
+lemma incidencePolarizationFrame_axis_zero_eq_incidencePlaneFrame
+    (plane : OrientedAffineHyperplane 3) (direction : Space.Direction 3)
+    (h : IsNonNormalIncidence direction plane.normal) :
+    (incidencePolarizationFrame direction plane.normal h).axis 0 =
+      (incidencePlaneFrame plane direction h).axis 0 := rfl
+
+/-- Positive rescalings with equal interface-tangential projections select the same canonical
+`s` axis.
+
+This is the geometric transport law used when phase matching equates positive scalar multiples of
+two propagation directions. It assigns no incident, reflected, transmitted, or material meaning. -/
+lemma incidencePolarizationFrame_axis_zero_eq_of_pos_smul_tangentialProjection_eq
+    (plane : OrientedAffineHyperplane 3)
+    (firstDirection secondDirection : Space.Direction 3)
+    (hFirst : IsNonNormalIncidence firstDirection plane.normal)
+    (hSecond : IsNonNormalIncidence secondDirection plane.normal)
+    (firstScale secondScale : ℝ) (hFirstScale : 0 < firstScale)
+    (hSecondScale : 0 < secondScale)
+    (hTangential :
+      plane.tangentialProjection
+          (firstScale • Space.basis.repr firstDirection.unit) =
+        plane.tangentialProjection
+          (secondScale • Space.basis.repr secondDirection.unit)) :
+    (incidencePolarizationFrame firstDirection plane.normal hFirst).axis 0 =
+      (incidencePolarizationFrame secondDirection plane.normal hSecond).axis 0 := by
+  have hCross := congrArg (fun v ↦ plane.normalVector ⨯ₑ₃ v) hTangential
+  rw [plane.tangentialProjection_smul, plane.tangentialProjection_smul,
+    Space.cross_smul, Space.cross_smul, plane.normalVector_cross_tangentialProjection,
+    plane.normalVector_cross_tangentialProjection] at hCross
+  rw [incidencePolarizationFrame_axis_zero, incidencePolarizationFrame_axis_zero,
+    sPolarizationAxis, sPolarizationAxis, ← OrientedAffineHyperplane.normalVector]
+  have hNormalized := congrArg NormedSpace.normalize hCross
+  rw [NormedSpace.normalize_smul_of_pos hFirstScale,
+    NormedSpace.normalize_smul_of_pos hSecondScale] at hNormalized
+  exact hNormalized
+
+/-!
+
+## D. Reflected incidence frames
+
+-/
+
+/-- Hyperplane reflection preserves non-normal incidence. -/
+lemma isNonNormalIncidence_of_vectorReflection
+    (plane : OrientedAffineHyperplane 3)
+    (incidentDirection reflectedDirection : Space.Direction 3)
+    (hIncident : IsNonNormalIncidence incidentDirection plane.normal)
+    (hReflection : Space.basis.repr reflectedDirection.unit =
+      plane.vectorReflection (Space.basis.repr incidentDirection.unit)) :
+    IsNonNormalIncidence reflectedDirection plane.normal := by
+  rw [IsNonNormalIncidence, hReflection, ← OrientedAffineHyperplane.normalVector]
+  rw [plane.normalVector_cross_vectorReflection]
+  exact hIncident
+
+/-- Canonical incidence frames related by hyperplane reflection share the incident-induced
+interface-plane `s` axis. -/
+lemma incidencePolarizationFrame_axis_zero_eq_incidencePlaneFrame_of_vectorReflection
+    (plane : OrientedAffineHyperplane 3)
+    (incidentDirection reflectedDirection : Space.Direction 3)
+    (hIncident : IsNonNormalIncidence incidentDirection plane.normal)
+    (hReflected : IsNonNormalIncidence reflectedDirection plane.normal)
+    (hReflection : Space.basis.repr reflectedDirection.unit =
+      plane.vectorReflection (Space.basis.repr incidentDirection.unit)) :
+    (incidencePolarizationFrame reflectedDirection plane.normal hReflected).axis 0 =
+      (incidencePlaneFrame plane incidentDirection hIncident).axis 0 := by
+  have hAxes :=
+    incidencePolarizationFrame_axis_zero_eq_of_pos_smul_tangentialProjection_eq
+      plane reflectedDirection incidentDirection hReflected hIncident 1 1
+        (by positivity) (by positivity) (by
+          simp only [one_smul, hReflection, plane.tangentialProjection_vectorReflection])
+  exact hAxes
 
 end
 

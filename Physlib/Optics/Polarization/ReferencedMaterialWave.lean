@@ -43,9 +43,15 @@ role, impose a boundary law, solve a Fresnel equation, or state an observable or
   dummy carrier when both the electric amplitude and Jones data vanish.
 - `IsZeroOrReferencedMaterialJonesWave.components_eq_zero_of_electricAmplitude_eq_zero`: a zero
   electric amplitude forces zero Jones data in either guarded branch.
+- `IsZeroOrReferencedMaterialJonesWave.reframe_of_electricAmplitude_eq_zero`: proved-zero Jones
+  data may be represented in any propagation frame without constraining the dummy carrier.
 - `JonesVector.isReferencedMaterialJonesWave_ofReal_toMaterialPlaneWave`: the canonical existing
   real material-wave construction satisfies the connector with its Jones data rephased to the
   plane point.
+- `IsReferencedMaterialJonesWave.isPhaseDirectedInto_iff`: strict phase direction is exactly the
+  corresponding signed propagation-frame normal condition.
+- `IsReferencedMaterialJonesWave.propagationVector_eq_vectorReflection_of_waveVector_eq`: complex
+  wave-vector reflection descends to reflection of the real frame propagation vector.
 - `PolarizationFrame.complexCross_propagationVector_embedJones`: the complex propagation
   quarter-turn.
 - `IsReferencedMaterialJonesWave.isTransverse` and `.isDispersionMatched`: the material-shell
@@ -66,8 +72,9 @@ role, impose a boundary law, solve a Fresnel equation, or state an observable or
 
 - A. Referenced material Jones data
 - B. Complex frame algebra
-- C. Material-shell results
-- D. Referenced boundary amplitudes
+- C. Propagation direction and reflection
+- D. Material-shell results
+- E. Referenced boundary amplitudes
 
 ## iv. References
 
@@ -224,7 +231,73 @@ variable {plane : OrientedAffineHyperplane 3} {medium : HomogeneousIsotropicMedi
 
 /-!
 
-## C. Material-shell results
+## C. Propagation direction and reflection
+
+-/
+
+/-- A referenced propagating material wave is phase-directed into a geometric side exactly when
+its real frame propagation vector has strictly positive side-signed normal component.
+
+This translates a supplied geometric direction; it does not infer incident, reflected, outgoing,
+group-velocity, or power meaning from a wave label. -/
+lemma isPhaseDirectedInto_iff
+    (h : IsReferencedMaterialJonesWave plane medium wave frame J)
+    (side : OrientedAffineHyperplane.Side) :
+    wave.waveVector.IsPhaseDirectedInto plane side ↔
+      0 < side.sign * plane.normalComponent frame.propagationVector := by
+  rw [ComplexWaveVector.IsPhaseDirectedInto,
+    ComplexWaveVector.hyperplaneNormalComponent_re, h.waveVector_eq,
+    ComplexWaveVector.phaseVector_ofReal]
+  simp only [OrientedAffineHyperplane.normalComponent, inner_smul_right]
+  have hScale : 0 < wave.angularFrequency / medium.waveSpeed :=
+    div_pos wave.angularFrequency_pos medium.waveSpeed_pos
+  cases side
+  · simp only [OrientedAffineHyperplane.Side.sign_negative, neg_one_mul, neg_pos]
+    constructor
+    · intro hNegative
+      rcases (mul_neg_iff.mp hNegative) with hSigns | hSigns
+      · exact hSigns.2
+      · exact (not_lt_of_ge hScale.le hSigns.1).elim
+    · exact mul_neg_of_pos_of_neg hScale
+  · simp only [OrientedAffineHyperplane.Side.sign_positive, one_mul]
+    exact mul_pos_iff_of_pos_left hScale
+
+/-- Equal-frequency referenced waves whose complex wave vectors are related by hyperplane
+reflection have real frame propagation vectors related by the same reflection.
+
+The result is role-neutral: callers must separately prove the wave-vector equality and its
+physical branch-selection meaning. -/
+lemma propagationVector_eq_vectorReflection_of_waveVector_eq
+    {incident reflected : ComplexMonochromaticPlaneWave}
+    {incidentDirection reflectedDirection : Space.Direction 3}
+    {incidentFrame : PolarizationFrame incidentDirection}
+    {reflectedFrame : PolarizationFrame reflectedDirection}
+    {incidentJones reflectedJones : JonesVector}
+    (hIncident : IsReferencedMaterialJonesWave plane medium incident incidentFrame incidentJones)
+    (hReflected : IsReferencedMaterialJonesWave plane medium reflected reflectedFrame
+      reflectedJones)
+    (hFrequency : reflected.angularFrequency = incident.angularFrequency)
+    (hWaveVector : reflected.waveVector =
+      ComplexWaveVector.hyperplaneReflection plane incident.waveVector) :
+    reflectedFrame.propagationVector =
+      plane.vectorReflection incidentFrame.propagationVector := by
+  have hVector := congrArg ComplexWaveVector.phaseVector hWaveVector
+  rw [hReflected.waveVector_eq, hIncident.waveVector_eq,
+    ComplexWaveVector.phaseVector_ofReal,
+    ComplexWaveVector.phaseVector_hyperplaneReflection_eq_vectorReflection,
+    ComplexWaveVector.phaseVector_ofReal, hFrequency] at hVector
+  have hScaleNe : incident.angularFrequency / medium.waveSpeed ≠ 0 :=
+    ne_of_gt (div_pos incident.angularFrequency_pos medium.waveSpeed_pos)
+  apply (smul_right_injective _ hScaleNe)
+  change (incident.angularFrequency / medium.waveSpeed) • reflectedFrame.propagationVector =
+    (incident.angularFrequency / medium.waveSpeed) •
+      plane.vectorReflection incidentFrame.propagationVector
+  rw [← plane.vectorReflection_smul]
+  exact hVector
+
+/-!
+
+## D. Material-shell results
 
 -/
 
@@ -270,7 +343,7 @@ lemma isMacroscopicMaxwellSolution
 
 /-!
 
-## D. Referenced boundary amplitudes
+## E. Referenced boundary amplitudes
 
 -/
 
@@ -432,6 +505,17 @@ lemma components_eq_zero_of_electricAmplitude_eq_zero
     ext i
     have hCoordinate := congrArg (fun v ↦ ⟪frame.complexAxis i, v⟫_ℂ) hEmbed
     simpa [PolarizationFrame.inner_complexAxis_embedJones] using hCoordinate
+
+/-- Proved-zero guarded Jones data may be represented in any propagation frame.
+
+Only the connector used by the proof is changed. The wave and its arbitrary dummy carrier data
+remain unchanged. -/
+lemma reframe_of_electricAmplitude_eq_zero
+    (h : IsZeroOrReferencedMaterialJonesWave plane medium wave frame J)
+    {newDirection : Space.Direction 3} (newFrame : PolarizationFrame newDirection)
+    (hElectric : wave.electricAmplitude = 0) :
+    IsZeroOrReferencedMaterialJonesWave plane medium wave newFrame J := by
+  exact Or.inl ⟨hElectric, h.components_eq_zero_of_electricAmplitude_eq_zero hElectric⟩
 
 /-- The zero-or-connected guard gives the same planar-frame tangential electric formula while
 preserving arbitrary carrier data in its zero branch. -/

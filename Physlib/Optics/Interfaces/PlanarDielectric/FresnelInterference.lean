@@ -45,6 +45,8 @@ balance for the actual superposed negative-side field.
   the corresponding additivity over every common averaging interval.
 - `PlanarDielectricWaveConfiguration.fresnel_superposedWave_normalFlux_balance`: the connected
   fixed-frequency Fresnel balance for the actual superposed fields.
+- `PlanarDielectricWaveConfiguration.fresnel_superposedWave_normalFlux_balance_of_incidenceFrames`:
+  the canonical non-normal-incidence endpoint with a derived common `s` axis and reflection guard.
 
 ## iii. Table of contents
 
@@ -499,6 +501,70 @@ lemma fresnel_superposedWave_normalFlux_balance
   rw [HasSuperposedWaveNormalFluxBalance, hCombined]
   rw [HasSeparateWaveNormalFluxBalance] at hSeparate
   simpa only [hTransmittedFrequency] using hSeparate
+
+/-- A fixed-frequency boundary with canonical non-normal incidence frames satisfies normal-flux
+balance for the actual superposed incident-plus-reflected field and the transmitted field.
+
+The canonical-frame hypotheses and tangential phase matching give the common `s` axis. The
+referenced connector data, phase matching, and explicit incident/reflected sign hypotheses give
+the exact active reflected-normal equality required by the connected Fresnel endpoint. A zero
+reflected field retains arbitrary dummy carrier and frame labels. -/
+lemma fresnel_superposedWave_normalFlux_balance_of_incidenceFrames
+    (hElectric : configuration.IsFixedFrequencyElectricBoundary)
+    (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
+    (hIncident : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.incident incidentFrame incidentJones)
+    (hReflected : IsZeroOrReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.reflected reflectedFrame reflectedJones)
+    (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.positiveMedium configuration.transmitted transmittedFrame
+        transmittedJones)
+    (hIncidentNonNormal : IsNonNormalIncidence incidentDirection
+      configuration.interface.plane.normal)
+    (hTransmittedNonNormal : IsNonNormalIncidence transmittedDirection
+      configuration.interface.plane.normal)
+    (hIncidentCanonical : incidentFrame = incidencePolarizationFrame incidentDirection
+      configuration.interface.plane.normal hIncidentNonNormal)
+    (hTransmittedCanonical : transmittedFrame = incidencePolarizationFrame transmittedDirection
+      configuration.interface.plane.normal hTransmittedNonNormal)
+    (hReflectedCanonical : configuration.reflected.electricAmplitude ≠ 0 →
+      ∃ hReflectedNonNormal : IsNonNormalIncidence reflectedDirection
+          configuration.interface.plane.normal,
+        reflectedFrame = incidencePolarizationFrame reflectedDirection
+          configuration.interface.plane.normal hReflectedNonNormal)
+    (hIncidentNormal : 0 <
+      configuration.interface.plane.normalComponent incidentFrame.propagationVector)
+    (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
+      configuration.interface.plane.normalComponent reflectedFrame.propagationVector < 0)
+    (hTransmittedNormal : 0 ≤
+      configuration.interface.plane.normalComponent transmittedFrame.propagationVector)
+    (startTime : Time) :
+    configuration.HasSuperposedWaveNormalFluxBalance startTime := by
+  let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
+    hIncidentNonNormal
+  have hData := hElectric.1.canonicalIncidenceFrame_data hIncident hReflected hTransmitted
+    hIncidentNonNormal hTransmittedNonNormal hIncidentCanonical hTransmittedCanonical
+      hReflectedCanonical hIncidentNormal hReflectedNormal
+  change incidentFrame.axis 0 = planeFrame.axis 0 ∧
+    transmittedFrame.axis 0 = planeFrame.axis 0 ∧
+      (configuration.reflected.electricAmplitude = 0 ∨
+        reflectedFrame.axis 0 = planeFrame.axis 0 ∧
+          reflectedFrame.propagationVector =
+            configuration.interface.plane.vectorReflection incidentFrame.propagationVector) at hData
+  rcases hData with ⟨hIncidentAlign, hTransmittedAlign, hReflectedData⟩
+  by_cases hZero : configuration.reflected.electricAmplitude = 0
+  · have hReflectedZero := hReflected.reframe_of_electricAmplitude_eq_zero planeFrame hZero
+    exact fresnel_superposedWave_normalFlux_balance hElectric hMagnetic planeFrame hIncident
+      hReflectedZero hTransmitted hIncidentAlign rfl hTransmittedAlign (Or.inl hZero)
+        hIncidentNormal hTransmittedNormal startTime
+  · rcases hReflectedData.resolve_left hZero with ⟨hReflectedAlign, hReflection⟩
+    have hNormal : configuration.interface.plane.normalComponent
+          reflectedFrame.propagationVector =
+        -configuration.interface.plane.normalComponent incidentFrame.propagationVector := by
+      rw [hReflection, configuration.interface.plane.normalComponent_vectorReflection]
+    exact fresnel_superposedWave_normalFlux_balance hElectric hMagnetic planeFrame hIncident
+      hReflected hTransmitted hIncidentAlign hReflectedAlign hTransmittedAlign (Or.inr hNormal)
+        hIncidentNormal hTransmittedNormal startTime
 
 end PlanarDielectricWaveConfiguration
 

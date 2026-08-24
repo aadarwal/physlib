@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.Optics.Interfaces.PlanarDielectric.CanonicalIncidence
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
 
 /-!
@@ -40,9 +41,11 @@ vanishes. Quotient results require only the matching denominator to be nonzero. 
 derive that condition for strictly positive incident normal component and nonnegative transmitted
 normal component. The final results connect the quotient lemmas to the referenced electric and
 magnetic equalities and their aligned Jones-wave data. They retain a zero-reflected-field branch
-with arbitrary reflected carrier data and require no nonzero incident amplitude. The guarded
-reflected normal relation remains an explicit premise: this file does not choose a propagation
-branch or state an irradiance or power law.
+with arbitrary reflected carrier data and require no nonzero incident amplitude. The core result
+takes the guarded reflected normal relation explicitly. Its canonical non-normal-incidence wrapper
+derives the active relation from phase matching, referenced material data, and explicitly selected
+opposite normal signs; no direction follows merely from a wave label. This file states no
+irradiance or power law.
 
 ## ii. Key results
 
@@ -60,6 +63,9 @@ branch or state an irradiance or power law.
   the four component formulas from the two referenced equalities and a Jones-zero guard.
 - `PlanarDielectricWaveConfiguration.fresnel_components_of_referenced_balances`: the wave-level
   form whose zero branch is stated using the reflected electric amplitude.
+- `PlanarDielectricWaveConfiguration.fresnel_components_of_referenced_balances_of_incidenceFrames`:
+  the canonical non-normal-incidence wrapper that derives the common `s`-axis and reflected-normal
+  hypotheses while preserving arbitrary zero-reflected carrier data.
 
 ## iii. Table of contents
 
@@ -547,6 +553,98 @@ lemma fresnel_components_of_referenced_balances
   exact fresnel_components_of_referenced_balances_of_jones_guard hElectric hMagnetic planeFrame
     hIncident hReflected hTransmitted hIncidentAlign hReflectedAlign hTransmittedAlign
       hJonesReflection hSDenominator hPDenominator
+
+/-- The fixed-frequency boundary equations give all four full-vector Fresnel component formulas
+when the propagating frames are the canonical non-normal incidence frames.
+
+The incident frame normal is positive, the transmitted frame normal is nonnegative, and the
+active reflected frame normal is explicitly selected negative. The canonical-frame hypotheses
+and tangential phase matching give the common `s` axis; the referenced connector data, phase
+matching, and opposite normal-sign hypotheses give exact active reflection. In the zero-reflected
+branch, the proof locally represents the zero Jones data in the common plane
+frame. The original dummy reflected carrier, direction, frame, and frequency remain unrestricted. -/
+lemma fresnel_components_of_referenced_balances_of_incidenceFrames
+    (hElectric : configuration.IsFixedFrequencyElectricBoundary)
+    (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
+    (hIncident : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.incident incidentFrame incidentJones)
+    (hReflected : IsZeroOrReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.reflected reflectedFrame reflectedJones)
+    (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.positiveMedium configuration.transmitted transmittedFrame
+        transmittedJones)
+    (hIncidentNonNormal : IsNonNormalIncidence incidentDirection
+      configuration.interface.plane.normal)
+    (hTransmittedNonNormal : IsNonNormalIncidence transmittedDirection
+      configuration.interface.plane.normal)
+    (hIncidentCanonical : incidentFrame = incidencePolarizationFrame incidentDirection
+      configuration.interface.plane.normal hIncidentNonNormal)
+    (hTransmittedCanonical : transmittedFrame = incidencePolarizationFrame transmittedDirection
+      configuration.interface.plane.normal hTransmittedNonNormal)
+    (hReflectedCanonical : configuration.reflected.electricAmplitude ≠ 0 →
+      ∃ hReflectedNonNormal : IsNonNormalIncidence reflectedDirection
+          configuration.interface.plane.normal,
+        reflectedFrame = incidencePolarizationFrame reflectedDirection
+          configuration.interface.plane.normal hReflectedNonNormal)
+    (hIncidentNormal : 0 <
+      configuration.interface.plane.normalComponent incidentFrame.propagationVector)
+    (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
+      configuration.interface.plane.normalComponent reflectedFrame.propagationVector < 0)
+    (hTransmittedNormal : 0 ≤
+      configuration.interface.plane.normalComponent transmittedFrame.propagationVector) :
+    reflectedJones.components 0 =
+        (configuration.interface.sFresnelReflectionCoefficient
+          (configuration.interface.plane.normalComponent incidentFrame.propagationVector)
+          (configuration.interface.plane.normalComponent
+            transmittedFrame.propagationVector) : ℂ) *
+          incidentJones.components 0 ∧
+      transmittedJones.components 0 =
+        (configuration.interface.sFresnelTransmissionCoefficient
+          (configuration.interface.plane.normalComponent incidentFrame.propagationVector)
+          (configuration.interface.plane.normalComponent
+            transmittedFrame.propagationVector) : ℂ) *
+          incidentJones.components 0 ∧
+      reflectedJones.components 1 =
+        (configuration.interface.pFresnelReflectionCoefficient
+          (configuration.interface.plane.normalComponent incidentFrame.propagationVector)
+          (configuration.interface.plane.normalComponent
+            transmittedFrame.propagationVector) : ℂ) *
+          incidentJones.components 1 ∧
+      transmittedJones.components 1 =
+        (configuration.interface.pFresnelTransmissionCoefficient
+          (configuration.interface.plane.normalComponent incidentFrame.propagationVector)
+          (configuration.interface.plane.normalComponent
+            transmittedFrame.propagationVector) : ℂ) *
+          incidentJones.components 1 := by
+  let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
+    hIncidentNonNormal
+  have hData := hElectric.1.canonicalIncidenceFrame_data hIncident hReflected hTransmitted
+    hIncidentNonNormal hTransmittedNonNormal hIncidentCanonical hTransmittedCanonical
+      hReflectedCanonical hIncidentNormal hReflectedNormal
+  change incidentFrame.axis 0 = planeFrame.axis 0 ∧
+    transmittedFrame.axis 0 = planeFrame.axis 0 ∧
+      (configuration.reflected.electricAmplitude = 0 ∨
+        reflectedFrame.axis 0 = planeFrame.axis 0 ∧
+          reflectedFrame.propagationVector =
+            configuration.interface.plane.vectorReflection incidentFrame.propagationVector) at hData
+  rcases hData with ⟨hIncidentAlign, hTransmittedAlign, hReflectedData⟩
+  have hSDenominator := configuration.interface.sFresnelDenominator_ne_zero
+    hIncidentNormal hTransmittedNormal
+  have hPDenominator := configuration.interface.pFresnelDenominator_ne_zero
+    hIncidentNormal hTransmittedNormal
+  by_cases hZero : configuration.reflected.electricAmplitude = 0
+  · have hReflectedZero := hReflected.reframe_of_electricAmplitude_eq_zero planeFrame hZero
+    exact fresnel_components_of_referenced_balances hElectric.2 hMagnetic planeFrame hIncident
+      hReflectedZero hTransmitted hIncidentAlign rfl hTransmittedAlign (Or.inl hZero)
+        hSDenominator hPDenominator
+  · rcases hReflectedData.resolve_left hZero with ⟨hReflectedAlign, hReflection⟩
+    have hNormal : configuration.interface.plane.normalComponent
+          reflectedFrame.propagationVector =
+        -configuration.interface.plane.normalComponent incidentFrame.propagationVector := by
+      rw [hReflection, configuration.interface.plane.normalComponent_vectorReflection]
+    exact fresnel_components_of_referenced_balances hElectric.2 hMagnetic planeFrame hIncident
+      hReflected hTransmitted hIncidentAlign hReflectedAlign hTransmittedAlign (Or.inr hNormal)
+        hSDenominator hPDenominator
 
 end PlanarDielectricWaveConfiguration
 
