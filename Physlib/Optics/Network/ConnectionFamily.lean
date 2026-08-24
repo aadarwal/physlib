@@ -181,6 +181,26 @@ lemma channelEmbedding_connectionChannelEmbedding (index : ι)
       (family.connection index).channelEmbedding channel := by
   rfl
 
+/-- An ambient channel is selected by the connected-channel embedding exactly when its physical
+port is selected by an indexed connection endpoint. -/
+lemma channel_mem_range_channelEmbedding_iff (channel : P.Channel) :
+    channel ∈ Set.range family.channelEmbedding ↔
+      channel.1 ∈ Set.range family.endpointEmbedding := by
+  constructor
+  · rintro ⟨⟨index, localChannel⟩, hChannel⟩
+    rcases localChannel with mode | mode
+    · exact ⟨(index, PortConnection.End.left), congrArg Sigma.fst hChannel⟩
+    · exact ⟨(index, PortConnection.End.right), congrArg Sigma.fst hChannel⟩
+  · rintro ⟨⟨index, endpoint⟩, hPort⟩
+    rcases channel with ⟨port, mode⟩
+    cases endpoint
+    · change (family.connection index).left = port at hPort
+      cases hPort
+      exact ⟨⟨index, Sum.inl mode⟩, rfl⟩
+    · change (family.connection index).right = port at hPort
+      cases hPort
+      exact ⟨⟨index, Sum.inr mode⟩, rfl⟩
+
 /-- The blockwise mate equivalence of every connected channel in a connection family. -/
 def mateEquiv : family.Channel ≃ family.Channel :=
   Equiv.sigmaCongrRight fun index => (family.connection index).mateEquiv
