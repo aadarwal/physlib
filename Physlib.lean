@@ -241,6 +241,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.Snell
 public import Physlib.Optics.Interfaces.PlanarDielectric.SubcriticalTransmission
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalCarrier
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFlux
+public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFresnel
+public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFresnelRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalPolarization
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalPolarizationRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalTransmission

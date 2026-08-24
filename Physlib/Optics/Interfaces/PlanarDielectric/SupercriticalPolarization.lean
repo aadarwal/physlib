@@ -53,6 +53,8 @@ reflection, irradiance, or power claim is made.
 - `positiveNormalDecayTransmittedJonesCandidate_tangentialElectricAmplitude` and
   `positiveNormalDecayTransmittedJonesCandidate_tangentialMagneticFieldStrengthAmplitude`:
   fixed-plane electric and magnetic-field-strength coordinates.
+- `positiveNormalDecayTransmittedReferencedJones`: the raw transmitted Jones data rephased and
+  rescaled to the affine interface point, with referenced electric and magnetic trace lemmas.
 - `positiveNormalDecayTransmittedJonesCandidate_isMacroscopicMaxwellSolution`:
   the negative-radicand positive-medium Maxwell solution.
 - `positiveNormalDecayTransmittedJonesCandidate_normalMeanFlux_eq_zero`:
@@ -62,6 +64,7 @@ reflection, irradiance, or power claim is made.
 
 - A. Canonical negative-radicand polarization frame
 - B. Raw Jones-amplitude carrier family
+- C. Plane-referenced transmitted Jones data
 
 ## iv. References
 
@@ -355,6 +358,88 @@ lemma positiveNormalDecayTransmittedJonesCandidate_normalMeanFlux_eq_zero
   rw [hNormal] at hzero
   change inner ℝ configuration.interface.plane.normalVector _ = 0
   exact hzero
+
+/-!
+
+## C. Plane-referenced transmitted Jones data
+
+-/
+
+/-- The canonical positive-normal-decay transmitted Jones data referenced to the stored affine
+point of the interface plane.
+
+The supplied Jones vector is the raw carrier amplitude at the coordinate origin. Referencing
+multiplies it by the exact, nonzero spatial factor at the interface point. -/
+noncomputable def positiveNormalDecayTransmittedReferencedJones
+    (configuration : PlanarDielectricWaveConfiguration)
+    (J : JonesVector) : JonesVector :=
+  JonesVector.scale
+    (configuration.positiveNormalDecayTransmittedWaveVector.spatialFactor
+      configuration.interface.plane.point) J
+
+/-- Each plane-referenced transmitted Jones coordinate is the raw coordinate multiplied by the
+stored-point spatial factor. -/
+@[simp]
+lemma positiveNormalDecayTransmittedReferencedJones_components
+    (configuration : PlanarDielectricWaveConfiguration)
+    (J : JonesVector) (i : Fin 2) :
+    (configuration.positiveNormalDecayTransmittedReferencedJones J).components i =
+        configuration.positiveNormalDecayTransmittedWaveVector.spatialFactor
+          configuration.interface.plane.point * J.components i := by
+  rfl
+
+/-- The referenced tangential electric amplitude of the canonical decay carrier has fixed-plane
+coordinates `(J_s, zeta J_p)` in the plane-referenced Jones data. -/
+lemma positiveNormalDecayTransmittedJonesCandidate_referencedTangentialElectricAmplitude
+    (configuration : PlanarDielectricWaveConfiguration)
+    (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector) :
+    (referencedMediumJointElectricTraceAmplitude configuration.interface.plane
+      configuration.interface.positiveMedium
+      (configuration.positiveNormalDecayTransmittedJonesCandidate hRadicand J)).1 =
+        (configuration.positiveNormalDecayTransmittedPolarizationFrame
+          hRadicand).planeFrame.embedJones
+            ((configuration.positiveNormalDecayTransmittedPolarizationFrame
+              hRadicand).tangentialJones configuration.interface.plane
+                (configuration.positiveNormalDecayTransmittedReferencedJones J)) := by
+  rw [referencedMediumJointElectricTraceAmplitude, mediumJointElectricTraceAmplitude]
+  simp only [Prod.smul_fst]
+  rw [configuration.positiveNormalDecayTransmittedJonesCandidate_waveVector hRadicand J,
+    configuration.positiveNormalDecayTransmittedJonesCandidate_electricAmplitude hRadicand J,
+    ← ComplexWaveVector.hyperplaneTangentialProjection_smul,
+    ← (configuration.positiveNormalDecayTransmittedPolarizationFrame
+      hRadicand).embedJones_scale,
+    (configuration.positiveNormalDecayTransmittedPolarizationFrame
+      hRadicand).hyperplaneTangentialProjection_embedJones]
+  rfl
+
+/-- The referenced positive-medium tangential magnetic-field-strength amplitude of the canonical
+decay carrier has fixed-plane coordinates `Y₂ (-J_p, zeta J_s)` in the plane-referenced Jones
+data. -/
+lemma
+  positiveNormalDecayTransmittedJonesCandidate_referencedTangentialMagneticFieldStrengthAmplitude
+    (configuration : PlanarDielectricWaveConfiguration)
+    (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector) :
+    referencedMediumTangentialMagneticFieldStrengthAmplitude configuration.interface.plane
+        configuration.interface.positiveMedium
+        (configuration.positiveNormalDecayTransmittedJonesCandidate hRadicand J) =
+      ((configuration.interface.positiveMedium.waveImpedance⁻¹ : ℝ) : ℂ) •
+        (configuration.positiveNormalDecayTransmittedPolarizationFrame
+          hRadicand).planeFrame.embedJones
+          (JonesVector.ofComponents
+            (-(configuration.positiveNormalDecayTransmittedReferencedJones J).components 1)
+            ((configuration.positiveNormalDecayTransmittedPolarizationFrame
+                hRadicand).normalizedWaveVectorNormalComponent configuration.interface.plane *
+              (configuration.positiveNormalDecayTransmittedReferencedJones J).components 0)) := by
+  rw [referencedMediumTangentialMagneticFieldStrengthAmplitude,
+    configuration.positiveNormalDecayTransmittedJonesCandidate_waveVector hRadicand J,
+    positiveNormalDecayTransmittedJonesCandidate_tangentialMagneticFieldStrengthAmplitude
+      configuration hRadicand J]
+  ext i
+  fin_cases i <;>
+    simp [PolarizationFrame.embedJones_apply, Fin.sum_univ_two,
+      positiveNormalDecayTransmittedReferencedJones, JonesVector.scale,
+      JonesVector.ofComponents]
+  all_goals ring
 
 end PlanarDielectricWaveConfiguration
 

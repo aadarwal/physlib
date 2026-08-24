@@ -783,6 +783,40 @@ PR unless maintainers explicitly ask to retain it.
   full-vector field coefficient is finite. At selected-tangent normal incidence, verify
   `r_p_tangent = r_s` and `t_p_tangent = t_s` while the moving reflected full-vector coordinate
   still has `r_p_full = -r_s`.
+- [ ] Human-check the supercritical complex Fresnel convention before upstreaming. The transmitted
+  argument is the dimensionless normalized normal factor
+  `zeta = (n dot K_t) / beta_2 = -I * alpha / beta_2`, never the dimensional value `-I * alpha`.
+  With `Y_j = Z_j inverse`, `chi_i > 0`, and `delta = alpha / beta_2 > 0`, independently verify
+  `r_s = (Y1 chi_i + I Y2 delta) / (Y1 chi_i - I Y2 delta)` and
+  `r_p = (Y2 chi_i + I Y1 delta) / (Y2 chi_i - I Y1 delta)`. Under the repository convention
+  `exp (I omega t - I K dot x)`, their phases are the positive `Real.Angle` values
+  `2 arctan (Y2 delta / (Y1 chi_i))` and
+  `2 arctan (Y1 delta / (Y2 chi_i))`; a source using negative-time phasors generally gives the
+  conjugate signs. Confirm `norm r_s = norm r_p = 1`. Keep the moving full-vector `p` coefficient
+  distinct from the fixed-plane tangential coefficient `-r_p`, whose extra minus sign is a basis
+  change and hence a `pi` phase shift rather than a physical disagreement.
+- [ ] Human-check the connected supercritical boundary theorem and exact regressions. The raw
+  canonical decay constructor stores its Jones amplitude at the coordinate origin, whereas every
+  boundary balance uses the affine plane's stored point; therefore the transmitted referenced
+  Jones data must be `spatialFactor K plane.point` times the raw data. Recheck the shifted fixture
+  where that multiplier is `-I`, since an origin-only test cannot detect omitted, conjugated, or
+  reversed referencing. In the reflected zero-field branch, proved-zero Jones data may be locally
+  reframed, but the original dummy carrier, frequency, wave vector, and frame labels must remain
+  unrestricted. Independently recheck the unequal-admittance fixture
+  `Y1 = 2/3`, `Y2 = 1`, `chi_i = 4/5`, `zeta = -4 I/3`, including
+  `r_s = (-21 + 20 I)/29`, `t_s = (8 + 20 I)/29`,
+  `r_p = (-19 + 180 I)/181`, and `t_p = (108 + 120 I)/181`. The proved Jones-intensity equality
+  concerns only the incident and reflected ordinary propagating waves; it does not assign raw
+  transmitted decay-frame Jones norm the meaning of power or prove an actual flux balance.
+- [ ] Keep positive-side decay, zero transmitted normal mean flux, and outgoing or causal
+  semantics as three distinct claims. This complex Fresnel slice selects the algebraic
+  positive-normal-decay boundary amplitude and proves unit reflected modulus and phase, but it
+  does not establish a radiation condition, limiting-absorption prescription, half-space support,
+  an evanescent positive-power port, or the connected reflected/superposed actual-flux TIR
+  endpoint. For upstream review, split affine referenced-transmitted data, branch-neutral complex
+  coefficient algebra and real compatibility, TIR denominator/modulus/phase, connected boundary
+  elimination, and exact regressions into separately reviewable concepts; keep the later actual
+  flux theorem and any outgoing semantics in their own proposals.
 - [ ] Human-check the selected-tangent connected wrapper and regressions. The incident and
   transmitted relations use the positive side; only a nonzero reflected field requires the
   negative-side relation. In the zero branch the original reflected direction, frame, frequency,
@@ -1147,7 +1181,8 @@ PR unless maintainers explicitly ask to retain it.
   `reconciles`, `records`, `solved`, `solver`, `specialize`, and `unavailable`.
   The guarded canonical-role-frame differential added `accepted`, `assigning`, `canonicality`,
   `conditionally`, `connectivity`, `existential`, `flow`, `hides`, `literal`, `manual`, `packages`,
-  `recognition`, `role`, `roles`, and `unconditional`.
+  `recognition`, `role`, `roles`, and `unconditional`. The complex Fresnel/TIR differential added
+  `acquires`, `arctangent`, `denominators`, `hybrid`, and `quadrant`.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 

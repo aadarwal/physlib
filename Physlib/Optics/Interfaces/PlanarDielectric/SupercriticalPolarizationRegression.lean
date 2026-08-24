@@ -43,12 +43,15 @@ constructor rather than reusing the expected carrier.
   positive-medium Maxwell endpoint.
 - `supercriticalPolarizationRegression_normalMeanFlux_eq_zero`: the
   configuration-level zero stored-normal mean-flux endpoint.
+- `supercriticalPolarizationRegressionShifted_referencedJones`: a nonzero affine interface point
+  contributes the exact stored-point spatial factor to the transmitted Jones data.
 
 ## iii. Table of contents
 
 - A. Exact interface configuration
 - B. Canonical frame and carrier recovery
 - C. Maxwell and flux endpoints
+- D. Nonzero affine reference point
 
 ## iv. References
 
@@ -361,6 +364,121 @@ lemma supercriticalPolarizationRegression_normalMeanFlux_eq_zero
     supercriticalPolarizationRegressionConfiguration
     supercriticalPolarizationRegression_transmittedNormalRadicand_neg
     complexDecayRegressionTMJones startTime x
+
+/-!
+
+## D. Nonzero affine reference point
+
+-/
+
+/-- The parallel regression plane shifted to first coordinate `pi / 10`. -/
+def supercriticalPolarizationRegressionShiftedPlane : OrientedAffineHyperplane 3 where
+  point := ⟨![Real.pi / 10, 0, 0]⟩
+  normal := positiveNormalDecayRegressionDirection
+
+/-- The negative-radicand interface with a nonzero stored affine point. -/
+def supercriticalPolarizationRegressionShiftedInterface : PlanarDielectricInterface where
+  plane := supercriticalPolarizationRegressionShiftedPlane
+  negativeMedium := supercriticalPolarizationRegressionNegativeMedium
+  positiveMedium := complexDecayRegressionMedium
+
+/-- The shifted-point configuration retains the independent dummy transmitted slot. -/
+def supercriticalPolarizationRegressionShiftedConfiguration :
+    PlanarDielectricWaveConfiguration where
+  interface := supercriticalPolarizationRegressionShiftedInterface
+  incident := supercriticalPolarizationRegressionIncident
+  reflected := supercriticalPolarizationRegressionReflected
+  transmitted := supercriticalPolarizationRegressionDummyTransmitted
+
+/-- Shifting the stored plane point does not change the exact negative transmitted radicand. -/
+lemma supercriticalPolarizationRegressionShifted_transmittedNormalRadicand :
+    supercriticalPolarizationRegressionShiftedConfiguration.transmittedNormalRadicand = -16 := by
+  rw [PlanarDielectricWaveConfiguration.transmittedNormalRadicand]
+  have hTangential :
+      supercriticalPolarizationRegressionShiftedPlane.tangentialProjection
+          supercriticalPolarizationRegressionIncident.waveVector.phaseVector =
+        WithLp.toLp 2 ![(5 : ℝ), 0, 0] := by
+    ext i
+    fin_cases i <;>
+      simp [supercriticalPolarizationRegressionShiftedPlane,
+        supercriticalPolarizationRegressionIncident,
+        supercriticalPolarizationRegressionIncidentWaveVector,
+        positiveNormalDecayRegressionDirection,
+        OrientedAffineHyperplane.tangentialProjection,
+        OrientedAffineHyperplane.normalComponent, OrientedAffineHyperplane.normalVector,
+        ComplexWaveVector.phaseVector, ComplexWaveVector.ofReal,
+        ComplexWaveVector.realPart, PiLp.inner_apply, RCLike.inner_apply]
+  rw [show supercriticalPolarizationRegressionShiftedConfiguration.interface.plane =
+      supercriticalPolarizationRegressionShiftedPlane by rfl,
+    show supercriticalPolarizationRegressionShiftedConfiguration.incident =
+      supercriticalPolarizationRegressionIncident by rfl,
+    hTangential]
+  norm_num [supercriticalPolarizationRegressionShiftedConfiguration,
+    supercriticalPolarizationRegressionShiftedInterface, complexDecayRegressionMedium,
+    supercriticalPolarizationRegressionIncident, EuclideanSpace.norm_eq,
+    Fin.sum_univ_three]
+  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, Fin.isValue, Matrix.cons_val, ne_eq,
+    OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero, Nat.ofNat_nonneg,
+    Real.sq_sqrt]
+  norm_num
+
+/-- The shifted-point regression remains on the strict negative-radicand branch. -/
+lemma supercriticalPolarizationRegressionShifted_transmittedNormalRadicand_neg :
+    supercriticalPolarizationRegressionShiftedConfiguration.transmittedNormalRadicand < 0 := by
+  rw [supercriticalPolarizationRegressionShifted_transmittedNormalRadicand]
+  norm_num
+
+/-- The shifted-point configuration constructs the same exact `(5, 0, -4 I)` wave vector. -/
+lemma supercriticalPolarizationRegressionShifted_positiveNormalDecayTransmittedWaveVector :
+    PlanarDielectricWaveConfiguration.positiveNormalDecayTransmittedWaveVector
+        supercriticalPolarizationRegressionShiftedConfiguration =
+      complexDecayRegressionWaveVector := by
+  rw [positiveNormalDecayTransmittedWaveVector_eq_ofPhaseAttenuation,
+    supercriticalPolarizationRegressionShifted_transmittedNormalRadicand,
+    complexDecayRegressionWaveVector_eq]
+  simp only [neg_neg]
+  rw [supercriticalPolarizationRegression_sqrt_sixteen]
+  ext i
+  fin_cases i <;>
+    simp [supercriticalPolarizationRegressionShiftedConfiguration,
+      supercriticalPolarizationRegressionShiftedInterface,
+      supercriticalPolarizationRegressionShiftedPlane,
+      supercriticalPolarizationRegressionIncident,
+      supercriticalPolarizationRegressionIncidentWaveVector,
+      positiveNormalDecayRegressionDirection,
+      OrientedAffineHyperplane.tangentialProjection,
+      OrientedAffineHyperplane.normalComponent, OrientedAffineHyperplane.normalVector,
+      ComplexWaveVector.phaseVector, ComplexWaveVector.ofReal,
+      ComplexWaveVector.realPart, ComplexWaveVector.ofPhaseAttenuation,
+      PiLp.inner_apply, RCLike.inner_apply]
+  all_goals ring
+
+/-- At the shifted affine point, the canonical decay wave has spatial factor `-I`. -/
+lemma supercriticalPolarizationRegressionShifted_spatialFactor :
+    (PlanarDielectricWaveConfiguration.positiveNormalDecayTransmittedWaveVector
+      supercriticalPolarizationRegressionShiftedConfiguration).spatialFactor
+        supercriticalPolarizationRegressionShiftedPlane.point = -Complex.I := by
+  rw [supercriticalPolarizationRegressionShifted_positiveNormalDecayTransmittedWaveVector,
+    complexDecayRegressionWaveVector_eq]
+  norm_num [ComplexWaveVector.spatialFactor, ComplexWaveVector.spatialPairing,
+    ComplexWaveVector.bilinearDot, supercriticalPolarizationRegressionShiftedPlane,
+    Fin.sum_univ_three, Matrix.cons_val_two, Matrix.head_cons]
+  rw [show -(Complex.I * (5 * ((Real.pi : ℂ) / 10))) =
+    (-(Real.pi : ℂ) / 2) * Complex.I by ring,
+    Complex.exp_neg_pi_div_two_mul_I]
+
+/-- The plane-referenced transmitted Jones data includes the exact nontrivial stored-point phase
+`-I`, rather than silently reusing the raw coordinate-origin amplitude. -/
+lemma supercriticalPolarizationRegressionShifted_referencedJones (J : JonesVector) :
+    PlanarDielectricWaveConfiguration.positiveNormalDecayTransmittedReferencedJones
+        supercriticalPolarizationRegressionShiftedConfiguration J =
+      JonesVector.scale (-Complex.I) J := by
+  rw [PlanarDielectricWaveConfiguration.positiveNormalDecayTransmittedReferencedJones]
+  change JonesVector.scale
+      ((PlanarDielectricWaveConfiguration.positiveNormalDecayTransmittedWaveVector
+        supercriticalPolarizationRegressionShiftedConfiguration).spatialFactor
+          supercriticalPolarizationRegressionShiftedPlane.point) J = _
+  rw [supercriticalPolarizationRegressionShifted_spatialFactor]
 
 end
 

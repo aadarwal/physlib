@@ -49,6 +49,8 @@ coordinates without misclassifying the full complex `p` vector as a real propaga
   quarter-turn identities.
 - `PositiveNormalDecayPolarizationFrame.bilinearDot_axis_embedJones`: recovery of the two raw
   `s`/`p` amplitudes.
+- `PositiveNormalDecayPolarizationFrame.embedJones_scale`: exact compatibility of complex Jones
+  scaling with the physical-vector embedding.
 - `PositiveNormalDecayPolarizationFrame.embedJones_jonesCoordinates_of_transverse`: every
   bilinearly transverse electric amplitude is reconstructed from its unique raw `s`/`p`
   coordinates.
@@ -395,6 +397,16 @@ lemma embedJones_eq (frame : PositiveNormalDecayPolarizationFrame normal)
       J.components 0 • frame.sAxis + J.components 1 • frame.pAxis := by
   rw [embedJones, Fin.sum_univ_two]
   rfl
+
+/-- Complex scaling of raw Jones coordinates commutes with the decay-frame embedding. -/
+lemma embedJones_scale (frame : PositiveNormalDecayPolarizationFrame normal)
+    (z : ℂ) (J : JonesVector) :
+    frame.embedJones (JonesVector.scale z J) = z • frame.embedJones J := by
+  rw [embedJones, embedJones]
+  simp only [JonesVector.scale, Finset.smul_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  simp [smul_smul]
 
 /-- Zero raw `s` and `p` amplitudes embed as the zero electric amplitude. -/
 @[simp]
