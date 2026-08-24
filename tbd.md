@@ -767,6 +767,32 @@ PR unless maintainers explicitly ask to retain it.
   non-normal frames, and explicit positive-incident plus active-negative-reflected normal
   selection rather than treating a wave label as a direction law. Keep the manual rational
   fixture solve independent of the general coefficient theorem.
+- [ ] Human-check the selected-tangent normal-incidence relation before upstreaming. A caller must
+  independently supply a plane-normal polarization frame; a propagation frame qualifies on a
+  selected geometric side only when its first axis is exactly equal to the selected first axis and
+  its propagation vector is exactly that side-normal vector. Confirm that its signed normal is the
+  side sign, its second full-vector axis is the side sign times the plane frame's second axis, and
+  its fixed-plane `p` component is `side.sign * J1`. This is a gauge choice, not a canonical `s`
+  axis or an incident/reflected/transmitted direction inferred from a label.
+- [ ] Human-check the fixed-plane tangential-`p` Fresnel convention before upstreaming. With the
+  existing full-vector denominator `D_p = Y2 chi_i + Y1 chi_t`, confirm
+  `r_p_tangent = (Y1 chi_t - Y2 chi_i) / D_p = -r_p_full` and
+  `t_p_tangent = 2 Y1 chi_t / D_p`, together with the division-free law
+  `chi_i * t_p_tangent = chi_t * t_p_full`. The quotient normal-ratio form requires
+  `chi_i != 0`; at transmitted grazing the tangential transmitted multiplier is zero even when the
+  full-vector field coefficient is finite. At selected-tangent normal incidence, verify
+  `r_p_tangent = r_s` and `t_p_tangent = t_s` while the moving reflected full-vector coordinate
+  still has `r_p_full = -r_s`.
+- [ ] Human-check the selected-tangent connected wrapper and regressions. The incident and
+  transmitted relations use the positive side; only a nonzero reflected field requires the
+  negative-side relation. In the zero branch the original reflected direction, frame, frequency,
+  and wave vector remain arbitrary while proved-zero Jones data is locally reframed. Independently
+  recheck the exact normal electric vectors `(-1,1,0)`, `(-1/3,1/3,0)`, `(-4/3,4/3,0)` and
+  magnetic-field-strength (`H`) vectors `(-5/2,-5/2,0)`, `(5/6,5/6,0)`, `(-5/3,-5/3,0)`, plus the
+  oblique conversion from full coefficients `(-1/5,8/5)` to fixed-plane coefficients `(1/5,6/5)`.
+  The connected zero-field regression deliberately uses wave vector zero, angular frequency two
+  against the active frequency one, and the positive-side frame in the reflected slot; confirm
+  that the conditional reflected-frame premise is unreachable rather than silently imposed.
 - [ ] Human-check the canonical incidence wrapper before upstreaming. Confirm that positive scalar
   rescaling of equal tangential phase directions preserves the oriented `s = normalize (n cross
   k-hat)` axis; complex hyperplane reflection descends to the exact real propagation-vector
@@ -1063,6 +1089,10 @@ PR unless maintainers explicitly ask to retain it.
   words were reworded and only the transverse-electric abbreviation `te` was added to both the
   Lean spelling dictionary and the separate CI codespell ignore list. The exact real-wave
   nonzero-amplitude bridge and complex-Maxwell regression introduced no new spelling vocabulary.
+  The selected-tangent normal-incidence differential added the correct new prose vocabulary
+  `alignment`, `apart`, `assertion`, `balance`, `balanced`, `balances`, `chi`, `conclusions`,
+  `converting`, `crosses`, `intentionally`, `multiplier`, `passes`, `performs`, `propagate`,
+  `reconciles`, `records`, `solved`, `solver`, `specialize`, and `unavailable`.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 

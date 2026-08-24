@@ -34,7 +34,10 @@ t_p = 2 Y₁ chi_i / D_p.
 Here `s` is Jones coordinate zero and `p` is the full electric-vector Jones coordinate one.
 Consequently the reflected propagation frame reverses the full-vector `p` sign at normal
 incidence, giving `r_p = -r_s` while `t_p = t_s`. These are peak electric-amplitude coefficients,
-not tangential-`p` coefficients.
+not fixed-plane tangential-`p` coefficients. The latter convention is also named explicitly:
+reflection negates the full-vector coefficient, while transmission changes its numerator from the
+incident to the transmitted signed normal component. The conversion is stated without dividing by
+the incident normal component and therefore remains algebraically meaningful at grazing incidence.
 
 The primary solution results are cross-multiplied and therefore remain meaningful when a denominator
 vanishes. Quotient results require only the matching denominator to be nonzero. Positivity lemmas
@@ -55,6 +58,9 @@ irradiance or power law.
   `PlanarDielectricInterface.sFresnelTransmissionCoefficient`: the full-vector `s` coefficients.
 - `PlanarDielectricInterface.pFresnelReflectionCoefficient` and
   `PlanarDielectricInterface.pFresnelTransmissionCoefficient`: the full-vector `p` coefficients.
+- `PlanarDielectricInterface.tangentialPFresnelReflectionCoefficient` and
+  `PlanarDielectricInterface.tangentialPFresnelTransmissionCoefficient`: coefficients for the
+  second coordinate in one fixed interface-plane frame.
 - `PlanarDielectricInterface.solve_sFresnel_cross_mul` and
   `PlanarDielectricInterface.solve_pFresnel_cross_mul`: guarded denominator-free scalar results.
 - `PlanarDielectricInterface.solve_sFresnel` and
@@ -63,6 +69,9 @@ irradiance or power law.
   the four component formulas from the two referenced equalities and a Jones-zero guard.
 - `PlanarDielectricWaveConfiguration.fresnel_components_of_referenced_balances`: the wave-level
   form whose zero branch is stated using the reflected electric amplitude.
+- The selected-tangent wrapper
+  `fresnel_tangential_components_of_referenced_balances_of_selectedTangentNormalIncidence` gives
+  the normal-incidence specialization in one fixed plane frame.
 - `PlanarDielectricWaveConfiguration.fresnel_components_of_referenced_balances_of_incidenceFrames`:
   the canonical non-normal-incidence wrapper that derives the common `s`-axis and reflected-normal
   hypotheses while preserving arbitrary zero-reflected carrier data.
@@ -138,6 +147,121 @@ def pFresnelTransmissionCoefficient (interface : PlanarDielectricInterface)
     (chi_i chi_t : ℝ) : ℝ :=
   2 * interface.negativeMedium.waveImpedance⁻¹ * chi_i /
     interface.pFresnelDenominator chi_i chi_t
+
+/-- The reflected fixed-plane tangential-`p` amplitude multiplier.
+
+For active reflection, the reflected signed normal is `-chi_i`. Consequently this coefficient is
+the negative of the propagation-oriented full-vector `p` reflection coefficient. The definition is
+a total algebraic multiplier, not a ratio obtained by dividing actual field amplitudes. -/
+def tangentialPFresnelReflectionCoefficient (interface : PlanarDielectricInterface)
+    (chi_i chi_t : ℝ) : ℝ :=
+  (interface.negativeMedium.waveImpedance⁻¹ * chi_t -
+      interface.positiveMedium.waveImpedance⁻¹ * chi_i) /
+    interface.pFresnelDenominator chi_i chi_t
+
+/-- The transmitted fixed-plane tangential-`p` amplitude multiplier.
+
+Its numerator contains `chi_t`, because tangential projection converts a transmitted full-vector
+`p` component `T` to `chi_t * T`. This total definition performs no division by `chi_i`; converting
+it back to a full-vector coefficient requires a nonzero incident normal component. -/
+def tangentialPFresnelTransmissionCoefficient (interface : PlanarDielectricInterface)
+    (chi_i chi_t : ℝ) : ℝ :=
+  2 * interface.negativeMedium.waveImpedance⁻¹ * chi_t /
+    interface.pFresnelDenominator chi_i chi_t
+
+/-- The fixed-plane tangential-`p` reflection coefficient is the negative of the full-vector
+coefficient. -/
+lemma tangentialPFresnelReflectionCoefficient_eq_neg_pFresnelReflectionCoefficient
+    (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
+    interface.tangentialPFresnelReflectionCoefficient chi_i chi_t =
+      -interface.pFresnelReflectionCoefficient chi_i chi_t := by
+  rw [tangentialPFresnelReflectionCoefficient, pFresnelReflectionCoefficient]
+  ring
+
+/-- Tangential projection converts the transmitted full-vector `p` coefficient without division:
+`chi_i * t_p_tangential = chi_t * t_p_full`. -/
+lemma tangentialPFresnelTransmissionCoefficient_cross_mul
+    (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
+    chi_i * interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t =
+      chi_t * interface.pFresnelTransmissionCoefficient chi_i chi_t := by
+  rw [tangentialPFresnelTransmissionCoefficient, pFresnelTransmissionCoefficient]
+  ring
+
+/-- Away from incident grazing, the tangential transmitted `p` coefficient is the full-vector
+coefficient multiplied by the transmitted-to-incident signed-normal ratio. -/
+lemma tangentialPFresnelTransmissionCoefficient_eq_normalRatio_mul
+    (interface : PlanarDielectricInterface) {chi_i chi_t : ℝ} (hIncident : chi_i ≠ 0) :
+    interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t =
+      (chi_t / chi_i) * interface.pFresnelTransmissionCoefficient chi_i chi_t := by
+  calc
+    interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t =
+        chi_i⁻¹ *
+          (chi_i * interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t) := by
+      rw [← mul_assoc, inv_mul_cancel₀ hIncident, one_mul]
+    _ = chi_i⁻¹ * (chi_t * interface.pFresnelTransmissionCoefficient chi_i chi_t) := by
+      rw [interface.tangentialPFresnelTransmissionCoefficient_cross_mul]
+    _ = (chi_t / chi_i) * interface.pFresnelTransmissionCoefficient chi_i chi_t := by
+      rw [div_eq_mul_inv]
+      ring
+
+/-- A full-vector reflected `p` amplitude law converts to the fixed-plane tangential convention
+under the same zero-amplitude-or-opposite-normal guard used by the Fresnel solver.
+
+The zero-amplitude branch leaves `chi_r` unrestricted. -/
+lemma tangentialPFresnelReflectionAmplitude_of_guard
+    (interface : PlanarDielectricInterface) {chi_i chi_r chi_t : ℝ} {I R : ℂ}
+    (hAmplitude :
+      R = (interface.pFresnelReflectionCoefficient chi_i chi_t : ℂ) * I)
+    (hReflection : R = 0 ∨ chi_r = -chi_i) :
+    (chi_r : ℂ) * R =
+      (interface.tangentialPFresnelReflectionCoefficient chi_i chi_t : ℂ) *
+        ((chi_i : ℂ) * I) := by
+  have hCoefficient :
+      (interface.tangentialPFresnelReflectionCoefficient chi_i chi_t : ℂ) =
+        -(interface.pFresnelReflectionCoefficient chi_i chi_t : ℂ) := by
+    exact_mod_cast
+      interface.tangentialPFresnelReflectionCoefficient_eq_neg_pFresnelReflectionCoefficient
+        chi_i chi_t
+  rcases hReflection with hZero | hNormal
+  · rw [hZero] at hAmplitude ⊢
+    simp only [mul_zero] at hAmplitude ⊢
+    rw [hCoefficient]
+    calc
+      0 = -(chi_i : ℂ) *
+          ((interface.pFresnelReflectionCoefficient chi_i chi_t : ℂ) * I) := by
+        rw [← hAmplitude]
+        simp
+      _ = -(interface.pFresnelReflectionCoefficient chi_i chi_t : ℂ) *
+          ((chi_i : ℂ) * I) := by ring
+  · rw [hAmplitude, hNormal, hCoefficient]
+    push_cast
+    ring
+
+/-- A full-vector transmitted `p` amplitude law converts to the fixed-plane tangential convention
+without dividing by the incident signed normal component. -/
+lemma tangentialPFresnelTransmissionAmplitude
+    (interface : PlanarDielectricInterface) {chi_i chi_t : ℝ} {I T : ℂ}
+    (hAmplitude :
+      T = (interface.pFresnelTransmissionCoefficient chi_i chi_t : ℂ) * I) :
+    (chi_t : ℂ) * T =
+      (interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t : ℂ) *
+        ((chi_i : ℂ) * I) := by
+  have hCoefficient :
+      (chi_i : ℂ) *
+          (interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t : ℂ) =
+      (chi_t : ℂ) * (interface.pFresnelTransmissionCoefficient chi_i chi_t : ℂ) := by
+    exact_mod_cast interface.tangentialPFresnelTransmissionCoefficient_cross_mul chi_i chi_t
+  rw [hAmplitude]
+  calc
+    (chi_t : ℂ) *
+        ((interface.pFresnelTransmissionCoefficient chi_i chi_t : ℂ) * I) =
+      ((chi_t : ℂ) * (interface.pFresnelTransmissionCoefficient chi_i chi_t : ℂ)) * I := by
+        ring
+    _ = ((chi_i : ℂ) *
+        (interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t : ℂ)) * I := by
+      rw [hCoefficient]
+    _ = (interface.tangentialPFresnelTransmissionCoefficient chi_i chi_t : ℂ) *
+        ((chi_i : ℂ) * I) := by ring
 
 /-!
 
@@ -398,6 +522,25 @@ lemma pFresnelTransmissionCoefficient_normalIncidence (interface : PlanarDielect
   congr 1
   ring
 
+/-- At normal incidence, the fixed-plane tangential-`p` and `s` reflection coefficients agree. -/
+lemma tangentialPFresnelReflectionCoefficient_normalIncidence
+    (interface : PlanarDielectricInterface) :
+    interface.tangentialPFresnelReflectionCoefficient 1 1 =
+      interface.sFresnelReflectionCoefficient 1 1 := by
+  rw [interface.tangentialPFresnelReflectionCoefficient_eq_neg_pFresnelReflectionCoefficient,
+    interface.pFresnelReflectionCoefficient_normalIncidence]
+  ring
+
+/-- At normal incidence, the fixed-plane tangential-`p` and `s` transmission coefficients agree. -/
+lemma tangentialPFresnelTransmissionCoefficient_normalIncidence
+    (interface : PlanarDielectricInterface) :
+    interface.tangentialPFresnelTransmissionCoefficient 1 1 =
+      interface.sFresnelTransmissionCoefficient 1 1 := by
+  rw [tangentialPFresnelTransmissionCoefficient, sFresnelTransmissionCoefficient,
+    pFresnelDenominator, sFresnelDenominator, mul_one]
+  congr 1
+  ring
+
 end PlanarDielectricInterface
 
 /-!
@@ -553,6 +696,135 @@ lemma fresnel_components_of_referenced_balances
   exact fresnel_components_of_referenced_balances_of_jones_guard hElectric hMagnetic planeFrame
     hIncident hReflected hTransmitted hIncidentAlign hReflectedAlign hTransmittedAlign
       hJonesReflection hSDenominator hPDenominator
+
+/-- Selected-tangent normal-incidence frames specialize the four full-vector Fresnel component
+laws to incident and transmitted signed normals `(1, 1)` and, in the active reflected branch, a
+reflected signed normal of `-1`.
+
+The incident and transmitted frames propagate along the stored positive normal and share the
+independently selected first axis of `planeFrame`. The reflected-frame condition is required only
+when its electric field is nonzero; a zero field retains arbitrary dummy carrier and frame data. -/
+lemma fresnel_components_of_referenced_balances_of_selectedTangentNormalIncidence
+    (hElectric : configuration.HasReferencedJointElectricBalance)
+    (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
+    (planeFrame : PolarizationFrame configuration.interface.plane.normal)
+    (hIncident : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.incident incidentFrame incidentJones)
+    (hReflected : IsZeroOrReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.reflected reflectedFrame reflectedJones)
+    (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.positiveMedium configuration.transmitted transmittedFrame
+        transmittedJones)
+    (hIncidentNormal : incidentFrame.IsSelectedTangentNormalIncidence
+      configuration.interface.plane planeFrame .positive)
+    (hTransmittedNormal : transmittedFrame.IsSelectedTangentNormalIncidence
+      configuration.interface.plane planeFrame .positive)
+    (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
+      reflectedFrame.IsSelectedTangentNormalIncidence
+        configuration.interface.plane planeFrame .negative) :
+    reflectedJones.components 0 =
+        (configuration.interface.sFresnelReflectionCoefficient 1 1 : ℂ) *
+          incidentJones.components 0 ∧
+      transmittedJones.components 0 =
+        (configuration.interface.sFresnelTransmissionCoefficient 1 1 : ℂ) *
+          incidentJones.components 0 ∧
+      reflectedJones.components 1 =
+        (configuration.interface.pFresnelReflectionCoefficient 1 1 : ℂ) *
+          incidentJones.components 1 ∧
+      transmittedJones.components 1 =
+        (configuration.interface.pFresnelTransmissionCoefficient 1 1 : ℂ) *
+          incidentJones.components 1 := by
+  have hIncidentComponent := hIncidentNormal.normalComponent_propagationVector
+  have hTransmittedComponent := hTransmittedNormal.normalComponent_propagationVector
+  have hSDenominator := configuration.interface.sFresnelDenominator_ne_zero
+    (chi_i := 1) (chi_t := 1) (by norm_num) (by norm_num)
+  have hPDenominator := configuration.interface.pFresnelDenominator_ne_zero
+    (chi_i := 1) (chi_t := 1) (by norm_num) (by norm_num)
+  by_cases hZero : configuration.reflected.electricAmplitude = 0
+  · have hReflectedZero := hReflected.reframe_of_electricAmplitude_eq_zero planeFrame hZero
+    simpa only [hIncidentComponent, hTransmittedComponent,
+      Space.OrientedAffineHyperplane.Side.sign_positive] using
+      fresnel_components_of_referenced_balances hElectric hMagnetic planeFrame hIncident
+        hReflectedZero hTransmitted hIncidentNormal.1 rfl hTransmittedNormal.1 (Or.inl hZero)
+          (by simpa only [hIncidentComponent, hTransmittedComponent,
+            Space.OrientedAffineHyperplane.Side.sign_positive] using hSDenominator)
+          (by simpa only [hIncidentComponent, hTransmittedComponent,
+            Space.OrientedAffineHyperplane.Side.sign_positive] using hPDenominator)
+  · have hReflectedData := hReflectedNormal hZero
+    have hReflectedComponent := hReflectedData.normalComponent_propagationVector
+    have hReflection : configuration.interface.plane.normalComponent
+          reflectedFrame.propagationVector =
+        -configuration.interface.plane.normalComponent incidentFrame.propagationVector := by
+      rw [hReflectedComponent, hIncidentComponent]
+      norm_num
+    simpa only [hIncidentComponent, hTransmittedComponent,
+      Space.OrientedAffineHyperplane.Side.sign_positive] using
+      fresnel_components_of_referenced_balances hElectric hMagnetic planeFrame hIncident hReflected
+        hTransmitted hIncidentNormal.1 hReflectedData.1 hTransmittedNormal.1 (Or.inr hReflection)
+          (by simpa only [hIncidentComponent, hTransmittedComponent,
+            Space.OrientedAffineHyperplane.Side.sign_positive] using hSDenominator)
+          (by simpa only [hIncidentComponent, hTransmittedComponent,
+            Space.OrientedAffineHyperplane.Side.sign_positive] using hPDenominator)
+
+/-- At selected-tangent normal incidence, the fixed-plane `p` amplitudes obey the explicitly named
+tangential-`p` Fresnel coefficients.
+
+Thus both polarization coordinates are resolved in one common tangent gauge. The reflected
+zero-field branch still permits an arbitrary dummy propagation frame. -/
+lemma fresnel_tangential_components_of_referenced_balances_of_selectedTangentNormalIncidence
+    (hElectric : configuration.HasReferencedJointElectricBalance)
+    (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
+    (planeFrame : PolarizationFrame configuration.interface.plane.normal)
+    (hIncident : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.incident incidentFrame incidentJones)
+    (hReflected : IsZeroOrReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.negativeMedium configuration.reflected reflectedFrame reflectedJones)
+    (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
+      configuration.interface.positiveMedium configuration.transmitted transmittedFrame
+        transmittedJones)
+    (hIncidentNormal : incidentFrame.IsSelectedTangentNormalIncidence
+      configuration.interface.plane planeFrame .positive)
+    (hTransmittedNormal : transmittedFrame.IsSelectedTangentNormalIncidence
+      configuration.interface.plane planeFrame .positive)
+    (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
+      reflectedFrame.IsSelectedTangentNormalIncidence
+        configuration.interface.plane planeFrame .negative) :
+    reflectedJones.components 0 =
+        (configuration.interface.sFresnelReflectionCoefficient 1 1 : ℂ) *
+          incidentJones.components 0 ∧
+      transmittedJones.components 0 =
+        (configuration.interface.sFresnelTransmissionCoefficient 1 1 : ℂ) *
+          incidentJones.components 0 ∧
+      reflectedFrame.normalScaledSecondComponent configuration.interface.plane reflectedJones =
+        (configuration.interface.tangentialPFresnelReflectionCoefficient 1 1 : ℂ) *
+          incidentFrame.normalScaledSecondComponent configuration.interface.plane incidentJones ∧
+      transmittedFrame.normalScaledSecondComponent configuration.interface.plane transmittedJones =
+        (configuration.interface.tangentialPFresnelTransmissionCoefficient 1 1 : ℂ) *
+          incidentFrame.normalScaledSecondComponent configuration.interface.plane
+            incidentJones := by
+  have hSolved := fresnel_components_of_referenced_balances_of_selectedTangentNormalIncidence
+    hElectric hMagnetic planeFrame hIncident hReflected hTransmitted hIncidentNormal
+      hTransmittedNormal hReflectedNormal
+  have hIncidentComponent := hIncidentNormal.normalComponent_propagationVector
+  have hTransmittedComponent := hTransmittedNormal.normalComponent_propagationVector
+  have hReflection : reflectedJones.components 1 = 0 ∨
+      configuration.interface.plane.normalComponent reflectedFrame.propagationVector = -1 := by
+    by_cases hZero : configuration.reflected.electricAmplitude = 0
+    · left
+      have hComponents := hReflected.components_eq_zero_of_electricAmplitude_eq_zero hZero
+      simpa using congrArg (fun v : EuclideanSpace ℂ (Fin 2) ↦ v 1) hComponents
+    · right
+      simpa using (hReflectedNormal hZero).normalComponent_propagationVector
+  have hReflectedP := configuration.interface.tangentialPFresnelReflectionAmplitude_of_guard
+    (chi_i := 1)
+    (chi_r := configuration.interface.plane.normalComponent reflectedFrame.propagationVector)
+    (chi_t := 1) hSolved.2.2.1 hReflection
+  have hTransmittedP := configuration.interface.tangentialPFresnelTransmissionAmplitude
+    (chi_i := 1) (chi_t := 1) hSolved.2.2.2
+  refine ⟨hSolved.1, hSolved.2.1, ?_, ?_⟩
+  · simpa [PolarizationFrame.normalScaledSecondComponent, hIncidentComponent] using hReflectedP
+  · simpa [PolarizationFrame.normalScaledSecondComponent, hIncidentComponent,
+      hTransmittedComponent] using hTransmittedP
 
 /-- The fixed-frequency boundary equations give all four full-vector Fresnel component formulas
 when the propagating frames are the canonical non-normal incidence frames.
