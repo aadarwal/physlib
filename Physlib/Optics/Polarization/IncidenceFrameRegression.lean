@@ -33,6 +33,8 @@ or derive such coefficients.
 - `normalIncidenceRegressionForwardFrame_isSelectedTangentNormalIncidence` and
   `normalIncidenceRegressionBackwardFrame_isSelectedTangentNormalIncidence`: the same frames carry
   the exact positive- and negative-side normal-incidence relations.
+- `normalIncidenceRegressionFrames_not_canonicalNonNormal`: neither normal-incidence direction
+  admits the canonical non-normal incidence-frame predicate.
 
 ## iii. Table of contents
 
@@ -221,6 +223,27 @@ lemma normalIncidenceRegressionBackwardFrame_isSelectedTangentNormalIncidence :
         incidenceRegressionNormal, normalIncidenceRegressionBackwardDirection,
         OrientedAffineHyperplane.sideNormalVector, OrientedAffineHyperplane.normalVector,
         Matrix.cons_val_two, Matrix.head_cons]
+
+/-- The canonical non-normal frame predicate excludes both selected-tangent normal-incidence
+directions, whose tangent axes are independent gauge data. -/
+lemma normalIncidenceRegressionFrames_not_canonicalNonNormal :
+    ¬ normalIncidenceRegressionForwardFrame.IsCanonicalNonNormalIncidenceFrame
+        incidenceRegressionNormal ∧
+      ¬ normalIncidenceRegressionBackwardFrame.IsCanonicalNonNormalIncidenceFrame
+        incidenceRegressionNormal := by
+  constructor
+  · intro hCanonical
+    apply hCanonical.isNonNormalIncidence
+    ext i
+    fin_cases i <;>
+      norm_num [incidenceRegressionNormal, IsNonNormalIncidence, crossProduct,
+        Matrix.cons_val_two, Matrix.head_cons]
+  · intro hCanonical
+    apply hCanonical.isNonNormalIncidence
+    ext i
+    fin_cases i <;>
+      norm_num [incidenceRegressionNormal, normalIncidenceRegressionBackwardDirection,
+        IsNonNormalIncidence, crossProduct, Matrix.cons_val_two, Matrix.head_cons]
 
 /-- The forward frame's fixed-plane `p` coordinate is its full-vector second Jones component. -/
 lemma normalIncidenceRegressionForwardFrame_normalScaledSecondComponent (J : JonesVector) :

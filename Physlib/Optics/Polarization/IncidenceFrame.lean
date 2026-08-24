@@ -36,6 +36,8 @@ normal admittance separately.
 - `IsNonNormalIncidence`: the exact nondegeneracy condition for the incidence plane.
 - `sPolarizationAxis` and `pPolarizationAxis`: the ordered unit polarization axes.
 - `incidencePolarizationFrame`: the resulting oriented `s`/`p` frame.
+- `PolarizationFrame.IsCanonicalNonNormalIncidenceFrame`: proof-independent recognition of that
+  frame convention for a supplied propagation direction and interface normal.
 - `incidencePlaneFrame`: the common interface-plane frame selected by an incidence direction.
 - `incidencePolarizationFrame_axis_zero_eq_of_pos_smul_tangentialProjection_eq`: positive
   tangential phase scaling preserves the canonical `s` axis.
@@ -172,6 +174,54 @@ lemma incidencePolarizationFrame_realizeJones_eq
           pPolarizationAxis propagationDirection interfaceNormal h := by
   rw [PolarizationFrame.realizeJones_eq_sum, Fin.sum_univ_two]
   rfl
+
+namespace PolarizationFrame
+
+variable {direction interfaceNormal : Space.Direction 3}
+
+/-- A polarization frame uses the canonical non-normal incidence `s`/`p` convention for an
+interface normal when it is the corresponding `incidencePolarizationFrame`.
+
+The existential witness hides the proof term for non-normality from downstream APIs. This
+predicate is purely geometric and assigns no incident, reflected, transmitted, or propagation-side
+role. It is deliberately unavailable at normal incidence, where a tangent gauge must be selected
+independently. -/
+def IsCanonicalNonNormalIncidenceFrame (frame : PolarizationFrame direction)
+    (interfaceNormal : Space.Direction 3) : Prop :=
+  ∃ h : IsNonNormalIncidence direction interfaceNormal,
+    frame = incidencePolarizationFrame direction interfaceNormal h
+
+namespace IsCanonicalNonNormalIncidenceFrame
+
+variable {frame : PolarizationFrame direction}
+
+/-- A canonical non-normal incidence frame carries the required non-normality witness. -/
+lemma isNonNormalIncidence
+    (hCanonical : frame.IsCanonicalNonNormalIncidenceFrame interfaceNormal) :
+    IsNonNormalIncidence direction interfaceNormal := by
+  exact hCanonical.choose
+
+/-- A canonical non-normal incidence frame equals the canonical frame formed with any proof of
+the same geometric non-normality condition. -/
+lemma eq_incidencePolarizationFrame
+    (hCanonical : frame.IsCanonicalNonNormalIncidenceFrame interfaceNormal)
+    (hNonNormal : IsNonNormalIncidence direction interfaceNormal) :
+    frame = incidencePolarizationFrame direction interfaceNormal hNonNormal := by
+  rcases hCanonical with ⟨hWitness, rfl⟩
+  rfl
+
+/-- The axes of a canonical non-normal incidence frame are the canonical `s` and `p` axes for one
+hidden proof of non-normality. -/
+lemma axes_eq (hCanonical : frame.IsCanonicalNonNormalIncidenceFrame interfaceNormal) :
+    ∃ h : IsNonNormalIncidence direction interfaceNormal,
+      frame.axis 0 = sPolarizationAxis direction interfaceNormal h ∧
+        frame.axis 1 = pPolarizationAxis direction interfaceNormal h := by
+  rcases hCanonical with ⟨hNonNormal, rfl⟩
+  exact ⟨hNonNormal, rfl, rfl⟩
+
+end IsCanonicalNonNormalIncidenceFrame
+
+end PolarizationFrame
 
 /-!
 

@@ -535,7 +535,9 @@ separate waves' actual one-period mean normal-flux balance.
 The canonical-frame hypotheses and tangential phase matching give the common `s` axis. The
 referenced connector data, phase matching, and explicit opposite normal-sign hypotheses give exact
 active reflection. An electrically zero reflected wave is locally represented by zero Jones data
-in the common plane frame, preserving all of its original dummy carrier labels. -/
+in the common plane frame, preserving all of its original dummy carrier labels. The incident and
+transmitted basis conventions, and conditionally the active-reflected convention, are supplied
+through the guarded role bundle. -/
 lemma fresnel_separateWave_normalFlux_balance_of_incidenceFrames
     (hElectric : configuration.IsFixedFrequencyElectricBoundary)
     (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
@@ -546,19 +548,8 @@ lemma fresnel_separateWave_normalFlux_balance_of_incidenceFrames
     (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
       configuration.interface.positiveMedium configuration.transmitted transmittedFrame
         transmittedJones)
-    (hIncidentNonNormal : IsNonNormalIncidence incidentDirection
-      configuration.interface.plane.normal)
-    (hTransmittedNonNormal : IsNonNormalIncidence transmittedDirection
-      configuration.interface.plane.normal)
-    (hIncidentCanonical : incidentFrame = incidencePolarizationFrame incidentDirection
-      configuration.interface.plane.normal hIncidentNonNormal)
-    (hTransmittedCanonical : transmittedFrame = incidencePolarizationFrame transmittedDirection
-      configuration.interface.plane.normal hTransmittedNonNormal)
-    (hReflectedCanonical : configuration.reflected.electricAmplitude ≠ 0 →
-      ∃ hReflectedNonNormal : IsNonNormalIncidence reflectedDirection
-          configuration.interface.plane.normal,
-        reflectedFrame = incidencePolarizationFrame reflectedDirection
-          configuration.interface.plane.normal hReflectedNonNormal)
+    (hFrames : configuration.HasCanonicalNonNormalIncidenceFrames incidentFrame reflectedFrame
+      transmittedFrame)
     (hIncidentNormal : 0 <
       configuration.interface.plane.normalComponent incidentFrame.propagationVector)
     (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
@@ -567,18 +558,10 @@ lemma fresnel_separateWave_normalFlux_balance_of_incidenceFrames
       configuration.interface.plane.normalComponent transmittedFrame.propagationVector)
     (startTime : Time) :
     configuration.HasSeparateWaveNormalFluxBalance startTime := by
-  let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
-    hIncidentNonNormal
   have hData := hElectric.1.canonicalIncidenceFrame_data hIncident hReflected hTransmitted
-    hIncidentNonNormal hTransmittedNonNormal hIncidentCanonical hTransmittedCanonical
-      hReflectedCanonical hIncidentNormal hReflectedNormal
-  change incidentFrame.axis 0 = planeFrame.axis 0 ∧
-    transmittedFrame.axis 0 = planeFrame.axis 0 ∧
-      (configuration.reflected.electricAmplitude = 0 ∨
-        reflectedFrame.axis 0 = planeFrame.axis 0 ∧
-          reflectedFrame.propagationVector =
-            configuration.interface.plane.vectorReflection incidentFrame.propagationVector) at hData
-  rcases hData with ⟨hIncidentAlign, hTransmittedAlign, hReflectedData⟩
+    hFrames hIncidentNormal hReflectedNormal
+  rcases hData with
+    ⟨planeFrame, hIncidentAlign, hTransmittedAlign, hReflectedData⟩
   by_cases hZero : configuration.reflected.electricAmplitude = 0
   · have hReflectedZero := hReflected.reframe_of_electricAmplitude_eq_zero planeFrame hZero
     exact fresnel_separateWave_normalFlux_balance hElectric.2 hMagnetic planeFrame hIncident

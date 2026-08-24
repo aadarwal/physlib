@@ -27,6 +27,11 @@ Jones data `(1, 1)`, `(5/11, -1/5)`, and `(16/11, 8/5)`.
   harmonic interference vector.
 - `fresnelInterferenceRegression_actual_ordered_terms`: nonzero ordered instantaneous cross terms
   at two phases.
+- `jonesBoundaryRegression_exact_hasCanonicalNonNormalIncidenceFrames` and
+  `jonesBoundaryRegression_canonicalRoleFrames_eq_incidencePolarizationFrames`: the active role
+  bundle and its guarded frame projections.
+- `jonesBoundaryRegression_canonicalRoleFrame_axes`: the literal canonical `s`/`p` axes recovered
+  through those projections.
 - `jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance`: the full connected actual-
   field endpoint.
 - `jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance_of_incidenceFrames`: the same
@@ -271,6 +276,106 @@ lemma jonesBoundaryRegressionTransmittedFrame_eq_incidencePolarizationFrame :
     rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
       jonesBoundaryRegression_transmitted_sPolarizationAxis,
       jonesBoundaryRegressionTransmittedFrame, PolarizationFrame.ofAxisZero_axis_one]
+
+/-- The three manually constructed propagation frames form the guarded canonical non-normal
+incident/reflected/transmitted basis bundle for the exact active fixture. -/
+lemma jonesBoundaryRegression_exact_hasCanonicalNonNormalIncidenceFrames :
+    PlanarDielectricWaveConfiguration.HasCanonicalNonNormalIncidenceFrames
+      (jonesBoundaryRegressionConfiguration (5 / 11) (16 / 11) (-1 / 5) (8 / 5))
+        jonesBoundaryRegressionIncidentFrame
+        jonesBoundaryRegressionReflectedFrame jonesBoundaryRegressionTransmittedFrame := by
+  refine ⟨⟨jonesBoundaryRegression_incident_isNonNormalIncidence,
+    jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame⟩, ?_,
+    ⟨jonesBoundaryRegression_transmitted_isNonNormalIncidence,
+      jonesBoundaryRegressionTransmittedFrame_eq_incidencePolarizationFrame⟩⟩
+  intro _
+  exact ⟨jonesBoundaryRegression_reflected_isNonNormalIncidence,
+    jonesBoundaryRegressionReflectedFrame_eq_incidencePolarizationFrame⟩
+
+/-- The reflected electric field in the active exact fixture is nonzero. -/
+lemma jonesBoundaryRegression_exact_reflected_electricAmplitude_ne_zero :
+    (jonesBoundaryRegressionConfiguration
+      (5 / 11) (16 / 11) (-1 / 5) (8 / 5)).reflected.electricAmplitude ≠ 0 := by
+  have hReflectedConnector : IsZeroOrReferencedMaterialJonesWave
+      jonesBoundaryRegressionPlane jonesBoundaryRegressionNegativeMedium
+        (jonesBoundaryRegressionReflectedWave
+          (jonesBoundaryRegressionReflectedJones (5 / 11) (-1 / 5)))
+        jonesBoundaryRegressionReflectedFrame
+        (jonesBoundaryRegressionReflectedJones (5 / 11) (-1 / 5)) :=
+    Or.inr (jonesBoundaryRegression_reflectedWave_isReferencedMaterialJonesWave
+      (jonesBoundaryRegressionReflectedJones (5 / 11) (-1 / 5)))
+  intro hZero
+  have hComponents := hReflectedConnector.components_eq_zero_of_electricAmplitude_eq_zero hZero
+  have hFirst := congrArg (fun v : EuclideanSpace ℂ (Fin 2) ↦ v 0) hComponents
+  norm_num [jonesBoundaryRegressionReflectedJones, JonesVector.ofComponents] at hFirst
+
+/-- The guarded role bundle recovers the three manual frame equalities to their canonical
+non-normal incidence frames, including the electrically active reflected role. -/
+lemma jonesBoundaryRegression_canonicalRoleFrames_eq_incidencePolarizationFrames :
+    jonesBoundaryRegressionIncidentFrame =
+        incidencePolarizationFrame jonesBoundaryRegressionIncidentDirection
+          jonesBoundaryRegressionPlane.normal
+            jonesBoundaryRegression_incident_isNonNormalIncidence ∧
+      jonesBoundaryRegressionReflectedFrame =
+        incidencePolarizationFrame jonesBoundaryRegressionReflectedDirection
+          jonesBoundaryRegressionPlane.normal
+            jonesBoundaryRegression_reflected_isNonNormalIncidence ∧
+      jonesBoundaryRegressionTransmittedFrame =
+        incidencePolarizationFrame jonesBoundaryRegressionTransmittedDirection
+          jonesBoundaryRegressionPlane.normal
+            jonesBoundaryRegression_transmitted_isNonNormalIncidence := by
+  have hFrames := jonesBoundaryRegression_exact_hasCanonicalNonNormalIncidenceFrames
+  have hIncident := hFrames.incident.eq_incidencePolarizationFrame
+    jonesBoundaryRegression_incident_isNonNormalIncidence
+  have hReflectedCanonical := hFrames.reflected_of_electricAmplitude_ne_zero
+    jonesBoundaryRegression_exact_reflected_electricAmplitude_ne_zero
+  have hReflected := hReflectedCanonical.eq_incidencePolarizationFrame
+    jonesBoundaryRegression_reflected_isNonNormalIncidence
+  have hTransmitted := hFrames.transmitted.eq_incidencePolarizationFrame
+    jonesBoundaryRegression_transmitted_isNonNormalIncidence
+  simpa only [jonesBoundaryRegressionConfiguration, jonesBoundaryRegressionInterface] using
+    And.intro hIncident (And.intro hReflected hTransmitted)
+
+/-- The role-bundled canonical frame projections recover all three exact `s` axes and their
+distinct full-vector `p` axes in the independent `3-4-5` fixture. -/
+lemma jonesBoundaryRegression_canonicalRoleFrame_axes :
+    jonesBoundaryRegressionIncidentFrame.axis 0 = WithLp.toLp 2 ![0, 1, 0] ∧
+      jonesBoundaryRegressionReflectedFrame.axis 0 = WithLp.toLp 2 ![0, 1, 0] ∧
+      jonesBoundaryRegressionTransmittedFrame.axis 0 = WithLp.toLp 2 ![0, 1, 0] ∧
+      jonesBoundaryRegressionIncidentFrame.axis 1 = WithLp.toLp 2 ![-4 / 5, 0, 3 / 5] ∧
+      jonesBoundaryRegressionReflectedFrame.axis 1 = WithLp.toLp 2 ![4 / 5, 0, 3 / 5] ∧
+      jonesBoundaryRegressionTransmittedFrame.axis 1 = WithLp.toLp 2 ![-3 / 5, 0, 4 / 5] := by
+  rcases jonesBoundaryRegression_canonicalRoleFrames_eq_incidencePolarizationFrames with
+    ⟨hIncident, hReflected, hTransmitted⟩
+  rw [hIncident, hReflected, hTransmitted]
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · simpa only [incidencePolarizationFrame_axis_zero,
+      jonesBoundaryRegressionAxisZero] using
+      jonesBoundaryRegression_incident_sPolarizationAxis
+  · simpa only [incidencePolarizationFrame_axis_zero,
+      jonesBoundaryRegressionAxisZero] using
+      jonesBoundaryRegression_reflected_sPolarizationAxis
+  · simpa only [incidencePolarizationFrame_axis_zero,
+      jonesBoundaryRegressionAxisZero] using
+      jonesBoundaryRegression_transmitted_sPolarizationAxis
+  · rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
+      jonesBoundaryRegression_incident_sPolarizationAxis]
+    ext i
+    fin_cases i <;>
+      norm_num [jonesBoundaryRegressionIncidentDirection, jonesBoundaryRegressionAxisZero,
+        crossProduct, Matrix.cons_val_two, Matrix.head_cons]
+  · rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
+      jonesBoundaryRegression_reflected_sPolarizationAxis]
+    ext i
+    fin_cases i <;>
+      norm_num [jonesBoundaryRegressionReflectedDirection, jonesBoundaryRegressionAxisZero,
+        crossProduct, Matrix.cons_val_two, Matrix.head_cons]
+  · rw [incidencePolarizationFrame_axis_one, pPolarizationAxis,
+      jonesBoundaryRegression_transmitted_sPolarizationAxis]
+    ext i
+    fin_cases i <;>
+      norm_num [jonesBoundaryRegressionTransmittedDirection, jonesBoundaryRegressionAxisZero,
+        crossProduct, Matrix.cons_val_two, Matrix.head_cons]
 
 /-!
 
@@ -654,12 +759,7 @@ lemma jonesBoundaryRegression_exact_hasSuperposedWaveNormalFluxBalance_of_incide
         (jonesBoundaryRegressionReflectedJones (5 / 11) (-1 / 5))))
       (jonesBoundaryRegression_transmittedWave_isReferencedMaterialJonesWave
         (jonesBoundaryRegressionTransmittedJones (16 / 11) (8 / 5)))
-      jonesBoundaryRegression_incident_isNonNormalIncidence
-      jonesBoundaryRegression_transmitted_isNonNormalIncidence
-      jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame
-      jonesBoundaryRegressionTransmittedFrame_eq_incidencePolarizationFrame
-      (fun _ ↦ ⟨jonesBoundaryRegression_reflected_isNonNormalIncidence,
-        jonesBoundaryRegressionReflectedFrame_eq_incidencePolarizationFrame⟩)
+      jonesBoundaryRegression_exact_hasCanonicalNonNormalIncidenceFrames
       (by
         dsimp only [jonesBoundaryRegressionConfiguration, jonesBoundaryRegressionInterface]
         rw [jonesBoundaryRegression_incidentNormalComponent]
@@ -739,6 +839,19 @@ def fresnelInterferenceRegressionZeroMatchedConfiguration :
   reflected := fresnelInterferenceRegressionZeroReflectedWave
   transmitted := jonesBoundaryRegressionIncidentWave jonesBoundaryRegressionIncidentJones
 
+/-- The zero-reflection fixture has canonical incident and transmitted roles while its deliberately
+normal dummy reflected frame is accepted only through the guarded zero-field branch. -/
+lemma fresnelInterferenceRegressionZeroMatched_hasCanonicalNonNormalIncidenceFrames :
+    PlanarDielectricWaveConfiguration.HasCanonicalNonNormalIncidenceFrames
+      fresnelInterferenceRegressionZeroMatchedConfiguration jonesBoundaryRegressionIncidentFrame
+        jonesBoundaryRegressionPlaneFrame jonesBoundaryRegressionIncidentFrame := by
+  refine ⟨⟨jonesBoundaryRegression_incident_isNonNormalIncidence,
+    jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame⟩, ?_,
+    ⟨jonesBoundaryRegression_incident_isNonNormalIncidence,
+      jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame⟩⟩
+  intro hActive
+  exact (hActive rfl).elim
+
 /-- The matched zero-reflection fixture satisfies electric phase matching and the referenced
 joint-electric balance while leaving the reflected frequency and wave vector arbitrary. -/
 lemma fresnelInterferenceRegressionZeroMatched_isFixedFrequencyElectricBoundary :
@@ -777,15 +890,21 @@ lemma fresnelInterferenceRegression_zeroReflection_canonicalSuperposedBalance
     fresnelInterferenceRegressionZeroMatchedConfiguration.reflected.waveVector = 0 ∧
       ¬ IsNonNormalIncidence jonesBoundaryRegressionPlane.normal
         jonesBoundaryRegressionPlane.normal ∧
+      ¬ jonesBoundaryRegressionPlaneFrame.IsCanonicalNonNormalIncidenceFrame
+        jonesBoundaryRegressionPlane.normal ∧
       fresnelInterferenceRegressionZeroMatchedConfiguration.reflected.angularFrequency ≠
         fresnelInterferenceRegressionZeroMatchedConfiguration.incident.angularFrequency ∧
       fresnelInterferenceRegressionZeroMatchedConfiguration.HasSuperposedWaveNormalFluxBalance
         startTime := by
-  refine ⟨rfl, ?_, ?_, ?_⟩
-  · intro hNonNormal
+  have hNotNonNormal : ¬ IsNonNormalIncidence jonesBoundaryRegressionPlane.normal
+      jonesBoundaryRegressionPlane.normal := by
+    intro hNonNormal
     apply hNonNormal
     ext i
     fin_cases i <;> simp [crossProduct] <;> ring
+  refine ⟨rfl, hNotNonNormal, ?_, ?_, ?_⟩
+  · intro hCanonical
+    exact hNotNonNormal hCanonical.isNonNormalIncidence
   · norm_num [fresnelInterferenceRegressionZeroMatchedConfiguration,
       fresnelInterferenceRegressionZeroReflectedWave, jonesBoundaryRegressionIncidentWave,
       ComplexMonochromaticPlaneWave.ofReal_angularFrequency,
@@ -813,11 +932,7 @@ lemma fresnelInterferenceRegression_zeroReflection_canonicalSuperposedBalance
               fresnelAmplitudeRegressionMatchedInterface] using
             (jonesBoundaryRegression_incidentWave_isReferencedMaterialJonesWave
               jonesBoundaryRegressionIncidentJones))
-          jonesBoundaryRegression_incident_isNonNormalIncidence
-          jonesBoundaryRegression_incident_isNonNormalIncidence
-          jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame
-          jonesBoundaryRegressionIncidentFrame_eq_incidencePolarizationFrame
-          (fun hActive ↦ (hActive rfl).elim)
+          fresnelInterferenceRegressionZeroMatched_hasCanonicalNonNormalIncidenceFrames
           (by
             dsimp only [fresnelInterferenceRegressionZeroMatchedConfiguration,
               fresnelAmplitudeRegressionMatchedInterface]

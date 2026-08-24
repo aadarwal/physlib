@@ -508,7 +508,9 @@ balance for the actual superposed incident-plus-reflected field and the transmit
 The canonical-frame hypotheses and tangential phase matching give the common `s` axis. The
 referenced connector data, phase matching, and explicit incident/reflected sign hypotheses give
 the exact active reflected-normal equality required by the connected Fresnel endpoint. A zero
-reflected field retains arbitrary dummy carrier and frame labels. -/
+reflected field retains arbitrary dummy carrier and frame labels. The incident and transmitted
+basis conventions, and conditionally the active-reflected convention, are supplied through the
+guarded role bundle. -/
 lemma fresnel_superposedWave_normalFlux_balance_of_incidenceFrames
     (hElectric : configuration.IsFixedFrequencyElectricBoundary)
     (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
@@ -519,19 +521,8 @@ lemma fresnel_superposedWave_normalFlux_balance_of_incidenceFrames
     (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
       configuration.interface.positiveMedium configuration.transmitted transmittedFrame
         transmittedJones)
-    (hIncidentNonNormal : IsNonNormalIncidence incidentDirection
-      configuration.interface.plane.normal)
-    (hTransmittedNonNormal : IsNonNormalIncidence transmittedDirection
-      configuration.interface.plane.normal)
-    (hIncidentCanonical : incidentFrame = incidencePolarizationFrame incidentDirection
-      configuration.interface.plane.normal hIncidentNonNormal)
-    (hTransmittedCanonical : transmittedFrame = incidencePolarizationFrame transmittedDirection
-      configuration.interface.plane.normal hTransmittedNonNormal)
-    (hReflectedCanonical : configuration.reflected.electricAmplitude ≠ 0 →
-      ∃ hReflectedNonNormal : IsNonNormalIncidence reflectedDirection
-          configuration.interface.plane.normal,
-        reflectedFrame = incidencePolarizationFrame reflectedDirection
-          configuration.interface.plane.normal hReflectedNonNormal)
+    (hFrames : configuration.HasCanonicalNonNormalIncidenceFrames incidentFrame reflectedFrame
+      transmittedFrame)
     (hIncidentNormal : 0 <
       configuration.interface.plane.normalComponent incidentFrame.propagationVector)
     (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
@@ -540,18 +531,10 @@ lemma fresnel_superposedWave_normalFlux_balance_of_incidenceFrames
       configuration.interface.plane.normalComponent transmittedFrame.propagationVector)
     (startTime : Time) :
     configuration.HasSuperposedWaveNormalFluxBalance startTime := by
-  let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
-    hIncidentNonNormal
   have hData := hElectric.1.canonicalIncidenceFrame_data hIncident hReflected hTransmitted
-    hIncidentNonNormal hTransmittedNonNormal hIncidentCanonical hTransmittedCanonical
-      hReflectedCanonical hIncidentNormal hReflectedNormal
-  change incidentFrame.axis 0 = planeFrame.axis 0 ∧
-    transmittedFrame.axis 0 = planeFrame.axis 0 ∧
-      (configuration.reflected.electricAmplitude = 0 ∨
-        reflectedFrame.axis 0 = planeFrame.axis 0 ∧
-          reflectedFrame.propagationVector =
-            configuration.interface.plane.vectorReflection incidentFrame.propagationVector) at hData
-  rcases hData with ⟨hIncidentAlign, hTransmittedAlign, hReflectedData⟩
+    hFrames hIncidentNormal hReflectedNormal
+  rcases hData with
+    ⟨planeFrame, hIncidentAlign, hTransmittedAlign, hReflectedData⟩
   by_cases hZero : configuration.reflected.electricAmplitude = 0
   · have hReflectedZero := hReflected.reframe_of_electricAmplitude_eq_zero planeFrame hZero
     exact fresnel_superposedWave_normalFlux_balance hElectric hMagnetic planeFrame hIncident

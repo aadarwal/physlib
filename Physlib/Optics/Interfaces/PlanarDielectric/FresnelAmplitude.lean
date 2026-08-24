@@ -831,8 +831,9 @@ when the propagating frames are the canonical non-normal incidence frames.
 
 The incident frame normal is positive, the transmitted frame normal is nonnegative, and the
 active reflected frame normal is explicitly selected negative. The canonical-frame hypotheses
-and tangential phase matching give the common `s` axis; the referenced connector data, phase
-matching, and opposite normal-sign hypotheses give exact active reflection. In the zero-reflected
+are supplied through the guarded role bundle. Tangential phase matching gives the common `s`
+axis; the referenced connector data, phase matching, and opposite normal-sign hypotheses give
+exact active reflection. In the zero-reflected
 branch, the proof locally represents the zero Jones data in the common plane
 frame. The original dummy reflected carrier, direction, frame, and frequency remain unrestricted. -/
 lemma fresnel_components_of_referenced_balances_of_incidenceFrames
@@ -845,19 +846,8 @@ lemma fresnel_components_of_referenced_balances_of_incidenceFrames
     (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
       configuration.interface.positiveMedium configuration.transmitted transmittedFrame
         transmittedJones)
-    (hIncidentNonNormal : IsNonNormalIncidence incidentDirection
-      configuration.interface.plane.normal)
-    (hTransmittedNonNormal : IsNonNormalIncidence transmittedDirection
-      configuration.interface.plane.normal)
-    (hIncidentCanonical : incidentFrame = incidencePolarizationFrame incidentDirection
-      configuration.interface.plane.normal hIncidentNonNormal)
-    (hTransmittedCanonical : transmittedFrame = incidencePolarizationFrame transmittedDirection
-      configuration.interface.plane.normal hTransmittedNonNormal)
-    (hReflectedCanonical : configuration.reflected.electricAmplitude ≠ 0 →
-      ∃ hReflectedNonNormal : IsNonNormalIncidence reflectedDirection
-          configuration.interface.plane.normal,
-        reflectedFrame = incidencePolarizationFrame reflectedDirection
-          configuration.interface.plane.normal hReflectedNonNormal)
+    (hFrames : configuration.HasCanonicalNonNormalIncidenceFrames incidentFrame reflectedFrame
+      transmittedFrame)
     (hIncidentNormal : 0 <
       configuration.interface.plane.normalComponent incidentFrame.propagationVector)
     (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
@@ -888,18 +878,10 @@ lemma fresnel_components_of_referenced_balances_of_incidenceFrames
           (configuration.interface.plane.normalComponent
             transmittedFrame.propagationVector) : ℂ) *
           incidentJones.components 1 := by
-  let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
-    hIncidentNonNormal
   have hData := hElectric.1.canonicalIncidenceFrame_data hIncident hReflected hTransmitted
-    hIncidentNonNormal hTransmittedNonNormal hIncidentCanonical hTransmittedCanonical
-      hReflectedCanonical hIncidentNormal hReflectedNormal
-  change incidentFrame.axis 0 = planeFrame.axis 0 ∧
-    transmittedFrame.axis 0 = planeFrame.axis 0 ∧
-      (configuration.reflected.electricAmplitude = 0 ∨
-        reflectedFrame.axis 0 = planeFrame.axis 0 ∧
-          reflectedFrame.propagationVector =
-            configuration.interface.plane.vectorReflection incidentFrame.propagationVector) at hData
-  rcases hData with ⟨hIncidentAlign, hTransmittedAlign, hReflectedData⟩
+    hFrames hIncidentNormal hReflectedNormal
+  rcases hData with
+    ⟨planeFrame, hIncidentAlign, hTransmittedAlign, hReflectedData⟩
   have hSDenominator := configuration.interface.sFresnelDenominator_ne_zero
     hIncidentNormal hTransmittedNormal
   have hPDenominator := configuration.interface.pFresnelDenominator_ne_zero
