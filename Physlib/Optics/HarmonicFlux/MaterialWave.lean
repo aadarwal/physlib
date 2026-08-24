@@ -79,6 +79,15 @@ def materialPlaneWaveIrradiance (J : JonesVector)
     (medium : HomogeneousIsotropicMedium) : ℝ :=
   J.intensity / (2 * medium.waveImpedance)
 
+/-- Material plane-wave irradiance is one half the inverse wave impedance times the squared Jones
+electric amplitude. -/
+lemma materialPlaneWaveIrradiance_eq_half_inv_impedance_mul_intensity
+    (J : JonesVector) (medium : HomogeneousIsotropicMedium) :
+    J.materialPlaneWaveIrradiance medium =
+      (1 / 2 : ℝ) * medium.waveImpedance⁻¹ * J.intensity := by
+  rw [materialPlaneWaveIrradiance]
+  field_simp [medium.waveImpedance_ne_zero]
+
 /-- Material plane-wave irradiance is nonnegative, including for the zero Jones vector. -/
 lemma materialPlaneWaveIrradiance_nonneg (J : JonesVector)
     (medium : HomogeneousIsotropicMedium) :

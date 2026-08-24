@@ -69,6 +69,14 @@ PR unless maintainers explicitly ask to retain it.
   definitions and denominator-free scalar algebra first; the connected referenced-balance theorem
   second; and exact normal, grazing, zero-field, and nonzero-phase regressions last. Keep the
   reflected-root selection wrapper and all flux results in later coherent proposals.
+- [ ] Split the fork-side Fresnel flux milestone before an upstream proposal: the generic harmonic
+  zero-phasor helper and material-irradiance rewrite in their existing upstream-owned files first;
+  the referenced complex-material-wave local flux bridge second; scalar normal-admittance power
+  ratios and channel conservation third; arbitrary-Jones and irradiance balance fourth; and the
+  connected separate-wave actual-flux endpoint fifth. Keep each exact regression with the concept
+  it checks rather than collecting the regressions into one combined proposal. Keep
+  incident-reflected interference cancellation and any common-frequency superposed-field theorem
+  in a later coherent proposal.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
   upstream diff.
 
@@ -755,6 +763,23 @@ PR unless maintainers explicitly ask to retain it.
   connected theorem assumes the reflected normal alternative; a later wrapper must derive it from
   the selected reflection branch rather than treating a wave label as a direction law. Keep the
   manual rational fixture solve independent of the general coefficient theorem.
+- [ ] Human-check the propagating Fresnel flux layer before upstreaming. Confirm that peak electric
+  amplitudes give signed normal flux `(1 / 2) Y chi (abs Js squared + abs Jp squared)` and that the
+  full-vector `p` coefficient uses the same transmitted-to-incident normal-admittance factor
+  `(Y2 chi_t) / (Y1 chi_i)` as `s`, not the tangential-`p` factor `Y / chi`. Verify the
+  denominator-free numerator certificates and the denominator-local unnormalized balances.
+  Reflectance is unconditionally nonnegative; verify the physical hypotheses `0 < chi_i` and
+  `0 <= chi_t` for the nonnegative transmission factor and `T`, and for `R + T = 1`.
+  Recheck the exact oblique values `3/8`, `(25/121, 96/121)`, and `(1/25, 24/25)`; normal values
+  `(1/9, 8/9)`; grazing values `(1, 0)` despite finite transmitted field amplitude; and matched
+  values `(0, 1)`. Certify that the quadrature regression exercises a nontrivial relative phase,
+  while the general arbitrary-Jones theorem proves phase independence. In the matched zero-field
+  regression, confirm that the deliberately arbitrary reflected normal is `chi_r = chi_i = 1`, so
+  `chi_r ≠ -chi_i`, while zero reflected Jones data still makes the signed balance hold. Confirm
+  that the final connected result balances the three waves' separate actual
+  one-period normal fluxes at the stored point. Do not describe it as the Poynting flux of the
+  superposed negative-side field until a common-frequency incident-reflected normal-interference
+  cancellation theorem is present.
 - [ ] Before claiming a complete fixed-frequency reduction of the four macroscopic boundary laws,
   prove that normal-`B` continuity is redundant for fixed-frequency phase-matched Faraday waves:
   `n dot B₀ = ω⁻¹ (n cross K) dot E₀`, so only tangential `K` and tangential `E₀` enter. Keep
