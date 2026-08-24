@@ -91,6 +91,8 @@ public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Bas
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBasic
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryAmplitude
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryExponent
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryMagnetic
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryMagneticRegression
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryNoncancellation
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBridge
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexCalculus
@@ -223,6 +225,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricFixedFrequency
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
+public import Physlib.Optics.Interfaces.PlanarDielectric.MagneticFixedFrequency
 public import Physlib.Optics.Interfaces.PlanarDielectric.PhaseMatchedDispersion
 public import Physlib.Optics.Interfaces.PlanarDielectric.Snell
 public import Physlib.Optics.Interfaces.PlanarDielectric.SubcriticalTransmission

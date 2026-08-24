@@ -1463,14 +1463,23 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
   equality under exactly the derived branches, with full local boundary wrappers;
 - [x] a reduced fixed-frequency complex-amplitude boundary problem introduced only after those
   conservation results, split into reusable active-wave phase-matching and stored-point-referenced
-  joint electric amplitude-balance predicates; and
+  joint electric amplitude-balance predicates;
 - [x] a guarded equivalence relating its amplitude equations to the primitive two-law electric trace
   problem, with the non-null guard used only to derive label matching in the primitive-to-reduced
-  direction and no claim of reconstructing either magnetic boundary law.
+  direction and no claim of reconstructing either magnetic boundary law;
+- [x] a medium-dependent tangential-`H` complex amplitude, its stored-plane-point reference, and
+  exact realization as the actual ordinary-real tangential magnetic field, while deliberately
+  stating only the valid one-way zero-electric-amplitude implication; and
+- [x] a one-way reduction from the primitive full local boundary with arbitrary free surface charge
+  and zero free surface current to the referenced tangential-`H` balance, under transmitted
+  frequency matching and the reflected zero-referenced-tangential-`H`-amplitude-or-frequency-
+  matching alternative, with an electric-phase-matching convenience wrapper and no hidden
+  magnetic converse.
 
-Exit: every later fixed-frequency electric-boundary calculation is connected to the
-independent-frequency physical problem, and no conservation conclusion is hidden in its own
-premises.
+Exit: every later fixed-frequency electric-boundary calculation and the required tangential-`H`
+amplitude equation are connected one way to the independent-frequency physical problem, and no
+conservation conclusion is hidden in its own premises. Redundancy of normal-`B` continuity and the
+incidence-frame scalar equations remain explicit later steps.
 
 #### E5b. Reflection, refraction, and total internal reflection
 
@@ -2279,9 +2288,9 @@ current integration base; a designed package whose prerequisite is merely active
 | E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor averaging, propagating material-wave irradiance, signed propagating normal flux, and Maxwell-qualified positive-normal-decay zero-normal-flux complete; aperture and modal-power bridges remain |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
-| E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
+| E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, and transverse positive-medium Maxwell plus zero-normal-mean-flux consequences complete; outgoing semantics and reflected flux-based TIR remain |
-| E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
+| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector electric and tangential-H balances now reach the primitive boundary problem; incidence-frame scalarization, solved amplitudes, admittance-normalized scattering, and flux balance remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |

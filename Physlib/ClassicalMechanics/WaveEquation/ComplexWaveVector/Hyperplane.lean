@@ -17,6 +17,7 @@ This file decomposes a dimension-generic complex wave vector relative to the rea
 oriented affine hyperplane. Its complex normal component uses the complex-bilinear wave-vector
 pairing, and its tangential projection subtracts that component times the complexified normal.
 The vector is recovered exactly as the sum of its tangential and normal parts.
+Both projections commute with componentwise real realization of a complex scalar multiple.
 
 For `K = q - I a`, the complex normal component is the real phase normal component minus `I`
 times the real attenuation normal component. Complex tangential projection acts separately on
@@ -51,6 +52,8 @@ attenuation.
 
 - `ComplexWaveVector.hyperplaneTangentialProjection_add_normal`: exact complex normal--tangential
   decomposition.
+- `ComplexWaveVector.tangentialProjection_realPart_smul`: real realization commutes with
+  tangential projection.
 - `ComplexWaveVector.hyperplaneTangentialProjection_ofPhaseAttenuation`: projection acts
   separately on phase and attenuation vectors.
 - `hyperplaneTangentialProjection_eq_ofReal_of_tangentialProjection_attenuationVector_eq_zero`:
@@ -123,6 +126,35 @@ def hyperplaneNormalComponent (plane : OrientedAffineHyperplane d)
 def hyperplaneTangentialProjection (plane : OrientedAffineHyperplane d)
     (z : ComplexWaveVector d) : ComplexWaveVector d :=
   z - hyperplaneNormalComponent plane z • ofReal plane.normalVector
+
+/-- Normal projection commutes with componentwise real realization of a complex scalar
+multiple. -/
+lemma normalComponent_realPart_smul
+    (plane : OrientedAffineHyperplane d) (c : ℂ) (z : ComplexWaveVector d) :
+    plane.normalComponent (realPart (c • z)) =
+      (c * hyperplaneNormalComponent plane z).re := by
+  rw [Space.OrientedAffineHyperplane.normalComponent, PiLp.inner_apply,
+    hyperplaneNormalComponent, bilinearDot, Finset.mul_sum, Complex.re_sum]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  simp only [ofReal_apply, realPart_apply, PiLp.smul_apply, smul_eq_mul,
+    Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, Complex.im_ofReal_mul,
+    RCLike.inner_apply, conj_trivial]
+  ring
+
+/-- Tangential projection commutes with componentwise real realization of a complex scalar
+multiple. -/
+lemma tangentialProjection_realPart_smul
+    (plane : OrientedAffineHyperplane d) (c : ℂ) (z : ComplexWaveVector d) :
+    plane.tangentialProjection (realPart (c • z)) =
+      realPart (c • hyperplaneTangentialProjection plane z) := by
+  ext i
+  rw [Space.OrientedAffineHyperplane.tangentialProjection, PiLp.sub_apply,
+    PiLp.smul_apply, normalComponent_realPart_smul]
+  simp only [realPart_apply, PiLp.smul_apply, smul_eq_mul,
+    hyperplaneTangentialProjection, PiLp.sub_apply, ofReal_apply,
+    Complex.mul_re, Complex.sub_re, Complex.sub_im, Complex.mul_im,
+    Complex.ofReal_re, Complex.ofReal_im]
+  ring
 
 private lemma bilinearDot_hyperplaneNormal_self (plane : OrientedAffineHyperplane d) :
     bilinearDot (ofReal plane.normalVector) (ofReal plane.normalVector) = 1 := by

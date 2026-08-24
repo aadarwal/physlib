@@ -223,6 +223,36 @@ lemma tangentialMagneticFieldStrength
       (surfaceCurrent t x : EuclideanSpace ℝ (Fin 3)) :=
   (h t x).2.2.2
 
+/-- At a point where the free surface current vanishes, the tangential magnetic-field strengths
+agree; the free surface charge remains arbitrary. -/
+lemma tangentialMagneticFieldStrength_eq_of_surfaceCurrent_eq_zero
+    (h : IsPlanarMacroscopicBoundary negativeTrace positiveTrace surfaceCharge surfaceCurrent)
+    (t : Time) (x : plane.carrier) (hCurrent : surfaceCurrent t x = 0) :
+    plane.projectionToTangent (negativeTrace.magneticFieldStrength t x) =
+      plane.projectionToTangent (positiveTrace.magneticFieldStrength t x) := by
+  symm
+  rw [← sub_eq_zero, ← map_sub]
+  apply Subtype.ext
+  simp only [plane.coe_projectionToTangent, Submodule.coe_zero]
+  let v := positiveTrace.magneticFieldStrength t x -
+    negativeTrace.magneticFieldStrength t x
+  have hcross : plane.normalVector ⨯ₑ₃ v = 0 := by
+    simpa only [hCurrent, ZeroMemClass.coe_zero] using
+      IsPlanarMacroscopicBoundary.tangentialMagneticFieldStrength h t x
+  have hdouble := congrArg (fun w ↦ plane.normalVector ⨯ₑ₃ w) hcross
+  have hcrossZero :
+      plane.normalVector ⨯ₑ₃ (0 : EuclideanSpace ℝ (Fin 3)) = 0 := by
+    simpa only [zero_smul] using
+      cross_smul plane.normalVector plane.normalVector 0
+  rw [Space.cross_cross_eq_smul_sub_smul',
+    plane.inner_normalVector_self, one_smul, hcrossZero] at hdouble
+  have hv : v = plane.normalComponent v • plane.normalVector :=
+    (sub_eq_zero.mp hdouble).symm
+  have htangent : plane.tangentialProjection v = 0 := by
+    rw [hv, plane.tangentialProjection_smul,
+      plane.tangentialProjection_normalVector, smul_zero]
+  simpa only [v] using htangent
+
 end IsPlanarMacroscopicBoundary
 
 /-!
@@ -274,28 +304,9 @@ lemma tangentialMagneticFieldStrength
     (h : IsSourceFreePlanarMacroscopicBoundary negativeTrace positiveTrace)
     (t : Time) (x : plane.carrier) :
     plane.projectionToTangent (negativeTrace.magneticFieldStrength t x) =
-      plane.projectionToTangent (positiveTrace.magneticFieldStrength t x) := by
-  symm
-  rw [← sub_eq_zero, ← map_sub]
-  apply Subtype.ext
-  simp only [plane.coe_projectionToTangent, Submodule.coe_zero]
-  let v := positiveTrace.magneticFieldStrength t x -
-    negativeTrace.magneticFieldStrength t x
-  have hcross : plane.normalVector ⨯ₑ₃ v = 0 :=
-    IsPlanarMacroscopicBoundary.tangentialMagneticFieldStrength h t x
-  have hdouble := congrArg (fun w ↦ plane.normalVector ⨯ₑ₃ w) hcross
-  have hcrossZero :
-      plane.normalVector ⨯ₑ₃ (0 : EuclideanSpace ℝ (Fin 3)) = 0 := by
-    simpa only [zero_smul] using
-      cross_smul plane.normalVector plane.normalVector 0
-  rw [Space.cross_cross_eq_smul_sub_smul',
-    plane.inner_normalVector_self, one_smul, hcrossZero] at hdouble
-  have hv : v = plane.normalComponent v • plane.normalVector :=
-    (sub_eq_zero.mp hdouble).symm
-  have htangent : plane.tangentialProjection v = 0 := by
-    rw [hv, plane.tangentialProjection_smul,
-      plane.tangentialProjection_normalVector, smul_zero]
-  simpa only [v] using htangent
+      plane.projectionToTangent (positiveTrace.magneticFieldStrength t x) :=
+  IsPlanarMacroscopicBoundary.tangentialMagneticFieldStrength_eq_of_surfaceCurrent_eq_zero
+    h t x rfl
 
 end IsSourceFreePlanarMacroscopicBoundary
 

@@ -679,6 +679,33 @@ PR unless maintainers explicitly ask to retain it.
   and normal-`D` laws. A full local boundary may inherit the forward reduction through its electric
   projection, but there must be no reduced-to-full implication or full-boundary equivalence:
   normal-`B` and tangential-`H` data are absent.
+- [ ] Human-check E5a's referenced tangential-magnetic reduction before upstreaming. Confirm the
+  project phasor convention `B₀ = ω⁻¹ (K cross E₀)` and the homogeneous-medium constitutive
+  convention `H₀ = μ⁻¹ B₀`, including the absence of complex conjugation in both formulas. The
+  calculation amplitude must be the complex hyperplane-tangential projection of `H₀`, multiplied
+  by the wave's spatial factor at the plane's stored point; for complex `K` this reference factor
+  can change modulus. Confirm that zero electric amplitude implies zero tangential `H₀`, while the
+  converse is intentionally absent. The primitive premise is a full local boundary with arbitrary
+  free surface charge and exactly zero free surface current. Its stored-point reduction needs only
+  transmitted frequency equality and the reflected alternative of zero referenced tangential
+  `H₀` amplitude or reflected frequency equality. The electric phase-matching wrapper maps its
+  `E₀ᵣ = 0` branch to that magnetic-zero branch; its tangential-wave-vector conditions are unused.
+  Check that the proof recovers the complex vector from the actual real field at time zero and at
+  `π / (2 * ω)`, rather than assuming a complex boundary equation. The exact
+  regression uses `K = (5, 0, -4 I)`, `E₀ = (0, 1, 0)`, `B₀ = (4 I, 0, 5)`, and `μ = 3`, giving
+  unreferenced tangential `H₀ = (4 I / 3, 0, 0)`. At stored point `(0, 0, 1)`, confirm that
+  `K dot p = -4 I`, the spatial factor is `exp (-4)`, the referenced amplitude is
+  `(4 exp (-4) I / 3, 0, 0)`, the actual data is zero at time zero, and its value at time
+  `π / 2` is `(-4 exp (-4) / 3, 0, 0)`. The zero-reflection branch must keep arbitrary dummy
+  frequency and wave-vector labels. This is only a one-way reduction of tangential `H`; it
+  neither reconstructs the full boundary nor proves normal-`B` continuity.
+- [ ] Before claiming a complete fixed-frequency reduction of the four macroscopic boundary laws,
+  prove that normal-`B` continuity is redundant for fixed-frequency phase-matched Faraday waves:
+  `n dot B₀ = ω⁻¹ (n cross K) dot E₀`, so only tangential `K` and tangential `E₀` enter. Keep
+  normal-`D` distinct: without the required Ampere--Maxwell/on-shell hypotheses it is not redundant
+  in the same structural way. Split any upstream proposal into the Electromagnetism-owned magnetic
+  amplitude/realization connector and the Optics-owned three-wave boundary reduction before adding
+  incidence-frame equations or Fresnel coefficients.
 - [ ] Split the fork-side E2a implementation before an upstream proposal: carrier data,
   geometry, and electric realization first; compatible magnetic induction and transversality
   second; regularity, wave equations, and the homogeneous-medium constitutive bridge third.
