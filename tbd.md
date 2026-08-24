@@ -1183,8 +1183,42 @@ PR unless maintainers explicitly ask to retain it.
   passive wiring, and quantum cloning.
 - [x] Add proof-gated extraction and round trips for total single-valued behaviors, including
   identity, series, and independent parallel closure plus exact complex gain and cascade-order
-  regressions. N3 is complete; the human chain-convention decision remains before N3T names and
-  formulas are fixed.
+  regressions. N3 is complete. Provisional convention-explicit N3T work may proceed on the fork,
+  while source-parity aliases, citations, and upstreaming remain human-gated.
+- [x] Add the convention-explicit N3T foundation with backward-first travelling-wave states,
+  relational two-port behavior, reversible scattering regrouping
+  `(aL, aR; bL, bR) ↔ ((bL, aL), (aR, bR))`, proof-gated chain-transform extraction, graph
+  uniqueness, and later-times-earlier matrix multiplication derived from relational series. The
+  zero-scattering regression must remain: it is functional as a scattering graph but multivalued
+  as a chain relation.
+- [x] Keep the convention-explicit `BackwardFirst` prefix in the fork API: it records the direct-sum
+  and matrix presentation order, while nominal wave wrappers separately record direction. Revisit
+  this public name during the human convention review before upstreaming.
+- [x] Add an orientation-sensitive end-to-end scattering regression: unequal through gains two and
+  three regroup and extract as backward-first gains one half and three. This prevents the symmetric
+  perfect-through identity from hiding a left/right, row/column, or inverted-block swap.
+- [x] Conceptually separate the N3T foundation into focused modules: reversible two-port/scattering
+  regrouping first, then proof-gated chain extraction and series, with each concept's regression
+  fixtures kept beside its public layer and the connected files retained for end-to-end validation.
+- [ ] Prepare those two N3T concepts as stacked upstream proposals after the convention and source
+  ledger are independently verified, unless maintainers explicitly request one connected proposal;
+  obtain maintainer agreement or split further if either proposal remains too large for review.
+- [ ] Human-check the fork's DATE-compatible convention before upstreaming, with SysCon used only
+  to corroborate the four-wave arrows and behavior: backward means toward the declared left port;
+  forward means toward the declared right port; the state order is backward then forward;
+  `(aL, aR)` are incident and `(bL, bR)` outgoing; and the regrouping is exactly left `(bL, aL)`,
+  right `(aR, bR)`. Confirm that an adjacent physical cascade identifies the entire middle
+  reference-plane state or inserts an explicit propagation behavior.
+- [ ] Implement the next N3T slice without a total scattering-matrix inverse: characterize chain
+  functionality of a scattering graph by bijectivity of its right-incident to left-outgoing block,
+  derive both block-conversion formulas under the exact block hypotheses, and prove behavioral and
+  matrix round trips. Keep the opposite convention behind an explicit permutation.
+- [ ] Before that conversion, connect the two-port scattering type to the N2a component boundary:
+  add canonical `Incident`/`Outgoing` sum-label equivalences and a typed two-port adapter from the
+  existing oriented scattering transform, with entrywise and behavior-level agreement.
+- [ ] Derive matched and loaded termination formulas from the relational constraint. In particular,
+  do not generalize the source's scalar `1 / M11` transmission formula without the determinant-one
+  hypothesis that makes it valid.
 - [ ] Before an upstream functional-behavior proposal, decide whether its core extraction API and
   adversarial regression suite should be reviewed as one coherent PR or as two stacked PRs. The
   fork milestone keeps atomic core and regression commits while preserving end-to-end validation.
@@ -1302,6 +1336,13 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Audit field versus power attenuation, amplitude versus power coupling coefficients, phasor
   time sign, chain direction and port ordering, `z` versus `q = z⁻¹`, dB/logarithm conventions,
   rejection-ratio parentheses, and strict versus non-strict stability inequalities.
+- [ ] Human-verify the N3T source ledger before citing it upstream. DATE 2014 fixes the four-wave
+  chain state as `[d; b] = K [c; a]`, hence backward-first, while its separately named two-port MRR
+  matrix uses internal ring fields and is not the generic two-sided scattering conversion. The
+  DATE termination notation appears endpoint-ambiguous, and the heterogeneous product notation
+  does not by itself fix fold direction. SysCon 2015 repeats the four-wave behavior. Treat these as
+  mathematical architecture references only; the inspected IEEE, EDAA, Springer, and Concordia
+  materials do not supply a license for adapting HOL implementation text.
 - [ ] Record every source hypothesis strengthened, corrected, or rejected by a Lean theorem.
 - [ ] Repair or independently reverify the vector-calculus Zulip reference in
   `Physlib/Optics/API-map.yaml`: its current `Physlib` archive path is stale and the cited message
