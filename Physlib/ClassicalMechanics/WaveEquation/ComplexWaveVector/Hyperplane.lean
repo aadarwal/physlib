@@ -17,7 +17,8 @@ This file decomposes a dimension-generic complex wave vector relative to the rea
 oriented affine hyperplane. Its complex normal component uses the complex-bilinear wave-vector
 pairing, and its tangential projection subtracts that component times the complexified normal.
 The vector is recovered exactly as the sum of its tangential and normal parts.
-Both projections commute with componentwise real realization of a complex scalar multiple.
+The tangential projection is complex-linear, agrees with real tangential projection after
+complexification, and commutes with componentwise real realization of a complex scalar multiple.
 
 For `K = q - I a`, the complex normal component is the real phase normal component minus `I`
 times the real attenuation normal component. Complex tangential projection acts separately on
@@ -52,6 +53,10 @@ attenuation.
 
 - `ComplexWaveVector.hyperplaneTangentialProjection_add_normal`: exact complex normal--tangential
   decomposition.
+- `ComplexWaveVector.hyperplaneTangentialProjection_add` and
+  `ComplexWaveVector.hyperplaneTangentialProjection_smul`: complex linearity.
+- `ComplexWaveVector.hyperplaneTangentialProjection_ofReal`: agreement with real tangential
+  projection after complexification.
 - `ComplexWaveVector.tangentialProjection_realPart_smul`: real realization commutes with
   tangential projection.
 - `ComplexWaveVector.hyperplaneTangentialProjection_ofPhaseAttenuation`: projection acts
@@ -126,6 +131,37 @@ def hyperplaneNormalComponent (plane : OrientedAffineHyperplane d)
 def hyperplaneTangentialProjection (plane : OrientedAffineHyperplane d)
     (z : ComplexWaveVector d) : ComplexWaveVector d :=
   z - hyperplaneNormalComponent plane z • ofReal plane.normalVector
+
+/-- Complex tangential projection commutes with vector addition. -/
+lemma hyperplaneTangentialProjection_add (plane : OrientedAffineHyperplane d)
+    (z w : ComplexWaveVector d) :
+    hyperplaneTangentialProjection plane (z + w) =
+      hyperplaneTangentialProjection plane z + hyperplaneTangentialProjection plane w := by
+  ext i
+  simp [hyperplaneTangentialProjection, hyperplaneNormalComponent,
+    bilinearDot_add_right]
+  ring
+
+/-- Complex tangential projection commutes with complex scalar multiplication. -/
+lemma hyperplaneTangentialProjection_smul (plane : OrientedAffineHyperplane d)
+    (c : ℂ) (z : ComplexWaveVector d) :
+    hyperplaneTangentialProjection plane (c • z) =
+      c • hyperplaneTangentialProjection plane z := by
+  ext i
+  simp [hyperplaneTangentialProjection, hyperplaneNormalComponent,
+    bilinearDot_smul_right, mul_assoc]
+  ring
+
+/-- Complex tangential projection of a complexified real vector is the complexification of its
+real tangential projection. -/
+lemma hyperplaneTangentialProjection_ofReal (plane : OrientedAffineHyperplane d)
+    (v : WaveVector d) :
+    hyperplaneTangentialProjection plane (ofReal v) =
+      ofReal (plane.tangentialProjection v) := by
+  rw [hyperplaneTangentialProjection, hyperplaneNormalComponent, bilinearDot_ofReal]
+  ext i
+  simp [OrientedAffineHyperplane.tangentialProjection,
+    OrientedAffineHyperplane.normalComponent]
 
 /-- Normal projection commutes with componentwise real realization of a complex scalar
 multiple. -/

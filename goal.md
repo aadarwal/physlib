@@ -1474,12 +1474,26 @@ Optics v0.1 requires this stronger exit; integrated-photonics work does not.
   and zero free surface current to the referenced tangential-`H` balance, under transmitted
   frequency matching and the reflected zero-referenced-tangential-`H`-amplitude-or-frequency-
   matching alternative, with an electric-phase-matching convenience wrapper and no hidden
-  magnetic converse.
+  magnetic converse;
+- [x] neutral projection of exactly aligned full-vector Jones frames into a common oriented-plane
+  frame, giving the signed coordinate laws `(J0, chi J1)` and `(-J1, chi J0)` for tangential
+  electric data and its propagation quarter-turn, including grazing `chi = 0` without division;
+- [x] a stored-plane-point material Jones connector that fixes the real propagating material wave
+  vector and complete referenced electric phasor, derives transversality, dispersion, Maxwell
+  satisfaction, the exact `v inverse` referenced magnetic-induction phasor, and the exact
+  `Z inverse` referenced tangential magnetic-field-strength phasor, while retaining a role-neutral
+  zero-electric-and-Jones-amplitude guard with arbitrary dummy carrier labels; and
+- [x] aligned common-plane-frame scalarization of the referenced tangential-`E` and tangential-`H`
+  balances into the four unsolved full-vector Jones equations with signed unit-direction normal
+  components and the correct negative- and positive-medium intrinsic admittances. This step assumes
+  neither common frequency nor phase matching, divides by no cosine or amplitude, and does not
+  claim normal-`D` or normal-`B` redundancy.
 
 Exit: every later fixed-frequency electric-boundary calculation and the required tangential-`H`
 amplitude equation are connected one way to the independent-frequency physical problem, and no
-conservation conclusion is hidden in its own premises. Redundancy of normal-`B` continuity and the
-incidence-frame scalar equations remain explicit later steps.
+conservation conclusion is hidden in its own premises. The aligned planar-frame scalar equations
+are now available; redundancy of normal-`B` continuity, canonical incidence-frame specialization,
+and their general Fresnel solution remain explicit later steps.
 
 #### E5b. Reflection, refraction, and total internal reflection
 
@@ -1595,17 +1609,21 @@ Exit: the geometric laws follow from the field and boundary setup.
 
 #### E6. Fresnel amplitudes and flux balance
 
-- `s`- and `p`-polarized reflection and transmission amplitudes derived by solving the boundary
+- [x] the four referenced tangential-`E`/`H` equations expressed in an exactly aligned common
+  planar frame, with full-vector Jones coordinates, signed normal factors, intrinsic admittances,
+  and an exact nonzero-reference-point regression that solves one rational fixture;
+- [ ] canonical incidence-frame alignment and `s`- and `p`-polarized reflection and transmission
+  amplitudes derived generally by solving the boundary
   equations;
-- normal-incidence specialization through a selected tangent frame;
-- oriented incident/reflected/transmitted `s` and `p` bases and an explicit choice between full-
+- [ ] normal-incidence specialization through a selected tangent frame;
+- [ ] oriented incident/reflected/transmitted `s` and `p` bases and an explicit choice between full-
   vector and tangential-amplitude coefficient conventions;
-- Brewster-angle results with the exact magnetic/nonmagnetic and positivity hypotheses needed for
-  existence;
-- total-internal-reflection modulus and phase results;
-- the power transmission factor with the correct normal-admittance multiplier;
-- `R + T = 1` for lossless propagating interfaces, proved using Poynting flux; and
-- the Fresnel multiport matrix normalized by square roots of normal admittance, with unitarity
+- [ ] Brewster-angle results with the exact magnetic/nonmagnetic and positivity hypotheses needed
+  for existence;
+- [ ] total-internal-reflection modulus and phase results;
+- [ ] the power transmission factor with the correct normal-admittance multiplier;
+- [ ] `R + T = 1` for lossless propagating interfaces, proved using Poynting flux; and
+- [ ] the Fresnel multiport matrix normalized by square roots of normal admittance, with unitarity
   proved in those power coordinates for strictly positive-admittance propagating channels rather
   than for raw electric-field amplitudes, grazing channels, or TIR evanescent fields.
 
@@ -2150,9 +2168,9 @@ allows it.
 
 ### J.2. Per integration milestone
 
-- `lake exe cache get`;
-- `lake build`;
-- `lake exe lint_all`, recording repository-baseline failures separately from new failures;
+- `lake-lock exe cache get`;
+- `lake-lock build`;
+- `lake-lock exe lint_all`, recording repository-baseline failures separately from new failures;
 - API-map linter with every completed location resolved;
 - `./scripts/lint-style.sh` after committing, because it reads committed state;
 - import-order, file-import, forbidden-term, spelling, and warnings-as-errors checks;
@@ -2172,9 +2190,10 @@ At the start of each goal session:
 
 1. read `goal.md`, `tbd.md`, `Physlib/Optics/API-map.yaml`, `AGENTS.md`, `AI-POLICY.md`, and the
    review guidelines;
-2. inspect the integration branch, open worktrees, upstream base, and outstanding agent reviews;
+2. inspect the integration branch, current reusable worktree, upstream base, and outstanding agent
+   reviews, and confirm at least 30 GB is free on `/`;
 3. select the earliest unblocked work package on a critical path;
-4. create a focused feature branch/worktree from the latest appropriate foundation;
+4. reuse the current worktree on a focused feature branch from the latest appropriate foundation;
 5. record any new convention or architecture decision in this file before dependent APIs spread;
 6. implement one coherent concept with its required physics-facing lemmas;
 7. validate locally and request independent review of statements as well as proofs;
@@ -2182,6 +2201,11 @@ At the start of each goal session:
    the user's fork;
 9. update the progress ledger and `tbd.md`; and
 10. continue to the next unblocked package rather than stopping merely because one commit landed.
+
+Every Lean or Lake invocation in this machine-local workflow must go through `lake-lock`. Let the
+wrapper wait on its machine-wide mutex without inspecting or counting Lean processes; one build
+normally owns several worker processes. Do not create additional worktrees, and stop to recover
+space if `/` has less than 30 GB free before a Lean job.
 
 If a package is blocked by a missing general theorem, place that theorem in the correct parent API
 and keep the Optics import direction clean. If it is blocked by a human convention, license, or
@@ -2290,7 +2314,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, and transverse positive-medium Maxwell plus zero-normal-mean-flux consequences complete; outgoing semantics and reflected flux-based TIR remain |
-| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector electric and tangential-H balances now reach the primitive boundary problem; incidence-frame scalarization, solved amplitudes, admittance-normalized scattering, and flux balance remain |
+| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector electric and tangential-H balances, aligned common-frame Jones scalarization, and an exact nonzero-phase coefficient fixture are complete; canonical incidence-frame specialization, general solved amplitudes, admittance-normalized scattering, and flux balance remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |

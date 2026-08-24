@@ -60,6 +60,11 @@ PR unless maintainers explicitly ask to retain it.
   global Jones representative without the required quotient-topology and continuity theorems.
 - [ ] Decide with maintainers whether the scattering wrapper belongs with modal foundations or in
   a separate typed-port PR. It intentionally has no multiplication instance.
+- [ ] Split the fork-side Jones boundary scalarization before an upstream proposal: neutral
+  complex projection linearity first; common planar-frame geometry second; the stored-point
+  material Jones connector third; the four unsolved boundary equations fourth; and the exact
+  nonzero-reference-point sign regression last. The combined fork milestone is intentionally
+  larger than one upstream PR.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
   upstream diff.
 
@@ -699,6 +704,41 @@ PR unless maintainers explicitly ask to retain it.
   `π / 2` is `(-4 exp (-4) / 3, 0, 0)`. The zero-reflection branch must keep arbitrary dummy
   frequency and wave-vector labels. This is only a one-way reduction of tangential `H`; it
   neither reconstructs the full boundary nor proves normal-`B` continuity.
+- [ ] Human-check the common planar-frame Jones projection before upstreaming. Confirm that the
+  plane frame uses `u1 = n cross u0`, every propagation frame is aligned by exact equality of its
+  first axis with `u0`, and `chi = n dot k-hat` is the signed normal component of the unit
+  propagation direction. With full-vector Jones electric coordinates, tangential projection must
+  give `(J0, chi J1)` and the propagation quarter-turn must give `(-J1, chi J0)`. A direction into
+  the geometric negative side has negative `chi`, but no incident/reflected/transmitted label
+  proves that sign. Grazing `chi = 0` remains valid and no division is allowed.
+- [ ] Human-check the plane-referenced material Jones connector before upstreaming. Confirm that it
+  fixes `K = ofReal ((omega / v) k-hat)` and the complete stored-point-referenced electric phasor
+  `spatialFactor K plane.point` times `E0`, not the raw amplitude at the origin. Verify that its
+  derived magnetic-induction phasor is `v inverse` times the propagation quarter-turn, while the
+  referenced tangential magnetic-field-strength phasor is `Z inverse` times its tangential
+  projection. Here `Z inverse` is the intrinsic material admittance; neither formula uses
+  conjugation or a time-average factor. The role-neutral zero guard must constrain only the
+  electric amplitude and Jones coordinates to zero; its dummy frequency and wave vector remain
+  arbitrary.
+- [ ] Human-check the four aligned Jones boundary equations before upstreaming. The transmitted
+  connector uses the positive-side medium while incident and reflected connectors use the
+  negative-side medium. Confirm exactly
+  `T0 = I0 + R0`, `chi_t T1 = chi_i I1 + chi_r R1`,
+  `Y2 chi_t T0 = Y1 chi_i I0 + Y1 chi_r R0`, and
+  `Y2 T1 = Y1 I1 + Y1 R1`, with `Y = Z inverse`. These lemmas assume only the two referenced
+  amplitude balances plus connectors and frame alignments; common frequency and phase matching
+  are not hidden premises. They do not divide by signed cosines or amplitudes, scalarize normal
+  `D`, reconstruct normal `B`, or yet prove a general Fresnel formula.
+- [ ] Human-check the exact Jones-boundary regression before upstreaming. Its nonzero stored plane
+  point must make all three canonical real material waves acquire a nontrivial carrier phase that
+  multiplication of the origin Jones data by `I` cancels. Verify the signed axes and normal
+  components for the incident
+  `(3/5, 0, 4/5)`, reflected `(3/5, 0, -4/5)`, and transmitted `(4/5, 0, 3/5)` directions, the
+  medium admittances `5/2` and `5/4`, and the simultaneous `s`/`p` solution
+  `r_s = 5/11`, `t_s = 16/11`, `r_p = -1/5`, and `t_p = 8/5`. Treat this as an exact regression of
+  the scalar equations, not as the general Fresnel theorem. Independently verify that the stated
+  tuple satisfies both complete reduced vector balances, including the normal-`D` entry, so the
+  uniqueness result is not only conditional.
 - [ ] Before claiming a complete fixed-frequency reduction of the four macroscopic boundary laws,
   prove that normal-`B` continuity is redundant for fixed-frequency phase-matched Faraday waves:
   `n dot B₀ = ω⁻¹ (n cross K) dot E₀`, so only tangential `K` and tangential `E₀` enter. Keep
@@ -926,9 +966,11 @@ PR unless maintainers explicitly ask to retain it.
 
 ## Validation before an upstream proposal
 
-- [ ] Run `lake exe cache get` and `lake build` from a clean checkout of the proposed branch.
-- [ ] Run `lake exe lint_all` and distinguish new failures from failures reproducible on the exact
-  upstream base commit.
+- [ ] Run `lake-lock exe cache get` and `lake-lock build` from a clean checkout of the proposed
+  branch; the machine-wide wrapper serializes Lean jobs, caps worker threads, and enforces the
+  free-disk guard.
+- [ ] Run `lake-lock exe lint_all` and distinguish new failures from failures reproducible on the
+  exact upstream base commit.
 - [ ] Run `uv run --with pyyaml python3 scripts/api_map_linter.py --repo .` and confirm every
   completed requirement resolves to the declarations it lists.
 - [ ] Commit first, then run `./scripts/lint-style.sh`, because the style linter reads committed
