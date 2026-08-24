@@ -17,8 +17,9 @@ Overview: |
     the separatrix energy and the below/above-threshold energy bounds, the invariance of
     the lifted dynamics under shifting the angle by whole turns,
     the uniqueness of the solutions with given initial angle and
-    angular velocity together with their time-reversal symmetry, and the local existence of a
-    solution for any initial data, and the small-angle limit —
+    angular velocity together with their time-reversal symmetry, and, for any initial data, a
+    curve with that initial data satisfying the equation of motion within ε of the initial
+    instant, and the small-angle limit —
     the linearized dynamics as a harmonic oscillator, its period 2π√(ℓ/g), and the cubic bound
     on the linearization error; the classical amplitude-dependent period formula follows in
     later modules; its identification with the nonlinear return time remains open.
@@ -77,7 +78,7 @@ Requirements:
   - description: The API contains the uniqueness of the solutions with given initial angle and angular velocity, and the time-reversal symmetry of the solutions.
     done: true
     location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Solution.lean (SimplePendulum.phaseVectorField, SimplePendulum.equationOfMotion_unique, SimplePendulum.IsSolution.eq_of_initial, SimplePendulum.isSolution_comp_neg, SimplePendulum.releasedFromRest_even)
-  - description: The API contains the local existence of a solution for any initial angle and angular velocity.
+  - description: The API contains, for any initial angle and angular velocity, a curve with that initial data satisfying the equation of motion within ε of the initial instant.
     done: true
     location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Solution.lean (SimplePendulum.exists_local_solution)
 
