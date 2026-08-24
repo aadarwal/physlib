@@ -420,9 +420,12 @@ Ownership rules:
   absorbed, so the identity is not a network energy balance, source model, or feedback solution.
 - `Optics.Network.LinearBehavior` supplies singular-safe complex-linear component relations,
   embeds linear maps and finite mode transforms as graphs, and proves identity, relational series,
-  and independent parallel composition laws. Its concrete regressions distinguish cascade order,
-  genuinely multivalued behavior, and disjoint parallel branches without assigning physical
-  realizability, causality, passivity, or losslessness.
+  and independent parallel composition laws. It characterizes total single-valued behaviors,
+  extracts their unique complex-linear maps behind an explicit proof gate, and proves graph round
+  trips plus identity, series, and parallel functionality closure. Its concrete regressions
+  distinguish cascade order, partial and multivalued behavior, singular functionality, and
+  disjoint parallel branches without assigning physical realizability, causality, passivity, or
+  losslessness.
 - `Optics.Network.RectangularBehavior` supplies algebraic copy, coherent sum, heterogeneous branch
   selection, and direct-coefficient weighted split/combine graphs. The three-four-five regression
   proves a one-sided identity and a nonidentity reverse-order idempotent with nonzero kernel, while
@@ -449,8 +452,8 @@ Ownership rules:
 - [ ] global wiring and well-posed network elimination; generic mode restriction/zero extension,
   typed local connections, proof-carrying indexed connection families, ambient partial routing,
   the explicit external-channel complement and incident injection, the core implicit behavior
-  graph/identity/series/parallel layer, and rectangular signal-junction behaviors are complete,
-  while proof-gated functional views remain;
+  graph/identity/series/parallel layer, proof-gated functional views, and rectangular
+  signal-junction behaviors are complete;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1817,7 +1820,7 @@ package remains blocked on the decision in section L; it does not block N2a--N6a
 - [x] rectangular copy, coherent-sum, branch-selection, and weighted split/combine behaviors,
   without pretending copy is wiring or a passive square optical splitter;
 - [x] agreement between relational composition and functional composition for graph behaviors;
-- [ ] proof-gated extraction and round trip of a total single-valued behavior as a linear map; and
+- [x] proof-gated extraction and round trip of a total single-valued behavior as a linear map; and
 - [x] no invertibility requirement merely to state a component.
 
 Exit: transfer matrices are derived views of suitable behavior, not the only possible component
@@ -2466,8 +2469,8 @@ current integration base; a designed package whose prerequisite is merely active
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
-| N3 behaviors | in progress | O1 | relation/graph embedding, identity/series/parallel, and rectangular junction behaviors complete; proof-gated functional views remain |
-| N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
+| N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
+| N3T chain semantics | blocked | N3 plus human chain-convention decision | behavior-derived two-port transfer matrices and conversions |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
@@ -2585,8 +2588,11 @@ human verification recorded in `tbd.md`.
    multivalued relation, and a rejected branch-incorrect parallel output. Rectangular copy,
    coherent sum, heterogeneous selection, and weighted split/combine now have exact membership,
    composition, kernel, idempotence, and modal-power laws with complex and three-four-five
-   regressions. Continue N3 with proof-gated total single-valued extraction before beginning
-   two-port chain semantics.
+   regressions. N3 is complete with explicit totality and single-valuedness predicates,
+   proof-gated extraction of the unique linear map, graph round trips, functionality closure under
+   identity/series/parallel composition, and exact complex gain/cascade regressions. Resolve the
+   travelling-wave and chain-matrix convention decision before fixing N3T's public conversion
+   names and formulas.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
