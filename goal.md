@@ -1612,12 +1612,18 @@ Exit: the geometric laws follow from the field and boundary setup.
 - [x] the four referenced tangential-`E`/`H` equations expressed in an exactly aligned common
   planar frame, with full-vector Jones coordinates, signed normal factors, intrinsic admittances,
   and an exact nonzero-reference-point regression that solves one rational fixture;
-- [ ] canonical incidence-frame alignment and `s`- and `p`-polarized reflection and transmission
-  amplitudes derived generally by solving the boundary
-  equations;
+- [x] real propagating full-vector `s`- and `p`-polarized reflection and transmission coefficients,
+  guarded cross-multiplied and quotient scalar solution lemmas, positive physical denominator
+  values, and a connected theorem deriving all four component laws from the referenced vector
+  balances without assuming a nonzero incident amplitude;
+- [x] algebraic normal-incidence signs `r_p = -r_s` and `t_p = t_s`, the transmitted-grazing
+  case, the zero-reflection dummy-carrier branch, and exact agreement with the independently
+  solved nonzero-phase fixture;
+- [ ] derive the reflected normal guard and aligned-frame hypotheses from canonical incidence
+  frames, electric phase matching, material dispersion, and the selected reflection branch;
 - [ ] normal-incidence specialization through a selected tangent frame;
-- [ ] oriented incident/reflected/transmitted `s` and `p` bases and an explicit choice between full-
-  vector and tangential-amplitude coefficient conventions;
+- [ ] canonical incident/reflected/transmitted `s` and `p` basis wrappers and an explicit
+  conversion from the selected full-vector coefficients to tangential-`p` coefficients;
 - [ ] Brewster-angle results with the exact magnetic/nonmagnetic and positivity hypotheses needed
   for existence;
 - [ ] total-internal-reflection modulus and phase results;
@@ -2314,7 +2320,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, and transverse positive-medium Maxwell plus zero-normal-mean-flux consequences complete; outgoing semantics and reflected flux-based TIR remain |
-| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector electric and tangential-H balances, aligned common-frame Jones scalarization, and an exact nonzero-phase coefficient fixture are complete; canonical incidence-frame specialization, general solved amplitudes, admittance-normalized scattering, and flux balance remain |
+| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, guarded real propagating s/p amplitude formulas, normal/grazing/zero branches, and exact independent fixture agreement are complete; deriving the reflection guard from canonical incidence geometry, admittance-normalized scattering, and flux balance remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
@@ -2471,22 +2477,25 @@ human verification recorded in `tbd.md`.
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.
 
-The next session should not jump directly to a microring formula or stored Fresnel coefficient.
+The next session should not jump directly to a microring formula.
 P6b-2 now connects the completed polarizer and retarder stacks in all reduced representations;
-P6b-3's physical observables and all Fresnel work must still follow the named electromagnetic
-medium, boundary, and flux dependencies. With E2's real material-Maxwell layer, oriented
-Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell complex
-carrier, exact real-wave bridge, generic carrier calculus, and bilinear material dispersion now
-connected with forward and converse ordinary-real-field Maxwell and exact algebraic plus
-  ordinary-real-field falsification regressions, neutral oriented-affine-hyperplane geometry,
+P6b-3's physical observables and the remaining Fresnel flux work must still follow the named
+electromagnetic medium, boundary, and flux dependencies. With E2's real material-Maxwell layer,
+oriented Jones/phasor realization, incidence frames, complex-wavevector decay geometry, off-shell
+complex carrier, exact real-wave bridge, generic carrier calculus, and bilinear material
+dispersion now connected with forward and converse ordinary-real-field Maxwell and exact
+algebraic plus ordinary-real-field falsification regressions, neutral
+oriented-affine-hyperplane geometry,
   positive-frequency ordinary-real-sum uniqueness, primitive interface traces and
   noncancellation, guarded fixed-frequency reduction, reflection/Snell/critical geometry, both
   canonical transmitted carrier branches, and the reusable real three-dimensional cross-product
   divergence identity, real Poynting theorem, and local peak-phasor Poynting average now connected,
   E3b's material-wave irradiance, signed propagating normal-flux, and Maxwell-qualified
-  positive-normal-decay zero-normal-flux bridges are now complete. The next physical-optics front
-  is tangential magnetic boundary reduction and Fresnel amplitude/flux balance, while aperture
-  and modal-power normalization remain separate E3b work. That layer can support outgoing
+  positive-normal-decay zero-normal-flux bridges are now complete. The tangential magnetic
+  reduction and guarded real propagating Fresnel amplitudes are also complete. The next
+  physical-optics front is deriving the reflection guard from canonical incidence geometry and
+  proving Fresnel flux balance, while aperture and modal-power normalization remain separate E3b
+  work. That layer can support outgoing
   semantics and reflected flux-based TIR without retroactively treating carrier decay as power
   flow.
   The reflected conservation result must continue to allow zero reflection, and reduced amplitudes

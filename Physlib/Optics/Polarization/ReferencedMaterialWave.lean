@@ -41,6 +41,8 @@ role, impose a boundary law, solve a Fresnel equation, or state an observable or
   phasor conditions.
 - `IsZeroOrReferencedMaterialJonesWave`: the role-neutral guarded form that retains an arbitrary
   dummy carrier when both the electric amplitude and Jones data vanish.
+- `IsZeroOrReferencedMaterialJonesWave.components_eq_zero_of_electricAmplitude_eq_zero`: a zero
+  electric amplitude forces zero Jones data in either guarded branch.
 - `JonesVector.isReferencedMaterialJonesWave_ofReal_toMaterialPlaneWave`: the canonical existing
   real material-wave construction satisfies the connector with its Jones data rephased to the
   plane point.
@@ -416,6 +418,20 @@ namespace IsZeroOrReferencedMaterialJonesWave
 variable {plane : OrientedAffineHyperplane 3} {medium : HomogeneousIsotropicMedium}
   {wave : ComplexMonochromaticPlaneWave} {direction : Space.Direction 3}
   {frame : PolarizationFrame direction} {J : JonesVector}
+
+/-- Under the zero-or-connected guard, a zero electric amplitude forces every Jones coordinate to
+vanish, including in the connected material-wave branch. -/
+lemma components_eq_zero_of_electricAmplitude_eq_zero
+    (h : IsZeroOrReferencedMaterialJonesWave plane medium wave frame J)
+    (hElectric : wave.electricAmplitude = 0) :
+    J.components = 0 := by
+  rcases h with hZero | hMaterial
+  · exact hZero.2
+  · have hEmbed : frame.embedJones J = 0 := by
+      rw [← hMaterial.referencedElectricAmplitude_eq, hElectric, smul_zero]
+    ext i
+    have hCoordinate := congrArg (fun v ↦ ⟪frame.complexAxis i, v⟫_ℂ) hEmbed
+    simpa [PolarizationFrame.inner_complexAxis_embedJones] using hCoordinate
 
 /-- The zero-or-connected guard gives the same planar-frame tangential electric formula while
 preserving arbitrary carrier data in its zero branch. -/
