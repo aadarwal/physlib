@@ -1037,6 +1037,19 @@ PR unless maintainers explicitly ask to retain it.
   despite mean `(15 / 2, 0, 0)`. The on-shell fixture with the same `K = (5, 0, -4 I)` and
   `E₀ = (1, 0, 1)` must have bilinear pairing `5 - 4 I` and mean vector
   `(5 / 6, 0, -5 / 6)`, proving transversality cannot be dropped.
+- [ ] Human-check the named half-space evanescence semantics before upstreaming. Confirm that the
+  five defining facts are nonzero electric amplitude, complex-bilinear transversality, the
+  lossless homogeneous-isotropic material shell, zero tangential attenuation, and strict
+  attenuation direction into the selected side. Phase tangency, positivity of the side-relative
+  rate, the positive-normal-decay representation, source-free Maxwell satisfaction, exact
+  carrier/local-phasor/ordinary-field scaling, and zero side-normal one-period mean flux must all
+  remain derived consequences. The carrier is global and grows into the opposite side; do not
+  reinterpret the predicate as half-space support, a medium-domain restriction, an outgoing or
+  causal condition, TIR, pointwise zero normal flux, zero tangential flux, or an evanescent
+  positive-power port. Recheck that the canonical negative-radicand Jones carrier satisfies the
+  predicate exactly when `J.components ≠ 0`, that the `(5, 0, -4 I)` regression has positive-side
+  rate four and fails on the negative side, and that its on-shell zero-amplitude copy satisfies the
+  other four conditions but is rejected solely by the active-field guard.
 - [ ] Split a future upstream proposal into the role-neutral positive-normal-decay harmonic-flux
   algebra and actual-field bridge, the planar Maxwell/normal-flux specialization, and the exact
   falsification regressions. Keep `NormalFlux.lean` restricted to its propagating material-wave
@@ -1222,7 +1235,9 @@ PR unless maintainers explicitly ask to retain it.
   `acquires`, `arctangent`, `denominators`, `hybrid`, and `quadrant`. The connected complex-TIR
   actual-flux differential introduced no new spelling vocabulary. The total-reflection retarder
   differential added `accumulates`, `bounces`, `catches`, `diagonally`, `disappears`, `entrance`,
-  `errors`, `exit`, `omit`, `prism`, `reflecting`, and `unobservable`.
+  `errors`, `exit`, `omit`, `prism`, `reflecting`, and `unobservable`. The named half-space
+  evanescence differential introduced no new spelling vocabulary after ordinary prose was
+  reworded.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 
