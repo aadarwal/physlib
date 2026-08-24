@@ -734,6 +734,15 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Before proposing E3b-1 upstream, keep signed interface-normal flux in its own coherent
   follow-up and decide whether the two pure frame-quadrature lemmas should travel with the
   polarization-frame prerequisite or with the material irradiance PR.
+- [ ] Human-check E3b-2's sign convention: the stored plane normal points from the geometric
+  negative side toward the positive side, so its signed mean flux is irradiance times the
+  propagation direction's stored-normal component. Against either side normal it must instead be
+  irradiance times the signed cosine of that direction's side-relative angle, including negative
+  obtuse flux and zero grazing flux.
+- [ ] Before proposing E3b-2 upstream, preserve `NormalFlux.lean` as a role-neutral follow-up to
+  propagating material irradiance. Do not infer incident, reflected, transmitted, outward, or
+  outgoing roles from a geometric side, and do not apply its ordinary-real propagating-wave result
+  to the future Maxwell-qualified complex evanescent carrier.
 - [ ] Before the complex attenuating/evanescent-wave harmonic-flux connector, add and review the
   general identity expressing `Phasor.realizeEuclidean` as the componentwise real part of a
   complex exponential times an amplitude. Decide then whether the currently local real-scalar
