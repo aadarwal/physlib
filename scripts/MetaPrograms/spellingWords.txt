@@ -3424,3 +3424,8 @@ recognition
 role
 roles
 unconditional
+acquires
+arctangent
+denominators
+hybrid
+quadrant
