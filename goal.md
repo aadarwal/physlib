@@ -395,6 +395,11 @@ Ownership rules:
   consequences without assigning support or outgoing semantics.
 - `Optics.Interfaces.PlanarDielectric.SupercriticalPolarization` supplies the canonical
   negative-radicand Jones connector and its exact nonzero-data characterization.
+- `Optics.Network.Port` supplies dependent port/channel families, nominal incident and outgoing
+  endpoint types, presentation-independent local bidirectional connections, the typed scattering
+  adapter, and convention-free unit-gain routing with its exact local `C * S` action order. It
+  does not yet supply connection families, global endpoint uniqueness, external channels, or
+  netlists.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -414,7 +419,8 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] typed ports, behaviors, wiring, and well-posed network elimination;
+- [ ] finite connection families, implicit behaviors, global wiring, and well-posed network
+  elimination; the typed local port/connection/routing seam is complete;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1720,20 +1726,31 @@ definitions.
 O2 now supplies the converse characterizations, parallel closure, and convention-free coordinate
 changes required by the network layer.
 
-#### N2a. Ports, channels, and convention-free routing — ready
+#### N2a. Ports, channels, and convention-free routing — in progress
 
-- a `PortModeFamily` with dependent flattened channel type `Σ p, Mode p`, with finiteness required
+- [x] a `PortModeFamily` with dependent flattened channel type `Σ p, Mode p`, with finiteness required
   only by finite operations;
-- nominally distinct incident and outgoing channel-end types with explicit canonical equivalences
+- [x] nominally distinct incident and outgoing channel-end types with explicit canonical equivalences
   and no coercion erasing the boundary;
-- a typed connection between distinct ports carrying an explicit equivalence between their mode
+- [x] a typed connection between distinct ports carrying an explicit equivalence between their mode
   fibers;
-- the local mate permutation, fixed-point-free involution, and global no-endpoint-reuse property
-  derived from those typed connections rather than accepted as unstructured flat data;
-- ideal unit-gain routing obtained by reindexing identity, with its endpoint action and power
+- [x] the local mate permutation and fixed-point-free involution, including invariance under
+  exchanging the connection's endpoint presentation;
+- [ ] finite connection families and global no-endpoint-reuse derived from typed connections
+  rather than accepted as unstructured flat data;
+- [x] the canonical component adapter `Incident → Outgoing` and ideal unit-gain routing
+  `Outgoing → Incident` obtained by reindexing, with exact endpoint action and power
   preservation proved;
-- channel relabeling and rephasing; and
-- power, passivity, and losslessness predicates that do not require choosing time-reversal data.
+- [x] covariance of ideal routing under input and output channel relabeling, including the exact
+  exchanged-presentation routing law;
+- [ ] matched-gauge covariance of connection routing under channel-end rephasing; arbitrary
+  independent endpoint rephasings do not leave a unit-gain wire unchanged;
+- [ ] convention-free port/network power, passivity, and losslessness predicates that do not
+  require time-reversal data;
+- [ ] connection-family routing assembly, external-channel complements, and the global partial
+  wiring transform; and
+- [x] the typed local `C * S : Incident → Incident` action order, without claiming feedback
+  solvability or assigning component gains, path phase, or delay to a wire.
 
 Exit: malformed direction or channel connections are unrepresentable or fail an explicit
 well-formedness predicate before semantic analysis.
@@ -2403,7 +2420,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
-| N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
+| N2a ports/routing | in progress | O2 reindex/direct-sum support | typed local connection, oriented scattering adapter, unit routing, and `C * S` seam complete; finite connection families, global endpoint uniqueness, external complements, and partial wiring remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
 | N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
@@ -2497,9 +2514,11 @@ human verification recorded in `tbd.md`.
    Relativity and Optics conventions, the neutral positive cone carries no optical Stokes ordering,
    and zero Jones data has no polarization direction.
 2. O2/N1 is complete, including predicate characterizations, binary parallel composition,
-   relabeling, and rephasing. N2a typed ports and convention-free routing is now ready; preserve
-   the distinction between incident and outgoing channel ends and do not encode feedback as
-   ordinary matrix multiplication.
+   relabeling, and rephasing. N2a now has the typed local port/connection seam, the oriented
+   scattering adapter, presentation-independent unit routing, and the incident-space `C * S`
+   action order. Continue with finite connection families, global endpoint uniqueness, and the
+   external-channel complement; preserve the endpoint distinction and do not encode feedback as
+   ordinary scattering-matrix multiplication.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
