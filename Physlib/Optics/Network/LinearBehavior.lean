@@ -19,7 +19,8 @@ embed as graph behaviors.
 
 A behavior is functional when every input has exactly one output. For such a behavior, Mathlib's
 vertical-line theorem supplies a proof-required complex-linear map whose graph is the original
-behavior. No inverse or finite-dimensional hypothesis is required.
+behavior. No inverse or finite-dimensional hypothesis is required. When the input-mode family is
+finite, the same functional behavior also determines a unique mode-transform matrix.
 
 Series composition uses an existential intermediate amplitude to identify the first behavior's
 output with the second behavior's input. Parallel composition places two independent behaviors on
@@ -41,6 +42,7 @@ not reuse one amplitude as more than one input.
 - `LinearBehavior.ofLinearMap`: the graph behavior of a complex-linear map.
 - `LinearBehavior.IsFunctional`: total, single-valued behavior.
 - `LinearBehavior.toLinearMap`: the proof-required linear map of a functional behavior.
+- `LinearBehavior.toModeTransform`: the proof-required finite matrix of a functional behavior.
 - `ModeTransform.toBehavior`: the graph behavior induced by a finite mode transform.
 - `ModeTransform.toBehavior_isFunctional`: every mode-transform behavior is functional.
 - `LinearBehavior.identity`: equality between input and output amplitudes.
@@ -194,6 +196,33 @@ lemma toLinearMap_ofLinearMap (map : ModeAmplitude ι →ₗ[ℂ] ModeAmplitude 
   apply ofLinearMap_injective
   rw [ofLinearMap_toLinearMap]
 
+/-- The finite mode-transform matrix whose graph is a functional behavior.
+
+The proof requirement excludes partial or multivalued relations. Finite input modes and a chosen
+decidable equality supply the matrix representation of the extracted complex-linear map.
+-/
+noncomputable def toModeTransform [Fintype ι] [DecidableEq ι]
+    (behavior : LinearBehavior ι κ) (hFunctional : behavior.IsFunctional) :
+    ModeTransform ι κ :=
+  Matrix.toEuclideanLin.symm (behavior.toLinearMap hFunctional)
+
+/-- The mode transform extracted from a behavior induces its extracted complex-linear map. -/
+@[simp]
+lemma toLinearMap_toModeTransform [Fintype ι] [DecidableEq ι]
+    (behavior : LinearBehavior ι κ) (hFunctional : behavior.IsFunctional) :
+    (behavior.toModeTransform hFunctional).toLinearMap = behavior.toLinearMap hFunctional :=
+  Matrix.toEuclideanLin.apply_symm_apply (behavior.toLinearMap hFunctional)
+
+/-- Membership in a functional finite-input behavior is evaluation of its extracted mode
+transform. -/
+lemma mem_iff_eq_toModeTransform [Fintype ι] [DecidableEq ι]
+    (behavior : LinearBehavior ι κ) (hFunctional : behavior.IsFunctional)
+    (input : ModeAmplitude ι) (output : ModeAmplitude κ) :
+    (input, output) ∈ behavior ↔
+      output = (behavior.toModeTransform hFunctional).toLinearMap input :=
+  (behavior.mem_iff_eq_toLinearMap hFunctional input output).trans
+    (by rw [toLinearMap_toModeTransform])
+
 /-- A behavior is functional exactly when it is the graph of a unique complex-linear map. -/
 lemma isFunctional_iff_existsUnique_eq_ofLinearMap (behavior : LinearBehavior ι κ) :
     behavior.IsFunctional ↔
@@ -264,6 +293,36 @@ lemma toBehavior_injective [Fintype ι] :
   exact LinearBehavior.ofLinearMap_injective (by simpa only [toBehavior] using hBehavior)
 
 end ModeTransform
+
+namespace LinearBehavior
+
+variable {ι : Type u} {κ : Type v}
+
+/-- Re-embedding the mode transform extracted from a functional finite-input behavior recovers
+the behavior. -/
+@[simp]
+lemma toBehavior_toModeTransform [Fintype ι] [DecidableEq ι]
+    (behavior : LinearBehavior ι κ) (hFunctional : behavior.IsFunctional) :
+    (behavior.toModeTransform hFunctional).toBehavior = behavior := by
+  change ofLinearMap (behavior.toModeTransform hFunctional).toLinearMap = behavior
+  rw [toLinearMap_toModeTransform, ofLinearMap_toLinearMap]
+
+/-- The extracted mode transform is the unique transform whose graph is the functional behavior. -/
+lemma toModeTransform_unique [Fintype ι] [DecidableEq ι]
+    (behavior : LinearBehavior ι κ) (hFunctional : behavior.IsFunctional)
+    (transform : ModeTransform ι κ) (hTransform : transform.toBehavior = behavior) :
+    behavior.toModeTransform hFunctional = transform := by
+  apply ModeTransform.toBehavior_injective
+  rw [toBehavior_toModeTransform, hTransform]
+
+/-- Extracting a mode transform from its graph recovers the original transform. -/
+@[simp]
+lemma toModeTransform_toBehavior [Fintype ι] [DecidableEq ι]
+    (transform : ModeTransform ι κ) :
+    transform.toBehavior.toModeTransform transform.toBehavior_isFunctional = transform :=
+  toModeTransform_unique transform.toBehavior transform.toBehavior_isFunctional transform rfl
+
+end LinearBehavior
 
 namespace LinearBehavior
 
@@ -433,6 +492,18 @@ end ModeTransform
 namespace LinearBehavior
 
 variable {ι : Type u} {κ : Type v} {μ : Type w} {ν : Type x}
+
+/-- Extracting the mode transform of a functional series composition gives the matrix product with
+the later behavior on the left. -/
+lemma toModeTransform_series [Fintype ι] [DecidableEq ι]
+    [Fintype κ] [DecidableEq κ]
+    (first : LinearBehavior ι κ) (second : LinearBehavior κ μ)
+    (hFirst : first.IsFunctional) (hSecond : second.IsFunctional) :
+    (first.series second).toModeTransform (hFirst.series hSecond) =
+      second.toModeTransform hSecond * first.toModeTransform hFirst := by
+  apply ModeTransform.toBehavior_injective
+  rw [toBehavior_toModeTransform, ← ModeTransform.toBehavior_mul,
+    toBehavior_toModeTransform, toBehavior_toModeTransform]
 
 /-!
 
