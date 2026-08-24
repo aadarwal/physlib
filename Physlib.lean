@@ -225,6 +225,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricFixedFrequency
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
+public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
+public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.MagneticFixedFrequency
 public import Physlib.Optics.Interfaces.PlanarDielectric.PhaseMatchedDispersion
 public import Physlib.Optics.Interfaces.PlanarDielectric.Snell
@@ -256,7 +258,9 @@ public import Physlib.Optics.Polarization.Mueller.Basic
 public import Physlib.Optics.Polarization.Mueller.Regression
 public import Physlib.Optics.Polarization.Mueller.Trace
 public import Physlib.Optics.Polarization.Mueller.Unitary
+public import Physlib.Optics.Polarization.PlanarFrame
 public import Physlib.Optics.Polarization.Poincare
+public import Physlib.Optics.Polarization.ReferencedMaterialWave
 public import Physlib.Optics.Polarization.RelativePhase
 public import Physlib.Optics.Polarization.RelativePhaseStokes
 public import Physlib.Optics.Polarization.Stokes
