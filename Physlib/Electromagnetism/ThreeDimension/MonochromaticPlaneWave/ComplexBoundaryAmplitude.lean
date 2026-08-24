@@ -168,34 +168,6 @@ def mediumJointElectricFieldData (plane : OrientedAffineHyperplane 3)
   (plane.tangentialProjection (wave.electricField t x),
     plane.normalComponent (wave.electricDisplacement medium t x))
 
-private lemma normalComponent_realPart_smul
-    (plane : OrientedAffineHyperplane 3) (c : ℂ) (z : EuclideanSpace ℂ (Fin 3)) :
-    plane.normalComponent (ComplexWaveVector.realPart (c • z)) =
-      (c * ComplexWaveVector.hyperplaneNormalComponent plane z).re := by
-  rw [Space.OrientedAffineHyperplane.normalComponent, PiLp.inner_apply,
-    ComplexWaveVector.hyperplaneNormalComponent, ComplexWaveVector.bilinearDot, Finset.mul_sum,
-    Complex.re_sum]
-  refine Finset.sum_congr rfl fun i _ => ?_
-  simp only [ComplexWaveVector.ofReal_apply, ComplexWaveVector.realPart_apply,
-    PiLp.smul_apply, smul_eq_mul, Complex.mul_re, Complex.ofReal_re,
-    Complex.ofReal_im, Complex.im_ofReal_mul, RCLike.inner_apply, conj_trivial]
-  ring
-
-private lemma tangentialProjection_realPart_smul
-    (plane : OrientedAffineHyperplane 3) (c : ℂ) (z : EuclideanSpace ℂ (Fin 3)) :
-    plane.tangentialProjection (ComplexWaveVector.realPart (c • z)) =
-      ComplexWaveVector.realPart
-        (c • ComplexWaveVector.hyperplaneTangentialProjection plane z) := by
-  ext i
-  rw [Space.OrientedAffineHyperplane.tangentialProjection, PiLp.sub_apply,
-    PiLp.smul_apply, normalComponent_realPart_smul]
-  simp only [ComplexWaveVector.realPart_apply, PiLp.smul_apply, smul_eq_mul,
-    ComplexWaveVector.hyperplaneTangentialProjection, PiLp.sub_apply,
-    ComplexWaveVector.ofReal_apply,
-    Complex.mul_re, Complex.sub_re, Complex.sub_im, Complex.mul_im,
-    Complex.ofReal_re, Complex.ofReal_im]
-  ring
-
 /-- The ordinary real joint electric field data is the componentwise real realization of the
 shared carrier multiplying its medium-dependent complex trace amplitude. -/
 lemma mediumJointElectricFieldData_eq_realPart_smul_amplitude
@@ -205,7 +177,7 @@ lemma mediumJointElectricFieldData_eq_realPart_smul_amplitude
       realPartJointElectricTraceAmplitude
         (wave.carrier t x • mediumJointElectricTraceAmplitude plane medium wave) := by
   apply Prod.ext
-  · exact tangentialProjection_realPart_smul plane
+  · exact ComplexWaveVector.tangentialProjection_realPart_smul plane
       (wave.carrier t x) wave.electricAmplitude
   · rw [mediumJointElectricFieldData, realPartJointElectricTraceAmplitude,
       mediumJointElectricTraceAmplitude]
@@ -216,7 +188,7 @@ lemma mediumJointElectricFieldData_eq_realPart_smul_amplitude
     change medium.ε *
         plane.normalComponent
           (ComplexWaveVector.realPart (wave.carrier t x • wave.electricAmplitude)) = _
-    rw [normalComponent_realPart_smul]
+    rw [ComplexWaveVector.normalComponent_realPart_smul]
     simp only [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
       Complex.mul_im]
     ring
