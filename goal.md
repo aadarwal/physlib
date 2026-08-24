@@ -527,7 +527,7 @@ electromagnetic v0.1
 finite networks and integrated photonics
   O1 mode core --> O2/N1 modal completion --> N2a ports/routing
   O1 mode core --> N3 relational behaviors
-  N3 --> N3T two-port chain semantics
+  N3 + N2a typed-endpoint core --> N3T two-port chain semantics
   O2/N1 + N2a + N3 --> N4 flat relational semantics --> N4C certified compiler
   N4 + N4C --> N5 well-posed elimination
   N4 --> relational N5H flattening; N5 --> functional N5H subsystem packaging
@@ -1828,14 +1828,18 @@ definition.
 
 #### N3T. Two-port chain semantics
 
-- typed left/right travelling-wave variables and an independently stated two-port behavior;
-- a chain-matrix view only when the behavior determines the required outputs;
-- scattering-to-chain and chain-to-scattering conversions with the exact transmission-block
-  invertibility hypotheses visible in their types or theorem statements;
-- behavioral equivalence and round trips for both conversions;
-- series connection as chain-matrix multiplication, proved from relational composition;
-- agreement with N5 netlist elimination and Redheffer feedback wherever both are defined; and
-- terminated-load reflection and transmission formulas.
+- [x] backward-first travelling-wave states and an independently stated relational two-port
+  behavior between oriented left and right reference planes;
+- [x] a left-to-right chain-transform view only when the behavior determines every right state
+  uniquely from its left state;
+- [ ] scattering-to-chain and chain-to-scattering matrix conversions with the exact
+  transmission-block invertibility hypotheses visible in their types or theorem statements, plus
+  their behavioral and matrix round trips;
+- [x] unconditional behavioral equivalence and round trips for the reversible regrouping between
+  incident/outgoing scattering coordinates and backward-first reference-plane states;
+- [x] series connection as chain-matrix multiplication, proved from relational composition;
+- [ ] agreement with N5 netlist elimination and Redheffer feedback wherever both are defined; and
+- [ ] terminated-load reflection and transmission formulas.
 
 Exit: the transfer/chain calculations used by the audited cascade and microring sources are
 derived views of the same component behavior, not illicit multiplication of scattering matrices.
@@ -2375,8 +2379,11 @@ upstream ownership decision, record the exact decision needed and work on an ind
   coefficients scale full electric-vector amplitudes or tangential components.
 - [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
-- [ ] Confirm chain-matrix port ordering, travelling-wave direction, and scattering-to-chain block
-  convention before N3T source-parity names are fixed.
+- [ ] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
+  corroborating the four-wave arrows and behavior: states are backward-first, scattering
+  `(aL, aR; bL, bR)` regroups as `((bL, aL), (aR, bR))`, and the left-to-right scattering
+  conversion inverts the right-incident to left-outgoing block. The fork uses only
+  convention-explicit names while this human verification remains open.
 - [ ] Confirm that every ring model distinguishes field from power attenuation and amplitude from
   power coupling coefficients.
 - [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
@@ -2470,7 +2477,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
-| N3T chain semantics | blocked | N3 plus human chain-convention decision | behavior-derived two-port transfer matrices and conversions |
+| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, proof-gated chain extraction, graph uniqueness, and series multiplication are complete; transmission-block conversions, netlist agreement, and terminations remain |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
@@ -2590,9 +2597,12 @@ human verification recorded in `tbd.md`.
    composition, kernel, idempotence, and modal-power laws with complex and three-four-five
    regressions. N3 is complete with explicit totality and single-valuedness predicates,
    proof-gated extraction of the unique linear map, graph round trips, functionality closure under
-   identity/series/parallel composition, and exact complex gain/cascade regressions. Resolve the
-   travelling-wave and chain-matrix convention decision before fixing N3T's public conversion
-   names and formulas.
+   identity/series/parallel composition, and exact complex gain/cascade regressions. The first N3T
+   slice now fixes only convention-explicit backward-first states, reversibly regroups scattering
+   variables, extracts a chain transform through a functionality proof, and derives later-times-
+   earlier matrix multiplication from relational series. Continue with the exact transmission-
+   block criterion and block formulas; do not introduce an unqualified source-parity alias or copy
+   a source termination formula before the open human checks are resolved.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
