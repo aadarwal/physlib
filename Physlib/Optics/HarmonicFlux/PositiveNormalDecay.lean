@@ -22,8 +22,8 @@ when `H₀` is any real scalar multiple of `K cross E₀`. The scalar may vanish
 sign. Material dispersion and the Maxwell equations are not used in this cancellation.
 
 The result is then connected to the actual one-period mean Poynting vector of the ordinary-real
-fields constructed by `ComplexMonochromaticPlaneWave`. The spatial envelope is retained and
-multiplies zero at every observation point.
+fields constructed by `ComplexMonochromaticPlaneWave`. At every observation point, the complete
+spatial envelope multiplies zero.
 
 ## ii. Key results
 

@@ -28,13 +28,13 @@ the separate Maxwell result.
 ## ii. Key results
 
 - `IsPositiveNormalDecayTransmittedCandidate.isMacroscopicMaxwellSolution`: positive-medium
-  source-free Maxwell qualification.
+  source-free Maxwell result.
 - Zero stored-normal one-period mean flux:
   `normalComponent_intervalAverage_poyntingVector_eq_zero`.
 
 ## iii. Table of contents
 
-- A. Positive-medium Maxwell qualification
+- A. Positive-medium Maxwell result
 - B. Stored-normal harmonic flux
 
 ## iv. Scope
@@ -66,7 +66,7 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 
 /-!
 
-## A. Positive-medium Maxwell qualification
+## A. Positive-medium Maxwell result
 
 -/
 
@@ -97,7 +97,7 @@ one-period mean Poynting component along the interface's stored normal at every 
 start.
 
 This averaged conclusion does not assert pointwise zero normal flux. Its algebra does not use the
-candidate's material-dispersion clause, although that clause combines with transversality in
+candidate's material-dispersion hypothesis, although that hypothesis combines with transversality in
 `isMacroscopicMaxwellSolution`. -/
 lemma normalComponent_intervalAverage_poyntingVector_eq_zero
     (h : configuration.IsPositiveNormalDecayTransmittedCandidate wave)

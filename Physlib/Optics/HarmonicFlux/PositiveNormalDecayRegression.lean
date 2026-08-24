@@ -46,7 +46,7 @@ zero mean normal flux.
 
 ## iv. Scope
 
-These are exact falsification regressions for the adopted carrier, transversality, material, and
+These exact regressions test the selected carrier, transversality, material, and
 Poynting conventions. They assign no interface boundary condition, transmitted or outgoing role,
 Fresnel coefficient, total-internal-reflection balance, aperture power, or modal power.
 -/
@@ -118,7 +118,7 @@ lemma complexDecayNontransverseRegression_not_isTransverse :
   have hre := congrArg Complex.re h
   norm_num at hre
 
-/-- The nontransverse fixture nevertheless lies on the same exact material-dispersion shell as
+/-- The nontransverse fixture still lies on the same exact material-dispersion shell as
 the transverse TE and TM fixtures. -/
 lemma complexDecayNontransverseRegression_isDispersionMatched :
     complexDecayNontransverseRegression.IsDispersionMatched
