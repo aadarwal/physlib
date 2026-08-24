@@ -1307,6 +1307,9 @@ Owner: Optics, importing E3a.
 - [x] signed normal flux density of a propagating material plane wave;
 - [x] a pointwise bridge from Euclidean phasor realization to the componentwise real part of a
   positive-exponential complex-carrier scaling, without broadening the Jones foundations;
+- [x] local electric and material magnetic-field-strength phasors for the off-shell complex
+  carrier, with the actual one-period mean Poynting vector equal to their harmonic-flux formula
+  and to the stored-reference formula scaled by the spatial factor's squared modulus;
 - [ ] zero normal average flux for the Maxwell-qualified evanescent transmitted wave where
   appropriate;
 - [ ] an aperture or normalized transverse-mode-profile integral when total power is claimed;
@@ -1332,6 +1335,16 @@ The separate pointwise realization bridge now identifies `Phasor.realizeEuclidea
 componentwise real part of a positive-exponential carrier scaling. It is isolated from the Jones
 foundations so later complex-carrier field connectors can reuse the exact sign and scalar-action
 convention without forcing WaveEquation imports on every polarization consumer.
+
+The completed complex-material-wave connector now keeps the common spatial factor in both local
+`E` and `H` phasors, realizes the actual ordinary-real fields from them, and derives their
+one-period mean Poynting vector without on-shell hypotheses. Its reference-amplitude form exposes
+`Complex.normSq (spatialFactor x)`. Exact transverse TE and TM Maxwell fixtures give respective
+mean vectors `(5 / 6, 0, 0)` and `(15 / 2, 0, 0)` at the origin, while positive-depth displacement
+scales the TE mean by `exp (-8 * depth)`, not the amplitude factor `exp (-4 * depth)`. These
+connector identities alone assign no interface, outgoing, evanescent-field, Fresnel,
+aperture-power, or modal-power semantics; the Maxwell-qualified zero-normal-flux conclusion
+remains the next separate result.
 
 The completed material-wave slice now proves that formula first for local electric and
 magnetic-field-strength phasors and then for the actual ordinary-real Maxwell material wave at

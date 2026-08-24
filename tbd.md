@@ -747,8 +747,25 @@ PR unless maintainers explicitly ask to retain it.
   identity expressing `Phasor.realizeEuclidean` as the componentwise real part of a positive-
   exponential carrier times an amplitude. It lives in the narrow cross-layer
   `Polarization.ComplexRealization` module, remains a deliberate named rewrite rather than a simp
-  rule, and leaves the currently local real-scalar realization and real/imaginary-part helpers
-  private until they acquire independent consumers.
+  rule, and does not broaden the Jones foundations with WaveEquation imports. The real-scalar
+  realization law became public only when both propagating material and complex-carrier field
+  connectors consumed it; the real/imaginary-part helpers remain private without that independent
+  demand.
+- [ ] Human-check the complex-carrier harmonic-flux connector pointwise: both local `E` and `H`
+  phasors must contain the complete common `spatialFactor x`, the `H` reference amplitude must be
+  `mu⁻¹ B₀`, and realization at `angularFrequency * time` must reconstruct the existing actual
+  ordinary-real fields with the repository's positive-time, negative-space carrier convention.
+- [ ] Human-check the stored-reference form of the complex-carrier connector: mean flux must carry
+  `Complex.normSq (spatialFactor x)`, not one copy of the envelope and not an implicit unit-modulus
+  assumption.
+- [ ] Confirm the exact complex-decay regression before upstreaming: for `K = (5, 0, -4 I)` the
+  transverse TE and TM fixtures must have origin mean vectors `(5 / 6, 0, 0)` and
+  `(15 / 2, 0, 0)`, while positive-depth displacement must scale TE mean flux by
+  `exp (-8 * depth)`, not the carrier-amplitude factor `exp (-4 * depth)`.
+- [ ] Keep the complex-carrier connector off shell when upstreaming: it permits zero amplitude and
+  assumes no transversality, dispersion, Maxwell, passivity, conservation, interface role,
+  outgoing condition, or evanescent-field meaning. Preserve the Maxwell-qualified zero-normal-
+  flux theorem and its interface specialization as a separate follow-up.
 
 ## Polarization conventions
 

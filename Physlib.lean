@@ -207,6 +207,8 @@ public import Physlib.Optics.Components.Retarder.MuellerRegression
 public import Physlib.Optics.Components.Retarder.Regression
 public import Physlib.Optics.Components.Retarder.WavePlate
 public import Physlib.Optics.HarmonicFlux.Basic
+public import Physlib.Optics.HarmonicFlux.ComplexMaterialWave
+public import Physlib.Optics.HarmonicFlux.ComplexMaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.MaterialWave
 public import Physlib.Optics.HarmonicFlux.MaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.NormalFlux
