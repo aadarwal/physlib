@@ -260,6 +260,8 @@ public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
 public import Physlib.Optics.Network.ConnectionFamily
 public import Physlib.Optics.Network.ConnectionFamilyRegression
+public import Physlib.Optics.Network.PartialRouting
+public import Physlib.Optics.Network.PartialRoutingRegression
 public import Physlib.Optics.Network.Port
 public import Physlib.Optics.Network.PortRegression
 public import Physlib.Optics.Polarization.Basic

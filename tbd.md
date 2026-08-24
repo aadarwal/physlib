@@ -1161,8 +1161,14 @@ PR unless maintainers explicitly ask to retain it.
   endpoint uniqueness, dependent connected-channel embedding, blockwise fixed-point-free mating,
   and exact total routing on connected channels. Keep family cardinality unrestricted in the data
   and require finiteness only for finite-dimensional action and power results.
-- [ ] Define internal/external channel separation and the full ambient partial wiring transform.
-  Do not mark the broad netlist API-map requirement complete before those invariants exist.
+- [x] Define the total ambient internal-wiring transform by zero-extending connected routing.
+  Prove exact connected, omitted-row, omitted-column, arbitrary-input, and selected-input action;
+  both connected range-projector Gram laws; exact output power; global normalized-modal passivity;
+  and power equality precisely on inputs supported on connected outgoing channels.
+- [ ] Define the explicit external-channel complement and its typed incident injection. Preserve
+  the distinction between a channel complement and physical-port coverage when empty mode fibers
+  are allowed. Do not mark the broad netlist API-map requirement complete before the remaining
+  netlist invariants exist.
 - [ ] Define time-reversed channel pairing and port reference planes before defining reciprocity;
   typed endpoints and coordinate rephasing alone do not supply these physical conventions.
 - [ ] Human-check the local typed-routing semantics before upstreaming. Confirm that component
@@ -1180,8 +1186,21 @@ PR unless maintainers explicitly ask to retain it.
   equivalence, composed embedding-after-mate result, cross-block zero, and both endpoint-reuse
   counterexamples. In particular, the all-`Empty` channel map is vacuously injective while its
   physical endpoint map is not. Treat connected-channel power preservation only as normalized
-  modal power; external complements, ambient partial routing, electromagnetic losslessness,
-  presentation covariance, and netlists remain absent.
+  modal power; external complements, electromagnetic losslessness, presentation covariance, and
+  netlists remain absent from this layer.
+- [ ] Human-check ambient partial-routing semantics before upstreaming. Confirm the factorization
+  `C = E_inc * U * R_out`, `Cᴴ * C = P_out`, and `C * Cᴴ = P_inc`; neither projector is generally
+  the ambient identity. In the three-port fixture recheck the two matched entries, unmatched zero,
+  omitted incident row and outgoing column, unit-power omitted pulse, strict modal-power decrease,
+  complex connected pulse of power five, and asymmetric `C * probe` regression. A zero outgoing
+  column means no internal feedback, while a zero incident row means no internal-wiring
+  contribution; neither means a matched load, absorption, termination, zero total incident
+  amplitude, or electromagnetic power loss. Confirm that `partialRouting` is a total transform;
+  “partial” refers to its connected-subspace action. Check `partialRouting_isPassive` only in
+  normalized modal coordinates and `partialRouting_power_eq_iff` exactly: full input power is
+  preserved iff every complement outgoing amplitude vanishes. The strict-decrease witness and
+  connected equality witness must not be summarized as a strict contraction. Confirm that an empty
+  exposed port need not create a complement channel.
 - [ ] Human-check the mode-embedding semantics before upstreaming. Recheck the non-prefix
   `Bool ↪ Fin 3` fixture, the omitted coordinate-one amplitude of power five, strict restriction
   loss, zero-extension isometry, the passive nonidentity ambient projector, and the genuinely
@@ -1281,7 +1300,8 @@ PR unless maintainers explicitly ask to retain it.
   The indexed connection-family differential added `blockwise`, `netlists`, `south`, and
   `vacuous`. The finite mode-embedding differential added `absorption`, `ambient`, `rectangular`,
   and `restriction`; all other initially reported ordinary prose was reworded using the existing
-  dictionary.
+  dictionary. The ambient partial-routing differential introduced no new spelling vocabulary
+  after ordinary prose was reworded using the existing dictionary and repository baseline.
 - [x] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate. The 2026-08-24 typed
   local-routing run reproduced pre-existing style and transitive-import diagnostics only in

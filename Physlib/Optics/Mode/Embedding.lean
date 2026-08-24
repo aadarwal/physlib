@@ -353,6 +353,86 @@ def ModeTransform.zeroExtend {ι ι' κ κ' : Type*} [Fintype ι] [Fintype κ]
   ModeTransform.zeroExtension outputEmbedding * transform *
     ModeTransform.restriction inputEmbedding
 
+/-- If a transform's input-side Gram matrix is the identity, the input-side Gram matrix of its
+zero extension is exactly the selected-coordinate range projector. -/
+lemma ModeTransform.zeroExtend_conjTranspose_mul_self
+    {ι ι' κ κ' : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype κ] [DecidableEq κ] [Fintype κ'] [DecidableEq ι'] [DecidableEq κ']
+    (transform : ModeTransform ι κ) (inputEmbedding : ι ↪ ι')
+    (outputEmbedding : κ ↪ κ') (hTransform : transformᴴ * transform = 1) :
+    (transform.zeroExtend inputEmbedding outputEmbedding)ᴴ *
+        transform.zeroExtend inputEmbedding outputEmbedding =
+      ModeTransform.rangeProjector inputEmbedding := by
+  change
+    ((ModeTransform.zeroExtension outputEmbedding * transform *
+          ModeTransform.restriction inputEmbedding)ᴴ *
+        (ModeTransform.zeroExtension outputEmbedding * transform *
+          ModeTransform.restriction inputEmbedding)) =
+      ModeTransform.zeroExtension inputEmbedding *
+        ModeTransform.restriction inputEmbedding
+  rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
+    ModeTransform.restriction_conjTranspose,
+    ModeTransform.zeroExtension_conjTranspose]
+  calc
+    (ModeTransform.zeroExtension inputEmbedding *
+          (transformᴴ * ModeTransform.restriction outputEmbedding)) *
+        (ModeTransform.zeroExtension outputEmbedding * transform *
+          ModeTransform.restriction inputEmbedding) =
+      ModeTransform.zeroExtension inputEmbedding *
+        (transformᴴ *
+          (ModeTransform.restriction outputEmbedding *
+            ModeTransform.zeroExtension outputEmbedding) * transform) *
+        ModeTransform.restriction inputEmbedding := by
+      simp only [Matrix.mul_assoc]
+    _ = ModeTransform.zeroExtension inputEmbedding * (transformᴴ * transform) *
+        ModeTransform.restriction inputEmbedding := by
+      rw [ModeTransform.restriction_mul_zeroExtension]
+      simp
+    _ = ModeTransform.zeroExtension inputEmbedding *
+        ModeTransform.restriction inputEmbedding := by
+      rw [hTransform]
+      simp
+
+/-- If a transform's output-side Gram matrix is the identity, the output-side Gram matrix of its
+zero extension is exactly the selected-coordinate range projector. -/
+lemma ModeTransform.zeroExtend_mul_conjTranspose
+    {ι ι' κ κ' : Type*} [Fintype ι] [DecidableEq ι] [Fintype ι']
+    [Fintype κ] [DecidableEq κ] [DecidableEq ι'] [DecidableEq κ']
+    (transform : ModeTransform ι κ) (inputEmbedding : ι ↪ ι')
+    (outputEmbedding : κ ↪ κ') (hTransform : transform * transformᴴ = 1) :
+    transform.zeroExtend inputEmbedding outputEmbedding *
+        (transform.zeroExtend inputEmbedding outputEmbedding)ᴴ =
+      ModeTransform.rangeProjector outputEmbedding := by
+  change
+    (ModeTransform.zeroExtension outputEmbedding * transform *
+          ModeTransform.restriction inputEmbedding) *
+        (ModeTransform.zeroExtension outputEmbedding * transform *
+          ModeTransform.restriction inputEmbedding)ᴴ =
+      ModeTransform.zeroExtension outputEmbedding *
+        ModeTransform.restriction outputEmbedding
+  rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul,
+    ModeTransform.restriction_conjTranspose,
+    ModeTransform.zeroExtension_conjTranspose]
+  calc
+    (ModeTransform.zeroExtension outputEmbedding * transform *
+          ModeTransform.restriction inputEmbedding) *
+        (ModeTransform.zeroExtension inputEmbedding *
+          (transformᴴ * ModeTransform.restriction outputEmbedding)) =
+      ModeTransform.zeroExtension outputEmbedding *
+        (transform *
+          (ModeTransform.restriction inputEmbedding *
+            ModeTransform.zeroExtension inputEmbedding) * transformᴴ) *
+        ModeTransform.restriction outputEmbedding := by
+      simp only [Matrix.mul_assoc]
+    _ = ModeTransform.zeroExtension outputEmbedding * (transform * transformᴴ) *
+        ModeTransform.restriction outputEmbedding := by
+      rw [ModeTransform.restriction_mul_zeroExtension]
+      simp
+    _ = ModeTransform.zeroExtension outputEmbedding *
+        ModeTransform.restriction outputEmbedding := by
+      rw [hTransform]
+      simp
+
 /-- Zero-extending a transform preserves every matrix entry whose row and column are both
 selected. -/
 @[simp]

@@ -405,8 +405,13 @@ Ownership rules:
   deliberately stops at one local connection.
 - `Optics.Network.ConnectionFamily` supplies proof-carrying indexed connection families with
   physical-port endpoint uniqueness, the dependent connected-channel embedding, the blockwise
-  fixed-point-free mate, and exact total routing over connected channels. It does not yet supply
-  external complements, ambient partial routing, or netlists.
+  fixed-point-free mate, and exact total routing over connected channels. It does not itself
+  supply external complements, ambient routing, or netlists.
+- `Optics.Network.PartialRouting` zero-extends connected routing to a total ambient
+  outgoing-to-incident internal-wiring transform. Its two Gram matrices are the connected range
+  projectors; it is globally passive in normalized modal coordinates and power-preserving exactly
+  on inputs supported on connected outgoing channels. Complement zeros mean no internal feedback
+  or no internal-wiring contribution, not termination or absorption.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -426,9 +431,10 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] external-channel partial routing, implicit behaviors, global wiring, and well-posed network
-  elimination; generic mode restriction/zero extension, typed local connections, and
-  proof-carrying indexed connection families are complete;
+- [ ] explicit external-channel complements and injection, implicit behaviors, global wiring, and
+  well-posed network elimination; generic mode restriction/zero extension, typed local
+  connections, proof-carrying indexed connection families, and ambient partial routing are
+  complete;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1763,7 +1769,12 @@ changes, and sparse restriction/zero-extension maps required by the network laye
   require time-reversal data;
 - [x] the dependent connected-channel embedding, blockwise mate, and exact unit routing on every
   connected channel, including cross-connection zeros and normalized modal-power preservation;
-- [ ] external-channel complements and the global zero-extended partial wiring transform; and
+- [x] the total ambient internal-wiring transform obtained by zero-extending connected routing,
+  with exact connected and complement action, input and output range-projector Gram laws, global
+  normalized-modal passivity, and power equality exactly for amplitudes supported on connected
+  outgoing channels; complement zeros model neither termination nor absorption;
+- [ ] an explicit external-channel complement and its typed injection into the remaining ambient
+  incident coordinates, including the empty-mode channel-versus-port boundary; and
 - [x] the typed local `C * S : Incident → Incident` action order, without claiming feedback
   solvability or assigning component gains, path phase, or delay to a wire.
 
@@ -2435,7 +2446,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
-| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, and connected-channel routing are complete; external complements and ambient partial wiring remain |
+| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, and the ambient partial-isometry router are complete; explicit external complements and injection remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | ready | O1 | relational composition, rectangular fan-out, and graph equivalence |
 | N3T chain semantics | blocked | N3 | behavior-derived two-port transfer matrices and conversions |
@@ -2536,10 +2547,14 @@ human verification recorded in `tbd.md`.
    scattering adapter, presentation-independent unit routing, and the incident-space `C * S`
    action order. Proof-carrying indexed connection families now add physical-port endpoint
    uniqueness, dependent connected-channel embedding, blockwise mating, and exact total routing
-   over connected channels. Continue by lifting this connected router through the new sparse maps
-   to an ambient passive partial router, with an explicit nonempty exposed-channel fixture;
-   preserve the endpoint distinction and do not encode feedback as ordinary scattering-matrix
-   multiplication.
+   over connected channels. The connected router is now lifted to the total ambient
+   internal-wiring transform `C`: `Cᴴ * C` and `C * Cᴴ` are the outgoing and incident connected
+   range projectors, its arbitrary-input power is exactly the connected-input power, and a
+   nonempty complement-channel fixture proves strict decrease for one complement-supported input
+   and therefore failure of global power preservation, without interpreting the deficit as
+   absorption. Continue with the explicit channel complement and external injection in
+   `a = C b + E u`; preserve the endpoint distinction and do not encode feedback as ordinary
+   scattering-matrix multiplication.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a

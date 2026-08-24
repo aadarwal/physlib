@@ -18,6 +18,9 @@ type is their dependent sum. Incident and outgoing channel ends are deliberately
 types: component scattering maps incident amplitudes to outgoing amplitudes, while a connection
 routes outgoing amplitudes back to incident amplitudes.
 
+Equivalences and embeddings of underlying channel labels lift separately to both nominal endpoint
+types, preserving the boundary while supporting later ambient routing.
+
 A local connection connects two distinct ports by an explicit equivalence between their mode fibers.
 Its local channel labels form a binary sum. The induced mate equivalence swaps the two ends, is an
 involution, and has no fixed point. Ideal unit-gain routing is the identity mode transform relabeled
@@ -34,6 +37,8 @@ interpretation. Splitters and combiners are components rather than one-to-many c
 
 ## iii. Key results
 
+- `Incident.relabelEmbedding` and `Outgoing.relabelEmbedding`: lift a channel embedding without
+  erasing the nominal endpoint type.
 - `PortConnection.channelEmbedding`: embeds both local mode fibers in the flattened channel type.
 - `PortConnection.symm` and `PortConnection.swapLocalChannel`: exchange endpoint presentation
   without changing the flattened connection.
@@ -46,6 +51,8 @@ interpretation. Splitters and combiners are components rather than one-to-many c
 - `ModeTransform.idealRouting`: unit-gain routing from outgoing to incident amplitudes.
 - `ModeTransform.idealRouting_apply`: routing preserves the amplitude at the matched endpoint.
 - `ModeTransform.idealRouting_isPowerPreserving`: ideal routing preserves normalized modal power.
+- `ModeTransform.idealRouting_conjTranspose_mul_self` and
+  `ModeTransform.idealRouting_mul_conjTranspose`: both ideal-routing Gram matrices are identities.
 - `ModeTransform.idealRouting_reindex`: routing is covariant under endpoint relabeling.
 - `PortConnection.idealRouting_mul_toOrientedModeTransform_apply`: the local `C * S` product has
   the intended incident-space action order.
@@ -62,6 +69,9 @@ interpretation. Splitters and combiners are components rather than one-to-many c
 @[expose] public section
 
 namespace Optics
+
+open Matrix
+open scoped ComplexConjugate
 
 noncomputable section
 
@@ -132,6 +142,31 @@ def relabelEquiv {ι : Type u} {κ : Type v} (e : ι ≃ κ) : Incident ι ≃ I
 lemma relabelEquiv_apply {ι : Type u} {κ : Type v} (e : ι ≃ κ) (i : ι) :
     relabelEquiv e (Incident.mk i) = Incident.mk (e i) := rfl
 
+/-- An embedding of underlying labels lifted to incident channel ends. -/
+def relabelEmbedding {ι : Type u} {κ : Type v} (embedding : ι ↪ κ) :
+    Incident ι ↪ Incident κ where
+  toFun endpoint := Incident.mk (embedding endpoint.channel)
+  inj' := by
+    intro first second hEndpoint
+    apply Incident.ext
+    exact embedding.injective (congrArg Incident.channel hEndpoint)
+
+/-- Lifting an embedding to incident ends maps the wrapped underlying label. -/
+@[simp]
+lemma relabelEmbedding_apply {ι : Type u} {κ : Type v} (embedding : ι ↪ κ) (i : ι) :
+    relabelEmbedding embedding (Incident.mk i) = Incident.mk (embedding i) := rfl
+
+/-- An incident endpoint is selected by a lifted embedding exactly when its channel is selected by
+the underlying embedding. -/
+lemma mk_mem_range_relabelEmbedding_iff {ι : Type u} {κ : Type v}
+    (embedding : ι ↪ κ) (i : κ) :
+    Incident.mk i ∈ Set.range (relabelEmbedding embedding) ↔ i ∈ Set.range embedding := by
+  constructor
+  · rintro ⟨endpoint, hEndpoint⟩
+    exact ⟨endpoint.channel, congrArg Incident.channel hEndpoint⟩
+  · rintro ⟨channel, rfl⟩
+    exact ⟨Incident.mk channel, rfl⟩
+
 end Incident
 
 namespace Outgoing
@@ -159,6 +194,31 @@ def relabelEquiv {ι : Type u} {κ : Type v} (e : ι ≃ κ) : Outgoing ι ≃ O
 @[simp]
 lemma relabelEquiv_apply {ι : Type u} {κ : Type v} (e : ι ≃ κ) (i : ι) :
     relabelEquiv e (Outgoing.mk i) = Outgoing.mk (e i) := rfl
+
+/-- An embedding of underlying labels lifted to outgoing channel ends. -/
+def relabelEmbedding {ι : Type u} {κ : Type v} (embedding : ι ↪ κ) :
+    Outgoing ι ↪ Outgoing κ where
+  toFun endpoint := Outgoing.mk (embedding endpoint.channel)
+  inj' := by
+    intro first second hEndpoint
+    apply Outgoing.ext
+    exact embedding.injective (congrArg Outgoing.channel hEndpoint)
+
+/-- Lifting an embedding to outgoing ends maps the wrapped underlying label. -/
+@[simp]
+lemma relabelEmbedding_apply {ι : Type u} {κ : Type v} (embedding : ι ↪ κ) (i : ι) :
+    relabelEmbedding embedding (Outgoing.mk i) = Outgoing.mk (embedding i) := rfl
+
+/-- An outgoing endpoint is selected by a lifted embedding exactly when its channel is selected by
+the underlying embedding. -/
+lemma mk_mem_range_relabelEmbedding_iff {ι : Type u} {κ : Type v}
+    (embedding : ι ↪ κ) (i : κ) :
+    Outgoing.mk i ∈ Set.range (relabelEmbedding embedding) ↔ i ∈ Set.range embedding := by
+  constructor
+  · rintro ⟨endpoint, hEndpoint⟩
+    exact ⟨endpoint.channel, congrArg Outgoing.channel hEndpoint⟩
+  · rintro ⟨channel, rfl⟩
+    exact ⟨Outgoing.mk channel, rfl⟩
 
 end Outgoing
 
@@ -431,6 +491,20 @@ lemma ModeTransform.idealRouting_isPowerPreserving {ι : Type u} {κ : Type v}
   intro amplitude
   rw [ModeTransform.toLinearMap_idealRouting, ModeAmplitude.power_reindex]
 
+/-- The input-side Gram matrix of ideal routing is the identity. -/
+lemma ModeTransform.idealRouting_conjTranspose_mul_self {ι : Type u} {κ : Type v}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ] (e : ι ≃ κ) :
+    (ModeTransform.idealRouting e)ᴴ * ModeTransform.idealRouting e = 1 := by
+  exact (ModeTransform.isPowerPreserving_iff_conjTranspose_mul_self
+    (ModeTransform.idealRouting e)).mp (ModeTransform.idealRouting_isPowerPreserving e)
+
+/-- The output-side Gram matrix of ideal routing is the identity. -/
+lemma ModeTransform.idealRouting_mul_conjTranspose {ι : Type u} {κ : Type v}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ] (e : ι ≃ κ) :
+    ModeTransform.idealRouting e * (ModeTransform.idealRouting e)ᴴ = 1 := by
+  exact (Matrix.mul_eq_one_comm_of_equiv (outgoingToIncidentEquiv e)).mp
+    (ModeTransform.idealRouting_conjTranspose_mul_self e)
+
 /-- Relabeling both endpoint types of ideal routing conjugates its underlying channel
 equivalence. -/
 lemma ModeTransform.idealRouting_reindex {ι : Type u} {κ : Type v} {μ : Type w} {ν : Type x}
@@ -487,7 +561,8 @@ lemma idealRouting_apply [Fintype connection.LocalChannel]
 /-- The ideal routing transform of a finite local connection preserves normalized modal power.
 
 This uses the bijection between the two ends of one local connection. A later global routing
-operator that is zero on exposed ports is only a partial isometry unless every port is internal.
+operator that is zero outside its selected channel embedding is a partial isometry; it preserves
+power globally only when no ambient channel lies outside that embedding.
 -/
 lemma idealRouting_isPowerPreserving [Fintype connection.LocalChannel]
     [DecidableEq connection.LocalChannel] :
