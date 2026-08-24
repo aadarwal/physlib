@@ -1310,8 +1310,8 @@ Owner: Optics, importing E3a.
 - [x] local electric and material magnetic-field-strength phasors for the off-shell complex
   carrier, with the actual one-period mean Poynting vector equal to their harmonic-flux formula
   and to the stored-reference formula scaled by the spatial factor's squared modulus;
-- [ ] zero normal average flux for the Maxwell-qualified evanescent transmitted wave where
-  appropriate;
+- [x] zero normal average flux for a bilinearly transverse, Maxwell-qualified
+  positive-normal-decay transmitted wave at every point and period start;
 - [ ] an aperture or normalized transverse-mode-profile integral when total power is claimed;
 - [ ] the Hermitian signed-power flux pairing for finite mode families, with its self-pairing equal
   to real time-averaged normal flux, mutual flux orthogonality, normalization, and
@@ -1343,8 +1343,19 @@ one-period mean Poynting vector without on-shell hypotheses. Its reference-ampli
 mean vectors `(5 / 6, 0, 0)` and `(15 / 2, 0, 0)` at the origin, while positive-depth displacement
 scales the TE mean by `exp (-8 * depth)`, not the amplitude factor `exp (-4 * depth)`. These
 connector identities alone assign no interface, outgoing, evanescent-field, Fresnel,
-aperture-power, or modal-power semantics; the Maxwell-qualified zero-normal-flux conclusion
-remains the next separate result.
+aperture-power, or modal-power semantics.
+
+The completed positive-normal-decay follow-up proves the zero-normal-flux conclusion without
+smuggling dispersion into the algebra. For `K = q - I * alpha * n`, tangent real phase `q`, purely
+normal positive attenuation, and a complex-bilinearly transverse electric phasor, every real
+multiple of `K cross E₀` used as `H₀` gives zero mean Poynting component along `n`. The actual
+ordinary-real fields inherit this result at every point and arbitrary period start. At the planar
+dielectric layer, a positive-normal-decay transmitted candidate already supplies positive-medium
+dispersion; adding the same explicit transversality both certifies the fields as a source-free
+macroscopic Maxwell solution and specializes the mean-flux result to the interface's stored
+normal. The transverse TM fixture still has instantaneous vector `(15 / 2, 0, -6)` at quarter
+phase, while an on-shell but nontransverse fixture has mean `(5 / 6, 0, -5 / 6)`. Thus the result
+is genuinely averaged, permits nonzero tangential flow, and cannot drop bilinear transversality.
 
 The completed material-wave slice now proves that formula first for local electric and
 magnetic-field-strength phasors and then for the actual ordinary-real Maxwell material wave at
@@ -2262,14 +2273,14 @@ current integration base; a designed package whose prerequisite is merely active
 | P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
-| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, and interface-oriented side-decaying carrier geometry complete; Maxwell-qualified evanescent/outgoing semantics remain |
+| E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, interface-oriented side-decaying carrier geometry, and its transverse positive-medium Maxwell qualification complete; outgoing semantics remain |
 | E3s cross-product divergence | done | Space derivative API | pointwise and function-level real three-dimensional div-cross identity under first differentiability |
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
-| E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor averaging, propagating material-wave irradiance, and signed normal flux complete; evanescent zero-normal-flux, aperture, and modal-power bridges remain |
+| E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor averaging, propagating material-wave irradiance, signed propagating normal flux, and Maxwell-qualified positive-normal-decay zero-normal-flux complete; aperture and modal-power bridges remain |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
-| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, and unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts complete; Maxwell-qualified evanescent/outgoing semantics and flux-based TIR remain |
+| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, and transverse positive-medium Maxwell plus zero-normal-mean-flux consequences complete; outgoing semantics and reflected flux-based TIR remain |
 | E6 Fresnel/flux | blocked | E3b, E5b | amplitude, admittance-normalized scattering, and flux suite |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
@@ -2413,9 +2424,10 @@ human verification recorded in `tbd.md`.
    ordinary-real-sum uniqueness layers. Preserve the now-complete primitive independent-frequency
    interface traces, electromagnetic noncancellation, guarded label matching, fixed-frequency
    reduction, reflection/Snell/critical geometry, and the positive-phase subcritical plus
-   positive-normal-decay supercritical carrier constructions. The latter is interface-oriented
-   decay geometry only: Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and
-   Fresnel power claims remain. With E3s, E3a, and E3b's local harmonic-average slice complete,
+   positive-normal-decay supercritical carrier constructions. The latter now has a separate
+   transverse positive-medium Maxwell qualification and zero-normal-mean-flux theorem; outgoing
+   semantics, reflected flux-based TIR, and Fresnel power claims remain. With E3s, E3a, and E3b's
+   local harmonic-average slice complete,
    proceed through its material-wave irradiance and normalization bridges before making those
    power claims.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
@@ -2438,10 +2450,11 @@ connected with forward and converse ordinary-real-field Maxwell and exact algebr
   noncancellation, guarded fixed-frequency reduction, reflection/Snell/critical geometry, both
   canonical transmitted carrier branches, and the reusable real three-dimensional cross-product
   divergence identity, real Poynting theorem, and local peak-phasor Poynting average now connected,
-  the next physical-optics front after E3b's material-wave irradiance and signed propagating
-  normal-flux bridges is its Maxwell-qualified evanescent zero-normal-flux result together with
-  aperture and modal-power normalization. That layer can then support
-  Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and Fresnel balance without
-  retroactively treating carrier decay as power flow.
+  E3b's material-wave irradiance, signed propagating normal-flux, and Maxwell-qualified
+  positive-normal-decay zero-normal-flux bridges are now complete. The next physical-optics front
+  is tangential magnetic boundary reduction and Fresnel amplitude/flux balance, while aperture
+  and modal-power normalization remain separate E3b work. That layer can support outgoing
+  semantics and reflected flux-based TIR without retroactively treating carrier decay as power
+  flow.
   The reflected conservation result must continue to allow zero reflection, and reduced amplitudes
   remain referenced to the interface point. The independent circuit front remains N2a/N3.
