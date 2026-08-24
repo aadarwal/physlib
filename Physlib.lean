@@ -256,6 +256,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
+public import Physlib.Optics.Network.Port
+public import Physlib.Optics.Network.PortRegression
 public import Physlib.Optics.Polarization.Basic
 public import Physlib.Optics.Polarization.Coherency
 public import Physlib.Optics.Polarization.ComplexRealization
