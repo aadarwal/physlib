@@ -1281,20 +1281,35 @@ Exit achieved: instantaneous real electromagnetic energy flow exists independent
 finite-mode conventions. The results are pointwise differential laws; harmonic averaging,
 integrated boundary flux, irradiance, and modal power remain E3b.
 
-#### E3b. Harmonic flux and Optics normalization
+#### E3b. Harmonic flux and Optics normalization — in progress
 
 Owner: Optics, importing E3a.
 
-- harmonic time average and complex-phasor formula with the factor and sign derived from the
-  adopted convention;
-- normal flux density of a propagating plane wave, including impedance;
-- zero normal average flux for the evanescent transmitted wave where appropriate;
-- an aperture or normalized transverse-mode-profile integral when total power is claimed;
-- the Hermitian signed-power flux pairing for finite mode families, with its self-pairing equal to
-  real time-averaged normal flux, mutual flux orthogonality, normalization, and incident/outgoing
-  sign conventions proved before extending a one-mode result to coherent superpositions; and
-- explicit maps from raw Jones field amplitudes to irradiance and from a declared normalized field
-  mode to `ModeAmplitude.power`.
+- [x] local harmonic time average and complex-phasor formula with the factor, cross-product order,
+  and conjugation derived from the adopted peak-phasor convention;
+- [ ] normal flux density of a propagating material plane wave, including impedance;
+- [ ] zero normal average flux for the Maxwell-qualified evanescent transmitted wave where
+  appropriate;
+- [ ] an aperture or normalized transverse-mode-profile integral when total power is claimed;
+- [ ] the Hermitian signed-power flux pairing for finite mode families, with its self-pairing equal
+  to real time-averaged normal flux, mutual flux orthogonality, normalization, and
+  incident/outgoing sign conventions proved before extending a one-mode result to coherent
+  superpositions; and
+- [ ] explicit maps from raw Jones field amplitudes to irradiance and from a declared normalized
+  field mode to `ModeAmplitude.power`.
+
+The completed local slice defines componentwise Euclidean phasor realization and conjugation,
+derives the scalar coherent-product average, and proves for arbitrary locally realized
+common-frequency fields that the one-period average of the actual instantaneous
+`ThreeDimension.poyntingVector` is
+`(1 / 2) Re (Ephasor cross conj Hphasor)`. The frequency is positive, the period may begin at any
+time, and exact linear and quadrature regressions independently pin the factor one half and
+second-phasor conjugation. The supplied phasors are local at the selected spatial point. Thus a
+complex plane-wave connector must include its spatial factor there rather than silently dropping
+attenuation. No Maxwell, irradiance, normal-flux, aperture-power, modal-normalization,
+outgoing-wave, or evanescence conclusion is part of this first slice. Next prove the propagating
+material-Jones formula `JonesVector.intensity / (2 * impedance)` times the propagation direction,
+then its signed normal-flux corollaries, before defining any Jones-to-modal-power conversion.
 
 Exit: “lossless” and “power balance” can be interpreted as electromagnetic statements for the
 mode family covered by the theorem.
@@ -2197,7 +2212,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, and interface-oriented side-decaying carrier geometry complete; Maxwell-qualified evanescent/outgoing semantics remain |
 | E3s cross-product divergence | done | Space derivative API | pointwise and function-level real three-dimensional div-cross identity under first differentiability |
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
-| E3b Optics normalization | blocked | O1, P1a, E2, E3a | harmonic flux, irradiance, and modal-power bridges |
+| E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor Poynting average complete; material-wave irradiance, normal flux, aperture, and modal-power bridges remain |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, a reusable fixed-frequency electric predicate, and its directionally guarded equivalence with the primitive two-law electric boundary |
@@ -2346,7 +2361,8 @@ human verification recorded in `tbd.md`.
    reduction, reflection/Snell/critical geometry, and the positive-phase subcritical plus
    positive-normal-decay supercritical carrier constructions. The latter is interface-oriented
    decay geometry only: Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and
-   Fresnel power claims remain. With E3s and E3a complete, proceed through E3b before making those
+   Fresnel power claims remain. With E3s, E3a, and E3b's local harmonic-average slice complete,
+   proceed through its material-wave irradiance and normalization bridges before making those
    power claims.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b remains blocked on that bridge even though the raw
@@ -2366,8 +2382,9 @@ connected with forward and converse ordinary-real-field Maxwell and exact algebr
   positive-frequency ordinary-real-sum uniqueness, primitive interface traces and
   noncancellation, guarded fixed-frequency reduction, reflection/Snell/critical geometry, both
   canonical transmitted carrier branches, and the reusable real three-dimensional cross-product
-  divergence identity and real Poynting theorem now connected, the next physical-optics front is
-  E3b's harmonic flux, irradiance, and modal-power normalization. That layer can then support
+  divergence identity, real Poynting theorem, and local peak-phasor Poynting average now connected,
+  the next physical-optics front is E3b's material-wave irradiance, signed normal flux, and
+  modal-power normalization. That layer can then support
   Maxwell-qualified evanescent/outgoing semantics, flux-based TIR, and Fresnel balance without
   retroactively treating carrier decay as power flow.
   The reflected conservation result must continue to allow zero reflection, and reduced amplitudes

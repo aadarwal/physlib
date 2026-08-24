@@ -1,3 +1,7 @@
+average
+averages
+averaging
+peak
 admittance
 antiparallel
 assert
