@@ -65,6 +65,10 @@ PR unless maintainers explicitly ask to retain it.
   material Jones connector third; the four unsolved boundary equations fourth; and the exact
   nonzero-reference-point sign regression last. The combined fork milestone is intentionally
   larger than one upstream PR.
+- [ ] Split the fork-side Fresnel amplitude milestone before an upstream proposal: real coefficient
+  definitions and denominator-free scalar algebra first; the connected referenced-balance theorem
+  second; and exact normal, grazing, zero-field, and nonzero-phase regressions last. Keep the
+  reflected-root selection wrapper and all flux results in later coherent proposals.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
   upstream diff.
 
@@ -739,6 +743,18 @@ PR unless maintainers explicitly ask to retain it.
   the scalar equations, not as the general Fresnel theorem. Independently verify that the stated
   tuple satisfies both complete reduced vector balances, including the normal-`D` entry, so the
   uniqueness result is not only conditional.
+- [ ] Human-check the propagating Fresnel amplitude solver before upstreaming. With
+  `Y_j = Z_j inverse`, `chi_r = -chi_i`, and full-vector electric Jones coordinates, confirm
+  `r_s = (Y1 chi_i - Y2 chi_t) / (Y1 chi_i + Y2 chi_t)`,
+  `t_s = 2 Y1 chi_i / (Y1 chi_i + Y2 chi_t)`,
+  `r_p = (Y2 chi_i - Y1 chi_t) / (Y2 chi_i + Y1 chi_t)`, and
+  `t_p = 2 Y1 chi_i / (Y2 chi_i + Y1 chi_t)`. The `p` reflection sign is tied to the
+  propagation-oriented full-vector basis, so normal incidence gives `r_p = -r_s`, not equality.
+  Verify that `chi_i > 0` and `chi_t >= 0` make both denominators positive, that the solver never
+  divides by `chi_t`, and that a zero reflected field keeps arbitrary dummy carrier data. The
+  connected theorem assumes the reflected normal alternative; a later wrapper must derive it from
+  the selected reflection branch rather than treating a wave label as a direction law. Keep the
+  manual rational fixture solve independent of the general coefficient theorem.
 - [ ] Before claiming a complete fixed-frequency reduction of the four macroscopic boundary laws,
   prove that normal-`B` continuity is redundant for fixed-frequency phase-matched Faraday waves:
   `n dot B₀ = ω⁻¹ (n cross K) dot E₀`, so only tangential `K` and tangential `E₀` enter. Keep

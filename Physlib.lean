@@ -225,6 +225,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricCollision
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricConservation
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricFixedFrequency
 public import Physlib.Optics.Interfaces.PlanarDielectric.ElectricLabelMatching
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelAmplitude
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelAmplitudeRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.MagneticFixedFrequency
