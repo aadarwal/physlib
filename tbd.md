@@ -1171,6 +1171,12 @@ PR unless maintainers explicitly ask to retain it.
   coordinate, and additive normalized-power laws. Preserve the empty-mode channel-versus-port
   distinction. Do not mark the broad netlist API-map requirement complete before the remaining
   netlist invariants exist.
+- [x] Define implicit complex-linear component behavior independently of invertibility, embed
+  arbitrary complex-linear maps and finite mode transforms as graph behaviors, and prove identity,
+  relational series, independent parallel, graph-composition, matrix-cascade, and block-diagonal
+  direct-sum laws. Preserve `(input, output)` pair order and `first.series second = second * first`
+  for transform graphs. Keep rectangular signal-junction behaviors and proof-gated functional
+  extraction as the next N3 package.
 - [ ] Define time-reversed channel pairing and port reference planes before defining reciprocity;
   typed endpoints and coordinate rephasing alone do not supply these physical conventions.
 - [ ] Human-check the local typed-routing semantics before upstreaming. Confirm that component
@@ -1218,6 +1224,17 @@ PR unless maintainers explicitly ask to retain it.
   lossless device. Complement outgoing power omitted by `C b` is not absorption, and external
   outgoing readout remains future work. The broad netlist and elimination requirements remain
   open.
+- [ ] Human-check the implicit linear-behavior layer before upstreaming. Confirm that membership
+  orders amplitudes as `(input, output)`, `first.series second` hides one exact intermediate
+  amplitude, and its transform graph is `second * first`. Recheck the concrete forward output
+  `(1 + 2I, 3 + 7I)`, reverse output `(7 + 2I, 3 + I)`, the free-output relation containing both
+  `(0, 0)` and `(0, unitPulse)`, the singular zero transform mapping a nonzero pulse to zero while
+  still inducing a valid graph, and the independent gain-two/gain-three parallel output `(2, 3I)`
+  together with rejection of the wrong right-branch value `2I`. Treat `LinearBehavior` only as a
+  homogeneous fixed-frequency complex-linear constraint: it supplies no totality, unique
+  solvability, invertibility, causality, passivity, electromagnetic normalization, or physical
+  realizability. Parallel composition takes two independent inputs; it is not fan-out, summation,
+  or a physical splitter.
 - [ ] Human-check the mode-embedding semantics before upstreaming. Recheck the non-prefix
   `Bool ↪ Fin 3` fixture, the omitted coordinate-one amplitude of power five, strict restriction
   loss, zero-extension isometry, the passive nonidentity ambient projector, and the genuinely
@@ -1238,9 +1255,11 @@ PR unless maintainers explicitly ask to retain it.
   complete component energy balance.
 - [ ] Supply an induced operator-norm bridge before expressing passivity as a matrix norm bound;
   the ambient norm inherited by the raw matrix alias is not that operator norm.
-- [ ] Represent component behavior independently of invertibility. For network equations
-  `b = S a` and `a = C b + E u`, define well-posedness by unique solvability of
-  `(1 - C * S) a = E u`; a contraction estimate may be sufficient but must not be necessary.
+- [x] Represent component behavior independently of invertibility, with graph behaviors only as a
+  proved functional specialization.
+- [ ] For network equations `b = S a` and `a = C b + E u`, define well-posedness by unique
+  solvability of `(1 - C * S) a = E u`; a contraction estimate may be sufficient but must not be
+  necessary.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
@@ -1318,13 +1337,22 @@ PR unless maintainers explicitly ask to retain it.
   `vacuous`. The finite mode-embedding differential added `absorption`, `ambient`, `rectangular`,
   and `restriction`; all other initially reported ordinary prose was reworded using the existing
   dictionary. The ambient partial-routing differential introduced no new spelling vocabulary
-  after ordinary prose was reworded using the existing dictionary and repository baseline.
+  after ordinary prose was reworded using the existing dictionary and repository baseline. The
+  implicit linear-behavior differential reworded ordinary prose and added `behavior`, `behaviors`,
+  `directsum`, `graphs`, `linearbehavior`, `modetransform`, `multivalued`, `oflinearmap`,
+  `relational`, `singular`, and `tobehavior`.
 - [x] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate. The 2026-08-24 typed
   local-routing run reproduced pre-existing style and transitive-import diagnostics only in
   unrelated files. Its build, file-import, illegal-import, alpha-import, duplicate-tag,
   sorry/pseudo-attribution, and declaration-linter stages passed, and neither new Network file
   appeared in a failure list.
+- [x] The 2026-08-24 implicit linear-behavior run passed the build, file-import, illegal-import,
+  alpha-import, duplicate-tag, sorry/pseudo-attribution, declaration-linter, API-map, and
+  changed-file style gates. The full linter reproduced only the known unrelated repository style
+  and transitive-import baseline after the new behavior module's initially redundant direct
+  Mathlib import was removed; a targeted transitive-import rerun then reported no changed Optics
+  module.
 
 ## Milestone gates
 
