@@ -36,6 +36,10 @@ constructor rather than reusing the expected carrier.
   the exact `(5, 0, -4 I)` wave vector.
 - `supercriticalPolarizationRegression_candidate_eq_complexDecayRegressionTM`: recovery of the
   existing TM carrier.
+- `supercriticalPolarizationRegressionCandidate_isHalfSpaceEvanescent`: the nonzero canonical
+  Jones carrier has the named positive-side evanescent classification.
+- `supercriticalPolarizationRegression_zeroJones_not_isHalfSpaceEvanescent`: zero Jones data is
+  outside the exact classification.
 - `supercriticalPolarizationRegression_tangentialElectricAmplitude` and
   `supercriticalPolarizationRegression_tangentialMagneticFieldStrengthAmplitude`: the exact
   fixed-plane amplitudes `(4, 0, 0)` and `(0, 3 I, 0)`.
@@ -271,6 +275,35 @@ lemma supercriticalPolarizationRegression_candidate_eq_complexDecayRegressionTM 
   · exact supercriticalPolarizationRegression_positiveNormalDecayTransmittedWaveVector
   · rw [supercriticalPolarizationRegression_polarizationFrame]
     exact complexDecayRegressionPolarizationFrame_embedJones_TM
+
+/-- The exact nonzero canonical Jones carrier is half-space evanescent into the interface's
+positive side. -/
+lemma supercriticalPolarizationRegressionCandidate_isHalfSpaceEvanescent :
+    IsHalfSpaceEvanescent
+      supercriticalPolarizationRegressionConfiguration.interface.plane .positive
+      supercriticalPolarizationRegressionConfiguration.interface.positiveMedium
+      supercriticalPolarizationRegressionCandidate := by
+  unfold supercriticalPolarizationRegressionCandidate
+  rw [positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent_iff]
+  intro hZero
+  have hSecond := congrArg (fun components ↦ components 1) hZero
+  norm_num [complexDecayRegressionTMJones] at hSecond
+
+/-- The canonical negative-radicand carrier built from zero Jones data is not an active
+half-space evanescent wave. -/
+lemma supercriticalPolarizationRegression_zeroJones_not_isHalfSpaceEvanescent :
+    ¬IsHalfSpaceEvanescent
+      supercriticalPolarizationRegressionConfiguration.interface.plane .positive
+      supercriticalPolarizationRegressionConfiguration.interface.positiveMedium
+      (positiveNormalDecayTransmittedJonesCandidate
+        supercriticalPolarizationRegressionConfiguration
+        supercriticalPolarizationRegression_transmittedNormalRadicand_neg
+        (JonesVector.ofComponents 0 0)) := by
+  rw [positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent_iff]
+  intro hNonzero
+  apply hNonzero
+  ext i
+  fin_cases i <;> simp
 
 /-- The configuration-level TM carrier recovers the independently defined compatible
 magnetic-induction amplitude `(0, 9 I, 0)`. -/
