@@ -1305,6 +1305,8 @@ Owner: Optics, importing E3a.
 - [x] the propagating material plane-wave mean Poynting vector and nonnegative irradiance,
   including impedance and the exact raw-Jones-amplitude bridge;
 - [x] signed normal flux density of a propagating material plane wave;
+- [x] a pointwise bridge from Euclidean phasor realization to the componentwise real part of a
+  positive-exponential complex-carrier scaling, without broadening the Jones foundations;
 - [ ] zero normal average flux for the Maxwell-qualified evanescent transmitted wave where
   appropriate;
 - [ ] an aperture or normalized transverse-mode-profile integral when total power is claimed;
@@ -1325,6 +1327,11 @@ second-phasor conjugation. The supplied phasors are local at the selected spatia
 complex plane-wave connector must include its spatial factor there rather than silently dropping
 attenuation. No Maxwell, irradiance, normal-flux, aperture-power, modal-normalization,
 outgoing-wave, or evanescence conclusion is part of this first slice.
+
+The separate pointwise realization bridge now identifies `Phasor.realizeEuclidean` with the
+componentwise real part of a positive-exponential carrier scaling. It is isolated from the Jones
+foundations so later complex-carrier field connectors can reuse the exact sign and scalar-action
+convention without forcing WaveEquation imports on every polarization consumer.
 
 The completed material-wave slice now proves that formula first for local electric and
 magnetic-field-strength phasors and then for the actual ordinary-real Maxwell material wave at

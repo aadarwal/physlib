@@ -743,11 +743,12 @@ PR unless maintainers explicitly ask to retain it.
   propagating material irradiance. Do not infer incident, reflected, transmitted, outward, or
   outgoing roles from a geometric side, and do not apply its ordinary-real propagating-wave result
   to the future Maxwell-qualified complex evanescent carrier.
-- [ ] Before the complex attenuating/evanescent-wave harmonic-flux connector, add and review the
-  general identity expressing `Phasor.realizeEuclidean` as the componentwise real part of a
-  complex exponential times an amplitude. Decide then whether the currently local real-scalar
-  realization and real/imaginary-part helper lemmas have enough independent consumers to become
-  public simp API.
+- [x] Before the complex attenuating/evanescent-wave harmonic-flux connector, add the general
+  identity expressing `Phasor.realizeEuclidean` as the componentwise real part of a positive-
+  exponential carrier times an amplitude. It lives in the narrow cross-layer
+  `Polarization.ComplexRealization` module, remains a deliberate named rewrite rather than a simp
+  rule, and leaves the currently local real-scalar realization and real/imaginary-part helpers
+  private until they acquire independent consumers.
 
 ## Polarization conventions
 
