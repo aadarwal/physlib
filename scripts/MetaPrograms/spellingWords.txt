@@ -3429,3 +3429,15 @@ arctangent
 denominators
 hybrid
 quadrant
+accumulates
+bounces
+catches
+diagonally
+disappears
+entrance
+errors
+exit
+omit
+prism
+reflecting
+unobservable

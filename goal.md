@@ -1679,6 +1679,14 @@ Exit: the geometric laws follow from the field and boundary setup.
   including the closed positive-time-convention `2 * arctan` formulas, physical specialization to
   the canonical normalized decay factor, fixed-plane `p` sign separation, and arbitrary-Jones
   reflected-intensity preservation;
+- [x] reconstruct the unit-modulus `s` and `p` coefficients from their named phases, package one
+  reflection as a diagonal Jones transform, prove the sign-locked retarder parameter
+  `rho = phi_s - phi_p`, raw Jones unitarity/intensity and Mueller equivalence, connect the matrix
+  action back to the boundary-selected reflected wave, and prove conditional matrix-self-
+  composition quarter-wave laws with a physically shell-compatible exact negative-quarter-wave
+  design regression; interpreting self-composition as two bounces still requires external frame
+  identification, so this is the verified polarization kernel of a future Fresnel rhomb, not its
+  two-face geometry or path-phase model;
 - [x] the full-vector power transmission factor with the common normal-admittance multiplier
   `(Y2 chi_t) / (Y1 chi_i)` for both polarizations;
 - [x] denominator-local unnormalized flux identities and physical `R + T = 1` for lossless real
@@ -2173,6 +2181,7 @@ universal continuous-frequency property.
 | E-03 | Fresnel boundary equations imply the amplitude formulas | sign and impedance errors |
 | E-04 | an unequal-admittance exact supercritical fixture derives both complex coefficient pairs from one simultaneous `s`/`p` boundary solution, proves unit reflected modulus and Jones-intensity preservation, and retains the canonical positive-normal-decay transmitted carrier | admittance swap, full-vector/fixed-plane `p` sign, normalized-decay, or disconnected-boundary errors |
 | E-04a | translating the interface reference point multiplies the canonical transmitted Jones data by its exact complex spatial factor | omitted, conjugated, or reversed affine-reference phase |
+| E-04b | a physically shell-compatible exact irrational-admittance design has incident normal factor `sqrt 2 / 2`, positive normalized decay, the exact negative-radicand identity, TIR phases `pi/4` and `pi/2`, and one-copy retarder parameter `-pi/4`; matrix self-composition is a negative quarter-wave plate up to common phase, while the unequal-admittance boundary fixture independently equals the same diagonal matrix action | off-shell design data, p-s sign, retarder convention, composition order, coefficient ordering, or disconnected-boundary errors |
 | E-05 | lossless propagating interface satisfies normal-flux balance | missing admittance factor |
 | E-06 | raw Jones intensity, irradiance, normalized mode power, and Fresnel S coordinates commute through the declared bridges | field/mode normalization conflation |
 | E-07 | flux of a finite coherent mode superposition equals modal power under the proved flux-orthonormality hypotheses | missing cross terms or incident/outgoing sign error |
@@ -2384,8 +2393,8 @@ current integration base; a designed package whose prerequisite is merely active
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
-| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, boundary-selected unit-modulus complex reflection with explicit phase, and connected reflected/separate/superposed actual normal-flux TIR are complete; named evanescent semantics and separate outgoing semantics remain |
-| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; Brewster, outgoing semantics, and admittance-normalized scattering remain |
+| E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; named evanescent semantics and separate outgoing semantics remain |
+| E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, and coordinate-change API |
 | N2a ports/routing | ready | O2 reindex/direct-sum support | typed convention-free connection API |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
@@ -2536,9 +2545,14 @@ human verification recorded in `tbd.md`.
    normal-incidence, coefficient-convention, and guarded role-specific canonical-basis milestones
    are now complete. The positive-normal-decay Fresnel boundary elimination, unit reflected
    modulus, explicit phase, reflected Jones-intensity preservation, and the connected
-   reflected/separate/superposed actual-flux TIR endpoint are also complete. Proceed to relative
-   `p-s` phase applications and separately named evanescent/outgoing semantics before any modal
-   normalization; do not make evanescent-port power claims early.
+   reflected/separate/superposed actual-flux TIR endpoint are also complete. The relative `p-s`
+   phase is now connected to an independently defined diagonal Jones transform, the existing
+   retarder convention, the boundary-selected reflected wave, and exact matrix-self-composition
+   quarter-wave regressions using physically shell-compatible incidence data. Do not interpret
+   self-composition as two bounces, or call that algebraic kernel a Fresnel rhomb, until two-face
+   geometry, frame transport, affine path phase, and entrance/exit faces are modeled. Proceed to
+   separately named evanescent/outgoing semantics before any modal normalization; do not make
+   evanescent-port power claims early.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
    intensity into physical power before E3b. P5b's propagating material-wave irradiance and actual
    mean-flux Malus laws are now complete, while its normalized-power endpoint remains blocked on
@@ -2576,9 +2590,15 @@ oriented-affine-hyperplane geometry,
   Boundary-selected complex Fresnel coefficients, unit reflected modulus, the closed positive-time
   phase formulas, affine referenced transmission, reflected Jones-intensity preservation, and the
   connected reflected/separate/superposed actual-flux TIR endpoint are now complete with an
-  unequal-admittance exact regression whose signed values are `8/15`, `-8/15`, and zero. The next
-  physical-optics front is relative `p-s` phase applications such as a Fresnel rhomb, followed by
-  separately defined evanescent/outgoing semantics.
+  unequal-admittance exact regression whose signed values are `8/15`, `-8/15`, and zero. The
+  relative `p-s` phase now factors the independently defined reflection matrix as the existing
+  linear retarder with `rho = phi_s - phi_p`; a physically shell-compatible exact design makes
+  matrix self-composition a negative quarter-wave plate up to common phase, and the
+  unequal-admittance boundary fixture recovers the same matrix action. This remains only the
+  polarization kernel of a future Fresnel rhomb: raw self-composition does not prove intermediate
+  frame identification and deliberately omits two-plane geometry, frame transport, inter-bounce
+  affine path phase, and entrance/exit faces. The next physical-optics front is separately defined
+  evanescent semantics, followed independently by outgoing semantics.
   Aperture and modal-power normalization remain separate E3b work; carrier decay must not be
   retroactively treated as power flow.
   The reflected conservation result must continue to allow zero reflection, and reduced amplitudes

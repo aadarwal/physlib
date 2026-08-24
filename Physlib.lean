@@ -248,6 +248,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFresnelReg
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalPolarization
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalPolarizationRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalTransmission
+public import Physlib.Optics.Interfaces.PlanarDielectric.TotalInternalReflectionRetarder
+public import Physlib.Optics.Interfaces.PlanarDielectric.TotalInternalReflectionRetarderRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.WaveBoundary
 public import Physlib.Optics.Mode.Basic
 public import Physlib.Optics.Mode.Reindex

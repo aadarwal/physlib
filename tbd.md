@@ -834,6 +834,26 @@ PR unless maintainers explicitly ask to retain it.
   stored-normal statements at the affine interface point, except that the transmitted zero result
   holds at every point; they do not imply pointwise zero normal flux, zero tangential flux,
   aperture power, an evanescent port, whole-plane conservation, outgoing behavior, or causality.
+- [ ] Human-check the total-internal-reflection retarder bridge before upstreaming. Confirm that
+  unit norm plus the named `Real.Angle` reconstructs each complex reflection coefficient in the
+  positive-time convention; the physical relative coefficient phase is `phi_p - phi_s`, while the
+  existing linear retarder must use `rho = phi_s - phi_p` because its second eigenvalue is
+  `exp (-I * rho)`. Confirm that the diagonal numerical transform orders abstract coordinates as
+  `(s,p)` and that the connected wrapper interprets them in the separately declared incident and
+  reflected frames only under its explicit alignments and full referenced electric and magnetic
+  boundary balances; the zero-reflection branch may retain a dummy reflected frame. Recheck the
+  exact design's incident normal factor `sqrt 2 / 2`, positive normalized decay, negative-radicand
+  shell identity, admittances, phase ratios `sqrt 2 - 1` and one, phases `pi/4` and `pi/2`, physical
+  relative phase `pi/4`, and retarder parameter `-pi/4`. Check that matrix self-composition gives
+  the negative-quarter-wave, diagonal-to-positive-quadrature, and Mueller results, but does not
+  itself prove the frame identification required to interpret two physical bounces. The common
+  `s` coefficient and its square are raw unit Jones phases, not modal power. Do not publish this
+  self-composition kernel as a `FresnelRhomb` component until two-face geometry, intermediate
+  frame transport, affine inter-bounce propagation phase, and entrance/exit faces are formalized
+  and a page-verified optics source is recorded by the human author. For upstream review, split
+  this work into a small phase-reconstruction support PR, a one-reflection Jones/connected-wrapper
+  PR, and a self-composition/physical-regression PR if maintainers prefer the usual sub-200-line
+  review units.
 - [ ] Human-check the selected-tangent connected wrapper and regressions. The incident and
   transmitted relations use the positive side; only a nonzero reflected field requires the
   negative-side relation. In the zero branch the original reflected direction, frame, frequency,
@@ -1200,7 +1220,9 @@ PR unless maintainers explicitly ask to retain it.
   `conditionally`, `connectivity`, `existential`, `flow`, `hides`, `literal`, `manual`, `packages`,
   `recognition`, `role`, `roles`, and `unconditional`. The complex Fresnel/TIR differential added
   `acquires`, `arctangent`, `denominators`, `hybrid`, and `quadrant`. The connected complex-TIR
-  actual-flux differential introduced no new spelling vocabulary.
+  actual-flux differential introduced no new spelling vocabulary. The total-reflection retarder
+  differential added `accumulates`, `bounces`, `catches`, `diagonally`, `disappears`, `entrance`,
+  `errors`, `exit`, `omit`, `prism`, `reflecting`, and `unobservable`.
 - [ ] Reproduce and document any repository-wide baseline lint failures instead of presenting them
   as failures introduced by Optics or claiming a completely clean gate.
 

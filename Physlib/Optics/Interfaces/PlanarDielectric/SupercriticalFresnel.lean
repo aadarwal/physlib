@@ -49,6 +49,8 @@ geometry is silently treated as an outgoing-wave or power-flow condition.
   analogue: unit reflection modulus on that branch.
 - `PlanarDielectricInterface.complexSFresnelReflectionCoefficient_phase_of_neg_I_mul` and its `p`
   analogue: the reflection phase as twice a first-quadrant numerator angle.
+- `PlanarDielectricInterface.complexSFresnelReflectionCoefficient_eq_phaseCircle_of_neg_I_mul`
+  and its `p` analogue: reconstruction of each unit-modulus coefficient from its named phase.
 - `PlanarDielectricInterface.sTotalInternalReflectionPhaseShift_eq_two_arctan` and its `p`
   analogue: the textbook closed phase in the positive-time phasor convention.
 - `PlanarDielectricWaveConfiguration.positiveNormalDecay_complexSFresnelReflectionCoefficient_norm`
@@ -585,6 +587,57 @@ lemma complexPFresnelReflectionCoefficient_phase_of_neg_I_mul
     Complex.star_def,
     Complex.arg_conj_coe_angle]
   simp [pTotalInternalReflectionPhaseShift, two_nsmul]
+
+private lemma complex_eq_arg_toCircle_of_norm_eq_one (z : ℂ) (hz : ‖z‖ = 1) :
+    z = (((Complex.arg z : Real.Angle).toCircle : Circle) : ℂ) := by
+  calc
+    z = ‖z‖ * Complex.exp (Complex.arg z * Complex.I) :=
+      (Complex.norm_mul_exp_arg_mul_I z).symm
+    _ = Complex.exp (Complex.arg z * Complex.I) := by simp [hz]
+    _ = (((Complex.arg z : Real.Angle).toCircle : Circle) : ℂ) := by
+      rw [Real.Angle.toCircle_coe, Circle.coe_exp]
+
+/-- On the positive-incident algebraic branch, the complex `s` reflection coefficient is the
+unit-circle representative of its named total-internal-reflection phase. -/
+lemma complexSFresnelReflectionCoefficient_eq_phaseCircle_of_neg_I_mul
+    (interface : PlanarDielectricInterface) {chi_i decayRatio : ℝ}
+    (hIncident : 0 < chi_i) :
+    interface.complexSFresnelReflectionCoefficient (chi_i : ℂ)
+        (-Complex.I * (decayRatio : ℂ)) =
+      (interface.sTotalInternalReflectionPhaseShift chi_i decayRatio).toCircle := by
+  let r := interface.complexSFresnelReflectionCoefficient (chi_i : ℂ)
+    (-Complex.I * (decayRatio : ℂ))
+  have hNorm : ‖r‖ = 1 :=
+    interface.complexSFresnelReflectionCoefficient_norm_of_neg_I_mul hIncident
+  have hPhase : (Complex.arg r : Real.Angle) =
+      interface.sTotalInternalReflectionPhaseShift chi_i decayRatio :=
+    interface.complexSFresnelReflectionCoefficient_phase_of_neg_I_mul hIncident
+  calc
+    r = (((Complex.arg r : Real.Angle).toCircle : Circle) : ℂ) :=
+      complex_eq_arg_toCircle_of_norm_eq_one r hNorm
+    _ = (interface.sTotalInternalReflectionPhaseShift chi_i decayRatio).toCircle := by
+      rw [hPhase]
+
+/-- On the positive-incident algebraic branch, the complex `p` reflection coefficient is the
+unit-circle representative of its named total-internal-reflection phase. -/
+lemma complexPFresnelReflectionCoefficient_eq_phaseCircle_of_neg_I_mul
+    (interface : PlanarDielectricInterface) {chi_i decayRatio : ℝ}
+    (hIncident : 0 < chi_i) :
+    interface.complexPFresnelReflectionCoefficient (chi_i : ℂ)
+        (-Complex.I * (decayRatio : ℂ)) =
+      (interface.pTotalInternalReflectionPhaseShift chi_i decayRatio).toCircle := by
+  let r := interface.complexPFresnelReflectionCoefficient (chi_i : ℂ)
+    (-Complex.I * (decayRatio : ℂ))
+  have hNorm : ‖r‖ = 1 :=
+    interface.complexPFresnelReflectionCoefficient_norm_of_neg_I_mul hIncident
+  have hPhase : (Complex.arg r : Real.Angle) =
+      interface.pTotalInternalReflectionPhaseShift chi_i decayRatio :=
+    interface.complexPFresnelReflectionCoefficient_phase_of_neg_I_mul hIncident
+  calc
+    r = (((Complex.arg r : Real.Angle).toCircle : Circle) : ℂ) :=
+      complex_eq_arg_toCircle_of_norm_eq_one r hNorm
+    _ = (interface.pTotalInternalReflectionPhaseShift chi_i decayRatio).toCircle := by
+      rw [hPhase]
 
 /-!
 
