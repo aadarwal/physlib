@@ -266,6 +266,23 @@ def ModeTransform.directSum {ι κ μ ν : Type*} (T : ModeTransform ι κ)
     (U : ModeTransform μ ν) : ModeTransform (ι ⊕ μ) (κ ⊕ ν) :=
   Matrix.fromBlocks T 0 0 U
 
+/-- A transform assembled from four blocks acts by the corresponding two coupled block
+equations. -/
+lemma ModeTransform.fromBlocks_apply {ι κ μ ν : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype μ] [DecidableEq μ]
+    (A : ModeTransform ι κ) (B : ModeTransform μ κ)
+    (C : ModeTransform ι ν) (D : ModeTransform μ ν)
+    (a : ModeAmplitude ι) (b : ModeAmplitude μ) :
+    ModeTransform.toLinearMap
+        (Matrix.fromBlocks A B C D : ModeTransform (ι ⊕ μ) (κ ⊕ ν)) (a.directSum b) =
+      (A.toLinearMap a + B.toLinearMap b).directSum
+        (C.toLinearMap a + D.toLinearMap b) := by
+  apply WithLp.ofLp_injective 2
+  funext i
+  rcases i with i | i
+  · simp [ModeAmplitude.directSum, Matrix.toLpLin_apply, Matrix.fromBlocks_mulVec]
+  · simp [ModeAmplitude.directSum, Matrix.toLpLin_apply, Matrix.fromBlocks_mulVec]
+
 /-- A block-diagonal transform acts independently on the two direct-sum amplitude families. -/
 lemma ModeTransform.directSum_apply {ι κ μ ν : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype μ] [DecidableEq μ] (T : ModeTransform ι κ) (U : ModeTransform μ ν)
