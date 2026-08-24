@@ -805,6 +805,18 @@ PR unless maintainers explicitly ask to retain it.
   frames and that both the old explicit-alignment endpoint and the canonical wrapper prove the
   same actual superposed-field normal-flux balance. Normal incidence still requires a selected
   tangent frame.
+- [ ] Human-check the role-specific canonical non-normal frame bundle before upstreaming. Confirm
+  that `IsCanonicalNonNormalIncidenceFrame` hides only the proof of non-normality and still means
+  exact equality with `incidencePolarizationFrame`; it must not manufacture a tangent at parallel
+  or antiparallel normal incidence. Confirm that
+  `HasCanonicalNonNormalIncidenceFrames` requires canonical incident and transmitted frames
+  unconditionally, requires the reflected frame only when its electric amplitude is nonzero, and
+  contains no phase-matching, material-connector, propagation-sign, reflection, boundary, flux, or
+  outgoing assertion. Recheck the exact bundled `3-4-5` axes `s_i = s_r = s_t = (0,1,0)`,
+  `p_i = (-4/5,0,3/5)`, `p_r = (4/5,0,3/5)`, and `p_t = (-3/5,0,4/5)`. In the zero-reflection
+  regression, confirm that the reflected wave vector remains zero, its frequency remains two
+  against the active frequency one, and its plane-normal dummy frame remains noncanonical while
+  the canonical superposed-flux endpoint succeeds.
 - [ ] Human-check the propagating Fresnel flux layer before upstreaming. Confirm that peak electric
   amplitudes give signed normal flux `(1 / 2) Y chi (abs Js squared + abs Jp squared)` and that the
   full-vector `p` coefficient uses the same transmitted-to-incident normal-admittance factor
