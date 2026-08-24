@@ -28,6 +28,10 @@ incidence plane. The reflected-frame hypothesis remains conditional on nonzero e
 A zero reflected field therefore keeps arbitrary dummy carrier, direction, frame, and frequency
 data.
 
+`HasCanonicalNonNormalIncidenceFrames` packages the three role-indexed basis conventions without
+assigning propagation signs from those roles. Incident and transmitted canonicality are
+unconditional; reflected canonicality is required only for an electrically active reflected wave.
+
 The selected normal signs are explicit geometric branch hypotheses. They do not follow from the
 incident or reflected labels and are not identified here with group velocity, energy flux, or an
 outgoing radiation condition. At normal incidence this convention selects no unique incidence
@@ -39,13 +43,16 @@ plane or `s` axis; an independently selected tangent frame is required.
   the selected reflected branch descends to the real frame propagation vectors.
 - `.reflected_electricAmplitude_eq_zero_or_normalComponent_propagationVector_eq_neg`:
   the reflected normal guard used by the real propagating Fresnel layer.
+- `PlanarDielectricWaveConfiguration.HasCanonicalNonNormalIncidenceFrames`: the guarded
+  incident/reflected/transmitted canonical `s`/`p` basis convention.
 - `IsElectricPhaseMatched.canonicalIncidenceFrame_data`: one interface-plane frame supplies the
   common `s` axis for the incident, transmitted, and active reflected canonical frames.
 
 ## iii. Table of contents
 
-- A. Selected reflected propagation branch
-- B. Common canonical incidence-frame data
+- A. Role-specific canonical non-normal frames
+- B. Selected reflected propagation branch
+- C. Common canonical incidence-frame data
 
 ## iv. References
 
@@ -64,6 +71,42 @@ open Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave
 
 noncomputable section
 
+namespace PlanarDielectricWaveConfiguration
+
+/-!
+
+## A. Role-specific canonical non-normal frames
+
+-/
+
+/-- The incident, transmitted, and electrically active reflected propagation frames use the
+canonical non-normal incidence `s`/`p` convention of an interface.
+
+This bundle records basis conventions only. Its role names do not imply propagation signs, phase
+directions, reflection, material-wave connectivity, boundary balance, or power flow. The reflected
+condition is guarded so an electrically zero reflected wave retains arbitrary dummy carrier,
+direction, frame, and frequency data. -/
+structure HasCanonicalNonNormalIncidenceFrames
+    (configuration : PlanarDielectricWaveConfiguration)
+    {incidentDirection reflectedDirection transmittedDirection : Space.Direction 3}
+    (incidentFrame : PolarizationFrame incidentDirection)
+    (reflectedFrame : PolarizationFrame reflectedDirection)
+    (transmittedFrame : PolarizationFrame transmittedDirection) : Prop where
+  /-- The incident frame uses the canonical non-normal incidence basis convention. -/
+  incident : incidentFrame.IsCanonicalNonNormalIncidenceFrame
+    configuration.interface.plane.normal
+  /-- A nonzero reflected electric field uses the canonical non-normal incidence basis
+  convention. -/
+  reflected_of_electricAmplitude_ne_zero :
+    configuration.reflected.electricAmplitude ≠ 0 →
+      reflectedFrame.IsCanonicalNonNormalIncidenceFrame
+        configuration.interface.plane.normal
+  /-- The transmitted frame uses the canonical non-normal incidence basis convention. -/
+  transmitted : transmittedFrame.IsCanonicalNonNormalIncidenceFrame
+    configuration.interface.plane.normal
+
+end PlanarDielectricWaveConfiguration
+
 namespace PlanarDielectricWaveConfiguration.IsElectricPhaseMatched
 
 variable {configuration : PlanarDielectricWaveConfiguration}
@@ -75,7 +118,7 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 
 /-!
 
-## A. Selected reflected propagation branch
+## B. Selected reflected propagation branch
 
 -/
 
@@ -147,7 +190,7 @@ lemma reflected_electricAmplitude_eq_zero_or_normalComponent_propagationVector_e
 
 /-!
 
-## B. Common canonical incidence-frame data
+## C. Common canonical incidence-frame data
 
 -/
 
@@ -166,31 +209,21 @@ lemma canonicalIncidenceFrame_data
     (hTransmitted : IsReferencedMaterialJonesWave configuration.interface.plane
       configuration.interface.positiveMedium configuration.transmitted transmittedFrame
         transmittedJones)
-    (hIncidentNonNormal : IsNonNormalIncidence incidentDirection
-      configuration.interface.plane.normal)
-    (hTransmittedNonNormal : IsNonNormalIncidence transmittedDirection
-      configuration.interface.plane.normal)
-    (hIncidentCanonical : incidentFrame = incidencePolarizationFrame incidentDirection
-      configuration.interface.plane.normal hIncidentNonNormal)
-    (hTransmittedCanonical : transmittedFrame = incidencePolarizationFrame transmittedDirection
-      configuration.interface.plane.normal hTransmittedNonNormal)
-    (hReflectedCanonical : configuration.reflected.electricAmplitude ≠ 0 →
-      ∃ hReflectedNonNormal : IsNonNormalIncidence reflectedDirection
-          configuration.interface.plane.normal,
-        reflectedFrame = incidencePolarizationFrame reflectedDirection
-          configuration.interface.plane.normal hReflectedNonNormal)
+    (hFrames : configuration.HasCanonicalNonNormalIncidenceFrames incidentFrame reflectedFrame
+      transmittedFrame)
     (hIncidentNormal : 0 <
       configuration.interface.plane.normalComponent incidentFrame.propagationVector)
     (hReflectedNormal : configuration.reflected.electricAmplitude ≠ 0 →
       configuration.interface.plane.normalComponent reflectedFrame.propagationVector < 0) :
-    let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
-      hIncidentNonNormal
-    incidentFrame.axis 0 = planeFrame.axis 0 ∧
-      transmittedFrame.axis 0 = planeFrame.axis 0 ∧
-      (configuration.reflected.electricAmplitude = 0 ∨
-        reflectedFrame.axis 0 = planeFrame.axis 0 ∧
-          reflectedFrame.propagationVector =
-            configuration.interface.plane.vectorReflection incidentFrame.propagationVector) := by
+    ∃ planeFrame : PolarizationFrame configuration.interface.plane.normal,
+      incidentFrame.axis 0 = planeFrame.axis 0 ∧
+        transmittedFrame.axis 0 = planeFrame.axis 0 ∧
+        (configuration.reflected.electricAmplitude = 0 ∨
+          reflectedFrame.axis 0 = planeFrame.axis 0 ∧
+            reflectedFrame.propagationVector =
+              configuration.interface.plane.vectorReflection incidentFrame.propagationVector) := by
+  rcases hFrames.incident with ⟨hIncidentNonNormal, hIncidentCanonical⟩
+  rcases hFrames.transmitted with ⟨hTransmittedNonNormal, hTransmittedCanonical⟩
   let planeFrame := incidencePlaneFrame configuration.interface.plane incidentDirection
     hIncidentNonNormal
   have hIncidentAlign : incidentFrame.axis 0 = planeFrame.axis 0 := by
@@ -218,14 +251,15 @@ lemma canonicalIncidenceFrame_data
     exact hCanonicalAxes.trans
       (incidencePolarizationFrame_axis_zero_eq_incidencePlaneFrame
         configuration.interface.plane incidentDirection hIncidentNonNormal)
-  refine ⟨hIncidentAlign, hTransmittedAlign, ?_⟩
+  refine ⟨planeFrame, hIncidentAlign, hTransmittedAlign, ?_⟩
   by_cases hZero : configuration.reflected.electricAmplitude = 0
   · exact Or.inl hZero
   · right
     have hReflection :=
       (hPhase.reflected_electricAmplitude_eq_zero_or_propagationVector_eq_vectorReflection
         hIncident hReflected hIncidentNormal hReflectedNormal).resolve_left hZero
-    rcases hReflectedCanonical hZero with ⟨hReflectedNonNormal, hCanonical⟩
+    rcases hFrames.reflected_of_electricAmplitude_ne_zero hZero with
+      ⟨hReflectedNonNormal, hCanonical⟩
     have hDirectionReflection : Space.basis.repr reflectedDirection.unit =
         configuration.interface.plane.vectorReflection
           (Space.basis.repr incidentDirection.unit) := by
