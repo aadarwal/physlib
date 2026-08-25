@@ -517,11 +517,10 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] global wiring and well-posed network elimination; generic mode restriction/zero extension,
-  typed local connections, proof-carrying indexed connection families, ambient partial routing,
-  the explicit external-channel complement and incident injection, the core implicit behavior
-  graph/identity/series/parallel layer, proof-gated functional views, and rectangular
-  signal-junction behaviors are complete;
+- [ ] the paired-external scattering specialization, series/Redheffer laws, and physical network
+  conservation/reciprocity results; generic mode embeddings, typed connection families, ambient
+  routing, external exposure/readout, implicit behaviors, wiring invariance, and the proof-gated
+  finite complete-state eliminator with a rectangular external response are complete;
 - [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
@@ -1983,15 +1982,17 @@ kernel semantics; a noncomputable complex matrix inverse is not the sole oracle.
 
 #### N5. Well-posed elimination
 
-- unique-solvability definition;
-- equivalence with trivial homogeneous kernel, injectivity/surjectivity, determinant nonzero, and
+- [x] unique-solvability definition for the complete incident/outgoing state;
+- [x] equivalence with trivial homogeneous kernel, injectivity/surjectivity, determinant nonzero, and
   matrix invertibility in the finite complex case;
-- external response transform `E_outᴴ * S * (I - C*S)⁻¹ * E_in`, with all domain and codomain
-  shapes visible in its statement, and a separate scattering specialization only under an
-  external input/output pairing and completeness theorem;
-- agreement of that formula with the relational semantics;
-- series cascade as a specialization; and
-- Redheffer star products for declared matched block partitions, with the particular feedback
+- [x] proof-gated complete-state and rectangular external response transforms, including
+  `E_outᴴ * S * (I - C*S)⁻¹ * E_in`, with every domain and codomain shape visible;
+- [x] agreement of those formulas with the singular-safe relational semantics, plus invariance of
+  well-posedness and covariance of the response under wiring-preserving presentation changes;
+- [ ] a separate square scattering specialization, only under an external input/output pairing and
+  completeness theorem;
+- [ ] series cascade as a specialization; and
+- [ ] Redheffer star products for declared matched block partitions, with the particular feedback
   block's invertibility hypothesis stated explicitly and reflective feedback kept distinct from
   one-way cascade.
 
@@ -2622,7 +2623,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
-| N5 elimination | in progress | N4, N4C | unique-solvability/inverse/external-map suite |
+| N5 elimination | in progress | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, hostile well-posed and singular fixtures, and wiring covariance are complete; scattering specialization, series, and Redheffer remain |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
 | N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
 | N6a conservation | blocked | N2a, N5; E3b for physical meaning | passive/lossless composition closure suite |
@@ -2787,7 +2788,15 @@ human verification recorded in `tbd.md`.
    stored-denominator guard, and a regular-at-point subring on which evaluation is a ring
    homomorphism. Guarded evaluation commutes with `S`, `C`, every external boundary matrix, and
    `1 - C * S`; its exact rational regression preserves a nonzero singular feedback kernel. N4C
-   is complete. Continue with well-posed elimination in N5.
+   is complete. N5 now defines well-posedness as functionality of the complete-state relation,
+   proves its exact finite equivalence with feedback injectivity, surjectivity, bijectivity,
+   trivial kernel, matrix unithood, and nonzero determinant, constructs the inverse only from that
+   proof, and identifies the complete solution
+   and rectangular external response formulas with the relational semantics. Its exact complex
+   fixture pins every stage of `E_outᴴ * S * (1 - C * S)⁻¹ * E_in`; the earlier singular fixture
+   is rejected without erasing its relation, and wiring-presentation exchange preserves both the
+   gate and the canonically relabelled response. Continue N5 with the paired-external scattering
+   specialization, series cascade, and Redheffer feedback.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a

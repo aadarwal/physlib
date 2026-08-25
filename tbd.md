@@ -1419,8 +1419,9 @@ PR unless maintainers explicitly ask to retain it.
   restriction—not as a source, termination, detector, boundary condition, or feedback solution.
   Confirm `E_outᴴ * E_out = 1` while `E_out * E_outᴴ` is the external outgoing range projector;
   the analogous incident laws hold for `E_in`. Do not call either exposure unitary, surjective, or
-  a lossless device. Complement outgoing power omitted by `C b` is not absorption. The broad
-  netlist and elimination requirements remain open.
+  a lossless device. Complement outgoing power omitted by `C b` is not absorption. The relational
+  netlist and proof-gated finite eliminator now exist; physical scattering, conservation, and
+  reciprocity specializations remain open.
 - [ ] Human-check the implicit linear-behavior layer before upstreaming. Confirm that membership
   orders amplitudes as `(input, output)`, `first.series second` hides one exact intermediate
   amplitude, and its transform graph and extracted functional map compose as `second * first` and
@@ -1462,9 +1463,21 @@ PR unless maintainers explicitly ask to retain it.
   the ambient norm inherited by the raw matrix alias is not that operator norm.
 - [x] Represent component behavior independently of invertibility, with graph behaviors only as a
   proved functional specialization.
-- [ ] For network equations `b = S a`, `a = C b + E_in u`, and `y = E_outᴴ b`, define
-  well-posedness by unique internal solvability of `(1 - C * S) a = E_in u`; a contraction estimate
-  may be sufficient but must not be necessary.
+- [x] For network equations `b = S a`, `a = C b + E_in u`, and `y = E_outᴴ b`, define
+  well-posedness by unique complete-state solvability and prove that, over finite complex mode
+  families, it is exactly bijectivity of `(1 - C * S)`. Construct the inverse only from that gate,
+  prove the complete solution and `E_outᴴ * S * (1 - C * S)⁻¹ * E_in` response graphs agree with
+  the relational semantics, and transport the gate and response under `WiringEquiv`. The exact
+  nonsymmetric complex fixture must retain its displayed two-sided feedback inverse and response
+  `[[1 + 4I, 6], [2, 4I]]`; the old singular fixture must remain not well posed. No contraction,
+  passivity, losslessness, reciprocity, causality, or square external scattering claim follows.
+- [ ] Human-check the N5 proof-gated eliminator before upstreaming. Recheck that `IsWellPosed`
+  concerns a unique complete `incident ⊕ outgoing` state for every external input, which is
+  stronger than uniqueness of the selected external output. Confirm all uses of an inverse are
+  downstream of bijectivity, the response multiplication order is exactly
+  `E_outᴴ * S * (1 - C * S)⁻¹ * E_in`, wiring invariance uses literal feedback equality and
+  canonical identity-on-ambient-channel external relabelling, and the rectangular response is not
+  called a `ScatteringMatrix` without a proved external input/output pairing and completeness law.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,

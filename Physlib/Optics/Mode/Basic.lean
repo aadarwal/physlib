@@ -44,6 +44,7 @@ spaces.
 - `ModeTransform.IsPowerPreserving`: a transform preserves total modal power.
 - `ModeTransform.IsPassive`: a transform does not increase total modal power.
 - `ModeTransform.directSum`: the block-diagonal parallel composition of two transforms.
+- `ModeTransform.inverseOfBijective`: the matrix of a proof-gated inverse linear equivalence.
 - `ScatteringMatrix`: a wrapped square transform from incident to outgoing amplitudes.
 - `ScatteringMatrix.IsLossless`: a scattering matrix is unitary.
 
@@ -346,7 +347,7 @@ lemma ModeTransform.fromBlocks_apply {ι κ μ ν : Type*}
     ModeTransform.toLinearMap
         (Matrix.fromBlocks A B C D : ModeTransform (ι ⊕ μ) (κ ⊕ ν)) (a.directSum b) =
       (A.toLinearMap a + B.toLinearMap b).directSum
-        (C.toLinearMap a + D.toLinearMap b) := by
+      (C.toLinearMap a + D.toLinearMap b) := by
   apply WithLp.ofLp_injective 2
   funext i
   rcases i with i | i
@@ -366,6 +367,85 @@ lemma ModeTransform.directSum_apply {ι κ μ ν : Type*} [Fintype ι] [Decidabl
       Matrix.fromBlocks_mulVec]
   · simp [ModeTransform.directSum, ModeAmplitude.directSum, Matrix.toLpLin_apply,
       Matrix.fromBlocks_mulVec]
+
+/-- A square finite mode transform acts bijectively exactly when its matrix is a unit. -/
+lemma ModeTransform.toLinearMap_bijective_iff_isUnit {ι : Type*}
+    [Fintype ι] [DecidableEq ι] (T : ModeTransform ι ι) :
+    Function.Bijective T.toLinearMap ↔ IsUnit T := by
+  have hUnitMap : IsUnit T.toLinearMap ↔ IsUnit T := by
+    change IsUnit ((Matrix.toLpLinAlgEquiv 2) T) ↔ IsUnit T
+    exact isUnit_map_iff (Matrix.toLpLinAlgEquiv 2) T
+  constructor
+  · intro hBijective
+    apply hUnitMap.mp
+    apply (LinearMap.isUnit_iff_ker_eq_bot T.toLinearMap).mpr
+    exact LinearMap.ker_eq_bot.mpr hBijective.1
+  · intro hUnit
+    have hInjective : Function.Injective T.toLinearMap :=
+      LinearMap.ker_eq_bot.mp
+        ((LinearMap.isUnit_iff_ker_eq_bot T.toLinearMap).mp (hUnitMap.mpr hUnit))
+    exact ⟨hInjective, LinearMap.injective_iff_surjective.mp hInjective⟩
+
+/-- A bijective mode transform bundled as a heterogeneous linear equivalence. -/
+noncomputable def ModeTransform.linearEquivOfBijective {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] (T : ModeTransform ι κ)
+    (hBijective : Function.Bijective T.toLinearMap) :
+    ModeAmplitude ι ≃ₗ[ℂ] ModeAmplitude κ :=
+  LinearEquiv.ofBijective T.toLinearMap hBijective
+
+/-- The mode-transform matrix of the inverse of a bijective mode transform. -/
+noncomputable def ModeTransform.inverseOfBijective {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (hBijective : Function.Bijective T.toLinearMap) :
+    ModeTransform κ ι :=
+  Matrix.toEuclideanLin.symm (T.linearEquivOfBijective hBijective).symm.toLinearMap
+
+/-- The matrix inverse constructed from bijectivity induces the inverse linear map. -/
+@[simp]
+lemma ModeTransform.toLinearMap_inverseOfBijective {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (hBijective : Function.Bijective T.toLinearMap) :
+    (T.inverseOfBijective hBijective).toLinearMap =
+      (T.linearEquivOfBijective hBijective).symm.toLinearMap :=
+  Matrix.toEuclideanLin.apply_symm_apply _
+
+/-- Applying a bijective transform after its proof-gated inverse is the identity. -/
+lemma ModeTransform.apply_inverseOfBijective {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (hBijective : Function.Bijective T.toLinearMap)
+    (amplitude : ModeAmplitude κ) :
+    T.toLinearMap ((T.inverseOfBijective hBijective).toLinearMap amplitude) = amplitude := by
+  rw [T.toLinearMap_inverseOfBijective hBijective]
+  exact (T.linearEquivOfBijective hBijective).apply_symm_apply amplitude
+
+/-- Applying the proof-gated inverse after a bijective transform is the identity. -/
+lemma ModeTransform.inverseOfBijective_apply {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (hBijective : Function.Bijective T.toLinearMap)
+    (amplitude : ModeAmplitude ι) :
+    (T.inverseOfBijective hBijective).toLinearMap (T.toLinearMap amplitude) = amplitude := by
+  rw [T.toLinearMap_inverseOfBijective hBijective]
+  exact (T.linearEquivOfBijective hBijective).symm_apply_apply amplitude
+
+/-- A bijective transform followed by its proof-gated inverse matrix is the identity. -/
+lemma ModeTransform.mul_inverseOfBijective {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (hBijective : Function.Bijective T.toLinearMap) :
+    T * T.inverseOfBijective hBijective = 1 := by
+  apply Matrix.toEuclideanLin.injective
+  rw [Matrix.toLpLin_mul_same, Matrix.toLpLin_one]
+  apply LinearMap.ext
+  exact T.apply_inverseOfBijective hBijective
+
+/-- The proof-gated inverse matrix followed by a bijective transform is the identity. -/
+lemma ModeTransform.inverseOfBijective_mul {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι κ) (hBijective : Function.Bijective T.toLinearMap) :
+    T.inverseOfBijective hBijective * T = 1 := by
+  apply Matrix.toEuclideanLin.injective
+  rw [Matrix.toLpLin_mul_same, Matrix.toLpLin_one]
+  apply LinearMap.ext
+  exact T.inverseOfBijective_apply hBijective
 
 /- The ambient norm inherited by the matrix alias is an entrywise norm, not the induced
 operator norm on mode amplitudes. Consequently, passivity should not be rewritten as `‖T‖ ≤ 1`
