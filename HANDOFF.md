@@ -24,7 +24,7 @@ conductor's, not this lane's. Slice 5 leaves it a clean hook and attempts nothin
 | 3 | Mason's theorem, and `Δ = det (1 - G)` | **done**, with the forward-path half of the numerator explicitly withheld |
 | 4 | Regressions: single loop, two non-touching loops, the touching case, `Δ = 0` | **done**, delivered with slice 3 |
 | 5 | `ofCoefficientMatrix` hook, plus the edge-indexed multigraph structure with `toMatrix` | **done** |
-| 7 | The forward-path numerator identity, closing Mason's formula in general | pending — scheduled by the controller ahead of slice 6 |
+| 7 | Mason's formula in general | **done** in loop-family form; the forward-path repackaging of the numerator remains |
 | 6 | Optional: edge-based enumeration closing regression G-02 by proof | pending — attempt after slice 7 |
 
 ---
@@ -466,6 +466,115 @@ SFG-TR'14; NSV'16 Definition 1, p. 34). A separate edge type is the same idea wi
 index made a first-class parameter rather than a list position, so section B should be classed as
 parity of representation. Section A has no source counterpart: no fetched source extracts a
 signal-flow graph from a linear system or relates it to a matrix inverse.
+
+---
+
+## Slice 7 — files
+
+- `Physlib/Mathematics/SignalFlowGraph/Numerator.lean` (223 lines)
+- `Physlib/Mathematics/SignalFlowGraph/NumeratorRegression.lean` (93 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all ten)
+
+```
+public import Physlib.Mathematics.SignalFlowGraph.Basic
+public import Physlib.Mathematics.SignalFlowGraph.BasicRegression
+public import Physlib.Mathematics.SignalFlowGraph.Combinatorics
+public import Physlib.Mathematics.SignalFlowGraph.CombinatoricsRegression
+public import Physlib.Mathematics.SignalFlowGraph.Extraction
+public import Physlib.Mathematics.SignalFlowGraph.ExtractionRegression
+public import Physlib.Mathematics.SignalFlowGraph.Mason
+public import Physlib.Mathematics.SignalFlowGraph.MasonRegression
+public import Physlib.Mathematics.SignalFlowGraph.Numerator
+public import Physlib.Mathematics.SignalFlowGraph.NumeratorRegression
+```
+
+### What slice 7 proves, and how it differs from what was asked
+
+The obligation left open by slice 3 was `masonNumerator G s t = adjugate (1 - G) t s`, and the
+plan was to close it by decomposing the orbit of the sink into a forward path. **That is not what
+happened, and the outcome is better than the plan in one respect and short of it in another.**
+
+Proved, in full generality, with no hypothesis:
+
+```
+cyclicNumerator_eq_adjugate :
+  cyclicNumerator G s t = (systemMatrix G).adjugate t s
+
+gain_eq_cyclicNumerator_div_graphDet :
+  gain G s t = cyclicNumerator G s t / graphDet G
+```
+
+where `cyclicNumerator` is the alternating sum over the families of pairwise non-touching loops
+whose loop through the sink sends it to the source, with the gain of that closing edge divided
+out. **So Mason's gain formula is now a complete calculation theorem: the gain between two nodes
+is a ratio of two explicit finite alternating sums over loop families, and both sums are proved
+equal to the linear-algebra quantities they are supposed to compute.** That is the milestone
+statement of `goal.md` section H.4 S6, "Mason gain formula under a nonzero graph determinant",
+discharged in general.
+
+**Why this route rather than the planned one.** The numerator turned out to be reachable by the
+*same* expansion that proved `graphDet_eq_det`, with no cycle bookkeeping at all. Replacing one
+row of the system matrix by a unit vector, as `Matrix.adjugate_apply` does, kills every
+permutation that does not route the sink to the source; the survivors expand exactly as in
+`Mason.lean`, except over the columns other than the sink; and adjoining the sink to each vertex
+set turns those terms into loop families that close through it. The extra minus sign is the one
+lost vertex in the exponent. `prod_updateRow` is the only genuinely new lemma. The whole file is
+223 lines and cost no heartbeat fights, against an estimate of about 350 lines of `Equiv.Perm`
+manipulation for the planned route.
+
+**What is still open.** The numerator is in loop-family form, not forward-path form. The residual
+obligation is now
+
+```
+masonNumerator G s t = cyclicNumerator G s t
+```
+
+which is a **repackaging of the same families, not new mathematical content**: the closing family
+of `cyclicNumerator` is a permutation routing the sink to the source, and deleting its closing
+edge from the orbit of the sink is exactly the forward path that `masonNumerator` sums over. The
+route is unchanged from what was recorded in slice 3, namely `List.formPerm` in one direction and
+`Equiv.Perm.toList` in the other, and the crux is the bridge lemma
+`pathGain G p = familyGain G (p.toFinset.erase t) p.formPerm`.
+
+`masonNumerator_eq_cyclicNumerator_twoNodeLoop` proves the open identity for the two-node feedback
+graph, so it has a proved instance rather than only plausibility.
+
+### Slice 7 — declarations
+
+`Physlib/Mathematics/SignalFlowGraph/Numerator.lean`, namespace `Physlib.SignalFlowGraph`:
+
+**A. Families that close through the sink** — `vertexSetsContaining`,
+`mem_vertexSetsContaining`, `loopFamiliesRouting`, `mem_loopFamiliesRouting`,
+`sum_loopFamiliesRouting`, `cyclicNumerator`.
+
+**B. The replaced row** — `prod_updateRow`, `sdiff_erase_eq_compl_insert`.
+
+**C. The numerator is the cofactor** — `cyclicNumerator_eq_adjugate`,
+`gain_eq_cyclicNumerator_div_graphDet`.
+
+`Physlib/Mathematics/SignalFlowGraph/NumeratorRegression.lean`, same namespace:
+`cyclicNumerator_twoNodeLoop`, `gain_eq_cyclicNumerator_div_twoNodeLoop`,
+`masonNumerator_eq_cyclicNumerator_twoNodeLoop`,
+`masonGain_eq_cyclicNumerator_div_twoNodeLoop`.
+
+### Slice 7 gates
+
+Build clean; `lean -Dwarn.sorry=false -Dweak.says.verify=true` gives zero output on all ten files;
+the Batteries declaration linter set run module-scoped over all ten modules passes; the
+`module_doc_lint` and `style_lint` rules re-run locally pass; no `sorry`, `axiom`,
+`native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import; imports minimal.
+
+**Budget report, as requested.** 223 lines of theory plus 93 of regression, against a stop-limit
+of about 500 lines; zero heartbeat fights. The budget was not exhausted, so there is room for the
+forward-path repackaging or for slice 6, and that choice is the controller's.
+
+### Parity classification for slice 7
+
+**Physlib-original.** No fetched source relates Mason's numerator to a cofactor. FMICS'15
+Definitions 3-4 (p. 168) and NSV'16 Definition 6 (p. 37) define it through the executable
+enumeration of forward circuits, and neither states a determinant or inverse-matrix
+identification.
 
 ### Slice 1 gates
 
