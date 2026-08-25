@@ -125,8 +125,8 @@ throughout.
 
 ## Slice 2 — files
 
-- `Physlib/Mathematics/ZTransform/Convergence.lean` (215 lines)
-- `Physlib/Mathematics/ZTransform/ConvergenceRegression.lean` (205 lines)
+- `Physlib/Mathematics/ZTransform/Convergence.lean` (264 lines)
+- `Physlib/Mathematics/ZTransform/ConvergenceRegression.lean` (211 lines)
 
 ### Registrations needed in `Physlib.lean` (cumulative, all four)
 
