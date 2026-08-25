@@ -137,5 +137,4 @@ lemma apertureFluxRegressionPositive_weighted_self :
 
 end
 
-
 end Optics

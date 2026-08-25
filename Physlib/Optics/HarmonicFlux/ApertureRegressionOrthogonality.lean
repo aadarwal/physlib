@@ -141,5 +141,4 @@ lemma apertureFluxRegressionPositive_negative :
 
 end
 
-
 end Optics

@@ -182,5 +182,4 @@ lemma apertureFluxRegressionNonorthogonalModes_not_isApertureFluxOrthonormal :
 
 end
 
-
 end Optics
