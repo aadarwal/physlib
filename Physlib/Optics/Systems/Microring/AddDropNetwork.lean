@@ -16,7 +16,8 @@ This file constructs a four-port add-drop microring as an explicit `FlatNetlist`
 directional couplers are joined by two physical N7 matched-propagation arcs. All four second-arm
 coupler ports participate in the feedback loop; the two first arms remain the input/through and
 add/drop buses. This file supplies the network and its coordinate equations; N5 well-posedness and
-response elimination are proved in `AddDrop.lean`.
+response elimination are proved at
+`Physlib/Optics/Systems/Microring/AddDrop.lean:481,635,674`.
 
 The N7 component declarations are `DirectionalCoupler.Parameters` and
 `DirectionalCoupler.physicalScattering` at
@@ -33,7 +34,8 @@ The total round-trip attenuation is split symmetrically as `sqrt a` on each arc,
 phase lift is split as `phi / 2` before coercion to `Real.Angle`. This is a modeling choice fixing
 the drop-port reference plane; it is not a claim that every physical ring has uniform distributed
 loss. The displayed scalar transfer expressions are totalized. This file does not identify them
-with the feedback-network response; that gated claim is proved in `AddDrop.lean`.
+with the feedback-network response; the gated response claims are at
+`Physlib/Optics/Systems/Microring/AddDrop.lean:635,674`.
 
 This is a fixed-carrier, single-mode model. Power means normalized modal power. The file makes no
 bandwidth, causality, dispersion, group-delay, nonlinear, thermal, material-realization, or

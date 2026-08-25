@@ -12,10 +12,10 @@ public import Physlib.Optics.Systems.Microring.AddDropNetwork
 
 ## i. Overview
 
-This file solves the explicit two-coupler, two-arc feedback network constructed in
-`AddDropNetwork`. It proves that N5 well-posedness is exactly nonvanishing of the complete
-circulation denominator and derives the input-to-through and input-to-drop responses from the N5
-channel equations.
+This file solves the explicit two-coupler, two-arc feedback network defined at
+`Physlib/Optics/Systems/Microring/AddDropNetwork.lean:412-460`. It proves that N5 well-posedness is
+exactly nonvanishing of the complete circulation denominator and derives the input-to-through and
+input-to-drop responses from the N5 channel equations.
 
 `roundTripSeries`, `throughTransferSeries`, and `dropTransferSeries` are totalized `tsum`
 expressions. They have no convergent-circulation or network-response meaning here without the
