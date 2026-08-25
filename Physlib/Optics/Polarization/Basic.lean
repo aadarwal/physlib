@@ -28,6 +28,9 @@ interpretations require later impedance, field-profile, and Poynting-flux normal
 - `Phasor.realize`: the real signal associated with a phasor and carrier phase.
 - `Phasor.realizeEuclidean`: componentwise realization of a complex Euclidean phasor array.
 - `Phasor.conjugateEuclidean`: componentwise conjugation of a complex Euclidean phasor array.
+- `Phasor.conjugateEuclidean_add`, `Phasor.conjugateEuclidean_smul`, and
+  `Phasor.conjugateEuclidean_conjugateEuclidean`: its additive, conjugate-scalar, and involution
+  laws.
 - `Phasor.ofAmplitudePhase`: a phasor constructed from a real amplitude and phase.
 - `JonesVector`: two raw transverse electric-field phasors.
 - `JonesVector.ofComponents`: a Jones vector constructed from two complex components.
@@ -174,6 +177,37 @@ def Phasor.conjugateEuclidean {d : ℕ} (amplitude : EuclideanSpace ℂ (Fin d))
 lemma Phasor.conjugateEuclidean_apply {d : ℕ}
     (amplitude : EuclideanSpace ℂ (Fin d)) (i : Fin d) :
     Phasor.conjugateEuclidean amplitude i = star (amplitude i) := rfl
+
+/-- Componentwise Euclidean conjugation preserves zero. -/
+@[simp]
+lemma Phasor.conjugateEuclidean_zero {d : ℕ} :
+    Phasor.conjugateEuclidean (0 : EuclideanSpace ℂ (Fin d)) = 0 := by
+  ext i
+  simp
+
+/-- Componentwise Euclidean conjugation distributes over addition. -/
+lemma Phasor.conjugateEuclidean_add {d : ℕ}
+    (first second : EuclideanSpace ℂ (Fin d)) :
+    Phasor.conjugateEuclidean (first + second) =
+      Phasor.conjugateEuclidean first + Phasor.conjugateEuclidean second := by
+  ext i
+  simp
+
+/-- Componentwise Euclidean conjugation turns complex scaling into conjugate scaling. -/
+lemma Phasor.conjugateEuclidean_smul {d : ℕ} (z : ℂ)
+    (amplitude : EuclideanSpace ℂ (Fin d)) :
+    Phasor.conjugateEuclidean (z • amplitude) =
+      star z • Phasor.conjugateEuclidean amplitude := by
+  ext i
+  simp
+
+/-- Applying componentwise Euclidean conjugation twice returns the original phasor array. -/
+@[simp]
+lemma Phasor.conjugateEuclidean_conjugateEuclidean {d : ℕ}
+    (amplitude : EuclideanSpace ℂ (Fin d)) :
+    Phasor.conjugateEuclidean (Phasor.conjugateEuclidean amplitude) = amplitude := by
+  ext i
+  simp
 
 /-! ## B. Jones vectors and squared intensity -/
 
