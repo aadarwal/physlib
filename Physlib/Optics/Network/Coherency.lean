@@ -213,7 +213,7 @@ lemma incoherentSum_trace {ι : Type*} [Fintype ι] (first second : CoherencyMat
   simp only [trace_eq_sum_channelPower, incoherentSum_channelPower, Finset.sum_add_distrib]
 
 /-- Transport is additive on decorrelated second-order data. -/
-lemma map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq κ]
+lemma map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ]
     (first second : CoherencyMatrix ι) (transform : ModeTransform ι κ) :
     (first.incoherentSum second).map transform =
       (first.map transform).incoherentSum (second.map transform) := by
@@ -232,7 +232,7 @@ lemma map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq �
 
 No interference term appears, and none was deleted: the decorrelation hypothesis is carried by the
 supplied second-order data. -/
-lemma channelPower_map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq κ]
+lemma channelPower_map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ]
     (first second : CoherencyMatrix ι) (transform : ModeTransform ι κ) (channel : κ) :
     ((first.incoherentSum second).map transform).channelPower channel =
       ((first.map transform).channelPower channel) +
@@ -240,7 +240,7 @@ lemma channelPower_map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ] [
   rw [map_incoherentSum, incoherentSum_channelPower]
 
 /-- Decorrelated inputs have exactly additive total output power. -/
-lemma trace_map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ] [DecidableEq κ]
+lemma trace_map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ]
     (first second : CoherencyMatrix ι) (transform : ModeTransform ι κ) :
     ((first.incoherentSum second).map transform).trace =
       (first.map transform).trace + (second.map transform).trace := by
@@ -264,7 +264,7 @@ channel.
 This makes the cross term a proved quantity rather than a modelling convenience: it vanishes
 exactly when the supplied second-order data is the decorrelated sum. -/
 lemma channelPower_map_ofAmplitude_add_sub_incoherentSum
-    {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     (first second : ModeAmplitude ι) (transform : ModeTransform ι κ) (channel : κ) :
     ((ofAmplitude (first + second)).map transform).channelPower channel -
         (((ofAmplitude first).incoherentSum (ofAmplitude second)).map transform).channelPower
