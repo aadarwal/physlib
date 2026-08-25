@@ -18,13 +18,13 @@ This lane edits none of them; the registrations it needs are listed below.
 | R2 ray-transfer components and systems | `Rays.Transfer` (+ `TransferRegression`) | done |
 | R3 imaging and cardinal points | `Rays.Imaging` (+ `ImagingRegression`) | done |
 | R4 Gaussian beams and the complex ABCD law | `Rays.Gaussian` (+ `GaussianRegression`) | done |
-| R5 optical resonators | `Physlib.Optics.Rays.Resonator` | not started |
+| R5 optical resonators | `Rays.Resonator` (+ `ResonatorRegression`) | done |
 
 ## Gates run, all four modules
 
 - `lake-lock build` of all four modules — clean, no warnings.
 - `lake-lock env lean -Dwarn.sorry=false -Dweak.says.verify=true <each file>` — zero output.
-- Batteries declaration linters (all 14, module-scoped over 711 declarations) — passed. Verified
+- Batteries declaration linters (all 14, module-scoped over 798 declarations) — passed. Verified
   to have teeth with a deliberately undocumented `def`, which the run rejected.
 - `module_doc_lint` and `style_lint` rules, plus the `regex_lint` unneeded-parentheses rule,
   reimplemented as text checks and run over both files — clean. Validated against
@@ -51,11 +51,13 @@ public import Physlib.Optics.Rays.Gaussian
 public import Physlib.Optics.Rays.GaussianRegression
 public import Physlib.Optics.Rays.Imaging
 public import Physlib.Optics.Rays.ImagingRegression
+public import Physlib.Optics.Rays.Resonator
+public import Physlib.Optics.Rays.ResonatorRegression
 public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
 ```
 
-Note the sort order: `Gaussian` and `Imaging` come before `Transfer`.
+Note the sort order: `Gaussian`, `Imaging` and `Resonator` all come before `Transfer`.
 
 ## Files added
 
@@ -67,6 +69,8 @@ Note the sort order: `Gaussian` and `Imaging` come before `Transfer`.
 - `Physlib/Optics/Rays/ImagingRegression.lean`
 - `Physlib/Optics/Rays/Gaussian.lean`
 - `Physlib/Optics/Rays/GaussianRegression.lean`
+- `Physlib/Optics/Rays/Resonator.lean`
+- `Physlib/Optics/Rays/ResonatorRegression.lean`
 
 ## Sync with `optics/development`
 
@@ -355,6 +359,40 @@ Section E, the paraxial Helmholtz equation:
 `.gaussianRegression_singular_not_isValid`, `.gaussianRegression_singular_would_be_junk`,
 `.gaussianRegression_helmholtz`, `.gaussianRegression_waistBeamParameter`.
 
+### `Physlib.Optics.Rays.Resonator`
+
+- `Optics.roundTripRay` with `roundTripRay_zero`, `roundTripRay_succ`.
+- `Optics.IsStable` — stability as boundedness of the ray under arbitrarily many round trips, with
+  the bounds chosen before the number of round trips.
+- `Optics.rayInvariant`, `Optics.rayInvariant_rayTransfer` (scaled by the determinant, an identity
+  needing no hypothesis), `Optics.rayInvariant_roundTripRay`.
+- `Optics.rayTrace`, `Optics.stabilityForm`, `Optics.stabilityForm_eq`,
+  `Optics.stabilityForm_roundTripRay`, `Optics.stabilityForm_nonneg`.
+- `Optics.entry_one_zero_ne_zero_of_abs_rayTrace_lt_two`,
+  `Optics.isStable_of_abs_trace_lt_two`.
+- `Optics.gParameter`, `Optics.twoMirrorRoundTrip`, `Optics.twoMirrorRoundTrip_isValid`,
+  `Optics.twoMirror_matrix`, `Optics.twoMirror_trace`, `Optics.twoMirror_det`,
+  `Optics.isStable_twoMirror`.
+- `Optics.rayInvariant_eq_ratio`, `Optics.gaussianEigenparameter`,
+  `Optics.im_gaussianEigenparameter_pos`, `Optics.quadratic_of_relations`,
+  `Optics.quadratic_gaussianEigenparameter`, `Optics.abcdTransform_gaussianEigenparameter`,
+  `Optics.exists_gaussian_eigenmode`.
+
+### `Physlib.Optics.Rays.ResonatorRegression`
+
+`Optics.resonatorRegressionStableMatrix`, `.resonatorRegression_stable_trace`,
+`.resonatorRegression_stable`, `.resonatorRegression_stable_det`,
+`.resonatorRegressionConfocalMatrix`, `.resonatorRegression_confocal_matrix`,
+`.resonatorRegression_confocal_trace`, `.roundTripRay_neg_one`,
+`.resonatorRegression_confocal_roundTripRay`, `.resonatorRegression_confocal_isStable`,
+`.resonatorRegressionFabryPerot`, `.resonatorRegression_fabryPerot_matrix`,
+`.resonatorRegression_fabryPerot_trace`, `.resonatorRegression_fabryPerot_step`,
+`.resonatorRegression_fabryPerot_roundTripRay`,
+`.resonatorRegression_fabryPerot_not_isStable`, `.resonatorRegressionNegatedMatrix`,
+`.resonatorRegression_negated_matrix`, `.resonatorRegression_negated_step`,
+`.resonatorRegression_negated_growth`, `.resonatorRegression_negated_radii_not_isStable`,
+`.resonatorRegression_guard`, `.resonatorRegression_eigenmode`.
+
 ---
 
 ## goal.md milestone rows satisfied
@@ -448,6 +486,33 @@ sentinels are about hypotheses rather than values:
 necessary — the phase-conjugating mirror carries a physical beam parameter out of the domain — and
 `gaussianRegression_singular_not_isValid` with `gaussianRegression_singular_would_be_junk` shows
 the singular matrix is rejected by validity and exactly what would go wrong without that.
+
+`goal.md` §H.5 R5 has four bullets:
+
+- *round-trip system and fixed-ray/fixed-beam predicates* — partial. The round-trip system and its
+  iteration are `twoMirrorRoundTrip` and `roundTripRay`, and the fixed-**beam** predicate is
+  `abcdTransform M q = q`, realised by `exists_gaussian_eigenmode`. A fixed-**ray** predicate, an
+  eigenvector of eigenvalue one, is **not** formalised.
+- *determinant-one trace criterion and its exact hypotheses* — done, and the hypotheses are exactly
+  the source's: `det M = 1` and a **strict** trace bound.
+- *Fabry-Perot, ring, and selected phase-conjugate resonators* — the plane-parallel Fabry-Perot is
+  done, as a boundary case study, and is proved **not** stable. Ring and phase-conjugate
+  resonators are **not** done.
+- *agreement between ray-stability and Gaussian fixed-point views* — done.
+  `rayInvariant_eq_ratio` proves the conserved ray quadratic is the eigenmode quadratic evaluated
+  at the height-to-angle ratio, and `exists_gaussian_eigenmode` produces the mode.
+
+**R-04 is done**, and the fixture set settles the strict-versus-non-strict question by example:
+`resonatorRegression_stable` is a cavity strictly inside the region;
+`resonatorRegression_confocal_isStable` is stable at trace exactly `-2`; and
+`resonatorRegression_fabryPerot_not_isStable` is **not** stable at trace exactly `2`. Two cavities
+on the same boundary with opposite outcomes, so `|A + D| ≤ 2` is not a criterion and the
+strictness in `isStable_of_abs_trace_lt_two` is load-bearing.
+
+**The reflection guard is now load-bearing at the level of stability, not arithmetic.**
+`resonatorRegression_negated_radii_not_isStable` proves that negating both mirror radii — what
+counting the direction reversal twice amounts to in the folded convention — turns the stable
+cavity into an unstable one. `resonatorRegression_guard` states the pair together.
 
 Of the three regressions named in the lane brief, the **symmetric two-lens system** is done here
 (`transferRegression_symmetricTwoLens_matrix` with its `A = D` symmetry and unit determinant),
@@ -622,6 +687,48 @@ is strictly stronger than the source statement. Neither restriction is dropped s
 **GB-07** (Thesis'15 Def. 4.13 + Thm. 4.13, APEX telescope) — **not** addressed. The source's
 hypotheses sit in an opaque `SHeFI_constraints` bundle that the thesis never unfolds, so a parity
 claim here would not be auditable. Not claimed, per the parity lane's recommendation.
+
+**RS-03** (Thesis'15 Def. 5.5 p. 101) — satisfied. Lean: `Optics.IsStable`. Stability is
+boundedness of the ray under arbitrarily many round trips, with the bounds chosen before the
+number of round trips, exactly the source's quantifier order. One cosmetic divergence: the source
+writes `|y_n| ≤ y ∧ |θ_n| < θ`, mixing a non-strict height bound with a strict angle bound; this
+lane uses `≤` for both, which is equivalent because the bounds are existentially quantified.
+Class: **parity**.
+
+**RS-05** (Thesis'15 Thm. 5.7 p. 103) — satisfied, regression **R-04** done. Lean:
+`Optics.isStable_of_abs_trace_lt_two`, with hypotheses `det M = 1` and the strict trace bound,
+exactly as the source states them. `Optics.twoMirror_det` discharges the determinant hypothesis
+for the two-mirror cavity directly, because folded mirrors are unimodular.
+Class: **parity**, extended by the endpoint analysis below, which the source does not give.
+
+**A Physlib addition with no source row.** The source proves only the sufficient direction. This
+lane additionally settles the boundary: the confocal cavity is stable at trace `-2` and the
+plane-parallel Fabry-Perot is unstable at trace `2`, so the non-strict inequality is not a
+criterion. Class: **stronger Physlib result**.
+
+**A second Physlib addition with no source row.** `Optics.exists_gaussian_eigenmode` and
+`Optics.rayInvariant_eq_ratio` connect the ray and Gaussian pictures: the conserved ray quadratic
+is the eigenmode quadratic evaluated at the height-to-angle ratio. `goal.md` §H.5 R5 asks for this
+agreement; the source's chapter 5 does not contain it.
+
+**RS-01 and RS-02** (Thesis'15 Thm. 5.1, Defs. 5.1–5.4, Thms. 5.2–5.5, pp. 97–100) — **partial and
+by a different construction, so not claimed as parity.** The source unfolds a resonator by
+replicating its component list `N` times and then proves lemmas about that list operation. This
+lane iterates the round-trip *matrix* instead (`roundTripRay`, `M ^ n`), which gives the same
+transported ray by the R2 fold theorem but is not the same construction. The source's
+`half_round_trip` and its component-shift and append lemmas are not formalised.
+
+**RS-04** (Thesis'15 Thm. 5.6 p. 102, Sylvester's theorem) — **not** formalised. This lane proves
+stability from a conserved quadratic form rather than from the Chebyshev matrix-power form. The
+downstream theorem RS-05 is obtained either way, but the Chebyshev form itself is not available
+here and is not claimed.
+
+**RS-06** (Thesis'15 Def. 5.10, Thms. 5.12–5.18, Table 5.1, pp. 110–115) — **not** addressed. The
+Fabry-Perot fixture here is the plane-parallel boundary case, not the source's fibre-ring-laser
+model with its XZ and YZ analyses and stability ranges. Not claimed.
+
+**RS-07** (chaos, Duffing and Tinkerbell maps) — deferred by the scope decision already recorded
+in `goal.md` §H.5. Not claimed.
 
 **Convention divergence to record.** This lane uses the Saleh & Teich folded reflection
 convention: after a mirror the axis is re-referenced to the new propagation direction, so a plane
