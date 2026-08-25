@@ -384,7 +384,7 @@ lemma trace_map_le_of_isPassive {ι κ : Type*} [Fintype ι] [DecidableEq ι] [F
       hTransform
   have hNonneg :
       0 ≤ (coherency.toMatrix * ((1 : ModeTransform ι ι) - transformᴴ * transform)).trace :=
-    Matrix.PosSemidef.trace_mul_nonneg coherency.posSemidef hDefect
+    Matrix.PosSemidef.trace_mul_nonneg_complex coherency.posSemidef hDefect
   have hExpand :
       (coherency.toMatrix * ((1 : ModeTransform ι ι) - transformᴴ * transform)).trace =
         Matrix.trace coherency.toMatrix -

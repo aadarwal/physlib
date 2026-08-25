@@ -18,8 +18,8 @@ complex matrices on a finite index type.
 
 ## ii. Main results
 
-- `Matrix.PosSemidef.trace_mul_nonneg`: the trace of a product of positive-semidefinite complex
-  matrices is nonnegative.
+- `Matrix.PosSemidef.trace_mul_nonneg_complex`: the trace of a product of positive-semidefinite
+  complex matrices is nonnegative.
 
 ## iii. Scope
 
@@ -49,7 +49,7 @@ noncomputable section
 -/
 
 /-- The trace of a product of positive-semidefinite complex matrices is nonnegative. -/
-lemma PosSemidef.trace_mul_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
+lemma PosSemidef.trace_mul_nonneg_complex {ι : Type*} [Fintype ι] [DecidableEq ι]
     {left right : Matrix ι ι ℂ} (hLeft : left.PosSemidef) (hRight : right.PosSemidef) :
     0 ≤ (left * right).trace := by
   classical
