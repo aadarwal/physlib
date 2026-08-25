@@ -73,7 +73,8 @@ Bind these, not their unfoldings:
   inverse, so that regularity can be stated as a function of the parameter. Its meaning has three
   regions: outside `solveDomain` it is Mathlib's junk inverse and means nothing; on
   `solveDomain \ validityDomain` it is a genuine algebraic inverse and the exact `N5` block
-  formula, but no component's model is claimed there, so it is not a physical response; on
+  formula, but not every component model is claimed valid there, so it is not a physical
+  response; on
   `responseDomain` it is the response. **Never quote it as a response without a
   `responseDomain` hypothesis**; use `unguardedResponse_eq_blockFormula` (algebraic, solve gate)
   or `unguardedResponse_eq_response` (physical gate).
@@ -123,8 +124,14 @@ outside it have no proved response.
   ports, mode compatibility, and conventions, with no well-posedness assumption to flatten).
 - H.3 N5H bullet 4 (functional packaging of a child as a scattering component only after that
   child's well-posedness and external-channel pairing have been proved).
-- I.3 row **N-10** — `parameterizedResponseRegression_mem_compileBehavior_iff`.
-- I.3 row **N-08** is *not* claimed; see "Remaining in this lane".
+- H.3 N5H bullet 3 (equality between hierarchical relational semantics and the semantics of the
+  flattened netlist) and bullet 5 in the form the contract asks it for -- the invariance a reused
+  subsystem needs; literal three-stage associativity is withheld, see below.
+- I.3 row **N-10** — `parameterizedResponseRegression_mem_compileBehavior_iff_solve`, gated on the
+  well-posed domain as goal.md requires; `parameterizedResponseRegression_mem_compileBehavior_iff`
+  is its response-domain corollary.
+- I.3 row **N-08** — `PortConnectionFamily.closeBehavior_append` and, at netlist level,
+  `HierarchicalNetlist.flatten_behavior_eq`.
 
 ## Explicit non-claims
 
@@ -138,8 +145,11 @@ outside it have no proved response.
 - No passivity, losslessness, reciprocity, causality, rationality in any variable, or
   electromagnetic normalization is asserted anywhere in this lane (invariants E.6, E.9).
 - `unguardedResponse` outside `solveDomain` is Mathlib's junk inverse and is never a response.
-- N5H flattening asserts nothing yet about semantics, and associativity is not proved; both are
-  withheld explicitly in the `Hierarchical` module doc as well as here.
+- Literal three-stage associativity of `append` is not proved, and is withheld explicitly in the
+  `Hierarchical` module doc as well as here. Everything proved about hierarchical semantics is
+  relational and unconditional: `closeBehavior_append`, `flatten_behavior_eq`, and
+  `closeBehavior_append_congr` carry no well-posedness, invertibility, or functionality hypothesis
+  on either stage.
 
 ## Worktree note for other lanes
 
@@ -151,24 +161,16 @@ second, so a sync costs no rebuild either.
 
 ## Remaining in this lane
 
-- N5H slice 5, semantics half: equality of hierarchical relational semantics with
-  flattened-netlist semantics (goal.md `N-08`). The packaging half of slice 5 is done
-  (`FlatNetlist.packagedScattering` and its `toBehavior` agreement). What is missing needs a
-  family-level `closeBehavior` -- the singular-safe closure of an abstract oriented boundary
-  behavior by a connection family, which `FlatNetlist.behavior` is already definitionally an
-  instance of -- together with three bridge identities in amplitude form:
-
-  ```text
-  (inner.append outer).partialRouting b
-      = inner.partialRouting b + E_in^inner (outer.partialRouting (E_out^inner b))
-  (inner.append outer).externalIncidentInjection = E_in^inner ∘ E_in^outer ∘ (external relabel)
-  (inner.append outer).externalOutgoingReadout   = (external relabel) ∘ E_out^outer ∘ E_out^inner
-  ```
-
-  each provable coordinatewise from `PortConnectionFamily.partialRouting_apply_internal`,
-  `partialRouting_apply_of_incident_not_mem_range`, and the `appendChannelEquiv` /
-  `appendExternalChannelEquiv` transports in this file.
-- N5H slice 6: associativity/invariance of `append` for reusing a verified subsystem.
+- Literal three-stage associativity of `append`. Regrouping changes the port family the third
+  stage is indexed by, from `(inner.append middle).externalPortModeFamily` to
+  `middle.externalPortModeFamily`, and transporting a whole connection family along an equivalence
+  of port families is machinery the codebase does not have. The invariance the `N5H` contract
+  actually asks for -- that a subsystem may be replaced by anything with the same closed relation
+  -- is proved as `PortConnectionFamily.closeBehavior_append_congr`. The module doc withholds
+  associativity explicitly.
+- A hierarchical regression instance (a two-level hierarchy whose flattened response equals the
+  direct one on an exact rational fixture). `N-08` is proved in general and unconditionally, so
+  this would be a fixture check rather than a missing theorem, but it is not written.
 - N5F slice 3 could be strengthened from `ContinuousAt`/`AnalyticAt` at a point to `ContinuousOn`/
   `AnalyticOnNhd` on an open subset of the solve domain; the pointwise forms are what is proved.
 

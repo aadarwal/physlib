@@ -51,10 +51,15 @@ closure operation and the proof-gated packaging of one child.
 Two results the `N5H` contract asks for are deliberately **not** claimed here.
 
 * Equality of hierarchical relational semantics with flattened-netlist semantics (goal.md row
-  `N-08`) is not proved. Sections G and H supply the closure operation and the stage-by-stage
-  reading of the flattened assembly that such a proof needs, and nothing in this file asserts the
-  equality itself.
-* Associativity and invariance of `append` for reusing a subsystem are not proved.
+  `N-08`) is proved, as `PortConnectionFamily.closeBehavior_append` and, at the level of netlists,
+  `HierarchicalNetlist.flatten_behavior_eq`. Neither carries a well-posedness hypothesis.
+* The invariance a reused subsystem needs is proved as
+  `PortConnectionFamily.closeBehavior_append_congr`: the flattened relation depends on the inner
+  stage only through that stage's own closed relation.
+* Literal three-stage associativity of `append` is **not** proved. Regrouping changes the port
+  family the third stage is indexed by -- from `(inner.append middle).externalPortModeFamily` to
+  `middle.externalPortModeFamily` -- and transporting a connection family along an equivalence of
+  port families is machinery this file does not have.
 
 Beyond that, nothing here assumes, implies, or requires that any child subsystem is well posed,
 passive, lossless, reciprocal, or causal, except in `packagedScattering` and its consequences,
@@ -86,6 +91,19 @@ carry the ambient ports and the outer mode equivalences verbatim.
   applied to its assembled component graph.
 - `PortConnectionFamily.append_incidentAssembly_apply_inner`, `..._apply_outer`, and
   `..._apply_external`: the flattened incident assembly read off stage by stage.
+- `PortConnectionFamily.append_incidentAssembly_eq`: the flattened incident assembly is the inner
+  stage's own assembly driven at the inner boundary, with no well-posedness of either stage.
+- `PortConnectionFamily.appendInnerDrive_eq` and
+  `PortConnectionFamily.append_externalOutgoingReadout_eq`: the drive delivered to the inner
+  boundary is the outer stage's own assembly, and the flattened readout is the outer readout of
+  the inner boundary readout.
+- `PortConnectionFamily.mem_closeBehavior_append_iff` and
+  `PortConnectionFamily.closeBehavior_append`: hierarchical relational semantics equals
+  flattened-netlist relational semantics, with no well-posedness hypothesis on either stage.
+- `PortConnectionFamily.closeBehavior_append_congr`: the flattened relation depends on the inner
+  stage only through that stage's own closed relation, which is the invariance a reused subsystem
+  needs.
+- `HierarchicalNetlist.flatten_behavior_eq`: the same equality stated for netlists.
 
 ## iv. Table of contents
 
@@ -97,6 +115,7 @@ carry the ambient ports and the outer mode equivalences verbatim.
 - F. Packaging a well-posed subsystem as one component
 - G. Relational closure of an abstract boundary behavior
 - H. The flattened incident assembly, stage by stage
+- I. Hierarchical semantics of a two-stage netlist
 
 -/
 
@@ -710,6 +729,29 @@ local instance twoStageAppendChannelFintype : Fintype (inner.append outer).Chann
 local instance twoStageAppendChannelDecidableEq :
     DecidableEq (inner.append outer).Channel := Classical.decEq _
 
+/-- Classical equality on the inner stage's connected channels. -/
+local instance twoStageInnerChannelDecidableEq : DecidableEq inner.Channel :=
+  Classical.decEq _
+
+/-- Classical equality on the boundary channels exposed by the inner stage. -/
+local instance twoStageBoundaryChannelDecidableEq :
+    DecidableEq inner.externalPortModeFamily.Channel := Classical.decEq _
+
+/-- Classical equality on the outer stage's connected channels. -/
+local instance twoStageOuterChannelDecidableEq : DecidableEq outer.Channel :=
+  Classical.decEq _
+
+/-- The external channels of the flattened family are finite. -/
+local instance twoStageAppendExternalChannelFintype :
+    Fintype (inner.append outer).ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The external channels of the outer stage are finite. -/
+local instance twoStageOuterExternalChannelFintype : Fintype outer.ExternalChannel := by
+  classical
+  infer_instance
+
 /-- On an inner-connected coordinate the flattened assembly is the inner stage's own routing.
 
 The outer stage and the external input are invisible there: a subsystem's internal wiring is not
@@ -759,6 +801,252 @@ lemma append_incidentAssembly_apply_external
       external (Incident.mk channel) :=
   (inner.append outer).incidentAssembly_apply_external outgoing external channel
 
+/-- The incident amplitude the outer stage delivers to the inner subsystem's exposed channels.
+
+It is read off the flattened assembly by restriction; nothing is solved and no inverse is formed.
+-/
+def appendInnerDrive
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel)) :
+    ModeAmplitude (Incident inner.ExternalChannel) :=
+  ((inner.append outer).incidentAssembly outgoing external).restrictEmbedding
+    inner.externalIncidentEmbedding
+
+/-- The flattened incident assembly is exactly the inner stage's own assembly, driven at the inner
+boundary by the amplitude the outer stage delivers there.
+
+This is the structural half of hierarchical flattening, and it needs no well-posedness of either
+stage: the two-stage wiring and the flattened wiring impose the same incident equation, coordinate
+by coordinate. On an inner-connected coordinate both sides are the inner routing of the outgoing
+amplitude; on an inner-external coordinate both sides are the delivered drive.
+-/
+theorem append_incidentAssembly_eq
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel)) :
+    (inner.append outer).incidentAssembly outgoing external =
+      inner.incidentAssembly outgoing (inner.appendInnerDrive outer outgoing external) := by
+  classical
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨channel⟩
+  by_cases hChannel : channel ∈ Set.range inner.channelEmbedding
+  · rcases hChannel with ⟨connected, rfl⟩
+    exact (inner.append_incidentAssembly_apply_inner outer outgoing external connected).trans
+      (inner.incidentAssembly_apply_connected_channel outgoing
+        (inner.appendInnerDrive outer outgoing external) connected).symm
+  · have hExternal : channel = (⟨channel, hChannel⟩ : inner.ExternalChannel).1 := rfl
+    rw [hExternal, inner.incidentAssembly_apply_external]
+    rfl
+
+omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype outer.Channel] in
+/-- A flattened external channel and its outer-stage presentation have the same ambient channel. -/
+lemma appendExternalChannelEquiv_coe (channel : (inner.append outer).ExternalChannel) :
+    ((inner.boundaryChannelEquiv
+        (inner.appendExternalChannelEquiv outer channel).1 : inner.ExternalChannel) :
+      P.Channel) = (channel : P.Channel) := rfl
+
+/-- The inner stage's boundary readout, in the outer stage's ambient coordinates, evaluates the
+ambient outgoing amplitude at the channel underlying that boundary coordinate. -/
+lemma boundaryReadout_apply
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (channel : inner.externalPortModeFamily.Channel) :
+    ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
+        (inner.externalOutgoingReadout.toLinearMap outgoing) (Outgoing.mk channel) =
+      outgoing (Outgoing.mk
+        ((inner.boundaryChannelEquiv channel : inner.ExternalChannel) : P.Channel)) := by
+  rw [ModeAmplitude.reindex_apply, inner.externalOutgoingReadout_apply,
+    ModeAmplitude.restrictEmbedding_apply,
+    PortConnectionFamily.externalOutgoingEmbedding_apply]
+  rfl
+
+omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype outer.Channel] in
+/-- An outer external channel and its flattened presentation have the same ambient channel. -/
+lemma appendExternalChannelEquiv_symm_coe (channel : outer.ExternalChannel) :
+    (((inner.appendExternalChannelEquiv outer).symm channel :
+      (inner.append outer).ExternalChannel) : P.Channel) =
+      ((inner.boundaryChannelEquiv channel.1 : inner.ExternalChannel) : P.Channel) := rfl
+
+/-- The drive delivered to the inner boundary is exactly the outer stage's own incident assembly,
+fed by the inner stage's boundary outgoing amplitudes and the flattened external input.
+
+Together with `append_incidentAssembly_eq` this is the whole incident content of flattening: the
+flattened equation is the inner equation and the outer equation, and nothing else.
+-/
+theorem appendInnerDrive_eq
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel)) :
+    ModeAmplitude.reindex (Incident.relabelEquiv inner.boundaryChannelEquiv.symm)
+        (inner.appendInnerDrive outer outgoing external) =
+      outer.incidentAssembly
+        (ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
+          (inner.externalOutgoingReadout.toLinearMap outgoing))
+        (ModeAmplitude.reindex (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer))
+          external) := by
+  classical
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨boundary⟩
+  by_cases hBoundary : boundary ∈ Set.range outer.channelEmbedding
+  · rcases hBoundary with ⟨connected, rfl⟩
+    rw [outer.incidentAssembly_apply_connected_channel]
+    show (inner.appendInnerDrive outer outgoing external)
+        (Incident.mk (inner.boundaryChannelEquiv (outer.channelEmbedding connected))) = _
+    rw [PortConnectionFamily.appendInnerDrive, ModeAmplitude.restrictEmbedding_apply,
+      PortConnectionFamily.externalIncidentEmbedding_apply,
+      inner.append_incidentAssembly_apply_outer outer,
+      inner.boundaryReadout_apply outgoing]
+  · have hExternal : boundary = (⟨boundary, hBoundary⟩ : outer.ExternalChannel).1 := rfl
+    rw [hExternal, outer.incidentAssembly_apply_external]
+    show (inner.appendInnerDrive outer outgoing external)
+        (Incident.mk (inner.boundaryChannelEquiv boundary)) = _
+    rw [PortConnectionFamily.appendInnerDrive, ModeAmplitude.restrictEmbedding_apply,
+      PortConnectionFamily.externalIncidentEmbedding_apply]
+    rw [show ((inner.boundaryChannelEquiv boundary : inner.ExternalChannel) : P.Channel) =
+        (((inner.appendExternalChannelEquiv outer).symm ⟨boundary, hBoundary⟩ :
+          (inner.append outer).ExternalChannel) : P.Channel) from rfl,
+      inner.append_incidentAssembly_apply_external outer]
+    rfl
+
+/-- Reading the flattened external channels is reading the outer stage's external channels of the
+inner stage's boundary readout. -/
+theorem append_externalOutgoingReadout_eq
+    (outgoing : ModeAmplitude (Outgoing P.Channel)) :
+    ModeAmplitude.reindex (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer))
+        ((inner.append outer).externalOutgoingReadout.toLinearMap outgoing) =
+      outer.externalOutgoingReadout.toLinearMap
+        (ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
+          (inner.externalOutgoingReadout.toLinearMap outgoing)) := by
+  classical
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨boundary⟩
+  rw [outer.externalOutgoingReadout_apply, ModeAmplitude.restrictEmbedding_apply,
+    PortConnectionFamily.externalOutgoingEmbedding_apply,
+    inner.boundaryReadout_apply outgoing]
+  show ((inner.append outer).externalOutgoingReadout.toLinearMap outgoing)
+      (Outgoing.mk ((inner.appendExternalChannelEquiv outer).symm boundary)) = _
+  rw [(inner.append outer).externalOutgoingReadout_apply,
+    ModeAmplitude.restrictEmbedding_apply,
+    PortConnectionFamily.externalOutgoingEmbedding_apply,
+    inner.appendExternalChannelEquiv_symm_coe outer]
+
+/-- Relabelling an amplitude and relabelling back recovers it. -/
+lemma reindex_symm_reindex {μ ν : Type*} [Fintype μ] [Fintype ν] (relabel : μ ≃ ν)
+    (amplitude : ModeAmplitude μ) :
+    ModeAmplitude.reindex relabel.symm (ModeAmplitude.reindex relabel amplitude) =
+      amplitude := by
+  apply WithLp.ofLp_injective 2
+  funext index
+  simp only [ModeAmplitude.reindex_apply, Equiv.symm_symm, Equiv.symm_apply_apply]
+
+/-- Relabelling an amplitude back and relabelling forward recovers it. -/
+lemma reindex_reindex_symm {μ ν : Type*} [Fintype μ] [Fintype ν] (relabel : μ ≃ ν)
+    (amplitude : ModeAmplitude ν) :
+    ModeAmplitude.reindex relabel (ModeAmplitude.reindex relabel.symm amplitude) =
+      amplitude := by
+  apply WithLp.ofLp_injective 2
+  funext index
+  simp only [ModeAmplitude.reindex_apply, Equiv.symm_symm, Equiv.apply_symm_apply]
+
+/-- The inner stage's closed behavior, presented on the boundary channels the outer stage wires.
+
+Only the labelling changes: the relation is transported along the canonical equivalence between
+the inner stage's external channels and its boundary port family's channels.
+-/
+def innerBoundaryBehavior
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)) :
+    LinearBehavior (Incident inner.externalPortModeFamily.Channel)
+      (Outgoing inner.externalPortModeFamily.Channel) :=
+  (inner.closeBehavior behavior).reindex
+    (Incident.relabelEquiv inner.boundaryChannelEquiv.symm)
+    (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
+
+/-- **Hierarchical semantics equals flattened semantics.**
+
+Wiring an abstract oriented boundary behavior by the flattened two-stage family gives exactly the
+relation obtained by first closing the inner stage and then closing the result with the outer
+stage, up to the canonical relabelling of external channels.
+
+No well-posedness, invertibility, solvability, or functionality hypothesis appears on either side:
+this is an identity of singular-safe relations. It is the statement that proofs may be organised
+by subsystem boundary without changing what the fully expanded channel equations say.
+-/
+theorem mem_closeBehavior_append_iff
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (input : ModeAmplitude (Incident (inner.append outer).ExternalChannel))
+    (output : ModeAmplitude (Outgoing (inner.append outer).ExternalChannel)) :
+    (input, output) ∈ (inner.append outer).closeBehavior behavior ↔
+      (ModeAmplitude.reindex
+          (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer)) input,
+        ModeAmplitude.reindex
+          (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)) output) ∈
+        outer.closeBehavior (inner.innerBoundaryBehavior behavior) := by
+  classical
+  rw [(inner.append outer).mem_closeBehavior_iff, outer.mem_closeBehavior_iff]
+  constructor
+  · rintro ⟨incident, outgoing, hBehavior, hIncident, hOutput⟩
+    refine ⟨ModeAmplitude.reindex (Incident.relabelEquiv inner.boundaryChannelEquiv.symm)
+        (inner.appendInnerDrive outer outgoing input),
+      ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
+        (inner.externalOutgoingReadout.toLinearMap outgoing), ?_, ?_, ?_⟩
+    · rw [innerBoundaryBehavior, LinearBehavior.mem_reindex_iff,
+        reindex_symm_reindex, reindex_symm_reindex, inner.mem_closeBehavior_iff]
+      refine ⟨incident, outgoing, hBehavior, ?_, rfl⟩
+      rw [hIncident, inner.append_incidentAssembly_eq outer]
+    · exact inner.appendInnerDrive_eq outer outgoing input
+    · rw [hOutput, inner.append_externalOutgoingReadout_eq outer]
+  · rintro ⟨boundaryIncident, boundaryOutgoing, hBoundary, hBoundaryIncident, hBoundaryOutput⟩
+    rw [innerBoundaryBehavior, LinearBehavior.mem_reindex_iff,
+      inner.mem_closeBehavior_iff] at hBoundary
+    obtain ⟨incident, outgoing, hBehavior, hIncident, hOutgoing⟩ := hBoundary
+    have hBoundaryOutgoing : boundaryOutgoing =
+        ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
+          (inner.externalOutgoingReadout.toLinearMap outgoing) := by
+      rw [← hOutgoing]
+      exact (reindex_reindex_symm _ _).symm
+    have hDrive : ModeAmplitude.reindex
+        (Incident.relabelEquiv inner.boundaryChannelEquiv.symm).symm boundaryIncident =
+        inner.appendInnerDrive outer outgoing input := by
+      rw [hBoundaryIncident, hBoundaryOutgoing, ← inner.appendInnerDrive_eq outer,
+        reindex_symm_reindex]
+    refine ⟨incident, outgoing, hBehavior, ?_, ?_⟩
+    · rw [hIncident, hDrive, ← inner.append_incidentAssembly_eq outer]
+    · have hReadout := inner.append_externalOutgoingReadout_eq outer outgoing
+      rw [hBoundaryOutgoing] at hBoundaryOutput
+      rw [← hReadout] at hBoundaryOutput
+      exact (reindex_symm_reindex
+        (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)) output).symm.trans
+        (congrArg (ModeAmplitude.reindex
+          (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm)
+          hBoundaryOutput) |>.trans (reindex_symm_reindex _ _)
+
+/-- The relational form of hierarchical flattening as an equality of behaviors. -/
+theorem closeBehavior_append
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)) :
+    (inner.append outer).closeBehavior behavior =
+      (outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+        (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm
+        (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm := by
+  ext ⟨input, output⟩
+  rw [LinearBehavior.mem_reindex_iff, Equiv.symm_symm, Equiv.symm_symm,
+    inner.mem_closeBehavior_append_iff outer]
+
+/-- **Reusing a subsystem.** The flattened semantics depends on the inner stage only through the
+inner stage's own closed behavior.
+
+Replacing what is inside a subsystem by anything with the same closed relation leaves the whole
+network's relation unchanged. This is the invariance a verified subsystem is reused under, and it
+needs no well-posedness: the subsystem is not required to be functional for its boundary relation
+to determine the rest.
+-/
+theorem closeBehavior_append_congr
+    {behavior otherBehavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)}
+    (hInner : inner.closeBehavior behavior = inner.closeBehavior otherBehavior) :
+    (inner.append outer).closeBehavior behavior =
+      (inner.append outer).closeBehavior otherBehavior := by
+  rw [inner.closeBehavior_append outer, inner.closeBehavior_append outer,
+    innerBoundaryBehavior, innerBoundaryBehavior, hInner]
+
 end PortConnectionFamily
 
 namespace FlatNetlist
@@ -775,6 +1063,113 @@ lemma behavior_eq_closeBehavior :
     netlist.connections.mem_closeBehavior_iff]
 
 end FlatNetlist
+
+/-!
+
+## I. Hierarchical semantics of a two-stage netlist
+
+-/
+
+namespace HierarchicalNetlist
+
+variable (netlist : HierarchicalNetlist.{u, v, w, x})
+variable [Fintype netlist.flatten.Channel] [Fintype netlist.innerNetlist.ConnectedChannel]
+variable [Fintype netlist.outer.Channel]
+
+/-- The inner subsystem netlist shares the flattened netlist's ambient channels. -/
+local instance innerNetlistChannelFintype : Fintype netlist.innerNetlist.Channel :=
+  inferInstanceAs (Fintype netlist.flatten.Channel)
+
+/-- The ambient component channels of a two-stage netlist are finite. -/
+local instance ambientChannelFintype :
+    Fintype netlist.components.aggregatePortModeFamily.Channel :=
+  inferInstanceAs (Fintype netlist.flatten.Channel)
+
+/-- Classical equality on the ambient component channels. -/
+local instance ambientChannelDecidableEq :
+    DecidableEq netlist.components.aggregatePortModeFamily.Channel := Classical.decEq _
+
+/-- The inner stage's connected channels are finite. -/
+local instance innerStageChannelFintype : Fintype netlist.inner.Channel :=
+  inferInstanceAs (Fintype netlist.innerNetlist.ConnectedChannel)
+
+/-- The inner stage's external channels are finite. -/
+local instance innerStageExternalChannelFintype : Fintype netlist.inner.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The boundary channels exposed by the inner stage are finite. -/
+local instance innerBoundaryChannelFintype :
+    Fintype netlist.inner.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ netlist.inner.boundaryChannelEquiv.symm
+
+/-- Classical equality on the boundary channels exposed by the inner stage. -/
+local instance innerBoundaryChannelDecidableEq :
+    DecidableEq netlist.inner.externalPortModeFamily.Channel := Classical.decEq _
+
+/-- The external channels of the outer stage are finite. -/
+local instance outerExternalChannelFintype : Fintype netlist.outer.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The connected channels of the flattened two-stage family are finite. -/
+local instance appendChannelFintype :
+    Fintype (netlist.inner.append netlist.outer).Channel :=
+  Fintype.ofEquiv _ (netlist.inner.appendChannelEquiv netlist.outer).symm
+
+/-- The connected channels of the flattened netlist are finite. -/
+local instance flattenConnectedChannelFintype : Fintype netlist.flatten.ConnectedChannel :=
+  inferInstanceAs (Fintype (netlist.inner.append netlist.outer).Channel)
+
+/-- The external channels of the flattened two-stage family are finite. -/
+local instance appendExternalChannelFintype :
+    Fintype (netlist.inner.append netlist.outer).ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The external channels of the flattened netlist are finite. -/
+local instance flattenExternalChannelFintype : Fintype netlist.flatten.ExternalChannel :=
+  inferInstanceAs (Fintype (netlist.inner.append netlist.outer).ExternalChannel)
+
+omit [Fintype netlist.outer.Channel] in
+/-- The boundary factor of hierarchical semantics is the inner subsystem netlist's own external
+behavior, relabelled onto the boundary channels the outer stage wires. -/
+lemma innerBoundaryBehavior_componentBehavior :
+    netlist.inner.innerBoundaryBehavior netlist.innerNetlist.componentBehavior =
+      netlist.innerNetlist.behavior.reindex
+        (Incident.relabelEquiv netlist.inner.boundaryChannelEquiv.symm)
+        (Outgoing.relabelEquiv netlist.inner.boundaryChannelEquiv.symm) :=
+  congrArg (fun relation => LinearBehavior.reindex
+      (Incident.relabelEquiv netlist.inner.boundaryChannelEquiv.symm)
+      (Outgoing.relabelEquiv netlist.inner.boundaryChannelEquiv.symm) relation)
+    netlist.innerNetlist.behavior_eq_closeBehavior.symm
+
+/-- **Hierarchical semantics equals flattened-netlist semantics**, at the level of netlists.
+
+The flattened netlist's singular-safe external behavior is exactly the outer stage's relational
+closure of the inner subsystem netlist's own external behavior, up to the canonical relabelling of
+external channels. Neither stage is assumed well posed.
+-/
+theorem flatten_behavior_eq :
+    netlist.flatten.behavior =
+      (netlist.outer.closeBehavior
+          (netlist.innerNetlist.behavior.reindex
+            (Incident.relabelEquiv netlist.inner.boundaryChannelEquiv.symm)
+            (Outgoing.relabelEquiv netlist.inner.boundaryChannelEquiv.symm))).reindex
+        (Incident.relabelEquiv
+          (netlist.inner.appendExternalChannelEquiv netlist.outer)).symm
+        (Outgoing.relabelEquiv
+          (netlist.inner.appendExternalChannelEquiv netlist.outer)).symm := by
+  refine netlist.flatten.behavior_eq_closeBehavior.trans ?_
+  refine (PortConnectionFamily.closeBehavior_append netlist.inner netlist.outer
+    netlist.innerNetlist.componentBehavior).trans ?_
+  exact congrArg (fun relation => LinearBehavior.reindex
+      (Incident.relabelEquiv (netlist.inner.appendExternalChannelEquiv netlist.outer)).symm
+      (Outgoing.relabelEquiv (netlist.inner.appendExternalChannelEquiv netlist.outer)).symm
+      (netlist.outer.closeBehavior relation))
+    netlist.innerBoundaryBehavior_componentBehavior
+
+end HierarchicalNetlist
 
 end
 
