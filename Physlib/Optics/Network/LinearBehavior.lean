@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Mode.Basic
+public import Physlib.Optics.Mode.Reindex
 
 /-!
 # Implicit linear optical behaviors
@@ -29,6 +29,9 @@ behavior and a return behavior, without requiring existence or uniqueness. For b
 constructed as graphs, the graph theorems prove that series and parallel recover ordinary
 linear-map composition and block-diagonal mode-transform composition.
 
+Finite behaviors can also be transported along input and output index equivalences. This is a
+change of labels for the complete relation, not an assumption that the relation is functional.
+
 ## ii. Scope
 
 The behavior type and its relational compositions require no finite index types, matrix inverse,
@@ -45,7 +48,9 @@ well-posedness assertion.
 - `LinearBehavior.IsFunctional`: total, single-valued behavior.
 - `LinearBehavior.toLinearMap`: the proof-required linear map of a functional behavior.
 - `LinearBehavior.toModeTransform`: the proof-required finite matrix of a functional behavior.
+- `LinearBehavior.reindex`: transport a finite relation along input and output relabellings.
 - `ModeTransform.toBehavior`: the graph behavior induced by a finite mode transform.
+- `ModeTransform.toBehavior_reindex`: transform and behavior relabelling agree.
 - `ModeTransform.toBehavior_isFunctional`: every mode-transform behavior is functional.
 - `LinearBehavior.identity`: equality between input and output amplitudes.
 - `LinearBehavior.series`: relational series composition.
@@ -111,6 +116,58 @@ lemma ofLinearMap_injective :
     rw [← hBehavior]
     simp
   exact (mem_ofLinearMap_iff second input (first input)).mp hMember
+
+/-- Relabel the input and output indices of a finite linear behavior.
+
+This transports the entire relation and therefore does not require the behavior to be functional.
+-/
+def reindex {ι' κ' : Type*} [Fintype ι] [Fintype ι'] [Fintype κ] [Fintype κ']
+    (eIn : ι ≃ ι') (eOut : κ ≃ κ') (behavior : LinearBehavior ι κ) :
+    LinearBehavior ι' κ' :=
+  behavior.map
+    (((ModeAmplitude.reindex eIn).toLinearEquiv.prodCongr
+      (ModeAmplitude.reindex eOut).toLinearEquiv) :
+        (ModeAmplitude ι × ModeAmplitude κ) ≃ₗ[ℂ]
+          (ModeAmplitude ι' × ModeAmplitude κ')).toLinearMap
+
+/-- Membership in a relabelled behavior is membership after returning both amplitudes to their
+original labels. -/
+@[simp]
+lemma mem_reindex_iff {ι' κ' : Type*} [Fintype ι] [Fintype ι'] [Fintype κ]
+    [Fintype κ'] (eIn : ι ≃ ι') (eOut : κ ≃ κ') (behavior : LinearBehavior ι κ)
+    (input : ModeAmplitude ι') (output : ModeAmplitude κ') :
+    (input, output) ∈ behavior.reindex eIn eOut ↔
+      (ModeAmplitude.reindex eIn.symm input,
+        ModeAmplitude.reindex eOut.symm output) ∈ behavior := by
+  rw [reindex, Submodule.mem_map_equiv]
+  have hInput : (ModeAmplitude.reindex eIn).symm input =
+      ModeAmplitude.reindex eIn.symm input := by
+    apply (ModeAmplitude.reindex eIn).injective
+    simp
+  have hOutput : (ModeAmplitude.reindex eOut).symm output =
+      ModeAmplitude.reindex eOut.symm output := by
+    apply (ModeAmplitude.reindex eOut).injective
+    simp
+  simp only [LinearEquiv.prodCongr_symm, LinearEquiv.prodCongr_apply]
+  have hPair :
+      ((ModeAmplitude.reindex eIn).symm input,
+        (ModeAmplitude.reindex eOut).symm output) =
+      (ModeAmplitude.reindex eIn.symm input,
+        ModeAmplitude.reindex eOut.symm output) :=
+    Prod.ext hInput hOutput
+  constructor
+  · intro hMember
+    exact hPair ▸ hMember
+  · intro hMember
+    exact hPair.symm ▸ hMember
+
+/-- Relabelling a behavior along identity equivalences changes nothing. -/
+@[simp]
+lemma reindex_refl_refl [Fintype ι] [Fintype κ] (behavior : LinearBehavior ι κ) :
+    behavior.reindex (Equiv.refl ι) (Equiv.refl κ) = behavior := by
+  ext ⟨input, output⟩
+  rw [mem_reindex_iff]
+  rfl
 
 /-- A behavior is total when every input amplitude is related to at least one output amplitude. -/
 def IsTotal (behavior : LinearBehavior ι κ) : Prop :=
@@ -287,6 +344,20 @@ lemma mem_toBehavior_iff_toLinearMap [Fintype ι] [DecidableEq ι]
     (input, output) ∈ transform.toBehavior ↔ output = transform.toLinearMap input := by
   rw [mem_toBehavior_iff]
   rfl
+
+/-- Relabelling a mode transform and then taking its graph agrees with relabelling the graph. -/
+lemma toBehavior_reindex {ι' κ' : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype ι'] [DecidableEq ι'] [Fintype κ] [Fintype κ']
+    (eIn : ι ≃ ι') (eOut : κ ≃ κ') (transform : ModeTransform ι κ) :
+    (transform.reindex eIn eOut).toBehavior = transform.toBehavior.reindex eIn eOut := by
+  ext ⟨input, output⟩
+  rw [mem_toBehavior_iff_toLinearMap, LinearBehavior.mem_reindex_iff,
+    mem_toBehavior_iff_toLinearMap, ModeTransform.toLinearMap_reindex_eq]
+  constructor
+  · intro hOutput
+    rw [hOutput, ModeAmplitude.reindex_symm_reindex]
+  · intro hOutput
+    rw [← hOutput, ModeAmplitude.reindex_reindex_symm]
 
 /-- Distinct mode transforms on a finite input family have distinct graph constructions. -/
 lemma toBehavior_injective [Fintype ι] :
