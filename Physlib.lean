@@ -218,6 +218,8 @@ public import Physlib.Optics.Components.Polarizer.Malus
 public import Physlib.Optics.Components.Polarizer.Mueller
 public import Physlib.Optics.Components.Polarizer.Regression
 public import Physlib.Optics.Components.ReflectionlessTwoPort
+public import Physlib.Optics.Components.ReflectionlessTwoPortPower
+public import Physlib.Optics.Components.ReflectionlessTwoPortPowerRegression
 public import Physlib.Optics.Components.ReflectionlessTwoPortRegression
 public import Physlib.Optics.Components.Retarder
 public import Physlib.Optics.Components.Retarder.Basic

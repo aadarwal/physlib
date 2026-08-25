@@ -2075,7 +2075,7 @@ no independently reusable component law for them.
   independently stated amplitude equations and an exact zero-reflection block realization; this
   is not yet a matched propagation, coupler, beam-splitter, physical-port, reciprocity, or
   material-realization law;
-- [ ] its stacked exact normalized-modal-power decomposition and passivity/losslessness
+- [x] its stacked exact normalized-modal-power decomposition and passivity/losslessness
   classifications, with the directional hypotheses proved necessary as well as sufficient;
 - basic component definitions may start after N2a and the O2 direct-sum/reindexing support, before
   the general eliminator is complete;
