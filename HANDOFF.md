@@ -1,7 +1,7 @@
 # HANDOFF — lane N5F/N5H
 
 Branch: `optics/n5f-n5h` (branched from `optics/development` at `48015bbf`, most recently merged
-through `9a9e273b`).
+through `cd7cdcf6`).
 Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-n5f-n5h`.
 Source parity: Physlib-original. The HOL corpus has no parameterized-compilation or hierarchical
 flattening development; there is no source file to mirror and no parity row to claim.
