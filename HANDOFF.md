@@ -27,16 +27,10 @@ The all-pass construction binds the following merged N7 declarations:
   `Physlib/Optics/Components/DirectionalCouplerPower.lean:59,63,67`.
 - `Optics.DirectionalCoupler.physicalBehavior` and `.physicalScattering` —
   `Physlib/Optics/Components/DirectionalCouplerPhysical.lean:145,161`.
-- `Optics.DirectionalCoupler.physicalBehavior_output_power`,
-  `.physicalScattering_isPassive`, and `.physicalScattering_isLossless` —
-  `Physlib/Optics/Components/DirectionalCouplerPhysicalPower.lean:51,63,72`.
 - `Optics.MatchedPropagation.Parameters` —
   `Physlib/Optics/Components/MatchedPropagation.lean:79`.
 - `Optics.MatchedPropagation.physicalBehavior` and `.physicalScattering` —
   `Physlib/Optics/Components/MatchedPropagationPhysical.lean:151,167`.
-- `Optics.MatchedPropagation.physicalBehavior_output_power`,
-  `.physicalScattering_isPassive`, and `.physicalScattering_isLossless` —
-  `Physlib/Optics/Components/MatchedPropagationPhysicalPower.lean:59,76,86`.
 
 The response is eliminated through `Optics.FlatNetlist.responseTransform` and
 `.toBehavior_responseTransform` at
@@ -84,6 +78,13 @@ Exact validation fixtures:
 - `Optics.AllPass.allPassRegression_resonance_loopCoefficient`
 - `Optics.AllPass.allPassRegression_resonance_denominator`
 - `Optics.AllPass.allPassRegression_resonance_throughTransfer`
+- `Optics.AllPass.allPassRegression_resonance_isWellPosed`
+- `Optics.AllPass.allPassRegression_resonance_responseTransform_entry`
+- `Optics.AllPass.allPassRegression_resonance_loopGain`
+- `Optics.AllPass.allPassRegression_resonance_isContractive`
+- `Optics.AllPass.allPassRegression_resonance_roundTripSeries`
+- `Optics.AllPass.allPassRegression_resonance_throughTransferSeries`
+- `Optics.AllPass.allPassRegression_resonance_response_eq_series`
 - `Optics.AllPass.allPassRegressionAntiresonanceParameters`
 - `Optics.AllPass.allPassRegression_antiresonance_loopCoefficient`
 - `Optics.AllPass.allPassRegression_antiresonance_denominator`
@@ -132,8 +133,9 @@ Supporting structural API:
   derived through N5, exact denominator gate in both directions, and contraction-gated geometric
   series equal to the elimination result.
 - `goal.md` I.3 row S-02, all-pass portion: elimination and convergent round-trip series agree.
-- Parity row IP-03, all-pass transfer portion: the transfer is a derived N5 consequence rather
-  than a formula stored in a behavior predicate.
+- The all-pass response is Physlib-original. Parity row IP-03 concerns the DATE 2014 two-port chain
+  matrix with its corrected transmission gate; no bridge from this response to that source port
+  order or chain matrix is claimed in this slice.
 
 ## Exact semantic split and non-claims
 
@@ -142,9 +144,11 @@ Supporting structural API:
 - N5 response statements are gated by `HasNonzeroDenominator`, proved equivalent to netlist
   well-posedness. The zero-denominator converse is witnessed by an explicit nonzero feedback
   kernel state; no determinant or totalized inverse is used for that converse.
-- The round-trip series is stated only under `IsContractive`; contraction is sufficient, not
-  necessary, for N5 well-posedness.
+- `roundTripSeries` and `throughTransferSeries` are totalized Mathlib `tsum` expressions. They have
+  no convergent-series or response meaning without `Summable`/`IsContractive`; only their
+  interpretation and response theorems are gated. Contraction is sufficient, not necessary, for
+  N5 well-posedness.
 - The module is fixed-carrier and single-mode. It makes no bandwidth, causality, dispersion,
   group-delay, material-realization, or omitted-loss-channel claim.
-- Power/conservation and sweep observables are intentionally deferred to the S3 slice, where they
-  will bind the merged N6 and N5F APIs.
+- Add-drop topology, ring through/drop power observables, critical coupling/extinction, free
+  spectral range, rejection ratio, and sweep observables are intentionally deferred.

@@ -5,8 +5,9 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Components.DirectionalCouplerPhysicalPower
-public import Physlib.Optics.Components.MatchedPropagationPhysicalPower
+public import Physlib.Optics.Components.DirectionalCouplerPhysical
+public import Physlib.Optics.Components.DirectionalCouplerPower
+public import Physlib.Optics.Components.MatchedPropagationPhysical
 public import Physlib.Optics.Network.FlatNetlistElimination
 
 /-!
@@ -26,24 +27,23 @@ The construction uses `DirectionalCoupler.Parameters` and
 `Physlib/Optics/Components/DirectionalCouplerPhysical.lean:161`, together with
 `MatchedPropagation.Parameters` and `MatchedPropagation.physicalScattering` from
 `Physlib/Optics/Components/MatchedPropagation.lean:79` and
-`Physlib/Optics/Components/MatchedPropagationPhysical.lean:167`. The component power laws used by
-later system results are `DirectionalCoupler.physicalBehavior_output_power` and
-`DirectionalCoupler.physicalScattering_isLossless` at
-`Physlib/Optics/Components/DirectionalCouplerPhysicalPower.lean:51,72`, and the corresponding
-matched-propagation results at
-`Physlib/Optics/Components/MatchedPropagationPhysicalPower.lean:59,86`.
+`Physlib/Optics/Components/MatchedPropagationPhysical.lean:167`.
 
 The N7 cross-arm coefficient is `-I * k`, as defined at
 `Physlib/Optics/Components/DirectionalCoupler.lean:68-70`. A source model using `+I * k` differs by
 an arm-gauge choice; the ring formulas below retain the N7 sign rather than silently changing it.
 
 The algebraic solve domain is exactly the nonvanishing of `1 - t * gamma`, where `gamma` is the
-single-pass complex field coefficient. The multiple-round-trip expansion is asserted only when
-`norm (t * gamma) < 1`; invertibility alone remains sufficient for algebraic elimination.
+single-pass complex field coefficient. `roundTripSeries` and `throughTransferSeries` are totalized
+Mathlib `tsum` expressions. They have no convergent-series or response meaning outside the explicit
+contraction gate `norm (t * gamma) < 1`; only the series interpretation and response theorems are
+gated there. Invertibility alone remains sufficient for algebraic elimination.
 
 This is a fixed-carrier, single-mode model. Power means normalized modal power, not electromagnetic
 power before a Poynting-normalization bridge. The file makes no reciprocity, bandwidth, causality,
-dispersion, group-delay, material-realization, or omitted-loss-channel claim.
+dispersion, group-delay, material-realization, or omitted-loss-channel claim. Add-drop topology,
+ring through/drop power observables, critical coupling or extinction, free spectral range, and
+rejection ratio are not established here.
 
 ## ii. Key results
 
@@ -1231,7 +1231,7 @@ theorem response_through (p : Parameters) (hDenominator : p.HasNonzeroDenominato
   ring
 
 /-- The input-to-through entry of the N5 response matrix is the all-pass transfer amplitude. -/
-theorem responseTransform_entry_through_input (p : Parameters)
+lemma responseTransform_entry_through_input (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :
     (netlist p).responseTransform (isWellPosed_of_hasNonzeroDenominator p hDenominator)
         (Outgoing.mk (throughChannel p)) (Incident.mk (inputChannel p)) =
@@ -1241,7 +1241,7 @@ theorem responseTransform_entry_through_input (p : Parameters)
 
 /-! ## E. Convergent multiple-round-trip view -/
 
-/-- The infinite sum of successive powers of the scalar circulation gain. -/
+/-- The totalized `tsum` of circulation powers, with series meaning only under summability. -/
 def roundTripSeries (p : Parameters) : ℂ :=
   ∑' circulation : ℕ, p.loopGain ^ circulation
 
@@ -1266,7 +1266,7 @@ lemma roundTripSeries_eq_inverse (p : Parameters) (hContractive : p.IsContractiv
   simpa only [roundTripSeries, Parameters.denominator] using
     (tsum_geometric_of_norm_lt_one hContractive)
 
-/-- The through amplitude obtained by summing all successive loop circulations. -/
+/-- A totalized expression using `roundTripSeries`, interpreted as a response only when gated. -/
 def throughTransferSeries (p : Parameters) : ℂ :=
   (p.throughAmplitude : ℂ) +
     DirectionalCoupler.crossCoefficient p.coupler ^ 2 * p.loopCoefficient *
