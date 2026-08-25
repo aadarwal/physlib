@@ -15,7 +15,26 @@ flattening development; there is no source file to mirror and no parity row to c
 | `Physlib/Optics/Network/Hierarchical.lean` | N5H slice 4 | see below |
 
 No existing file was edited. `Physlib.lean`, `Physlib/Optics/API-map.yaml`, `goal.md`, and
-`tbd.md` are untouched.
+`tbd.md` are untouched in every commit.
+
+## Gate evidence
+
+Batch 1 was gated after merging `optics/development` (`7fbad549`) into this branch. The shipped
+declaration linters resolve declarations through the `Physlib` module registry, so they cannot see
+an unregistered module. To make the gate real, the four registrations below were added to
+`Physlib.lean` **temporarily**, the gate was run, and the file was then restored byte-for-byte and
+never committed (`git diff Physlib.lean` is empty at the cutoff). With the modules registered:
+
+```
+lake build Physlib                → exit 0, no errors, no warnings
+lake exe check_file_imports       → exit 0
+lake exe sorry_lint               → exit 0
+lake exe runPhyslibLinters        → exit 0, "Linting passed for Physlib."
+```
+
+Additional checks run directly on the four files: no `sorry`, `axiom`, `native_decide`,
+`maxHeartbeats`, or `Lean.ofReduceBool`; every line at most 100 characters; a docstring on every
+declaration; `scripts/lint-style.py` clean.
 
 ## Registrations the conductor must apply at merge
 
@@ -76,6 +95,9 @@ outside it have no proved response.
   `.appendExternalChannelEquiv`.
 - `HierarchicalNetlist`, `.innerNetlist`, `.flatten`, `.flattenExternalChannelEquiv`,
   `.flattenConnectedChannelEquiv`.
+- `FlatNetlist.packagedScattering` and `FlatNetlist.toOrientedModeTransform_packagedScattering`:
+  a verified subsystem as one scattering component, gated on well-posedness and using only the
+  canonical `Incident.channelEquiv` / `Outgoing.channelEquiv` endpoint pairing.
 
 ## goal.md rows
 
@@ -86,7 +108,10 @@ outside it have no proved response.
   inverse-domain control).
 - H.3 N5H bullets 1–2 (hierarchical network; relational flattening preserving typed external
   ports, mode compatibility, and conventions, with no well-posedness assumption to flatten).
+- H.3 N5H bullet 4 (functional packaging of a child as a scattering component only after that
+  child's well-posedness and external-channel pairing have been proved).
 - I.3 row **N-10** — `parameterizedResponseRegression_mem_compileBehavior_iff`.
+- I.3 row **N-08** is *not* claimed; see "Remaining in this lane".
 
 ## Explicit non-claims
 
@@ -102,11 +127,22 @@ outside it have no proved response.
 - `unguardedResponse` outside `solveDomain` is Mathlib's junk inverse and is never a response.
 - N5H flattening asserts nothing yet about semantics; see "Remaining" below.
 
+## Worktree note for other lanes
+
+Seeding this worktree needed no cold build: `cp -Rc <optics-development>/.lake/build .lake/build`
+is an APFS clone (about two seconds, no extra disk), and a single `lake-lock build` then confirmed
+all 3067 jobs up to date. After merging `optics/development`, `rsync -a --ignore-existing
+<optics-development>/.lake/build/ .lake/build/` pulls in only the newly built modules in about a
+second, so a sync costs no rebuild either.
+
 ## Remaining in this lane
 
-- N5H slice 5: equality of hierarchical relational semantics with flattened-netlist semantics
-  (goal.md `N-08`), and functional packaging of a well-posed child as a scattering component.
-  The three bridge identities this needs, in amplitude form, are
+- N5H slice 5, semantics half: equality of hierarchical relational semantics with
+  flattened-netlist semantics (goal.md `N-08`). The packaging half of slice 5 is done
+  (`FlatNetlist.packagedScattering` and its `toBehavior` agreement). What is missing needs a
+  family-level `closeBehavior` -- the singular-safe closure of an abstract oriented boundary
+  behavior by a connection family, which `FlatNetlist.behavior` is already definitionally an
+  instance of -- together with three bridge identities in amplitude form:
 
   ```text
   (inner.append outer).partialRouting b
