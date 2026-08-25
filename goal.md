@@ -1889,14 +1889,17 @@ Exit: network equations come from a typed netlist rather than being supplied ind
 
 #### N4C. Certified finite-netlist compiler
 
-- finite executable data for ports, directed channel endpoints, component incidences, and gains;
-- decidable well-formedness checking for endpoint direction, mode compatibility, self-wiring,
-  reuse, and fan-out;
-- executable construction of `S`, `C`, `E_in`, and `E_out`;
-- a soundness theorem equating compiled equations with N4's flat relational semantics;
-- an algebraic backend over an appropriate field, with exact rational-function instantiation for
+- [x] finite executable `Fin`-indexed component, port, mode-fiber, incidence, local-gain, and
+  bidirectional physical-connection data, with explicit mode maps in both directions;
+- [x] decidable well-formedness reflected exactly to mutual mode-map inversion and physical-port
+  endpoint injectivity, rejecting self-wiring, same-side or mixed-end reuse, and wire-level
+  fan-out. Connections are bidirectional data; incident/outgoing channel direction is enforced by
+  N4's derived map types rather than stored as an unverified direction flag;
+- [ ] executable construction of `S`, `C`, `E_in`, and `E_out`;
+- [ ] a soundness theorem equating compiled equations with N4's flat relational semantics;
+- [ ] an algebraic backend over an appropriate field, with exact rational-function instantiation for
   finite-delay responses; and
-- evaluation into `ℂ` away from every required denominator, proved to commute with compilation.
+- [ ] evaluation into `ℂ` away from every required denominator, proved to commute with compilation.
 
 Exit: exact executable fixtures test an implementation that is proved correct with respect to the
 kernel semantics; a noncomputable complex matrix inverse is not the sole oracle.
@@ -2506,7 +2509,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
-| N4C certified compiler | ready | N4 | executable assembly and semantic soundness |
+| N4C certified compiler | in progress | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, and hostile construction tests are complete; generic executable `S`, `C`, `E_in`, `E_out`, entrywise soundness, and the rational-function evaluation layer remain |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
 | N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
@@ -2642,8 +2645,11 @@ human verification recorded in `tbd.md`.
    order-free componentwise relation now proves that the assembled graph is exactly simultaneous
    satisfaction of every canonically restricted local component graph. Wiring-preserving
    relabellings now leave ambient routing and feedback literally equal and transport the complete
-   external behavior canonically, even for the singular fixture. N4 is complete; continue with the
-   certified N4C compiler, while well-posed elimination remains in N5.
+   external behavior canonically, even for the singular fixture. N4 is complete. N4C now has a
+   finite executable data model, an exact reflected checker for inverse mode tables and unique
+   physical endpoints, and proof-carrying compilation into the same relational kernel. Continue
+   with generic executable `S`, `C`, `E_in`, and `E_out` plus entrywise semantic soundness; keep
+   well-posed elimination in N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a

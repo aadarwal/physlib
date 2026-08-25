@@ -267,6 +267,8 @@ public import Physlib.Optics.Network.FlatNetlistRegression
 public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
+public import Physlib.Optics.Network.NetlistData
+public import Physlib.Optics.Network.NetlistDataRegression
 public import Physlib.Optics.Network.PartialRouting
 public import Physlib.Optics.Network.PartialRoutingRegression
 public import Physlib.Optics.Network.Port
