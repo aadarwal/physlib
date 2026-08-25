@@ -34,6 +34,9 @@ stored reference amplitudes would not preserve spatial decay.
 
 - `intervalAverage_comp_carrierPhase`: change from one time period to one carrier-phase cycle.
 - `Phasor.intervalAverage_realize_mul_realize`: the scalar coherent-product average.
+- `Phasor.conjugateEuclidean_complexCross`: conjugation commutes with the coordinate cross product.
+- `ComplexWaveVector.bilinearDot_ofReal_conjugateEuclidean`: conjugation through contraction with
+  a real vector.
 - `timeAveragedPoyntingVector`: the closed complex-phasor expression.
 - `timeAveragedPoyntingVector_smul`: the common-carrier squared-modulus scaling law.
 - `timeAveragedPoyntingInterferenceVector`: the two coherent cross terms between phasor pairs.
@@ -50,9 +53,10 @@ stored reference amplitudes would not preserve spatial decay.
 - C. Vector phasor average
 - D. Electromagnetic Poynting-vector bridge
 
-## iv. Scope
+## iv. References
 
-These are local kinematic averaging identities. They require no Maxwell, transversality,
+This Physlib-original derivation fixes the repository's peak-phasor convention. These are local
+kinematic averaging identities. They require no Maxwell, transversality,
 dispersion, nonzero-amplitude, propagation-direction, or outgoing-wave hypothesis. This file does
 not define irradiance, interface-normal flux, aperture-integrated power, modal normalization,
 passivity, or evanescence.
@@ -200,6 +204,28 @@ lemma Phasor.intervalAverage_realize_mul_realize (z w : Phasor) (phaseOffset : �
 ## C. Vector phasor average
 
 -/
+
+/-- Componentwise conjugation commutes with the complex coordinate cross product. -/
+lemma Phasor.conjugateEuclidean_complexCross
+    (first second : EuclideanSpace ℂ (Fin 3)) :
+    Phasor.conjugateEuclidean
+        (ComplexMonochromaticPlaneWave.complexCross first second) =
+      ComplexMonochromaticPlaneWave.complexCross
+        (Phasor.conjugateEuclidean first) (Phasor.conjugateEuclidean second) := by
+  ext i
+  fin_cases i <;>
+    simp [Phasor.conjugateEuclidean, ComplexMonochromaticPlaneWave.complexCross,
+      crossProduct]
+
+/-- Conjugating the second vector conjugates its complex-bilinear contraction against a real
+vector. -/
+lemma ComplexWaveVector.bilinearDot_ofReal_conjugateEuclidean
+    (normalVector : WaveVector 3) (vector : EuclideanSpace ℂ (Fin 3)) :
+    ComplexWaveVector.bilinearDot (ComplexWaveVector.ofReal normalVector)
+        (Phasor.conjugateEuclidean vector) =
+      star (ComplexWaveVector.bilinearDot (ComplexWaveVector.ofReal normalVector) vector) := by
+  simp [ComplexWaveVector.bilinearDot, Phasor.conjugateEuclidean,
+    ComplexWaveVector.ofReal]
 
 private lemma continuous_cross_realizeEuclidean
     (electricPhasor magneticFieldStrengthPhasor : EuclideanSpace ℂ (Fin 3)) :

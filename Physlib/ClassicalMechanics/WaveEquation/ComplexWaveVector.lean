@@ -30,6 +30,8 @@ square-root branch, describe a transmitted wave, or make a power-flow claim.
 ## ii. Key results
 
 - `ComplexWaveVector.ofPhaseAttenuation`: construct `q - I * a`.
+- `ComplexWaveVector.inner_realPart_eq_bilinearDot_re`: contract a real vector with a complex
+  vector's real part through the bilinear pairing.
 - `ComplexWaveVector.ofPhaseAttenuation_phaseVector_attenuationVector`: reconstruct a vector from
   its phase and attenuation vectors.
 - `ComplexWaveVector.spatialFactor_ofPhaseAttenuation`: separate decay and phase.
@@ -199,6 +201,16 @@ lemma bilinearDot_ofReal (u v : WaveVector d) :
   apply Finset.sum_congr rfl
   intro i _
   simp [RCLike.inner_apply, mul_comm]
+
+/-- Pairing a real vector with the componentwise real part of a complex vector is the real part
+of their complex-bilinear coordinate pairing. -/
+lemma inner_realPart_eq_bilinearDot_re (u : WaveVector d) (v : ComplexWaveVector d) :
+    inner ℝ u (realPart v) = (bilinearDot (ofReal u) v).re := by
+  rw [PiLp.inner_apply, bilinearDot, Complex.re_sum]
+  apply Finset.sum_congr rfl
+  intro i _
+  simp [RCLike.inner_apply]
+  ring
 
 /-!
 
