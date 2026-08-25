@@ -19,7 +19,7 @@ listed below for the conductor to apply at merge.
 | 3 | Linear constant-coefficient difference equations to rational transfer functions; general IIR; the audited second-order low-pass; first-order all-pass regression | **done** |
 | 4 | Stability: poles, the unit circle, BIBO, with the proved directions stated explicitly; two-pole regression | **done** |
 | 5 | Inverse transform and uniqueness (JAL'18 Thms. 15-17), built on the `IsExteriorOfCircle` lemmas | **done**, by the approved fallback route — see below |
-| 6 | The finite-convolution theorem, and existence of causal solutions of a strictly causal recurrence | pending — scheduled by the controller on 2026-08-25 |
+| 6 | The finite-convolution theorem, and existence of causal solutions of a strictly causal recurrence | **done** |
 
 The slice-5 change follows the controller's decision of 2026-08-25: the corrected `goal.md`
 (merged `bf0a4063`) names ITP'14 **and** JAL'18, including the inverse transform and uniqueness,
@@ -567,10 +567,12 @@ proved. The module doc of `Inverse.lean` says so and says what it would cost. Le
 should therefore be marked as reached *in content* but not in the source's literal formula, or
 kept open, at the reviewer's discretion.
 
-### A correction to the source's uniqueness statement
+### Uniqueness: a load-bearing hypothesis, not a source error
 
-JAL'18 Theorem 16 states uniqueness with no causality hypothesis, because the source works with
-one-sided sequences where the question cannot arise. This lane's sequences are two-sided, and the
+JAL'18 Theorem 16 states uniqueness with no causality hypothesis, and that is correct in its own
+setting: its sequences are `ℕ → ℂ`, so causality is definitional there. The controller has
+classed ledger row ZT-09 as "stronger, hypothesis load-bearing in the ℤ-indexed setting" rather
+than as a source error, and that classification is right. This lane's sequences are two-sided, and the
 unilateral transform never sees a negative index. So uniqueness of the *sequence* genuinely needs
 causality, and without it only the nonnegative-index samples are determined.
 
@@ -625,6 +627,134 @@ minimal.
 - **ZT-09** (JAL'18 Thm. 16 uniqueness and Thm. 17 initial value, p. 894) — reached, with
   Thm. 16 corrected by an explicit causality hypothesis that the source's one-sided setting
   hides, and with that hypothesis proved necessary.
+
+---
+
+## Slice 6 — files
+
+- `Physlib/Mathematics/ZTransform/Convolution.lean` (219 lines)
+- `Physlib/Mathematics/ZTransform/ConvolutionRegression.lean` (103 lines)
+- `Physlib/Mathematics/ZTransform/Existence.lean` (194 lines)
+- `Physlib/Mathematics/ZTransform/ExistenceRegression.lean` (107 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all fourteen)
+
+```
+public import Physlib.Mathematics.ZTransform.Basic
+public import Physlib.Mathematics.ZTransform.BasicRegression
+public import Physlib.Mathematics.ZTransform.Convergence
+public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+public import Physlib.Mathematics.ZTransform.Convolution
+public import Physlib.Mathematics.ZTransform.ConvolutionRegression
+public import Physlib.Mathematics.ZTransform.DifferenceEquation
+public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+public import Physlib.Mathematics.ZTransform.Existence
+public import Physlib.Mathematics.ZTransform.ExistenceRegression
+public import Physlib.Mathematics.ZTransform.Inverse
+public import Physlib.Mathematics.ZTransform.InverseRegression
+public import Physlib.Mathematics.ZTransform.Stability
+public import Physlib.Mathematics.ZTransform.StabilityRegression
+```
+
+Alphabetical order satisfies the dependency order. Note that `Convolution` sits above
+`Stability`, because `Stability` owns the `convolution` definition; that layering is the
+controller's decision of 2026-08-25 and avoids touching a merged file. A hoist of `convolution`
+into its own file below `Stability` is a possible later cleanup and is not done here.
+
+### (a) The convolution theorem
+
+`transform_convolution`: where both transform series converge absolutely,
+`transform (convolution h x) z = transform h z * transform x z`. Proved through Mathlib's Cauchy
+product for absolutely convergent series, over the `convolution` already defined in
+`Stability.lean` — **no second definition was introduced**.
+
+Supporting results: `convolution_natCast` (with a causal input the convolution is a finite sum at
+each nonnegative index), `seriesTerm_convolution` (the transform series term is the Cauchy
+product of the two term sequences), `summable_seriesTerm_convolution`, `mem_ROC_convolution`,
+`IsCausal.convolution`, `convolution_unitImpulse_left`.
+
+**Causality is required of the input only.** The sequence being convolved with may have nonzero
+negative-index samples; they are never read, because the convolution sums over nonnegative lags.
+That asymmetry is stated in the module doc, together with the non-claim that the convolution is
+commutative — with a two-sided left argument and a one-sided sum it is not, and no theorem
+asserts otherwise.
+
+### The identification direction, per the controller's ZT-11 note
+
+Section D of `Convolution.lean` supplies the characterization form rather than only the
+computation form:
+
+- `convolution_unitImpulse_right`: the response to the unit impulse reads the nonnegative-index
+  samples back **off** the sequence.
+- `eq_natCast_of_convolution_unitImpulse_eq` and
+  `eq_of_isCausal_of_convolution_unitImpulse_eq`: a causal sequence is **identified** by its
+  impulse response.
+
+Together with `eq_geometricSeq_of_transform_eq` from slice 5 (ledger row ZT-11), this gives the
+lane two identification results rather than one: a causal sequence is determined by its impulse
+response, and a causal sequence with a given rational transform on a suitable exterior is
+determined outright. The regression `eq_of_convolution_geometricSeq_eq` instantiates the first:
+two geometric sequences with the same impulse response have the same ratio, read off at index
+one.
+
+### (b) Existence of the causal solution
+
+`solveNat` constructs the nonnegative-index samples by recursion on the index, guarded by
+`0 < k ∧ k ≤ n` on each lag, which is what makes the recursion decrease.
+`recurrenceSolution` is its zero extension, so the initial conditions are the zero ones supplied
+by causality.
+
+- `isRecurrenceSolution_recurrenceSolution`: the construction solves the difference equation,
+  given `0 ∉ s` and a causal input.
+- `existsUnique_causal_isRecurrenceSolution`: **exactly one** causal solution, combining this
+  construction with slice 3's uniqueness.
+- `eq_recurrenceSolution`: every causal solution is the constructed one.
+- `transform_recurrenceSolution_cleared` and `transform_recurrenceSolution`: the cleared identity
+  and the transfer relation, now stated for the constructed solution rather than for a solution
+  supplied as a hypothesis. **The transfer-function statements are no longer conditional on
+  someone handing over a solution.**
+
+Inhomogeneous initial conditions are **not** treated. They would need the equation restated with
+a separate initial-state argument, and the module doc says no theorem here asserts anything about
+them.
+
+### Slice 6 — regressions and what each detects
+
+- `transform_convolution_geometricSeq`: the convolution of the geometric sequence with itself has
+  transform the square of the one-pole rational function. The left side goes through a Cauchy
+  product of two series and the right side through a single geometric sum, so the two routes are
+  independent and agreeing is evidence rather than restatement.
+- `recurrenceSolution_onePole`: the recursively constructed causal solution of the one-pole
+  recurrence driven by the unit impulse **is** the geometric sequence. Three constructions that
+  never mention one another meet on one object: a recursion on the index with no formula, a
+  scaled unit step with no recurrence, and a uniqueness theorem forcing them together.
+- `transform_recurrenceSolution_onePole` and `transform_recurrenceSolution_onePole_eq`: the
+  transfer relation for the one-pole recurrence with no solution hypothesis, and its closed form.
+- `convolution_geometricSeq_unitImpulse_one` and `eq_of_convolution_geometricSeq_eq`: the
+  parameter of a one-pole system is read off its impulse response, and different parameters give
+  different responses.
+
+### Slice 6 gates
+
+Same set, all clean over all fourteen files: build; `lean -Dwarn.sorry=false
+-Dweak.says.verify=true` gives zero output on each; the Batteries declaration linter set run
+module-scoped over all fourteen modules passes; `module_doc_lint` and `style_lint` rules re-run
+locally pass; no `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats` (the two
+heartbeat timeouts hit while writing `Convolution.lean` were fixed by pinning the Cauchy
+product's implicit arguments, not by raising the limit); no `Physlib.Optics` import; imports
+minimal.
+
+### Slice 6 — milestone rows
+
+`goal.md` §H.4 S5, "finite convolution and linear recurrences with initial conditions" — now
+fully discharged. The convolution half is `transform_convolution`; the recurrence half is
+slice 3's `eq_of_isRecurrenceSolution` plus this slice's
+`existsUnique_causal_isRecurrenceSolution`; the initial conditions are the zero ones from
+causality.
+
+Neither half is a parity claim: no fetched source in the Concordia HVG corpus contains a
+z-transform convolution theorem or an existence theorem for solutions of a difference equation.
+Both module docs say so.
 
 ## Milestone and ledger rows touched by slice 1
 
