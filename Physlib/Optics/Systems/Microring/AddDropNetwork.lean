@@ -5,7 +5,10 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Systems.Microring.AllPass
+public import Physlib.Optics.Components.DirectionalCouplerPhysical
+public import Physlib.Optics.Components.DirectionalCouplerPower
+public import Physlib.Optics.Components.MatchedPropagationPhysical
+public import Physlib.Optics.Network.FlatNetlistElimination
 
 /-!
 # Add-drop microring network data and channel equations
@@ -41,7 +44,7 @@ This is a fixed-carrier, single-mode model. Power means normalized modal power. 
 bandwidth, causality, dispersion, group-delay, nonlinear, thermal, material-realization, or
 omitted-loss-channel claim. It does not derive through/drop powers, power balance, resonance or
 antiresonance extrema, critical coupling, extinction, rejection ratio, parameter recovery, or free
-spectral range.
+spectral range. It asserts neither reciprocity nor a time-reversed pairing of external ports.
 
 ## ii. Key results
 
@@ -240,16 +243,34 @@ lemma Parameters.isContractive_iff (p : Parameters) :
       ‖(p.inputThroughAmplitude : ℂ) * (p.dropThroughAmplitude : ℂ) *
         p.roundTripCoefficient‖ < 1 := Iff.rfl
 
-/-- Component validity for the two couplers and two propagation arcs. -/
+/-- Physical validity of the declared ring attenuation and all four projected N7 components. -/
 def Parameters.IsValid (p : Parameters) : Prop :=
   p.inputCoupler.IsValid ∧ p.dropCoupler.IsValid ∧
-    p.firstPropagation.IsValid ∧ p.secondPropagation.IsValid
+    0 ≤ p.fieldAttenuation ∧ p.fieldAttenuation ≤ 1 ∧
+      p.firstPropagation.IsValid ∧ p.secondPropagation.IsValid
 
-/-- Add-drop validity is exactly the four N7 component-validity predicates. -/
+/-- Add-drop validity exposes the declared attenuation bounds and four N7 validity predicates. -/
 lemma Parameters.isValid_iff (p : Parameters) :
     p.IsValid ↔
       p.inputCoupler.IsValid ∧ p.dropCoupler.IsValid ∧
-        p.firstPropagation.IsValid ∧ p.secondPropagation.IsValid := Iff.rfl
+        0 ≤ p.fieldAttenuation ∧ p.fieldAttenuation ≤ 1 ∧
+          p.firstPropagation.IsValid ∧ p.secondPropagation.IsValid := Iff.rfl
+
+/-- A physically valid ring has nonnegative declared round-trip field attenuation. -/
+lemma Parameters.IsValid.fieldAttenuation_nonneg {p : Parameters} (hp : p.IsValid) :
+    0 ≤ p.fieldAttenuation := hp.2.2.1
+
+/-- A physically valid ring has declared round-trip field attenuation at most one. -/
+lemma Parameters.IsValid.fieldAttenuation_le_one {p : Parameters} (hp : p.IsValid) :
+    p.fieldAttenuation ≤ 1 := hp.2.2.2.1
+
+/-- Validity makes the symmetric-arc product realize the declared round-trip field factor. -/
+lemma Parameters.IsValid.roundTripCoefficient_eq_fieldAttenuation {p : Parameters}
+    (hp : p.IsValid) :
+    p.roundTripCoefficient =
+      (p.fieldAttenuation : ℂ) * MatchedPropagation.carrierPhaseFactor
+        ((p.roundTripPhase : ℝ) : Real.Angle) :=
+  p.roundTripCoefficient_eq_fieldAttenuation hp.fieldAttenuation_nonneg
 
 /-- The totalized input-to-through algebraic transfer amplitude. -/
 def throughTransfer (p : Parameters) : ℂ :=
@@ -440,17 +461,25 @@ def connections (p : Parameters) :
       cases secondConnection <;> cases secondEnd
     all_goals first | rfl | cases hPort
 
-/-- The four connection labels select the declared consecutive component pairs. -/
+/-- The four connection labels pin both endpoints of every consecutive component pair. -/
 lemma connections_pairs (p : Parameters) :
     ((connections p).connection Connection.inputToFirst).left =
         ⟨Component.inputCoupler, DirectionalCoupler.Port.rightSecond⟩ ∧
+      ((connections p).connection Connection.inputToFirst).right =
+        ⟨Component.firstArc, MatchedPropagation.Port.left⟩ ∧
+      ((connections p).connection Connection.firstToDrop).left =
+        ⟨Component.firstArc, MatchedPropagation.Port.right⟩ ∧
       ((connections p).connection Connection.firstToDrop).right =
         ⟨Component.dropCoupler, DirectionalCoupler.Port.leftSecond⟩ ∧
+      ((connections p).connection Connection.dropToSecond).left =
+        ⟨Component.dropCoupler, DirectionalCoupler.Port.rightSecond⟩ ∧
       ((connections p).connection Connection.dropToSecond).right =
         ⟨Component.secondArc, MatchedPropagation.Port.left⟩ ∧
+      ((connections p).connection Connection.secondToInput).left =
+        ⟨Component.secondArc, MatchedPropagation.Port.right⟩ ∧
       ((connections p).connection Connection.secondToInput).right =
         ⟨Component.inputCoupler, DirectionalCoupler.Port.leftSecond⟩ :=
-  ⟨rfl, rfl, rfl, rfl⟩
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 /-- The explicit add-drop microring flat netlist. -/
 def netlist (p : Parameters) : FlatNetlist where

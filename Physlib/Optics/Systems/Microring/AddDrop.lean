@@ -13,7 +13,7 @@ public import Physlib.Optics.Systems.Microring.AddDropNetwork
 ## i. Overview
 
 This file solves the explicit two-coupler, two-arc feedback network defined at
-`Physlib/Optics/Systems/Microring/AddDropNetwork.lean:412-460`. It proves that N5 well-posedness is
+`Physlib/Optics/Systems/Microring/AddDropNetwork.lean:435-489`. It proves that N5 well-posedness is
 exactly nonvanishing of the complete circulation denominator and derives the input-to-through and
 input-to-drop responses from the N5 channel equations.
 
@@ -25,7 +25,7 @@ This is a fixed-carrier, single-mode model. Power means normalized modal power. 
 bandwidth, causality, dispersion, group-delay, nonlinear, thermal, material-realization, or
 omitted-loss-channel claim. It does not derive through/drop powers, power balance, resonance or
 antiresonance extrema, critical coupling, extinction, rejection ratio, parameter recovery, or free
-spectral range.
+spectral range. It asserts neither reciprocity nor a time-reversed pairing of external ports.
 
 ## ii. Key results
 

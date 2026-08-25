@@ -4,7 +4,7 @@
 
 - Branch: `optics/s2-microring`.
 - Slice: S2 add-drop explicit feedback network.
-- Integration base: `optics/development` at `c99476af`.
+- Integration base: `optics/development` at `66339fd4`.
 - The earlier all-pass slice was merged into `optics/development` at `6343fa62`.
 
 ## Files and registrations
@@ -64,6 +64,9 @@ Parameters and scalar amplitudes:
 - `Optics.AddDrop.Parameters.HasNonzeroDenominator`
 - `Optics.AddDrop.Parameters.IsContractive`
 - `Optics.AddDrop.Parameters.IsValid`
+- `Optics.AddDrop.Parameters.IsValid.fieldAttenuation_nonneg`
+- `Optics.AddDrop.Parameters.IsValid.fieldAttenuation_le_one`
+- `Optics.AddDrop.Parameters.IsValid.roundTripCoefficient_eq_fieldAttenuation`
 - `Optics.AddDrop.throughTransfer`
 - `Optics.AddDrop.dropTransfer`
 - `Optics.AddDrop.standardThroughTransfer`
@@ -108,6 +111,7 @@ Exact named-point fixtures:
 
 - `Optics.AddDrop.addDropRegressionResonanceParameters`
 - `Optics.AddDrop.addDropRegression_resonance_isValid`
+- `Optics.AddDrop.addDropRegression_connections_pairs`
 - `Optics.AddDrop.addDropRegression_resonance_firstArcCoefficient`
 - `Optics.AddDrop.addDropRegression_resonance_secondArcCoefficient`
 - `Optics.AddDrop.addDropRegression_resonance_roundTripCoefficient`
@@ -144,6 +148,9 @@ Exact named-point fixtures:
   `Parameters.isContractive_iff`, and `Parameters.isValid_iff`.
 - Network data: `componentPortFamily`, `componentPortFamily_eq`, `componentScattering`,
   `componentScattering_eq`, `components_data`, `connections_pairs`, and `netlist_data`.
+- The public `connections_pairs` law and `addDropRegression_connections_pairs` fixture pin both
+  endpoints of all four connections; no claim rests on symmetric numeric values detecting every
+  possible arc-port permutation.
 - Aggregate channels: `inputCouplerChannel`, `dropCouplerChannel`, `firstArcChannel`,
   `secondArcChannel`, their injection/disjointness lemmas, and the four external-channel
   nonconnection lemmas.
@@ -182,10 +189,12 @@ Exact named-point fixtures:
   `Summable`/`IsContractive`; only the interpretation and response lemmas are gated. Contraction
   is sufficient, not necessary, for N5 well-posedness.
 - The symmetric `sqrt a` arc split fixes a drop-port reference plane. The theorem relating its
-  product to the declared round-trip field attenuation is explicitly gated by `0 ≤ a`.
+  product to the declared round-trip field attenuation follows directly from `Parameters.IsValid`,
+  which includes the physical bounds `0 ≤ a ≤ 1`.
 - “Resonance” and “antiresonance” in regression names denote zero- and half-turn phase points.
   No extremum, minimum, maximum, or global resonance characterization is claimed.
 - The modules are fixed-carrier and single-mode. They do not establish power observables,
   lossless balance, critical coupling, extinction, rejection ratio, parameter recovery, free
   spectral range, bandwidth, causality, dispersion, group delay, nonlinear response, thermal
   response, material realization, or omitted-loss-channel behavior.
+- The modules assert neither reciprocity nor a time-reversed pairing of external ports.

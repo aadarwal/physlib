@@ -19,8 +19,10 @@ corresponding values are `-9 / 100`, `75 / 109`, and `32 * I / 109`.
 
 The scalar checks directly expand the N7 component coefficients and transfer definitions. The
 response fixtures separately solve the N5 channel equations at zero phase, so changing an explicit
-feedback pairing can break them. A further independent fixture sums the concrete geometric series
-with circulation gain `9 / 100`.
+feedback pairing can break them. A structural sentinel separately pins both endpoints of every
+connection; this claim is about that sentinel, not about numeric detectability of every arc-port
+permutation. A further independent fixture sums the concrete geometric series with circulation
+gain `9 / 100`.
 
 “Resonance” and “antiresonance” below name the zero- and half-turn phase points. The fixtures
 do not prove an extremum, minimum, maximum, or global resonance characterization. They make no
@@ -66,7 +68,35 @@ def addDropRegressionResonanceParameters : Parameters where
   fieldAttenuation := 1 / 4
   roundTripPhase := 0
 
-/-- The zero-phase fixture satisfies all four N7 component-validity predicates. -/
+/-- The structural fixture pins both endpoints of all four feedback connections. -/
+lemma addDropRegression_connections_pairs :
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.inputToFirst).left =
+      ⟨Component.inputCoupler, DirectionalCoupler.Port.rightSecond⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.inputToFirst).right =
+      ⟨Component.firstArc, MatchedPropagation.Port.left⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.firstToDrop).left =
+      ⟨Component.firstArc, MatchedPropagation.Port.right⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.firstToDrop).right =
+      ⟨Component.dropCoupler, DirectionalCoupler.Port.leftSecond⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.dropToSecond).left =
+      ⟨Component.dropCoupler, DirectionalCoupler.Port.rightSecond⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.dropToSecond).right =
+      ⟨Component.secondArc, MatchedPropagation.Port.left⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.secondToInput).left =
+      ⟨Component.secondArc, MatchedPropagation.Port.right⟩ ∧
+    ((connections addDropRegressionResonanceParameters).connection
+        Connection.secondToInput).right =
+      ⟨Component.inputCoupler, DirectionalCoupler.Port.leftSecond⟩ := by
+  exact ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+/-- The zero-phase fixture satisfies the attenuation bounds and all four N7 validity predicates. -/
 lemma addDropRegression_resonance_isValid :
     addDropRegressionResonanceParameters.IsValid := by
   have hSqrt : Real.sqrt 4 = 2 := by
@@ -79,10 +109,14 @@ lemma addDropRegression_resonance_isValid :
     · norm_num [addDropRegressionResonanceParameters, Parameters.dropCoupler,
         DirectionalCoupler.Parameters.IsValid, DirectionalCoupler.Parameters.IsUnitary,
         DirectionalCoupler.Parameters.powerFactor]
-    · constructor <;>
-        norm_num [addDropRegressionResonanceParameters, Parameters.firstPropagation,
-          Parameters.secondPropagation, Parameters.halfArcAttenuation,
-          MatchedPropagation.Parameters.IsValid, hSqrt]
+    · constructor
+      · norm_num [addDropRegressionResonanceParameters]
+      · constructor
+        · norm_num [addDropRegressionResonanceParameters]
+        · constructor <;>
+            norm_num [addDropRegressionResonanceParameters, Parameters.firstPropagation,
+              Parameters.secondPropagation, Parameters.halfArcAttenuation,
+              MatchedPropagation.Parameters.IsValid, hSqrt]
 
 /-- Direct expansion gives the first zero-phase arc coefficient `1 / 2`. -/
 lemma addDropRegression_resonance_firstArcCoefficient :
@@ -257,22 +291,41 @@ lemma addDropRegression_resonance_responseTransform_entry_drop :
     (fun state => state (Incident.mk
       (dropCouplerChannel p DirectionalCoupler.Port.leftFirst))) hAssembly'
   rw [incidentAssembly_apply_drop_leftFirst, inputAmplitude_apply_add] at hAdd
-  have hReturn := inputCoupler_leftSecond_solution p
-    (by rw [Parameters.HasNonzeroDenominator,
-      addDropRegression_resonance_denominator]; norm_num) 1
-    incident outgoing hScattering hAssembly'
   have hFirst := congrArg
     (fun state => state (Incident.mk
       (firstArcChannel p MatchedPropagation.Port.left))) hAssembly'
   rw [incidentAssembly_apply_firstArc_left,
     scatteringEquation_inputCoupler_rightSecond p incident outgoing hScattering,
-    hInput, hReturn] at hFirst
+    hInput] at hFirst
   have hDropRing := congrArg
     (fun state => state (Incident.mk
       (dropCouplerChannel p DirectionalCoupler.Port.leftSecond))) hAssembly'
   rw [incidentAssembly_apply_dropCoupler_leftSecond,
     scatteringEquation_firstArc_right p incident outgoing hScattering,
     hFirst] at hDropRing
+  have hSecond := congrArg
+    (fun state => state (Incident.mk
+      (secondArcChannel p MatchedPropagation.Port.left))) hAssembly'
+  rw [incidentAssembly_apply_secondArc_left,
+    scatteringEquation_dropCoupler_rightSecond p incident outgoing hScattering,
+    hAdd, hDropRing, mul_zero, zero_add] at hSecond
+  have hReturn := congrArg
+    (fun state => state (Incident.mk
+      (inputCouplerChannel p DirectionalCoupler.Port.leftSecond))) hAssembly'
+  rw [incidentAssembly_apply_inputCoupler_leftSecond,
+    scatteringEquation_secondArc_right p incident outgoing hScattering,
+    hSecond] at hReturn
+  have hReturn' := hReturn
+  simp only [p, addDropRegression_resonance_firstArcCoefficient,
+    addDropRegression_resonance_secondArcCoefficient] at hReturn'
+  norm_num [addDropRegressionResonanceParameters, Parameters.inputCoupler,
+    DirectionalCoupler.crossCoefficient] at hReturn'
+  have hLoopSolution :
+      incident
+          (Incident.mk (inputCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+        -(12 / 91 : ℂ) * Complex.I := by
+    linear_combination (100 / 91 : ℂ) * hReturn'
+  rw [hLoopSolution] at hDropRing
   have hDrop := scatteringEquation_dropCoupler_rightFirst p incident outgoing hScattering
   rw [hAdd, hDropRing, mul_zero, zero_add] at hDrop
   have hReadout := congrArg (fun state => state (Outgoing.mk (dropChannel p))) hOutput
@@ -282,9 +335,7 @@ lemma addDropRegression_resonance_responseTransform_entry_drop :
           (inputAmplitude p 1) (Outgoing.mk (dropChannel p)) =
         -32 / 91 := by
     rw [hReadout, hDrop]
-    simp only [p, addDropRegression_resonance_firstArcCoefficient,
-      addDropRegression_resonance_secondArcCoefficient,
-      addDropRegression_resonance_denominator]
+    simp only [p, addDropRegression_resonance_firstArcCoefficient]
     simp [addDropRegressionResonanceParameters, Parameters.inputCoupler,
       Parameters.dropCoupler, DirectionalCoupler.crossCoefficient]
     ring_nf
@@ -357,7 +408,7 @@ def addDropRegressionAntiresonanceParameters : Parameters where
   fieldAttenuation := 1 / 4
   roundTripPhase := Real.pi
 
-/-- The half-turn fixture satisfies all four N7 component-validity predicates. -/
+/-- The half-turn fixture satisfies the attenuation bounds and all four N7 validity predicates. -/
 lemma addDropRegression_antiresonance_isValid :
     addDropRegressionAntiresonanceParameters.IsValid := by
   have hSqrt : Real.sqrt 4 = 2 := by
@@ -370,10 +421,14 @@ lemma addDropRegression_antiresonance_isValid :
     · norm_num [addDropRegressionAntiresonanceParameters, Parameters.dropCoupler,
         DirectionalCoupler.Parameters.IsValid, DirectionalCoupler.Parameters.IsUnitary,
         DirectionalCoupler.Parameters.powerFactor]
-    · constructor <;>
-        norm_num [addDropRegressionAntiresonanceParameters, Parameters.firstPropagation,
-          Parameters.secondPropagation, Parameters.halfArcAttenuation,
-          MatchedPropagation.Parameters.IsValid, hSqrt]
+    · constructor
+      · norm_num [addDropRegressionAntiresonanceParameters]
+      · constructor
+        · norm_num [addDropRegressionAntiresonanceParameters]
+        · constructor <;>
+            norm_num [addDropRegressionAntiresonanceParameters, Parameters.firstPropagation,
+              Parameters.secondPropagation, Parameters.halfArcAttenuation,
+              MatchedPropagation.Parameters.IsValid, hSqrt]
 
 /-- Direct expansion gives the first half-turn arc coefficient `-I / 2`. -/
 lemma addDropRegression_antiresonance_firstArcCoefficient :
