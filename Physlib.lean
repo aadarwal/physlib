@@ -183,8 +183,14 @@ public import Physlib.Mathematics.ZTransform.Basic
 public import Physlib.Mathematics.ZTransform.BasicRegression
 public import Physlib.Mathematics.ZTransform.Convergence
 public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+public import Physlib.Mathematics.ZTransform.Convolution
+public import Physlib.Mathematics.ZTransform.ConvolutionRegression
 public import Physlib.Mathematics.ZTransform.DifferenceEquation
 public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+public import Physlib.Mathematics.ZTransform.Existence
+public import Physlib.Mathematics.ZTransform.ExistenceRegression
+public import Physlib.Mathematics.ZTransform.Inverse
+public import Physlib.Mathematics.ZTransform.InverseRegression
 public import Physlib.Mathematics.ZTransform.Stability
 public import Physlib.Mathematics.ZTransform.StabilityRegression
 public import Physlib.Meta.AllFilePaths

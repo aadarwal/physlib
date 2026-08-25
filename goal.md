@@ -2173,7 +2173,8 @@ resonance theorem.
 #### S5. Difference equations and Z-transform
 
 Lane ownership: a controller-managed worker begins S5 after N5 is registered. The spine agent does
-not implement or coordinate this lane; it reviews and merges the completed worker branch.
+not implement or coordinate this lane; it reviews and merges the completed worker branch. The
+neutral mathematics package is now complete in the limit-at-infinity formulation described below.
 
 - causal complex sequences with zero extension;
 - finite convolution and linear recurrences with initial conditions;
@@ -2195,7 +2196,9 @@ Source parity here targets both ITP'14 and its JAL'18 journal extension. ITP'14'
 absolute summability and leaves inverse/uniqueness as future work (p. 497); JAL'18 adds the
 exterior-circle ROC shape (Def. 19) and makes inverse Z-transform and uniqueness mandatory parity
 rows (Thms. 15--16, p. 894). Keeping conditional and absolute convergence distinct remains a
-Physlib strengthening.
+Physlib strengthening. `Physlib.Mathematics.ZTransform.Inverse` recovers every sample by a proved
+limit at infinity and proves causal uniqueness; the source's literal Taylor-coefficient formula
+is deliberately not claimed and remains recorded in `tbd.md`.
 
 #### S6. Signal-flow graphs and Mason's rule
 
@@ -2635,7 +2638,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S2/S3 microrings | blocked | S0, N5, N5F, N6a, N7 | pointwise response and observable suite |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
-| S5 Z-transform | reserved for worker after N5 registration | Mathlib analysis audit | ITP'14 plus JAL'18 recurrence/ROC/inverse/uniqueness suite |
+| S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
 | S6 Mason | blocked | N5, finite graph audit | combinatorial/matrix equivalence |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
@@ -2698,7 +2701,7 @@ The long-running goal is complete only when:
   examples.
 - U. Siddique, M. Y. Mahmoud, and S. Tahar, [*Formal Analysis of Discrete-Time Systems using
   z-Transform*](https://hvg.ece.concordia.ca/Publications/Journals/JAL18.pdf), *Journal of Applied
-  Logics -- IfCoLog Journal of Logics and their Applications* 5(4):875--907, 2018, for the
+  Logics -- IfCoLog Journal of Logics and their Applications* 5(4):875--906, 2018, for the
   exterior-circle ROC, inverse and uniqueness theorems, initial-value theorem, higher differences,
   and LCCDE results.
 - S. Khan-Afshar, U. Siddique, M. Y. Mahmoud, V. Aravantinos, O. Seddiki, O. Hasan, and S. Tahar,

@@ -1511,6 +1511,14 @@ PR unless maintainers explicitly ask to retain it.
   range was not recovered from the older `PhysLean` archive during the E1 audit.
 - [ ] Replace source decimal examples by exact values or certified intervals before using them as
   regression evidence.
+- [ ] Add JAL'18 Theorem 15's literal Taylor-coefficient inverse formula after exhibiting the
+  reciprocal-variable transform as an analytic power series with its radius of convergence. The
+  current `tendsto_inversion_cobounded` recovers every sample by limits at infinity and reaches the
+  inversion content, but it does not claim the source's iterated-derivative presentation.
+- [ ] Split any upstream S5 proposal into focused stacked concepts: inversion/uniqueness,
+  convolution, and causal recurrence-solution existence. The fork retained the controller's exact
+  final worker cutoff for integration, but that batch is intentionally broader than one upstream
+  Physlib PR.
 
 ## Validation before an upstream proposal
 
