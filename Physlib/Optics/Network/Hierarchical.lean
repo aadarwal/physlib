@@ -48,18 +48,26 @@ coordinates.
 This file supplies the wiring layer of hierarchical composition together with the relational
 closure operation and the proof-gated packaging of one child.
 
-Two results the `N5H` contract asks for are deliberately **not** claimed here.
+Of the results the `N5H` contract asks for, two are proved here and two are deliberately withheld.
+
+Proved:
 
 * Equality of hierarchical relational semantics with flattened-netlist semantics (goal.md row
-  `N-08`) is proved, as `PortConnectionFamily.closeBehavior_append` and, at the level of netlists,
+  `N-08`), as `PortConnectionFamily.closeBehavior_append` and, at the level of netlists,
   `HierarchicalNetlist.flatten_behavior_eq`. Neither carries a well-posedness hypothesis.
-* The invariance a reused subsystem needs is proved as
-  `PortConnectionFamily.closeBehavior_append_congr`: the flattened relation depends on the inner
-  stage only through that stage's own closed relation.
-* Literal three-stage associativity of `append` is **not** proved. Regrouping changes the port
-  family the third stage is indexed by -- from `(inner.append middle).externalPortModeFamily` to
-  `middle.externalPortModeFamily` -- and transporting a connection family along an equivalence of
-  port families is machinery this file does not have.
+* Congruence under a **fixed inner wiring**, as
+  `PortConnectionFamily.closeBehavior_append_congr`: with both stages' connection families held
+  fixed, the flattened relation depends on the inner components only through the inner stage's
+  closed relation.
+
+Withheld:
+
+* The stronger reuse statement -- that the inner connection *family* may be replaced by a
+  different family with the same boundary relation -- is **not** proved. It needs transport of a
+  `PortConnectionFamily` along an equivalence of port families, which this file does not have.
+* Literal three-stage associativity of `append` is **not** proved, for the same missing machinery:
+  regrouping changes the port family the third stage is indexed by, from
+  `(inner.append middle).externalPortModeFamily` to `middle.externalPortModeFamily`.
 
 Beyond that, nothing here assumes, implies, or requires that any child subsystem is well posed,
 passive, lossless, reciprocal, or causal, except in `packagedScattering` and its consequences,
@@ -100,9 +108,9 @@ carry the ambient ports and the outer mode equivalences verbatim.
 - `PortConnectionFamily.mem_closeBehavior_append_iff` and
   `PortConnectionFamily.closeBehavior_append`: hierarchical relational semantics equals
   flattened-netlist relational semantics, with no well-posedness hypothesis on either stage.
-- `PortConnectionFamily.closeBehavior_append_congr`: the flattened relation depends on the inner
-  stage only through that stage's own closed relation, which is the invariance a reused subsystem
-  needs.
+- `PortConnectionFamily.closeBehavior_append_congr`: with both connection families fixed, the
+  flattened relation depends on the inner components only through the inner stage's closed
+  relation.
 - `HierarchicalNetlist.flatten_behavior_eq`: the same equality stated for netlists.
 
 ## iv. Table of contents
@@ -820,7 +828,7 @@ stage: the two-stage wiring and the flattened wiring impose the same incident eq
 by coordinate. On an inner-connected coordinate both sides are the inner routing of the outgoing
 amplitude; on an inner-external coordinate both sides are the delivered drive.
 -/
-theorem append_incidentAssembly_eq
+lemma append_incidentAssembly_eq
     (outgoing : ModeAmplitude (Outgoing P.Channel))
     (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel)) :
     (inner.append outer).incidentAssembly outgoing external =
@@ -872,7 +880,7 @@ fed by the inner stage's boundary outgoing amplitudes and the flattened external
 Together with `append_incidentAssembly_eq` this is the whole incident content of flattening: the
 flattened equation is the inner equation and the outer equation, and nothing else.
 -/
-theorem appendInnerDrive_eq
+lemma appendInnerDrive_eq
     (outgoing : ModeAmplitude (Outgoing P.Channel))
     (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel)) :
     ModeAmplitude.reindex (Incident.relabelEquiv inner.boundaryChannelEquiv.symm)
@@ -909,7 +917,7 @@ theorem appendInnerDrive_eq
 
 /-- Reading the flattened external channels is reading the outer stage's external channels of the
 inner stage's boundary readout. -/
-theorem append_externalOutgoingReadout_eq
+lemma append_externalOutgoingReadout_eq
     (outgoing : ModeAmplitude (Outgoing P.Channel)) :
     ModeAmplitude.reindex (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer))
         ((inner.append outer).externalOutgoingReadout.toLinearMap outgoing) =
@@ -929,24 +937,6 @@ theorem append_externalOutgoingReadout_eq
     ModeAmplitude.restrictEmbedding_apply,
     PortConnectionFamily.externalOutgoingEmbedding_apply,
     inner.appendExternalChannelEquiv_symm_coe outer]
-
-/-- Relabelling an amplitude and relabelling back recovers it. -/
-lemma reindex_symm_reindex {μ ν : Type*} [Fintype μ] [Fintype ν] (relabel : μ ≃ ν)
-    (amplitude : ModeAmplitude μ) :
-    ModeAmplitude.reindex relabel.symm (ModeAmplitude.reindex relabel amplitude) =
-      amplitude := by
-  apply WithLp.ofLp_injective 2
-  funext index
-  simp only [ModeAmplitude.reindex_apply, Equiv.symm_symm, Equiv.symm_apply_apply]
-
-/-- Relabelling an amplitude back and relabelling forward recovers it. -/
-lemma reindex_reindex_symm {μ ν : Type*} [Fintype μ] [Fintype ν] (relabel : μ ≃ ν)
-    (amplitude : ModeAmplitude ν) :
-    ModeAmplitude.reindex relabel (ModeAmplitude.reindex relabel.symm amplitude) =
-      amplitude := by
-  apply WithLp.ofLp_injective 2
-  funext index
-  simp only [ModeAmplitude.reindex_apply, Equiv.symm_symm, Equiv.apply_symm_apply]
 
 /-- The inner stage's closed behavior, presented on the boundary channels the outer stage wires.
 
@@ -971,7 +961,7 @@ No well-posedness, invertibility, solvability, or functionality hypothesis appea
 this is an identity of singular-safe relations. It is the statement that proofs may be organised
 by subsystem boundary without changing what the fully expanded channel equations say.
 -/
-theorem mem_closeBehavior_append_iff
+lemma mem_closeBehavior_append_iff
     (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
     (input : ModeAmplitude (Incident (inner.append outer).ExternalChannel))
     (output : ModeAmplitude (Outgoing (inner.append outer).ExternalChannel)) :
@@ -990,7 +980,8 @@ theorem mem_closeBehavior_append_iff
       ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
         (inner.externalOutgoingReadout.toLinearMap outgoing), ?_, ?_, ?_⟩
     · rw [innerBoundaryBehavior, LinearBehavior.mem_reindex_iff,
-        reindex_symm_reindex, reindex_symm_reindex, inner.mem_closeBehavior_iff]
+        ModeAmplitude.reindex_symm_reindex, ModeAmplitude.reindex_symm_reindex,
+        inner.mem_closeBehavior_iff]
       refine ⟨incident, outgoing, hBehavior, ?_, rfl⟩
       rw [hIncident, inner.append_incidentAssembly_eq outer]
     · exact inner.appendInnerDrive_eq outer outgoing input
@@ -1003,25 +994,25 @@ theorem mem_closeBehavior_append_iff
         ModeAmplitude.reindex (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm)
           (inner.externalOutgoingReadout.toLinearMap outgoing) := by
       rw [← hOutgoing]
-      exact (reindex_reindex_symm _ _).symm
+      exact (ModeAmplitude.reindex_reindex_symm _ _).symm
     have hDrive : ModeAmplitude.reindex
         (Incident.relabelEquiv inner.boundaryChannelEquiv.symm).symm boundaryIncident =
         inner.appendInnerDrive outer outgoing input := by
       rw [hBoundaryIncident, hBoundaryOutgoing, ← inner.appendInnerDrive_eq outer,
-        reindex_symm_reindex]
+        ModeAmplitude.reindex_symm_reindex]
     refine ⟨incident, outgoing, hBehavior, ?_, ?_⟩
     · rw [hIncident, hDrive, ← inner.append_incidentAssembly_eq outer]
     · have hReadout := inner.append_externalOutgoingReadout_eq outer outgoing
       rw [hBoundaryOutgoing] at hBoundaryOutput
       rw [← hReadout] at hBoundaryOutput
-      exact (reindex_symm_reindex
+      exact (ModeAmplitude.reindex_symm_reindex
         (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)) output).symm.trans
         (congrArg (ModeAmplitude.reindex
           (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm)
-          hBoundaryOutput) |>.trans (reindex_symm_reindex _ _)
+          hBoundaryOutput) |>.trans (ModeAmplitude.reindex_symm_reindex _ _)
 
 /-- The relational form of hierarchical flattening as an equality of behaviors. -/
-theorem closeBehavior_append
+lemma closeBehavior_append
     (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)) :
     (inner.append outer).closeBehavior behavior =
       (outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
@@ -1031,15 +1022,18 @@ theorem closeBehavior_append
   rw [LinearBehavior.mem_reindex_iff, Equiv.symm_symm, Equiv.symm_symm,
     inner.mem_closeBehavior_append_iff outer]
 
-/-- **Reusing a subsystem.** The flattened semantics depends on the inner stage only through the
-inner stage's own closed behavior.
+/-- **Congruence under a fixed inner wiring.** With both connection families held fixed, the
+flattened relation depends on the inner components only through the inner stage's closed relation.
 
-Replacing what is inside a subsystem by anything with the same closed relation leaves the whole
-network's relation unchanged. This is the invariance a verified subsystem is reused under, and it
-needs no well-posedness: the subsystem is not required to be functional for its boundary relation
-to determine the rest.
+Two boundary behaviors that the inner stage closes to the same relation are interchangeable inside
+the flattened network. This needs no well-posedness: the inner stage is not required to be
+functional for its closed relation to determine the rest.
+
+It is *not* the statement that the inner connection family itself may be replaced by a different
+family with the same boundary relation. That would require transporting a `PortConnectionFamily`
+along an equivalence of port families, which this file does not supply.
 -/
-theorem closeBehavior_append_congr
+lemma closeBehavior_append_congr
     {behavior otherBehavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)}
     (hInner : inner.closeBehavior behavior = inner.closeBehavior otherBehavior) :
     (inner.append outer).closeBehavior behavior =
@@ -1150,7 +1144,7 @@ The flattened netlist's singular-safe external behavior is exactly the outer sta
 closure of the inner subsystem netlist's own external behavior, up to the canonical relabelling of
 external channels. Neither stage is assumed well posed.
 -/
-theorem flatten_behavior_eq :
+lemma flatten_behavior_eq :
     netlist.flatten.behavior =
       (netlist.outer.closeBehavior
           (netlist.innerNetlist.behavior.reindex
