@@ -166,6 +166,8 @@ public import Physlib.Mathematics.PauliMatrices.Basic
 public import Physlib.Mathematics.PauliMatrices.SelfAdjoint
 public import Physlib.Mathematics.PiTensorProduct
 public import Physlib.Mathematics.RatComplexNum
+public import Physlib.Mathematics.RationalFunction.Coefficients
+public import Physlib.Mathematics.RationalFunction.CoefficientsRegression
 public import Physlib.Mathematics.Resolvent
 public import Physlib.Mathematics.SO3.Basic
 public import Physlib.Mathematics.SchurTriangulation
@@ -267,6 +269,8 @@ public import Physlib.Optics.Network.FlatNetlistRegression
 public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
+public import Physlib.Optics.Network.NetlistCoefficients
+public import Physlib.Optics.Network.NetlistCoefficientsRegression
 public import Physlib.Optics.Network.NetlistData
 public import Physlib.Optics.Network.NetlistDataRegression
 public import Physlib.Optics.Network.NetlistMatrices

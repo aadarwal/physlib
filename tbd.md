@@ -1184,8 +1184,8 @@ PR unless maintainers explicitly ask to retain it.
   additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. The
   later `FlatNetlist` construction now closes the broad structural API-map requirement. N4C's
   finite data, reflected well-formedness check, proof-carrying kernel construction, executable
-  matrix assembly, and entrywise semantic soundness are now complete; its normalized coefficient
-  backend and guarded evaluation layer remain separate work.
+  matrix assembly, entrywise semantic soundness, normalized rational coefficients, and guarded
+  rational-function evaluation are now complete.
 - [ ] Before upstreaming the external-output completion, prepare a stack in this order: the neutral
   complementary-range-projector lemma in `Mode/Embedding`; outgoing endpoint partition, exposure,
   and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
@@ -1244,10 +1244,17 @@ PR unless maintainers explicitly ask to retain it.
   incidents, and output readout is `E_outᵀ`. Confirm independently that coefficient evaluation and
   relabelling identify all four raw matrices with the N4 typed maps, and that the semantic theorem
   retains every singular solution rather than selecting one by an implicit inverse.
-- [ ] Complete N4C's coefficient layer with an executable normalized coefficient-list
+- [x] Complete N4C's coefficient layer with an executable normalized coefficient-list
   representation, a proof-exact rational-function interpretation, and a denominator-guarded
   evaluation theorem that commutes with compilation. Do not introduce an inverse, determinant,
   or well-posedness assumption before N5.
+- [ ] Human-check N4C's coefficient semantics before upstreaming. Coefficient lists are
+  little-endian and normalized only by removing trailing zeroes; stored numerator/denominator
+  pairs are deliberately unreduced. The stored-denominator guard is sufficient but not necessary
+  after cancellation, while direct field division remains total at zero in Lean. Confirm that the
+  guarded theorems, rather than an unguarded point value, carry the intended meaning. The backend
+  has one formal algebraic variable and makes no claim of rational dependence on physical
+  frequency, causality, stability, invertibility, or unique solvability.
 - [ ] Human-check before upstreaming that `WiringEquiv`, rather than an index permutation alone,
   is the public hypothesis; that the ambient port family is fixed; and that component relabelling
   and mode-phase gauge are excluded covariance statements. Confirm independently that the
