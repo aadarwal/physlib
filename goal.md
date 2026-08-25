@@ -1856,17 +1856,19 @@ derived views of the same component behavior, not illicit multiplication of scat
 
 #### N4. Scattering netlists and equations
 
-- disjoint-sum assembly of component incident and outgoing channel spaces;
-- block-diagonal assembly of component scattering matrices;
-- a routing transform `C : A_out → A_in`, an input exposure `E_in : U → A_in`, and an output
+- [x] component-owned channel spaces used through the existing incident/outgoing wrappers, retaining
+  explicit ownership of every physical port and local mode;
+- [x] block-diagonal assembly of heterogeneous component scattering matrices, with exact
+  same-component, cross-component-zero, and componentwise amplitude-action laws;
+- [ ] a routing transform `C : A_out → A_in`, an input exposure `E_in : U → A_in`, and an output
   exposure `E_out : Y → A_out`, each derived from typed endpoint selections;
-- proofs of the exposure isometries and projection identities, and of routing/exposure
+- [x] proofs of the exposure isometries and projection identities, and of routing/exposure
   disjointness and completeness;
-- derivation of `b = S*a`, `a = C*b + E_in*u`, `y = E_outᴴ*b`, and
+- [ ] derivation of `b = S*a`, `a = C*b + E_in*u`, `y = E_outᴴ*b`, and
   `(I - C*S)*a = E_in*u`;
-- a singular-safe `FlatNetlist.behavior` defined by existential internal amplitudes, together with
-  a theorem that it equals relational composition of the assembled component behaviors; and
-- invariance under internal-channel reordering.
+- [ ] a singular-safe `FlatNetlist.behavior` defined by existential internal amplitudes, together
+  with a theorem that it equals relational composition of the assembled component behaviors; and
+- [ ] invariance under internal-channel reordering.
 
 Exit: network equations come from a typed netlist rather than being supplied independently.
 
@@ -2488,7 +2490,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
-| N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
+| N4 network equations | in progress | N1/O2, N2a, N3 | component-family assembly is complete; flat relational semantics and shaped equations remain |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
@@ -2614,9 +2616,10 @@ human verification recorded in `tbd.md`.
    raw sum-labelled scattering matrices to the typed two-port boundary, proves both exact
    proof-gated scattering/chain conversions and round trips, derives later-times-earlier matrix
    multiplication from relational series, and supplies singular-safe right-load termination with
-   exact response formulas. Continue with N4 flat-network semantics: dependent component-channel
-   sums, block-diagonal component laws, and the implicit relation `b = S a`,
-   `a = C b + E_in u`, `y = E_outᴴ b` built from the now-complete boundary API. Do not use an
+   exact response formulas. N4 has begun with dependent component-owned port/channel sums,
+   canonical channel reassociation, and block-diagonal scattering with exact entry and mixed-action
+   laws. Continue with the implicit relation `b = S a`, `a = C b + E_in u`,
+   `y = E_outᴴ b` built from that assembly and the now-complete boundary API. Do not use an
    inverse to define that behavior; well-posed elimination belongs to N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
