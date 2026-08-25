@@ -348,6 +348,7 @@ public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.FlatNetlistEliminationRegression
 public import Physlib.Optics.Network.FlatNetlistRegression
 public import Physlib.Optics.Network.Hierarchical
+public import Physlib.Optics.Network.HierarchicalRegression
 public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
