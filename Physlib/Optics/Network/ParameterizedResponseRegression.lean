@@ -768,9 +768,10 @@ theorem parameterizedResponseRegression_mem_compileBehavior_iff {value : ℂ}
     ((Set.ext_iff.mp parameterizedResponseRegression_solveDomain_eq value).mp hValue.1)
     input output
 
-/-- The response is asymmetric away from the degenerate parameter, so a transposed external
-transfer matrix is detected. -/
-lemma parameterizedResponseRegression_response_asymmetric (value : ℂ)
+/-- The exact rational family is asymmetric at every algebraically solvable parameter, so a
+transposed external transfer matrix is detected. This is a statement about the algebraic family,
+which is a physical response only on the response domain. -/
+lemma parameterizedResponseRegression_rationalFamily_asymmetric (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0) :
     parameterizedResponseRegressionResponse value
         (Outgoing.mk parameterizedResponseRegressionExternalB)

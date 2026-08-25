@@ -54,8 +54,9 @@ three regions of the parameter space, and the difference is deliberate.
 * Outside `solveDomain` the middle factor is Mathlib's junk value for the inverse of a singular
   matrix, and the whole expression means nothing at all.
 * On `solveDomain \ validityDomain` the middle factor is a genuine algebraic inverse and the
-  expression is the exact `N5` block formula, but no component's stored model is claimed to hold
-  there, so it is not a physical response. The regression exhibits such a parameter.
+  expression is the exact `N5` block formula, but not every component model is claimed valid
+  there -- at least one component lacks a validity claim, while others may well have one -- so it
+  is not a physical response. The regression exhibits such a parameter.
 * On `responseDomain` it agrees with the proof-gated `response`.
 
 Accordingly the algebraic statements about it carry a `solveDomain` hypothesis and the physical
@@ -84,10 +85,12 @@ ones a `responseDomain` hypothesis; the words *physical response* are reserved f
   proof-gated response exactly on the domain.
 - `ParameterizedNetlist.response_reparameterize`: response evaluation commutes with substitution
   into the parameter.
-- `ParameterizedNetlist.continuousAt_unguardedResponse`: continuity of the response from
-  continuity of the stored component entries, on the algebraic solve domain.
-- `ParameterizedNetlist.analyticAt_unguardedResponse_entry`: entrywise analyticity of the response
-  from analyticity of the stored component entries, on the algebraic solve domain.
+- `ParameterizedNetlist.continuousAt_unguardedResponse`: continuity of the algebraic total-inverse
+  formula on the algebraic solve domain, from continuity of the stored component entries. This is
+  not a claim that a physical response is continuous.
+- `ParameterizedNetlist.analyticAt_unguardedResponse_entry`: entrywise analyticity of the algebraic
+  total-inverse formula on the algebraic solve domain, from analyticity of the stored component
+  entries. This is not a claim that a physical response is analytic.
 
 ## iv. Table of contents
 
