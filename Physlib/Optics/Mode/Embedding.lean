@@ -25,6 +25,8 @@ family containing exposed channels.
 
 - `ModeAmplitude.restrictEmbedding`: restrict an ambient amplitude along an embedding.
 - `ModeTransform.restriction`: select the coordinates in an embedding's range.
+- `ModeTransform.blockDiagonal'_apply`: evaluate a dependent block-diagonal transform on one
+  output block using the matching restricted input amplitude.
 - `ModeTransform.zeroExtension`: extend selected amplitudes by zero.
 - `ModeTransform.rangeProjector`: map ambient amplitudes onto the selected coordinates.
 - `ModeTransform.zeroExtend`: include a transform in full input and output mode families.
@@ -168,6 +170,26 @@ lemma ModeTransform.toLinearMap_restriction {ι κ : Type*} [Fintype κ] [Decida
   funext selected
   simp [Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
     ModeTransform.restriction_entry]
+
+/-- A dependent block-diagonal transform acts on one output block using only the corresponding
+restricted input amplitude. -/
+lemma ModeTransform.blockDiagonal'_apply {ο : Type*} {ι : ο → Type*} {κ : ο → Type*}
+    [Fintype ο] [DecidableEq ο] [∀ o, Fintype (ι o)] [∀ o, DecidableEq (ι o)]
+    (transform : ∀ o, ModeTransform (ι o) (κ o))
+    (amplitude : ModeAmplitude (Σ o, ι o)) (o : ο) (output : κ o) :
+    ModeTransform.toLinearMap
+        (Matrix.blockDiagonal' transform : ModeTransform (Σ o, ι o) (Σ o, κ o))
+        amplitude ⟨o, output⟩ =
+      ModeTransform.toLinearMap (transform o)
+        (amplitude.restrictEmbedding (Function.Embedding.sigmaMk o)) output := by
+  simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
+    dotProduct, ← Finset.univ_sigma_univ, Finset.sum_sigma,
+    Matrix.blockDiagonal'_apply]
+  rw [Fintype.sum_eq_single o]
+  · simp [ModeAmplitude.restrictEmbedding_apply]
+  · intro j hji
+    exact Finset.sum_eq_zero fun _ _ => by
+      rw [dif_neg hji.symm, zero_mul]
 
 /-- The adjoint of coordinate restriction extends selected amplitudes by zero. -/
 def ModeTransform.zeroExtension {ι κ : Type*} [DecidableEq κ] (embedding : ι ↪ κ) :
