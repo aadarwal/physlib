@@ -40,6 +40,7 @@ spaces.
   sum.
 - `ModeTransform`: a matrix mapping input mode amplitudes to output mode amplitudes.
 - `ModeTransform.toLinearMap`: the induced linear map between mode-amplitude spaces.
+- `ModeTransform.mulVecWith`: matrix-vector action with the finite enumeration supplied explicitly.
 - `ModeTransform.IsPowerPreserving`: a transform preserves total modal power.
 - `ModeTransform.IsPassive`: a transform does not increase total modal power.
 - `ModeTransform.directSum`: the block-diagonal parallel composition of two transforms.
@@ -247,6 +248,65 @@ abbrev ModeTransform (ι κ : Type*) := Matrix κ ι ℂ
 abbrev ModeTransform.toLinearMap {ι κ : Type*} [Fintype ι] [DecidableEq ι]
     (T : ModeTransform ι κ) : ModeAmplitude ι →ₗ[ℂ] ModeAmplitude κ :=
   Matrix.toEuclideanLin T
+
+/-- Forgetting the `L²` wrapper exposes transform application as ordinary matrix-vector
+multiplication.
+
+The right-hand side does not depend on the `DecidableEq` implementation used to bundle the linear
+map, which is useful when constructive and locally classical finite-mode APIs meet.
+-/
+lemma ModeTransform.ofLp_toLinearMap_apply {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] (T : ModeTransform ι κ) (amplitude : ModeAmplitude ι) :
+    WithLp.ofLp (T.toLinearMap amplitude) = Matrix.mulVec T (WithLp.ofLp amplitude) := by
+  rfl
+
+/-- Matrix-vector action with the finite enumeration supplied explicitly.
+
+This form is useful at executable/compiler boundaries where the constructive enumeration must be
+kept visible instead of being recovered by typeclass search.
+-/
+def ModeTransform.mulVecWith {ι κ : Type*} (fintype : Fintype ι)
+    (T : ModeTransform ι κ) (input : ι → ℂ) : κ → ℂ := by
+  letI := fintype
+  exact Matrix.mulVec T input
+
+/-- Supplying the ambient finite enumeration recovers ordinary matrix-vector action. -/
+@[simp]
+lemma ModeTransform.mulVecWith_inferInstance {ι κ : Type*} [Fintype ι]
+    (T : ModeTransform ι κ) (input : ι → ℂ) :
+    ModeTransform.mulVecWith (inferInstance : Fintype ι) T input = Matrix.mulVec T input := by
+  rfl
+
+/-- A bundled transform equation is equivalent to its unbundled matrix-vector equation. -/
+lemma ModeTransform.eq_toLinearMap_iff_mulVec {ι κ : Type*}
+    [Fintype ι] [DecidableEq ι] (T : ModeTransform ι κ)
+    (input : ModeAmplitude ι) (output : ModeAmplitude κ) :
+    output = T.toLinearMap input ↔
+      WithLp.ofLp output = Matrix.mulVec T (WithLp.ofLp input) := by
+  constructor
+  · intro h
+    rw [h, T.ofLp_toLinearMap_apply]
+  · intro h
+    apply WithLp.ofLp_injective 2
+    rw [T.ofLp_toLinearMap_apply]
+    exact h
+
+/-- A sum of two bundled transform actions is equivalent to the corresponding sum of ordinary
+matrix-vector products. -/
+lemma ModeTransform.eq_toLinearMap_add_iff_mulVec_add {ι κ μ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (T : ModeTransform ι μ) (U : ModeTransform κ μ)
+    (first : ModeAmplitude ι) (second : ModeAmplitude κ) (output : ModeAmplitude μ) :
+    output = T.toLinearMap first + U.toLinearMap second ↔
+      WithLp.ofLp output = Matrix.mulVec T (WithLp.ofLp first) +
+        Matrix.mulVec U (WithLp.ofLp second) := by
+  constructor
+  · intro h
+    rw [h, WithLp.ofLp_add, T.ofLp_toLinearMap_apply, U.ofLp_toLinearMap_apply]
+  · intro h
+    apply WithLp.ofLp_injective 2
+    rw [WithLp.ofLp_add, T.ofLp_toLinearMap_apply, U.ofLp_toLinearMap_apply]
+    exact h
 
 /-- A product of mode transforms acts by applying the right transform first and the left transform
 second. -/

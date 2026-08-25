@@ -120,6 +120,12 @@ structure Outgoing (ι : Type u) where
 
 namespace Incident
 
+/-- Lift an explicitly supplied finite channel enumeration to incident endpoint labels. -/
+@[instance_reducible]
+def fintypeOf {ι : Type u} (fintype : Fintype ι) : Fintype (Incident ι) := by
+  letI := fintype
+  infer_instance
+
 /-- The canonical equivalence from incident channel ends to their underlying labels. -/
 def channelEquiv {ι : Type u} : Incident ι ≃ ι where
   toFun := Incident.channel
@@ -205,6 +211,12 @@ lemma mk_mem_range_relabelEmbedding_iff {ι : Type u} {κ : Type v}
 end Incident
 
 namespace Outgoing
+
+/-- Lift an explicitly supplied finite channel enumeration to outgoing endpoint labels. -/
+@[instance_reducible]
+def fintypeOf {ι : Type u} (fintype : Fintype ι) : Fintype (Outgoing ι) := by
+  letI := fintype
+  infer_instance
 
 /-- The canonical equivalence from outgoing channel ends to their underlying labels. -/
 def channelEquiv {ι : Type u} : Outgoing ι ≃ ι where
