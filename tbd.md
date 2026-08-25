@@ -1536,6 +1536,13 @@ PR unless maintainers explicitly ask to retain it.
   docstring-token emulation found no new missing word after prose rewording. The full linter
   reproduced only the known unrelated repository style and transitive-import baselines; neither
   functional-behavior Optics module appeared in either failure list.
+- [x] The 2026-08-25 N4 wiring-invariance run passed cache retrieval, the 4,710-job `Physlib`
+  build (including every `LinearBehavior` and two-port importer), focused warning-free source and
+  regression elaboration, both Physlib and QuantumInfo declaration linters, public-file import,
+  illegal-import, alpha-import, duplicate-tag, sorry/pseudo-attribution, committed-state style,
+  whitespace, forbidden-term, and API-map gates. The Optics API map resolved 2,479 names with no
+  missing file or declaration. The full linter reproduced only the known unrelated repository
+  style and transitive-import baselines; no changed Optics module appeared in either failure list.
 
 ## Milestone gates
 
