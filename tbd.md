@@ -959,9 +959,33 @@ PR unless maintainers explicitly ask to retain it.
 - [x] Prove the local common-frequency bridge from ordinary real fields and peak phasors to the
   one-period average of the actual instantaneous Poynting vector. This first slice deliberately
   stops before Maxwell, propagation, impedance, normal flux, irradiance, and modal power.
-- [ ] Complete the bridge from propagating field modes and complex amplitudes to time-averaged
-  normal Poynting flux. Until then, modal power and losslessness are terms internal to the stated
-  power-normalization convention, not field-level energy theorems.
+- [x] Complete the measured-profile bridge from supplied phasor profiles and complex amplitudes to
+  the closed time-averaged normal Poynting expression. The implementation uses an explicit measure,
+  proves the Hermitian self-pairing and full coherent double-sum laws, and reaches
+  `ModeAmplitude.power` only under pairwise integrability, mutual flux orthogonality, unit
+  normalization, and an explicitly declared incident or outgoing role. It does not prove modal
+  completeness or Maxwell qualification of arbitrary supplied profiles.
+- [ ] Complete the physical E3b specialization from the abstract measured-profile bridge to a
+  Maxwell-qualified family of propagating modes at one common positive carrier frequency. Supply
+  an explicit aperture parameterization with its pulled-back area measure, or another justified
+  geometric measure, and prove the integrated actual one-period Poynting-flux identity before
+  treating the resulting `ModeAmplitude.power` equality as electromagnetic power normalization.
+- [ ] Human-check the E3b measured-profile pairing convention before an upstream proposal: the
+  ordered mixed term must be `1 / 4 * n dot (E_F cross conj H_G)`, the Hermitian completion must
+  conjugate the exchanged term, and self-pairing must reduce to `1 / 2 * Re (n dot
+  (E cross conj H))`. Confirm that magnetic field strength `H`, not induction `B`, is integrated.
+- [ ] Decide the upstream surface-measure boundary for E3b. The current theorem deliberately takes
+  a supplied measure on a profile-coordinate type, so a pulled-back geometric area measure or
+  finite-cell quadrature convention must be supplied by a consumer. Do not describe the abstract
+  measure as physical area without a separate parameterization-and-Jacobian theorem.
+- [ ] Keep the E3b normalized-mode claim restricted to the supplied finite synthesis image when
+  upstreaming. Do not infer completeness, Maxwell qualification, raw-Jones normalization, device
+  losslessness, or positive-power ports for omitted radiation, absorption, or evanescent fields.
+  Preserve the exact nonorthogonal `3-4-5` regression: both profiles have unit self-flux while the
+  cross-pairing is `3 / 5`; equal coordinates then have field self-pairing `16 / 5` but coordinate
+  power `2`, so individual normalization alone cannot justify modal power. Preserve also the
+  weighted-measure result `51 / 50`, which prevents the integration layer from silently fixing
+  counting measure.
 
 ## Harmonic-flux conventions
 
