@@ -12,7 +12,7 @@ flattening development; there is no source file to mirror and no parity row to c
 | `Physlib/Mathematics/LinearAlgebra/Matrix/Analytic.lean` | prerequisite | see below |
 | `Physlib/Optics/Network/ParameterizedResponse.lean` | N5F slices 1–3 | see below |
 | `Physlib/Optics/Network/ParameterizedResponseRegression.lean` | N5F regressions | see below |
-| `Physlib/Optics/Network/Hierarchical.lean` | N5H slice 4 | see below |
+| `Physlib/Optics/Network/Hierarchical.lean` | N5H slices 4-6 | see below |
 
 No existing file was edited. `Physlib.lean`, `Physlib/Optics/API-map.yaml`, `goal.md`, and
 `tbd.md` are untouched in every commit.
@@ -125,13 +125,17 @@ outside it have no proved response.
 - H.3 N5H bullet 4 (functional packaging of a child as a scattering component only after that
   child's well-posedness and external-channel pairing have been proved).
 - H.3 N5H bullet 3 (equality between hierarchical relational semantics and the semantics of the
-  flattened netlist) and bullet 5 in the form the contract asks it for -- the invariance a reused
-  subsystem needs; literal three-stage associativity is withheld, see below.
+  flattened netlist) as a theorem, and bullet 5 in the narrower form actually proved: congruence
+  under a fixed inner wiring. The stronger reuse statement and literal three-stage associativity
+  are both withheld; see below.
 - I.3 row **N-10** — `parameterizedResponseRegression_mem_compileBehavior_iff_solve`, gated on the
   well-posed domain as goal.md requires; `parameterizedResponseRegression_mem_compileBehavior_iff`
   is its response-domain corollary.
-- I.3 row **N-08** — `PortConnectionFamily.closeBehavior_append` and, at netlist level,
-  `HierarchicalNetlist.flatten_behavior_eq`.
+- I.3 row **N-08** is **not yet claimed**. The general theorem is proved
+  (`PortConnectionFamily.closeBehavior_append` and, at netlist level,
+  `HierarchicalNetlist.flatten_behavior_eq`), but the row's failure mode is
+  "subsystem-boundary or port-lift errors", and the doctrine requires a concrete fixture that
+  could fail. That fixture is in progress and is not in this batch; see "Remaining in this lane".
 
 ## Explicit non-claims
 
@@ -161,16 +165,25 @@ second, so a sync costs no rebuild either.
 
 ## Remaining in this lane
 
-- Literal three-stage associativity of `append`. Regrouping changes the port family the third
-  stage is indexed by, from `(inner.append middle).externalPortModeFamily` to
-  `middle.externalPortModeFamily`, and transporting a whole connection family along an equivalence
-  of port families is machinery the codebase does not have. The invariance the `N5H` contract
-  actually asks for -- that a subsystem may be replaced by anything with the same closed relation
-  -- is proved as `PortConnectionFamily.closeBehavior_append_congr`. The module doc withholds
-  associativity explicitly.
-- A hierarchical regression instance (a two-level hierarchy whose flattened response equals the
-  direct one on an exact rational fixture). `N-08` is proved in general and unconditionally, so
-  this would be a fixture check rather than a missing theorem, but it is not written.
+- Literal three-stage associativity of `append`, and the stronger subsystem-reuse statement that
+  the inner connection *family* may be replaced by a different family with the same boundary
+  relation. Both need the same missing machinery: transport of a `PortConnectionFamily` along an
+  equivalence of port families. What is proved instead is
+  `PortConnectionFamily.closeBehavior_append_congr`: with both connection families held fixed, the
+  flattened relation depends on the inner components only through the inner stage's closed
+  relation. The module doc withholds both stronger statements explicitly.
+- The hierarchical regression fixture that `I.3` row `N-08` requires
+  (`Physlib/Optics/Network/HierarchicalRegression.lean`, in progress, not in this batch). Its
+  shape is settled: a three-component chain wired in two stages, with an inner connection joining
+  the first two components' link ports and an outer connection joining the second component's
+  remaining boundary port to the third, leaving one external channel on each end. All components
+  are reflectionless with distinct forward and backward transmissions, so the flattened network is
+  the exact integer two-port `y(out) = 165 * u(in)`, `y(in) = 182 * u(out)`; the asymmetry is what
+  a port-lift error would disturb. The fixture proves the same hand-computed pair is a member both
+  of `flatten.behavior` (from the flattened netlist's own three channel equations) and of the outer
+  closure of `innerNetlist.behavior` (from the closure's own three equations), neither routed
+  through `flatten_behavior_eq` or `behavior_eq_closeBehavior`, plus a mis-lifted-port negative
+  control. Until it lands, row `N-08` is not claimed.
 - N5F slice 3 could be strengthened from `ContinuousAt`/`AnalyticAt` at a point to `ContinuousOn`/
   `AnalyticOnNhd` on an open subset of the solve domain; the pointwise forms are what is proved.
 

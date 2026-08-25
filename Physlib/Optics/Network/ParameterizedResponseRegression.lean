@@ -715,7 +715,7 @@ lemma parameterizedResponseRegression_outputReadout_mul_outgoingSolution (value 
 /-- The algebraic total-inverse formula takes this exact rational value at every algebraically
 solvable parameter. No claim of physical validity is made here; stored component validity is a
 separate and strictly stronger condition. -/
-theorem parameterizedResponseRegression_unguardedResponse_eq (value : ℂ)
+lemma parameterizedResponseRegression_unguardedResponse_eq (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0) :
     parameterizedResponseRegression.unguardedResponse value =
       parameterizedResponseRegressionResponse value := by
@@ -731,7 +731,7 @@ theorem parameterizedResponseRegression_unguardedResponse_eq (value : ℂ)
     parameterizedResponseRegression_outputReadout_mul_outgoingSolution]
 
 /-- On the physical response domain the proof-gated response is the same exact rational matrix. -/
-theorem parameterizedResponseRegression_response_eq {value : ℂ}
+lemma parameterizedResponseRegression_response_eq {value : ℂ}
     (hValue : value ∈ parameterizedResponseRegression.responseDomain) :
     parameterizedResponseRegression.response hValue =
       parameterizedResponseRegressionResponse value := by
@@ -747,7 +747,7 @@ The gate is `solveDomain`, which is what the milestone asks for. Gating it on `r
 instead would lose real cases: `2` is algebraically solvable and outside the declared validity
 domain, and the equality still holds there.
 -/
-theorem parameterizedResponseRegression_mem_compileBehavior_iff_solve (value : ℂ)
+lemma parameterizedResponseRegression_mem_compileBehavior_iff_solve (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0)
     (input : ModeAmplitude parameterizedResponseRegression.ExternalIncident)
     (output : ModeAmplitude parameterizedResponseRegression.ExternalOutgoing) :
@@ -758,7 +758,7 @@ theorem parameterizedResponseRegression_mem_compileBehavior_iff_solve (value : �
     (parameterizedResponseRegression_mem_solveDomain value hValue) input output
 
 /-- The physical corollary of `N-10` on the response domain. -/
-theorem parameterizedResponseRegression_mem_compileBehavior_iff {value : ℂ}
+lemma parameterizedResponseRegression_mem_compileBehavior_iff {value : ℂ}
     (hValue : value ∈ parameterizedResponseRegression.responseDomain)
     (input : ModeAmplitude parameterizedResponseRegression.ExternalIncident)
     (output : ModeAmplitude parameterizedResponseRegression.ExternalOutgoing) :
@@ -823,7 +823,7 @@ lemma parameterizedResponseRegression_two_not_mem_validityDomain :
 
 /-- The physical response domain is strictly smaller than the algebraic solve domain: algebraic
 solvability alone does not license a physical response. -/
-theorem parameterizedResponseRegression_responseDomain_ssubset_solveDomain :
+lemma parameterizedResponseRegression_responseDomain_ssubset_solveDomain :
     parameterizedResponseRegression.responseDomain ⊂
       parameterizedResponseRegression.solveDomain := by
   refine ⟨parameterizedResponseRegression.responseDomain_subset_solveDomain, ?_⟩
@@ -834,7 +834,7 @@ theorem parameterizedResponseRegression_responseDomain_ssubset_solveDomain :
 
 /-- The physical response domain is strictly smaller than the declared validity domain: a claimed
 component model does not make a network solvable. -/
-theorem parameterizedResponseRegression_responseDomain_ssubset_validityDomain :
+lemma parameterizedResponseRegression_responseDomain_ssubset_validityDomain :
     parameterizedResponseRegression.responseDomain ⊂
       parameterizedResponseRegressionComponents.validityDomain := by
   refine ⟨parameterizedResponseRegression.responseDomain_subset_validityDomain, ?_⟩
@@ -868,7 +868,7 @@ lemma parameterizedResponseRegression_zero_mem_responseDomain :
 
 /-- At a unit-imaginary reflection the denominator is exactly two and the response is
 `[[I, 1], [1/2, I/2]]` in exposed order. -/
-theorem parameterizedResponseRegression_response_i :
+lemma parameterizedResponseRegression_response_i :
     parameterizedResponseRegression.response
         parameterizedResponseRegression_i_mem_responseDomain
         (Outgoing.mk parameterizedResponseRegressionExternalA)
@@ -881,7 +881,7 @@ theorem parameterizedResponseRegression_response_i :
   ring
 
 /-- At zero reflection the network degenerates to the exact reflectionless response entry `2`. -/
-theorem parameterizedResponseRegression_response_zero :
+lemma parameterizedResponseRegression_response_zero :
     parameterizedResponseRegression.response
         parameterizedResponseRegression_zero_mem_responseDomain
         (Outgoing.mk parameterizedResponseRegressionExternalA)

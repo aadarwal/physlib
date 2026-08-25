@@ -37,11 +37,13 @@ spatial envelope multiplies zero.
 - A. Positive-normal-decay phasor algebra
 - B. Actual-field mean flux
 
-## iv. Scope
+## iv. References
 
-The conclusion is a local time-averaged flux-density statement. It does not say that the
-instantaneous normal Poynting vector vanishes, and it permits nonzero tangential mean flux. It
-supplies no material dispersion, Maxwell, interface, incident, reflected, transmitted, outgoing,
+This Physlib-original cancellation result uses the complex-wave-vector convention documented in
+`ComplexWaveVector`. The conclusion is a local time-averaged flux-density statement. It does not
+say that the instantaneous normal Poynting vector vanishes, and it permits nonzero tangential mean
+flux. It supplies no material dispersion, Maxwell, interface, incident, reflected, transmitted,
+outgoing,
 Fresnel, total-internal-reflection, conservation, half-space-support, aperture-power, or
 modal-power conclusion. The carrier remains globally defined and grows under displacement
 opposite to its positive decay direction.
@@ -64,35 +66,6 @@ namespace PositiveNormalDecayWaveVector
 ## A. Positive-normal-decay phasor algebra
 
 -/
-
-private lemma conjugateEuclidean_smul (z : ℂ) (v : EuclideanSpace ℂ (Fin 3)) :
-    Phasor.conjugateEuclidean (z • v) =
-      star z • Phasor.conjugateEuclidean v := by
-  ext i
-  simp [Phasor.conjugateEuclidean]
-
-private lemma conjugateEuclidean_complexCross
-    (u v : EuclideanSpace ℂ (Fin 3)) :
-    Phasor.conjugateEuclidean
-        (ComplexMonochromaticPlaneWave.complexCross u v) =
-      ComplexMonochromaticPlaneWave.complexCross
-        (Phasor.conjugateEuclidean u) (Phasor.conjugateEuclidean v) := by
-  ext i
-  fin_cases i <;>
-    simp [Phasor.conjugateEuclidean, ComplexMonochromaticPlaneWave.complexCross,
-      crossProduct]
-
-private lemma conjugateEuclidean_ofReal (v : WaveVector 3) :
-    Phasor.conjugateEuclidean (ofReal v) = ofReal v := by
-  ext i
-  simp [Phasor.conjugateEuclidean]
-
-private lemma bilinearDot_conjugateEuclidean
-    (u v : EuclideanSpace ℂ (Fin 3)) :
-    bilinearDot (Phasor.conjugateEuclidean u)
-        (Phasor.conjugateEuclidean v) =
-      star (bilinearDot u v) := by
-  simp [bilinearDot, Phasor.conjugateEuclidean]
 
 private lemma conjugateEuclidean_waveVector
     {normal : Direction 3} (data : PositiveNormalDecayWaveVector normal) :
@@ -137,16 +110,6 @@ private lemma bilinearDot_normal_conjugateWaveVector
   rw [bilinearDot_ofReal, htangent, hnormal]
   simp
 
-private lemma bilinearDot_ofReal_conjugateEuclidean
-    (normalVector : WaveVector 3) (v : EuclideanSpace ℂ (Fin 3)) :
-    bilinearDot (ofReal normalVector) (Phasor.conjugateEuclidean v) =
-      star (bilinearDot (ofReal normalVector) v) := by
-  calc
-    bilinearDot (ofReal normalVector) (Phasor.conjugateEuclidean v) =
-        bilinearDot (Phasor.conjugateEuclidean (ofReal normalVector))
-          (Phasor.conjugateEuclidean v) := by rw [conjugateEuclidean_ofReal]
-    _ = _ := bilinearDot_conjugateEuclidean _ _
-
 private lemma bilinearDot_self_conjugateEuclidean_im
     (v : EuclideanSpace ℂ (Fin 3)) :
     (bilinearDot v (Phasor.conjugateEuclidean v)).im = 0 := by
@@ -165,23 +128,14 @@ private lemma referenceFlux_normal_re_eq_zero
         (Phasor.conjugateEuclidean
           (ComplexMonochromaticPlaneWave.complexCross
             data.waveVector electricAmplitude)))).re = 0 := by
-  rw [conjugateEuclidean_complexCross,
+  rw [Phasor.conjugateEuclidean_complexCross,
     ComplexMonochromaticPlaneWave.complexCross_complexCross,
     bilinearDot_sub_right, bilinearDot_smul_right, bilinearDot_smul_right,
     bilinearDot_normal_conjugateWaveVector,
     bilinearDot_electric_conjugateWaveVector data electricAmplitude hTransverse,
-    bilinearDot_ofReal_conjugateEuclidean]
+    ComplexWaveVector.bilinearDot_ofReal_conjugateEuclidean]
   have hnormIm := bilinearDot_self_conjugateEuclidean_im electricAmplitude
   simp [Complex.mul_re, hnormIm]
-  ring
-
-private lemma inner_realPart_eq_bilinearDot_re
-    (u : WaveVector 3) (z : EuclideanSpace ℂ (Fin 3)) :
-    inner ℝ u (realPart z) = (bilinearDot (ofReal u) z).re := by
-  rw [PiLp.inner_apply, bilinearDot, Complex.re_sum]
-  apply Finset.sum_congr rfl
-  intro i _
-  simp [RCLike.inner_apply]
   ring
 
 /-- A bilinearly transverse electric phasor whose magnetic phasor is a real scalar multiple of
@@ -198,11 +152,11 @@ lemma inner_normalVector_timeAveragedPoyntingVector_complexCross_eq_zero
         ((magneticScale : ℂ) •
           ComplexMonochromaticPlaneWave.complexCross data.waveVector electricPhasor)) = 0 := by
   rw [Optics.timeAveragedPoyntingVector, inner_smul_right,
-    inner_realPart_eq_bilinearDot_re, conjugateEuclidean_smul,
-    conjugateEuclidean_complexCross,
+    inner_realPart_eq_bilinearDot_re, Phasor.conjugateEuclidean_smul,
+    Phasor.conjugateEuclidean_complexCross,
     ComplexMonochromaticPlaneWave.complexCross_smul_right, bilinearDot_smul_right]
   have hcore := referenceFlux_normal_re_eq_zero data electricPhasor hTransverse
-  rw [conjugateEuclidean_complexCross] at hcore
+  rw [Phasor.conjugateEuclidean_complexCross] at hcore
   simp [Complex.mul_re, hcore]
 
 end PositiveNormalDecayWaveVector

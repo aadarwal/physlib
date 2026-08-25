@@ -1439,13 +1439,19 @@ Owner: Optics, importing E3a.
   with actual one-period vector and signed-normal flux at the stored plane point;
 - [x] zero normal average flux for a bilinearly transverse, Maxwell-qualified
   positive-normal-decay transmitted wave at every point and period start;
-- [ ] an aperture or normalized transverse-mode-profile integral when total power is claimed;
-- [ ] the Hermitian signed-power flux pairing for finite mode families, with its self-pairing equal
-  to real time-averaged normal flux, mutual flux orthogonality, normalization, and
+- [x] a measured-profile integral with an explicitly supplied measure rather than an inferred
+  geometric aperture-area measure;
+- [x] the Hermitian signed-power flux pairing for supplied finite phasor-profile families, with its
+  self-pairing equal to the closed time-averaged normal Poynting expression, mutual flux
+  orthogonality, normalization, and
   incident/outgoing sign conventions proved before extending a one-mode result to coherent
   superpositions; and
 - [x] an explicit map from raw Jones field amplitudes to material plane-wave irradiance; and
-- [ ] an explicit map from a declared normalized field mode to `ModeAmplitude.power`.
+- [x] an explicit map from a declared normalized measured profile family to
+  `ModeAmplitude.power` on its finite synthesis image; and
+- [ ] a physical specialization connecting that abstract profile family to Maxwell-qualified,
+  common-positive-frequency propagating modes, with an explicit aperture parameterization or
+  justified geometric area measure and an integrated actual one-period Poynting-flux theorem.
 
 The completed local slice defines componentwise Euclidean phasor realization and conjugation,
 derives the scalar coherent-product average, and proves for arbitrary locally realized
@@ -1502,8 +1508,23 @@ remain valid, while the geometric sides acquire no incident, reflected, transmit
 outgoing meaning. The theorem is for the propagating ordinary-real material wave and supplies no
 evanescent-field conclusion.
 
-Exit: “lossless” and “power balance” can be interpreted as electromagnetic statements for the
-mode family covered by the theorem.
+The completed measured-profile slice takes an explicit measure on an arbitrary profile-coordinate
+type rather than inventing a geometric surface measure. Its Hermitian pairing uses the declared
+peak-phasor convention, is complex-linear in the first profile, conjugate-linear in the second,
+and has self-pairing equal to the integral of the stored-normal component of the existing closed
+time-averaged Poynting expression. Finite coherent synthesis first expands to the complete double
+sum of modal cross terms. Only a pairwise-integrable, mutually flux-orthogonal, unit-normalized
+family then reduces that sum to `ModeAmplitude.power`, with incident and outgoing signs selected
+by an explicit role relative to the stored normal. The conclusion holds on the supplied synthesis
+image. It does not assert that the family is complete, that arbitrary supplied profiles satisfy
+Maxwell or share a physical carrier frequency, that the supplied measure is geometric area, that
+raw Jones coordinates are power normalized, or that omitted and evanescent channels carry
+ordinary positive modal power. Exact unequal-cell and nonorthogonal regressions make the measure,
+slot convention, role signs, coherent terms, and mutual-orthogonality requirement load-bearing.
+
+Exit pending: “lossless” and “power balance” become electromagnetic statements only after the
+abstract measured-profile family is connected to Maxwell-qualified propagating modes, a justified
+aperture measure, and actual one-period integrated Poynting flux.
 
 #### E4a. Planar interface and local boundary semantics
 
@@ -2645,7 +2666,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, interface-oriented side-decaying carrier geometry, its complex-bilinear s/p frame, transverse positive-medium Maxwell qualification, and named nonzero half-space evanescence are complete; separate outgoing semantics remain |
 | E3s cross-product divergence | done | Space derivative API | pointwise and function-level real three-dimensional div-cross identity under first differentiability |
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
-| E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor averaging, propagating material-wave irradiance, signed propagating normal flux, and Maxwell-qualified positive-normal-decay zero-normal-flux complete; aperture and modal-power bridges remain |
+| E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor averaging, propagating material-wave irradiance, signed propagating and positive-normal-decay flux, and the abstract measured-profile pairing/synthesis-to-modal-power bridge are complete; the Maxwell-qualified propagating-family, geometric-aperture, actual-field connector remains |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |

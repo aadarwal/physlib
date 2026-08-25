@@ -522,7 +522,6 @@ lemma toBehavior_response {value : Param} (hValue : value ∈ netlist.responseDo
     (netlist.response hValue).toBehavior = (netlist.compile value).behavior :=
   (netlist.compile value).toBehavior_responseTransform hValue.1
 
-
 /-- The response does not depend on which proof of domain membership is supplied. -/
 lemma response_congr {value : Param} (first second : value ∈ netlist.responseDomain) :
     netlist.response first = netlist.response second := rfl
@@ -737,7 +736,7 @@ the solve domain where validity fails there is no physical response to be contin
 statement is this one restricted to `responseDomain`, where `unguardedResponse_eq_response`
 applies.
 -/
-theorem continuousAt_unguardedResponse {value : Param}
+lemma continuousAt_unguardedResponse {value : Param}
     (hComponents : netlist.ComponentEntriesContinuousAt value)
     (hSolve : value ∈ netlist.solveDomain) :
     ContinuousAt netlist.unguardedResponse value := by
@@ -840,7 +839,7 @@ Mathlib's determinant/adjugate presentation of the matrix inverse: `Matrix.inv_d
 a reciprocal determinant, which is analytic exactly because the solve domain forbids a vanishing
 determinant.
 -/
-theorem analyticAt_unguardedResponse_entry {value : Param}
+lemma analyticAt_unguardedResponse_entry {value : Param}
     (hComponents : netlist.ComponentEntriesAnalyticAt value)
     (hSolve : value ∈ netlist.solveDomain)
     (output : netlist.ExternalOutgoing) (input : netlist.ExternalIncident) :
