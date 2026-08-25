@@ -244,7 +244,7 @@ theorem isStable_of_abs_trace_lt_two (M : RayTransferMatrix) (hdet : M.det = 1)
   rw [le_div_iff₀ (by positivity)]
   have hexpand : |s.height| * (2 * |M 1 0|) = |2 * M 1 0 * s.height| := by
     rw [abs_mul, abs_mul]
-    simp
+    norm_num
     ring
   rw [hexpand]
   calc |2 * M 1 0 * s.height|
