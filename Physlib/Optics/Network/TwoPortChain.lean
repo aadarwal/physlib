@@ -55,6 +55,14 @@ noncomputable section
 
 universe u v w
 
+/-- A left-to-right chain transform in backward-first reference-plane coordinates.
+
+Its defining equation is `(aR, bR) = K (bL, aL)`: rows index the right state and columns index
+the left state.
+-/
+abbrev BackwardFirstChainTransform (ι : Type u) (κ : Type v) :=
+  ModeTransform (BackwardWave ι ⊕ ForwardWave ι) (BackwardWave κ ⊕ ForwardWave κ)
+
 namespace BackwardFirstTwoPortBehavior
 
 variable {ι : Type u} {κ : Type v} {μ : Type w}
@@ -78,8 +86,7 @@ In named scattering variables its defining equation is `(aR, bR) = K (bL, aL)`.
 -/
 noncomputable def leftToRightChainTransform [Fintype ι] [DecidableEq ι]
     (behavior : BackwardFirstTwoPortBehavior ι κ)
-    (hChain : behavior.HasLeftToRightChainView) :
-    ModeTransform (BackwardWave ι ⊕ ForwardWave ι) (BackwardWave κ ⊕ ForwardWave κ) :=
+    (hChain : behavior.HasLeftToRightChainView) : BackwardFirstChainTransform ι κ :=
   behavior.toModeTransform hChain
 
 /-- The derived chain transform induces the linear map extracted from the behavior. -/
@@ -115,8 +122,7 @@ two-port behavior. -/
 lemma leftToRightChainTransform_unique [Fintype ι] [DecidableEq ι]
     (behavior : BackwardFirstTwoPortBehavior ι κ)
     (hChain : behavior.HasLeftToRightChainView)
-    (transform : ModeTransform (BackwardWave ι ⊕ ForwardWave ι)
-      (BackwardWave κ ⊕ ForwardWave κ))
+    (transform : BackwardFirstChainTransform ι κ)
     (hTransform : transform.toBehavior = behavior) :
     behavior.leftToRightChainTransform hChain = transform :=
   behavior.toModeTransform_unique hChain transform hTransform
@@ -124,8 +130,7 @@ lemma leftToRightChainTransform_unique [Fintype ι] [DecidableEq ι]
 /-- Extracting the chain transform from a transform's graph recovers that transform. -/
 @[simp]
 lemma leftToRightChainTransform_toBehavior [Fintype ι] [DecidableEq ι]
-    (transform : ModeTransform (BackwardWave ι ⊕ ForwardWave ι)
-      (BackwardWave κ ⊕ ForwardWave κ)) :
+    (transform : BackwardFirstChainTransform ι κ) :
     leftToRightChainTransform transform.toBehavior transform.toBehavior_isFunctional = transform :=
   LinearBehavior.toModeTransform_toBehavior transform
 

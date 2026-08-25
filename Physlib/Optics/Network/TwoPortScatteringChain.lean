@@ -140,8 +140,12 @@ lemma rightReflection_apply (scattering : TwoPortScatteringTransform ι κ)
     scattering.rightReflection ⟨output⟩ ⟨input⟩ =
       scattering (Sum.inr ⟨output⟩) (Sum.inr ⟨input⟩) := rfl
 
-/-- A two-port transform has the required left-to-right scattering pivot when its
-right-incident-to-left-outgoing block is bijective as a linear map. -/
+/-- The algebraic pivot required by the chosen backward-first left-to-right chain presentation.
+
+Equivalently, the block mapping right-incident waves to left-outgoing waves is bijective. This is a
+solvability condition for this coordinate presentation; it does not assert invertibility,
+losslessness, reciprocity, or realizability of the full scattering transform.
+-/
 def HasBijectiveRightToLeftTransmission [Fintype κ] [DecidableEq κ]
     (scattering : TwoPortScatteringTransform ι κ) : Prop :=
   Function.Bijective scattering.rightToLeftTransmission.toLinearMap
@@ -428,8 +432,7 @@ noncomputable def backwardFirstChainBlockFormula
     [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
     (scattering : TwoPortScatteringTransform ι κ)
     (hTransmission : scattering.HasBijectiveRightToLeftTransmission) :
-    ModeTransform (BackwardWave ι ⊕ ForwardWave ι)
-      (BackwardWave κ ⊕ ForwardWave κ) :=
+    BackwardFirstChainTransform ι κ :=
   let inverseTransmission := scattering.rightToLeftTransmissionInverse hTransmission
   Matrix.fromBlocks inverseTransmission
     (-(inverseTransmission * scattering.leftReflection))
@@ -521,8 +524,7 @@ noncomputable def toBackwardFirstChainTransform
     [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
     (scattering : TwoPortScatteringTransform ι κ)
     (hTransmission : scattering.HasBijectiveRightToLeftTransmission) :
-    ModeTransform (BackwardWave ι ⊕ ForwardWave ι)
-      (BackwardWave κ ⊕ ForwardWave κ) :=
+    BackwardFirstChainTransform ι κ :=
   scattering.toBackwardFirstBehavior.leftToRightChainTransform
     ((scattering.hasLeftToRightChainView_iff_rightToLeftTransmission_bijective).2 hTransmission)
 

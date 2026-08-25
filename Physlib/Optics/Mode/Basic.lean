@@ -248,6 +248,16 @@ abbrev ModeTransform.toLinearMap {ι κ : Type*} [Fintype ι] [DecidableEq ι]
     (T : ModeTransform ι κ) : ModeAmplitude ι →ₗ[ℂ] ModeAmplitude κ :=
   Matrix.toEuclideanLin T
 
+/-- A product of mode transforms acts by applying the right transform first and the left transform
+second. -/
+lemma ModeTransform.toLinearMap_mul_apply {ι κ μ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (left : ModeTransform κ μ) (right : ModeTransform ι κ)
+    (amplitude : ModeAmplitude ι) :
+    ModeTransform.toLinearMap (left * right : ModeTransform ι μ) amplitude =
+      left.toLinearMap (right.toLinearMap amplitude) := by
+  simp only [ModeTransform.toLinearMap, Matrix.toLpLin_mul_same, LinearMap.comp_apply]
+
 /-- A mode transform is power-preserving when it preserves total modal power for every input. -/
 def ModeTransform.IsPowerPreserving {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     (T : ModeTransform ι κ) : Prop :=
