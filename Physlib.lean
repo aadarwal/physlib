@@ -152,6 +152,7 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Mathematics.KroneckerDelta.Contraction
 public import Physlib.Mathematics.LeviCivita.Basic
+public import Physlib.Mathematics.LinearAlgebra.Matrix.PosSemidefTrace
 public import Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint
 public import Physlib.Mathematics.LinearMaps
 public import Physlib.Mathematics.LinearPMap
@@ -313,8 +314,11 @@ public import Physlib.Optics.Mode.Embedding
 public import Physlib.Optics.Mode.EmbeddingRegression
 public import Physlib.Optics.Mode.Reindex
 public import Physlib.Optics.Mode.Rephase
+public import Physlib.Optics.Network.Coherency
 public import Physlib.Optics.Network.ConnectionFamily
 public import Physlib.Optics.Network.ConnectionFamilyRegression
+public import Physlib.Optics.Network.Conservation
+public import Physlib.Optics.Network.ConservationRegression
 public import Physlib.Optics.Network.ExternalChannel
 public import Physlib.Optics.Network.ExternalChannelRegression
 public import Physlib.Optics.Network.FlatNetlist
