@@ -1214,16 +1214,25 @@ PR unless maintainers explicitly ask to retain it.
   and the behavior-derived transform has the proved block formula and exact graph equality. Its
   regressions include a singular full scattering transform with bijective pivot, noncommuting
   reflection blocks, and a zero-pivot negative case.
-- [ ] Derive the inverse chain-to-scattering block formula under bijectivity of the exact leading
-  chain block and prove behavioral and matrix round trips in both directions. Keep the opposite
-  convention behind an explicit permutation.
+- [x] Derive the inverse chain-to-scattering block formula under bijectivity of the exact leading
+  chain block and prove behavioral and matrix round trips in both directions. The proved formula
+  distinguishes right-to-left transmission `K₁₁⁻¹` from left-to-right transmission
+  `K₂₂ - K₂₁ K₁₁⁻¹ K₁₂`. For scalar blocks with `K₁₁ ≠ 0`, the latter is
+  `det K / K₁₁`, hence equals `1 / K₁₁` when `det K = 1`. Keep the opposite convention behind an
+  explicit permutation.
+- [ ] Before upstreaming reverse conversion, split the pivot criterion, exact formula, behavioral
+  extraction, round trips, and adversarial regressions into maintainer-agreed stacked proposals.
+  The connected fork milestone intentionally remains larger than the usual 200-line review guide.
+- [ ] Human-verify whether and how DATE14 Theorem 5's terminated `transm = 1 / M11` statement uses
+  determinant one and maps onto this backward-first convention. Until then, describe the Lean
+  result as independent block algebra rather than DATE/HOL source parity.
 - [x] Connect the two-port scattering type to the N2a component boundary with canonical
   `Incident`/`Outgoing` sum-label equivalences and a typed two-port adapter from the existing
   oriented scattering transform. Exact four-block entries, amplitude covariance, losslessness,
   behavior membership, label round trip, and a four-distinct-nonreal-entry regression now agree.
 - [ ] Derive matched and loaded termination formulas from the relational constraint. In particular,
-  do not generalize the source's scalar `1 / M11` transmission formula without the determinant-one
-  hypothesis that makes it valid.
+  do not identify the generic Schur complement with DATE's terminated `1 / M11` statement until
+  the human source/convention audit establishes its hypotheses and coordinate correspondence.
 - [ ] Before an upstream functional-behavior proposal, decide whether its core extraction API and
   adversarial regression suite should be reviewed as one coherent PR or as two stacked PRs. The
   fork milestone keeps atomic core and regression commits while preserving end-to-end validation.

@@ -1838,7 +1838,7 @@ definition.
 - [x] scattering-to-chain conversion derived from the regrouped behavior exactly when the
   right-incident to left-outgoing transmission block is bijective, with its exact four-block
   formula and graph equality proved without a full scattering-matrix inverse;
-- [ ] chain-to-scattering conversion under bijectivity of the exact leading chain block, plus both
+- [x] chain-to-scattering conversion under bijectivity of the exact leading chain block, plus both
   behavioral and matrix round trips;
 - [x] unconditional behavioral equivalence and round trips for the reversible regrouping between
   incident/outgoing scattering coordinates and backward-first reference-plane states;
@@ -2482,7 +2482,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
-| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, and the exact behavior-derived scattering-to-chain conversion are complete; the inverse conversion, conversion round trips, netlist agreement, and terminations remain |
+| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions, and their behavioral and matrix round trips are complete; netlist agreement and terminations remain |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
