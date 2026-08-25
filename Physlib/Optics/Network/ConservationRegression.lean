@@ -834,6 +834,11 @@ it cannot distinguish `H * Gamma * Hᴴ` from `Hᴴ * Gamma * H` or from an untr
 This section therefore transports hand-computed second-order data through an explicit transform
 that is both mixing and asymmetric, and pins every entry of the result.
 
+Subsection G.1 proves its anchors directly from `CoherencyMatrix.map` and the input constructors,
+expanding both matrix products by hand; it does not use `CoherencyMatrix.map_toMatrix_apply` or any
+other derived congruence expansion. Subsection G.2 derives the channel-power, trace and
+negative-control statements from those anchors alone.
+
 -/
 
 /-- An explicit mixing, asymmetric transform `[[1, 1], [2, I]]` on two channels.
@@ -887,7 +892,21 @@ lemma conservationCoherencyRegressionAdjoint_eq :
     norm_num [conservationCoherencyRegressionAdjoint, conservationCoherencyRegressionTransform,
       Matrix.conjTranspose, Matrix.transpose, Matrix.map, Matrix.of_apply, Complex.ext_iff]
 
-/-- The exact transported coherency of the diagonal incoherent input, entry by entry.
+/-!
+
+### G.1. Independent anchors
+
+Every statement in this subsection is proved by unfolding `CoherencyMatrix.map` and the input
+constructor and then expanding the two matrix products with `Matrix.mul_apply`,
+`Matrix.conjTranspose` and the two-element `Fin` sums. None of them uses
+`CoherencyMatrix.map_toMatrix_apply` or any other derived congruence expansion, so they are an
+independent check of the transport definition rather than a restatement of it. The channel-power
+and trace checks of subsection G.2 are then derived from these anchors.
+
+-/
+
+/-- Anchor: the exact transported coherency of the diagonal incoherent input, entry by entry,
+hand-expanded from the definition.
 
 The off-diagonal entries carry the sign that distinguishes `H * Gamma * Hᴴ` from an untransposed
 congruence, and the diagonal entries distinguish it from the reversed orientation. -/
@@ -896,10 +915,61 @@ lemma conservationCoherencyRegression_diagonal_map_apply (row column : Fin 2) :
           conservationCoherencyRegressionPowers_nonneg).map
         conservationCoherencyRegressionTransform).toMatrix row column =
       ![![3, 2 - 2 * Complex.I], ![2 + 2 * Complex.I, 6]] row column := by
-  rw [CoherencyMatrix.map_toMatrix_apply]
+  rw [CoherencyMatrix.map_toMatrix, CoherencyMatrix.ofChannelPowers_toMatrix]
+  simp only [Matrix.mul_apply, Fin.sum_univ_two]
   fin_cases row <;> fin_cases column <;>
     norm_num [conservationCoherencyRegressionTransform, conservationCoherencyRegressionPowers,
-      Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply, Complex.ext_iff]
+      Matrix.conjTranspose, Matrix.transpose, Matrix.map, Matrix.of_apply, Matrix.diagonal,
+      Complex.ext_iff]
+
+/-- Anchor: the reversed congruence `Hᴴ * Gamma * H` gives nine in the first output channel,
+hand-expanded from the definition. -/
+lemma conservationCoherencyRegression_reversed_map_apply :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+          conservationCoherencyRegressionPowers_nonneg).map
+        conservationCoherencyRegressionAdjoint).toMatrix 0 0 = 9 := by
+  rw [CoherencyMatrix.map_toMatrix, CoherencyMatrix.ofChannelPowers_toMatrix]
+  simp only [Matrix.mul_apply, Fin.sum_univ_two]
+  norm_num [conservationCoherencyRegressionAdjoint, conservationCoherencyRegressionPowers,
+    Matrix.conjTranspose, Matrix.transpose, Matrix.map, Matrix.of_apply, Matrix.diagonal,
+    Complex.ext_iff]
+
+/-- Anchor: the diagonal entries transported from two decorrelated unit contributions,
+hand-expanded from the definition. -/
+lemma conservationCoherencyRegression_unit_map_apply :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionUnitPowers
+            conservationCoherencyRegressionUnitPowers_nonneg).map
+          conservationCoherencyRegressionTransform).toMatrix 0 0 = 2 ∧
+      ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionUnitPowers
+              conservationCoherencyRegressionUnitPowers_nonneg).map
+            conservationCoherencyRegressionTransform).toMatrix 1 1 = 5 := by
+  constructor <;>
+    · rw [CoherencyMatrix.map_toMatrix, CoherencyMatrix.ofChannelPowers_toMatrix]
+      simp only [Matrix.mul_apply, Fin.sum_univ_two]
+      norm_num [conservationCoherencyRegressionTransform,
+        conservationCoherencyRegressionUnitPowers, Matrix.conjTranspose, Matrix.transpose,
+        Matrix.map, Matrix.of_apply, Matrix.diagonal, Complex.ext_iff]
+
+/-- Anchor: the diagonal entries transported from the coherent superposition of the same two
+contributions, hand-expanded from the definition. -/
+lemma conservationCoherencyRegression_coherent_map_apply :
+    ((CoherencyMatrix.ofAmplitude conservationCoherencyRegressionAmplitude).map
+          conservationCoherencyRegressionTransform).toMatrix 0 0 = 4 ∧
+      ((CoherencyMatrix.ofAmplitude conservationCoherencyRegressionAmplitude).map
+            conservationCoherencyRegressionTransform).toMatrix 1 1 = 5 := by
+  constructor <;>
+    · rw [CoherencyMatrix.map_toMatrix, CoherencyMatrix.ofAmplitude_toMatrix]
+      simp only [Matrix.mul_apply, Fin.sum_univ_two]
+      norm_num [conservationCoherencyRegressionTransform, Matrix.vecMulVec,
+        Matrix.conjTranspose, Matrix.transpose, Matrix.map, Matrix.of_apply, Complex.ext_iff]
+
+/-!
+
+### G.2. Observables derived from the anchors
+
+These reuse the hand-expanded anchors of G.1 and add no further transport reasoning.
+
+-/
 
 /-- The first output channel of the diagonal incoherent input carries power three. -/
 lemma conservationCoherencyRegression_diagonal_channelPower_zero :
@@ -938,17 +1008,17 @@ lemma conservationCoherencyRegression_reversed_orientation :
       ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
             conservationCoherencyRegressionPowers_nonneg).map
           conservationCoherencyRegressionTransform).toMatrix 0 0 := by
-  rw [CoherencyMatrix.map_toMatrix_apply, conservationCoherencyRegression_diagonal_map_apply]
-  norm_num [conservationCoherencyRegressionAdjoint, conservationCoherencyRegressionPowers,
-    Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply, Complex.ext_iff]
+  rw [conservationCoherencyRegression_reversed_map_apply,
+    conservationCoherencyRegression_diagonal_map_apply]
+  norm_num
 
 /-- The coherent superposition of the two unit contributions gives output channel power four in
 the first channel: the two unit powers plus an interference term of two. -/
 lemma conservationCoherencyRegression_coherent_channelPower_zero :
     ((CoherencyMatrix.ofAmplitude conservationCoherencyRegressionAmplitude).map
         conservationCoherencyRegressionTransform).channelPower 0 = 4 := by
-  rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
-  norm_num [conservationCoherencyRegressionTransform, Fin.sum_univ_two]
+  rw [CoherencyMatrix.channelPower, conservationCoherencyRegression_coherent_map_apply.1]
+  norm_num
 
 /-- The same two contributions taken decorrelated give output channel power two in the first
 channel: the interference term is exactly the difference. -/
@@ -956,9 +1026,8 @@ lemma conservationCoherencyRegression_decorrelated_channelPower_zero :
     ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionUnitPowers
           conservationCoherencyRegressionUnitPowers_nonneg).map
         conservationCoherencyRegressionTransform).channelPower 0 = 2 := by
-  rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
-  norm_num [conservationCoherencyRegressionTransform, conservationCoherencyRegressionUnitPowers,
-    Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply]
+  rw [CoherencyMatrix.channelPower, conservationCoherencyRegression_unit_map_apply.1]
+  norm_num
 
 /-- In the second output channel the same coherent and decorrelated inputs agree, both at five,
 because that channel's interference term happens to vanish.
@@ -972,11 +1041,10 @@ lemma conservationCoherencyRegression_channelPower_one_agree :
             conservationCoherencyRegressionUnitPowers_nonneg).map
           conservationCoherencyRegressionTransform).channelPower 1 = 5 := by
   constructor
-  · rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
-    norm_num [conservationCoherencyRegressionTransform, Fin.sum_univ_two]
-  · rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
-    norm_num [conservationCoherencyRegressionTransform, conservationCoherencyRegressionUnitPowers,
-      Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply]
+  · rw [CoherencyMatrix.channelPower, conservationCoherencyRegression_coherent_map_apply.2]
+    norm_num
+  · rw [CoherencyMatrix.channelPower, conservationCoherencyRegression_unit_map_apply.2]
+    norm_num
 
 end
 
