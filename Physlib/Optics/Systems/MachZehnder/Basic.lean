@@ -29,9 +29,11 @@ fixed-carrier `a * exp (-I * φ)` law at
 
 This is the Physlib extension recorded at `goal.md:2150-2160`, not a HOL-corpus parity result.
 Powers are normalized modal powers, not electromagnetic powers without a separate Poynting
-normalization. The model has no polarization or dispersion, and attenuation occurs only through
-the explicitly parameterized arm amplitude factors. The phase parameters are fixed-frequency
-path phases, not time-domain delays.
+normalization. The algebraic response exists for every `Parameters`, including arbitrary lossy or
+gaining couplers and arms; physical meaning is asserted only under `Parameters.IsValid`. In that
+domain the N7 couplers are unitary and attenuation can occur only through the arm factors. The
+model has no polarization or dispersion, and phase parameters are fixed-frequency path phases,
+not time-domain delays. No reciprocity or time-reversed external-port pairing is claimed.
 
 ## ii. Key results
 
@@ -427,7 +429,96 @@ lemma balanced_phase_factor_ratio_eq_output_ratio
   rw [Complex.I_sq]
   ring
 
-set_option maxHeartbeats 800000 in
+/-- For a left-only drive, both solved arm coordinates incident from the output coupler vanish. -/
+lemma leftIncidentSolution_arm_right_eq_zero (p : Parameters) (first second : ℂ) :
+    let input := leftInput p first second
+    let incident :=
+      ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+    incident (Incident.mk (ambientChannel p .upperArm (armChannel 1))) = 0 ∧
+      incident (Incident.mk (ambientChannel p .lowerArm (armChannel 1))) = 0 := by
+  let input := leftInput p first second
+  let incident :=
+    ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+  change incident (Incident.mk (ambientChannel p .upperArm (armChannel 1))) = 0 ∧
+    incident (Incident.mk (ambientChannel p .lowerArm (armChannel 1))) = 0
+  have hFirst := incidentSolution_apply_external p (isWellPosed p) input .outputFirst
+  have hSecond := incidentSolution_apply_external p (isWellPosed p) input .outputSecond
+  change incident (Incident.mk (ambientChannel p .outputCoupler (couplerChannel 2))) =
+    input (externalIncidentEquiv p .outputFirst) at hFirst
+  change incident (Incident.mk (ambientChannel p .outputCoupler (couplerChannel 3))) =
+    input (externalIncidentEquiv p .outputSecond) at hSecond
+  rw [leftInput_apply] at hFirst hSecond
+  have hOutgoing := outputCoupler_outgoing_left p incident
+  rw [hFirst, hSecond] at hOutgoing
+  simp only [mul_zero, add_zero] at hOutgoing
+  have hUpper := incidentSolution_apply_connected p (isWellPosed p) input
+    ⟨Connection.upperOutput, Sum.inl ()⟩
+  have hLower := incidentSolution_apply_connected p (isWellPosed p) input
+    ⟨Connection.lowerOutput, Sum.inl ()⟩
+  change incident (Incident.mk (ambientChannel p .upperArm (armChannel 1))) =
+    (netlist p).scatteringTransform.toLinearMap incident
+      (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 0))) at hUpper
+  change incident (Incident.mk (ambientChannel p .lowerArm (armChannel 1))) =
+    (netlist p).scatteringTransform.toLinearMap incident
+      (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 1))) at hLower
+  exact ⟨hUpper.trans hOutgoing.1, hLower.trans hOutgoing.2⟩
+
+/-- For a left-only drive, reverse arm propagation reaches the input coupler with zero field. -/
+lemma leftIncidentSolution_input_right_eq_zero (p : Parameters) (first second : ℂ) :
+    let input := leftInput p first second
+    let incident :=
+      ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+    incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 2))) = 0 ∧
+      incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 3))) = 0 := by
+  let input := leftInput p first second
+  let incident :=
+    ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+  change incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 2))) = 0 ∧
+    incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 3))) = 0
+  have hArms := leftIncidentSolution_arm_right_eq_zero p first second
+  change incident (Incident.mk (ambientChannel p .upperArm (armChannel 1))) = 0 ∧
+    incident (Incident.mk (ambientChannel p .lowerArm (armChannel 1))) = 0 at hArms
+  have hUpperOutgoing := upperArm_outgoing_left p incident
+  have hLowerOutgoing := lowerArm_outgoing_left p incident
+  rw [hArms.1] at hUpperOutgoing
+  rw [hArms.2] at hLowerOutgoing
+  simp only [mul_zero] at hUpperOutgoing hLowerOutgoing
+  have hUpper := incidentSolution_apply_connected p (isWellPosed p) input
+    ⟨Connection.upperInput, Sum.inl ()⟩
+  have hLower := incidentSolution_apply_connected p (isWellPosed p) input
+    ⟨Connection.lowerInput, Sum.inl ()⟩
+  change incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 2))) =
+    (netlist p).scatteringTransform.toLinearMap incident
+      (Outgoing.mk (ambientChannel p .upperArm (armChannel 0))) at hUpper
+  change incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 3))) =
+    (netlist p).scatteringTransform.toLinearMap incident
+      (Outgoing.mk (ambientChannel p .lowerArm (armChannel 0))) at hLower
+  exact ⟨hUpper.trans hUpperOutgoing, hLower.trans hLowerOutgoing⟩
+
+/-- For a left-only drive, both left-going output coordinates of the input coupler vanish. -/
+lemma leftIncidentSolution_inputCoupler_outgoing_left_eq_zero
+    (p : Parameters) (first second : ℂ) :
+    let input := leftInput p first second
+    let incident :=
+      ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+    (netlist p).scatteringTransform.toLinearMap incident
+          (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 0))) = 0 ∧
+      (netlist p).scatteringTransform.toLinearMap incident
+          (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 1))) = 0 := by
+  let input := leftInput p first second
+  let incident :=
+    ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+  change (netlist p).scatteringTransform.toLinearMap incident
+        (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 0))) = 0 ∧
+    (netlist p).scatteringTransform.toLinearMap incident
+        (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 1))) = 0
+  have hIncident := leftIncidentSolution_input_right_eq_zero p first second
+  change incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 2))) = 0 ∧
+    incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 3))) = 0 at hIncident
+  have hOutgoing := inputCoupler_outgoing_left p incident
+  rw [hIncident.1, hIncident.2] at hOutgoing
+  simpa only [mul_zero, add_zero] using hOutgoing
+
 /-- A left-incident field produces no reflected amplitudes at either left external port. -/
 lemma reflected_amplitudes_eq_zero (p : Parameters) (first second : ℂ) :
     ((netlist p).responseTransform (isWellPosed p)).toLinearMap
@@ -435,162 +526,22 @@ lemma reflected_amplitudes_eq_zero (p : Parameters) (first second : ℂ) :
       ((netlist p).responseTransform (isWellPosed p)).toLinearMap
           (leftInput p first second) (externalOutgoingEquiv p .inputSecond) = 0 := by
   let input := leftInput p first second
-  let incident := (netlist p).incidentSolutionBlockFormula (isWellPosed p) |>.toLinearMap input
-  let outgoing := (netlist p).scatteringTransform.toLinearMap incident
-  have hFeedback : (netlist p).feedbackOperator.toLinearMap incident =
-      (netlist p).inputExposure.toLinearMap input := by
-    change (netlist p).feedbackOperator.toLinearMap
-      ((netlist p).incidentSolutionBlockFormula (isWellPosed p) |>.toLinearMap input) = _
-    change (netlist p).feedbackOperator.toLinearMap
-      (ModeTransform.toLinearMap
-        ((netlist p).feedbackInverse (isWellPosed p) * (netlist p).inputExposure)
-          input) = _
-    rw [ModeTransform.toLinearMap_mul_apply,
-      (netlist p).feedbackOperator_apply_feedbackInverse]
-  have hAssembly : incident =
-      (netlist p).connections.incidentAssembly outgoing input := by
-    exact incident_eq_incidentAssembly_of_feedbackEquation p input incident hFeedback
-  have hExternal (port : ExternalPort) :
-      incident (Incident.mk (externalAmbientChannel p port)) =
-        input (externalIncidentEquiv p port) := by
-    rw [hAssembly]
-    have h := (netlist p).connections.incidentAssembly_apply_external outgoing input
-      (externalChannel p port)
-    rw [externalChannel_val] at h
-    rw [externalIncidentEquiv_apply]
-    exact h
-  have hConnected (channel : (netlist p).ConnectedChannel) :
-      incident (Incident.mk ((netlist p).connections.channelEmbedding channel)) =
-        outgoing (Outgoing.mk ((netlist p).connections.channelEmbedding
-          ((netlist p).connections.mateEquiv channel))) := by
-    rw [hAssembly]
-    exact (netlist p).connections.incidentAssembly_apply_connected_channel
-      outgoing input channel
-  have hOutputRightFirst :
-      incident (Incident.mk (ambientChannel p .outputCoupler (couplerChannel 2))) = 0 := by
-    have h := hExternal .outputFirst
-    change incident (Incident.mk (ambientChannel p .outputCoupler (couplerChannel 2))) =
-      input (externalIncidentEquiv p .outputFirst) at h
-    exact h.trans (by simpa only [input] using leftInput_apply p first second .outputFirst)
-  have hOutputRightSecond :
-      incident (Incident.mk (ambientChannel p .outputCoupler (couplerChannel 3))) = 0 := by
-    have h := hExternal .outputSecond
-    change incident (Incident.mk (ambientChannel p .outputCoupler (couplerChannel 3))) =
-      input (externalIncidentEquiv p .outputSecond) at h
-    exact h.trans (by simpa only [input] using leftInput_apply p first second .outputSecond)
-  have hOutputOutgoingLeftFirst :
-      outgoing (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 0))) = 0 := by
-    change (netlist p).scatteringTransform.toLinearMap incident
-      (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 0))) = 0
-    rw [scatteringTransform_apply_component p incident .outputCoupler (couplerChannel 0)]
-    change (couplerScattering p.outputCoupler).toModeTransform.toLinearMap
-      (localIncident p incident .outputCoupler) (couplerChannel 0) = 0
-    rw [couplerScattering_apply_leftFirst, localIncident_apply, localIncident_apply,
-      hOutputRightFirst, hOutputRightSecond]
-    simp
-  have hOutputOutgoingLeftSecond :
-      outgoing (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 1))) = 0 := by
-    change (netlist p).scatteringTransform.toLinearMap incident
-      (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 1))) = 0
-    rw [scatteringTransform_apply_component p incident .outputCoupler (couplerChannel 1)]
-    change (couplerScattering p.outputCoupler).toModeTransform.toLinearMap
-      (localIncident p incident .outputCoupler) (couplerChannel 1) = 0
-    rw [couplerScattering_apply_leftSecond, localIncident_apply, localIncident_apply,
-      hOutputRightFirst, hOutputRightSecond]
-    simp
-  have hUpperRight :
-      incident (Incident.mk (ambientChannel p .upperArm (armChannel 1))) = 0 := by
-    have h := hConnected ⟨Connection.upperOutput, Sum.inl ()⟩
-    change incident (Incident.mk (ambientChannel p .upperArm (armChannel 1))) =
-      outgoing (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 0))) at h
-    exact h.trans hOutputOutgoingLeftFirst
-  have hLowerRight :
-      incident (Incident.mk (ambientChannel p .lowerArm (armChannel 1))) = 0 := by
-    have h := hConnected ⟨Connection.lowerOutput, Sum.inl ()⟩
-    change incident (Incident.mk (ambientChannel p .lowerArm (armChannel 1))) =
-      outgoing (Outgoing.mk (ambientChannel p .outputCoupler (couplerChannel 1))) at h
-    exact h.trans hOutputOutgoingLeftSecond
-  have hUpperOutgoingLeft :
-      outgoing (Outgoing.mk (ambientChannel p .upperArm (armChannel 0))) = 0 := by
-    change (netlist p).scatteringTransform.toLinearMap incident
-      (Outgoing.mk (ambientChannel p .upperArm (armChannel 0))) = 0
-    rw [scatteringTransform_apply_component p incident .upperArm (armChannel 0)]
-    change (armScattering p.upperArm).toModeTransform.toLinearMap
-      (localIncident p incident .upperArm) (armChannel 0) = 0
-    rw [armScattering_apply_left, localIncident_apply, hUpperRight]
-    simp
-  have hLowerOutgoingLeft :
-      outgoing (Outgoing.mk (ambientChannel p .lowerArm (armChannel 0))) = 0 := by
-    change (netlist p).scatteringTransform.toLinearMap incident
-      (Outgoing.mk (ambientChannel p .lowerArm (armChannel 0))) = 0
-    rw [scatteringTransform_apply_component p incident .lowerArm (armChannel 0)]
-    change (armScattering p.lowerArm).toModeTransform.toLinearMap
-      (localIncident p incident .lowerArm) (armChannel 0) = 0
-    rw [armScattering_apply_left, localIncident_apply, hLowerRight]
-    simp
-  have hInputRightFirst :
-      incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 2))) = 0 := by
-    have h := hConnected ⟨Connection.upperInput, Sum.inl ()⟩
-    change incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 2))) =
-      outgoing (Outgoing.mk (ambientChannel p .upperArm (armChannel 0))) at h
-    exact h.trans hUpperOutgoingLeft
-  have hInputRightSecond :
-      incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 3))) = 0 := by
-    have h := hConnected ⟨Connection.lowerInput, Sum.inl ()⟩
-    change incident (Incident.mk (ambientChannel p .inputCoupler (couplerChannel 3))) =
-      outgoing (Outgoing.mk (ambientChannel p .lowerArm (armChannel 0))) at h
-    exact h.trans hLowerOutgoingLeft
-  have hInputOutgoingFirst :
-      outgoing (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 0))) = 0 := by
-    change (netlist p).scatteringTransform.toLinearMap incident
-      (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 0))) = 0
-    rw [scatteringTransform_apply_component p incident .inputCoupler (couplerChannel 0)]
-    change (couplerScattering p.inputCoupler).toModeTransform.toLinearMap
-      (localIncident p incident .inputCoupler) (couplerChannel 0) = 0
-    rw [couplerScattering_apply_leftFirst, localIncident_apply, localIncident_apply,
-      hInputRightFirst, hInputRightSecond]
-    simp
-  have hInputOutgoingSecond :
-      outgoing (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 1))) = 0 := by
-    change (netlist p).scatteringTransform.toLinearMap incident
-      (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 1))) = 0
-    rw [scatteringTransform_apply_component p incident .inputCoupler (couplerChannel 1)]
-    change (couplerScattering p.inputCoupler).toModeTransform.toLinearMap
-      (localIncident p incident .inputCoupler) (couplerChannel 1) = 0
-    rw [couplerScattering_apply_leftSecond, localIncident_apply, localIncident_apply,
-      hInputRightFirst, hInputRightSecond]
-    simp
-  have hResponse :
-      ((netlist p).responseTransform (isWellPosed p)).toLinearMap input =
-        (netlist p).outputReadout.toLinearMap outgoing := by
-    calc
-      ((netlist p).responseTransform (isWellPosed p)).toLinearMap input =
-          ((netlist p).responseBlockFormula (isWellPosed p)).toLinearMap input :=
-        congrArg (fun transform => transform.toLinearMap input)
-          ((netlist p).responseTransform_eq_blockFormula (isWellPosed p))
-      _ = (netlist p).outputReadout.toLinearMap
-          (((netlist p).outgoingSolutionBlockFormula (isWellPosed p)).toLinearMap input) :=
-        (netlist p).responseBlockFormula_apply (isWellPosed p) input
-      _ = (netlist p).outputReadout.toLinearMap
-          ((netlist p).scatteringTransform.toLinearMap
-            (((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input)) :=
-        congrArg ((netlist p).outputReadout.toLinearMap)
-          ((netlist p).outgoingSolutionBlockFormula_apply (isWellPosed p) input)
-      _ = (netlist p).outputReadout.toLinearMap outgoing := rfl
-  have hReadout (port : ExternalPort) :
-      (netlist p).outputReadout.toLinearMap outgoing (externalOutgoingEquiv p port) =
-        outgoing (Outgoing.mk (externalAmbientChannel p port)) := by
-    rw [PortConnectionFamily.externalOutgoingReadout_apply]
-    rfl
+  let incident :=
+    ((netlist p).incidentSolutionBlockFormula (isWellPosed p)).toLinearMap input
+  have hOutgoing := leftIncidentSolution_inputCoupler_outgoing_left_eq_zero p first second
+  change (netlist p).scatteringTransform.toLinearMap incident
+        (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 0))) = 0 ∧
+    (netlist p).scatteringTransform.toLinearMap incident
+        (Outgoing.mk (ambientChannel p .inputCoupler (couplerChannel 1))) = 0 at hOutgoing
   constructor
   · change ((netlist p).responseTransform (isWellPosed p)).toLinearMap input
       (externalOutgoingEquiv p .inputFirst) = 0
-    rw [hResponse, hReadout]
-    exact hInputOutgoingFirst
+    exact (responseTransform_apply_external p (isWellPosed p) input .inputFirst).trans
+      hOutgoing.1
   · change ((netlist p).responseTransform (isWellPosed p)).toLinearMap input
       (externalOutgoingEquiv p .inputSecond) = 0
-    rw [hResponse, hReadout]
-    exact hInputOutgoingSecond
+    exact (responseTransform_apply_external p (isWellPosed p) input .inputSecond).trans
+      hOutgoing.2
 
 /-- A sum over the four named external ports in their declared order. -/
 lemma sum_externalPort (value : ExternalPort → ℝ) :

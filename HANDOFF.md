@@ -40,6 +40,42 @@ Slice 3 proves `Optics.MachZehnder.components_isLossless`, obtains
 bind N6 as `Optics.MachZehnder.coherent_output_channelPower` and
 `Optics.MachZehnder.incoherent_output_channelPower_add`.
 
+Slice 1b removes every raised-heartbeat override. Coordinate helpers split the feed-forward
+kernel and N5 readout proofs while retaining the module's shared finite and decidable-equality
+instances. The phase-zero and phase-`π` anchors now obtain witnesses from the raw N4 behavior
+equations, follow each declared connection, and read the actual N5 response without using the
+headline, balanced, or named-point transfer lemmas. The ratio fixture names the two actual response
+coordinates; the every-phase power fixture remains explicitly an N6 API specialization.
+
+Proof-support declarations added in slice 1b are
+`Optics.MachZehnder.inputCoupler_outgoing_right`,
+`Optics.MachZehnder.inputCoupler_outgoing_left`,
+`Optics.MachZehnder.outputCoupler_outgoing_right`,
+`Optics.MachZehnder.outputCoupler_outgoing_left`,
+`Optics.MachZehnder.upperArm_outgoing_right`,
+`Optics.MachZehnder.lowerArm_outgoing_right`,
+`Optics.MachZehnder.upperArm_outgoing_left`,
+`Optics.MachZehnder.lowerArm_outgoing_left`,
+`Optics.MachZehnder.incidentSolution_eq_incidentAssembly`,
+`Optics.MachZehnder.incidentSolution_apply_external`,
+`Optics.MachZehnder.incidentSolution_apply_connected`,
+`Optics.MachZehnder.responseTransform_apply_external`,
+`Optics.MachZehnder.feedbackFixedPoint_apply_external`,
+`Optics.MachZehnder.feedbackFixedPoint_apply_connected`,
+`Optics.MachZehnder.feedbackFixedPoint_input_left_eq_zero`,
+`Optics.MachZehnder.feedbackFixedPoint_arm_left_eq_zero`,
+`Optics.MachZehnder.feedbackFixedPoint_output_left_eq_zero`,
+`Optics.MachZehnder.feedbackFixedPoint_output_right_eq_zero`,
+`Optics.MachZehnder.feedbackFixedPoint_arm_right_eq_zero`,
+`Optics.MachZehnder.feedbackFixedPoint_input_right_eq_zero`,
+`Optics.MachZehnder.incidentSolution_inputCoupler_right_amplitudes`,
+`Optics.MachZehnder.incidentSolution_arm_right_amplitudes`,
+`Optics.MachZehnder.incidentSolution_outputCoupler_left_amplitudes`,
+`Optics.MachZehnder.leftIncidentSolution_arm_right_eq_zero`,
+`Optics.MachZehnder.leftIncidentSolution_input_right_eq_zero`,
+`Optics.MachZehnder.leftIncidentSolution_inputCoupler_outgoing_left_eq_zero`, and
+`Optics.MachZehnder.machZehnderRegression_response_equations`.
+
 ## Exact validation bindings
 
 Topology and general response:
@@ -86,6 +122,7 @@ S-01 regressions:
 
 - `Optics.MachZehnder.machZehnderRegression_balanced_through_mul_cross`
 - `Optics.MachZehnder.machZehnderRegression_carrierPhaseFactor_points`
+- `Optics.MachZehnder.machZehnderRegression_response_equations`
 - `Optics.MachZehnder.machZehnderRegression_phase_zero_output_amplitudes`
 - `Optics.MachZehnder.machZehnderRegression_phase_zero_dark_port`
 - `Optics.MachZehnder.machZehnderRegression_phase_pi_output_amplitudes`
@@ -141,8 +178,10 @@ Matched propagation:
 
 - No polarization.
 - No dispersion or time-domain delay; arm phases are fixed-frequency path phases.
-- No loss except through the explicitly parameterized per-arm field-amplitude factors.
+- The algebraic response is total on every `Parameters`, including arbitrary lossy or gaining
+  couplers and arms. Physical meaning is asserted only under `Parameters.IsValid`; there the
+  couplers are unitary and attenuation can occur only through the arm factors.
 - `ModeAmplitude.power` is normalized modal power, not electromagnetic power without a separate
   Poynting normalization.
-- No reciprocity or time-reversed external-port pairing is claimed by the N6 packaging.
+- No reciprocity or time-reversed external-port pairing is claimed by the modules or N6 packaging.
 - This is a Physlib extension row, not a HOL-corpus parity result.
