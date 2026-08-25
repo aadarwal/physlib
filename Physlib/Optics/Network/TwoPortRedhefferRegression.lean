@@ -68,19 +68,15 @@ def first : TwoPortScatteringTransform Unit Unit :=
 def second : TwoPortScatteringTransform Unit Unit :=
   scalarTwoPort 1 7 11 13
 
-@[simp]
 lemma scalarTwoPort_leftReflection (a b c d : ℂ) :
     (scalarTwoPort a b c d).leftReflection ⟨()⟩ ⟨()⟩ = a := rfl
 
-@[simp]
 lemma scalarTwoPort_rightToLeftTransmission (a b c d : ℂ) :
     (scalarTwoPort a b c d).rightToLeftTransmission ⟨()⟩ ⟨()⟩ = b := rfl
 
-@[simp]
 lemma scalarTwoPort_leftToRightTransmission (a b c d : ℂ) :
     (scalarTwoPort a b c d).leftToRightTransmission ⟨()⟩ ⟨()⟩ = c := rfl
 
-@[simp]
 lemma scalarTwoPort_rightReflection (a b c d : ℂ) :
     (scalarTwoPort a b c d).rightReflection ⟨()⟩ ⟨()⟩ = d := rfl
 
