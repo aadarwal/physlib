@@ -46,6 +46,7 @@ separate layer built on this certified boundary.
 - `FiniteConnectionSpec`: a bidirectional physical-port connection with explicit mode maps in both
   directions.
 - `FiniteNetlistData`: local scattering entries and a finite array of connection specifications.
+- `FiniteNetlistData.mapGains`: change only the local coefficient representation.
 - `FiniteNetlistData.WellFormed`: mutually inverse mode maps and globally unique endpoint ports.
 - `FiniteNetlistData.wellFormed_eq_true_iff`: Boolean reflection of the certificate.
 - `FiniteNetlistData.toFlatNetlist`: proof-carrying compilation into the N4 relational kernel.
@@ -147,7 +148,25 @@ structure FiniteNetlistData (R : Type*) where
 
 namespace FiniteNetlistData
 
-variable {R : Type*} (data : FiniteNetlistData R)
+variable {R S : Type*} (data : FiniteNetlistData R)
+
+/-- Apply a function to every stored local scattering gain without changing shape or wiring. -/
+@[reducible]
+def mapGains (map : R → S) : FiniteNetlistData S where
+  shape := data.shape
+  scattering := fun component => (data.scattering component).map map
+  connections := data.connections
+
+@[simp]
+lemma mapGains_shape (map : R → S) : (data.mapGains map).shape = data.shape := rfl
+
+@[simp]
+lemma mapGains_scattering (map : R → S) (component : data.shape.Component) :
+    (data.mapGains map).scattering component = (data.scattering component).map map := rfl
+
+@[simp]
+lemma mapGains_connections (map : R → S) :
+    (data.mapGains map).connections = data.connections := rfl
 
 /-- The finite index type of stored physical connections. -/
 abbrev Connection := Fin data.connections.size
@@ -191,6 +210,38 @@ def HasUniqueEndpointPorts : Prop := Function.Injective data.endpointPort
 def WellFormed : Prop :=
   data.HasLeftInverseModeMaps ∧
     data.HasRightInverseModeMaps ∧ data.HasUniqueEndpointPorts
+
+/-- Changing only local gains preserves the exact structural well-formedness proposition. -/
+@[simp]
+lemma mapGains_wellFormed_iff (map : R → S) :
+    (data.mapGains map).WellFormed ↔ data.WellFormed := by
+  unfold WellFormed
+  constructor
+  · rintro ⟨hLeft, hRight, hPorts⟩
+    refine ⟨?_, ?_, ?_⟩
+    · intro index mode
+      exact hLeft index mode
+    · intro index mode
+      exact hRight index mode
+    · intro first second hEqual
+      rcases first with ⟨firstIndex, firstEnd⟩
+      rcases second with ⟨secondIndex, secondEnd⟩
+      cases firstEnd <;> cases secondEnd <;> exact hPorts hEqual
+  · rintro ⟨hLeft, hRight, hPorts⟩
+    refine ⟨?_, ?_, ?_⟩
+    · intro index mode
+      exact hLeft index mode
+    · intro index mode
+      exact hRight index mode
+    · intro first second hEqual
+      rcases first with ⟨firstIndex, firstEnd⟩
+      rcases second with ⟨secondIndex, secondEnd⟩
+      cases firstEnd <;> cases secondEnd <;> exact hPorts hEqual
+
+/-- A structural certificate transports unchanged when only local gains are mapped. -/
+lemma WellFormed.mapGains (h : data.WellFormed) (map : R → S) :
+    (data.mapGains map).WellFormed :=
+  (data.mapGains_wellFormed_iff map).2 h
 
 instance instDecidableWellFormed : Decidable data.WellFormed := by
   unfold WellFormed HasLeftInverseModeMaps HasRightInverseModeMaps HasUniqueEndpointPorts

@@ -17,7 +17,8 @@ of the N4 network equations. Component blocks give `S`, stored bidirectional phy
 give the unit-gain return matrix `C`, and the exact complement of their channel image gives the
 incident and outgoing exposure matrices `E_in` and `E_out`.
 
-All four constructions are executable over the coefficient semiring. Mapping coefficients into
+All four constructions are executable over a coefficient type with distinguished zero and one.
+Mapping coefficients into
 `ℂ` agrees entrywise with the transforms derived independently by the singular-safe `FlatNetlist`
 kernel. The equality proof is extensional, so it does not identify the constructive equality
 decisions used here with the kernel's local classical decisions.
@@ -182,7 +183,7 @@ abbrev ExternalChannel := (Set.range data.connectedChannelMap)ᶜ
 
 section Matrices
 
-variable [Semiring R]
+variable [Zero R] [One R]
 
 /-- The block-diagonal component matrix before aggregate-channel reassociation. -/
 def indexedScatteringMatrix :
@@ -249,9 +250,9 @@ end Feedback
 
 -/
 
-section Soundness
+section MatrixEntries
 
-variable [Semiring R]
+variable [Zero R]
 
 /-- A raw diagonal component block is exactly its stored local scattering matrix. -/
 @[simp]
@@ -272,6 +273,8 @@ lemma scatteringMatrix_entry_of_ne {first second : data.shape.Component}
         (Incident.mk (data.shape.indexedChannelEquiv ⟨second, input⟩)) = 0 := by
   exact Matrix.blockDiagonal'_apply_ne data.scattering output input hComponent
 
+variable [One R]
+
 /-- Raw routing has unit gain from every stored channel to its stored mate. -/
 @[simp]
 lemma routingMatrix_entry_mate (channel : data.ConnectedChannel) :
@@ -286,6 +289,12 @@ lemma routingMatrix_entry_mate (channel : data.ConnectedChannel) :
 lemma inputExposureMatrix_entry (external : data.ExternalChannel) :
     data.inputExposureMatrix (Incident.mk external.1) (Incident.mk external) = 1 := by
   simp [inputExposureMatrix]
+
+end MatrixEntries
+
+section Soundness
+
+variable [Semiring R]
 
 /-- Raw input exposure injects an external amplitude at its underlying ambient coordinate. -/
 lemma inputExposureMatrix_mulVec_external [Fintype data.ExternalChannel]
