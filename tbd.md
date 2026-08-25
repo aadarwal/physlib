@@ -965,19 +965,33 @@ PR unless maintainers explicitly ask to retain it.
   `ModeAmplitude.power` only under pairwise integrability, mutual flux orthogonality, unit
   normalization, and an explicitly declared incident or outgoing role. It does not prove modal
   completeness or Maxwell qualification of arbitrary supplied profiles.
-- [ ] Complete the physical E3b specialization from the abstract measured-profile bridge to a
+- [x] Complete the physical E3b specialization from the abstract measured-profile bridge to a
   Maxwell-qualified family of propagating modes at one common positive carrier frequency. Supply
   an explicit aperture parameterization with its pulled-back area measure, or another justified
   geometric measure, and prove the integrated actual one-period Poynting-flux identity before
   treating the resulting `ModeAmplitude.power` equality as electromagnetic power normalization.
+  The implemented route uses a measurable planar `GeometricAperture`, ambient normalized
+  two-dimensional Hausdorff measure restricted to its region, finite common-frequency carrier
+  synthesis, and an actual-period integral theorem.
+- [ ] Human-check the physical E3b specialization before upstreaming. Confirm that every stored
+  carrier has the same positive angular frequency, zero attenuation, bilinear transversality, and
+  material dispersion; that complex coordinates scale peak phasors before ordinary-real field
+  realization; and that finite synthesis remains a fixed-medium source-free Maxwell solution.
+  Recheck that `GeometricAperture.areaMeasure` is ambient normalized two-dimensional Hausdorff
+  measure restricted to a measurable planar region, not an arbitrary profile weight or a proved
+  parameterized-surface Jacobian formula. Preserve the singleton `3 + 4 I` regression with
+  electric field `(0, 3, -4)`, magnetic field strength `(0, 4, 3)`, and actual integrated flux
+  `25`. Do not broaden the theorem beyond the declared finite synthesis image.
 - [ ] Human-check the E3b measured-profile pairing convention before an upstream proposal: the
   ordered mixed term must be `1 / 4 * n dot (E_F cross conj H_G)`, the Hermitian completion must
   conjugate the exchanged term, and self-pairing must reduce to `1 / 2 * Re (n dot
   (E cross conj H))`. Confirm that magnetic field strength `H`, not induction `B`, is integrated.
-- [ ] Decide the upstream surface-measure boundary for E3b. The current theorem deliberately takes
-  a supplied measure on a profile-coordinate type, so a pulled-back geometric area measure or
-  finite-cell quadrature convention must be supplied by a consumer. Do not describe the abstract
-  measure as physical area without a separate parameterization-and-Jacobian theorem.
+- [x] Decide the fork's surface-measure boundary for E3b. The abstract theorem continues to take a
+  supplied measure on a profile-coordinate type. The physical specialization separately uses
+  Mathlib's normalized two-dimensional Hausdorff measure on ambient `Space`, restricted to a
+  measurable region proved to lie in an oriented affine plane. A future parameterized-surface API
+  still needs its own pullback-and-Jacobian theorem; do not reinterpret arbitrary profile weights
+  or finite-cell quadrature as geometric area.
 - [ ] Keep the E3b normalized-mode claim restricted to the supplied finite synthesis image when
   upstreaming. Do not infer completeness, Maxwell qualification, raw-Jones normalization, device
   losslessness, or positive-power ports for omitted radiation, absorption, or evanescent fields.
@@ -1476,8 +1490,10 @@ PR unless maintainers explicitly ask to retain it.
   predicates with physical losslessness or passivity.
 - [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
   raw Stokes coordinates. The separate P5b/E3b follow-up now supplies propagating plane-wave
-  irradiance and actual mean-flux corollaries, but no aperture power, normalized modal power, or
-  electromagnetic-passivity conclusion exists until the flux-normalized mode family is proved.
+  irradiance, actual mean-flux corollaries, and a conditional geometric-aperture modal-power
+  normalization for declared propagating Maxwell families. P5b must still transport the analyzer
+  law through that bridge; no raw-Jones coercion, modal completeness, or complete-device
+  electromagnetic-passivity conclusion follows automatically.
 - [ ] Human-check P5b-1's ideal-analyzer boundary: its actual-field Malus theorem constructs input
   and output plane waves in the same medium, propagation frame, frequency, and phase convention.
   It models no reflection, refraction, internal component field, absorption, heating, or fate of
@@ -1554,6 +1570,17 @@ PR unless maintainers explicitly ask to retain it.
   shipped Physlib API while retaining its `no source` classification. Audit the source `-j`
   sign and port order before citing it as motivation, and do not mark the separate beam-splitter,
   reciprocity, material, bandwidth, or electromagnetic-normalization work complete.
+- [ ] Human-check the S2 all-pass microring slice before upstreaming. Confirm that the ring is the
+  explicit `FlatNetlist` built from the N7 coupler and matched-propagation components, that its
+  complete-state well-posedness is equivalent to `1 - t * gamma ≠ 0`, and that the converse uses
+  the displayed singular-incident kernel witness rather than an inverse assumption. The N5
+  response entry must equal `t + crossCoefficient^2 * gamma / (1 - t * gamma)` and specialize to
+  `(t - gamma) / (1 - t * gamma)` only under the unitary coupler law and the stored `-I` cross
+  convention. Treat `roundTripSeries` and `throughTransferSeries` as totalized `tsum`s whose
+  physical/geometric-series interpretation requires `‖t * gamma‖ < 1`. The exact `1 / 7`
+  resonance fixture independently pins both the channel equations and the convergent series.
+  This slice proves no add-drop response, power observable, critical coupling, bandwidth,
+  causality, dispersion, group delay, material model, or DATE/SysCon parity bridge.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
