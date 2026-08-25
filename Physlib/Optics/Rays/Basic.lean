@@ -7,7 +7,6 @@ module
 
 public import Mathlib.Analysis.Calculus.Deriv.Slope
 public import Mathlib.Analysis.InnerProductSpace.PiL2
-public import Mathlib.Analysis.SpecialFunctions.Trigonometric.ArctanDeriv
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.InverseDeriv
 public import Physlib.Optics.Basic
@@ -22,7 +21,9 @@ layering note.
 
 A `MeridionalRay` is a physical ray in a plane containing the optical axis: a base point together
 with a unit propagation direction, the direction recorded by the signed angle it makes with the
-axis. Its transport is exact rectilinear motion along that unit direction.
+axis. `MeridionalRay.IsForward` distinguishes directions with positive axial component. The
+plane-to-plane transport formula is total, while `MeridionalRay.basePoint_transport` identifies it
+with exact rectilinear motion under the necessary non-grazing hypothesis.
 
 A `ParaxialRay` is the reduced meridional coordinate `(height, angle)` at a reference plane. The
 paraxial transport and interface laws are stated on `ParaxialRay` as *model* laws, following the
@@ -36,31 +37,38 @@ axis. This is the content the source development postulates outright.
 
 Conventions are fixed once here and used unchanged by every later ray module.
 
-- The optical axis is the second coordinate direction and light propagates towards larger values
-  of it. Ray height is the first coordinate, positive on one fixed side of the axis.
+- The optical axis is the second coordinate direction, whose positive direction is the reference
+  forward direction. A ray need not point forward; that physical guard is
+  `MeridionalRay.IsForward`. Ray height is the first coordinate, positive on one fixed side of the
+  axis.
 - A ray angle is the signed angle between the propagation direction and the axis, so that the
   propagation direction of a meridional ray is `(sin θ, cos θ)`.
-- A surface radius of curvature is positive when the centre of curvature lies downstream of the
-  surface.
+- A surface radius of curvature is positive when the centre of curvature lies on the outgoing
+  side of the surface, which is downstream in the locally folded coordinate after the interface.
+  Comparing signed radii with a source using convex/concave labels therefore needs an explicit
+  convention map.
 - Reflection uses the *folded* convention: after a mirror the axis is re-referenced to the new
   propagation direction. A plane mirror therefore acts as the identity on `(height, angle)`, and
-  a mirror does not change the refractive index. The alternative unfolded convention, in which a
-  plane mirror sends `θ` to `-θ`, differs by one angle reversal and is recorded in
+  a mirror does not change the refractive index. The explicit output-angle coordinate reversal,
+  which sends the folded plane-mirror output `θ` to `-θ`, is recorded in
   `Physlib.Optics.Rays.Transfer`.
 
 Explicit non-claims. No electromagnetic field, irradiance, polarization, or power is assigned to a
-ray here; a ray carries only a position and a direction. The paraxial interface laws for curved
-surfaces are model laws: this file proves the small-angle bridge for planar refraction and for
-free-space transport only, and makes no claim that the spherical-surface laws have been derived
-from an exact surface geometry. Nothing here connects a ray to the wave or electromagnetic models
-in `Physlib.Optics.Polarization` or `Physlib.Electromagnetism`. Section F supplies the ray-side
-objects a bridge to the exact interface geometry needs, but does not build that bridge.
+ray here; a ray carries only a position and a direction. At a grazing angle, real division and
+`tan` are totalized algebraically, so the unguarded transport definition is not a physical
+intersection theorem. The paraxial interface laws for curved surfaces are model laws: this file
+proves the small-angle bridge for planar refraction and for free-space transport only, and makes
+no claim that the spherical-surface laws have been derived from an exact surface geometry. Nothing
+here connects a ray to the wave or electromagnetic models in `Physlib.Optics.Polarization` or
+`Physlib.Electromagnetism`. Section F supplies signed meridional data for a future bridge to exact
+interface geometry, but does not identify it with E5b's unoriented Euclidean angle.
 
 ## ii. Key results
 
 - `Optics.MeridionalRay.norm_direction`: a ray direction is a unit vector.
-- `Optics.MeridionalRay.basePoint_transport`: exact transport moves the base point along the unit
-  direction by the arclength that advances the axial coordinate by the stated amount.
+- `Optics.MeridionalRay.IsForward`: the direction has strictly positive axial component.
+- `Optics.MeridionalRay.basePoint_transport`: non-grazing transport moves the base point along the
+  unit direction by the signed line parameter that advances the axial coordinate as stated.
 - `Optics.ParaxialGap.rayBehavior_iff_eq_transport`: the relational free-space law is the graph of
   the paraxial transport map.
 - `Optics.ParaxialInterface.exists_rayBehavior` and
@@ -70,10 +78,10 @@ objects a bridge to the exact interface geometry needs, but does not build that 
   exact rectilinear transport to first order in the ray angle.
 - `Optics.abs_paraxialSnell_sub_le`: exact Snell refraction implies the paraxial refraction law up
   to an explicit cubic error.
-- `Optics.tendsto_exactRefractionAngle_div`: the exactly refracted angle has paraxial angle ratio
-  `n₀ / n₁` in the limit on the axis.
-- `Optics.MeridionalRay.cos_incidenceAngle`: the named hook for the cross-lane bridge to the
-  exact interface geometry, identifying the incidence angle with the direction-normal angle.
+- `Optics.tendsto_exactRefractionAngle_div`: the principal-branch Snell expression has paraxial
+  angle ratio `n₀ / n₁` in the limit on the axis.
+- `Optics.MeridionalRay.cos_signedIncidenceAngle`: the cosine bridge between the signed
+  meridional difference and the direction-normal inner product.
 
 ## iii. Table of contents
 
@@ -187,6 +195,9 @@ structure MeridionalRay where
 
 namespace MeridionalRay
 
+/-- A meridional ray points forward when its direction has strictly positive axial component. -/
+def IsForward (r : MeridionalRay) : Prop := 0 < cos r.angle
+
 /-- The unit propagation direction of a meridional ray, in `(transverse, axial)` components. -/
 def direction (r : MeridionalRay) : EuclideanSpace ℝ (Fin 2) := !₂[sin r.angle, cos r.angle]
 
@@ -213,11 +224,13 @@ lemma norm_direction (r : MeridionalRay) : ‖r.direction‖ = 1 := by
   rw [EuclideanSpace.norm_eq]
   simp [Fin.sum_univ_two, Real.norm_eq_abs, sq_abs, sin_sq_add_cos_sq]
 
-/-- Exact rectilinear transport of a meridional ray to the reference plane a signed axial distance
-`d` downstream.
+/-- The total plane-to-plane transport formula for a meridional ray across signed axial distance
+`d`.
 
-The transverse height advances by `d * tan angle`. This is exact geometry, with no small-angle
-approximation; the corresponding paraxial law replaces `tan angle` by `angle`.
+The transverse height advances by `d * tan angle`; the corresponding paraxial law replaces
+`tan angle` by `angle`. When `cos angle ≠ 0`, `basePoint_transport` proves that this is exact
+rectilinear geometry with signed line parameter `d / cos angle`. At a grazing angle the real
+functions are totalized, and this definition carries no physical intersection claim.
 -/
 def transport (d : ℝ) (r : MeridionalRay) : MeridionalRay where
   height := r.height + d * tan r.angle
@@ -235,11 +248,11 @@ lemma transport_height (d : ℝ) (r : MeridionalRay) :
 lemma transport_axialPosition (d : ℝ) (r : MeridionalRay) :
     (r.transport d).axialPosition = r.axialPosition + d := rfl
 
-/-- Transport moves the base point along the unit propagation direction.
+/-- Non-grazing transport moves the base point along the unit propagation direction.
 
-The arclength travelled is `d / cos angle`, which is the arclength advancing the axial coordinate
-by `d`. The hypothesis `cos angle ≠ 0` excludes rays travelling perpendicular to the axis, which
-never reach a downstream reference plane.
+The signed line parameter is `d / cos angle`, which advances the axial coordinate by `d`. It is a
+nonnegative forward arclength when `r.IsForward` and `0 ≤ d`. The hypothesis here only excludes
+rays perpendicular to the axis; direction and distance signs remain explicit.
 -/
 lemma basePoint_transport (r : MeridionalRay) (hcos : cos r.angle ≠ 0) (d : ℝ) :
     (r.transport d).basePoint = r.basePoint + (d / cos r.angle) • r.direction := by
@@ -252,6 +265,11 @@ lemma basePoint_transport (r : MeridionalRay) (hcos : cos r.angle ≠ 0) (d : �
   · simp only [basePoint, transport, direction, Fin.mk_one, PiLp.toLp_apply,
       Matrix.cons_val_one, Matrix.cons_val_zero, PiLp.add_apply, PiLp.smul_apply, smul_eq_mul,
       hcancel]
+
+/-- Forward transport across a nonnegative axial distance has a nonnegative line parameter. -/
+lemma transportParameter_nonneg (r : MeridionalRay) (hForward : r.IsForward) {d : ℝ}
+    (hd : 0 ≤ d) : 0 ≤ d / cos r.angle :=
+  div_nonneg hd hForward.le
 
 /-- The paraxial coordinate of a meridional ray at its own reference plane. -/
 def toParaxial (r : MeridionalRay) : ParaxialRay := ⟨r.height, r.angle⟩
@@ -515,11 +533,13 @@ lemma abs_paraxialSnell_sub_le {n₀ n₁ θ₀ θ₁ : ℝ} (hn₀ : 0 ≤ n₀
         · exact abs_sub_sin_le θ₁
     _ = (n₀ * |θ₀| ^ 3 + n₁ * |θ₁| ^ 3) / 6 := by ring
 
-/-- The angle of the ray refracted at a plane surface, obtained from exact Snell refraction.
+/-- The principal-branch angle obtained by algebraically solving the sine form of Snell refraction.
 
 Off the range where Snell refraction has a solution this returns the clamped value supplied by
 `Real.arcsin`; `sin_exactRefractionAngle` states the exact Snell law under the hypothesis that
-excludes total internal reflection.
+excludes total internal reflection. This definition is total even at `n₁ = 0`, where Lean's field
+division is algebraically totalized and no physical refraction meaning is claimed. Physical uses
+must separately supply positive medium indices and the intended propagation branch.
 -/
 def exactRefractionAngle (n₀ n₁ θ : ℝ) : ℝ := arcsin (n₀ / n₁ * sin θ)
 
@@ -534,10 +554,10 @@ lemma sin_exactRefractionAngle {n₀ n₁ θ : ℝ} (hn₁ : n₁ ≠ 0) (h : |n
 
 /-- The paraxial angle ratio is the exact refraction ratio in the limit on the axis.
 
-The paraxial law `n₁ θ₁ = n₀ θ₀` says the angle ratio is `n₀ / n₁`; this is exactly the limit of
-the ratio of the exactly refracted angle to the incident angle as the incident angle tends to
-zero. Near the axis the refraction ratio is automatically in range, so no total-internal-reflection
-hypothesis appears.
+The paraxial law `n₁ θ₁ = n₀ θ₀` says the angle ratio is `n₀ / n₁`; this is exactly the analytic
+limit of the principal-branch expression as the incident angle tends to zero. The identity is
+stated for arbitrary real parameters using Lean's totalized division. Interpreting it as physical
+refraction additionally requires positive indices; the theorem itself selects no outgoing ray.
 -/
 lemma tendsto_exactRefractionAngle_div (n₀ n₁ : ℝ) :
     Tendsto (fun θ : ℝ => exactRefractionAngle n₀ n₁ θ / θ) (𝓝[≠] 0) (𝓝 (n₀ / n₁)) := by
@@ -587,47 +607,51 @@ end ParaxialGap
 
 -/
 
-/-- The unit normal of a plane surface whose normal is tilted by `normalAngle` from the optical
-axis, in `(transverse, axial)` components. -/
-def surfaceNormal (normalAngle : ℝ) : EuclideanSpace ℝ (Fin 2) :=
+/-- The unit normal of a meridional plane section whose normal is tilted by `normalAngle` from the
+optical axis, in `(transverse, axial)` components. -/
+def meridionalSurfaceNormal (normalAngle : ℝ) : EuclideanSpace ℝ (Fin 2) :=
   !₂[sin normalAngle, cos normalAngle]
 
-/-- A surface normal is a unit vector. -/
-lemma norm_surfaceNormal (normalAngle : ℝ) : ‖surfaceNormal normalAngle‖ = 1 := by
+/-- A meridional surface normal is a unit vector. -/
+lemma norm_meridionalSurfaceNormal (normalAngle : ℝ) :
+    ‖meridionalSurfaceNormal normalAngle‖ = 1 := by
   rw [EuclideanSpace.norm_eq]
-  simp [Fin.sum_univ_two, Real.norm_eq_abs, sq_abs, sin_sq_add_cos_sq, surfaceNormal]
+  simp [Fin.sum_univ_two, Real.norm_eq_abs, sq_abs, sin_sq_add_cos_sq,
+    meridionalSurfaceNormal]
 
 namespace MeridionalRay
 
-/-- The angle of incidence of a meridional ray on a plane surface whose normal makes the angle
-`normalAngle` with the optical axis.
+/-- The signed difference between a meridional ray angle and a plane-normal angle.
 
 This is the named hook for the cross-lane bridge that `goal.md` §H.5 R1 asks for, between the
 paraxial ray angle used here and the exact geometric incidence directions of E5b. That bridge
 cannot live in this module, whose layering rule forbids importing `Physlib.Optics.Interfaces`.
 The objects it needs from the ray side are `Optics.MeridionalRay.direction`,
-`Optics.surfaceNormal` and this angle, tied together by `Optics.MeridionalRay.cos_incidenceAngle`
-below. The bridge module should relate them to
+`Optics.meridionalSurfaceNormal` and this signed difference, tied together by
+`Optics.MeridionalRay.cos_signedIncidenceAngle` below. The E5b angle is an unoriented Euclidean
+angle in `[0, π]`, so equality of these real numbers is not asserted. A bridge must use the cosine
+identity together with explicit range and side conventions. The target is
 `Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry`, whose `incidentPhaseAngle` is
 measured from the negative-side normal, and the sign map between the two conventions is the first
 thing that bridge has to fix.
 -/
-def incidenceAngle (r : MeridionalRay) (normalAngle : ℝ) : ℝ := r.angle - normalAngle
+def signedIncidenceAngle (r : MeridionalRay) (normalAngle : ℝ) : ℝ := r.angle - normalAngle
 
 @[simp]
-lemma incidenceAngle_zero (r : MeridionalRay) : r.incidenceAngle 0 = r.angle := by
-  simp [incidenceAngle]
+lemma signedIncidenceAngle_zero (r : MeridionalRay) : r.signedIncidenceAngle 0 = r.angle := by
+  simp [signedIncidenceAngle]
 
-/-- The incidence angle is the angle between the ray's propagation direction and the surface
-normal: its cosine is their inner product.
+/-- The cosine of the signed meridional angle difference is the inner product of the ray direction
+and the meridional surface normal.
 
-This identity is what any bridge to the exact interface geometry must pass through, so it is
-proved on the ray side rather than left to the bridge module.
+This is the dimension-two identity that a later range-guarded bridge to E5b's unoriented angle must
+pass through. Equality of cosines alone does not identify the two angle values.
 -/
-lemma cos_incidenceAngle (r : MeridionalRay) (normalAngle : ℝ) :
-    cos (r.incidenceAngle normalAngle) = inner ℝ r.direction (surfaceNormal normalAngle) := by
-  rw [incidenceAngle, cos_sub, PiLp.inner_apply]
-  simp [Fin.sum_univ_two, direction, surfaceNormal, RCLike.inner_apply]
+lemma cos_signedIncidenceAngle (r : MeridionalRay) (normalAngle : ℝ) :
+    cos (r.signedIncidenceAngle normalAngle) =
+      inner ℝ r.direction (meridionalSurfaceNormal normalAngle) := by
+  rw [signedIncidenceAngle, cos_sub, PiLp.inner_apply]
+  simp [Fin.sum_univ_two, direction, meridionalSurfaceNormal, RCLike.inner_apply]
   ring
 
 end MeridionalRay
