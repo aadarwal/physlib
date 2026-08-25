@@ -251,6 +251,15 @@ lemma externalIncidentInjection_entry_external [DecidableEq P.Channel]
     family.externalIncidentInjection (Incident.mk channel.1) (Incident.mk channel) = 1 := by
   simp [externalIncidentInjection]
 
+/-- External incident injection is zero away from the selected ambient coordinate. -/
+lemma externalIncidentInjection_entry_of_ne [DecidableEq P.Channel]
+    (incident : P.Channel) (external : family.ExternalChannel)
+    (hChannel : incident ≠ external.1) :
+    family.externalIncidentInjection (Incident.mk incident) (Incident.mk external) = 0 := by
+  unfold externalIncidentInjection
+  rw [ModeTransform.zeroExtension_entry,
+    if_neg (fun hEqual => hChannel (congrArg Incident.channel hEqual).symm)]
+
 /-- External incident injection has a zero entry from an external input to a connected ambient
 coordinate. -/
 lemma externalIncidentInjection_entry_connected [DecidableEq P.Channel]
@@ -421,6 +430,31 @@ lemma externalOutgoingInjection_entry_external [DecidableEq P.Channel]
     (channel : family.ExternalChannel) :
     family.externalOutgoingInjection (Outgoing.mk channel.1) (Outgoing.mk channel) = 1 := by
   simp [externalOutgoingInjection]
+
+/-- External outgoing readout has a unit entry at every selected external coordinate. -/
+@[simp]
+lemma externalOutgoingReadout_entry_external [DecidableEq P.Channel]
+    (channel : family.ExternalChannel) :
+    family.externalOutgoingReadout (Outgoing.mk channel) (Outgoing.mk channel.1) = 1 := by
+  simp [externalOutgoingReadout]
+
+/-- External outgoing injection is zero away from the selected ambient coordinate. -/
+lemma externalOutgoingInjection_entry_of_ne [DecidableEq P.Channel]
+    (outgoing : P.Channel) (external : family.ExternalChannel)
+    (hChannel : outgoing ≠ external.1) :
+    family.externalOutgoingInjection (Outgoing.mk outgoing) (Outgoing.mk external) = 0 := by
+  unfold externalOutgoingInjection
+  rw [ModeTransform.zeroExtension_entry,
+    if_neg (fun hEqual => hChannel (congrArg Outgoing.channel hEqual).symm)]
+
+/-- External outgoing readout is zero away from the selected ambient coordinate. -/
+lemma externalOutgoingReadout_entry_of_ne [DecidableEq P.Channel]
+    (external : family.ExternalChannel) (outgoing : P.Channel)
+    (hChannel : outgoing ≠ external.1) :
+    family.externalOutgoingReadout (Outgoing.mk external) (Outgoing.mk outgoing) = 0 := by
+  unfold externalOutgoingReadout
+  rw [ModeTransform.restriction_entry,
+    if_neg (fun hEqual => hChannel (congrArg Outgoing.channel hEqual).symm)]
 
 /-- External outgoing injection has a zero entry from an external input to a connected ambient
 coordinate. -/

@@ -30,7 +30,8 @@ planar boundaries, waveguides, and phase-matching arguments.
 
 Two vectors have the same tangential projection exactly when their real inner products against
 every tangent vector agree. This describes the projection without choosing a tangent basis and
-makes explicit that tangent probes cannot distinguish normal components.
+makes explicit that tangent probes cannot distinguish normal components. Equal tangential
+projections also place either vector in the real span of the other vector and the stored normal.
 
 The two geometric sides are exchanged by an explicit opposite operation. The corresponding
 side-relative vector angle is measured with Mathlib's unoriented Euclidean angle. Reflection of a
@@ -43,6 +44,8 @@ negates its normal component, and preserves the angle when the reference side is
 - `OrientedAffineHyperplane.normalComponent_tangentialProjection`: the tangential projection is
   tangent.
 - `OrientedAffineHyperplane.tangentialProjection_add_normal`: exact vector decomposition.
+- `OrientedAffineHyperplane.mem_span_pair_normalVector_of_tangentialProjection_eq`: equal
+  tangential projections give a common two-generator real span.
 - `OrientedAffineHyperplane.tangentialProjection_normalVector`: the unit normal projects to zero.
 - `OrientedAffineHyperplane.tangentSubmodule`: tangent displacements as a real submodule.
 - `OrientedAffineHyperplane.eq_normalComponent_smul_normalVector_of_inner_eq_zero_on_tangent`:
@@ -398,6 +401,19 @@ lemma tangentialProjection_add_normal (plane : OrientedAffineHyperplane d)
     (v : EuclideanSpace ℝ (Fin d)) :
     plane.tangentialProjection v + plane.normalComponent v • plane.normalVector = v := by
   simp [tangentialProjection]
+
+/-- If two vectors have the same tangential projection, then either lies in the real span of the
+other vector and the oriented unit normal. -/
+lemma mem_span_pair_normalVector_of_tangentialProjection_eq
+    (plane : OrientedAffineHyperplane d) {u v : EuclideanSpace ℝ (Fin d)}
+    (hProjection : plane.tangentialProjection v = plane.tangentialProjection u) :
+    v ∈ Submodule.span ℝ {u, plane.normalVector} := by
+  let carrier := Submodule.span ℝ {u, plane.normalVector}
+  have hu : u ∈ carrier := Submodule.subset_span (by simp)
+  have hn : plane.normalVector ∈ carrier := Submodule.subset_span (by simp)
+  rw [← plane.tangentialProjection_add_normal v, hProjection, tangentialProjection]
+  exact carrier.add_mem (carrier.sub_mem hu (carrier.smul_mem _ hn))
+    (carrier.smul_mem _ hn)
 
 /-- Tangential projection commutes with vector addition. -/
 lemma tangentialProjection_add (plane : OrientedAffineHyperplane d)

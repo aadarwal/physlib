@@ -13,7 +13,8 @@ public import Physlib.Optics.Rays.Basic
 ## i. Overview
 
 Exact rational fixtures pin the sign, ordering, and index conventions of the paraxial ray laws,
-and identity limits pin the degenerate cases every later ray module inherits.
+while exact axis, grazing, and backward directions pin the forward-ray guard inherited by later
+physical statements.
 
 The refracting fixtures are chosen so that an inverted index ratio, a dropped index step, or a
 flipped curvature sign changes the stated value. The converging-surface fixture in particular
@@ -30,8 +31,8 @@ because `θ < tan θ`.
 - `Optics.raysBasicRegression_planeRefracting`: the index ratio is `n₀ / n₁`, not its inverse.
 - `Optics.raysBasicRegression_sphericalRefracting_converging`: a converging surface bends an
   axis-parallel ray towards the axis.
-- `Optics.raysBasicRegression_sphericalMirror_focal`: a concave mirror of radius `R` focuses an
-  axis-parallel ray at `R / 2`.
+- `Optics.raysBasicRegression_sphericalMirror_focal`: a positive-radius focusing mirror fixes the
+  outgoing slope, and the following gap reaches the axis one radius-half later.
 - `Optics.raysBasicRegression_phaseConjugate_ne_planeMirror`: the folded plane mirror and the
   phase-conjugating mirror are different components.
 - `Optics.raysBasicRegression_paraxial_height_lt_exact`: the paraxial gap law underestimates the
@@ -64,6 +65,22 @@ open Real
 ## A. Gap transport sentinels
 
 -/
+
+/-- An axis-parallel meridional ray points forward. -/
+lemma raysBasicRegression_axisRay_isForward :
+    (MeridionalRay.mk 1 0 0).IsForward := by
+  norm_num [MeridionalRay.IsForward]
+
+/-- A ray perpendicular to the axis is not forward, so unguarded grazing transport has no physical
+downstream interpretation. -/
+lemma raysBasicRegression_grazingRay_not_isForward :
+    ¬(MeridionalRay.mk 1 0 (π / 2)).IsForward := by
+  simp [MeridionalRay.IsForward]
+
+/-- A ray directed along the negative optical axis is not forward. -/
+lemma raysBasicRegression_backwardRay_not_isForward :
+    ¬(MeridionalRay.mk 1 0 π).IsForward := by
+  norm_num [MeridionalRay.IsForward]
 
 /-- A homogeneous gap of index `3 / 2` and axial length `3`. -/
 def raysBasicRegressionGap : ParaxialGap := ⟨3 / 2, 3⟩
@@ -121,7 +138,7 @@ lemma raysBasicRegression_planeRefracting_unique (r₁ : ParaxialRay)
 axis-parallel ray at height `1` to the angle `-1 / 3`.
 
 The sign is the physical content: a converging surface sends the ray towards the axis. Dropping
-the index step, or flipping the curvature sign, reverses it.
+the index step erases the bending, while flipping the curvature sign reverses it.
 -/
 lemma raysBasicRegression_sphericalRefracting_converging :
     (ParaxialInterface.sphericalRefracting 1).RayBehavior 1 (3 / 2) ⟨1, 0⟩ ⟨1, -1 / 3⟩ := by
@@ -132,12 +149,18 @@ lemma raysBasicRegression_sphericalRefracting_converging :
 lemma raysBasicRegression_sphericalRefracting_angle_neg :
     (⟨1, -1 / 3⟩ : ParaxialRay).angle < 0 := by norm_num
 
-/-- A concave mirror of radius `2` sends an axis-parallel ray at height `1` to the angle `-1`, so
-it crosses the axis one unit downstream, at the focal distance `R / 2`. -/
+/-- Under Physlib's outgoing-side radius convention, a positive-radius focusing mirror sends an
+axis-parallel ray at height `1` to angle `-1`. -/
 lemma raysBasicRegression_sphericalMirror_focal :
     (ParaxialInterface.sphericalMirror 2).RayBehavior 1 1 ⟨1, 0⟩ ⟨1, -1⟩ := by
   refine ⟨rfl, ?_⟩
   norm_num
+
+/-- A unit gap after the positive-radius focusing-mirror fixture reaches the optical axis, pinning
+the focal-distance consequence rather than only its outgoing slope. -/
+lemma raysBasicRegression_sphericalMirror_reaches_axis :
+    (ParaxialGap.mk 1 1).RayBehavior ⟨1, -1⟩ ⟨0, -1⟩ := by
+  constructor <;> norm_num
 
 /-- The folded plane mirror leaves a ray angle alone, while the phase-conjugating mirror reverses
 it, so the two components are not interchangeable. -/
@@ -178,14 +201,16 @@ lemma raysBasicRegression_planeRefracting_matched {n : ℝ} (hn : n ≠ 0) (r₀
     (h : ParaxialInterface.planeRefracting.RayBehavior n n r₀ r₁) : r₁ = r₀ :=
   ParaxialRay.ext h.1 (mul_left_cancel₀ hn h.2)
 
-/-- A spherical surface between equal indices leaves the ray coordinate unchanged, whatever its
-radius: with no index step there is nothing to refract. -/
-lemma raysBasicRegression_sphericalRefracting_matched {n radius : ℝ} (hn : n ≠ 0)
+/-- A valid spherical surface between equal positive indices leaves the ray coordinate unchanged:
+with no index step there is nothing to refract. -/
+lemma raysBasicRegression_sphericalRefracting_matched {n radius : ℝ} (hn : 0 < n)
+    (hRadius : radius ≠ 0)
     (r₀ r₁ : ParaxialRay)
     (h : (ParaxialInterface.sphericalRefracting radius).RayBehavior n n r₀ r₁) : r₁ = r₀ := by
-  refine ParaxialRay.ext h.1 (mul_left_cancel₀ hn ?_)
-  rw [h.2]
-  ring
+  apply ParaxialInterface.rayBehavior_unique
+    (i := ParaxialInterface.sphericalRefracting radius) (n₀ := n) (n₁ := n)
+    ⟨hn, hn, hRadius⟩ r₀ r₁ r₀ h
+  exact ⟨rfl, by ring⟩
 
 /-- Between equal indices the exactly refracted angle is the incident angle, for any incident
 angle in the principal range. This is the identity limit of `Optics.exactRefractionAngle`. -/

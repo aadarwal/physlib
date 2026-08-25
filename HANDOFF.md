@@ -24,7 +24,7 @@ This lane edits none of them; the registrations it needs are listed below.
 
 - `lake-lock build` of all four modules — clean, no warnings.
 - `lake-lock env lean -Dwarn.sorry=false -Dweak.says.verify=true <each file>` — zero output.
-- Batteries declaration linters (all 14, module-scoped over 663 declarations) — passed. Verified
+- Batteries declaration linters (all 14, module-scoped over 711 declarations) — passed. Verified
   to have teeth with a deliberately undocumented `def`, which the run rejected.
 - `module_doc_lint` and `style_lint` rules, plus the `regex_lint` unneeded-parentheses rule,
   reimplemented as text checks and run over both files — clean. Validated against
@@ -68,14 +68,36 @@ Note the sort order: `Gaussian` and `Imaging` come before `Transfer`.
 - `Physlib/Optics/Rays/Gaussian.lean`
 - `Physlib/Optics/Rays/GaussianRegression.lean`
 
-## Pending prose fix on the integration branch
+## Sync with `optics/development`
 
-The controller reported on 2026-08-25 that the conductor is correcting one wording in
-`Rays/Transfer.lean` **on `optics/development`**: its reference prose calls the thesis convention
-"unfolded", which the parity lane's reading shows is wrong — the thesis matrices are the *folded*
-ones, and `Optics.angleReversal`'s form is a separate fixed-axis presentation. This branch has
-deliberately **not** touched that prose, to avoid a merge conflict with the correction. Files
-added from R4 onward use the corrected terminology.
+`optics/development` was merged into this branch after R4 (merge commit below), bringing the
+conductor's post-review changes `2647af48` and `d10f5d32`. Conflicts in `Rays/Basic.lean` and
+`Rays/Transfer.lean` were resolved **in the conductor's favour**, as instructed. One non-conflicting
+addition of this lane was kept, because it postdates the review and the parity lane asked for it:
+`Optics.angleReversal_mul_self`, with its docstring rewritten into the corrected terminology.
+
+What the sync changed on this lane's side:
+
+- **`Optics.composedIsValid_objectImageFrame` gained two hypotheses.** `ComposedIsValid` is now a
+  conjunction that includes `ComposedIndicesCompatible`, so the object-image frame now also
+  requires `objectGap.index = ParaxialSystem.headIndex cs exitGap` and
+  `exitGap.index = imageGap.index`. This is a strengthening in the right direction: object space
+  must be the medium the system is entered from and image space the medium it is left into, which
+  is exactly what GO-06's explicit index positivity is about. The R3 ledger note stands.
+- **`Optics.thickLens_principalDistances` now names `thickLensSystem`** in its `hM` hypothesis,
+  instead of spelling out the two-component list. No change in content.
+- Nothing in R4 changed. `Rays/Gaussian.lean` and `Rays/GaussianRegression.lean` compiled against
+  the new API unchanged.
+- The terminology correction landed: the prose no longer calls the thesis convention "unfolded",
+  and `unfoldedTransferMatrix` is now `outputAngleReversedTransferMatrix`. This lane's own prose
+  in `TransferRegression.lean` was updated to match.
+- The lane's centre-of-curvature note lost its "derived by the parity lane, not stated by the
+  thesis" provenance in the conductor's rewrite. That provenance belongs in the parity ledger
+  rather than in the module doc, and is recorded in the GO-03 row below.
+
+**Registration still needed.** `optics/development` already registers `Rays.Basic`,
+`Rays.BasicRegression`, `Rays.Transfer` and `Rays.TransferRegression`. The four modules from R3
+and R4 are still unregistered; see the list above.
 
 ---
 
@@ -408,8 +430,12 @@ sign convention at the same time.
 - *physically valid domain and free-propagation law* — done. The domain is a field of
   `GaussianBeam`, not a side condition, and `im_abcdTransform_pos` proves it is preserved.
 - *Gaussian solution of the paraxial wave/Helmholtz equation* — done, for the transverse-Laplacian
-  form with the `exp (- i k z)` carrier, stated explicitly in `SatisfiesParaxialHelmholtz`. No
-  claim is made about the full three-dimensional Laplacian or the opposite carrier sign.
+  form with the `exp (- i k z)` carrier, stated explicitly in `SatisfiesParaxialHelmholtz`. The
+  parity lane has since confirmed this **matches the source exactly** (Defs. 4.3–4.5, Eq. 4.4), so
+  GB-02 is parity and needs no convention-mapping row. One typing divergence is recorded in the
+  module doc and runs *against* this development: the source quantifies its verification over
+  complex `x`, `y`, `z`, an artifact of its complex-differentiation tactic, so it asserts strictly
+  more instances than the real-coordinate statement here.
 - *ABCD transformation with denominator and domain proofs* — done, and in the strong form: the
   denominator condition is **proved**, not assumed. See the ledger note on GB-04 below.
 - *output waist and location formulas* — done, `outputWaistDistance_of_isAtWaist` and

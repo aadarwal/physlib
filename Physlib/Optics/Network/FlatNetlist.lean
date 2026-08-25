@@ -55,6 +55,8 @@ ordering.
 - `FlatNetlist.solutionBehavior`: every full state satisfying component and return relations.
 - `FlatNetlist.behavior`: the singular-safe external behavior obtained by relational projection.
 - `FlatNetlist.mem_behavior_iff_equations`: the exact three network equations.
+- `FlatNetlist.mem_behavior_iff_matrixEquations`: the same equations with explicit finite
+  enumerations and unbundled matrix-vector actions.
 - `FlatNetlist.mem_behavior_iff_feedbackEquation`: the equivalent implicit feedback relation.
 
 ## iv. Table of contents
@@ -138,26 +140,135 @@ def scatteringMatrix : ScatteringMatrix netlist.Channel := by
 def scatteringTransform : ModeTransform netlist.IncidentIndex netlist.OutgoingIndex :=
   netlist.scatteringMatrix.toOrientedModeTransform
 
+/-- The assembled netlist transform retains every local entry of one component block. -/
+lemma scatteringTransform_entry_same (component : netlist.components.Component)
+    (output input : (netlist.components.portFamily component).Channel) :
+    netlist.scatteringTransform
+        (Outgoing.mk (netlist.components.componentChannelEmbedding component output))
+        (Incident.mk (netlist.components.componentChannelEmbedding component input)) =
+      (netlist.components.scattering component).toModeTransform output input := by
+  classical
+  unfold scatteringTransform
+  rw [ScatteringMatrix.toOrientedModeTransform_apply]
+  unfold scatteringMatrix
+  exact netlist.components.assembledScatteringMatrix_entry_same component output input
+
+/-- Distinct component blocks have no direct entry in the assembled netlist transform. -/
+lemma scatteringTransform_entry_of_ne {first second : netlist.components.Component}
+    (hComponent : first ≠ second)
+    (output : (netlist.components.portFamily first).Channel)
+    (input : (netlist.components.portFamily second).Channel) :
+    netlist.scatteringTransform
+        (Outgoing.mk (netlist.components.componentChannelEmbedding first output))
+        (Incident.mk (netlist.components.componentChannelEmbedding second input)) = 0 := by
+  classical
+  unfold scatteringTransform
+  rw [ScatteringMatrix.toOrientedModeTransform_apply]
+  unfold scatteringMatrix
+  exact netlist.components.assembledScatteringMatrix_entry_of_ne hComponent output input
+
 /-- The partial internal-routing law `C : A_out → A_in` derived from physical connections. -/
 abbrev routingTransform [Fintype netlist.ConnectedChannel]
     [DecidableEq netlist.ConnectedChannel] [DecidableEq netlist.Channel] :
     ModeTransform netlist.OutgoingIndex netlist.IncidentIndex :=
   netlist.connections.partialRouting
 
+/-- One connected outgoing column of netlist routing has its unit entry at the exact mate. -/
+lemma routingTransform_entry_connected_column [Fintype netlist.ConnectedChannel]
+    [DecidableEq netlist.ConnectedChannel] [DecidableEq netlist.Channel]
+    (incident : netlist.Channel) (channel : netlist.ConnectedChannel) :
+    netlist.routingTransform (Incident.mk incident)
+        (Outgoing.mk (netlist.connections.channelEmbedding channel)) =
+      if incident = netlist.connections.channelEmbedding
+          (netlist.connections.mateEquiv channel) then 1 else 0 := by
+  exact netlist.connections.partialRouting_entry_connected_column incident channel
+
+/-- Netlist routing sends every connected outgoing channel to its exact incident mate. -/
+lemma routingTransform_entry_mate [Fintype netlist.ConnectedChannel]
+    [DecidableEq netlist.ConnectedChannel] [DecidableEq netlist.Channel]
+    (channel : netlist.ConnectedChannel) :
+    netlist.routingTransform
+        (Incident.mk (netlist.connections.channelEmbedding
+          (netlist.connections.mateEquiv channel)))
+        (Outgoing.mk (netlist.connections.channelEmbedding channel)) = 1 := by
+  exact netlist.connections.partialRouting_entry_mate channel
+
+/-- Every non-mate row of a connected netlist-routing column is zero. -/
+lemma routingTransform_entry_connected_column_of_ne [Fintype netlist.ConnectedChannel]
+    [DecidableEq netlist.ConnectedChannel] [DecidableEq netlist.Channel]
+    (incident : netlist.Channel) (channel : netlist.ConnectedChannel)
+    (hIncident : incident ≠ netlist.connections.channelEmbedding
+      (netlist.connections.mateEquiv channel)) :
+    netlist.routingTransform (Incident.mk incident)
+        (Outgoing.mk (netlist.connections.channelEmbedding channel)) = 0 := by
+  rw [netlist.routingTransform_entry_connected_column, if_neg hIncident]
+
+/-- An outgoing coordinate outside the connected range gives a zero netlist-routing column. -/
+lemma routingTransform_entry_of_outgoing_not_mem_range [Fintype netlist.ConnectedChannel]
+    [DecidableEq netlist.ConnectedChannel] [DecidableEq netlist.Channel]
+    (outgoing : netlist.Channel)
+    (hOutgoing : outgoing ∉ Set.range netlist.connections.channelEmbedding)
+    (incident : netlist.IncidentIndex) :
+    netlist.routingTransform incident (Outgoing.mk outgoing) = 0 := by
+  exact netlist.connections.partialRouting_entry_of_outgoing_not_mem_range
+    outgoing hOutgoing incident
+
 /-- The external incident injection `E_in : U → A_in`. -/
 abbrev inputExposure [DecidableEq netlist.Channel] :
     ModeTransform netlist.ExternalIncident netlist.IncidentIndex :=
   netlist.connections.externalIncidentInjection
+
+/-- Netlist input exposure has a unit entry at each external incident coordinate. -/
+lemma inputExposure_entry_external [DecidableEq netlist.Channel]
+    (channel : netlist.ExternalChannel) :
+    netlist.inputExposure (Incident.mk channel.1) (Incident.mk channel) = 1 := by
+  exact netlist.connections.externalIncidentInjection_entry_external channel
+
+/-- Netlist input exposure is zero away from the selected external coordinate. -/
+lemma inputExposure_entry_of_ne [DecidableEq netlist.Channel]
+    (incident : netlist.Channel) (external : netlist.ExternalChannel)
+    (hChannel : incident ≠ external.1) :
+    netlist.inputExposure (Incident.mk incident) (Incident.mk external) = 0 := by
+  exact netlist.connections.externalIncidentInjection_entry_of_ne
+    incident external hChannel
 
 /-- The external outgoing exposure `E_out : Y → A_out`. -/
 abbrev outputExposure [DecidableEq netlist.Channel] :
     ModeTransform netlist.ExternalOutgoing netlist.OutgoingIndex :=
   netlist.connections.externalOutgoingInjection
 
+/-- Netlist output exposure has a unit entry at each external outgoing coordinate. -/
+lemma outputExposure_entry_external [DecidableEq netlist.Channel]
+    (channel : netlist.ExternalChannel) :
+    netlist.outputExposure (Outgoing.mk channel.1) (Outgoing.mk channel) = 1 := by
+  exact netlist.connections.externalOutgoingInjection_entry_external channel
+
+/-- Netlist output exposure is zero away from the selected external coordinate. -/
+lemma outputExposure_entry_of_ne [DecidableEq netlist.Channel]
+    (outgoing : netlist.Channel) (external : netlist.ExternalChannel)
+    (hChannel : outgoing ≠ external.1) :
+    netlist.outputExposure (Outgoing.mk outgoing) (Outgoing.mk external) = 0 := by
+  exact netlist.connections.externalOutgoingInjection_entry_of_ne
+    outgoing external hChannel
+
 /-- The external outgoing readout `E_outᴴ : A_out → Y`. -/
 abbrev outputReadout [DecidableEq netlist.Channel] :
     ModeTransform netlist.OutgoingIndex netlist.ExternalOutgoing :=
   netlist.connections.externalOutgoingReadout
+
+/-- Netlist output readout has a unit entry at each selected external coordinate. -/
+lemma outputReadout_entry_external [DecidableEq netlist.Channel]
+    (channel : netlist.ExternalChannel) :
+    netlist.outputReadout (Outgoing.mk channel) (Outgoing.mk channel.1) = 1 := by
+  exact netlist.connections.externalOutgoingReadout_entry_external channel
+
+/-- Netlist output readout is zero away from the selected external coordinate. -/
+lemma outputReadout_entry_of_ne [DecidableEq netlist.Channel]
+    (external : netlist.ExternalChannel) (outgoing : netlist.Channel)
+    (hChannel : outgoing ≠ external.1) :
+    netlist.outputReadout (Outgoing.mk external) (Outgoing.mk outgoing) = 0 := by
+  exact netlist.connections.externalOutgoingReadout_entry_of_ne
+    external outgoing hChannel
 
 /-- Netlist output readout is the adjoint of the derived output exposure. -/
 lemma outputReadout_eq_conjTranspose [DecidableEq netlist.Channel] :
@@ -385,6 +496,73 @@ lemma mem_behavior_iff_equations
   rw [netlist.mem_behavior_iff_componentBehavior]
   simp only [netlist.mem_componentBehavior_iff,
     PortConnectionFamily.incidentAssembly]
+
+/-- Netlist behavior membership is equivalently stated by instance-stable matrix-vector
+equations. This form forgets the `L²` wrappers and therefore does not expose the local classical
+equality decision used to bundle each matrix action as a linear map. -/
+lemma mem_behavior_iff_matrixEquations
+    (incidentFintype : Fintype netlist.IncidentIndex)
+    (outgoingFintype : Fintype netlist.OutgoingIndex)
+    (externalIncidentFintype : Fintype netlist.ExternalIncident)
+    (connectedDecEq : DecidableEq netlist.ConnectedChannel)
+    (decEq : DecidableEq netlist.Channel)
+    (input : ModeAmplitude netlist.ExternalIncident)
+    (output : ModeAmplitude netlist.ExternalOutgoing) :
+    (input, output) ∈ netlist.behavior ↔
+      ∃ incident : ModeAmplitude netlist.IncidentIndex,
+        ∃ outgoing : ModeAmplitude netlist.OutgoingIndex,
+          WithLp.ofLp outgoing =
+              ModeTransform.mulVecWith incidentFintype netlist.scatteringTransform
+                (WithLp.ofLp incident) ∧
+            WithLp.ofLp incident =
+              ModeTransform.mulVecWith outgoingFintype
+                  (@FlatNetlist.routingTransform netlist _ connectedDecEq decEq)
+                  (WithLp.ofLp outgoing) +
+                ModeTransform.mulVecWith externalIncidentFintype
+                  (@FlatNetlist.inputExposure netlist decEq) (WithLp.ofLp input) ∧
+            WithLp.ofLp output =
+              ModeTransform.mulVecWith outgoingFintype
+                (@FlatNetlist.outputReadout netlist decEq) (WithLp.ofLp outgoing) := by
+  have hIncidentFintype : incidentFintype =
+      Incident.fintypeOf (inferInstance : Fintype netlist.Channel) :=
+    Subsingleton.elim _ _
+  have hOutgoingFintype : outgoingFintype =
+      Outgoing.fintypeOf (inferInstance : Fintype netlist.Channel) := Subsingleton.elim _ _
+  have hExternalIncidentFintype : externalIncidentFintype =
+      Incident.fintypeOf (inferInstance : Fintype netlist.ExternalChannel) :=
+    Subsingleton.elim _ _
+  have hConnectedDecEq : connectedDecEq = connectedChannelDecidableEq netlist :=
+    Subsingleton.elim _ _
+  have hDecEq : decEq = channelDecidableEq netlist := Subsingleton.elim _ _
+  rw [hIncidentFintype, hOutgoingFintype, hExternalIncidentFintype,
+    hConnectedDecEq, hDecEq]
+  clear hIncidentFintype hOutgoingFintype hExternalIncidentFintype
+    hConnectedDecEq hDecEq incidentFintype outgoingFintype externalIncidentFintype
+    connectedDecEq decEq
+  rw [netlist.mem_behavior_iff_equations]
+  constructor
+  · rintro ⟨incident, outgoing, hScattering, hIncident, hOutput⟩
+    refine ⟨incident, outgoing, ?_, ?_, ?_⟩
+    · simpa only [ModeTransform.mulVecWith_inferInstance] using
+        (ModeTransform.eq_toLinearMap_iff_mulVec
+          netlist.scatteringTransform incident outgoing).mp hScattering
+    · simpa only [ModeTransform.mulVecWith_inferInstance] using
+        (ModeTransform.eq_toLinearMap_add_iff_mulVec_add netlist.routingTransform
+          netlist.inputExposure outgoing input incident).mp hIncident
+    · simpa only [ModeTransform.mulVecWith_inferInstance] using
+        (ModeTransform.eq_toLinearMap_iff_mulVec
+          netlist.outputReadout outgoing output).mp hOutput
+  · rintro ⟨incident, outgoing, hScattering, hIncident, hOutput⟩
+    refine ⟨incident, outgoing, ?_, ?_, ?_⟩
+    · apply (ModeTransform.eq_toLinearMap_iff_mulVec
+        netlist.scatteringTransform incident outgoing).mpr
+      simpa only [ModeTransform.mulVecWith_inferInstance] using hScattering
+    · apply (ModeTransform.eq_toLinearMap_add_iff_mulVec_add netlist.routingTransform
+        netlist.inputExposure outgoing input incident).mpr
+      simpa only [ModeTransform.mulVecWith_inferInstance] using hIncident
+    · apply (ModeTransform.eq_toLinearMap_iff_mulVec
+        netlist.outputReadout outgoing output).mpr
+      simpa only [ModeTransform.mulVecWith_inferInstance] using hOutput
 
 /-!
 

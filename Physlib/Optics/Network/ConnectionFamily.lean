@@ -262,6 +262,14 @@ def idealRouting [DecidableEq family.Channel] :
     ModeTransform (Outgoing family.Channel) (Incident family.Channel) :=
   ModeTransform.idealRouting family.mateEquiv
 
+/-- Connected ideal routing has one entry exactly at each outgoing channel's mate. -/
+lemma idealRouting_entry [DecidableEq family.Channel] (output input : family.Channel) :
+    family.idealRouting (Incident.mk output) (Outgoing.mk input) =
+      if output = family.mateEquiv input then 1 else 0 := by
+  unfold idealRouting
+  rw [ModeTransform.idealRouting_entry, outgoingToIncidentEquiv_apply]
+  simp only [Incident.mk.injEq]
+
 /-- The routing entry from a connected channel to its family mate is exactly one. -/
 @[simp]
 lemma idealRouting_entry_mate [DecidableEq family.Channel] (channel : family.Channel) :

@@ -395,6 +395,17 @@ PR unless maintainers explicitly ask to retain it.
   hence equal phase angles. The zero-amplitude branch must remain explicit because its wave vector
   and angle are arbitrary dummy data. Do not interpret this phase-angle equality as a ray,
   group-velocity, energy-flux, outgoing, irradiance, or power theorem.
+- [ ] Human-check the law of the plane of incidence against SPIE'14 Thm. 4.5 (p. 8) and MCS'14
+  Thm. 5.1 (arXiv pp. 16--17). Confirm first the neutral geometric step: equal tangential
+  projections place one real vector in the span of the other vector and the stored unit normal.
+  Electric phase matching must then place the transmitted phase vector in that span and preserve
+  the alternative that a zero reflected electric amplitude has arbitrary dummy wave-vector data;
+  only the active branch places the reflected phase vector in the same span. Confirm separately
+  that an exact complex hyperplane-reflection branch descends to the real vector-reflection formula
+  and hence the same span. The span may have dimension below two at normal incidence, so do not
+  claim a unique geometric plane there. The exact `3-4-5` regression must discharge the reflected
+  activity guard independently. This is phase-vector coplanarity, not a ray, group-velocity,
+  outgoing, irradiance, or power statement.
 - [ ] Human-check the phase Snell stack before upstreaming. Confirm first that complex material
   dispersion plus zero whole attenuation gives `‖q‖ * v = omega` on the positive-frequency and
   positive-wave-speed branches; zero tangential attenuation alone is insufficient. Confirm that
@@ -1172,8 +1183,9 @@ PR unless maintainers explicitly ask to retain it.
   and prove exact action, Gram, isometry, cross-zero, projector-completeness, `C b + E_in u`, and
   additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. The
   later `FlatNetlist` construction now closes the broad structural API-map requirement. N4C's
-  finite data, reflected well-formedness check, and proof-carrying kernel construction are now
-  complete; executable matrix assembly and entrywise semantic soundness remain separate work.
+  finite data, reflected well-formedness check, proof-carrying kernel construction, executable
+  matrix assembly, entrywise semantic soundness, normalized rational coefficients, and guarded
+  rational-function evaluation are now complete.
 - [ ] Before upstreaming the external-output completion, prepare a stack in this order: the neutral
   complementary-range-projector lemma in `Mode/Embedding`; outgoing endpoint partition, exposure,
   and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
@@ -1220,12 +1232,29 @@ PR unless maintainers explicitly ask to retain it.
   direction flag is accepted as evidence. Confirm that `wellFormed` is the exhaustive finite
   `Decidable` for its public specification, so any future optimized checker must be proved
   equivalent rather than treated as an independent oracle.
-- [ ] Complete N4C with generic executable `S`, `C`, `E_in`, and `E_out` matrices and prove their
-  entrywise evaluation agrees with the derived N4 maps. Account explicitly for proof-irrelevance
-  between the compiled constructive `DecidableEq` instances and N4's locally chosen classical
-  instances. Then add an executable normalized coefficient-list representation with a proof-exact
-  interpretation into rational functions and a denominator-guarded evaluation theorem, without
-  introducing an inverse, determinant, or well-posedness assumption before N5.
+- [x] Complete N4C's matrix layer with generic executable `S`, `C`, `E_in`, `E_out`, transposed
+  readout, and `1 - C * S`; prove entrywise evaluation agrees with the derived N4 maps and that
+  the three evaluated matrix equations are exactly the singular-safe external relation. The
+  explicit finite enumerations account for proof-irrelevance against N4's local classical
+  instances. Hostile exact fixtures retain two distinct zero-input outputs, send nonzero input
+  `(1, -1)` to `(0, 2)`, keep external columns out of internal routing, and distinguish a
+  three-mode forward cycle from its inverse.
+- [ ] Human-check before upstreaming every N4C matrix shape and orientation: rows are outputs,
+  columns are inputs, `C` maps outgoing channels to incident mates, `E_in` injects external
+  incidents, and output readout is `E_outᵀ`. Confirm independently that coefficient evaluation and
+  relabelling identify all four raw matrices with the N4 typed maps, and that the semantic theorem
+  retains every singular solution rather than selecting one by an implicit inverse.
+- [x] Complete N4C's coefficient layer with an executable normalized coefficient-list
+  representation, a proof-exact rational-function interpretation, and a denominator-guarded
+  evaluation theorem that commutes with compilation. Do not introduce an inverse, determinant,
+  or well-posedness assumption before N5.
+- [ ] Human-check N4C's coefficient semantics before upstreaming. Coefficient lists are
+  little-endian and normalized only by removing trailing zeroes; stored numerator/denominator
+  pairs are deliberately unreduced. The stored-denominator guard is sufficient but not necessary
+  after cancellation, while direct field division remains total at zero in Lean. Confirm that the
+  guarded theorems, rather than an unguarded point value, carry the intended meaning. The backend
+  has one formal algebraic variable and makes no claim of rational dependence on physical
+  frequency, causality, stability, invertibility, or unique solvability.
 - [ ] Human-check before upstreaming that `WiringEquiv`, rather than an index permutation alone,
   is the public hypothesis; that the ambient port family is fixed; and that component relabelling
   and mode-phase gauge are excluded covariance statements. Confirm independently that the
@@ -1390,8 +1419,9 @@ PR unless maintainers explicitly ask to retain it.
   restriction—not as a source, termination, detector, boundary condition, or feedback solution.
   Confirm `E_outᴴ * E_out = 1` while `E_out * E_outᴴ` is the external outgoing range projector;
   the analogous incident laws hold for `E_in`. Do not call either exposure unitary, surjective, or
-  a lossless device. Complement outgoing power omitted by `C b` is not absorption. The broad
-  netlist and elimination requirements remain open.
+  a lossless device. Complement outgoing power omitted by `C b` is not absorption. The relational
+  netlist and proof-gated finite eliminator now exist; physical scattering, conservation, and
+  reciprocity specializations remain open.
 - [ ] Human-check the implicit linear-behavior layer before upstreaming. Confirm that membership
   orders amplitudes as `(input, output)`, `first.series second` hides one exact intermediate
   amplitude, and its transform graph and extracted functional map compose as `second * first` and
@@ -1433,13 +1463,55 @@ PR unless maintainers explicitly ask to retain it.
   the ambient norm inherited by the raw matrix alias is not that operator norm.
 - [x] Represent component behavior independently of invertibility, with graph behaviors only as a
   proved functional specialization.
-- [ ] For network equations `b = S a`, `a = C b + E_in u`, and `y = E_outᴴ b`, define
-  well-posedness by unique internal solvability of `(1 - C * S) a = E_in u`; a contraction estimate
-  may be sufficient but must not be necessary.
+- [x] For network equations `b = S a`, `a = C b + E_in u`, and `y = E_outᴴ b`, define
+  well-posedness by unique complete-state solvability and prove that, over finite complex mode
+  families, it is exactly bijectivity of `(1 - C * S)`. Construct the inverse only from that gate,
+  prove the complete solution and `E_outᴴ * S * (1 - C * S)⁻¹ * E_in` response graphs agree with
+  the relational semantics, and transport the gate and response under `WiringEquiv`. The exact
+  nonsymmetric complex fixture must retain its displayed two-sided feedback inverse and response
+  `[[1 + 4I, 6], [2, 4I]]`; the old singular fixture must remain not well posed. No contraction,
+  passivity, losslessness, reciprocity, causality, or square external scattering claim follows.
+- [ ] Human-check the N5 proof-gated eliminator before upstreaming. Recheck that `IsWellPosed`
+  concerns a unique complete `incident ⊕ outgoing` state for every external input, which is
+  stronger than uniqueness of the selected external output. Confirm all uses of an inverse are
+  downstream of bijectivity, the response multiplication order is exactly
+  `E_outᴴ * S * (1 - C * S)⁻¹ * E_in`, wiring invariance uses literal feedback equality and
+  canonical identity-on-ambient-channel external relabelling, and the rectangular response is not
+  called a `ScatteringMatrix` without a proved external input/output pairing and completeness law.
+- [ ] Human-check the algebraic N7-0 reflectionless two-port substrate before upstreaming. Confirm
+  that `bL = T_rl aR` and `bR = T_lr aL`, hence the matrix blocks are exactly
+  `[[0, T_rl], [T_lr, 0]]`; that the heterogeneous `Unit`/`Fin 2` regression pins both directional
+  placements. Zero reflection is not an impedance-matching derivation, arbitrary directional
+  transforms do not assert reciprocity, raw sum labels are not component-owned physical ports,
+  and this substrate is not yet propagation, delay, attenuation, coupling, or material
+  realization.
+- [ ] Human-check the stacked N7-0 modal-power classification separately. Confirm that the output
+  identities are decompositions rather than unconditional conservation; that the passive and
+  lossless iff laws concern only normalized modal power; that the two unit phases are not inverse
+  transforms; and that the gain-two failure uses a complete two-port input rather than assuming
+  the classifier's converse. Upstream this layer and its regressions only after the algebraic
+  behavior/realization stack.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
+
+## Ray and transfer source checks
+
+- [ ] Human-check the R1/R2 source map before upstreaming. In Siddique's 2015 thesis, Def. 3.7 on
+  printed p. 44 states the interface relation and table 3.1 on printed p. 47 gives the same folded
+  plane/spherical reflection and refraction matrices used by `ParaxialInterface.transferMatrix`.
+  The output-angle-reversal transform in section D is therefore a Physlib coordinate operation,
+  not the thesis convention. Independently map the thesis's convex/concave radius vocabulary on
+  printed p. 98 to Physlib's outgoing-side signed radius before attaching those geometric labels.
+- [ ] Keep totalized algebra separate from physical ray use. A downstream physical statement must
+  supply forward and non-grazing ray hypotheses where needed, positive refractive indices,
+  nonnegative gaps or lens thickness, nonzero curved-surface radii, and nonzero focal length.
+  Complete the range- and side-guarded bridge from `MeridionalRay.cos_signedIncidenceAngle` to
+  E5b's unoriented exact incidence angle rather than identifying signed angles from cosine alone.
+- [ ] Split an upstream R1/R2 proposal into focused stacks. The exact worker cutoff grouped the
+  physical/paraxial ray foundation, its regressions, the transfer/system layer, and its regressions
+  into a fork-integration batch larger than the review guideline; those remain separable concepts.
 
 ## Source and license checks
 
@@ -1469,6 +1541,14 @@ PR unless maintainers explicitly ask to retain it.
   range was not recovered from the older `PhysLean` archive during the E1 audit.
 - [ ] Replace source decimal examples by exact values or certified intervals before using them as
   regression evidence.
+- [ ] Add JAL'18 Theorem 15's literal Taylor-coefficient inverse formula after exhibiting the
+  reciprocal-variable transform as an analytic power series with its radius of convergence. The
+  current `tendsto_inversion_cobounded` recovers every sample by limits at infinity and reaches the
+  inversion content, but it does not claim the source's iterated-derivative presentation.
+- [ ] Split any upstream S5 proposal into focused stacked concepts: inversion/uniqueness,
+  convolution, and causal recurrence-solution existence. The fork retained the controller's exact
+  final worker cutoff for integration, but that batch is intentionally broader than one upstream
+  Physlib PR.
 
 ## Validation before an upstream proposal
 

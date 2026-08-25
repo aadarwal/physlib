@@ -578,6 +578,13 @@ one, in the two coordinates orthogonal to the optical axis, and the axial term e
 `- 2 i k ∂_z`, which is the form taken by the suppressed carrier `exp (- i k z)`. A development
 using the full three-dimensional Laplacian, or the opposite carrier sign, states a different
 equation, and nothing here is a claim about those.
+
+One divergence from the source is a typing choice, not a physical one, and it goes against this
+development. The source types its amplitude on complex arguments and quantifies its verification
+over complex `x`, `y`, and `z`, which is an artifact of the complex-differentiation tactic it
+uses; it therefore asserts strictly more instances than the statement here, which takes real
+transverse and axial coordinates and real derivatives. The version here is the physically faithful
+one and the logically narrower one on that axis, so it is not the same statement.
 -/
 def SatisfiesParaxialHelmholtz (k : ℝ) (u : ℝ → ℝ → ℝ → ℂ) : Prop :=
   ∀ x y z : ℝ,

@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 public import Physlib.Optics.Interfaces.PlanarDielectric.PhaseMatchedDispersion
 
 /-!
@@ -30,6 +31,11 @@ reflection then proves equality of the incident and reflected phase angles. This
 law. It does not identify phase direction with group velocity, energy flux, a ray, outgoing
 behavior, irradiance, or power.
 
+Tangential phase matching also proves the law of the plane of incidence in a basis-free form. The
+transmitted phase vector, and every active reflected phase vector, lie in the real span of the
+incident phase vector and interface normal. The reflected result retains the zero-amplitude dummy
+label alternative; an exact hyperplane-reflection branch has the same span property directly.
+
 ## ii. Key results
 
 - `incidentPhaseAngle`: incident phase angle from the positive-side normal.
@@ -39,12 +45,17 @@ behavior, irradiance, or power.
   reflection branch obeys the phase-angle law.
 - `reflected_electricAmplitude_eq_zero_or_phaseAngles_eq_of_phaseDirections`:
   phase matching, dispersion, and supplied phase directions give the guarded angular law.
+- `reflected_electricAmplitude_eq_zero_or_phaseVectors_mem_incidencePlane`:
+  phase matching gives the guarded law of the plane of incidence.
+- `reflected_electricAmplitude_eq_zero_or_phaseVectors_coplanar`:
+  the weaker, plane-agnostic corollary using Mathlib's named affine-coplanarity predicate.
 
 ## iii. Table of contents
 
 - A. Label-relative phase angles
 - B. Acute-angle ranges from phase direction
 - C. Angular law of reflection
+- D. Law of the plane of incidence
 
 ## iv. References
 
@@ -183,6 +194,151 @@ lemma reflected_electricAmplitude_eq_zero_or_phaseAngles_eq_of_phaseDirections
   · exact Or.inr
       (configuration.reflectedPhaseAngle_eq_incidentPhaseAngle_of_hyperplaneReflection
         hReflection)
+
+end IsElectricPhaseMatched
+
+/-!
+
+## D. Law of the plane of incidence
+
+-/
+
+/-- A reflected phase vector on the exact hyperplane-reflection branch lies in the real span of
+the incident phase vector and interface normal. -/
+lemma reflected_phaseVector_mem_incidencePlane_of_hyperplaneReflection
+    (configuration : PlanarDielectricWaveConfiguration)
+    (hReflection : configuration.reflected.waveVector =
+      ComplexWaveVector.hyperplaneReflection configuration.interface.plane
+        configuration.incident.waveVector) :
+    configuration.reflected.waveVector.phaseVector ∈
+      Submodule.span ℝ {configuration.incident.waveVector.phaseVector,
+        configuration.interface.plane.normalVector} := by
+  rw [hReflection,
+    ComplexWaveVector.phaseVector_hyperplaneReflection_eq_vectorReflection,
+    OrientedAffineHyperplane.vectorReflection_eq_sub_two_smul_normalVector]
+  exact Submodule.sub_mem _ (Submodule.subset_span (by simp))
+    (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
+
+namespace IsElectricPhaseMatched
+
+variable {configuration : PlanarDielectricWaveConfiguration}
+
+/-- Tangential phase matching places the transmitted phase vector in the real span of the
+incident phase vector and interface normal. -/
+lemma transmitted_phaseVector_mem_incidencePlane
+    (h : configuration.IsElectricPhaseMatched) :
+    configuration.transmitted.waveVector.phaseVector ∈
+      Submodule.span ℝ {configuration.incident.waveVector.phaseVector,
+        configuration.interface.plane.normalVector} := by
+  exact
+    configuration.interface.plane.mem_span_pair_normalVector_of_tangentialProjection_eq
+      h.transmitted_tangentialPhase_attenuation_eq_incident.1
+
+/-- Tangential phase matching places every active reflected phase vector in the real span of the
+incident phase vector and interface normal, while a zero reflected electric amplitude retains its
+unconstrained dummy wave-vector label. -/
+lemma reflected_electricAmplitude_eq_zero_or_phaseVector_mem_incidencePlane
+    (h : configuration.IsElectricPhaseMatched) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      configuration.reflected.waveVector.phaseVector ∈
+        Submodule.span ℝ {configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector} := by
+  rcases h.2 with hZero | hMatched
+  · exact Or.inl hZero
+  · right
+    apply configuration.interface.plane.mem_span_pair_normalVector_of_tangentialProjection_eq
+    simpa only [ComplexWaveVector.phaseVector_hyperplaneTangentialProjection] using
+      congrArg ComplexWaveVector.phaseVector hMatched.2
+
+/-- **Law of the plane of incidence.** Under electric phase matching, the transmitted and every
+active reflected phase vector lie in the real span of the incident phase vector and interface
+normal.
+
+The incident phase vector and normal are the two generators, so this is the basis-free
+coplanarity statement for the four vectors. The zero-reflected-amplitude branch remains guarded
+because its wave-vector label is intentionally unconstrained. -/
+lemma reflected_electricAmplitude_eq_zero_or_phaseVectors_mem_incidencePlane
+    (h : configuration.IsElectricPhaseMatched) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      (configuration.reflected.waveVector.phaseVector ∈
+          Submodule.span ℝ {configuration.incident.waveVector.phaseVector,
+            configuration.interface.plane.normalVector} ∧
+        configuration.transmitted.waveVector.phaseVector ∈
+          Submodule.span ℝ {configuration.incident.waveVector.phaseVector,
+            configuration.interface.plane.normalVector}) := by
+  rcases h.reflected_electricAmplitude_eq_zero_or_phaseVector_mem_incidencePlane with
+    hZero | hReflected
+  · exact Or.inl hZero
+  · exact Or.inr ⟨hReflected, h.transmitted_phaseVector_mem_incidencePlane⟩
+
+/-- **Law of the plane of incidence, in Mathlib's affine formulation.** Under electric phase
+matching, zero, the incident, active-reflected, and transmitted phase vectors, and the interface
+normal form a coplanar set of points. This is the weaker, plane-agnostic corollary of the span
+formulation above.
+
+The reflected zero-electric-amplitude branch stays explicit because its dummy phase vector need
+not lie in the physical incidence plane. -/
+lemma reflected_electricAmplitude_eq_zero_or_phaseVectors_coplanar
+    (h : configuration.IsElectricPhaseMatched) :
+    configuration.reflected.electricAmplitude = 0 ∨
+      Coplanar ℝ {0, configuration.incident.waveVector.phaseVector,
+        configuration.reflected.waveVector.phaseVector,
+        configuration.transmitted.waveVector.phaseVector,
+        configuration.interface.plane.normalVector} := by
+  rcases h.reflected_electricAmplitude_eq_zero_or_phaseVectors_mem_incidencePlane with
+    hZero | ⟨hReflected, hTransmitted⟩
+  · exact Or.inl hZero
+  · right
+    have hReflectedAffine : configuration.reflected.waveVector.phaseVector ∈
+        affineSpan ℝ {0, configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector} := by
+      change configuration.reflected.waveVector.phaseVector ∈
+        (affineSpan ℝ (insert 0 {configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector}) :
+            Set (EuclideanSpace ℝ (Fin 3)))
+      rw [affineSpan_insert_zero]
+      exact hReflected
+    have hTransmittedAffine : configuration.transmitted.waveVector.phaseVector ∈
+        affineSpan ℝ {0, configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector} := by
+      change configuration.transmitted.waveVector.phaseVector ∈
+        (affineSpan ℝ (insert 0 {configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector}) :
+            Set (EuclideanSpace ℝ (Fin 3)))
+      rw [affineSpan_insert_zero]
+      exact hTransmitted
+    have hReflectedCoplanar : Coplanar ℝ
+        {configuration.reflected.waveVector.phaseVector, 0,
+          configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector} :=
+      (coplanar_insert_iff_of_mem_affineSpan hReflectedAffine).2
+        (coplanar_triple ℝ (0 : EuclideanSpace ℝ (Fin 3))
+          configuration.incident.waveVector.phaseVector
+          configuration.interface.plane.normalVector)
+    have hTransmittedExpanded : configuration.transmitted.waveVector.phaseVector ∈
+        affineSpan ℝ {configuration.reflected.waveVector.phaseVector, 0,
+          configuration.incident.waveVector.phaseVector,
+          configuration.interface.plane.normalVector} :=
+      affineSpan_mono ℝ (Set.subset_insert _ _) hTransmittedAffine
+    have hCoplanar :=
+      (coplanar_insert_iff_of_mem_affineSpan hTransmittedExpanded).2 hReflectedCoplanar
+    have hSet :
+        ({(0 : EuclideanSpace ℝ (Fin 3)), configuration.incident.waveVector.phaseVector,
+            configuration.reflected.waveVector.phaseVector,
+            configuration.transmitted.waveVector.phaseVector,
+            configuration.interface.plane.normalVector} :
+          Set (EuclideanSpace ℝ (Fin 3))) =
+          ({configuration.transmitted.waveVector.phaseVector,
+            configuration.reflected.waveVector.phaseVector,
+            (0 : EuclideanSpace ℝ (Fin 3)),
+            configuration.incident.waveVector.phaseVector,
+            configuration.interface.plane.normalVector} :
+          Set (EuclideanSpace ℝ (Fin 3))) := by
+      ext v
+      simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+      aesop
+    rw [hSet]
+    exact hCoplanar
 
 end IsElectricPhaseMatched
 end PlanarDielectricWaveConfiguration

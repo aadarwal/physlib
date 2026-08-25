@@ -192,23 +192,31 @@ theorem composedMatrix_objectImageFrame (objectGap imageGap : ParaxialGap)
   simp only [ParaxialSystem.composedMatrix, ParaxialSystem.matrix, one_mul, shiftedMatrix,
     translationMatrix_eq_transferMatrix]
 
-/-- The object-image frame is a valid composed system exactly when both bracketing gaps are valid
-and the bracketed system is.
+/-- The object-image frame is a valid composed system exactly when both bracketing gaps are valid,
+the bracketed system is, and the indices agree at the two shared reference planes.
 
 The positivity of the object-space and image-space refractive indices, which the source states as
-explicit hypotheses of this frame, is exactly what `ParaxialGap.IsValid` carries for the two
-bracketing gaps.
+explicit hypotheses of this frame, is what `ParaxialGap.IsValid` carries for the two bracketing
+gaps. The two index-matching hypotheses are the composed-system compatibility condition: object
+space must be the medium the system is entered from, and image space the medium it is left into.
 -/
 theorem composedIsValid_objectImageFrame (objectGap imageGap : ParaxialGap)
     (cs : List ParaxialComponent) (exitGap : ParaxialGap) (hObject : objectGap.IsValid)
-    (hSystem : ParaxialSystem.IsValid cs exitGap) (hImage : imageGap.IsValid) :
+    (hSystem : ParaxialSystem.IsValid cs exitGap) (hImage : imageGap.IsValid)
+    (hEntry : objectGap.index = ParaxialSystem.headIndex cs exitGap)
+    (hExit : exitGap.index = imageGap.index) :
     ParaxialSystem.ComposedIsValid [([], objectGap), (cs, exitGap), ([], imageGap)] := by
-  intro subsystem hMember
-  simp only [List.mem_cons, List.not_mem_nil, or_false] at hMember
-  rcases hMember with rfl | rfl | rfl
-  · exact hObject
-  · exact hSystem
-  · exact hImage
+  refine ⟨?_, ?_⟩
+  · intro subsystem hMember
+    simp only [List.mem_cons, List.not_mem_nil, or_false] at hMember
+    rcases hMember with rfl | rfl | rfl
+    · exact hObject
+    · exact hSystem
+    · exact hImage
+  · rw [ParaxialSystem.ComposedIndicesCompatible]
+    simp only [List.isChain_cons, List.head?_cons, Option.mem_def, Option.some.injEq,
+      forall_eq', ParaxialSystem.headIndex]
+    exact ⟨hEntry, hExit, by simp, List.isChain_nil⟩
 
 /-!
 
@@ -558,9 +566,7 @@ downstream. At zero thickness both vanish, recovering
 -/
 theorem thickLens_principalDistances (n nL t R₁ R₂ : ℝ) (hn : n ≠ 0) (hnL : nL ≠ 0)
     (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) (M : RayTransferMatrix)
-    (hM : M = ParaxialSystem.matrix
-      [⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₁⟩,
-        ⟨⟨nL, t⟩, ParaxialInterface.sphericalRefracting R₂⟩] ⟨n, 0⟩)
+    (hM : M = ParaxialSystem.matrix (thickLensSystem n nL t R₁ R₂) ⟨n, 0⟩)
     (hC : M 1 0 ≠ 0) :
     imagePrincipalDistance M = -effectiveFocalLength M * t * (nL - n) / (nL * R₁) ∧
       objectPrincipalDistance M = effectiveFocalLength M * t * (nL - n) / (nL * R₂) := by

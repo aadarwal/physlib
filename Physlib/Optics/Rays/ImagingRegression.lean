@@ -236,7 +236,7 @@ lemma imagingRegression_objectImageFrame_isValid :
         ([⟨⟨1, 0⟩, ParaxialInterface.prescribed 1 0 (-1) 1⟩], (⟨1, 0⟩ : ParaxialGap)),
         ([], (⟨1, 2⟩ : ParaxialGap))] := by
   refine composedIsValid_objectImageFrame ⟨1, 2⟩ ⟨1, 2⟩ _ _ ⟨by norm_num, by norm_num⟩ ?_
-    ⟨by norm_num, by norm_num⟩
+    ⟨by norm_num, by norm_num⟩ rfl rfl
   refine ⟨⟨?_, ?_⟩, ?_, ?_, ?_⟩ <;>
     norm_num [ParaxialSystem.headIndex, ParaxialInterface.IsValid]
 

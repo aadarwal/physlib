@@ -23,9 +23,9 @@ check and is caught only here.
 
 The remaining sections pin the canonical closed forms that later slices build on: the symmetric
 two-lens system, whose `A = D` symmetry is a sharper sentinel than its determinant, and the
-`2f`-to-`2f` thin-lens configuration, whose vanishing `B` entry is the imaging condition that
-`Physlib.Optics.Rays.Imaging` will interpret. Both are obtained from the system fold rather than
-by multiplying matrices by hand.
+positive-focal-length `2f`-to-`2f` configuration, whose vanishing `B` entry is the imaging
+condition that `Physlib.Optics.Rays.Imaging` will interpret. Both are obtained from the system
+fold rather than by multiplying matrices by hand.
 
 ## ii. Key results
 
@@ -48,7 +48,7 @@ by multiplying matrices by hand.
 - B. The symmetric two-lens system
 - C. Thin-lens imaging at twice the focal length
 - D. The determinant law across an index step
-- E. The unfolded reflection convention
+- E. Output-angle reversal
 - F. Identity and zero limits
 
 ## iv. References
@@ -70,15 +70,16 @@ noncomputable section
 
 -/
 
-/-- A thin lens of focal length `f`, in a medium of index `1`, as a prescribed component.
+/-- A lens-shaped prescribed matrix parameterized by the algebraic value `f`, in unit index.
 
 Its entries satisfy the index-ratio determinant condition between equal indices, so it is a valid
-prescribed component for any `f`.
+prescribed component for any `f`. At `f = 0` totalized division makes it the identity; physical
+focal-length fixtures below impose `f ≠ 0` or `0 < f`.
 -/
 def transferRegressionLens (f : ℝ) : ParaxialInterface :=
   ParaxialInterface.prescribed 1 0 (-1 / f) 1
 
-/-- A regression thin lens is a valid component between equal unit indices. -/
+/-- The lens-shaped prescribed matrix is algebraically valid between equal unit indices. -/
 lemma transferRegressionLens_isValid (f : ℝ) : (transferRegressionLens f).IsValid 1 1 := by
   refine ⟨by norm_num, by norm_num, ?_⟩
   norm_num
@@ -136,21 +137,19 @@ lemma transferRegression_order_matters :
     rw [hEq]
   norm_num at h01
 
-/-- Neither the determinant law nor the `A` entry detects the swap: both orders have determinant
-`1` and the same `A` entry. Only the full matrix does. -/
+/-- Neither the determinant law nor the `A` entry detects the swap: both determinants are `1` and
+the `A` entries agree. Only the full matrix does. -/
 lemma transferRegression_det_blind_to_order :
     (ParaxialSystem.matrix [transferRegressionFirst, transferRegressionSecond]
-        transferRegressionExit).det =
-      (ParaxialSystem.matrix [transferRegressionSecond, transferRegressionFirst]
-        transferRegressionExit).det ∧
-    ParaxialSystem.matrix [transferRegressionFirst, transferRegressionSecond]
-        transferRegressionExit 0 0 =
-      ParaxialSystem.matrix [transferRegressionSecond, transferRegressionFirst]
-        transferRegressionExit 0 0 := by
+        transferRegressionExit).det = 1 ∧
+    (ParaxialSystem.matrix [transferRegressionSecond, transferRegressionFirst]
+        transferRegressionExit).det = 1 ∧
+      ParaxialSystem.matrix [transferRegressionFirst, transferRegressionSecond]
+          transferRegressionExit 0 0 =
+        ParaxialSystem.matrix [transferRegressionSecond, transferRegressionFirst]
+          transferRegressionExit 0 0 := by
   rw [transferRegression_matrix, transferRegression_matrix_swapped]
-  refine ⟨?_, by norm_num⟩
-  rw [Matrix.det_fin_two_of, Matrix.det_fin_two_of]
-  norm_num
+  norm_num [Matrix.det_fin_two_of]
 
 /-- The order sentinel reaches the outgoing ray itself, through the relational system law rather
 than through the matrix: the same incoming ray leaves the two orders differently. -/
@@ -159,12 +158,17 @@ lemma transferRegression_ray_order_matters :
         transferRegressionExit ⟨1, 0⟩ ⟨0, -1 / 2⟩ ∧
     ParaxialSystem.RayBehavior [transferRegressionSecond, transferRegressionFirst]
         transferRegressionExit ⟨1, 0⟩ ⟨0, -1⟩ := by
-  obtain ⟨hFirst, hSecond⟩ := transferRegression_isValid
   refine ⟨?_, ?_⟩
-  · rw [ParaxialSystem.rayBehavior_iff_matrix _ _ hFirst, transferRegression_matrix]
-    ext <;> norm_num
-  · rw [ParaxialSystem.rayBehavior_iff_matrix _ _ hSecond, transferRegression_matrix_swapped]
-    ext <;> norm_num
+  · refine ⟨⟨1, 0⟩, ⟨1, -1 / 2⟩, ?_, ?_,
+      ⟨⟨0, -1 / 2⟩, ⟨0, -1 / 2⟩, ?_, ?_, ?_⟩⟩ <;>
+      norm_num [transferRegressionFirst, transferRegressionSecond, transferRegressionExit,
+        transferRegressionLens, ParaxialSystem.RayBehavior, ParaxialGap.RayBehavior,
+        ParaxialInterface.RayBehavior]
+  · refine ⟨⟨1, 0⟩, ⟨1, -1⟩, ?_, ?_,
+      ⟨⟨0, -1⟩, ⟨0, -1⟩, ?_, ?_, ?_⟩⟩ <;>
+      norm_num [transferRegressionFirst, transferRegressionSecond, transferRegressionExit,
+        transferRegressionLens, ParaxialSystem.RayBehavior, ParaxialGap.RayBehavior,
+        ParaxialInterface.RayBehavior]
 
 /-!
 
@@ -177,7 +181,8 @@ gap of length `d`, in a medium of index `1`. -/
 def transferRegressionSymmetricTwoLens (f d : ℝ) : List ParaxialComponent :=
   [⟨⟨1, 0⟩, transferRegressionLens f⟩, ⟨⟨1, d⟩, transferRegressionLens f⟩]
 
-/-- The symmetric two-lens system is valid for every focal length and separation. -/
+/-- The algebraic prescribed-component system is valid for every focal parameter and nonnegative
+separation. Physical focal-length use additionally requires `f ≠ 0`. -/
 lemma transferRegressionSymmetricTwoLens_isValid (f d : ℝ) (hd : 0 ≤ d) :
     ParaxialSystem.IsValid (transferRegressionSymmetricTwoLens f d) ⟨1, 0⟩ := by
   refine ⟨⟨by norm_num, by norm_num⟩, transferRegressionLens_isValid f,
@@ -220,8 +225,8 @@ lens of focal length `f`, and an image plane the same distance behind it. -/
 def transferRegressionTwoFocalLengths (f : ℝ) : List ParaxialComponent :=
   [⟨⟨1, 2 * f⟩, transferRegressionLens f⟩]
 
-/-- The `2f`-to-`2f` configuration is valid for a nonnegative focal length. -/
-lemma transferRegressionTwoFocalLengths_isValid (f : ℝ) (hf : 0 ≤ f) :
+/-- The `2f`-to-`2f` fixture is valid for a positive focal length. -/
+lemma transferRegressionTwoFocalLengths_isValid (f : ℝ) (hf : 0 < f) :
     ParaxialSystem.IsValid (transferRegressionTwoFocalLengths f) ⟨1, 2 * f⟩ := by
   refine ⟨⟨by norm_num, by linarith⟩, transferRegressionLens_isValid f, by norm_num, by linarith⟩
 
@@ -242,13 +247,14 @@ lemma transferRegression_imaging_twoFocalLengths (f : ℝ) (hf : f ≠ 0) :
   fin_cases i <;> fin_cases j <;>
     simp [Matrix.mul_apply, Fin.sum_univ_two] <;> field_simp <;> ring
 
-/-- At the `2f` conjugate planes an on-axis object height is imaged to its negative, with the ray
-angle unchanged up to sign for an axis-parallel input. -/
-lemma transferRegression_imaging_twoFocalLengths_ray (f : ℝ) (hf : f ≠ 0) (hfPos : 0 ≤ f) :
+/-- A unit-height axis-parallel input reaches height `-1` and slope `-1 / f` at the second
+conjugate plane. -/
+lemma transferRegression_imaging_twoFocalLengths_ray (f : ℝ) (hf : 0 < f) :
     ParaxialSystem.RayBehavior (transferRegressionTwoFocalLengths f) ⟨1, 2 * f⟩ ⟨1, 0⟩
       ⟨-1, -1 / f⟩ := by
-  rw [ParaxialSystem.rayBehavior_iff_matrix _ _ (transferRegressionTwoFocalLengths_isValid f hfPos),
-    transferRegression_imaging_twoFocalLengths f hf]
+  rw [ParaxialSystem.rayBehavior_iff_matrix _ _
+    (transferRegressionTwoFocalLengths_isValid f hf),
+    transferRegression_imaging_twoFocalLengths f hf.ne']
   ext <;> norm_num
 
 /-!
@@ -297,28 +303,29 @@ lemma transferRegression_det_indexStep_law :
 
 /-!
 
-## E. The unfolded reflection convention
+## E. Output-angle reversal
 
 -/
 
-/-- In the folded convention a concave mirror of radius `2` has determinant `1`; in the unfolded
-convention the same mirror has determinant `-1`.
+/-- The folded radius-`2` mirror matrix has determinant `1`; reversing its output-angle coordinate
+gives determinant `-1`.
 
-The two conventions differ by exactly one angle reversal, so any comparison against a source
-using the other one must account for this sign.
+This pins the coordinate operation only; it does not classify the mirror as concave or identify a
+particular source convention.
 -/
-lemma transferRegression_unfolded_det (n : ℝ) :
+lemma transferRegression_outputAngleReversed_det (n : ℝ) :
     ((ParaxialInterface.sphericalMirror 2).transferMatrix n n).det = 1 ∧
-      ((ParaxialInterface.sphericalMirror 2).unfoldedTransferMatrix n n).det = -1 := by
+      ((ParaxialInterface.sphericalMirror 2).outputAngleReversedTransferMatrix n n).det = -1 := by
   refine ⟨by simp [ParaxialInterface.transferMatrix, Matrix.det_fin_two_of], ?_⟩
-  rw [ParaxialInterface.det_unfoldedTransferMatrix, ParaxialInterface.transferMatrix,
-    Matrix.det_fin_two_of]
+  rw [ParaxialInterface.det_outputAngleReversedTransferMatrix,
+    ParaxialInterface.transferMatrix, Matrix.det_fin_two_of]
   norm_num
 
-/-- The unfolded matrix of a concave mirror of radius `2`. -/
-lemma transferRegression_unfolded_sphericalMirror (n : ℝ) :
-    (ParaxialInterface.sphericalMirror 2).unfoldedTransferMatrix n n = !![1, 0; 1, -1] := by
-  rw [ParaxialInterface.unfoldedTransferMatrix_sphericalMirror]
+/-- The output-angle-reversed matrix of the radius-`2` spherical-mirror fixture. -/
+lemma transferRegression_outputAngleReversed_sphericalMirror (n : ℝ) :
+    (ParaxialInterface.sphericalMirror 2).outputAngleReversedTransferMatrix n n =
+      !![1, 0; 1, -1] := by
+  rw [ParaxialInterface.outputAngleReversedTransferMatrix_sphericalMirror]
   norm_num
 
 /-- A two-mirror round trip: travel the cavity length, reflect off the far mirror, travel back,
@@ -339,8 +346,9 @@ lemma transferRegressionRoundTrip_isValid (d R₁ R₂ : ℝ) (hd : 0 ≤ d) (hR
 `gᵢ = 1 - d / Rᵢ`.
 
 This is the convention guard the reflection bookkeeping needs. The direction reversal at a mirror
-can be absorbed into the matrix, as the folded convention here does, or kept explicit, as
-`ParaxialInterface.unfoldedTransferMatrix` does; but it must not be counted twice. A treatment
+is absorbed into the mirror matrix by the folded convention used here, and can also be applied
+explicitly as a coordinate operation by
+`ParaxialInterface.outputAngleReversedTransferMatrix`; but it must not be counted twice. A treatment
 that keeps the reversal explicit *and* negates the radii on unfolding computes the round trip of
 the negated radii instead, and `transferRegression_roundTrip_negated_radii` shows that changes the
 answer in a way a single-mirror check cannot see.
@@ -406,6 +414,16 @@ lemma transferRegression_twoReversals : angleReversal * angleReversal = 1 :=
 
 -/
 
+/-- Individually valid subsystems with mismatched adjacent refractive indices do not form a valid
+composed optical system. -/
+lemma transferRegression_mismatchedIndices_not_composedIsValid :
+    ¬ParaxialSystem.ComposedIsValid
+      [(([] : List ParaxialComponent), ⟨1, 0⟩),
+        (([] : List ParaxialComponent), ⟨2, 0⟩)] := by
+  intro hValid
+  norm_num [ParaxialSystem.ComposedIsValid, ParaxialSystem.ComposedIndicesCompatible,
+    ParaxialSystem.headIndex] at hValid
+
 /-- A system with no components and a zero-length exit gap is the identity. -/
 lemma transferRegression_matrix_nil : ParaxialSystem.matrix [] ⟨1, 0⟩ = 1 := by
   rw [ParaxialSystem.matrix, ParaxialGap.transferMatrix, Matrix.one_fin_two]
@@ -417,18 +435,15 @@ lemma transferRegression_composedMatrix_nil : ParaxialSystem.composedMatrix [] =
 surface radii: with no index step there is nothing to refract. -/
 lemma transferRegression_thinLens_matched (n R₁ R₂ : ℝ) (hn : n ≠ 0) (hR₁ : R₁ ≠ 0)
     (hR₂ : R₂ ≠ 0) :
-    ParaxialSystem.matrix
-        [⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₁⟩,
-          ⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₂⟩] ⟨n, 0⟩ = 1 := by
+    ParaxialSystem.matrix (thinLensSystem n n R₁ R₂) ⟨n, 0⟩ = 1 := by
   rw [thinLens_matrix n n R₁ R₂ hn hn hR₁ hR₂, Matrix.one_fin_two, div_self hn]
   norm_num
 
-/-- A biconvex glass lens of unit radii in air has focal length `1`, so its matrix is
-`!![1, 0; -1, 1]`. The lensmaker's equation gives `1 / f = (3 / 2 - 1) (1 + 1) = 1`. -/
-lemma transferRegression_thinLens_biconvex :
-    ParaxialSystem.matrix
-        [⟨⟨1, 0⟩, ParaxialInterface.sphericalRefracting 1⟩,
-          ⟨⟨3 / 2, 0⟩, ParaxialInterface.sphericalRefracting (-1)⟩] ⟨1, 0⟩ =
+/-- The opposite-unit-radius glass-lens fixture has focal parameter `1`, since its lensmaker
+expression is `(3 / 2 - 1) (1 - (-1)) = 1`. No convexity label is attached before the signed-radius
+source convention is independently audited. -/
+lemma transferRegression_thinLens_oppositeRadii :
+    ParaxialSystem.matrix (thinLensSystem 1 (3 / 2) 1 (-1)) ⟨1, 0⟩ =
       thinLensMatrix 1 := by
   rw [thinLens_matrix_eq_thinLensMatrix 1 (3 / 2) 1 (-1) 1 (by norm_num) (by norm_num)
     (by norm_num) (by norm_num) (by norm_num)]

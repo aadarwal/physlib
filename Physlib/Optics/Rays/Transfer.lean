@@ -5,8 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-public import Mathlib.LinearAlgebra.Matrix.Notation
 public import Physlib.Optics.Rays.Basic
 
 /-!
@@ -14,12 +12,12 @@ public import Physlib.Optics.Rays.Basic
 
 ## i. Overview
 
-Every ray-transfer matrix in this file is *derived* from the relational component law of
-`Physlib.Optics.Rays.Basic`, never used to define one. The pattern is the same for each
-component: `transferMatrix_rayBehavior` proves that the matrix action satisfies the component's
-relational law, and the uniqueness result already proved for that law upgrades this to an
-equivalence. A closed form obtained by multiplying matrices is therefore a theorem about the
-component semantics, not a restatement of a definition.
+The named gap, refracting, and reflecting component matrices in this file are verified against
+the relational component laws of `Physlib.Optics.Rays.Basic`. The pattern is that
+`transferMatrix_rayBehavior` proves that the matrix action satisfies the component law, and
+uniqueness upgrades this to an equivalence. The `prescribed` constructor is the deliberate
+exception: its relation is specified by its matrix entries. The standalone `thinLensMatrix` is
+also an algebraic target, then connected to a two-surface system by the lensmaker theorem.
 
 An ordered optical system is a finite list of components in the order a ray meets them, together
 with the gap the ray leaves through. A component is one homogeneous gap followed by one
@@ -34,10 +32,10 @@ ray-transfer theorem for an arbitrary finite valid system, and
 subsystems.
 
 Reflection conventions. `Physlib.Optics.Rays.Basic` fixes the folded convention, in which the
-axis is re-referenced to the new propagation direction after a mirror. Section D records the map
-to the unfolded convention, in which a plane mirror sends `θ` to `-θ`: the unfolded matrix is the
-folded one post-multiplied by `Optics.angleReversal`. Both are available so that a comparison
-against a source using the other convention is an explicit theorem rather than a silent sign.
+axis is re-referenced to the new propagation direction after a mirror. Section D records a generic
+output-angle coordinate reversal: its matrix is `Optics.angleReversal` multiplied on the left of
+the component matrix. Siddique's table 3.1 already uses the folded mirror matrices. Identifying a
+different source convention additionally requires an explicit axis and signed-radius map.
 
 The determinant law. `ParaxialInterface.det_transferMatrix` gives `det = n₀ / n₁` for five of the
 six constructors, and `ParaxialSystem.det_matrix` gives the telescoped form for a whole system.
@@ -47,9 +45,9 @@ value stated separately, rather than weakening the law to a statement about `|de
 
 Explicit non-claims. These matrices carry no field, power, or polarization, and there is no
 diffraction, aperture, or finite-beam content: a system that is geometrically well behaved here
-may still be unusable physically. The thin- and thick-lens results are exact consequences of the
-paraxial surface laws, so they inherit exactly the small-angle validity those laws carry, and
-nothing more.
+may still be unusable physically. The thin- and thick-lens matrix identities are algebraic
+consequences of the paraxial surface formulas. Their behavior-level corollaries separately require
+positive indices, nonnegative thickness, and nonzero surface radii.
 
 ## ii. Key results
 
@@ -72,7 +70,7 @@ nothing more.
 - A. Ray-transfer matrices and their action
 - B. Component matrices derived from component laws
 - C. The determinant law
-- D. The unfolded reflection convention
+- D. Output-angle reversal
 - E. Ordered optical systems
 - F. The system ray-transfer theorem
 - G. Composed systems
@@ -83,8 +81,8 @@ nothing more.
 - B. E. A. Saleh and M. C. Teich, *Fundamentals of Photonics*, 3rd edition, chapter 1, table
   1.4-1 for the component matrices and section 1.4 for the lensmaker's equation.
 - M. U. Siddique, *Formal Analysis of Geometrical Optics using Theorem Proving*, PhD thesis,
-  Concordia University, 2015, chapter 3, theorems 3.4 to 3.7, for the corresponding results in
-  the unfolded reflection convention.
+  Concordia University, 2015, chapter 3, for the component and system results. Table 3.1 uses the
+  folded mirror matrices; mapping its signed-radius vocabulary to Physlib remains a human check.
 
 -/
 
@@ -203,8 +201,8 @@ lemma ParaxialInterface.transferMatrix_rayBehavior {n₀ n₁ : ℝ} {i : Paraxi
 
 /-- The interface matrix is the unique realisation of the relational interface law.
 
-This is the component-level ray-transfer theorem: the matrix is not the definition of the
-component, it is the extracted content of the component's behaviour.
+For the named geometric constructors this extracts the matrix content of the independently stated
+component behavior. For `prescribed`, the relation intentionally records the supplied entries.
 -/
 lemma ParaxialInterface.rayBehavior_iff_transferMatrix {n₀ n₁ : ℝ} {i : ParaxialInterface}
     (h : i.IsValid n₀ n₁) (r₀ r₁ : ParaxialRay) :
@@ -258,67 +256,71 @@ lemma ParaxialInterface.det_transferMatrix_phaseConjugate (n₀ n₁ : ℝ) :
 
 /-!
 
-## D. The unfolded reflection convention
+## D. Output-angle reversal
 
 -/
 
-/-- The angle-reversal matrix relating the folded and unfolded reflection conventions. -/
+/-- The coordinate transform that preserves ray height and reverses the output angle. -/
 def angleReversal : RayTransferMatrix := !![1, 0; 0, -1]
 
-/-- Reversing the ray angle twice is the identity.
+/-- Reversing the output-angle coordinate twice is the identity.
 
-This is the guard against double-counting the direction reversal. A treatment that keeps the
-reversal explicit, as this one does, must *not* also negate the radii when unfolding: doing both
-would apply the same physical reversal twice. See the round-trip regression in
-`Physlib.Optics.Rays.TransferRegression`.
+This is the guard against double-counting a reflection's direction reversal. A treatment that
+keeps the reversal explicit as a coordinate operation, as this one does, must *not* also negate
+the radii on the reversed leg: doing both applies the same physical reversal twice. See the
+two-mirror round-trip regression in `Physlib.Optics.Rays.TransferRegression`.
 -/
 @[simp]
 lemma angleReversal_mul_self : angleReversal * angleReversal = 1 := by
   rw [angleReversal, Matrix.mul_fin_two, Matrix.one_fin_two]
   norm_num
 
-/-- The unfolded-convention matrix of an interface: the folded matrix followed by the reversal
-that re-references the axis to the incoming propagation direction.
+/-- The transfer matrix obtained by reversing the output-angle coordinate.
 
 `Physlib.Optics.Rays.Basic` fixes the folded convention, in which a plane mirror is the identity.
-Sources that keep the axis fixed across a mirror, and so send `θ` to `-θ`, use this matrix
-instead. Recording the map explicitly means a comparison against such a source is a theorem
-rather than an undocumented sign. Matching a particular source table entry by entry additionally
-requires that source's radius-sign convention, which is a human-audit item and is not asserted
-here.
+Left multiplication by `angleReversal` changes only the reported outgoing angle. For a mirror it
+can express a coordinate convention in which a plane mirror sends `θ` to `-θ`; applying it to an
+arbitrary transmitting interface is only a coordinate operation, not a new physical component.
+No particular source convention is claimed without a separate axis and signed-radius audit.
 -/
-def ParaxialInterface.unfoldedTransferMatrix (n₀ n₁ : ℝ) (i : ParaxialInterface) :
+def ParaxialInterface.outputAngleReversedTransferMatrix (n₀ n₁ : ℝ)
+    (i : ParaxialInterface) :
     RayTransferMatrix :=
   angleReversal * i.transferMatrix n₀ n₁
 
-/-- In the unfolded convention a plane mirror reverses the ray angle. -/
-lemma ParaxialInterface.unfoldedTransferMatrix_planeMirror (n₀ n₁ : ℝ) :
-    ParaxialInterface.planeMirror.unfoldedTransferMatrix n₀ n₁ = !![1, 0; 0, -1] := by
-  simp [unfoldedTransferMatrix, transferMatrix, angleReversal]
+/-- Reversing the output angle of the folded plane-mirror matrix gives `diag(1, -1)`. -/
+lemma ParaxialInterface.outputAngleReversedTransferMatrix_planeMirror (n₀ n₁ : ℝ) :
+    ParaxialInterface.planeMirror.outputAngleReversedTransferMatrix n₀ n₁ =
+      !![1, 0; 0, -1] := by
+  simp [outputAngleReversedTransferMatrix, transferMatrix, angleReversal]
 
-/-- In the unfolded convention a spherical mirror of radius `radius` has the matrix
-`!![1, 0; 2 / radius, -1]`. -/
-lemma ParaxialInterface.unfoldedTransferMatrix_sphericalMirror (n₀ n₁ radius : ℝ) :
-    (ParaxialInterface.sphericalMirror radius).unfoldedTransferMatrix n₀ n₁ =
+/-- Reversing the output angle of the folded spherical-mirror matrix changes both entries in its
+second row, giving `!![1, 0; 2 / radius, -1]`. -/
+lemma ParaxialInterface.outputAngleReversedTransferMatrix_sphericalMirror
+    (n₀ n₁ radius : ℝ) :
+    (ParaxialInterface.sphericalMirror radius).outputAngleReversedTransferMatrix n₀ n₁ =
       !![1, 0; 2 / radius, -1] := by
-  rw [unfoldedTransferMatrix, transferMatrix, angleReversal]
+  rw [outputAngleReversedTransferMatrix, transferMatrix, angleReversal]
   ext i j
   fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two]
   ring
 
-/-- The unfolded convention is exactly the folded one with the outgoing angle reversed. -/
-lemma rayTransfer_unfoldedTransferMatrix (n₀ n₁ : ℝ) (i : ParaxialInterface) (r : ParaxialRay) :
-    rayTransfer (i.unfoldedTransferMatrix n₀ n₁) r =
+/-- The transformed matrix is exactly the original transfer followed by output-angle reversal. -/
+lemma rayTransfer_outputAngleReversedTransferMatrix
+    (n₀ n₁ : ℝ) (i : ParaxialInterface) (r : ParaxialRay) :
+    rayTransfer (i.outputAngleReversedTransferMatrix n₀ n₁) r =
       ⟨(rayTransfer (i.transferMatrix n₀ n₁) r).height,
         -(rayTransfer (i.transferMatrix n₀ n₁) r).angle⟩ := by
-  rw [ParaxialInterface.unfoldedTransferMatrix, rayTransfer_mul]
+  rw [ParaxialInterface.outputAngleReversedTransferMatrix, rayTransfer_mul]
   ext <;> simp [angleReversal]
 
-/-- Reversing the angle multiplies the determinant by `-1`, so an unfolded reflecting component
-has determinant `-(n₀ / n₁)` wherever the folded one has `n₀ / n₁`. -/
-lemma ParaxialInterface.det_unfoldedTransferMatrix (n₀ n₁ : ℝ) (i : ParaxialInterface) :
-    (i.unfoldedTransferMatrix n₀ n₁).det = -(i.transferMatrix n₀ n₁).det := by
-  rw [unfoldedTransferMatrix, Matrix.det_mul, angleReversal, Matrix.det_fin_two_of]
+/-- Output-angle reversal multiplies the transfer-matrix determinant by `-1`. -/
+lemma ParaxialInterface.det_outputAngleReversedTransferMatrix
+    (n₀ n₁ : ℝ) (i : ParaxialInterface) :
+    (i.outputAngleReversedTransferMatrix n₀ n₁).det =
+      -(i.transferMatrix n₀ n₁).det := by
+  rw [outputAngleReversedTransferMatrix, Matrix.det_mul, angleReversal,
+    Matrix.det_fin_two_of]
   ring
 
 /-!
@@ -448,9 +450,15 @@ def composedMatrix : List (List ParaxialComponent × ParaxialGap) → RayTransfe
   | [] => 1
   | s :: rest => composedMatrix rest * matrix s.1 s.2
 
-/-- A composed system is valid when each of its subsystems is. -/
+/-- Adjacent subsystems are index-compatible when each exit index is the next entry index. -/
+def ComposedIndicesCompatible
+    (subsystems : List (List ParaxialComponent × ParaxialGap)) : Prop :=
+  subsystems.IsChain fun first second => first.2.index = headIndex second.1 second.2
+
+/-- A composed system is valid when every subsystem is valid and adjacent subsystem indices
+agree at their shared reference plane. -/
 def ComposedIsValid (subsystems : List (List ParaxialComponent × ParaxialGap)) : Prop :=
-  ∀ s ∈ subsystems, IsValid s.1 s.2
+  (∀ s ∈ subsystems, IsValid s.1 s.2) ∧ ComposedIndicesCompatible subsystems
 
 /-- The behaviour of a ray in a composed system: the ray passes through each subsystem in turn,
 with the coordinates between subsystems existentially quantified. -/
@@ -473,8 +481,9 @@ theorem composedRayBehavior_iff_composedMatrix :
       rw [ComposedRayBehavior, composedMatrix, rayTransfer_one]
   | cons s rest ih =>
       intro hValid r₀ r₁
-      have hHead : IsValid s.1 s.2 := hValid s List.mem_cons_self
-      have hRest : ComposedIsValid rest := fun t ht => hValid t (List.mem_cons_of_mem s ht)
+      have hHead : IsValid s.1 s.2 := hValid.1 s List.mem_cons_self
+      have hRest : ComposedIsValid rest :=
+        ⟨fun t ht => hValid.1 t (List.mem_cons_of_mem s ht), hValid.2.of_cons⟩
       constructor
       · rintro ⟨rMid, hFirst, hRestBehavior⟩
         rw [rayBehavior_iff_matrix s.1 s.2 hHead] at hFirst
@@ -494,7 +503,37 @@ end ParaxialSystem
 
 -/
 
-/-- The ray-transfer matrix of a thin lens of focal length `f`. -/
+/-- The two-surface paraxial system used to model a thick lens.
+
+The first spherical surface carries the ray from surrounding index `n` into lens index `nL`; the
+second, after thickness `t`, carries it back to `n`.
+-/
+def thickLensSystem (n nL t R₁ R₂ : ℝ) : List ParaxialComponent :=
+  [⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₁⟩,
+    ⟨⟨nL, t⟩, ParaxialInterface.sphericalRefracting R₂⟩]
+
+/-- The zero-thickness specialization of `Optics.thickLensSystem`. -/
+def thinLensSystem (n nL R₁ R₂ : ℝ) : List ParaxialComponent :=
+  thickLensSystem n nL 0 R₁ R₂
+
+/-- Positive indices, nonnegative thickness, and nonzero radii make the thick-lens system valid. -/
+lemma thickLensSystem_isValid {n nL t R₁ R₂ : ℝ} (hn : 0 < n) (hnL : 0 < nL)
+    (ht : 0 ≤ t) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
+    ParaxialSystem.IsValid (thickLensSystem n nL t R₁ R₂) ⟨n, 0⟩ := by
+  refine ⟨⟨hn, by norm_num⟩, ⟨hn, hnL, hR₁⟩, ⟨hnL, ht⟩,
+    ⟨hnL, hn, hR₂⟩, hn, by norm_num⟩
+
+/-- Positive indices and nonzero radii make the zero-thickness lens system valid. -/
+lemma thinLensSystem_isValid {n nL R₁ R₂ : ℝ} (hn : 0 < n) (hnL : 0 < nL)
+    (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
+    ParaxialSystem.IsValid (thinLensSystem n nL R₁ R₂) ⟨n, 0⟩ := by
+  exact thickLensSystem_isValid hn hnL (by norm_num) hR₁ hR₂
+
+/-- The algebraic ray-transfer matrix parameterized by a focal-length value `f`.
+
+Physical focal-length statements must assume `f ≠ 0`. At `f = 0`, Lean's totalized division makes
+this matrix the identity; no zero-focal-length optical interpretation is claimed.
+-/
 def thinLensMatrix (f : ℝ) : RayTransferMatrix := !![1, 0; -1 / f, 1]
 
 /-- A thin lens has unit determinant. -/
@@ -506,42 +545,58 @@ lemma det_thinLensMatrix (f : ℝ) : (thinLensMatrix f).det = 1 := by
 separated by a gap of length `t` in a medium of index `nL`, both immersed in a medium of index
 `n`, gives the stated matrix.
 
-Nothing here is stipulated: the matrix is the system matrix of a two-component system built from
-the paraxial surface laws of `Physlib.Optics.Rays.Basic`, so its lower-left entry is a derived
-lensmaker's equation with thickness, not a definition.
+This is an algebraic identity for the matrix of `thickLensSystem`. Under the positivity,
+nonnegative-thickness, and nonzero-radius hypotheses of `thickLensSystem_isValid`, the subsequent
+behavior theorem connects it to the independently stated surface laws.
 -/
 theorem thickLens_matrix (n nL t R₁ R₂ : ℝ) (hn : n ≠ 0) (hnL : nL ≠ 0) (hR₁ : R₁ ≠ 0)
     (hR₂ : R₂ ≠ 0) :
-    ParaxialSystem.matrix
-        [⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₁⟩,
-          ⟨⟨nL, t⟩, ParaxialInterface.sphericalRefracting R₂⟩] ⟨n, 0⟩ =
+    ParaxialSystem.matrix (thickLensSystem n nL t R₁ R₂) ⟨n, 0⟩ =
       !![1 - t * (nL - n) / (nL * R₁), t * n / nL;
         -((nL / n - 1) * (1 / R₁ - 1 / R₂ + t * (nL - n) / (nL * R₁ * R₂))),
         1 + t * (nL - n) / (nL * R₂)] := by
-  simp only [ParaxialSystem.matrix, ParaxialSystem.headIndex, ParaxialInterface.transferMatrix,
-    ParaxialGap.transferMatrix]
+  simp only [thickLensSystem, ParaxialSystem.matrix, ParaxialSystem.headIndex,
+    ParaxialInterface.transferMatrix, ParaxialGap.transferMatrix]
   ext i j
   fin_cases i <;> fin_cases j <;>
     simp [Matrix.mul_apply, Fin.sum_univ_two] <;> field_simp <;> ring
+
+/-- A physically valid thick-lens system satisfies the closed-form ray-transfer relation. -/
+lemma thickLens_rayBehavior_iff_matrix {n nL t R₁ R₂ : ℝ} (hn : 0 < n) (hnL : 0 < nL)
+    (ht : 0 ≤ t) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) (r₀ r₁ : ParaxialRay) :
+    ParaxialSystem.RayBehavior (thickLensSystem n nL t R₁ R₂) ⟨n, 0⟩ r₀ r₁ ↔
+      r₁ = rayTransfer
+        !![1 - t * (nL - n) / (nL * R₁), t * n / nL;
+          -((nL / n - 1) * (1 / R₁ - 1 / R₂ + t * (nL - n) / (nL * R₁ * R₂))),
+          1 + t * (nL - n) / (nL * R₂)] r₀ := by
+  rw [ParaxialSystem.rayBehavior_iff_matrix _ _
+    (thickLensSystem_isValid hn hnL ht hR₁ hR₂),
+    thickLens_matrix n nL t R₁ R₂ hn.ne' hnL.ne' hR₁ hR₂]
 
 /-- **The lensmaker's equation.** A thin lens is the zero-thickness case of `thickLens_matrix`,
 and its lower-left entry is `-(nL / n - 1) (1 / R₁ - 1 / R₂)`. -/
 theorem thinLens_matrix (n nL R₁ R₂ : ℝ) (hn : n ≠ 0) (hnL : nL ≠ 0) (hR₁ : R₁ ≠ 0)
     (hR₂ : R₂ ≠ 0) :
-    ParaxialSystem.matrix
-        [⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₁⟩,
-          ⟨⟨nL, 0⟩, ParaxialInterface.sphericalRefracting R₂⟩] ⟨n, 0⟩ =
+    ParaxialSystem.matrix (thinLensSystem n nL R₁ R₂) ⟨n, 0⟩ =
       !![1, 0; -((nL / n - 1) * (1 / R₁ - 1 / R₂)), 1] := by
+  rw [thinLensSystem]
   rw [thickLens_matrix n nL 0 R₁ R₂ hn hnL hR₁ hR₂]
   norm_num
+
+/-- A physically valid thin-lens system satisfies the lensmaker ray-transfer relation. -/
+lemma thinLens_rayBehavior_iff_matrix {n nL R₁ R₂ : ℝ} (hn : 0 < n) (hnL : 0 < nL)
+    (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) (r₀ r₁ : ParaxialRay) :
+    ParaxialSystem.RayBehavior (thinLensSystem n nL R₁ R₂) ⟨n, 0⟩ r₀ r₁ ↔
+      r₁ = rayTransfer !![1, 0; -((nL / n - 1) * (1 / R₁ - 1 / R₂)), 1] r₀ := by
+  rw [ParaxialSystem.rayBehavior_iff_matrix _ _
+    (thinLensSystem_isValid hn hnL hR₁ hR₂),
+    thinLens_matrix n nL R₁ R₂ hn.ne' hnL.ne' hR₁ hR₂]
 
 /-- The thin lens obtained from two spherical surfaces is the thin-lens matrix of the focal
 length given by the lensmaker's equation. -/
 theorem thinLens_matrix_eq_thinLensMatrix (n nL R₁ R₂ f : ℝ) (hn : n ≠ 0) (hnL : nL ≠ 0)
     (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) (hf : 1 / f = (nL / n - 1) * (1 / R₁ - 1 / R₂)) :
-    ParaxialSystem.matrix
-        [⟨⟨n, 0⟩, ParaxialInterface.sphericalRefracting R₁⟩,
-          ⟨⟨nL, 0⟩, ParaxialInterface.sphericalRefracting R₂⟩] ⟨n, 0⟩ =
+    ParaxialSystem.matrix (thinLensSystem n nL R₁ R₂) ⟨n, 0⟩ =
       thinLensMatrix f := by
   rw [thinLens_matrix n nL R₁ R₂ hn hnL hR₁ hR₂, thinLensMatrix, ← hf]
   ext i j
