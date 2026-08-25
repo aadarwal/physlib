@@ -21,8 +21,11 @@ meaningful when the internal feedback equations have no solution or several solu
 
 The middle mode family is identified literally. A relabeling, phase-gauge change, or reference-
 plane adapter must be supplied before composition when the two middle boundaries use different
-coordinates. This file does not assert functionality, passivity, losslessness, reciprocity,
-causality, or a physical device realization.
+coordinates. The travelling-wave ordering is the convention registered by
+`TwoPortScatteringChain`. This file does not assert functionality, passivity, losslessness,
+reciprocity, causality, associativity, an identity law, or a physical device realization.
+Agreement with the independent
+`FlatNetlist`/N5H composition route has not yet been proved; that is the open X-01 bridge.
 
 ## iii. Key definitions and results
 
