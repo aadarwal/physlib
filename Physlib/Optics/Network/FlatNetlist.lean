@@ -40,8 +40,9 @@ not assert that either behavior is total, single-valued, passive, lossless, reci
 electromagnetically normalized. In particular, `1 - C * S` is not inverted here. Well-posedness
 must later concern uniqueness of the complete solution state, which is stronger than uniqueness of
 the externally observed output. `componentBehavior` is the graph of the already assembled
-block-diagonal transform; identifying it with a dependent parallel composition of every local
-component graph is a separate family-level theorem.
+block-diagonal transform. The component-family bridge identifies this graph with simultaneous
+satisfaction of every canonically restricted local component graph, without choosing a component
+ordering.
 
 ## iii. Key definitions and results
 
@@ -50,6 +51,7 @@ component graph is a separate family-level theorem.
 - `FlatNetlist.routingTransform`: the ambient partial-routing law `C`.
 - `FlatNetlist.inputExposure` and `FlatNetlist.outputReadout`: the derived external boundary maps.
 - `FlatNetlist.incidentAssemblyBehavior`: relational composition implementing `C b + E_in u`.
+- `FlatNetlist.mem_componentBehavior_iff_forall_component`: the exact local component graph laws.
 - `FlatNetlist.solutionBehavior`: every full state satisfying component and return relations.
 - `FlatNetlist.behavior`: the singular-safe external behavior obtained by relational projection.
 - `FlatNetlist.mem_behavior_iff_equations`: the exact three network equations.
@@ -188,6 +190,37 @@ lemma mem_componentBehavior_iff
       outgoing = netlist.scatteringTransform.toLinearMap incident := by
   classical
   exact ModeTransform.mem_toBehavior_iff_toLinearMap _ _ _
+
+/-- The aggregate component graph is the order-free relation requiring every restricted local
+component graph simultaneously. -/
+lemma componentBehavior_eq_componentwiseBehavior
+    [Fintype netlist.components.Component]
+    [∀ component, Fintype (netlist.components.portFamily component).Channel] :
+    netlist.componentBehavior = netlist.components.componentwiseBehavior := by
+  classical
+  change
+    netlist.components.assembledScatteringMatrix.toOrientedModeTransform.toBehavior =
+      netlist.components.componentwiseBehavior
+  exact
+    netlist.components.componentwiseBehavior_eq_assembledScatteringMatrix_toBehavior.symm
+
+/-- Aggregate component membership is exactly local graph membership at every component. -/
+lemma mem_componentBehavior_iff_forall_component
+    [Fintype netlist.components.Component]
+    [∀ component, Fintype (netlist.components.portFamily component).Channel]
+    (incident : ModeAmplitude netlist.IncidentIndex)
+    (outgoing : ModeAmplitude netlist.OutgoingIndex) :
+    (incident, outgoing) ∈ netlist.componentBehavior ↔
+      ∀ component,
+        (incident.restrictEmbedding
+            (Incident.relabelEmbedding
+              (netlist.components.componentChannelEmbedding component)),
+          outgoing.restrictEmbedding
+            (Outgoing.relabelEmbedding
+              (netlist.components.componentChannelEmbedding component))) ∈
+          (netlist.components.scattering component).toOrientedModeTransform.toBehavior := by
+  rw [netlist.componentBehavior_eq_componentwiseBehavior,
+    netlist.components.mem_componentwiseBehavior_iff]
 
 variable [Fintype netlist.ConnectedChannel]
 
