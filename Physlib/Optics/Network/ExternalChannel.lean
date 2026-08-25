@@ -8,18 +8,19 @@ module
 public import Physlib.Optics.Network.PartialRouting
 
 /-!
-# External optical channels and incident injection
+# External optical channels and boundary exposure
 
 ## i. Overview
 
 A connection family selects the ambient channels that belong to internal routing. This file
 defines its external channels as the exact complement of that selected range, proves that connected
-and external channels form a complete disjoint partition, and lifts the external inclusion to the
-nominal incident endpoint type.
+and external channels form a complete disjoint partition, and lifts the external inclusion to both
+nominal endpoint types.
 
-The resulting zero-extension transform is the typed external incident injection `E` in the
-algebraic expression `a = C b + E u`, where `C` is ambient partial routing. The coordinate and power
-laws below show that `C b` and `E u` have disjoint support in complementary incident coordinates.
+The resulting zero-extension transforms are the typed external incident injection `E_in` in the
+algebraic expression `a = C b + E_in u` and the external outgoing exposure `E_out` whose adjoint
+reads `y = E_outᴴ b`. The coordinate and power laws below show that connected and external
+coordinates remain distinct on both sides of the network boundary.
 
 ## ii. Scope
 
@@ -29,11 +30,11 @@ fibers over those ports. There is no one-channel-per-port identification: an unc
 several modeled modes contributes several external channels, while one with an empty mode fiber
 contributes none.
 
-The injection assigns amplitudes to already declared external incident coordinates; it does not
-model a source impedance, termination, incoming-wave data, feedback solvability,
-electromagnetic power, or an electromagnetic boundary condition. Complement outgoing coordinates
-are absent from `C b` because `C` does not route them internally, not because they are absorbed.
-Consequently, the modal-power identity below is not a network energy balance.
+The endpoint exposures assign or select amplitudes at already declared external coordinates; they
+do not choose the supplied incoming-wave data or model its source impedance, termination,
+feedback solvability, electromagnetic power, or electromagnetic boundary condition. Complement
+outgoing coordinates are absent from `C b` because `C` does not route them internally, not because
+they are absorbed. Consequently, the modal-power identities below are not network energy balances.
 
 ## iii. Key definitions and results
 
@@ -43,14 +44,16 @@ Consequently, the modal-power identity below is not a network energy balance.
 - `PortConnectionFamily.externalChannelEquivUnconnectedPortModes`: external channels are the
   dependent sum of modes over structurally unconnected ports.
 - `PortConnectionFamily.externalIncidentInjection`: the typed external incident injection.
-- `PortConnectionFamily.incidentAssembly`: the coordinate-level expression `C b + E u`.
+- `PortConnectionFamily.externalOutgoingInjection`: the typed external outgoing exposure; its
+  adjoint is coordinate readout.
+- `PortConnectionFamily.incidentAssembly`: the coordinate-level expression `C b + E_in u`.
 - `PortConnectionFamily.incidentAssembly_power`: connected and external modal powers add because
   their incident-coordinate ranges are disjoint.
 
 ## iv. Table of contents
 
 - A. The external-channel complement
-- B. External incident injection
+- B. External endpoint exposure
 - C. The assembled incident amplitude
 
 -/
@@ -174,7 +177,9 @@ lemma channelPartitionEquiv_symm_externalChannelEmbedding
 
 /-!
 
-## B. External incident injection
+## B. External endpoint exposure
+
+### B.1. Incident injection
 
 -/
 
@@ -315,13 +320,308 @@ lemma externalIncidentInjection_mul_conjTranspose
   simp only [externalIncidentInjection, ModeTransform.zeroExtension_conjTranspose]
   rfl
 
+/-- Connected and external incident range projectors resolve the ambient identity. -/
+lemma incidentRangeProjector_add_externalRangeProjector
+    [Fintype family.Channel] [Fintype family.ExternalChannel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    ModeTransform.rangeProjector family.incidentChannelEmbedding +
+        ModeTransform.rangeProjector family.externalIncidentEmbedding =
+      (1 : ModeTransform (Incident P.Channel) (Incident P.Channel)) := by
+  exact ModeTransform.rangeProjector_add_rangeProjector_eq_one
+    family.incidentChannelEmbedding family.externalIncidentEmbedding
+      family.incidentPartitionEquiv family.incidentPartitionEquiv_apply_inl
+        family.incidentPartitionEquiv_apply_inr
+
+/-!
+
+### B.2. Outgoing exposure and readout
+
+-/
+
+/-- The external-channel embedding lifted to nominal outgoing endpoint labels. -/
+def externalOutgoingEmbedding :
+    Outgoing family.ExternalChannel ↪ Outgoing P.Channel :=
+  Outgoing.relabelEmbedding family.externalChannelEmbedding
+
+/-- An external outgoing endpoint embeds at its underlying ambient physical channel. -/
+@[simp]
+lemma externalOutgoingEmbedding_apply (channel : family.ExternalChannel) :
+    family.externalOutgoingEmbedding (Outgoing.mk channel) =
+      Outgoing.mk channel.1 := rfl
+
+/-- An ambient outgoing endpoint lies in the external range exactly when its channel is not
+connected. -/
+lemma outgoing_mk_mem_range_externalChannelEmbedding_iff (channel : P.Channel) :
+    Outgoing.mk channel ∈ Set.range family.externalOutgoingEmbedding ↔
+      channel ∉ Set.range family.channelEmbedding := by
+  change Outgoing.mk channel ∈
+      Set.range (Outgoing.relabelEmbedding family.externalChannelEmbedding) ↔ _
+  rw [Outgoing.mk_mem_range_relabelEmbedding_iff,
+    family.mem_range_externalChannelEmbedding_iff]
+
+/-- Connected and external outgoing embeddings have disjoint values. -/
+lemma outgoingChannelEmbedding_ne_externalOutgoingEmbedding
+    (connected : Outgoing family.Channel) (external : Outgoing family.ExternalChannel) :
+    family.outgoingChannelEmbedding connected ≠
+      family.externalOutgoingEmbedding external := by
+  intro hEndpoint
+  apply external.channel.2
+  exact ⟨connected.channel, congrArg Outgoing.channel hEndpoint⟩
+
+/-- Connected and external outgoing endpoints exactly partition the ambient outgoing type. -/
+noncomputable def outgoingPartitionEquiv :
+    Outgoing family.Channel ⊕ Outgoing family.ExternalChannel ≃ Outgoing P.Channel :=
+  (Outgoing.channelEquiv.sumCongr Outgoing.channelEquiv).trans
+    (family.channelPartitionEquiv.trans Outgoing.channelEquiv.symm)
+
+/-- The outgoing partition equivalence includes a connected outgoing endpoint. -/
+@[simp]
+lemma outgoingPartitionEquiv_apply_inl (channel : Outgoing family.Channel) :
+    family.outgoingPartitionEquiv (Sum.inl channel) =
+      family.outgoingChannelEmbedding channel := by
+  rcases channel with ⟨channel⟩
+  rfl
+
+/-- The outgoing partition equivalence includes an external outgoing endpoint. -/
+@[simp]
+lemma outgoingPartitionEquiv_apply_inr (channel : Outgoing family.ExternalChannel) :
+    family.outgoingPartitionEquiv (Sum.inr channel) =
+      family.externalOutgoingEmbedding channel := by
+  rcases channel with ⟨channel⟩
+  rfl
+
+/-- Extend an external outgoing amplitude by zero to all ambient outgoing coordinates.
+
+This is the exposure transform `E_out`; its adjoint reads the external output in
+`y = E_outᴴ b`. It adds no termination or detector model.
+-/
+def externalOutgoingInjection [DecidableEq P.Channel] :
+    ModeTransform (Outgoing family.ExternalChannel) (Outgoing P.Channel) :=
+  ModeTransform.zeroExtension family.externalOutgoingEmbedding
+
+/-- Restrict an ambient outgoing amplitude to the exposed external coordinates.
+
+This is the readout `E_outᴴ`; it selects modeled wave amplitudes and does not add a detector or
+measurement model.
+-/
+def externalOutgoingReadout [DecidableEq P.Channel] :
+    ModeTransform (Outgoing P.Channel) (Outgoing family.ExternalChannel) :=
+  ModeTransform.restriction family.externalOutgoingEmbedding
+
+/-- External outgoing readout is the adjoint of external outgoing injection. -/
+lemma externalOutgoingReadout_eq_conjTranspose [DecidableEq P.Channel] :
+    family.externalOutgoingReadout =
+      (PortConnectionFamily.externalOutgoingInjection family)ᴴ := by
+  rw [externalOutgoingReadout, externalOutgoingInjection,
+    ModeTransform.zeroExtension_conjTranspose]
+
+/-- External outgoing injection has a unit entry at every selected external coordinate. -/
+@[simp]
+lemma externalOutgoingInjection_entry_external [DecidableEq P.Channel]
+    (channel : family.ExternalChannel) :
+    family.externalOutgoingInjection (Outgoing.mk channel.1) (Outgoing.mk channel) = 1 := by
+  simp [externalOutgoingInjection]
+
+/-- External outgoing injection has a zero entry from an external input to a connected ambient
+coordinate. -/
+lemma externalOutgoingInjection_entry_connected [DecidableEq P.Channel]
+    (connected : family.Channel) (external : family.ExternalChannel) :
+    family.externalOutgoingInjection
+        (Outgoing.mk (family.channelEmbedding connected)) (Outgoing.mk external) = 0 := by
+  have hNe : family.externalOutgoingEmbedding (Outgoing.mk external) ≠
+      Outgoing.mk (family.channelEmbedding connected) := by
+    intro hChannel
+    exact family.channelEmbedding_ne_externalChannelEmbedding connected external
+      (congrArg Outgoing.channel hChannel).symm
+  simp only [externalOutgoingInjection, ModeTransform.zeroExtension_entry,
+    if_neg hNe]
+
+/-- External outgoing injection recovers the exact amplitude at every external coordinate. -/
+@[simp]
+lemma externalOutgoingInjection_apply_external
+    [Fintype family.ExternalChannel] [DecidableEq P.Channel]
+    (amplitude : ModeAmplitude (Outgoing family.ExternalChannel))
+    (channel : family.ExternalChannel) :
+    family.externalOutgoingInjection.toLinearMap amplitude (Outgoing.mk channel.1) =
+      amplitude (Outgoing.mk channel) := by
+  exact ModeTransform.zeroExtension_apply_image family.externalOutgoingEmbedding amplitude
+    (Outgoing.mk channel)
+
+/-- External outgoing injection vanishes at every connected outgoing coordinate. -/
+lemma externalOutgoingInjection_apply_connected
+    [Fintype family.ExternalChannel] [DecidableEq P.Channel]
+    (amplitude : ModeAmplitude (Outgoing family.ExternalChannel))
+    (channel : family.Channel) :
+    family.externalOutgoingInjection.toLinearMap amplitude
+        (Outgoing.mk (family.channelEmbedding channel)) = 0 := by
+  apply ModeTransform.zeroExtension_apply_of_not_mem_range
+    family.externalOutgoingEmbedding amplitude
+  intro hRange
+  rw [family.outgoing_mk_mem_range_externalChannelEmbedding_iff] at hRange
+  exact hRange ⟨channel, rfl⟩
+
+/-- External outgoing injection preserves normalized external modal power. -/
+lemma externalOutgoingInjection_isPowerPreserving
+    [Fintype family.ExternalChannel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    family.externalOutgoingInjection.IsPowerPreserving :=
+  ModeTransform.zeroExtension_isPowerPreserving family.externalOutgoingEmbedding
+
+/-- External outgoing injection is an isometry of finite normalized mode-amplitude spaces. -/
+lemma externalOutgoingInjection_isometry
+    [Fintype family.ExternalChannel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    Isometry family.externalOutgoingInjection.toLinearMap :=
+  ModeTransform.zeroExtension_isometry family.externalOutgoingEmbedding
+
+/-- The adjoint of external outgoing injection is exact coordinate restriction. -/
+lemma externalOutgoingInjection_conjTranspose_apply
+    [Fintype P.Channel] [DecidableEq P.Channel]
+    (amplitude : ModeAmplitude (Outgoing P.Channel)) :
+    ModeTransform.toLinearMap
+        (PortConnectionFamily.externalOutgoingInjection family)ᴴ amplitude =
+      amplitude.restrictEmbedding family.externalOutgoingEmbedding := by
+  rw [externalOutgoingInjection, ModeTransform.zeroExtension_conjTranspose,
+    ModeTransform.toLinearMap_restriction]
+
+/-- External outgoing readout returns the selected ambient coordinates without conjugating their
+amplitudes. -/
+@[simp]
+lemma externalOutgoingReadout_apply
+    [Fintype P.Channel] [DecidableEq P.Channel]
+    (amplitude : ModeAmplitude (Outgoing P.Channel)) :
+    family.externalOutgoingReadout.toLinearMap amplitude =
+      amplitude.restrictEmbedding family.externalOutgoingEmbedding := by
+  exact ModeTransform.toLinearMap_restriction family.externalOutgoingEmbedding amplitude
+
+/-- The input-side Gram matrix of external outgoing injection is the identity. -/
+lemma externalOutgoingInjection_conjTranspose_mul_self
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    (PortConnectionFamily.externalOutgoingInjection family)ᴴ *
+      family.externalOutgoingInjection = 1 := by
+  simpa only [externalOutgoingInjection, ModeTransform.zeroExtension_conjTranspose] using
+    ModeTransform.restriction_mul_zeroExtension family.externalOutgoingEmbedding
+
+/-- The output-side Gram matrix of external outgoing injection is its ambient range projector. -/
+lemma externalOutgoingInjection_mul_conjTranspose
+    [Fintype family.ExternalChannel] [DecidableEq P.Channel] :
+    family.externalOutgoingInjection *
+        (PortConnectionFamily.externalOutgoingInjection family)ᴴ =
+      ModeTransform.rangeProjector family.externalOutgoingEmbedding := by
+  simp only [externalOutgoingInjection, ModeTransform.zeroExtension_conjTranspose]
+  rfl
+
+/-- External outgoing readout after exposure is the identity on external amplitudes. -/
+lemma externalOutgoingReadout_mul_externalOutgoingInjection
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    family.externalOutgoingReadout * family.externalOutgoingInjection = 1 := by
+  rw [family.externalOutgoingReadout_eq_conjTranspose,
+    family.externalOutgoingInjection_conjTranspose_mul_self]
+
+/-- Exposure after external outgoing readout is the external ambient range projector. -/
+lemma externalOutgoingInjection_mul_externalOutgoingReadout
+    [Fintype family.ExternalChannel] [DecidableEq P.Channel] :
+    family.externalOutgoingInjection * family.externalOutgoingReadout =
+      ModeTransform.rangeProjector family.externalOutgoingEmbedding := by
+  rw [family.externalOutgoingReadout_eq_conjTranspose,
+    family.externalOutgoingInjection_mul_conjTranspose]
+
+/-- Connected and external outgoing range projectors resolve the ambient identity. -/
+lemma outgoingRangeProjector_add_externalRangeProjector
+    [Fintype family.Channel] [Fintype family.ExternalChannel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    ModeTransform.rangeProjector family.outgoingChannelEmbedding +
+        ModeTransform.rangeProjector family.externalOutgoingEmbedding =
+      (1 : ModeTransform (Outgoing P.Channel) (Outgoing P.Channel)) := by
+  exact ModeTransform.rangeProjector_add_rangeProjector_eq_one
+    family.outgoingChannelEmbedding family.externalOutgoingEmbedding
+      family.outgoingPartitionEquiv family.outgoingPartitionEquiv_apply_inl
+        family.outgoingPartitionEquiv_apply_inr
+
+/-!
+
+### B.3. Connected-external boundary decomposition
+
+-/
+
+/-- Ambient routing ignores every amplitude injected on an external outgoing coordinate. -/
+lemma partialRouting_mul_externalOutgoingInjection
+    [Fintype family.Channel] [DecidableEq family.Channel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    family.partialRouting * family.externalOutgoingInjection = 0 := by
+  classical
+  ext incident external
+  rw [Matrix.mul_apply]
+  apply Finset.sum_eq_zero
+  intro outgoing _
+  by_cases hOutgoing : family.externalOutgoingEmbedding external = outgoing
+  · subst outgoing
+    change family.partialRouting incident (Outgoing.mk external.channel.1) *
+        family.externalOutgoingInjection
+          (family.externalOutgoingEmbedding external) external = 0
+    rw [family.partialRouting_entry_of_outgoing_not_mem_range
+      external.channel.1 external.channel.2]
+    simp
+  · rw [externalOutgoingInjection, ModeTransform.zeroExtension_entry, if_neg hOutgoing]
+    simp
+
+/-- External incident readout ignores every coordinate produced by ambient internal routing. -/
+lemma externalIncidentInjection_conjTranspose_mul_partialRouting
+    [Fintype family.Channel] [DecidableEq family.Channel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    (PortConnectionFamily.externalIncidentInjection family)ᴴ *
+      family.partialRouting = 0 := by
+  classical
+  simp only [externalIncidentInjection, ModeTransform.zeroExtension_conjTranspose]
+  ext external outgoing
+  rw [Matrix.mul_apply]
+  apply Finset.sum_eq_zero
+  intro incident _
+  by_cases hIncident : family.externalIncidentEmbedding external = incident
+  · subst incident
+    rw [ModeTransform.restriction_entry, if_pos rfl]
+    change 1 * family.partialRouting (Incident.mk external.channel.1) outgoing = 0
+    rw [family.partialRouting_entry_of_incident_not_mem_range
+      external.channel.1 external.channel.2]
+    simp
+  · rw [ModeTransform.restriction_entry, if_neg hIncident]
+    simp
+
+/-- Connected routing inputs and external outgoing exposure resolve every ambient outgoing
+coordinate exactly once. -/
+lemma partialRouting_conjTranspose_mul_self_add_externalOutgoingProjector
+    [Fintype family.Channel] [DecidableEq family.Channel]
+    [Fintype family.ExternalChannel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    family.partialRoutingᴴ * family.partialRouting +
+        family.externalOutgoingInjection *
+          (PortConnectionFamily.externalOutgoingInjection family)ᴴ =
+      (1 : ModeTransform (Outgoing P.Channel) (Outgoing P.Channel)) := by
+  rw [family.partialRouting_conjTranspose_mul_self,
+    family.externalOutgoingInjection_mul_conjTranspose,
+    family.outgoingRangeProjector_add_externalRangeProjector]
+
+/-- Connected routing outputs and external incident injection resolve every ambient incident
+coordinate exactly once. -/
+lemma partialRouting_mul_conjTranspose_add_externalIncidentProjector
+    [Fintype family.Channel] [DecidableEq family.Channel]
+    [Fintype family.ExternalChannel]
+    [Fintype P.Channel] [DecidableEq P.Channel] :
+    family.partialRouting * family.partialRoutingᴴ +
+        family.externalIncidentInjection *
+          (PortConnectionFamily.externalIncidentInjection family)ᴴ =
+      (1 : ModeTransform (Incident P.Channel) (Incident P.Channel)) := by
+  rw [family.partialRouting_mul_conjTranspose,
+    family.externalIncidentInjection_mul_conjTranspose,
+    family.incidentRangeProjector_add_externalRangeProjector]
+
 /-!
 
 ## C. The assembled incident amplitude
 
 -/
 
-/-- The ambient incident amplitude `C b + E u` from internal routing and external injection.
+/-- The ambient incident amplitude `C b + E_in u` from internal routing and external injection.
 
 This is only an algebraic right-hand side. It does not assert that a component law supplies `b`,
 that a fixed point exists, or that the resulting network is uniquely solvable.

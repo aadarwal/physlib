@@ -415,9 +415,11 @@ Ownership rules:
   or no internal-wiring contribution, not termination or absorption.
 - `Optics.Network.ExternalChannel` defines the exact channel complement, identifies it with the
   dependent sum of modeled modes over unconnected physical ports, and supplies the incident
-  zero-extension injection `E`. Its `C b + E u` assembly has exact connected/external action and
-  additive normalized modal power. Complement outgoing coordinates omitted by `C` are not thereby
-  absorbed, so the identity is not a network energy balance, source model, or feedback solution.
+  injection `E_in`, outgoing exposure `E_out`, and restriction readout `E_outᴴ`. Their exact
+  coordinate, isometry, Gram, cross-zero, and projector-completeness laws give complete nominal
+  boundary decompositions. Its `C b + E_in u` assembly has exact connected/external action and
+  additive normalized modal power. These coordinate operations are not a source, detector,
+  termination, network energy balance, or feedback solution.
 - `Optics.Network.LinearBehavior` supplies singular-safe complex-linear component relations,
   embeds linear maps and finite mode transforms as graphs, and proves identity, relational series,
   and independent parallel composition laws. It characterizes total single-valued behaviors,
@@ -1792,9 +1794,10 @@ changes, and sparse restriction/zero-extension maps required by the network laye
   with exact connected and complement action, input and output range-projector Gram laws, global
   normalized-modal passivity, and power equality exactly for amplitudes supported on connected
   outgoing channels; complement zeros model neither termination nor absorption;
-- [x] an explicit external-channel complement and its typed injection into the remaining ambient
-  incident coordinates, including a structural channel-versus-port equivalence and an empty-mode
-  regression proving that an unconnected physical port need not contribute a channel; and
+- [x] an explicit external-channel complement with typed incident injection `E_in`, outgoing
+  exposure `E_out`, and readout `E_outᴴ`, including structural endpoint partitions, cross-zero and
+  projector-completeness laws, a channel-versus-port equivalence, and an empty-mode regression
+  proving that an unconnected physical port need not contribute a channel; and
 - [x] the typed local `C * S : Incident → Incident` action order, without claiming feedback
   solvability or assigning component gains, path phase, or delay to a wire.
 
@@ -2481,7 +2484,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection and angular reflection, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
-| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
+| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, `E_in`, `E_out`, adjoint readout, and both boundary projector decompositions are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
@@ -2589,12 +2592,14 @@ human verification recorded in `tbd.md`.
    and therefore failure of global power preservation, without interpreting the deficit as
    absorption. The explicit external channel complement now partitions the ambient channel type,
    is equivalent to the dependent sum of modes over unconnected ports, and supplies the typed
-   incident injection `E`. The expression `C b + E u` has exact connected/external coordinate
-   action and normalized modal power equal to the power in the connected restriction of the
-   outgoing amplitude plus external incident power. This is not a network energy balance. The
-   empty-mode fixture proves that an unconnected physical port need not create a channel. Continue
-   toward network-equation semantics without treating this expression as a source model or
-   feedback solution and without encoding feedback as ordinary scattering-matrix multiplication.
+   incident injection `E_in`, outgoing exposure `E_out`, and exact restriction readout `E_outᴴ`.
+   Their two Gram laws, cross-zero identities with `C`, and connected/external projector sums prove
+   complete incident and outgoing coordinate decompositions. The expression `C b + E_in u` has
+   exact connected/external action and normalized modal power equal to connected outgoing power
+   plus external incident power. This is not a network energy balance. The empty-mode fixture
+   proves that an unconnected physical port need not create a channel. Continue toward
+   network-equation semantics without treating these boundary maps as source, detector, or
+   feedback models and without encoding feedback as ordinary scattering-matrix multiplication.
    The N3 core now represents implicit complex-linear behavior independently of invertibility,
    embeds maps and mode transforms as graphs, and proves identity, existential series, independent
    parallel, graph-composition, matrix-cascade, and block-diagonal laws. Its regressions distinguish
@@ -2610,9 +2615,9 @@ human verification recorded in `tbd.md`.
    proof-gated scattering/chain conversions and round trips, derives later-times-earlier matrix
    multiplication from relational series, and supplies singular-safe right-load termination with
    exact response formulas. Continue with N4 flat-network semantics: dependent component-channel
-   sums, block-diagonal component laws, typed external output exposure, and the implicit relation
-   `b = S a`, `a = C b + E_in u`, `y = E_outᴴ b`. Do not use an inverse to define that behavior;
-   well-posed elimination belongs to N5.
+   sums, block-diagonal component laws, and the implicit relation `b = S a`,
+   `a = C b + E_in u`, `y = E_outᴴ b` built from the now-complete boundary API. Do not use an
+   inverse to define that behavior; well-posed elimination belongs to N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
