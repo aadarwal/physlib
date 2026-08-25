@@ -354,14 +354,14 @@ def reciprocalZ (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) :
 /-- Reciprocal-z reparameterization retains finite aggregate channels. -/
 local instance reciprocalZChannelFintype
     (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1)
-    [Fintype oneDelayNetlist.Channel] [Fintype oneDelayNetlist.ConnectedChannel] :
+    [Fintype oneDelayNetlist.Channel] :
     Fintype oneDelayNetlist.reciprocalZ.Channel :=
   inferInstanceAs (Fintype oneDelayNetlist.Channel)
 
 /-- Reciprocal-z reparameterization retains finite connected channels. -/
 local instance reciprocalZConnectedChannelFintype
     (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1)
-    [Fintype oneDelayNetlist.Channel] [Fintype oneDelayNetlist.ConnectedChannel] :
+    [Fintype oneDelayNetlist.ConnectedChannel] :
     Fintype oneDelayNetlist.reciprocalZ.ConnectedChannel :=
   inferInstanceAs (Fintype oneDelayNetlist.ConnectedChannel)
 
