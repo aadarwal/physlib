@@ -5,8 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.Determinant.Basic
-public import Mathlib.LinearAlgebra.Matrix.Notation
 public import Physlib.Optics.Rays.Basic
 
 /-!

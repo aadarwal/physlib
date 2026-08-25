@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.Calculus.Deriv.Slope
 public import Mathlib.Analysis.InnerProductSpace.PiL2
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.InverseDeriv
