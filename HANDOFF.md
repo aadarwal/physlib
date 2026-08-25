@@ -195,8 +195,14 @@ for finite-delay linear networks” is explicitly withheld.
 
 ### Gates
 
-Pending the post-sync chained Slice 1b gate; the registry will be restored byte-for-byte
-afterward.
+- Synced onto `optics/development` commit `af062790` in merge commit `afbd7baa` before cutoff.
+- All five registered delay-transfer modules, direct Lean checks with
+  `-DwarningAsError=true`, the temporary-registry `Physlib` target, and
+  `lake exe runPhyslibLinters` passed in one locked chain.
+- The same chain found no `DelayTransfer` style or redundant-import finding, and
+  `check_file_imports` reported that all registered files were imported correctly.
+- `Physlib.lean` was restored byte-identically to SHA-256
+  `ad2036c829a114b2a4e18d1035ecb1a30452724b474bd8c6fe038df8fbf5d5cd`.
 
 ## Slice 2: candidate singularities and reduced poles
 
