@@ -395,6 +395,17 @@ PR unless maintainers explicitly ask to retain it.
   hence equal phase angles. The zero-amplitude branch must remain explicit because its wave vector
   and angle are arbitrary dummy data. Do not interpret this phase-angle equality as a ray,
   group-velocity, energy-flux, outgoing, irradiance, or power theorem.
+- [ ] Human-check the law of the plane of incidence against SPIE'14 Thm. 4.5 (p. 8) and MCS'14
+  Thm. 5.1 (arXiv pp. 16--17). Confirm first the neutral geometric step: equal tangential
+  projections place one real vector in the span of the other vector and the stored unit normal.
+  Electric phase matching must then place the transmitted phase vector in that span and preserve
+  the alternative that a zero reflected electric amplitude has arbitrary dummy wave-vector data;
+  only the active branch places the reflected phase vector in the same span. Confirm separately
+  that an exact complex hyperplane-reflection branch descends to the real vector-reflection formula
+  and hence the same span. The span may have dimension below two at normal incidence, so do not
+  claim a unique geometric plane there. The exact `3-4-5` regression must discharge the reflected
+  activity guard independently. This is phase-vector coplanarity, not a ray, group-velocity,
+  outgoing, irradiance, or power statement.
 - [ ] Human-check the phase Snell stack before upstreaming. Confirm first that complex material
   dispersion plus zero whole attenuation gives `‖q‖ * v = omega` on the positive-frequency and
   positive-wave-speed branches; zero tangential attenuation alone is insufficient. Confirm that
