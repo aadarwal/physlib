@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Algebra.Polynomial.FieldDivision
 public import Physlib.Mathematics.ZTransform.Stability
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 

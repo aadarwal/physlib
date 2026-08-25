@@ -294,8 +294,8 @@ lemma allPassRationalNetlist_compile_eq (p : AllPass.Parameters) (q : ℂ)
         { Component := AllPass.Component
           portFamily := AllPass.componentPortFamily
           scattering := (allPassRationalComponents p).scattering (fun _ => q) }
-       Connection := AllPass.Connection
-       connections := AllPass.connections p } : FlatNetlist) = AllPass.netlist p
+      Connection := AllPass.Connection
+      connections := AllPass.connections p } : FlatNetlist) = AllPass.netlist p
   rw [hScattering]
   rfl
 
