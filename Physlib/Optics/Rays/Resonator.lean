@@ -48,6 +48,10 @@ The explicit eigenparameter formula is a totalized algebraic candidate outside t
 domain; only the proof-gated eigenbeam is given physical meaning.
 Generic source-style reverse-list unfolding, its validity predicate, and its connection to matrix
 powers remain open, so this file does not claim literal parity with the source stability predicate.
+Three further source results are withheld by name and are not formalised here: the
+Sylvester-Chebyshev matrix-power form of a unimodular round trip, the fibre-ring-laser
+Fabry-Perot analyses in the two transverse planes with their stability ranges, and the
+phase-conjugate resonator and nonlinear-map chaos results.
 
 ## ii. Key results
 
