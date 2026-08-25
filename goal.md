@@ -1844,7 +1844,9 @@ definition.
   incident/outgoing scattering coordinates and backward-first reference-plane states;
 - [x] series connection as chain-matrix multiplication, proved from relational composition;
 - [ ] agreement with N5 netlist elimination and Redheffer feedback wherever both are defined; and
-- [ ] terminated-load reflection and transmission formulas.
+- [x] relational right-load termination with complete internal-wave solutions, exact well-posedness,
+  proof-gated reflection and forward-response extraction, noncommutative loaded-chain block formulas,
+  and zero-return agreement with the existing scattering blocks.
 
 Exit: the transfer/chain calculations used by the audited cascade and microring sources are
 derived views of the same component behavior, not illicit multiplication of scattering matrices.
@@ -2482,7 +2484,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, and incident injection are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
-| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions, and their behavioral and matrix round trips are complete; netlist agreement and terminations remain |
+| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
 | N4 network equations | blocked | N1/O2, N2a, N3 | flat relational semantics and shaped matrix equations |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |

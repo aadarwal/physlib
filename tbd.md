@@ -1230,9 +1230,25 @@ PR unless maintainers explicitly ask to retain it.
   `Incident`/`Outgoing` sum-label equivalences and a typed two-port adapter from the existing
   oriented scattering transform. Exact four-block entries, amplitude covariance, losslessness,
   behavior membership, label round trip, and a four-distinct-nonreal-entry regression now agree.
-- [ ] Derive matched and loaded termination formulas from the relational constraint. In particular,
-  do not identify the generic Schur complement with DATE's terminated `1 / M11` statement until
-  the human source/convention audit establishes its hypotheses and coordinate correspondence.
+- [x] Derive source-neutral right-load termination from the relational constraint. The generic
+  behavior retains the complete solution `(bL, (aR, bR))`; for a graph load `aR = Γ bR`, exact
+  well-posedness is injectivity of `P = K₁₁ - Γ K₂₁` together with solvability of every incident
+  forcing `Q aL`, where `Q = Γ K₂₂ - K₁₂`. Under the stronger bijective-pivot gate, the extracted
+  responses are `RΓ = P⁻¹ Q` and `FΓ = K₂₁ RΓ + K₂₂`. Zero return agrees with the existing
+  left-reflection and left-to-right scattering blocks. Scalar, asymmetric tuple-order,
+  noncommutative, rectangular non-surjective, and singular-pivot regressions guard the result.
+- [ ] Before upstreaming right termination, split the connected fork milestone into stacked
+  proposals for relational semantics, exact chain well-posedness, bijective-pivot formulas, and
+  zero-return/scattering agreement. Its connected regression suite intentionally exceeds the
+  usual 200-line review guideline.
+- [ ] Human-check every right-termination definition, statement, and proof before upstreaming, and
+  do not call zero return a matched, absorbing, passive, or physically realized load without
+  separate electromagnetic hypotheses. Do not identify the generic Schur complement with DATE's
+  terminated `1 / M11` statement until the source/convention audit establishes its hypotheses and
+  coordinate correspondence.
+- [ ] Factor the repeated proof-dependent inverse construction for a bijective `ModeTransform`
+  into a generic mode API before a third upstream inverse block is proposed; leading-block,
+  transmission-block, and termination-pivot inverses currently repeat the same equivalence pattern.
 - [ ] Before an upstream functional-behavior proposal, decide whether its core extraction API and
   adversarial regression suite should be reviewed as one coherent PR or as two stacked PRs. The
   fork milestone keeps atomic core and regression commits while preserving end-to-end validation.
