@@ -20,10 +20,11 @@ conductor's, not this lane's. Slice 5 leaves it a clean hook and attempts nothin
 | Slice | Content | Status |
 |---|---|---|
 | 1 | Structure and node-equation semantics; unique solvability; gain as an inverse entry | **done** |
-| 2 | Paths, loops, non-touching loop families, the graph determinant and cofactors | pending |
+| 2 | Paths, loops, non-touching loop families, the graph determinant and cofactors | **done** |
 | 3 | Mason's theorem, and `Δ = det (1 - G)` | pending |
 | 4 | Regressions: single loop, two non-touching loops, the touching three-node case, `Δ = 0` | pending |
-| 5 | `ofCoefficientMatrix` hook for the conductor | pending |
+| 5 | `ofCoefficientMatrix` hook, plus the edge-indexed multigraph structure with `toMatrix` | pending |
+| 6 | Optional: edge-based enumeration closing regression G-02 by proof | pending — attempt only after 2-5 land |
 
 ---
 
@@ -102,11 +103,128 @@ zero-weight-independence bullets cheaply. Making the *enumeration* in slices 2 a
 rather than node-based, which is what regression G-02 actually demands, is a larger change and
 would not compose with the determinant route.
 
-**Decision requested:** (i) add the edge-indexed structure with `toMatrix` in slice 5, alongside
-`ofCoefficientMatrix`, closing the representation bullets and leaving G-02 open and named; or
-(ii) leave the whole multigraph question to a later lane; or (iii) something else. I will take
-option (i) by default if I hear nothing, since it is cheap and strictly increases coverage, and I
-will report the residual G-02 gap either way.
+**Decided by the controller on 2026-08-25.** The matrix route stays. Slice 5 adds the
+edge-indexed structure with `toMatrix`, closing the representation and zero-weight-independence
+bullets. A further optional slice 6 closes regression G-02 **by proof** rather than by
+representation: edge-based enumeration of forward paths and simple loops over the multigraph,
+where edge identity distinguishes parallel paths and loops, together with the theorem that the
+edge-based sums equal the matrix-level ones. Mason then holds edge-based as a corollary of the
+matrix theorem. Slice 6 is attempted only after 2-5 land cleanly; if disproportionate, the
+representation ships and the G-02 residual is stated exactly.
+
+---
+
+## Slice 2 — files
+
+- `Physlib/Mathematics/SignalFlowGraph/Combinatorics.lean` (273 lines)
+- `Physlib/Mathematics/SignalFlowGraph/CombinatoricsRegression.lean` (124 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all four)
+
+```
+public import Physlib.Mathematics.SignalFlowGraph.Basic
+public import Physlib.Mathematics.SignalFlowGraph.BasicRegression
+public import Physlib.Mathematics.SignalFlowGraph.Combinatorics
+public import Physlib.Mathematics.SignalFlowGraph.CombinatoricsRegression
+```
+
+### Slice 2 — declarations
+
+`Physlib/Mathematics/SignalFlowGraph/Combinatorics.lean`, namespace `Physlib.SignalFlowGraph`:
+
+**A. Non-touching loop families** — `loopFamilies`, `mem_loopFamilies`, `one_mem_loopFamilies`,
+`loopFamilies_empty`, `loopCount`, `loopCount_one`, `familyGain`, `familyGain_empty`.
+
+**B. The graph determinant** — `graphDetOn`, `graphDet`, `graphDetOn_empty`.
+
+**C. Forward paths** — `listsLen`, `mem_listsLen_iff`, `nodupLists`, `mem_nodupLists_iff`,
+`forwardPaths`, `mem_forwardPaths_iff`, `singleton_mem_forwardPaths`,
+`nil_notMem_forwardPaths`.
+
+**D. Path gains, cofactors, and Mason's quotient** — `pathGain`, `pathGain_nil`,
+`pathGain_singleton`, `pathGain_cons_cons`, `pathCofactor`, `masonNumerator`, `masonGain`.
+
+`Physlib/Mathematics/SignalFlowGraph/CombinatoricsRegression.lean`, same namespace:
+`forwardPaths_fin_three`, `forwardPaths_fin_two`, `forwardPaths_self_fin_two`,
+`pathGain_fin_three`, `pathCofactor_spanning`, `pathCofactor_direct`,
+`masonNumerator_twoNodeLoop`.
+
+### The encoding choice that makes "non-touching" structural
+
+A family of pairwise non-touching loops on a vertex set `T` is carried by a **permutation** of the
+node type whose support is contained in `T`. This is exact, not merely convenient:
+
+- the cycles of a permutation are automatically vertex-disjoint, so **"pairwise non-touching" is a
+  property of the representation rather than a side condition anyone has to check**;
+- the vertices of `T` that the permutation fixes are precisely the self-loops of the family;
+- so `loopCount T σ = (T.card - σ.support.card) + Multiset.card σ.cycleType` counts self-loops
+  plus nontrivial cycles.
+
+Unwinding `graphDetOn` on a two-element vertex set gives `G i i * G j j - G j i * G i j`, that is
+the product of two non-touching self-loop gains minus the two-cycle gain, which is the expected
+second-order Mason term. This encoding is also what makes slice 3 provable: the Leibniz expansion
+of `det (1 - G)` sums over permutations, and their cycle decompositions are exactly these
+families.
+
+### Executable enumeration, and a real obstacle overcome
+
+`goal.md` section H.4 S6 demands "executable and proved-correct enumeration". The first attempt
+enumerated each vertex subset's orderings with `Finset.toList` and `List.permutations`. That is
+mathematically fine but **does not evaluate**: `Multiset.toList` is `noncomputable` in Mathlib, so
+`decide` got stuck on it and no example could be settled by evaluation.
+
+The shipped enumeration instead builds node lists by recursion on a length bound
+(`listsLen`) and filters for repetition-freeness (`nodupLists`), using no choice. The length bound
+loses nothing because a repetition-free list over a finite node type is no longer than the node
+count (`List.Nodup.length_le_card`). `mem_listsLen_iff` and `mem_nodupLists_iff` prove the
+enumeration correct, and the regression file settles `forwardPaths (0 : Fin 3) 2 = {[0,2],
+[0,1,2]}` and its two-node analogues **by `decide`** — evaluation, not argument.
+
+A consequence worth recording: the file no longer uses a blanket `noncomputable section`. The
+complex-valued definitions carry `noncomputable` individually and the enumeration is left
+computable, which is what makes `decide` available.
+
+### Slice 2 — regressions and what each detects
+
+- `forwardPaths_fin_three`, `forwardPaths_fin_two`, `forwardPaths_self_fin_two`: the enumeration
+  evaluated. The self-path case pins that a node is joined to itself by the trivial one-node path
+  alone, which is what gives the correct unit gain in Mason's formula.
+- `pathGain_fin_three`: the two-hop gain is `G 1 0 * G 2 1`, which fixes the reading direction of
+  each edge (from tail to head) and would fail under a transposed convention.
+- `pathCofactor_spanning` and `pathCofactor_direct`: a path visiting every node has unit cofactor,
+  and the direct hop on three nodes leaves exactly the middle vertex. Together these fix the
+  **orientation** of the cofactor, which is otherwise easy to define as the determinant of the
+  vertices the path *does* touch.
+- `masonNumerator_twoNodeLoop`: the numerator for the two-node feedback graph is `a`. Slice 3 or 4
+  divides it by the graph determinant and meets slice 1's independently computed
+  `gain_twoNodeLoop = a / (1 - a * b)`.
+
+### Slice 2 gates
+
+Build clean; `lean -Dwarn.sorry=false -Dweak.says.verify=true` gives zero output on all four
+files; the Batteries declaration linter set run module-scoped over all four modules passes; the
+`module_doc_lint` and `style_lint` rules re-run locally pass; no `sorry`, `axiom`,
+`native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import; imports minimal
+(`Mathlib.GroupTheory.Perm.Cycle.Type` and `Mathlib.Data.Fintype.Card` were transitively
+available through `Basic` and were dropped).
+
+One linter finding was acted on rather than suppressed: `simpNF` reported that a
+`loopCount_empty_one` simp lemma was derivable from `loopCount_one` and `Finset.card_empty`, so
+the lemma was deleted and its single use inlined.
+
+### Parity classification for slice 2
+
+**Parity of coverage, with a representational difference, against ledger row IP-21.** FMICS'15
+Definitions 1-4 (pp. 167-168) supply an SFG type, executable elementary-circuit and
+forward-circuit enumeration, and Mason's gain as a quotient; SFG-TR'14 and NSV'16 Definition 6
+(p. 37) do the same. This slice supplies the same objects with the same executability, and adds a
+determinant defined directly as the alternating sum over families, which the sources define only
+through their enumeration.
+
+The representational difference is the one already recorded: the sources carry loops and paths as
+**branch** lists, so parallel edges stay distinct; here they are node-level, so they do not.
+Slices 5 and 6 address that, and until slice 6 lands regression row G-02 is **not** met. The
+module doc says so.
 
 ### Slice 1 gates
 
