@@ -1220,9 +1220,13 @@ PR unless maintainers explicitly ask to retain it.
   `K₂₂ - K₂₁ K₁₁⁻¹ K₁₂`. For scalar blocks with `K₁₁ ≠ 0`, the latter is
   `det K / K₁₁`, hence equals `1 / K₁₁` when `det K = 1`. Keep the opposite convention behind an
   explicit permutation.
-- [ ] Before upstreaming reverse conversion, split the pivot criterion, exact formula, behavioral
-  extraction, round trips, and adversarial regressions into maintainer-agreed stacked proposals.
-  The connected fork milestone intentionally remains larger than the usual 200-line review guide.
+- [ ] Before upstreaming chain-to-scattering conversion, use maintainer-agreed stacked proposals in
+  this order: neutral chain blocks and generic inverse support; scattering behavior and its exact
+  pivot criterion; the block formula and graph equality; behavior-derived extraction with both
+  round trips; then focused adversarial regressions. Move the generic chain block decomposition
+  from `TwoPortChainScattering.lean` to `TwoPortChain.lean` in the neutral first stack. The
+  connected fork milestone and its deliberately independent formula regressions remain larger than
+  the usual 200-line review guide.
 - [ ] Human-verify whether and how DATE14 Theorem 5's terminated `transm = 1 / M11` statement uses
   determinant one and maps onto this backward-first convention. Until then, describe the Lean
   result as independent block algebra rather than DATE/HOL source parity.
@@ -1239,8 +1243,13 @@ PR unless maintainers explicitly ask to retain it.
   noncommutative, rectangular non-surjective, and singular-pivot regressions guard the result.
 - [ ] Before upstreaming right termination, split the connected fork milestone into stacked
   proposals for relational semantics, exact chain well-posedness, bijective-pivot formulas, and
-  zero-return/scattering agreement. Its connected regression suite intentionally exceeds the
-  usual 200-line review guideline.
+  zero-return/scattering agreement. Keep the core chain-termination layer independent of
+  chain-to-scattering conversion, and place zero-return/scattering agreement in a small bridge.
+  Its connected regression suite intentionally exceeds the usual 200-line review guideline.
+- [x] Validate the merged fork right-termination milestone on 2026-08-24 with a cache check, the
+  4,704-job Physlib build, Physlib and QuantumInfo declaration linters, the commit-sensitive style
+  linter, the API-map linter, and `lint_all`. The full linter reported only pre-existing repository
+  backlogs in unrelated files; no termination file was flagged.
 - [ ] Human-check every right-termination definition, statement, and proof before upstreaming, and
   do not call zero return a matched, absorbing, passive, or physically realized load without
   separate electromagnetic hypotheses. Do not identify the generic Schur complement with DATE's
