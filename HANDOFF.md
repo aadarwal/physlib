@@ -18,7 +18,7 @@ listed below for the conductor to apply at merge.
 | 2 | Modulus-only absolute convergence, exterior-of-circle ROC shape, reciprocal power series, unit step, geometric sequence, and the conditional-but-not-absolute witness | **done** |
 | 3 | Linear constant-coefficient difference equations to rational transfer functions; general IIR; the audited second-order low-pass; first-order all-pass regression | **done** |
 | 4 | Stability: poles, the unit circle, BIBO, with the proved directions stated explicitly; two-pole regression | **done** |
-| 5 | Inverse transform and uniqueness (JAL'18 Thms. 15-17), built on the `IsExteriorOfCircle` lemmas | pending — **now in scope**, see the scope note below |
+| 5 | Inverse transform and uniqueness (JAL'18 Thms. 15-17), built on the `IsExteriorOfCircle` lemmas | **done**, by the approved fallback route — see below |
 | 6 | The finite-convolution theorem, and existence of causal solutions of a strictly causal recurrence | pending — scheduled by the controller on 2026-08-25 |
 
 The slice-5 change follows the controller's decision of 2026-08-25: the corrected `goal.md`
@@ -513,6 +513,118 @@ implications are.
 `goal.md` §I.3 row S-07, "pole/zero/stability theorems include the audited unstable parameter
 case" — the unstable case is present and proved for this lane's one-pole system. The DCDR
 instance of S-07 is S-track work.
+
+---
+
+## Slice 5 — files
+
+- `Physlib/Mathematics/ZTransform/Inverse.lean` (240 lines)
+- `Physlib/Mathematics/ZTransform/InverseRegression.lean` (168 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all ten)
+
+```
+public import Physlib.Mathematics.ZTransform.Basic
+public import Physlib.Mathematics.ZTransform.BasicRegression
+public import Physlib.Mathematics.ZTransform.Convergence
+public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+public import Physlib.Mathematics.ZTransform.DifferenceEquation
+public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+public import Physlib.Mathematics.ZTransform.Inverse
+public import Physlib.Mathematics.ZTransform.InverseRegression
+public import Physlib.Mathematics.ZTransform.Stability
+public import Physlib.Mathematics.ZTransform.StabilityRegression
+```
+
+Alphabetical order satisfies the dependency order (`Inverse` needs only `Convergence`;
+`InverseRegression` needs `BasicRegression` and `Inverse`).
+
+### The route taken, and the one gap
+
+The controller pre-approved the fallback route, and it is the route taken. JAL'18 Theorem 15
+recovers the samples as Taylor coefficients,
+`f n = D^n (fun z => transform f z⁻¹) 0 / n !`. That form needs the power series in the
+reciprocal variable exhibited as an analytic function with its radius of convergence, and then
+Mathlib's `HasFPowerSeriesAt` to iterated-derivative machinery. **That form is not proved.**
+
+Instead the samples are recovered by limits at infinity, which is the same content by a
+different route and needs no complex differentiation:
+
+- `tendsto_transform_cobounded` (JAL'18 Thm. 17, initial value): `transform f z → f 0` as `z`
+  leaves every bounded set.
+- `tendsto_inversion_cobounded` (the inversion formula, JAL'18 Thm. 15 in a different form):
+  `z ^ m * (transform f z - ∑ n < m, f n * z⁻¹ ^ n) → f m`.
+- `eq_natCast_of_transform_eqOn` and `eq_of_isCausal_of_transform_eqOn` (JAL'18 Thm. 16,
+  uniqueness).
+
+Everything rests on one elementary quantitative estimate,
+`norm_transform_sub_apply_zero_le`: if `w ∈ ROC f` and `‖w‖ ≤ ‖z‖` then
+`‖transform f z - f 0‖ ≤ seriesMass f w * (‖w‖ / ‖z‖)`. That estimate uses slice 2's
+modulus-only comparison; no analyticity, no contour integral, no partial fractions.
+
+**Gap, stated rather than papered over:** the Taylor-coefficient form of Theorem 15 is not
+proved. The module doc of `Inverse.lean` says so and says what it would cost. Ledger row ZT-08
+should therefore be marked as reached *in content* but not in the source's literal formula, or
+kept open, at the reviewer's discretion.
+
+### A correction to the source's uniqueness statement
+
+JAL'18 Theorem 16 states uniqueness with no causality hypothesis, because the source works with
+one-sided sequences where the question cannot arise. This lane's sequences are two-sided, and the
+unilateral transform never sees a negative index. So uniqueness of the *sequence* genuinely needs
+causality, and without it only the nonnegative-index samples are determined.
+
+This is proved, not assumed. `Physlib.ZTransform.shiftedImpulse` is the unit impulse with one
+extra sample at index `-1`. `transform_shiftedImpulse_eq` proves its transform equals the unit
+impulse's at **every** point, and `shiftedImpulse_ne_unitImpulse` proves the two sequences are
+different. So `eq_of_isCausal_of_transform_eqOn` cannot have its causality hypothesis dropped,
+and `eq_natCast_of_transform_eqOn` is exactly as strong as it can be.
+
+### Slice 5 — declarations
+
+`Physlib/Mathematics/ZTransform/Inverse.lean`, namespace `Physlib.ZTransform`:
+`seriesMass`, `seriesMass_nonneg`, `norm_seriesTerm_succ_le`,
+`norm_transform_sub_apply_zero_le`, `tendsto_norm_ratio_cobounded`,
+`tendsto_transform_cobounded`, `tendsto_inversion_cobounded`, `eq_natCast_of_transform_eqOn`,
+`eq_of_isCausal_of_transform_eqOn`.
+
+`Physlib/Mathematics/ZTransform/InverseRegression.lean`, same namespace: `shiftedImpulse`,
+`summable_seriesTerm_regressionAtNegOne`, `transform_shiftedImpulse_eq`,
+`shiftedImpulse_ne_unitImpulse`, `shiftedImpulse_not_isCausal`, `two_mul_mem_ROC_geometric`,
+`tendsto_transform_geometricSeq`, `tendsto_inversion_geometricSeq_one`,
+`eq_geometricSeq_of_transform_eq`.
+
+### Slice 5 — regressions and what each detects
+
+- **Uniqueness without causality is false**: the `shiftedImpulse` pair above. This is the only
+  regression in the lane that refutes a source statement's applicability in this setting rather
+  than confirming one.
+- **The inversion formula is instantiated, not just stated**: `tendsto_transform_geometricSeq`
+  recovers the geometric sequence's sample at index zero, and
+  `tendsto_inversion_geometricSeq_one` recovers its sample at index one as the ratio `a`.
+- **Uniqueness used in the direction that matters**: `eq_geometricSeq_of_transform_eq` proves
+  that any *causal* sequence whose transform is the one-pole rational function on a suitable
+  exterior *is* the geometric sequence. That is a characterization rather than a computation,
+  and it is the shape the system-level track needs when it identifies a network response with a
+  recurrence.
+
+### Slice 5 gates
+
+Same set, all clean over all ten files: build; `lean -Dwarn.sorry=false -Dweak.says.verify=true`
+gives zero output on each; the Batteries declaration linter set run module-scoped over all ten
+modules passes; `module_doc_lint` and `style_lint` rules re-run locally pass; no `sorry`,
+`axiom`, `native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import; imports
+minimal.
+
+### Slice 5 — ledger rows
+
+- **ZT-08** (JAL'18 Def. 19 + Thm. 15, pp. 893-894) — `IsExteriorOfCircle` and the region-shape
+  lemmas were reached in slice 2. The inverse transform is reached **in content**, as
+  `tendsto_inversion_cobounded`, but **not** in the source's Taylor-coefficient formula. See the
+  gap above.
+- **ZT-09** (JAL'18 Thm. 16 uniqueness and Thm. 17 initial value, p. 894) — reached, with
+  Thm. 16 corrected by an explicit causality hypothesis that the source's one-sided setting
+  hides, and with that hypothesis proved necessary.
 
 ## Milestone and ledger rows touched by slice 1
 
