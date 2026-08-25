@@ -1512,6 +1512,26 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Split an upstream R1/R2 proposal into focused stacks. The exact worker cutoff grouped the
   physical/paraxial ray foundation, its regressions, the transfer/system layer, and its regressions
   into a fork-integration batch larger than the review guideline; those remain separable concepts.
+- [ ] Human-check the R3 cardinal-point source map before upstreaming. Confirm the shifted
+  object/image reference-plane signs, the distinct object- and image-space effective focal lengths
+  when `det M ≠ 1`, and every nonzero-power hypothesis against the cited primary source. The
+  implemented layer supplies behavioral specifications, realization, and uniqueness, but the
+  representative ophthalmic or telescope subsystem in `goal.md` remains open.
+- [ ] Human-check the R4 Gaussian source map before upstreaming. Confirm the positive-imaginary
+  `q` convention, wavelength scaling across unequal-index systems, carrier sign, waist and
+  wavefront-radius totalizations, and the paraxial-Helmholtz convention. The regressions connect
+  the `q` transport, beam width, and differential equation to the same stored beam; they do not
+  claim aperture power, polarization, higher modes, or a quantified Helmholtz-approximation error.
+- [ ] Human-check the R5 source and scope map before upstreaming. The shipped slice proves
+  matrix-power boundedness, a determinant-one strict-trace sufficient criterion, exact two-mirror
+  boundary cases, and a proof-gated fixed Gaussian beam. It is a matrix-level analogue rather than
+  literal parity with the source's reverse-list resonator unfolding and validity predicate. Keep
+  generic source-style unfolding, ring and phase-conjugate resonators, the fibre-ring case study,
+  Sylvester/Chebyshev powers, and the selected source case suites open.
+- [ ] Split upstream R3, R4, and R5 proposals by coherent concept. The fork integration batches
+  group theory files with large regression suites beyond the review-size guideline; preserve the
+  independently reviewable imaging, Gaussian-domain/transport, stability, two-mirror, and fixed-
+  beam layers rather than presenting the combined merge as one upstream change.
 
 ## Source and license checks
 
