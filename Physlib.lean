@@ -88,6 +88,7 @@ public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellBridge
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellEquations
 public import Physlib.Electromagnetism.ThreeDimension.MaxwellEquations
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.Basic
+public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexAmplitude
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBasic
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryAmplitude
 public import Physlib.Electromagnetism.ThreeDimension.MonochromaticPlaneWave.ComplexBoundaryExponent
@@ -273,6 +274,7 @@ public import Physlib.Optics.HarmonicFlux.ApertureRegressionOrthogonality
 public import Physlib.Optics.HarmonicFlux.Basic
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWave
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWaveRegression
+public import Physlib.Optics.HarmonicFlux.GeometricAperture
 public import Physlib.Optics.HarmonicFlux.MaterialWave
 public import Physlib.Optics.HarmonicFlux.MaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.ModePower
@@ -287,6 +289,14 @@ public import Physlib.Optics.HarmonicFlux.PairingRegression
 public import Physlib.Optics.HarmonicFlux.Polarizer
 public import Physlib.Optics.HarmonicFlux.PositiveNormalDecay
 public import Physlib.Optics.HarmonicFlux.PositiveNormalDecayRegression
+public import Physlib.Optics.HarmonicFlux.PropagatingMode
+public import Physlib.Optics.HarmonicFlux.PropagatingModeFlux
+public import Physlib.Optics.HarmonicFlux.PropagatingModeGeometricPower
+public import Physlib.Optics.HarmonicFlux.PropagatingModePower
+public import Physlib.Optics.HarmonicFlux.PropagatingModePowerRegression
+public import Physlib.Optics.HarmonicFlux.PropagatingModeRealization
+public import Physlib.Optics.HarmonicFlux.PropagatingModeRegression
+public import Physlib.Optics.HarmonicFlux.PropagatingModeSynthesis
 public import Physlib.Optics.HarmonicFlux.ReferencedMaterialWave
 public import Physlib.Optics.HarmonicFlux.Regression
 public import Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry
@@ -413,6 +423,8 @@ public import Physlib.Optics.Rays.Resonator
 public import Physlib.Optics.Rays.ResonatorRegression
 public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
+public import Physlib.Optics.Systems.Microring.AllPass
+public import Physlib.Optics.Systems.Microring.AllPassRegression
 public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
