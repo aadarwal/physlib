@@ -371,7 +371,8 @@ component whose paraxial matrix is known but not derived here; its validity cond
 requires the entries to satisfy the index-ratio determinant law, which the source does not
 impose.
 
-Radii of curvature are signed, positive when the centre of curvature lies downstream.
+Radii of curvature are signed, positive when the centre of curvature lies on the outgoing side of
+the surface, as fixed in the module documentation.
 -/
 inductive ParaxialInterface where
   /-- Refraction at a plane surface separating two media. -/
@@ -630,9 +631,10 @@ The objects it needs from the ray side are `Optics.MeridionalRay.direction`,
 `Optics.MeridionalRay.cos_signedIncidenceAngle` below. The E5b angle is an unoriented Euclidean
 angle in `[0, π]`, so equality of these real numbers is not asserted. A bridge must use the cosine
 identity together with explicit range and side conventions. The target is
-`Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry`, whose `incidentPhaseAngle` is
-measured from the negative-side normal, and the sign map between the two conventions is the first
-thing that bridge has to fix.
+`Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry`, which measures its incident and
+transmitted phase angles from the normal into the *positive* side and its reflected phase angle
+from the normal into the *negative* side. Reconciling those side choices with the single normal
+angle used here is the first thing that bridge has to fix.
 -/
 def signedIncidenceAngle (r : MeridionalRay) (normalAngle : ℝ) : ℝ := r.angle - normalAngle
 
