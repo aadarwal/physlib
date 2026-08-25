@@ -53,7 +53,8 @@ ray here; a ray carries only a position and a direction. The paraxial interface 
 surfaces are model laws: this file proves the small-angle bridge for planar refraction and for
 free-space transport only, and makes no claim that the spherical-surface laws have been derived
 from an exact surface geometry. Nothing here connects a ray to the wave or electromagnetic models
-in `Physlib.Optics.Polarization` or `Physlib.Electromagnetism`.
+in `Physlib.Optics.Polarization` or `Physlib.Electromagnetism`. Section F supplies the ray-side
+objects a bridge to the exact interface geometry needs, but does not build that bridge.
 
 ## ii. Key results
 
@@ -71,6 +72,8 @@ in `Physlib.Optics.Polarization` or `Physlib.Electromagnetism`.
   to an explicit cubic error.
 - `Optics.tendsto_exactRefractionAngle_div`: the exactly refracted angle has paraxial angle ratio
   `n₀ / n₁` in the limit on the axis.
+- `Optics.MeridionalRay.cos_incidenceAngle`: the named hook for the cross-lane bridge to the
+  exact interface geometry, identifying the incidence angle with the direction-normal angle.
 
 ## iii. Table of contents
 
@@ -79,6 +82,7 @@ in `Physlib.Optics.Polarization` or `Physlib.Electromagnetism`.
 - C. Homogeneous gaps and paraxial transport
 - D. Refracting and reflecting interfaces
 - E. The paraxial regime
+- F. Hook for the exact-incidence bridge
 
 ## iv. References
 
@@ -576,6 +580,57 @@ lemma tendsto_transport_height_error (g : ParaxialGap) (y z : ℝ) :
   ring
 
 end ParaxialGap
+
+/-!
+
+## F. Hook for the exact-incidence bridge
+
+-/
+
+/-- The unit normal of a plane surface whose normal is tilted by `normalAngle` from the optical
+axis, in `(transverse, axial)` components. -/
+def surfaceNormal (normalAngle : ℝ) : EuclideanSpace ℝ (Fin 2) :=
+  !₂[sin normalAngle, cos normalAngle]
+
+/-- A surface normal is a unit vector. -/
+lemma norm_surfaceNormal (normalAngle : ℝ) : ‖surfaceNormal normalAngle‖ = 1 := by
+  rw [EuclideanSpace.norm_eq]
+  simp [Fin.sum_univ_two, Real.norm_eq_abs, sq_abs, sin_sq_add_cos_sq, surfaceNormal]
+
+namespace MeridionalRay
+
+/-- The angle of incidence of a meridional ray on a plane surface whose normal makes the angle
+`normalAngle` with the optical axis.
+
+This is the named hook for the cross-lane bridge that `goal.md` §H.5 R1 asks for, between the
+paraxial ray angle used here and the exact geometric incidence directions of E5b. That bridge
+cannot live in this module, whose layering rule forbids importing `Physlib.Optics.Interfaces`.
+The objects it needs from the ray side are `Optics.MeridionalRay.direction`,
+`Optics.surfaceNormal` and this angle, tied together by `Optics.MeridionalRay.cos_incidenceAngle`
+below. The bridge module should relate them to
+`Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry`, whose `incidentPhaseAngle` is
+measured from the negative-side normal, and the sign map between the two conventions is the first
+thing that bridge has to fix.
+-/
+def incidenceAngle (r : MeridionalRay) (normalAngle : ℝ) : ℝ := r.angle - normalAngle
+
+@[simp]
+lemma incidenceAngle_zero (r : MeridionalRay) : r.incidenceAngle 0 = r.angle := by
+  simp [incidenceAngle]
+
+/-- The incidence angle is the angle between the ray's propagation direction and the surface
+normal: its cosine is their inner product.
+
+This identity is what any bridge to the exact interface geometry must pass through, so it is
+proved on the ray side rather than left to the bridge module.
+-/
+lemma cos_incidenceAngle (r : MeridionalRay) (normalAngle : ℝ) :
+    cos (r.incidenceAngle normalAngle) = inner ℝ r.direction (surfaceNormal normalAngle) := by
+  rw [incidenceAngle, cos_sub, PiLp.inner_apply]
+  simp [Fin.sum_univ_two, direction, surfaceNormal, RCLike.inner_apply]
+  ring
+
+end MeridionalRay
 
 end
 
