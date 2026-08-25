@@ -517,11 +517,13 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] the paired-external scattering specialization, series/Redheffer laws, and physical network
-  conservation/reciprocity results; generic mode embeddings, typed connection families, ambient
-  routing, external exposure/readout, implicit behaviors, wiring invariance, and the proof-gated
-  finite complete-state eliminator with a rectangular external response are complete;
-- [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
+- [ ] a physical time-reversed external-port pairing, convention-aware reciprocity, and X-01
+  agreement between the singular-safe two-port Redheffer route and FlatNetlist/N5H elimination;
+  canonical external scattering packaging, the local Redheffer construction, and normalized modal
+  network conservation are complete;
+- [ ] reusable beam splitters, mirrors, polarization components, and dielectric-interface
+  scattering; fixed-carrier propagation, a directional coupler, Mach--Zehnder, and one-bus
+  all-pass microring slices are complete;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
 
@@ -2024,12 +2026,16 @@ kernel semantics; a noncomputable complex matrix inverse is not the sole oracle.
   `E_outᴴ * S * (I - C*S)⁻¹ * E_in`, with every domain and codomain shape visible;
 - [x] agreement of those formulas with the singular-safe relational semantics, plus invariance of
   well-posedness and covariance of the response under wiring-preserving presentation changes;
-- [ ] a separate square scattering specialization, only under an external input/output pairing and
-  completeness theorem;
-- [ ] series cascade as a specialization; and
+- [x] a separate square scattering specialization on the exact external-channel complement,
+  using the canonical incident/outgoing wrapper pairing while explicitly withholding any
+  time-reversed physical-port or reciprocity claim;
+- [x] reflection-free series cascade as a specialization, with the later directional
+  transmission block on the left; and
 - [ ] Redheffer star products for declared matched block partitions, with the particular feedback
   block's invertibility hypothesis stated explicitly and reflective feedback kept distinct from
-  one-way cascade.
+  one-way cascade. The singular-safe relation, proof-gated matrix formula, and relation-level
+  regressions are complete; agreement with the same two-device wiring through
+  `FlatNetlist`/N5H remains the X-01 exit.
 
 Exit: the solver works whenever the finite network is uniquely solvable, without imposing a norm
 contraction as a necessary condition.
@@ -2161,19 +2167,26 @@ proofs. Reciprocity extensions are added only after N2b/N6b conventions are avai
 Exit: microring formulas are consequences of a physically parameterized component realization,
 not the defining fields of a formula container.
 
-#### S1. Mach-Zehnder interferometer — Physlib extension, no HOL source
+#### S1. Mach-Zehnder interferometer — complete Physlib extension, no HOL source
 
 No Concordia source defines or analyzes a Mach--Zehnder interferometer; SysCon'15 mentions it only
 as a motivating citation (p. 562). S1 is valuable system verification, but it is not a parity row.
 
-- depend on the N5 solver and the N6a/N7 conservation and component laws, rather than supplying an
+- [x] depend on the N5 solver and the N6a/N7 conservation and component laws, rather than supplying an
   interferometer-specific transfer formula;
-- construct it solely from two couplers and two arms;
-- prove complex output amplitudes and both output powers;
-- prove lossless power balance; and
-- specialize to balanced, dark-port, and phase-sensing cases.
+- [x] construct it solely from two couplers and two arms;
+- [x] prove complex output amplitudes and both output powers;
+- [x] prove lossless power balance; and
+- [x] specialize to balanced, dark-port, and phase-sensing cases.
 
-#### S2. All-pass and add-drop microring resonators — all-pass slice complete
+The implementation is an explicit feed-forward `FlatNetlist`; its N5 well-posedness is proved for
+every parameter record, and the closed amplitudes are derived from `responseTransform`. Balanced
+phase-zero and phase-`π` regressions independently follow the channel equations, while N6 supplies
+the all-phase normalized-modal power balance. The phase-ratio theorem identifies the relative arm
+phase factor under a nonzero-input hypothesis. This is not a HOL-parity claim and supplies no
+time-domain delay, dispersion, polarization, reciprocity, or material model.
+
+#### S2. All-pass and add-drop microring resonators — amplitude/series slices complete
 
 - [x] construct the one-bus all-pass ring as an explicit `FlatNetlist` from the proved N7
   directional coupler and matched-propagation components;
@@ -2182,8 +2195,16 @@ as a motivating citation (p. 562). S1 is valuable system verification, but it is
   kernel witness for the converse;
 - [x] prove the multiple-round-trip geometric series only under `‖t * gamma‖ < 1` and identify
   it with the algebraic-elimination response where both views apply;
-- [ ] construct the two-bus add-drop ring as an explicit feedback network; and
-- [ ] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
+- [x] construct the two-bus add-drop ring as an explicit feedback network; and
+- [x] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
+
+The add-drop implementation is a four-port `FlatNetlist` made from two directional couplers and
+two fixed-carrier half arcs. Its complete-state well-posedness is equivalent to
+`1 - t₁ * t₂ * gamma ≠ 0`; N5 elimination derives both transfer amplitudes. Their totalized
+round-trip series acquire the geometric-series interpretation only under contraction. The equal
+half-arc attenuation/phase split fixes a model and a drop-port reference-plane convention. Power
+observables, extrema, identifiability, free spectral range, reciprocity, and source-parity bridges
+remain S3 or later work.
 
 #### S3. Ring observables
 
@@ -2496,10 +2517,10 @@ corpus reports no numerical or simulation cross-validation of a formalized resul
 | B-01 | contraction feedback series converges to the algebraic inverse response | unjustified geometric series |
 | B-02 | a noncontractive but invertible feedback example remains well posed | contraction treated as necessary |
 | B-03 | the source-mapped nested feedback/sum/pickoff identity follows from common behavior semantics | block-algebra orientation error |
-| S-01 | **Physlib extension:** balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
-| S-02 | **all-pass met:** elimination and the contractive round-trip series agree; add-drop remains | feedback orientation errors |
+| S-01 | **Physlib extension met:** balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
+| S-02 | **met:** all-pass and add-drop elimination agree with their contractive round-trip series | feedback orientation errors |
 | S-03 | microring transfer, power, resonance, and rejection specializations | hidden nondegeneracy assumptions |
-| S-04 | physical add-drop realization yields the exact transfer response | disconnected ring formula |
+| S-04 | **met:** the physical add-drop realization yields both exact transfer responses | disconnected ring formula |
 | S-05 | add-drop power and rejection ratio satisfy their positivity and logarithm domains | amplitude/power or dB-convention error |
 | S-06 | the audited eight-node DCDR response agrees between elimination and Mason gain | graph topology or path/loop error |
 | S-07 | DCDR pole/zero/stability theorems include the audited unstable parameter case | cancellation or strictness error |
@@ -2696,20 +2717,20 @@ current integration base; a designed package whose prerequisite is merely active
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
-| N5 elimination | in progress | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, hostile well-posed and singular fixtures, and wiring covariance are complete; scattering specialization, series, and Redheffer remain |
-| N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
-| N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
-| N6a conservation | blocked | N2a, N5; E3b for physical meaning | passive/lossless composition closure suite |
+| N5 elimination | in progress: local Redheffer route complete, X-01 bridge open | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, and proof-gated Redheffer realization are complete; agreement with FlatNetlist/N5H composition remains |
+| N5F parameterized compilation | in progress | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
+| N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening construction, well-posed subsystem packaging, close behavior, and append assembly laws are complete; hierarchical/flattened semantic equality remains |
+| N6a conservation | done | N2a, N5; E3b for physical meaning | exact wiring power balance, componentwise passive/lossless closure, and lossless external scattering matrix |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
-| N6c coherent/incoherent observables | blocked | P2a, N5, N6a | coherency transport and decorrelation suite |
+| N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
-| S1 Mach-Zehnder (Physlib extension) | blocked | N5, N6a, N7 | transfer and power suite; no HOL source |
-| S2/S3 microrings | in progress: all-pass amplitude/series slice complete | S0, N5, N5F, N6a, N7 | explicit one-bus netlist, exact solve gate, N5 through response, and contractive round-trip-series agreement complete; add-drop and observable suite remain |
+| S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
+| S2/S3 microrings | in progress: all-pass and add-drop amplitude/series slices complete | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 through/drop responses, and contractive round-trip-series agreement complete; observable, identifiability, FSR, and source-parity suites remain |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: neutral matrix/cofactor foundation integrated; forward-path bijection, edge enumeration, and N5 agreement open | N5, finite graph audit | combinatorial/matrix equivalence |
+| S6 Mason | in progress: neutral matrix/cofactor, classical forward-path formula, edge enumeration, distinguished terminals, and definition-level regressions integrated; N5 agreement remains | N5, finite graph audit | combinatorial/matrix equivalence |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |

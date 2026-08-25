@@ -16,7 +16,7 @@ The singular-safe relational series behavior is functional whenever its named in
 pivot is bijective. This file extracts the unique typed scattering transform from that relation
 and identifies it with the previously proved four-block formula.
 
-## ii. Scope
+Scope:
 
 `redhefferStar` is proof-gated and composes reflective scattering systems. It is not ordinary
 matrix multiplication, a chain-matrix product, a reciprocity statement, or a convergence result.
@@ -25,7 +25,7 @@ identity theorem is asserted.
 Agreement with the independent `FlatNetlist`/N5H elimination route has not yet been proved; that
 is the open X-01 bridge.
 
-## iii. Key definitions and results
+## ii. Key results
 
 - `TwoPortScatteringTransform.isFunctional_redhefferSeriesBehavior`: functionality from the
   explicit pivot gate.
@@ -34,10 +34,14 @@ is the open X-01 bridge.
 - `TwoPortScatteringTransform.redhefferStar_eq_blockFormula`: equality with the noncommutative
   block formula.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Functional extraction
 - B. Agreement with the block formula
+
+## iv. References
+
+This behavior-derived construction is Physlib-original; no external source is used here.
 
 -/
 
@@ -119,6 +123,5 @@ lemma redhefferStar_eq_blockFormula
 end TwoPortScatteringTransform
 
 end
-
 
 end Optics
