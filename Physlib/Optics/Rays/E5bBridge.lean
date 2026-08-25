@@ -49,9 +49,11 @@ Explicit non-claims. A phase direction is not a ray: the interface theory is car
 phase angles assert nothing about group velocity, energy flux, or outgoing behaviour, and nothing
 here upgrades them. The correspondence is geometric only. Nothing here derives the *paraxial*
 interface laws for curved surfaces, which remain model laws, and nothing here assigns a field,
-power, or polarization to a ray. The tangent vector of section A is supplied, not constructed:
-this file does not claim that every configuration admits a meridional plane containing a given
-ray.
+power, or polarization to a ray. The tangent vector of section A is a parameter, and section F
+constructs one only *away from normal incidence*: at exactly normal incidence the tangential
+projection of the incident phase vector vanishes, every unit tangent in the interface serves
+equally, and the meridional plane is genuinely undetermined. That is a fact about the physics, not
+a gap in the formalisation, and the hypothesis of section F records it.
 
 ## ii. Key results
 
@@ -69,6 +71,8 @@ ray.
   cubic bound of `Physlib.Optics.Rays.Basic`, against the *derived* Snell law.
 - `Optics.RealisesIncidentPhaseDirection` and
   `Optics.abs_paraxialSnell_sub_le_snellLaw_meridional`: the same bound, stated about the ray.
+- `Optics.exists_realisesIncidentPhaseDirection`: away from normal incidence, a realising tangent
+  and ray exist and are constructed.
 
 ## iii. Table of contents
 
@@ -77,6 +81,7 @@ ray.
 - C. Reflection
 - D. Refraction
 - E. Refraction stated about a ray
+- F. Existence of the realising ray
 
 ## iv. References
 
@@ -248,13 +253,17 @@ theorem angleToSide_vectorReflection_meridionalDirection {d : ℕ}
 
 -/
 
-/-- **The paraxial refraction law rests on the derived Snell law.**
+/-- **The paraxial refraction bound, with its Snell hypothesis discharged.**
 
 `Optics.abs_paraxialSnell_sub_le` bounds the deviation of the paraxial refraction law from exact
 Snell refraction by an explicit cubic term. In `Physlib.Optics.Rays.Basic` its Snell hypothesis was
 supplied by hand. Here the same bound is obtained with that hypothesis discharged by
-`IsElectricPhaseMatched.snellLaw_refractiveIndexRelativeTo`, so the paraxial approximation of the
-ray development rests on the interface theory rather than on a stipulated law.
+`IsElectricPhaseMatched.snellLaw_refractiveIndexRelativeTo`.
+
+The provenance is exactly that and no more: the Snell law is derived from the supplied electric
+phase-matching predicate together with material dispersion matching and zero attenuation. That
+predicate is stipulated rather than derived from the integral Maxwell equations, so this is a
+reduction to a stated boundary condition, not to Maxwell.
 
 The refractive indices are relative to a common reference medium, and their nonnegativity is
 discharged rather than assumed.
@@ -404,8 +413,9 @@ replaced by the signed incidence angle of a ray that realises the incident phase
 the form in which the bound is a statement about the ray development rather than about the
 interface theory alone.
 
-It still says only that the Snell law the bound is measured against is derived; the paraxial law
-being bounded remains a model law.
+It says no more about provenance than `Optics.abs_paraxialSnell_sub_le_snellLaw` does: the Snell
+law is reduced to a stipulated electric phase-matching predicate, not to Maxwell, and the paraxial
+law being bounded remains a model law.
 -/
 theorem abs_paraxialSnell_sub_le_snellLaw_meridional
     {configuration : PlanarDielectricWaveConfiguration} {r : MeridionalRay} {normalAngle : ℝ}
@@ -435,6 +445,115 @@ theorem abs_paraxialSnell_sub_le_snellLaw_meridional
     hupper]
   exact abs_paraxialSnell_sub_le_snellLaw h reference hIncidentDispersion hTransmittedDispersion
     hIncidentAttenuation hTransmittedAttenuation
+
+/-!
+
+## F. Existence of the realising ray
+
+-/
+
+/-- The unit tangent singled out by a phase vector that is not normally incident.
+
+At normal incidence the tangential projection vanishes and this is the junk value `0`; the results
+below therefore all carry the non-normal-incidence hypothesis, which is the condition under which
+a plane of incidence exists at all.
+-/
+def incidenceTangent (plane : OrientedAffineHyperplane 3) (k : EuclideanSpace ℝ (Fin 3)) :
+    EuclideanSpace ℝ (Fin 3) :=
+  ‖plane.tangentialProjection k‖⁻¹ • plane.tangentialProjection k
+
+/-- Away from normal incidence the singled-out tangent is a unit vector. -/
+lemma norm_incidenceTangent (plane : OrientedAffineHyperplane 3) (k : EuclideanSpace ℝ (Fin 3))
+    (h : plane.tangentialProjection k ≠ 0) : ‖incidenceTangent plane k‖ = 1 := by
+  rw [incidenceTangent, norm_smul, norm_inv, norm_norm]
+  exact inv_mul_cancel₀ (norm_ne_zero_iff.mpr h)
+
+/-- The singled-out tangent lies in the interface. -/
+lemma normalComponent_incidenceTangent (plane : OrientedAffineHyperplane 3)
+    (k : EuclideanSpace ℝ (Fin 3)) :
+    plane.normalComponent (incidenceTangent plane k) = 0 := by
+  rw [incidenceTangent, OrientedAffineHyperplane.normalComponent, real_inner_smul_right,
+    ← OrientedAffineHyperplane.normalComponent, plane.normalComponent_tangentialProjection,
+    mul_zero]
+
+/-- The meridional ray singled out by a phase vector: it sits on the axis and carries the phase
+vector's own angle to the positive side. -/
+def incidenceRay (plane : OrientedAffineHyperplane 3) (k : EuclideanSpace ℝ (Fin 3)) :
+    MeridionalRay :=
+  ⟨0, 0, plane.angleToSide .positive k⟩
+
+lemma incidenceRay_signedIncidenceAngle (plane : OrientedAffineHyperplane 3)
+    (k : EuclideanSpace ℝ (Fin 3)) :
+    (incidenceRay plane k).signedIncidenceAngle 0 = plane.angleToSide .positive k := by
+  rw [MeridionalRay.signedIncidenceAngle, incidenceRay, sub_zero]
+
+/-- The constructed tangent and ray really do realise the incident phase direction.
+
+The scale factor is the phase vector's norm, which is what the construction discards: a ray has a
+direction and no magnitude.
+-/
+theorem realisesIncidentPhaseDirection_incidenceRay
+    (configuration : PlanarDielectricWaveConfiguration)
+    (h : configuration.interface.plane.tangentialProjection
+      configuration.incident.waveVector.phaseVector ≠ 0) :
+    RealisesIncidentPhaseDirection configuration
+      (incidenceRay configuration.interface.plane
+        configuration.incident.waveVector.phaseVector) 0
+      (incidenceTangent configuration.interface.plane
+        configuration.incident.waveVector.phaseVector) := by
+  set plane := configuration.interface.plane with hplane
+  set k := configuration.incident.waveVector.phaseVector with hk
+  have hkne : k ≠ 0 := by
+    intro hzero
+    apply h
+    rw [hzero]
+    simp [OrientedAffineHyperplane.tangentialProjection,
+      OrientedAffineHyperplane.normalComponent]
+  have hnorm : 0 < ‖k‖ := norm_pos_iff.mpr hkne
+  have hproj : ‖plane.tangentialProjection k‖ ≠ 0 := norm_ne_zero_iff.mpr h
+  refine ⟨‖k‖, hnorm, ?_⟩
+  have hcos : ‖k‖ * Real.cos (plane.angleToSide .positive k) = plane.normalComponent k := by
+    have hraw := plane.cos_angleToSide_mul_norm .positive k
+    rw [OrientedAffineHyperplane.Side.sign_positive, one_mul] at hraw
+    linarith [hraw]
+  have hsin : ‖k‖ * Real.sin (plane.angleToSide .positive k) =
+      ‖plane.tangentialProjection k‖ := by
+    have hraw := plane.sin_angleToSide_mul_norm .positive k
+    linarith [hraw]
+  rw [meridionalDirection, incidenceRay_signedIncidenceAngle,
+    OrientedAffineHyperplane.sideNormalVector_positive, incidenceTangent, smul_add, smul_smul,
+    smul_smul, hcos, hsin, smul_smul, mul_inv_cancel₀ hproj, one_smul, add_comm]
+  exact (plane.tangentialProjection_add_normal k).symm
+
+/-- **Existence of the realising ray.** Away from normal incidence, a configuration determines a
+unit tangent in its interface and a meridional ray that realises its incident phase direction,
+with the signed incidence angle already in the range the bridge results need.
+
+This is what makes the hypothesis of section E discharge-able rather than an assumption about the
+configuration. The conclusion is packaged in exactly the form
+`Optics.abs_paraxialSnell_sub_le_snellLaw_meridional` consumes.
+-/
+theorem exists_realisesIncidentPhaseDirection
+    (configuration : PlanarDielectricWaveConfiguration)
+    (h : configuration.interface.plane.tangentialProjection
+      configuration.incident.waveVector.phaseVector ≠ 0) :
+    ∃ (tangent : EuclideanSpace ℝ (Fin 3)) (r : MeridionalRay) (normalAngle : ℝ),
+      ‖tangent‖ = 1 ∧
+        configuration.interface.plane.normalComponent tangent = 0 ∧
+        RealisesIncidentPhaseDirection configuration r normalAngle tangent ∧
+        0 ≤ r.signedIncidenceAngle normalAngle ∧
+        r.signedIncidenceAngle normalAngle ≤ π :=
+  ⟨incidenceTangent configuration.interface.plane
+      configuration.incident.waveVector.phaseVector,
+    incidenceRay configuration.interface.plane configuration.incident.waveVector.phaseVector, 0,
+    norm_incidenceTangent _ _ h, normalComponent_incidenceTangent _ _,
+    realisesIncidentPhaseDirection_incidenceRay configuration h,
+    by
+      rw [incidenceRay_signedIncidenceAngle]
+      exact InnerProductGeometry.angle_nonneg _ _,
+    by
+      rw [incidenceRay_signedIncidenceAngle]
+      exact InnerProductGeometry.angle_le_pi _ _⟩
 
 end
 

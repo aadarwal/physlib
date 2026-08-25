@@ -13,8 +13,10 @@ one place the ray layering rule is lifted: `Physlib/Optics/Rays/E5bBridge.lean` 
 
 | Commit | Contents |
 |---|---|
-| `de4be782` | Docstring correction to `Rays/Basic.lean`. **Hand over separately** — it fixes a false claim already on the integration branch and depends on nothing else |
-| (this one) | The bridge module and its regressions |
+| `de4be782` | Side-convention docstring fix, already merged as `48015bbf` |
+| `23d3b6fe` | The refraction results stated about a ray |
+| `f5b8c2b7` | R5 corrective slice: withhold RS-04, RS-06, RS-07 by name |
+| (this one) | Meridional-plane existence, and the provenance correction below |
 
 ## Registrations needed in `Physlib.lean`
 
@@ -105,7 +107,7 @@ Section C, reflection:
   reflected ray makes the same angle. This is the exact content of the folded plane-mirror law:
   re-referencing the axis *is* the exchange of sides.
 
-Section D, refraction:
+Section D, refraction (see the provenance correction below before quoting these):
 
 - `Optics.exactRefractionAngle_incidentPhaseAngle` — the transmitted phase angle **is** the ray
   development's `exactRefractionAngle` of the incident phase angle.
@@ -113,6 +115,36 @@ Section D, refraction:
   cubic bound, with the Snell hypothesis **discharged** by
   `IsElectricPhaseMatched.snellLaw_refractiveIndexRelativeTo` rather than supplied by hand. The
   refractive-index positivity is discharged too, via `refractiveIndexRelativeTo_pos`.
+
+Section E, refraction stated about a ray:
+
+- `Optics.angleToSide_smul_of_pos`, `Optics.RealisesIncidentPhaseDirection`,
+  `Optics.incidentPhaseAngle_eq_signedIncidenceAngle`,
+  `Optics.transmittedPhaseAngle_eq_exactRefractionAngle_signedIncidenceAngle`,
+  `Optics.abs_paraxialSnell_sub_le_snellLaw_meridional`.
+
+Section F, existence of the realising ray:
+
+- `Optics.incidenceTangent`, `Optics.norm_incidenceTangent`,
+  `Optics.normalComponent_incidenceTangent`, `Optics.incidenceRay`,
+  `Optics.incidenceRay_signedIncidenceAngle`,
+  `Optics.realisesIncidentPhaseDirection_incidenceRay`,
+  `Optics.exists_realisesIncidentPhaseDirection`.
+
+  The construction decomposes the incident phase vector into its normal component and tangential
+  projection, takes the tangent to be the normalised projection and the ray angle to be the phase
+  vector's own `angleToSide`, and the scale factor is the phase vector's norm — which is exactly
+  what a ray discards. The conclusion is packaged with the range facts, so it plugs directly into
+  section E.
+
+  **The hypothesis is that the tangential projection is nonzero, that is, not normal incidence.**
+  This is a fact about the physics, not a formalisation gap: at exactly normal incidence every unit
+  tangent in the interface serves equally and there is no plane of incidence to construct.
+
+  E5b's `transmitted_phaseVector_mem_incidencePlane` does **not** supply this. It is a membership
+  statement — the transmitted phase vector lies in the span of the incident phase vector and the
+  normal — not a construction of a tangent. It is complementary, and it is what would let the same
+  meridional plane serve the transmitted wave; that extension is not done here.
 
 ### `Physlib.Optics.Rays.E5bBridgeRegression`
 
@@ -133,20 +165,42 @@ or sign error shows up as a changed coordinate rather than as a changed name.
 
 ## What this closes, and what it does not
 
+**A provenance correction to this note's own earlier wording.** An earlier version of this file,
+and of the module documentation, said the paraxial bound "rests on the interface theory rather than
+on a stipulated law", and reports from this lane said the Snell law was derived from Maxwell.
+**That was false and has been corrected in the module documentation and in both refraction
+docstrings.** The error was this lane's: it verified what
+`snellLaw_refractiveIndexRelativeTo` *consumes* and asserted the provenance of the whole chain
+without checking whether what it consumes is itself derived. It is not. The interface modules say
+so of their own predicates, verbatim:
+
+- `Interfaces/PlanarDielectric/WaveBoundary.lean` — "the local boundary predicates are stipulated
+  rather than derived from integral Maxwell equations".
+- `Electromagnetism/ThreeDimension/BoundaryConditions/Planar.lean` — "These declarations state
+  local boundary conditions but do not derive them from integral Maxwell equations".
+
+The accurate statement, now in the module doc: the Snell law is derived from the supplied electric
+phase-matching predicate together with material dispersion matching and zero attenuation; that
+predicate is stipulated, not derived from the integral Maxwell equations, so this is a reduction to
+a **stated boundary condition**, not to Maxwell. Maxwell enters only through the half-space
+plane-wave solutions. Closing it to Maxwell waits on E4b.
+
 **Closes:** `goal.md` §H.5 R1 bullet 4. The ledger row GO-02 recorded the paraxial law as
 "postulated" in the source with a Physlib target of "stronger — limit or explicit assumption **+ EM
-bridge**". The limit and the explicit cubic bound were delivered in R1; the EM bridge is this lane.
-`abs_paraxialSnell_sub_le_snellLaw` is the statement that closes it: the small-angle bound now rests
-on a Snell law derived from electric phase matching, not on one written down by hand.
+bridge**". The limit and the explicit cubic bound were delivered in R1; the bridge is this lane.
+**The GO-02 row must use the corrected wording above** — "the paraxial bound's Snell hypothesis is
+discharged against the interface theory's stipulated phase-matching predicate", never "derived from
+Maxwell".
 
 **Does not close, and is not claimed:**
 
 1. **A phase direction is not a ray.** The interface theory is explicit that its phase angles assert
    nothing about group velocity, energy flux, or outgoing behaviour. Nothing here upgrades them.
    The correspondence is geometric only.
-2. **The meridional plane is supplied, not constructed.** The tangent vector is a parameter. This
-   file does not claim that every configuration admits a meridional plane containing a given ray,
-   which would need an existence argument about the incidence plane.
+2. **The meridional plane is constructed only away from normal incidence.** Section F builds the
+   tangent and the realising ray for any configuration whose incident phase vector has nonzero
+   tangential projection. At exactly normal incidence there is no plane of incidence to construct,
+   and nothing is claimed there.
 3. **Curved surfaces are untouched.** The paraxial laws for spherical surfaces remain model laws.
    This bridge covers the *planar* interface only, which is the one E5b models.
 4. **No field, power, or polarization** is assigned to a ray anywhere in the ray development.
