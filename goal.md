@@ -2276,9 +2276,10 @@ parity ledger is discharged by a public declaration and regression.
 
 ### H.5. Foundational ray, imaging, Gaussian-beam, and resonator milestone
 
-Lane ownership: a separate controller-managed worker begins R1--R5 after N5 is registered. The
-spine agent skips this lane and reviews and merges its completed branch when the controller
-presents it.
+Lane ownership: a separate controller-managed worker develops R1--R5. The spine agent skips
+implementation in that lane and reviews and merges exact completed cutoffs presented by the
+controller. The R1/R2 ray and transfer foundations are integrated; the E5b cross-layer bridge and
+R3--R5 remain open.
 
 #### R1. Physical and paraxial rays
 
@@ -2649,7 +2650,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
-| R1--R5 ray/beam foundations | reserved for worker after N5 registration | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
+| R1--R5 ray/beam foundations | in progress: R1/R2 core integrated; E5b bridge and R3--R5 open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 
 ## O. Overall completion checklist

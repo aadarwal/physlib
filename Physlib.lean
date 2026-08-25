@@ -347,6 +347,10 @@ public import Physlib.Optics.Polarization.ReferencedMaterialWave
 public import Physlib.Optics.Polarization.RelativePhase
 public import Physlib.Optics.Polarization.RelativePhaseStokes
 public import Physlib.Optics.Polarization.Stokes
+public import Physlib.Optics.Rays.Basic
+public import Physlib.Optics.Rays.BasicRegression
+public import Physlib.Optics.Rays.Transfer
+public import Physlib.Optics.Rays.TransferRegression
 public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic

@@ -1496,6 +1496,23 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
 
+## Ray and transfer source checks
+
+- [ ] Human-check the R1/R2 source map before upstreaming. In Siddique's 2015 thesis, Def. 3.7 on
+  printed p. 44 states the interface relation and table 3.1 on printed p. 47 gives the same folded
+  plane/spherical reflection and refraction matrices used by `ParaxialInterface.transferMatrix`.
+  The output-angle-reversal transform in section D is therefore a Physlib coordinate operation,
+  not the thesis convention. Independently map the thesis's convex/concave radius vocabulary on
+  printed p. 98 to Physlib's outgoing-side signed radius before attaching those geometric labels.
+- [ ] Keep totalized algebra separate from physical ray use. A downstream physical statement must
+  supply forward and non-grazing ray hypotheses where needed, positive refractive indices,
+  nonnegative gaps or lens thickness, nonzero curved-surface radii, and nonzero focal length.
+  Complete the range- and side-guarded bridge from `MeridionalRay.cos_signedIncidenceAngle` to
+  E5b's unoriented exact incidence angle rather than identifying signed angles from cosine alone.
+- [ ] Split an upstream R1/R2 proposal into focused stacks. The exact worker cutoff grouped the
+  physical/paraxial ray foundation, its regressions, the transfer/system layer, and its regressions
+  into a fork-integration batch larger than the review guideline; those remain separable concepts.
+
 ## Source and license checks
 
 - [ ] Create and human-verify the source-to-Lean parity ledger required by `goal.md` B.5. Every
