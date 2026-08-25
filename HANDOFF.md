@@ -3,8 +3,8 @@
 ## Branch and cutoff scope
 
 - Branch: `optics/s2-microring`.
-- Slice: S3 add-drop observables and proof-gated nondispersive frequency response.
-- Integration base: `optics/development` at `af062790` or later at cutoff.
+- Slice: S3b independent extinction and one-FSR N5F regression sentinels.
+- Integration base: `optics/development` at `b440ebb5` or later at cutoff.
 - S2 all-pass and add-drop amplitude/series slices are already registered on development.
 
 ## Files and requested registrations
@@ -218,6 +218,15 @@ N5F/FSR fixture names:
 - `Optics.AddDrop.observablesRegression_groupDelay` = `6 / 5`
 - `Optics.AddDrop.observablesRegression_angularFSR` = `5 * Real.pi / 3`
 - `Optics.AddDrop.observablesRegression_frequencyFSR` = `5 / 6`
+- `Optics.AddDrop.observablesRegression_parametersAt_oneFSR_roundTripPhase`
+- `Optics.AddDrop.observablesRegression_parametersAt_oneFSR_roundTripCoefficient`
+- `Optics.AddDrop.observablesRegression_parametersAt_oneFSR_denominator`
+- `Optics.AddDrop.observablesRegression_parametersAt_oneFSR_throughTransfer`
+- `Optics.AddDrop.observablesRegression_oneFSR_mem_responseDomain`
+- `Optics.AddDrop.observablesRegressionN5FThroughPowerAt`
+- `Optics.AddDrop.observablesRegressionN5FThroughPowerAt_zero`
+- `Optics.AddDrop.observablesRegression_n5f_oneFSR_throughPower`
+- `Optics.AddDrop.observablesRegression_n5f_oneFSR_throughPower_eq_zero`
 - `Optics.AddDrop.observablesRegression_zero_mem_responseDomain`
 - `Optics.AddDrop.observablesRegression_zero_mem_networkResponseDomain`
 - `Optics.AddDrop.observablesRegression_oneFSR_mem_networkResponseDomain`

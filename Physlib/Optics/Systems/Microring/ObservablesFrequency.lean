@@ -28,7 +28,9 @@ frequency with constant group delay `n_g L / v`. The result is periodicity of th
 powers. No drop-amplitude periodicity is claimed; the symmetric half-arc reference-plane choice is
 retained rather than quotienting field phase. The model makes no claim for a
 frequency-dependent group index, dispersion, linewidth, quality factor, group delay inferred from
-the response, material realization, or validity outside `responseDomain`.
+the response, material realization, or validity outside `responseDomain`. The affine frequency
+model makes no time-domain or causality inference. It adds no radiation, bend-scattering,
+absorption, or other omitted-loss channel, and proves no reciprocity statement.
 
 ## ii. Key results
 

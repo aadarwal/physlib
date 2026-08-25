@@ -52,6 +52,11 @@ group-delay, dispersion, thermal, nonlinear, fabrication, or free-spectral-range
 response and free spectral range are handled by the proof-gated N5F response in
 `ObservablesFrequency`.
 
+The modeled ports contain no radiation, bend-scattering, absorption, or other omitted-loss
+channels. Accordingly, the lossless balance is conditional on the declared N7 component model; it
+does not prove that those channels are a complete electromagnetic description. This file also
+makes no reciprocity or time-domain causality claim.
+
 ## ii. Key results
 
 - `AddDrop.throughPower_eq_closedForm` and `dropPower_eq_closedForm`: exact algebraic power forms.

@@ -319,15 +319,20 @@ lemma observablesRegression_critical_isResonant :
   apply Parameters.isResonant_of_roundTripPhase_eq_zero
   rfl
 
-/-- Critical coupling gives exact through-field extinction at the named point. -/
+/-- Primitive expansion of the S2 transfer gives exact through-field extinction at the named
+point, independently of the general critical-coupling theorem. -/
 lemma observablesRegression_critical_extinction :
     throughTransfer observablesRegressionCriticalParameters = 0 := by
-  exact criticalCoupling_extinction observablesRegressionCriticalParameters
-    observablesRegression_critical_isLossless.1
-    (by norm_num [observablesRegressionCriticalParameters])
-    observablesRegression_critical_hasNonzeroDenominator
-    observablesRegression_critical_isResonant
-    observablesRegression_critical_isCriticallyCoupled
+  rw [throughTransfer, observablesRegression_critical_denominator]
+  norm_num [observablesRegressionCriticalParameters, Parameters.inputCoupler,
+    Parameters.dropCoupler, Parameters.roundTripCoefficient,
+    Parameters.firstArcCoefficient, Parameters.secondArcCoefficient,
+    Parameters.firstPropagation, Parameters.secondPropagation,
+    Parameters.halfArcAttenuation, Parameters.halfArcPhase,
+    MatchedPropagation.transmissionCoefficient, MatchedPropagation.carrierPhaseFactor,
+    DirectionalCoupler.crossCoefficient]
+  rw [mul_pow, Complex.I_sq]
+  norm_num
 
 /-- The N6-routed theorem specializes to exact lossless power balance at the critical point. -/
 lemma observablesRegression_critical_lossless_powerBalance :
@@ -408,6 +413,51 @@ lemma observablesRegression_parametersAt_zero :
   simp [NondispersiveGroupIndexModel.parametersAt,
     observablesRegressionNondispersiveModel]
 
+/-- Direct expansion of the affine phase lift gives one full turn at one angular FSR. -/
+lemma observablesRegression_parametersAt_oneFSR_roundTripPhase :
+    (observablesRegressionNondispersiveModel.parametersAt
+      observablesRegressionNondispersiveModel.angularFSR).roundTripPhase =
+        2 * Real.pi := by
+  rw [NondispersiveGroupIndexModel.parametersAt, observablesRegression_angularFSR,
+    observablesRegression_groupDelay]
+  simp only [observablesRegressionNondispersiveModel,
+    addDropRegressionResonanceParameters]
+  ring
+
+/-- The two half arcs at one angular FSR compose to the original quarter-retention loop factor. -/
+lemma observablesRegression_parametersAt_oneFSR_roundTripCoefficient :
+    (observablesRegressionNondispersiveModel.parametersAt
+      observablesRegressionNondispersiveModel.angularFSR).roundTripCoefficient = 1 / 4 := by
+  rw [Parameters.roundTripCoefficient_eq_fieldAttenuation _
+    (by norm_num [NondispersiveGroupIndexModel.parametersAt,
+      observablesRegressionNondispersiveModel, addDropRegressionResonanceParameters])]
+  rw [observablesRegression_parametersAt_oneFSR_roundTripPhase]
+  simp [NondispersiveGroupIndexModel.parametersAt,
+    observablesRegressionNondispersiveModel, addDropRegressionResonanceParameters,
+    MatchedPropagation.carrierPhaseFactor, Real.Angle.coe_two_pi]
+
+/-- Direct expansion gives the same nonzero feedback denominator one angular FSR later. -/
+lemma observablesRegression_parametersAt_oneFSR_denominator :
+    (observablesRegressionNondispersiveModel.parametersAt
+      observablesRegressionNondispersiveModel.angularFSR).denominator = 91 / 100 := by
+  rw [Parameters.denominator, Parameters.loopGain,
+    observablesRegression_parametersAt_oneFSR_roundTripCoefficient]
+  norm_num [NondispersiveGroupIndexModel.parametersAt,
+    observablesRegressionNondispersiveModel, addDropRegressionResonanceParameters]
+
+/-- Primitive S2 expansion at one angular FSR gives the same through amplitude `45 / 91`. -/
+lemma observablesRegression_parametersAt_oneFSR_throughTransfer :
+    throughTransfer
+        (observablesRegressionNondispersiveModel.parametersAt
+          observablesRegressionNondispersiveModel.angularFSR) = 45 / 91 := by
+  rw [throughTransfer, observablesRegression_parametersAt_oneFSR_denominator,
+    observablesRegression_parametersAt_oneFSR_roundTripCoefficient]
+  norm_num [NondispersiveGroupIndexModel.parametersAt,
+    observablesRegressionNondispersiveModel, addDropRegressionResonanceParameters,
+    Parameters.inputCoupler, DirectionalCoupler.crossCoefficient]
+  rw [mul_pow, Complex.I_sq]
+  norm_num
+
 /-- Zero angular frequency belongs to the exact physical N5F response domain. -/
 lemma observablesRegression_zero_mem_responseDomain :
     0 ∈ (parameterizedNetlist
@@ -430,6 +480,29 @@ lemma observablesRegression_oneFSR_mem_networkResponseDomain :
   exact observablesRegressionNondispersiveModel.add_angularFSR_mem_responseDomain
     observablesRegression_zero_mem_networkResponseDomain
 
+/-- One angular FSR belongs to the parameterized-netlist response domain used by the fixture. -/
+lemma observablesRegression_oneFSR_mem_responseDomain :
+    observablesRegressionNondispersiveModel.angularFSR ∈
+      (parameterizedNetlist
+        observablesRegressionNondispersiveModel.parametersAt).responseDomain := by
+  simpa only [zero_add, NondispersiveGroupIndexModel.network] using
+    observablesRegression_oneFSR_mem_networkResponseDomain
+
+/-- The proof-gated N5F input-to-through response power at a selected angular frequency. -/
+def observablesRegressionN5FThroughPowerAt (angularFrequency : ℝ)
+    (hFrequency : angularFrequency ∈
+      (parameterizedNetlist
+        observablesRegressionNondispersiveModel.parametersAt).responseDomain) : ℝ :=
+  Complex.normSq
+    ((parameterizedNetlist
+      observablesRegressionNondispersiveModel.parametersAt).response hFrequency
+      (Outgoing.mk
+        (throughChannel
+          (observablesRegressionNondispersiveModel.parametersAt angularFrequency)))
+      (Incident.mk
+        (inputChannel
+          (observablesRegressionNondispersiveModel.parametersAt angularFrequency))))
+
 /-- The proof-gated N5F through response has the independently expanded zero-phase power. -/
 lemma observablesRegression_n5f_resonance_throughPower :
     Complex.normSq
@@ -446,6 +519,37 @@ lemma observablesRegression_n5f_resonance_throughPower :
   rw [parameterizedNetlist_response_through_power,
     observablesRegression_parametersAt_zero,
     observablesRegression_resonance_throughPower]
+
+/-- The compact response-power fixture agrees with the direct zero-frequency N5F anchor. -/
+lemma observablesRegressionN5FThroughPowerAt_zero :
+    observablesRegressionN5FThroughPowerAt 0
+      observablesRegression_zero_mem_responseDomain = 2025 / 8281 := by
+  exact observablesRegression_n5f_resonance_throughPower
+
+/-- The proof-gated N5F response one angular FSR later has power `2025 / 8281`, by direct
+parameter, phase-factor, and S2 transfer expansion rather than the FSR periodicity theorem. -/
+lemma observablesRegression_n5f_oneFSR_throughPower :
+    observablesRegressionN5FThroughPowerAt
+        observablesRegressionNondispersiveModel.angularFSR
+        observablesRegression_oneFSR_mem_responseDomain = 2025 / 8281 := by
+  unfold observablesRegressionN5FThroughPowerAt
+  rw [parameterizedNetlist_response_through_power]
+  change Complex.normSq
+      (throughTransfer
+        (observablesRegressionNondispersiveModel.parametersAt
+          observablesRegressionNondispersiveModel.angularFSR)) = _
+  rw [observablesRegression_parametersAt_oneFSR_throughTransfer]
+  norm_num [Complex.normSq_apply]
+
+/-- The two independently reduced N5F response powers at zero and one FSR are equal. -/
+lemma observablesRegression_n5f_oneFSR_throughPower_eq_zero :
+    observablesRegressionN5FThroughPowerAt
+        observablesRegressionNondispersiveModel.angularFSR
+        observablesRegression_oneFSR_mem_responseDomain =
+      observablesRegressionN5FThroughPowerAt 0
+        observablesRegression_zero_mem_responseDomain := by
+  rw [observablesRegression_n5f_oneFSR_throughPower,
+    observablesRegressionN5FThroughPowerAt_zero]
 
 
 end AddDrop
