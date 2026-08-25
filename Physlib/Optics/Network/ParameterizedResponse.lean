@@ -522,7 +522,6 @@ lemma toBehavior_response {value : Param} (hValue : value ∈ netlist.responseDo
     (netlist.response hValue).toBehavior = (netlist.compile value).behavior :=
   (netlist.compile value).toBehavior_responseTransform hValue.1
 
-
 /-- The response does not depend on which proof of domain membership is supplied. -/
 lemma response_congr {value : Param} (first second : value ∈ netlist.responseDomain) :
     netlist.response first = netlist.response second := rfl

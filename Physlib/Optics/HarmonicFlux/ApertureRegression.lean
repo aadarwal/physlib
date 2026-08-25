@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.MeasureTheory.Integral.Bochner.SumMeasure
 public import Physlib.Optics.HarmonicFlux.Aperture
 
 /-!
@@ -136,6 +135,5 @@ lemma apertureFluxRegressionPositive_weighted_self :
   norm_num
 
 end
-
 
 end Optics

@@ -159,5 +159,4 @@ lemma signedNormalFluxDensity_regression_oppositeNormal :
 
 end
 
-
 end Optics

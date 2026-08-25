@@ -161,5 +161,4 @@ lemma apertureFluxRegressionSynthesis_flux :
 
 end
 
-
 end Optics
