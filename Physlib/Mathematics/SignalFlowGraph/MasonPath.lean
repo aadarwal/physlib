@@ -436,7 +436,7 @@ lemma masonNumerator_eq_adjugate (G : Matrix ι ι ℂ) (s t : ι) :
 /-- **Mason's gain formula.** Where the graph determinant does not vanish, the gain between two
 nodes is the sum over forward paths of the path gain times the graph determinant of the nodes the
 path does not touch, divided by the graph determinant of the whole graph. -/
-lemma masonGain_eq_gain (G : Matrix ι ι ℂ) (s t : ι) (h : graphDet G ≠ 0) :
+theorem masonGain_eq_gain (G : Matrix ι ι ℂ) (s t : ι) (h : graphDet G ≠ 0) :
     masonGain G s t = gain G s t :=
   (gain_eq_masonGain G s t h (masonNumerator_eq_adjugate G s t)).symm
 
