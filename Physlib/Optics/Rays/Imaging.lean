@@ -28,10 +28,11 @@ Translations are taken by `Optics.translationMatrix`, which is a gap matrix with
 index forgotten. `Optics.translationMatrix_eq_transferMatrix` records that this loses nothing: a
 gap's ray-transfer matrix does not depend on its index.
 
-The nondegeneracy hypotheses are explicit throughout. Focal, principal, and nodal distances all
-require `M 1 0 ≠ 0`, that is, a system with nonzero power. An afocal system has no cardinal
-points at finite distance, and the theorems below say nothing about one rather than dividing by
-zero silently.
+The specification and uniqueness results carry the nondegeneracy hypothesis `M 1 0 ≠ 0`, that
+is, nonzero system power. The raw distance formulas remain total Lean functions when `M 1 0 = 0`;
+their resulting zeros do not assert finite physical cardinal points. For an afocal system the
+corresponding specifications can be unsatisfied or nonunique, so the totalized formulas must not
+be used without the hypothesis.
 
 Explicit non-claims. Nothing here is a claim about image quality: these are paraxial statements
 about where rays go, with no aberration, diffraction, aperture, or finite-beam content. A pair of
@@ -47,8 +48,8 @@ power is carried by a ray, so "image" here means a geometric conjugate plane and
 - `Optics.isBackFocalDistance_backFocalDistance` and
   `Optics.isFrontFocalDistance_frontFocalDistance`, with their uniqueness results.
 - `Optics.arePrincipalDistances` and `Optics.areNodalDistances`, with uniqueness.
-- `Optics.nodal_eq_principal_of_det_eq_one`: nodal and principal planes coincide exactly when the
-  system does not change refractive index.
+- `Optics.nodal_eq_principal_iff`: for nonzero system power, nodal and principal planes coincide
+  exactly when the determinant is one.
 - `Optics.newton_imaging_equation`: `x x' = det M / C ^ 2`, which is `f ^ 2` for a system in a
   single medium.
 - `Optics.thinLensMatrix_imaging_iff`: the thin-lens imaging equation `1 / s + 1 / s' = 1 / f`.
@@ -73,8 +74,9 @@ power is carried by a ray, so "image" here means a geometric conjugate plane and
 - B. E. A. Saleh and M. C. Teich, *Fundamentals of Photonics*, 3rd edition, chapter 1, for the
   imaging condition, magnifications, and the lens equations.
 - M. U. Siddique, *Formal Analysis of Geometrical Optics using Theorem Proving*, PhD thesis,
-  Concordia University, 2015, chapter 3, definitions 3.14 to 3.21 and theorems 3.9 to 3.12, for
-  the specification-definition-theorem treatment of the cardinal points.
+  Concordia University, 2015, chapter 3, definition 3.13 for the object-image frame, and
+  definitions 3.14 to 3.21 and theorems 3.9 to 3.12 for the
+  specification-definition-theorem treatment of the cardinal points.
 
 -/
 
@@ -185,22 +187,22 @@ The frame therefore adds no new generality: it is the composed semantics special
 bracketed by free space, with the object and image planes as first-class parameters. Every result
 below about `Optics.shiftedMatrix` is a result about this frame.
 -/
-theorem composedMatrix_objectImageFrame (objectGap imageGap : ParaxialGap)
+lemma composedMatrix_objectImageFrame (objectGap imageGap : ParaxialGap)
     (cs : List ParaxialComponent) (exitGap : ParaxialGap) :
     ParaxialSystem.composedMatrix [([], objectGap), (cs, exitGap), ([], imageGap)] =
       shiftedMatrix objectGap.length imageGap.length (ParaxialSystem.matrix cs exitGap) := by
   simp only [ParaxialSystem.composedMatrix, ParaxialSystem.matrix, one_mul, shiftedMatrix,
     translationMatrix_eq_transferMatrix]
 
-/-- The object-image frame is a valid composed system exactly when both bracketing gaps are valid,
-the bracketed system is, and the indices agree at the two shared reference planes.
+/-- The object-image frame is a valid composed system when both bracketing gaps are valid, the
+bracketed system is valid, and the indices agree at the two shared reference planes.
 
 The positivity of the object-space and image-space refractive indices, which the source states as
 explicit hypotheses of this frame, is what `ParaxialGap.IsValid` carries for the two bracketing
 gaps. The two index-matching hypotheses are the composed-system compatibility condition: object
 space must be the medium the system is entered from, and image space the medium it is left into.
 -/
-theorem composedIsValid_objectImageFrame (objectGap imageGap : ParaxialGap)
+lemma composedIsValid_objectImageFrame (objectGap imageGap : ParaxialGap)
     (cs : List ParaxialComponent) (exitGap : ParaxialGap) (hObject : objectGap.IsValid)
     (hSystem : ParaxialSystem.IsValid cs exitGap) (hImage : imageGap.IsValid)
     (hEntry : objectGap.index = ParaxialSystem.headIndex cs exitGap)
@@ -251,7 +253,7 @@ def angularMagnification (M : RayTransferMatrix) : ℝ := M 1 1
 
 /-- **Specification of the transverse magnification.** Between conjugate planes the outgoing
 height is the transverse magnification times the incoming height. -/
-theorem height_eq_transverseMagnification_mul (M : RayTransferMatrix) (h : IsConjugate M)
+lemma height_eq_transverseMagnification_mul (M : RayTransferMatrix) (h : IsConjugate M)
     (r : ParaxialRay) :
     (rayTransfer M r).height = transverseMagnification M * r.height := by
   rw [isConjugate_iff_entry_zero_one_eq_zero] at h
@@ -260,7 +262,7 @@ theorem height_eq_transverseMagnification_mul (M : RayTransferMatrix) (h : IsCon
 /-- **Specification of the angular magnification.** A ray leaving the axial point of the object
 plane has its angle multiplied by the angular magnification. This needs no conjugacy
 hypothesis. -/
-theorem angle_eq_angularMagnification_mul (M : RayTransferMatrix) (r : ParaxialRay)
+lemma angle_eq_angularMagnification_mul (M : RayTransferMatrix) (r : ParaxialRay)
     (h : r.height = 0) :
     (rayTransfer M r).angle = angularMagnification M * r.angle := by
   simp [angularMagnification, h]
@@ -281,8 +283,20 @@ theorem transverseMagnification_mul_angularMagnification (M : RayTransferMatrix)
 
 -/
 
-/-- The effective focal length of a system of nonzero power. -/
-def effectiveFocalLength (M : RayTransferMatrix) : ℝ := -1 / M 1 0
+/-- The image-space effective focal length of a system, totalized at zero power. -/
+def imageSpaceEffectiveFocalLength (M : RayTransferMatrix) : ℝ := -1 / M 1 0
+
+/-- The object-space effective focal length of a system, totalized at zero power. -/
+def objectSpaceEffectiveFocalLength (M : RayTransferMatrix) : ℝ := -M.det / M 1 0
+
+/-- For nonzero system power, the product of the object- and image-space effective focal lengths
+is `det M / C²`. -/
+lemma objectSpaceEffectiveFocalLength_mul_imageSpaceEffectiveFocalLength
+    (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
+    objectSpaceEffectiveFocalLength M * imageSpaceEffectiveFocalLength M =
+      M.det / M 1 0 ^ 2 := by
+  rw [objectSpaceEffectiveFocalLength, imageSpaceEffectiveFocalLength]
+  field_simp
 
 /-- **Specification of the back focal distance.** Placing the image plane at this distance
 downstream of the exit sends every incoming ray parallel to the axis onto the axis. -/
@@ -293,7 +307,7 @@ def IsBackFocalDistance (M : RayTransferMatrix) (z : ℝ) : Prop :=
 def backFocalDistance (M : RayTransferMatrix) : ℝ := -(M 0 0) / M 1 0
 
 /-- The back focal distance meets its specification. -/
-theorem isBackFocalDistance_backFocalDistance (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
+lemma isBackFocalDistance_backFocalDistance (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
     IsBackFocalDistance M (backFocalDistance M) := by
   intro r hAngle
   simp only [rayTransfer_height, shiftedMatrix_zero_zero, shiftedMatrix_zero_one,
@@ -302,7 +316,7 @@ theorem isBackFocalDistance_backFocalDistance (M : RayTransferMatrix) (hC : M 1 
   ring
 
 /-- The back focal distance is the only distance meeting its specification. -/
-theorem isBackFocalDistance_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (z : ℝ)
+lemma isBackFocalDistance_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (z : ℝ)
     (h : IsBackFocalDistance M z) : z = backFocalDistance M := by
   have h1 := h ⟨1, 0⟩ rfl
   simp only [rayTransfer_height, shiftedMatrix_zero_zero, shiftedMatrix_zero_one, mul_zero,
@@ -319,7 +333,7 @@ def IsFrontFocalDistance (M : RayTransferMatrix) (z : ℝ) : Prop :=
 def frontFocalDistance (M : RayTransferMatrix) : ℝ := -(M 1 1) / M 1 0
 
 /-- The front focal distance meets its specification. -/
-theorem isFrontFocalDistance_frontFocalDistance (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
+lemma isFrontFocalDistance_frontFocalDistance (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
     IsFrontFocalDistance M (frontFocalDistance M) := by
   intro r hHeight
   simp only [rayTransfer_angle, shiftedMatrix_one_zero, shiftedMatrix_one_one, hHeight, mul_zero,
@@ -328,7 +342,7 @@ theorem isFrontFocalDistance_frontFocalDistance (M : RayTransferMatrix) (hC : M 
   ring
 
 /-- The front focal distance is the only distance meeting its specification. -/
-theorem isFrontFocalDistance_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (z : ℝ)
+lemma isFrontFocalDistance_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (z : ℝ)
     (h : IsFrontFocalDistance M z) : z = frontFocalDistance M := by
   have h1 := h ⟨0, 1⟩ rfl
   simp only [rayTransfer_angle, shiftedMatrix_one_zero, shiftedMatrix_one_one, mul_zero, zero_add,
@@ -356,7 +370,7 @@ def objectPrincipalDistance (M : RayTransferMatrix) : ℝ := (M.det - M 1 1) / M
 def imagePrincipalDistance (M : RayTransferMatrix) : ℝ := (1 - M 0 0) / M 1 0
 
 /-- The principal distances meet their specification. -/
-theorem arePrincipalDistances (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
+lemma arePrincipalDistances (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
     ArePrincipalDistances M (objectPrincipalDistance M) (imagePrincipalDistance M) := by
   have hdet : M.det = M 0 0 * M 1 1 - M 0 1 * M 1 0 := Matrix.det_fin_two M
   constructor
@@ -369,7 +383,7 @@ theorem arePrincipalDistances (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
     ring
 
 /-- The principal distances are the only pair meeting their specification. -/
-theorem arePrincipalDistances_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0)
+lemma arePrincipalDistances_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0)
     (zObject zImage : ℝ) (h : ArePrincipalDistances M zObject zImage) :
     zObject = objectPrincipalDistance M ∧ zImage = imagePrincipalDistance M := by
   obtain ⟨hConjugate, hMagnification⟩ := h
@@ -402,7 +416,7 @@ def objectNodalDistance (M : RayTransferMatrix) : ℝ := (1 - M 1 1) / M 1 0
 def imageNodalDistance (M : RayTransferMatrix) : ℝ := (M.det - M 0 0) / M 1 0
 
 /-- The nodal distances meet their specification. -/
-theorem areNodalDistances (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
+lemma areNodalDistances (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
     AreNodalDistances M (objectNodalDistance M) (imageNodalDistance M) := by
   have hdet : M.det = M 0 0 * M 1 1 - M 0 1 * M 1 0 := Matrix.det_fin_two M
   constructor
@@ -415,7 +429,7 @@ theorem areNodalDistances (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
     ring
 
 /-- The nodal distances are the only pair meeting their specification. -/
-theorem areNodalDistances_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (zObject zImage : ℝ)
+lemma areNodalDistances_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (zObject zImage : ℝ)
     (h : AreNodalDistances M zObject zImage) :
     zObject = objectNodalDistance M ∧ zImage = imageNodalDistance M := by
   obtain ⟨hConjugate, hAngular⟩ := h
@@ -427,16 +441,29 @@ theorem areNodalDistances_unique (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (zOb
   · rw [imageNodalDistance, Matrix.det_fin_two, eq_div_iff hC]
     linear_combination M 1 0 * hConjugate - (zImage * M 1 0 + M 0 0) * hAngular
 
-/-- **Nodal planes coincide with principal planes exactly for a system in a single medium.**
+/-- Nodal planes coincide with principal planes when the system determinant is one.
 
-The two pairs agree when the determinant is one, that is when the system does not change the
-refractive index. For a system that does, they are genuinely different points.
+This implication is valid even for the totalized zero-power formulas. The converse needs nonzero
+power and is `Optics.nodal_eq_principal_iff`.
 -/
-theorem nodal_eq_principal_of_det_eq_one (M : RayTransferMatrix) (h : M.det = 1) :
+lemma nodal_eq_principal_of_det_eq_one (M : RayTransferMatrix) (h : M.det = 1) :
     objectNodalDistance M = objectPrincipalDistance M ∧
       imageNodalDistance M = imagePrincipalDistance M := by
   rw [objectNodalDistance, objectPrincipalDistance, imageNodalDistance, imagePrincipalDistance, h]
   exact ⟨rfl, rfl⟩
+
+/-- **Nodal and principal planes coincide exactly when the determinant is one**, provided the
+system has nonzero power. For a valid system without phase conjugation, determinant one is the
+same-medium case. -/
+lemma nodal_eq_principal_iff (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) :
+    (objectNodalDistance M = objectPrincipalDistance M ∧
+      imageNodalDistance M = imagePrincipalDistance M) ↔ M.det = 1 := by
+  constructor
+  · rintro ⟨hObject, -⟩
+    rw [objectNodalDistance, objectPrincipalDistance] at hObject
+    field_simp [hC] at hObject
+    linarith
+  · exact nodal_eq_principal_of_det_eq_one M
 
 /-!
 
@@ -446,8 +473,7 @@ theorem nodal_eq_principal_of_det_eq_one (M : RayTransferMatrix) (h : M.det = 1)
 
 /-- **Newton's imaging equation.** For conjugate planes, the object distance measured from the
 front focal plane and the image distance measured from the back focal plane have product
-`det M / C ^ 2`, which is the square of the effective focal length whenever the system does not
-change the refractive index. -/
+`det M / C ^ 2`, the product of the object-space and image-space effective focal lengths. -/
 theorem newton_imaging_equation (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (zObject zImage : ℝ)
     (h : IsConjugate (shiftedMatrix zObject zImage M)) :
     (zObject - frontFocalDistance M) * (zImage - backFocalDistance M) = M.det / M 1 0 ^ 2 := by
@@ -466,12 +492,13 @@ theorem newton_imaging_equation (M : RayTransferMatrix) (hC : M 1 0 ≠ 0) (zObj
   rw [hx, hx', div_mul_div_comm, key, pow_two]
 
 /-- Newton's equation for a system in a single medium, where the determinant is one. -/
-theorem newton_imaging_equation_of_det_eq_one (M : RayTransferMatrix) (hC : M 1 0 ≠ 0)
+lemma newton_imaging_equation_of_det_eq_one (M : RayTransferMatrix) (hC : M 1 0 ≠ 0)
     (hdet : M.det = 1) (zObject zImage : ℝ)
     (h : IsConjugate (shiftedMatrix zObject zImage M)) :
     (zObject - frontFocalDistance M) * (zImage - backFocalDistance M) =
-      effectiveFocalLength M ^ 2 := by
-  rw [newton_imaging_equation M hC zObject zImage h, hdet, effectiveFocalLength]
+      imageSpaceEffectiveFocalLength M ^ 2 := by
+  rw [newton_imaging_equation M hC zObject zImage h, hdet,
+    imageSpaceEffectiveFocalLength]
   field_simp
 
 /-- **The thin-lens imaging condition.** An object plane a distance `s` in front of a thin lens
@@ -527,12 +554,28 @@ theorem thinLensMatrix_focalDistances (f : ℝ) (hf : f ≠ 0) :
   rw [backFocalDistance, frontFocalDistance, hA, hCentry, hD]
   refine ⟨?_, ?_⟩ <;> field_simp
 
-/-- A thin lens has both principal planes at the lens itself. -/
-theorem thinLensMatrix_principalDistances (f : ℝ) :
+/-- The totalized raw principal-distance formulas of a thin-lens matrix are both zero.
+
+At `f = 0` this is only an algebraic statement about totalized formulas. The physical
+principal-plane specification is `Optics.thinLensMatrix_arePrincipalDistances` and requires
+`f ≠ 0`.
+-/
+lemma thinLensMatrix_principalDistances (f : ℝ) :
     objectPrincipalDistance (thinLensMatrix f) = 0 ∧
       imagePrincipalDistance (thinLensMatrix f) = 0 := by
   rw [objectPrincipalDistance, imagePrincipalDistance, det_thinLensMatrix]
   simp [thinLensMatrix]
+
+/-- A thin lens of nonzero focal length has both principal planes at the lens itself in the
+independent behavioural specification. -/
+lemma thinLensMatrix_arePrincipalDistances (f : ℝ) (hf : f ≠ 0) :
+    ArePrincipalDistances (thinLensMatrix f) 0 0 := by
+  have hC : thinLensMatrix f 1 0 ≠ 0 := by
+    change -1 / f ≠ 0
+    exact div_ne_zero (by norm_num) hf
+  obtain ⟨hObject, hImage⟩ := thinLensMatrix_principalDistances f
+  have h := arePrincipalDistances (thinLensMatrix f) hC
+  rwa [hObject, hImage] at h
 
 /-!
 
@@ -540,19 +583,19 @@ theorem thinLensMatrix_principalDistances (f : ℝ) :
 
 -/
 
-/-- The image-side principal distance expressed through the effective focal length. -/
-lemma imagePrincipalDistance_eq_effectiveFocalLength_mul (M : RayTransferMatrix)
+/-- The image-side principal distance expressed through the image-space effective focal length. -/
+lemma imagePrincipalDistance_eq_imageSpaceEffectiveFocalLength_mul (M : RayTransferMatrix)
     (hC : M 1 0 ≠ 0) :
-    imagePrincipalDistance M = effectiveFocalLength M * (M 0 0 - 1) := by
-  rw [imagePrincipalDistance, effectiveFocalLength]
+    imagePrincipalDistance M = imageSpaceEffectiveFocalLength M * (M 0 0 - 1) := by
+  rw [imagePrincipalDistance, imageSpaceEffectiveFocalLength]
   field_simp
   ring
 
-/-- The object-side principal distance expressed through the effective focal length. -/
-lemma objectPrincipalDistance_eq_effectiveFocalLength_mul (M : RayTransferMatrix)
+/-- The object-side principal distance expressed through the image-space effective focal length. -/
+lemma objectPrincipalDistance_eq_imageSpaceEffectiveFocalLength_mul (M : RayTransferMatrix)
     (hC : M 1 0 ≠ 0) :
-    objectPrincipalDistance M = effectiveFocalLength M * (M 1 1 - M.det) := by
-  rw [objectPrincipalDistance, effectiveFocalLength]
+    objectPrincipalDistance M = imageSpaceEffectiveFocalLength M * (M 1 1 - M.det) := by
+  rw [objectPrincipalDistance, imageSpaceEffectiveFocalLength]
   field_simp
   ring
 
@@ -568,8 +611,10 @@ theorem thickLens_principalDistances (n nL t R₁ R₂ : ℝ) (hn : n ≠ 0) (hn
     (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) (M : RayTransferMatrix)
     (hM : M = ParaxialSystem.matrix (thickLensSystem n nL t R₁ R₂) ⟨n, 0⟩)
     (hC : M 1 0 ≠ 0) :
-    imagePrincipalDistance M = -effectiveFocalLength M * t * (nL - n) / (nL * R₁) ∧
-      objectPrincipalDistance M = effectiveFocalLength M * t * (nL - n) / (nL * R₂) := by
+    imagePrincipalDistance M =
+        -imageSpaceEffectiveFocalLength M * t * (nL - n) / (nL * R₁) ∧
+      objectPrincipalDistance M =
+        imageSpaceEffectiveFocalLength M * t * (nL - n) / (nL * R₂) := by
   have hEntryA : M 0 0 = 1 - t * (nL - n) / (nL * R₁) := by
     rw [hM, thickLens_matrix n nL t R₁ R₂ hn hnL hR₁ hR₂]
     rfl
@@ -581,9 +626,9 @@ theorem thickLens_principalDistances (n nL t R₁ R₂ : ℝ) (hn : n ≠ 0) (hn
     field_simp
     ring
   constructor
-  · rw [imagePrincipalDistance_eq_effectiveFocalLength_mul M hC, hEntryA]
+  · rw [imagePrincipalDistance_eq_imageSpaceEffectiveFocalLength_mul M hC, hEntryA]
     ring
-  · rw [objectPrincipalDistance_eq_effectiveFocalLength_mul M hC, hEntryD, hDet]
+  · rw [objectPrincipalDistance_eq_imageSpaceEffectiveFocalLength_mul M hC, hEntryD, hDet]
     ring
 
 end

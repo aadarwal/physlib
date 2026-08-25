@@ -360,6 +360,12 @@ public import Physlib.Optics.Polarization.RelativePhaseStokes
 public import Physlib.Optics.Polarization.Stokes
 public import Physlib.Optics.Rays.Basic
 public import Physlib.Optics.Rays.BasicRegression
+public import Physlib.Optics.Rays.Gaussian
+public import Physlib.Optics.Rays.GaussianRegression
+public import Physlib.Optics.Rays.Imaging
+public import Physlib.Optics.Rays.ImagingRegression
+public import Physlib.Optics.Rays.Resonator
+public import Physlib.Optics.Rays.ResonatorRegression
 public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
 public import Physlib.Optics.Systems.PolarizerRetarder
