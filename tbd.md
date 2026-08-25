@@ -1169,9 +1169,9 @@ PR unless maintainers explicitly ask to retain it.
   exposure `E_out`, and restriction readout `E_outᴴ`. Prove complete connected/external endpoint
   partitions, identify external channels with the dependent sum of modes over unconnected ports,
   and prove exact action, Gram, isometry, cross-zero, projector-completeness, `C b + E_in u`, and
-  additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. Do not
-  mark the broad netlist API-map requirement complete before the remaining netlist invariants
-  exist.
+  additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. The
+  later `FlatNetlist` construction now closes the broad structural API-map requirement; executable
+  well-formedness checking and semantic compilation remain separate N4C work.
 - [ ] Before upstreaming the external-output completion, prepare a stack in this order: the neutral
   complementary-range-projector lemma in `Mode/Embedding`; outgoing endpoint partition, exposure,
   and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
@@ -1186,6 +1186,20 @@ PR unless maintainers explicitly ask to retain it.
   component. Reuse the same local port label under different component tags, retain a nonsymmetric
   nonreal two-mode block, test all four cross-component entries, and pin the mixed aggregate
   output as `(4 + 3 I, 12 + 16 I, 18 + 26 I)`.
+- [x] Add the source-neutral `LinearBehavior.feedbackSolutions` construction and singular-safe
+  `FlatNetlist` relational semantics. Derive `S`, `C`, `E_in`, `E_out`, and `E_outᴴ` from the owned
+  component/connection data, retain complete incident/outgoing states, project the external
+  relation, and prove the exact shaped and implicit feedback equations without an inverse.
+- [x] Add the hostile N-11 shared-link regression: both local component matrices have explicit
+  two-sided inverses, while zero input has distinct complete states and external outputs, the
+  feedback operator has a nonzero kernel witness, and a separate external input has no solution.
+- [ ] Before upstreaming flat-netlist semantics, prepare a focused stack for the source-neutral
+  feedback relation, netlist data and derived maps, compositional external semantics, and hostile
+  singular regression. Human-check state order, `C * S`, `E_outᴴ`, partial/multivalued behavior,
+  and the absence of inverse or physical conservation claims.
+- [ ] Human-certify every flat-netlist declaration and proof under `AI-POLICY.md`. This milestone
+  introduces no new bibliographic claim; the DATE/SysCon convention and source-formula gates stay
+  separate and open where already recorded.
 - [ ] Before upstreaming component-family assembly, prepare a stack in this order: the generic
   dependent block-diagonal action lemma in `Mode/Embedding`; aggregate component/port/channel types
   and reassociation; assembled scattering and exact laws; then the hostile heterogeneous
