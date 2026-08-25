@@ -8,14 +8,14 @@ module
 public import Physlib.Optics.Mode.Basic
 
 /-!
-# Embedding finite optical mode families
+# Embeddings of optical mode families
 
 ## i. Overview
 
-This file uses an embedding between a finite family of power-normalized modes and a full ambient
-family. The restriction transform evaluates the selected coordinates, while its adjoint extends
-selected amplitudes by zero. Their two matrix products distinguish the selected identity from the
-ambient range projector.
+This file uses an embedding between a selected family of power-normalized modes and a full ambient
+family. Amplitude restriction and its bundled linear map evaluate the selected coordinates without
+a finiteness assumption. For finite coordinate families, the corresponding restriction transform
+and its adjoint distinguish the selected identity from the ambient range projector.
 
 The same maps zero-extend a rectangular mode transform into full input and output families.
 This is the linear-algebra interface needed to include a connected optical system in an ambient
@@ -24,6 +24,7 @@ family containing exposed channels.
 ## ii. Main definitions
 
 - `ModeAmplitude.restrictEmbedding`: restrict an ambient amplitude along an embedding.
+- `ModeAmplitude.restrictEmbeddingLinearMap`: the bundled complex-linear amplitude restriction.
 - `ModeTransform.restriction`: select the coordinates in an embedding's range.
 - `ModeTransform.blockDiagonal'_apply`: evaluate a dependent block-diagonal transform on one
   output block using the matching restricted input amplitude.
@@ -33,7 +34,8 @@ family containing exposed channels.
 
 ## iii. Scope
 
-These constructions concern finite power-normalized coordinate families. A restriction is
+Amplitude restriction and its bundled linear map do not require finite index families. The matrix,
+power, and norm results concern finite power-normalized coordinate families. A restriction is
 passive but generally not power-preserving, because it discards amplitudes not in the selected
 range. Zero extension is power-preserving but generally not surjective. Neither operation claims
 physical absorption, electromagnetic flux conservation, or a physical-port partition.
@@ -60,11 +62,31 @@ def ModeAmplitude.restrictEmbedding {ι κ : Type*} (embedding : ι ↪ κ)
     (amplitude : ModeAmplitude κ) : ModeAmplitude ι :=
   WithLp.toLp 2 (WithLp.ofLp amplitude ∘ embedding)
 
+/-- Complex-linear restriction of an ambient amplitude along an embedding. -/
+def ModeAmplitude.restrictEmbeddingLinearMap {ι κ : Type*} (embedding : ι ↪ κ) :
+    ModeAmplitude κ →ₗ[ℂ] ModeAmplitude ι where
+  toFun := ModeAmplitude.restrictEmbedding embedding
+  map_add' first second := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rfl
+  map_smul' scalar amplitude := by
+    apply WithLp.ofLp_injective 2
+    funext index
+    rfl
+
 /-- Restriction evaluates an amplitude at the corresponding ambient coordinate. -/
 @[simp]
 lemma ModeAmplitude.restrictEmbedding_apply {ι κ : Type*} (embedding : ι ↪ κ)
     (amplitude : ModeAmplitude κ) (mode : ι) :
     amplitude.restrictEmbedding embedding mode = amplitude (embedding mode) := rfl
+
+/-- Bundled embedding restriction agrees with coordinate restriction. -/
+@[simp]
+lemma ModeAmplitude.restrictEmbeddingLinearMap_apply {ι κ : Type*} (embedding : ι ↪ κ)
+    (amplitude : ModeAmplitude κ) :
+    ModeAmplitude.restrictEmbeddingLinearMap embedding amplitude =
+      amplitude.restrictEmbedding embedding := rfl
 
 /-- The power of a restricted amplitude is the sum over the selected ambient coordinates. -/
 lemma ModeAmplitude.power_restrictEmbedding_eq_sum {ι κ : Type*} [Fintype ι]
