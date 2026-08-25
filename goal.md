@@ -1839,7 +1839,7 @@ definition.
   right-incident to left-outgoing transmission block is bijective, with its exact four-block
   formula and graph equality proved without a full scattering-matrix inverse;
 - [x] chain-to-scattering conversion under bijectivity of the exact leading chain block, plus both
-  behavioral and matrix round trips;
+  behavioral and matrix round trips and independent scalar/noncommutative formula regressions;
 - [x] unconditional behavioral equivalence and round trips for the reversible regrouping between
   incident/outgoing scattering coordinates and backward-first reference-plane states;
 - [x] series connection as chain-matrix multiplication, proved from relational composition;
@@ -2604,13 +2604,15 @@ human verification recorded in `tbd.md`.
    composition, kernel, idempotence, and modal-power laws with complex and three-four-five
    regressions. N3 is complete with explicit totality and single-valuedness predicates,
    proof-gated extraction of the unique linear map, graph round trips, functionality closure under
-   identity/series/parallel composition, and exact complex gain/cascade regressions. The first N3T
-   slice now fixes convention-explicit backward-first states, reversibly regroups scattering
-   variables, connects raw sum-labelled scattering matrices to the typed two-port boundary,
-   extracts a chain transform through a functionality proof, and derives later-times-earlier
-   matrix multiplication from relational series. Continue with the exact transmission-
-   block criterion and block formulas; do not introduce an unqualified source-parity alias or copy
-   a source termination formula before the open human checks are resolved.
+   identity/series/parallel composition, and exact complex gain/cascade regressions. N3T now fixes
+   convention-explicit backward-first states, reversibly regroups scattering variables, connects
+   raw sum-labelled scattering matrices to the typed two-port boundary, proves both exact
+   proof-gated scattering/chain conversions and round trips, derives later-times-earlier matrix
+   multiplication from relational series, and supplies singular-safe right-load termination with
+   exact response formulas. Continue with N4 flat-network semantics: dependent component-channel
+   sums, block-diagonal component laws, typed external output exposure, and the implicit relation
+   `b = S a`, `a = C b + E_in u`, `y = E_outᴴ b`. Do not use an inverse to define that behavior;
+   well-posed elimination belongs to N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
