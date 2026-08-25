@@ -23,8 +23,9 @@ conductor's, not this lane's. Slice 5 leaves it a clean hook and attempts nothin
 | 2 | Paths, loops, non-touching loop families, the graph determinant and cofactors | **done** |
 | 3 | Mason's theorem, and `Δ = det (1 - G)` | **done**, with the forward-path half of the numerator explicitly withheld |
 | 4 | Regressions: single loop, two non-touching loops, the touching case, `Δ = 0` | **done**, delivered with slice 3 |
-| 5 | `ofCoefficientMatrix` hook, plus the edge-indexed multigraph structure with `toMatrix` | pending |
-| 6 | Optional: edge-based enumeration closing regression G-02 by proof | pending — attempt only after 2-5 land |
+| 5 | `ofCoefficientMatrix` hook, plus the edge-indexed multigraph structure with `toMatrix` | **done** |
+| 7 | The forward-path numerator identity, closing Mason's formula in general | pending — scheduled by the controller ahead of slice 6 |
+| 6 | Optional: edge-based enumeration closing regression G-02 by proof | pending — attempt after slice 7 |
 
 ---
 
@@ -360,6 +361,111 @@ the determinant only through their executable enumeration of elementary circuits
 IP-21's Mason's-gain content is matched at the level of the objects and their enumeration
 (slice 2); the identification with `det (1 - G)` and with the inverse-matrix entry goes beyond
 every source.
+
+---
+
+## Slice 5 — files
+
+- `Physlib/Mathematics/SignalFlowGraph/Extraction.lean` (172 lines)
+- `Physlib/Mathematics/SignalFlowGraph/ExtractionRegression.lean` (146 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all eight)
+
+```
+public import Physlib.Mathematics.SignalFlowGraph.Basic
+public import Physlib.Mathematics.SignalFlowGraph.BasicRegression
+public import Physlib.Mathematics.SignalFlowGraph.Combinatorics
+public import Physlib.Mathematics.SignalFlowGraph.CombinatoricsRegression
+public import Physlib.Mathematics.SignalFlowGraph.Extraction
+public import Physlib.Mathematics.SignalFlowGraph.ExtractionRegression
+public import Physlib.Mathematics.SignalFlowGraph.Mason
+public import Physlib.Mathematics.SignalFlowGraph.MasonRegression
+```
+
+Alphabetical order satisfies the dependency order.
+
+### The extraction hook for the conductor
+
+Two entry points, so a caller never has to guess which side of `1 - G` a matrix belongs on:
+
+- `ofCoefficientMatrix` for a system already written `x = A x + b`; the matrix is the gain matrix
+  as it stands, and `isNodeSolution_ofCoefficientMatrix` is the promised trivial lemma.
+- `ofSystemMatrix` for a system written `M x = b`, which is the shape a solved netlist produces;
+  the gain matrix is `1 - M`. Then `systemMatrix_ofSystemMatrix` is the round trip,
+  `isNodeSolution_ofSystemMatrix` gives back the original linear system,
+  `graphDet_ofSystemMatrix : graphDet (ofSystemMatrix M) = M.det`, and
+  `gain_ofSystemMatrix : gain (ofSystemMatrix M) s t = M⁻¹ t s`.
+
+The second is the one the conductor will want: it says the loop sum of the extracted graph is an
+ordinary determinant and its gains are ordinary inverse entries, so the S6 exit theorem reduces to
+matching the netlist's `M` with this `M`. **Nothing here asserts agreement with any netlist or
+network semantics; that is the conductor's theorem, deliberately not attempted.**
+
+### The multigraph layer, and why it is not decoration
+
+`Multigraph ι E` carries `source, target : E → ι` and `gain : E → ℂ` on a separate edge type. That
+gives both bullets of `goal.md` section H.4 S6 that a matrix cannot give:
+
+- **parallel edges are distinct**, being distinct elements of `E`;
+- **the topology does not depend on the gains**: `setGain_edgesBetween` proves the edges joining
+  each ordered pair of nodes are unchanged when the gains are replaced, so an edge of gain zero is
+  still an edge.
+
+`Multigraph.toMatrix` sums the parallel edges into the gain matrix, connecting the layer to
+everything already proved.
+
+**The lossiness is proved, not asserted.** `toMatrix_parallelPair_eq_singleEdge`: two parallel
+edges of gains `a` and `b` and one edge of gain `a + b` have the **same** gain matrix, while
+`card_edgesBetween_parallelPair` and `card_edgesBetween_singleEdge` show the two multigraphs have
+two edges and one edge respectively. So the residual gap in regression row G-02 is a fact about
+the matrix layer rather than an oversight in it, and the multigraph layer demonstrably carries
+information the matrix layer does not.
+
+### Slice 5 — declarations
+
+`Physlib/Mathematics/SignalFlowGraph/Extraction.lean`, namespace `Physlib.SignalFlowGraph`:
+
+**A. Graphs from a linear system** — `ofCoefficientMatrix`, `isNodeSolution_ofCoefficientMatrix`,
+`ofSystemMatrix`, `systemMatrix_ofSystemMatrix`, `isNodeSolution_ofSystemMatrix`,
+`graphDet_ofSystemMatrix`, `gain_ofSystemMatrix`.
+
+**B. Multigraphs with explicit edge identity** — `Multigraph`, `Multigraph.edgesBetween`,
+`Multigraph.mem_edgesBetween`, `Multigraph.setGain`, `Multigraph.setGain_source`,
+`Multigraph.setGain_target`, `Multigraph.setGain_edgesBetween`.
+
+**C. The gain matrix of a multigraph** — `Multigraph.toMatrix`, `Multigraph.toMatrix_apply`,
+`Multigraph.toMatrix_of_isEmpty`.
+
+`Physlib/Mathematics/SignalFlowGraph/ExtractionRegression.lean`, same namespace: `parallelPair`,
+`singleEdge`, `toMatrix_parallelPair`, `toMatrix_singleEdge`,
+`toMatrix_parallelPair_eq_singleEdge`, `edgesBetween_parallelPair`, `edgesBetween_singleEdge`,
+`card_edgesBetween_parallelPair`, `card_edgesBetween_singleEdge`, `edgesBetween_setGain_zero`,
+`card_edgesBetween_setGain_zero`, `systemMatrix_ofSystemMatrix_twoNodeLoop`,
+`graphDet_ofSystemMatrix_twoNodeLoop`.
+
+### Slice 5 gates
+
+Build clean; `lean -Dwarn.sorry=false -Dweak.says.verify=true` gives zero output on all eight
+files; the Batteries declaration linter set run module-scoped over all eight modules passes; the
+`module_doc_lint` and `style_lint` rules re-run locally pass; no `sorry`, `axiom`,
+`native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import; imports minimal.
+
+Two linter findings were acted on rather than suppressed. The first draft declared
+`[DecidableEq ι]` on the multigraph definitions while a section variable already supplied it,
+which `overlappingInstances` flagged; the file now scopes its `variable` blocks per section so
+each declaration takes exactly the instances it uses. The first draft also proved three cardinality
+facts by `decide`, which fails on statements containing free complex variables; they are now
+proved by identifying the edge set with `Finset.univ`, which is both correct and general in the
+gains.
+
+### Parity classification for slice 5
+
+**Physlib-original, with the multigraph a reformulation of the source representation.** The
+sources carry a graph as a list of branches `ℕ × ℂ × ℕ` (FMICS'15 Definition 1, p. 167;
+SFG-TR'14; NSV'16 Definition 1, p. 34). A separate edge type is the same idea with the branch
+index made a first-class parameter rather than a list position, so section B should be classed as
+parity of representation. Section A has no source counterpart: no fetched source extracts a
+signal-flow graph from a linear system or relates it to a matrix inverse.
 
 ### Slice 1 gates
 
