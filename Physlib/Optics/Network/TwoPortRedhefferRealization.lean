@@ -17,20 +17,24 @@ behavior whenever the named feedback pivot is bijective. The proof solves only t
 backward-wave equation and checks both component laws; the block formula is not taken as the
 definition of composition.
 
-## ii. Scope
+Scope:
 
 The result is fixed-frequency complex-linear algebra. It introduces no commutativity,
 reciprocity, passivity, losslessness, convergence, or physical-realization assumption.
 
-## iii. Key result
+## ii. Key results
 
 - `TwoPortScatteringTransform.toBehavior_redhefferBlockFormula`: the block formula realizes the
   relational series behavior.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Internal-equation equivalence
 - B. Realization of relational series composition
+
+## iv. References
+
+This realization proof is Physlib-original; no external source is used here.
 
 -/
 

@@ -17,7 +17,7 @@ feedback equation with operator `1 - Rl₂ * Rr₁`. This file names that exact 
 requires its bijectivity explicitly, and states the resulting noncommutative four-block Redheffer
 formula.
 
-## ii. Scope and convention
+Scope and convention:
 
 Rows and columns of each travelling-wave scattering transform are ordered left then right. The
 chosen pivot acts on the internal backward-wave family. Its inverse is proof-gated; no total
@@ -25,7 +25,7 @@ matrix inverse, norm-contraction criterion, reciprocity, or commutativity assump
 Bijectivity is a sufficient gate for extracting the external matrix; no converse or minimality
 claim about external functionality is made.
 
-## iii. Key definitions and results
+## ii. Key results
 
 - `TwoPortScatteringTransform.redhefferFeedbackBlock`: `1 - Rl₂ * Rr₁`.
 - `TwoPortScatteringTransform.HasBijectiveRedhefferFeedback`: the exact matrix-extraction gate.
@@ -33,10 +33,14 @@ claim about external functionality is made.
 - `TwoPortScatteringTransform.redhefferBlockFormula`: the typed four-block formula.
 - The four named block lemmas expose the exact noncommutative product order.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Internal feedback pivot
 - B. Four-block Redheffer formula
+
+## iv. References
+
+This typed derivation is Physlib-original; no external source is used here.
 
 -/
 

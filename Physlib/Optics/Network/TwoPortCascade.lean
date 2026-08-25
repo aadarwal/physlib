@@ -16,23 +16,27 @@ When the first device has no right reflection and the second has no left reflect
 feedback block is the identity. The Redheffer product then reduces to ordinary directional
 transmission multiplication while retaining the two devices' external reflection blocks.
 
-## ii. Scope
+Scope:
 
 Only the two facing reflection blocks are assumed zero. The result does not infer impedance
 matching, reciprocity, passivity, losslessness, causality, or absence of the two external
 reflections. Matrix multiplication is recovered for the directional transmission blocks, not for
 the complete reflective scattering matrices.
 
-## iii. Key definitions and results
+## ii. Key results
 
 - `TwoPortScatteringTransform.hasBijectiveRedhefferFeedback_of_facingReflections_eq_zero`.
 - `TwoPortScatteringTransform.reflectionFreeSeriesCascade`.
 - The four named cascade-block lemmas, including the two ordered transmission products.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Identity feedback pivot
 - B. Ordinary directional cascade
+
+## iv. References
+
+This specialization is Physlib-original; no external source is used here.
 
 -/
 
