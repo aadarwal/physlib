@@ -17,14 +17,14 @@ This lane edits none of them; the registrations it needs are listed below.
 | R1 physical and paraxial rays | `Physlib.Optics.Rays.Basic` (+ `BasicRegression`) | done |
 | R2 ray-transfer components and systems | `Rays.Transfer` (+ `TransferRegression`) | done |
 | R3 imaging and cardinal points | `Rays.Imaging` (+ `ImagingRegression`) | done |
-| R4 Gaussian beams and the complex ABCD law | `Physlib.Optics.Rays.Gaussian` | not started |
+| R4 Gaussian beams and the complex ABCD law | `Rays.Gaussian` (+ `GaussianRegression`) | done |
 | R5 optical resonators | `Physlib.Optics.Rays.Resonator` | not started |
 
 ## Gates run, all four modules
 
 - `lake-lock build` of all four modules — clean, no warnings.
 - `lake-lock env lean -Dwarn.sorry=false -Dweak.says.verify=true <each file>` — zero output.
-- Batteries declaration linters (all 14, module-scoped over 488 declarations) — passed. Verified
+- Batteries declaration linters (all 14, module-scoped over 663 declarations) — passed. Verified
   to have teeth with a deliberately undocumented `def`, which the run rejected.
 - `module_doc_lint` and `style_lint` rules, plus the `regex_lint` unneeded-parentheses rule,
   reimplemented as text checks and run over both files — clean. Validated against
@@ -47,13 +47,15 @@ Insert in sorted position (they sort between `Physlib.Optics.Polarization.*` and
 ```
 public import Physlib.Optics.Rays.Basic
 public import Physlib.Optics.Rays.BasicRegression
+public import Physlib.Optics.Rays.Gaussian
+public import Physlib.Optics.Rays.GaussianRegression
 public import Physlib.Optics.Rays.Imaging
 public import Physlib.Optics.Rays.ImagingRegression
 public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
 ```
 
-Note the sort order: `Imaging` and `ImagingRegression` come before `Transfer`.
+Note the sort order: `Gaussian` and `Imaging` come before `Transfer`.
 
 ## Files added
 
@@ -63,6 +65,17 @@ Note the sort order: `Imaging` and `ImagingRegression` come before `Transfer`.
 - `Physlib/Optics/Rays/TransferRegression.lean`
 - `Physlib/Optics/Rays/Imaging.lean`
 - `Physlib/Optics/Rays/ImagingRegression.lean`
+- `Physlib/Optics/Rays/Gaussian.lean`
+- `Physlib/Optics/Rays/GaussianRegression.lean`
+
+## Pending prose fix on the integration branch
+
+The controller reported on 2026-08-25 that the conductor is correcting one wording in
+`Rays/Transfer.lean` **on `optics/development`**: its reference prose calls the thesis convention
+"unfolded", which the parity lane's reading shows is wrong — the thesis matrices are the *folded*
+ones, and `Optics.angleReversal`'s form is a separate fixed-axis presentation. This branch has
+deliberately **not** touched that prose, to avoid a merge conflict with the correction. Files
+added from R4 onward use the corrected terminology.
 
 ---
 
@@ -260,6 +273,66 @@ Added to `Physlib.Optics.Rays.Transfer` for the convention guard:
 `.transferRegression_roundTrip_det`, `.transferRegression_roundTrip_negated_radii`,
 `.transferRegression_twoReversals`.
 
+### `Physlib.Optics.Rays.Gaussian`
+
+Section A, the beam parameter:
+
+- `Optics.GaussianBeam` — wavelength and complex beam parameter, with `0 < wavelength` and
+  `0 < q.im` as structure fields.
+- `Optics.GaussianBeam.q_ne_zero`, `.normSq_q_pos`, `.rayleighRange`, `.rayleighRange_pos`,
+  `.waistRadius`, `.waistRadius_pos`, `.rayleighRange_eq`.
+
+Section B, derived beam quantities:
+
+- `Optics.GaussianBeam.beamRadius`, `.beamRadius_pos`, `.wavefrontCurvature`, `.inv_q_eq`,
+  `.wavefrontRadius`, `.wavefrontRadius_mul_wavefrontCurvature`.
+- `Optics.GaussianBeam.IsAtWaist`, `.beamRadius_of_isAtWaist`, `.wavefrontCurvature_of_isAtWaist`.
+
+Section C, the complex ABCD law:
+
+- `Optics.abcdDenominator`, `Optics.abcdTransform`, with `abcdDenominator_re`,
+  `abcdDenominator_im`.
+- `Optics.abcdDenominator_ne_zero` — the denominator proof.
+- `Optics.im_abcdTransform`, `Optics.im_abcdTransform_pos` — the domain proof.
+- `Optics.GaussianBeam.transform` with `transform_wavelength`, `transform_q`, and
+  `.beamRadius_transform_of_entries`.
+
+Section D, free propagation and the waist:
+
+- `Optics.det_translationMatrix`, `Optics.det_translationMatrix_pos`,
+  `Optics.abcdTransform_translationMatrix`.
+- `Optics.GaussianBeam.transform_translationMatrix_q`, `.transform_translationMatrix_wavelength`,
+  `.rayleighRange_transform_translationMatrix`, `.waistRadius_transform_translationMatrix`.
+- `Optics.GaussianBeam.beamRadius_translation_of_isAtWaist`,
+  `.wavefrontRadius_translation_of_isAtWaist`.
+- `Optics.GaussianBeam.outputWaistDistance`, `.isAtWaist_transform_outputWaistDistance`,
+  `.transform_q_of_isAtWaist`, `.outputWaistDistance_of_isAtWaist`,
+  `.waistRadius_sq_transform_of_isAtWaist`, `.waistRadius_sq_at_outputWaist`.
+
+Section E, the paraxial Helmholtz equation:
+
+- `Optics.waistBeamParameter` with `_re`, `_im`, `waistBeamParameter_ne_zero`.
+- `Optics.gaussianExponentCoefficient`, `Optics.gaussianExponentCoefficient_eq`,
+  `Optics.gaussianAmplitude`, `Optics.gaussianAmplitude_comm`.
+- `Optics.SatisfiesParaxialHelmholtz`.
+- `Optics.hasDerivAt_gaussianAmplitude_transverse`,
+  `Optics.hasDerivAt_deriv_gaussianAmplitude_transverse`,
+  `Optics.deriv_deriv_gaussianAmplitude_transverse`,
+  `Optics.hasDerivAt_gaussianAmplitude_axial`.
+- `Optics.gaussianAmplitude_satisfiesParaxialHelmholtz`.
+
+### `Physlib.Optics.Rays.GaussianRegression`
+
+`Optics.gaussianRegressionBeam`, `.gaussianRegressionBeam_isAtWaist`,
+`.gaussianRegressionBeam_rayleighRange`, `.gaussianRegression_beamRadius_at_waist`,
+`.gaussianRegression_wavefrontCurvature_at_waist`,
+`.gaussianRegression_beamRadius_at_rayleighRange`,
+`.gaussianRegression_not_isAtWaist_after_propagation`,
+`.gaussianRegression_thinLens_beamRadius`, `.gaussianRegression_denominator_ne_zero`,
+`.gaussianRegression_phaseConjugate_leaves_domain`,
+`.gaussianRegression_singular_not_isValid`, `.gaussianRegression_singular_would_be_junk`,
+`.gaussianRegression_helmholtz`, `.gaussianRegression_waistBeamParameter`.
+
 ---
 
 ## goal.md milestone rows satisfied
@@ -328,6 +401,27 @@ specification being vacuous. The sharpest fixture is
 both nodal points at its centre of curvature and both principal points at the vertex, which
 separates two notions that coincide for every system in a single medium and checks the distance
 sign convention at the same time.
+
+`goal.md` §H.5 R4 has five bullets, four done:
+
+- *wavelength, waist, Rayleigh range, and complex `q` parameter* — done.
+- *physically valid domain and free-propagation law* — done. The domain is a field of
+  `GaussianBeam`, not a side condition, and `im_abcdTransform_pos` proves it is preserved.
+- *Gaussian solution of the paraxial wave/Helmholtz equation* — done, for the transverse-Laplacian
+  form with the `exp (- i k z)` carrier, stated explicitly in `SatisfiesParaxialHelmholtz`. No
+  claim is made about the full three-dimensional Laplacian or the opposite carrier sign.
+- *ABCD transformation with denominator and domain proofs* — done, and in the strong form: the
+  denominator condition is **proved**, not assumed. See the ledger note on GB-04 below.
+- *output waist and location formulas* — done, `outputWaistDistance_of_isAtWaist` and
+  `waistRadius_sq_at_outputWaist`.
+
+**R-03 is done**, both halves on the same beam: `gaussianRegression_helmholtz` is the wave-equation
+half and the propagation, thin-lens, denominator, and domain lemmas are the ABCD half. Two
+sentinels are about hypotheses rather than values:
+`gaussianRegression_phaseConjugate_leaves_domain` shows the positive-determinant hypothesis is
+necessary — the phase-conjugating mirror carries a physical beam parameter out of the domain — and
+`gaussianRegression_singular_not_isValid` with `gaussianRegression_singular_would_be_junk` shows
+the singular matrix is rejected by validity and exactly what would go wrong without that.
 
 Of the three regressions named in the lane brief, the **symmetric two-lens system** is done here
 (`transferRegression_symmetricTwoLens_matrix` with its `A = D` symmetry and unit determinant),
@@ -459,6 +553,49 @@ the identity.
 criterion applies directly; `Optics.transferRegression_roundTrip_det` proves the round trip has
 unit determinant. The unfolded `det = -1` form satisfies the hypothesis only for an even number
 of reversals. This will be stated explicitly in R5.
+
+**GB-01 to GB-03** (Thesis'15 Defs. 4.1–4.7, Thms. 4.1–4.4, Lemmas 1–2, pp. 68–74) — satisfied
+except for beam intensity. Lean: `Optics.GaussianBeam` and its derived quantities;
+`Optics.gaussianAmplitude_satisfiesParaxialHelmholtz` is Thm. 4.2. Beam intensity (Def. 4.7,
+Thm. 4.4) is **not** formalised: this lane assigns no power or irradiance to a beam. The source's
+`z ≠ 0` side condition on the wavefront radius is reproduced as `q.re ≠ 0` on
+`Optics.GaussianBeam.wavefrontRadius_mul_wavefrontCurvature`; the curvature itself needs no side
+condition and is the primitive here.
+
+**GB-04** (Thesis'15 Defs. 4.8–4.10 + Thms. 4.5–4.7, pp. 76–79) — satisfied, and **stronger than
+the row previously recorded**. The parity lane has corrected its own earlier note: the source's
+omission of `C q + D ≠ 0` is sound rather than sloppy, because the condition is derivable from
+`0 < Im q` plus matrix nondegeneracy. This lane derives it, in
+`Optics.abcdDenominator_ne_zero`, rather than assuming it, which is what `goal.md` §R4's
+"denominator and domain proofs" asks for. `Optics.im_abcdTransform_pos` is the domain half.
+Class: **parity, strengthened** — the hypothesis is discharged, not added.
+
+**A gap in the source closed here.** The source's free-form interface constructor is
+unconditionally valid, so it admits a singular matrix, and with a total division the ABCD law
+would then assert `q' = 0`. `ParaxialInterface.prescribed` carries the index-ratio determinant
+condition, so the singular case is rejected; `Optics.gaussianRegression_singular_not_isValid` and
+`Optics.gaussianRegression_singular_would_be_junk` exhibit both halves. The parity lane records
+that whether the source's beam predicate admits that constructor at all is **UNVERIFIED** from
+the thesis text, so this is recorded as a Physlib improvement rather than as a defect found in the
+source.
+
+**A hypothesis-placement divergence the ledger must record.** The source embeds its positivity
+conditions inside its beam predicates (Defs. 4.9–4.10). This lane puts them in the fields of
+`Optics.GaussianBeam`. The two are therefore **not statement-for-statement comparable**: theorems
+here carry fewer explicit hypotheses because the structure carries them. This is a deliberate
+choice, flagged at the parity lane's request.
+
+**GB-05 and GB-06** (Thesis'15 Def. 4.11 + Thms. 4.8–4.10, pp. 84–86) — satisfied. The
+quasi-optical frame is `Optics.shiftedMatrix` from R3, already proved to be the composed system
+bracketed by free space. Thm. 4.10's `[H4]` is, in real terms, exactly `C q + D ≠ 0` at the waist,
+which is discharged here rather than assumed. **Thm. 4.10 constrains the beam to be at its waist
+at both ends**; this lane keeps the input-waist hypothesis and *derives* the output waist
+(`isAtWaist_transform_outputWaistDistance`), so `Optics.GaussianBeam.waistRadius_sq_at_outputWaist`
+is strictly stronger than the source statement. Neither restriction is dropped silently.
+
+**GB-07** (Thesis'15 Def. 4.13 + Thm. 4.13, APEX telescope) — **not** addressed. The source's
+hypotheses sit in an opaque `SHeFI_constraints` bundle that the thesis never unfolds, so a parity
+claim here would not be auditable. Not claimed, per the parity lane's recommendation.
 
 **Convention divergence to record.** This lane uses the Saleh & Teich folded reflection
 convention: after a mirror the axis is re-referenced to the new propagation direction, so a plane
