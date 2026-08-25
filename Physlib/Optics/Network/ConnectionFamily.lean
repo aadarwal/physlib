@@ -22,6 +22,9 @@ embedding into the ambient port-family channels is derived from physical-port un
 family mate and ideal routing are assembled blockwise from the existing local mates; they never
 pair channels in different connections.
 
+Connection-family reindexing changes only the labels used for connection blocks. Exchanging the
+endpoint presentation of every connection similarly changes only the local left/right labels.
+
 ## ii. Scope
 
 This file models only channels at connected ports. It does not construct the complementary
@@ -38,6 +41,8 @@ termination, reciprocity data, or electromagnetic power interpretation.
 - `PortConnectionFamily.idealRouting_apply`: every connected outgoing amplitude reaches its mate.
 - `PortConnectionFamily.idealRouting_isPowerPreserving`: connected-channel routing preserves
   normalized modal power.
+- `PortConnectionFamily.reindex`: relabel a connection family without changing its connections.
+- `PortConnectionFamily.symm`: exchange the endpoint presentation of every connection.
 
 ## iv. Table of contents
 
@@ -45,6 +50,7 @@ termination, reciprocity data, or electromagnetic power interpretation.
 - B. Proof-carrying connection families
 - C. Connected channels and blockwise mates
 - D. Connected-channel ideal routing
+- E. Presentation changes
 
 -/
 
@@ -303,6 +309,63 @@ lemma idealRouting_apply [Fintype family.Channel] [DecidableEq family.Channel]
 lemma idealRouting_isPowerPreserving [Fintype family.Channel] [DecidableEq family.Channel] :
     family.idealRouting.IsPowerPreserving :=
   ModeTransform.idealRouting_isPowerPreserving family.mateEquiv
+
+/-!
+
+## E. Presentation changes
+
+-/
+
+/-- Relabel the indices of a connection family without changing its physical connections. -/
+def reindex {ι' : Type*} (e : ι ≃ ι') : PortConnectionFamily P ι' where
+  connection index := family.connection (e.symm index)
+  endpointPort_injective := by
+    rintro ⟨first, firstEnd⟩ ⟨second, secondEnd⟩ hPort
+    have hOld : (e.symm first, firstEnd) = (e.symm second, secondEnd) := by
+      apply family.endpointPort_injective
+      exact hPort
+    have hIndex : e.symm first = e.symm second :=
+      congrArg (fun endpoint : ι × PortConnection.End => endpoint.1) hOld
+    have hEnd : firstEnd = secondEnd :=
+      congrArg (fun endpoint : ι × PortConnection.End => endpoint.2) hOld
+    exact Prod.ext (e.symm.injective hIndex) hEnd
+
+/-- Exchange the left/right endpoint presentation of every connection in a family. -/
+def symm : PortConnectionFamily P ι where
+  connection index := (family.connection index).symm
+  endpointPort_injective := by
+    rintro ⟨first, firstEnd⟩ ⟨second, secondEnd⟩ hPort
+    cases firstEnd <;> cases secondEnd
+    · have hOld : (first, PortConnection.End.right) =
+          (second, PortConnection.End.right) := by
+        apply family.endpointPort_injective
+        exact hPort
+      have hIndex : first = second :=
+        congrArg (fun endpoint : ι × PortConnection.End => endpoint.1) hOld
+      subst second
+      rfl
+    · have hOld : (first, PortConnection.End.right) =
+          (second, PortConnection.End.left) := by
+        apply family.endpointPort_injective
+        exact hPort
+      have hEnd : PortConnection.End.right = PortConnection.End.left :=
+        congrArg (fun endpoint : ι × PortConnection.End => endpoint.2) hOld
+      cases hEnd
+    · have hOld : (first, PortConnection.End.left) =
+          (second, PortConnection.End.right) := by
+        apply family.endpointPort_injective
+        exact hPort
+      have hEnd : PortConnection.End.left = PortConnection.End.right :=
+        congrArg (fun endpoint : ι × PortConnection.End => endpoint.2) hOld
+      cases hEnd
+    · have hOld : (first, PortConnection.End.left) =
+          (second, PortConnection.End.left) := by
+        apply family.endpointPort_injective
+        exact hPort
+      have hIndex : first = second :=
+        congrArg (fun endpoint : ι × PortConnection.End => endpoint.1) hOld
+      subst second
+      rfl
 
 end PortConnectionFamily
 
