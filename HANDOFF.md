@@ -17,8 +17,9 @@ listed below for the conductor to apply at merge.
 | 1 | Causal sequences, unilateral transform, ROC (absolute vs conditional), linearity, shift laws, first difference, z-scaling, unit impulse | **done** (`340de28a`) |
 | 2 | Modulus-only absolute convergence, exterior-of-circle ROC shape, reciprocal power series, unit step, geometric sequence, and the conditional-but-not-absolute witness | **done** |
 | 3 | Linear constant-coefficient difference equations to rational transfer functions; general IIR; the audited second-order low-pass; first-order all-pass regression | **done** |
-| 4 | Stability: poles, the unit circle, BIBO, with the proved directions stated explicitly; two-pole regression | pending |
+| 4 | Stability: poles, the unit circle, BIBO, with the proved directions stated explicitly; two-pole regression | **done** |
 | 5 | Inverse transform and uniqueness (JAL'18 Thms. 15-17), built on the `IsExteriorOfCircle` lemmas | pending — **now in scope**, see the scope note below |
+| 6 | The finite-convolution theorem, and existence of causal solutions of a strictly causal recurrence | pending — scheduled by the controller on 2026-08-25 |
 
 The slice-5 change follows the controller's decision of 2026-08-25: the corrected `goal.md`
 (merged `bf0a4063`) names ITP'14 **and** JAL'18, including the inverse transform and uniqueness,
@@ -373,6 +374,145 @@ Parity ledger:
   theorem for causal solutions of a strictly causal recurrence, and a `PowerSeries ℂ` valued
   formal-power-series map. All three are named in `goal.md` §H.4 S5. None is needed by slices 4
   or 5, so they can be a slice 6 or dropped by explicit decision.
+
+---
+
+## Slice 4 — files
+
+- `Physlib/Mathematics/ZTransform/Stability.lean` (289 lines)
+- `Physlib/Mathematics/ZTransform/StabilityRegression.lean` (208 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all eight)
+
+```
+public import Physlib.Mathematics.ZTransform.Basic
+public import Physlib.Mathematics.ZTransform.BasicRegression
+public import Physlib.Mathematics.ZTransform.Convergence
+public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+public import Physlib.Mathematics.ZTransform.DifferenceEquation
+public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+public import Physlib.Mathematics.ZTransform.Stability
+public import Physlib.Mathematics.ZTransform.StabilityRegression
+```
+
+Alphabetical order satisfies the dependency order.
+
+### Slice 4 is Physlib-original
+
+Parity ledger row ZT-10 records that **no fetched source in the Concordia HVG corpus contains a
+Schur-stability theorem, a bounded-input bounded-output equivalence, or a group-delay or
+dispersion theorem**; FMICS'15 p. 171 claims group delay and dispersion in prose only, marked
+UNVERIFIED. Slice 4 is therefore not a parity claim and must be reviewed on its own merits. The
+module docs say so.
+
+### Exactly what slice 4 proves, and what it withholds
+
+Proved, both directions:
+
+- `isAbsSummable_iff_one_mem_ROC`, `isAbsSummable_iff_sphere_subset_ROC`,
+  `isAbsSummable_iff_closedExterior_subset_ROC`. Absolute summability of a sequence, membership
+  of `1` in its absolute region of convergence, containment of the unit circle in that region,
+  and containment of the whole closed exterior of the unit circle are all **equivalent**. The
+  strong closed-exterior form follows from slice 2's modulus-only result and is not available
+  from the usual strict-inequality Abel argument.
+
+Proved, one direction only:
+
+- `isBIBOStable_of_isAbsSummable` and `isBIBOStable_of_sphere_subset_ROC`. Absolute summability
+  implies bounded-input bounded-output stability of the causal convolution operator, with the
+  explicit bound `norm_convolution_le`: `‖convolution h x n‖ ≤ (∑' k, ‖h k‖) * C`.
+- **Withheld:** the converse, that bounded-input bounded-output stability implies absolute
+  summability. It is true for this class, but the standard proof needs a sign-selecting input
+  that is not formalized here. No theorem in the file states an equivalence, and the module doc
+  says the converse is not proved.
+
+Proved for Schur stability:
+
+- `denominator_ne_zero_of_isSchurStable`: Schur stability makes the denominator symbol
+  nonvanishing on the whole closed exterior of the unit circle.
+- `closedExterior_subset_iirROC_of_isSchurStable` and
+  `transform_eq_transferFunction_mul_of_isSchurStable`: with absolutely summable causal input and
+  output, the transfer relation therefore holds at every point with `1 ≤ ‖z‖`, in particular on
+  the unit circle itself.
+- **Withheld:** that Schur stability implies a solution of the difference equation is absolutely
+  summable. That is the substantive direction of the classical theorem and needs a partial
+  fraction or companion-matrix argument that is not present.
+- **Withheld:** that a candidate pole is an actual pole. `candidatePoles` is named a *candidate*
+  set precisely because a numerator zero at the same point can cancel it, matching `goal.md`
+  §S4's distinction.
+
+Sufficient criterion:
+
+- `isSchurStable_of_sum_norm_lt_one`: total feedback modulus below one implies Schur stability.
+  It is sufficient and **not** necessary, and that is proved, not merely asserted — see the
+  two-pole regression below.
+
+### The convolution operator, and its relation to slice 6
+
+`convolution` is **defined** in slice 4 because bounded-input bounded-output stability cannot be
+stated without it, and the boundedness bound is proved here. The transform of a convolution, the
+convolution theorem `transform (convolution h x) z = transform h z * transform x z`, is **not**
+proved here; it is slice 6 work per the controller's decision of 2026-08-25, and will be built on
+this definition rather than on a second one.
+
+### Slice 4 — declarations
+
+`Physlib/Mathematics/ZTransform/Stability.lean`, namespace `Physlib.ZTransform`:
+`IsAbsSummable`, `seriesTerm_one`, `isAbsSummable_iff_one_mem_ROC`,
+`isAbsSummable_iff_closedExterior_subset_ROC`, `isAbsSummable_iff_sphere_subset_ROC`,
+`IsBoundedSeq`, `convolution`, `IsBoundedSeq.nonneg_of_bound`,
+`summable_norm_convolution_term`, `norm_convolution_le`, `IsBIBOStable`,
+`isBIBOStable_of_isAbsSummable`, `isBIBOStable_of_sphere_subset_ROC`, `candidatePoles`,
+`IsSchurStable`, `denominator_ne_zero_of_isSchurStable`,
+`closedExterior_subset_iirROC_of_isSchurStable`,
+`transform_eq_transferFunction_mul_of_isSchurStable`, `isSchurStable_of_sum_norm_lt_one`.
+
+`Physlib/Mathematics/ZTransform/StabilityRegression.lean`, same namespace:
+`delaySymbol_onePoleFeedback`, `candidatePoles_onePole`, `isSchurStable_onePole_iff`,
+`isAbsSummable_geometricSeq`, `sphere_subset_ROC_geometricSeq`, `isBIBOStable_geometricSeq`,
+`isSchurStable_onePole_of_norm_lt_one`, `not_isAbsSummable_geometricSeq_two`,
+`one_notMem_ROC_geometricSeq_two`, `not_isSchurStable_onePole_two`,
+`candidatePoles_onePole_two`, `twoPoleFeedback`, `twoPoleFeedback_one`, `twoPoleFeedback_two`,
+`delaySymbol_twoPoleFeedback`, `isSchurStable_twoPole`, `not_sum_norm_lt_one_twoPole`.
+
+### Slice 4 — regressions and what each detects
+
+- **The audited unstable parameter case** (`goal.md` §I.3 row S-07 asks for one):
+  `not_isAbsSummable_geometricSeq_two`, `one_notMem_ROC_geometricSeq_two`, and
+  `not_isSchurStable_onePole_two`. The `a = 2` one-pole system is proved *not* stable in all
+  three senses, so the stable conclusions in section B depend on the parameter and are not
+  proved by accident.
+- **Reciprocal-convention check:** `candidatePoles_onePole` computes the candidate pole set
+  exactly, as a singleton, and `candidatePoles_onePole_two` pins it at `2` rather than at `2⁻¹`.
+  A reversed `z` versus `z⁻¹` convention fails here.
+- **The criterion is strictly sufficient:** `twoPoleFeedback` has denominator symbol
+  `(u - 2) ^ 2 / 4`, so its only candidate pole is `2⁻¹` and `isSchurStable_twoPole` holds; but
+  its feedback coefficients have total modulus `5 / 4`, so `not_sum_norm_lt_one_twoPole` shows
+  `isSchurStable_of_sum_norm_lt_one` does not apply to it. Necessity of the coefficient
+  criterion is thereby refuted, not merely left unclaimed.
+
+### Slice 4 gates
+
+Same set, all clean over all eight files: build; `lean -Dwarn.sorry=false
+-Dweak.says.verify=true` gives zero output on each; the Batteries declaration linter set run
+module-scoped over all eight modules passes; `module_doc_lint` and `style_lint` rules re-run
+locally pass; no `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats`; no
+`Physlib.Optics` import; imports minimal.
+
+### Slice 4 — milestone and ledger rows
+
+`goal.md` §H.4 S5, "absolute-summability/BIBO stability results and their relation to poles and
+the region of convergence for the selected causal rational class" — done to the extent stated
+above, with the two withheld directions named in the module doc rather than silently skipped.
+
+`goal.md` §H.4 S4P, "discrete-time Schur stability and BIBO equivalence only for a stated proper
+causal rational class" — the class is stated (`IsRecurrenceSolution` with feedback lags `s` and
+`0 ∉ s` where needed), and the equivalence is deliberately **not** asserted; only the proved
+implications are.
+
+`goal.md` §I.3 row S-07, "pole/zero/stability theorems include the audited unstable parameter
+case" — the unstable case is present and proved for this lane's one-pole system. The DCDR
+instance of S-07 is S-track work.
 
 ## Milestone and ledger rows touched by slice 1
 
