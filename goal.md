@@ -517,10 +517,11 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] a physical time-reversed external-port pairing, convention-aware reciprocity, and X-01
-  agreement between the singular-safe two-port Redheffer route and FlatNetlist/N5H elimination;
-  canonical external scattering packaging, the local Redheffer construction, and normalized modal
-  network conservation are complete;
+- [ ] a physical time-reversed external-port pairing and convention-aware reciprocity. The local
+  two-device X-01 agreement between the singular-safe Redheffer route, `FlatNetlist`, N5H
+  composition, and N5 elimination is complete; the broader Mason/system cross-semantics oracle
+  remains open. Canonical external scattering packaging and normalized modal network conservation
+  are complete;
 - [ ] reusable beam splitters, mirrors, polarization components, and dielectric-interface
   scattering; fixed-carrier propagation, a directional coupler, Mach--Zehnder, and one-bus
   all-pass microring slices are complete;
@@ -1962,7 +1963,8 @@ definition.
 - [x] unconditional behavioral equivalence and round trips for the reversible regrouping between
   incident/outgoing scattering coordinates and backward-first reference-plane states;
 - [x] series connection as chain-matrix multiplication, proved from relational composition;
-- [ ] agreement with N5 netlist elimination and Redheffer feedback wherever both are defined; and
+- [x] agreement between the canonical two-device N5 netlist elimination and Redheffer feedback on
+  their common well-posed domain, with unconditional agreement at the relational layer; and
 - [x] relational right-load termination with complete internal-wave solutions, exact well-posedness,
   proof-gated reflection and forward-response extraction, noncommutative loaded-chain block formulas,
   and zero-return agreement with the existing scattering blocks.
@@ -2031,11 +2033,12 @@ kernel semantics; a noncomputable complex matrix inverse is not the sole oracle.
   time-reversed physical-port or reciprocity claim;
 - [x] reflection-free series cascade as a specialization, with the later directional
   transmission block on the left; and
-- [ ] Redheffer star products for declared matched block partitions, with the particular feedback
+- [x] Redheffer star products for declared matched block partitions, with the particular feedback
   block's invertibility hypothesis stated explicitly and reflective feedback kept distinct from
-  one-way cascade. The singular-safe relation, proof-gated matrix formula, and relation-level
-  regressions are complete; agreement with the same two-device wiring through
-  `FlatNetlist`/N5H remains the X-01 exit.
+  one-way cascade. The singular-safe relation, proof-gated matrix formula, canonical two-device
+  `FlatNetlist` realization, N5H `closeBehavior` agreement, common-domain N5 response agreement,
+  and independent regular/singular regressions are complete. No converse minimality of the local
+  pivot gate, associativity, or identity element is claimed.
 
 Exit: the solver works whenever the finite network is uniquely solvable, without imposing a norm
 contraction as a necessary condition.
@@ -2064,13 +2067,19 @@ from the same network semantics at every frequency where the response is defined
 
 #### N5H. Hierarchical composition and flattening
 
-- a hierarchical network whose child components may themselves be well-formed networks;
-- a relational flattening operation preserving typed external ports, mode compatibility, and
+- [x] a hierarchical network whose child components may themselves be well-formed networks;
+- [x] a relational flattening operation preserving typed external ports, mode compatibility, and
   conventions, with no well-posedness assumption required merely to flatten;
-- equality between hierarchical relational semantics and the semantics of the flattened netlist;
-- functional packaging of a child as a scattering/response component only after that child's
+- [x] equality between hierarchical relational semantics and the semantics of the flattened
+  netlist, with the N-08 fixture supplying independent raw-equation membership, universal forward
+  forcing, and a mis-lifted-port negative control;
+- [x] functional packaging of a child as a scattering/response component only after that child's
   well-posedness and external-channel pairing have been proved; and
-- associativity/invariance results needed to reuse a verified subsystem.
+- [ ] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
+  port families. This single construction is needed both to replace an inner family by another
+  with the same boundary relation and to state literal three-stage append associativity. The
+  fixed-inner-wiring congruence is already complete. All current N-08 hypotheses are structural
+  `Fintype` assumptions on channel indices, not physical assumptions.
 
 Exit: proofs scale by verified subsystem boundaries without changing the result obtained from the
 fully flattened channel equations.
@@ -2714,12 +2723,12 @@ current integration base; a designed package whose prerequisite is merely active
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, `E_in`, `E_out`, adjoint readout, and both boundary projector decompositions are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
-| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
+| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, relational right-load termination, and canonical two-device FlatNetlist/Redheffer agreement are complete; broader source/system integration remains |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
-| N5 elimination | in progress: local Redheffer route complete, X-01 bridge open | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, and proof-gated Redheffer realization are complete; agreement with FlatNetlist/N5H composition remains |
+| N5 elimination | done | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, proof-gated Redheffer realization, and canonical FlatNetlist/N5H/common-domain response agreement are complete |
 | N5F parameterized compilation | in progress | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
-| N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening construction, well-posed subsystem packaging, close behavior, and append assembly laws are complete; hierarchical/flattened semantic equality remains |
+| N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening, well-posed subsystem packaging, close behavior, append assembly, unconditional hierarchical/flattened semantic equality, N-08 evidence, and fixed-inner-wiring congruence are complete; one port-family transport construction remains for both inner-family replacement and literal three-stage associativity |
 | N6a conservation | done | N2a, N5; E3b for physical meaning | exact wiring power balance, componentwise passive/lossless closure, and lossless external scattering matrix |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
 | N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |

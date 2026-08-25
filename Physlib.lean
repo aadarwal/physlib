@@ -388,6 +388,17 @@ public import Physlib.Optics.Network.TwoPortScatteringChain
 public import Physlib.Optics.Network.TwoPortScatteringChainRegression
 public import Physlib.Optics.Network.TwoPortScatteringRegression
 public import Physlib.Optics.Network.TwoPortSeries
+public import Physlib.Optics.Network.TwoPortSeriesNetlist
+public import Physlib.Optics.Network.TwoPortSeriesNetlistBehavior
+public import Physlib.Optics.Network.TwoPortSeriesNetlistCoordinates
+public import Physlib.Optics.Network.TwoPortSeriesNetlistExternal
+public import Physlib.Optics.Network.TwoPortSeriesNetlistLocal
+public import Physlib.Optics.Network.TwoPortSeriesNetlistReconstruction
+public import Physlib.Optics.Network.TwoPortSeriesNetlistRegression
+public import Physlib.Optics.Network.TwoPortSeriesNetlistResponse
+public import Physlib.Optics.Network.TwoPortSeriesNetlistSingularRegression
+public import Physlib.Optics.Network.TwoPortSeriesNetlistState
+public import Physlib.Optics.Network.TwoPortSeriesNetlistWiring
 public import Physlib.Optics.Network.TwoPortSeriesRegression
 public import Physlib.Optics.Network.TwoPortTermination
 public import Physlib.Optics.Network.TwoPortTerminationRegression

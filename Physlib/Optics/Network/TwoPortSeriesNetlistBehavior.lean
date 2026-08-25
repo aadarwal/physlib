@@ -59,7 +59,7 @@ def externalBehavior {left middle right : Type u}
   (netlist first second).behavior.reindex
     (externalIncidentEquiv first second) (externalOutgoingEquiv first second)
 
-/-- The canonical flat-netlist closure equals singular-safe relational Redheffer composition. -/
+/-- The canonical flat-netlist external behavior equals singular-safe Redheffer composition. -/
 lemma externalBehavior_eq_redhefferSeriesBehavior
     {left middle right : Type u}
     [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
