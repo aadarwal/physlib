@@ -24,11 +24,18 @@ enumeration is decidable and is settled by evaluation. The resulting closed form
 agree with the determinant of the system matrix, which is a second and independent proof of the
 general identity restricted to two nodes.
 
-The gain is checked the other way round. Rather than reading an entry of the inverse system
-matrix, an explicit signal vector is exhibited and verified to satisfy the node equations under a
-unit injection at the input. Uniqueness of the causal solution then forces the gain to be its
-output component. So the value `a / (1 - a * b)`, obtained elsewhere from a two-by-two adjugate,
-is confirmed here from the semantics with no matrix inverse involved.
+The gain is checked the other way round, in two layers that should not be confused. The first
+is inverse-free: an explicit signal vector is exhibited and verified to satisfy the node equations
+under a unit injection at the input, and separately the output component of *any* solution of
+those equations is shown to be `a / (1 - a * b)`, by eliminating the input component between the
+two scalar equations. That argument uses no inverse, no adjugate and no uniqueness lemma, so it
+confirms the value obtained elsewhere from a two-by-two adjugate by a genuinely different route.
+
+The second layer transfers this to `gain`, and it is not inverse-free, because it cannot be:
+`gain` is *defined* as an entry of the totalized inverse system matrix, and the bridge from a
+solution to that entry runs through `gain_eq_nodeSolution` and `eq_nodeSolution`, both proved by
+multiplying by the inverse. What the corollary avoids is expanding the two-by-two inverse in
+closed form, not the inverse itself.
 
 ## ii. Key results
 
@@ -41,8 +48,10 @@ is confirmed here from the semantics with no matrix inverse involved.
   definition.
 - `Physlib.SignalFlowGraph.isNodeSolution_twoNodeLoop_explicit`: an explicit solution of the node
   equations.
-- `Physlib.SignalFlowGraph.gain_twoNodeLoop_direct`: the gain from the semantics, with no matrix
-  inverse.
+- `Physlib.SignalFlowGraph.output_of_isNodeSolution_twoNodeLoop`: the output component of every
+  solution of the node equations, forced without any use of an inverse.
+- `Physlib.SignalFlowGraph.gain_twoNodeLoop_via_nodeSolution`: the same value for `gain`, through
+  the inverse bridge that the definition of `gain` makes unavoidable.
 
 ## iii. Table of contents
 
@@ -170,9 +179,27 @@ lemma isNodeSolution_twoNodeLoop_explicit {a b : ℂ} (h : 1 - a * b ≠ 0) :
     ring
   · simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two]
 
-/-- The gain of the two-node feedback graph, obtained from the node equations and uniqueness
-rather than from an entry of the inverse system matrix. -/
-lemma gain_twoNodeLoop_direct {a b : ℂ} (h : 1 - a * b ≠ 0) :
+/-- The output signal of the two-node feedback graph is forced by the node equations alone: every
+signal vector satisfying them under a unit injection at the input has the same output component.
+The derivation eliminates the input component between the two scalar equations, so it appeals to
+no matrix inverse, no adjugate, and no uniqueness lemma. -/
+lemma output_of_isNodeSolution_twoNodeLoop {a b : ℂ} (h : 1 - a * b ≠ 0) (x : Fin 2 → ℂ)
+    (hx : IsNodeSolution (twoNodeLoop a b) (Pi.single 0 1) x) :
+    x 1 = a / (1 - a * b) := by
+  rw [isNodeSolution_iff, systemMatrix_twoNodeLoop] at hx
+  have h0 := congrFun hx 0
+  have h1 := congrFun hx 1
+  simp [Matrix.mulVec, dotProduct, Fin.sum_univ_two] at h0 h1
+  rw [eq_div_iff h]
+  linear_combination h1 + a * h0
+
+/-- The gain of the two-node feedback graph. This follows from the explicit solution, but unlike
+`output_of_isNodeSolution_twoNodeLoop` it is **not** inverse-free, and the difference is worth
+stating. `gain` is by definition an entry of the totalized inverse system matrix, and the step
+from a solution to that entry goes through `gain_eq_nodeSolution` and `eq_nodeSolution`, each
+proved by multiplying by the inverse. What is avoided here is expanding the two-by-two inverse in
+closed form. -/
+lemma gain_twoNodeLoop_via_nodeSolution {a b : ℂ} (h : 1 - a * b ≠ 0) :
     gain (twoNodeLoop a b) 0 1 = a / (1 - a * b) := by
   have hunit : IsUnit (systemMatrix (twoNodeLoop a b)).det := by
     rw [det_systemMatrix_twoNodeLoop, isUnit_iff_ne_zero]
@@ -181,9 +208,11 @@ lemma gain_twoNodeLoop_direct {a b : ℂ} (h : 1 - a * b ≠ 0) :
   rw [gain_eq_nodeSolution, ← hsol]
   simp [div_eq_mul_inv]
 
-/-- The transfer function of the terminated two-node feedback graph, from the semantics. -/
+/-- The transfer function of the terminated two-node feedback graph. Like
+`gain_twoNodeLoop_via_nodeSolution`, this reads an entry of the totalized inverse and so carries
+the inverse bridge with it. -/
 lemma transfer_terminate_twoNodeLoop {a b : ℂ} (h : 1 - a * b ≠ 0) :
     (TerminatedGraph.mk (twoNodeLoop a b) 0 1).transfer = a / (1 - a * b) :=
-  gain_twoNodeLoop_direct h
+  gain_twoNodeLoop_via_nodeSolution h
 
 end Physlib.SignalFlowGraph

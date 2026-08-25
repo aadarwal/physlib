@@ -946,6 +946,79 @@ determinant identity at all.
 - No `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import.
 - Every new declaration in both new files is a `lemma`, per the house convention.
 
+## Slice 8b — three claim/semantics corrections
+
+Reviewer verdict D on `ac23a99c` was NOT READY on three points, all of them about what the code
+was *claimed* to show rather than about what it proves. The four earlier fixes passed. These three
+are corrected as follows.
+
+**1. The gain audit was not inverse-free, and now says so.** The module doc claimed the two-node
+gain was confirmed "with no matrix inverse involved". That was wrong. `gain` is *defined* as an
+entry of the totalized inverse system matrix, and the old proof reached it through
+`gain_eq_nodeSolution` and `eq_nodeSolution`, both proved by multiplying by that inverse. What the
+proof actually avoided was expanding the two-by-two inverse in closed form — a weaker thing.
+
+The fix supplies the statement that *is* inverse-free.
+`output_of_isNodeSolution_twoNodeLoop` shows that **every** signal vector satisfying the node
+equations under a unit injection has output component `a / (1 - a * b)`, by eliminating the input
+component between the two scalar equations. No inverse, no adjugate, and no uniqueness lemma
+appears in it. The old corollary is renamed `gain_twoNodeLoop_via_nodeSolution`, and both its
+docstring and the module doc now state that it carries the inverse bridge and why that is
+unavoidable for a statement about `gain`. The unsupported word "causal" is gone: nothing in this
+file involves a causality notion, which belongs to the Z-transform lane.
+
+**2. Terminated.lean no longer overstates the singular case.** Three related overstatements are
+corrected. The doc called `transfer` "the output signal produced by a unit injection"
+unconditionally, but `transfer` and `nodeSolution` are totalized inverse expressions;
+`Basic.lean` is careful about this and the new file had lost that care. The references section
+also said the transfer function is "not defined when the graph determinant vanishes", which
+contradicts its own definition — it *is* defined everywhere, since Mathlib's inverse is totalized.
+
+Now: the unconditional identities are labelled as identities between totalized expressions, and
+the file states that a response reading requires invertibility. Rather than leave that as prose,
+`TerminatedGraph.transfer_eq_of_isNodeSolution` puts the boundary in Lean — under
+`IsUnit (systemMatrix _).det`, the transfer function is the output component of a solution of the
+node equations, and since solutions are unique there, that is the response reading. It is the only
+identity in the file that asserts one.
+
+**3. The parity claim is corrected, and a structure is added that earns it.** The file claimed
+parity of representation with FMICS'15 Definition 1, but `TerminatedGraph` stores only a matrix
+and two terminals, while the source record is a *branch list* with a node count and two terminals.
+Since `toMatrix` has already summed parallel edges, the branch list has no counterpart — which is
+exactly the representation divergence already recorded as ledger row IP-21. The claim as written
+contradicted the ledger.
+
+Bundling turned out to be cheap, so rather than only narrowing the claim the file now contains
+both halves honestly:
+
+- `TerminatedMultigraph` bundles the edge-indexed `Multigraph` with the two terminals. This
+  **does** match Definition 1's shape — branch list to `Multigraph` (parallel edges distinct
+  exactly as distinct branches are), node count to the `Fintype` instance, terminals to the two
+  fields. Parity of representation is claimed here, and only here. It carries `transfer`,
+  `transfer_eq_edgeMason`, `transfer_eq_of_isNodeSolution`, and
+  `toTerminatedGraph`/`transfer_toTerminatedGraph` recording that forgetting edges leaves the
+  value alone — the content of retaining edges is in the enumeration, not in the number.
+- `TerminatedGraph` keeps the narrowed claim: parity of the distinguished-terminal fields only,
+  and only when composed with a separate `Multigraph`. `Multigraph.terminate` is documented as
+  forgetting edge identity.
+
+### Files in slice 8b
+
+- `Physlib/Mathematics/SignalFlowGraph/Terminated.lean` — fixes 2 and 3
+- `Physlib/Mathematics/SignalFlowGraph/DefinitionRegression.lean` — fix 1
+
+No new modules, so the registration list is unchanged from slice 8.
+
+### Slice 8b gates
+
+- `lake-lock build` of all seventeen modules — clean.
+- `lake-lock env lean -Dwarn.sorry=false -Dweak.says.verify=true` on each of the seventeen — zero
+  output.
+- Module-scoped Batteries declaration linters over all seventeen — passed.
+- `module_doc_lint` and `style_lint` — clean.
+- No `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import.
+- All new declarations are `lemma`, per the house convention.
+
 ### Slice 1 gates
 
 - `lake-lock build` of both modules — clean.
