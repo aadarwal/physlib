@@ -152,6 +152,7 @@ public import Physlib.Mathematics.InnerProductSpace.Submodule
 public import Physlib.Mathematics.KroneckerDelta.Basic
 public import Physlib.Mathematics.KroneckerDelta.Contraction
 public import Physlib.Mathematics.LeviCivita.Basic
+public import Physlib.Mathematics.LinearAlgebra.Matrix.Analytic
 public import Physlib.Mathematics.LinearAlgebra.Matrix.PosSemidefTrace
 public import Physlib.Mathematics.LinearAlgebra.Matrix.SelfAdjoint
 public import Physlib.Mathematics.LinearMaps
@@ -336,6 +337,7 @@ public import Physlib.Optics.Network.FlatNetlist
 public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.FlatNetlistEliminationRegression
 public import Physlib.Optics.Network.FlatNetlistRegression
+public import Physlib.Optics.Network.Hierarchical
 public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
@@ -345,6 +347,8 @@ public import Physlib.Optics.Network.NetlistData
 public import Physlib.Optics.Network.NetlistDataRegression
 public import Physlib.Optics.Network.NetlistMatrices
 public import Physlib.Optics.Network.NetlistMatricesRegression
+public import Physlib.Optics.Network.ParameterizedResponse
+public import Physlib.Optics.Network.ParameterizedResponseRegression
 public import Physlib.Optics.Network.PartialRouting
 public import Physlib.Optics.Network.PartialRoutingRegression
 public import Physlib.Optics.Network.Port

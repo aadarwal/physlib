@@ -33,6 +33,17 @@ inverse.
 - `analyticAt_matrix_adjugate_entry`: adjugate entries of an entrywise-analytic square family are
   analytic.
 - `analyticAt_matrix_inv_entry`: inverse entries are analytic wherever the determinant is nonzero.
+
+## iii. Table of contents
+
+- A. Products
+- B. Determinant and adjugate
+- C. The total inverse away from a vanishing determinant
+
+## iv. References
+
+These Physlib-original convenience lemmas assemble Mathlib's entrywise analyticity and total
+matrix-inverse APIs. No external formal-development source is copied or translated.
 -/
 
 @[expose] public section
