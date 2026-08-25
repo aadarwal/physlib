@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Network.TwoPortRedhefferStar
+public import Physlib.Optics.Network.TwoPortSeriesRegression
 
 /-!
 # Regression tests for the Redheffer star product
@@ -24,6 +25,7 @@ causality, or material-realization claim.
 ## ii. Key results
 
 - The reflective fixture has feedback pivot `-1` and star blocks `(-13, -21, -55, -141)`.
+- The `-13` anchor is also recovered through relational star membership without the block formula.
 - The singular fixture has a zero pivot and cannot construct a proof-gated star matrix.
 - `TwoPortSeriesRegression` separately tests the gate-free relation at both regular and singular
   pivots.
@@ -147,6 +149,56 @@ lemma redhefferStar_rightReflection :
   norm_num [first, second, scalarTwoPort, Matrix.mul_apply,
     ← BackwardWave.channelEquiv.symm.sum_comp,
     ← ForwardWave.channelEquiv.symm.sum_comp]
+
+/-- Relational reconstruction independently pins the star product's left-reflection entry.
+
+Unlike the four formula anchors above, this proof enters through `toBehavior_redhefferStar`, an
+explicit shared middle state, and the backward-first component equations. It never rewrites with
+`redhefferStar_eq_blockFormula`.
+-/
+lemma redhefferStar_leftReflection_via_relation :
+    (first.redhefferStar second hasBijectiveFeedback).leftReflection ⟨()⟩ ⟨()⟩ = -13 := by
+  let left := TwoPortSeriesRegression.scalarState (-13) 1
+  let middle := TwoPortSeriesRegression.scalarState (-5) (-5)
+  let right := TwoPortSeriesRegression.scalarState 0 (-55)
+  have hSeriesBackward :
+      (left, right) ∈ TwoPortScatteringBehavior.toBackwardFirst
+        (first.redhefferSeriesBehavior second) := by
+    rw [first.mem_toBackwardFirst_redhefferSeriesBehavior_iff second]
+    refine ⟨middle, ?_⟩
+    simp only [left, middle, right, TwoPortSeriesRegression.scalarState,
+      ModeAmplitude.restrictInl_directSum, ModeAmplitude.restrictInr_directSum]
+    apply And.intro <;> apply And.intro <;>
+      apply WithLp.ofLp_injective 2 <;> funext index
+    all_goals
+      rcases index with ⟨⟨⟩⟩
+      norm_num [TwoPortSeriesRegression.scalarAmplitude, first, second, scalarTwoPort,
+        Matrix.mulVec, dotProduct,
+        ← ForwardWave.channelEquiv.symm.sum_comp,
+        ← BackwardWave.channelEquiv.symm.sum_comp]
+  have hSeries :
+      scatteringBackwardFirstLinearEquiv.symm (left, right) ∈
+        first.redhefferSeriesBehavior second :=
+    (TwoPortScatteringBehavior.mem_toBackwardFirst_iff _ _ _).mp hSeriesBackward
+  have hStar :
+      scatteringBackwardFirstLinearEquiv.symm (left, right) ∈
+        (first.redhefferStar second hasBijectiveFeedback).toBehavior := by
+    rw [first.toBehavior_redhefferStar second hasBijectiveFeedback]
+    exact hSeries
+  have hStarBackward :
+      (left, right) ∈
+        (first.redhefferStar second hasBijectiveFeedback).toBackwardFirstBehavior :=
+    (TwoPortScatteringBehavior.mem_toBackwardFirst_iff _ _ _).mpr hStar
+  have hBlocks :=
+    (TwoPortScatteringTransform.mem_toBackwardFirstBehavior_iff_blockEquations
+      (first.redhefferStar second hasBijectiveFeedback) left right).mp hStarBackward
+  have hCoordinate := congrArg
+    (fun amplitude : ModeAmplitude (BackwardWave Unit) => amplitude ⟨()⟩) hBlocks.1
+  norm_num [left, right, TwoPortSeriesRegression.scalarState,
+    TwoPortSeriesRegression.scalarAmplitude, ModeTransform.toLinearMap,
+    Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
+    ← ForwardWave.channelEquiv.symm.sum_comp] at hCoordinate
+  exact hCoordinate.symm
 
 /-!
 
