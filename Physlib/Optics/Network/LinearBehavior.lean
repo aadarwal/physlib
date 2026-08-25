@@ -24,9 +24,10 @@ finite, the same functional behavior also determines a unique mode-transform mat
 
 Series composition uses an existential intermediate amplitude to identify the first behavior's
 output with the second behavior's input. Parallel composition places two independent behaviors on
-disjoint sum-indexed mode families. For behaviors constructed as graphs, the graph theorems prove
-that these relational operations recover ordinary linear-map composition and block-diagonal
-mode-transform composition.
+disjoint sum-indexed mode families. `feedbackSolutions` retains every state satisfying a forward
+behavior and a return behavior, without requiring existence or uniqueness. For behaviors
+constructed as graphs, the graph theorems prove that series and parallel recover ordinary
+linear-map composition and block-diagonal mode-transform composition.
 
 ## ii. Scope
 
@@ -34,7 +35,8 @@ The behavior type and its relational compositions require no finite index types,
 or unique-solvability hypothesis. They are fixed-frequency complex-linear semantics only: no
 causality, delay, source, termination, passivity, electromagnetic normalization, or physical
 realization is included. Parallel composition does not duplicate or sum an amplitude, and it does
-not reuse one amplitude as more than one input.
+not reuse one amplitude as more than one input. A feedback-solution relation is not an inverse or a
+well-posedness assertion.
 
 ## iii. Key definitions and results
 
@@ -48,6 +50,7 @@ not reuse one amplitude as more than one input.
 - `LinearBehavior.identity`: equality between input and output amplitudes.
 - `LinearBehavior.series`: relational series composition.
 - `LinearBehavior.parallel`: independent behavior on disjoint mode families.
+- `LinearBehavior.feedbackSolutions`: all states satisfying a forward and return relation.
 - `ModeTransform.toBehavior_mul`: matrix cascade agrees with relational series composition.
 - `ModeTransform.toBehavior_directSum`: block-diagonal action agrees with relational parallel
   composition.
@@ -57,6 +60,7 @@ not reuse one amplitude as more than one input.
 - A. Behaviors and functional graphs
 - B. Identity and series composition
 - C. Parallel composition
+- D. Feedback-solution relations
 
 -/
 
@@ -661,6 +665,104 @@ lemma toBehavior_directSum [Fintype ι] [Fintype μ]
       exact congrArg ModeAmplitude.restrictInr (hTransform.trans hAction)
 
 end ModeTransform
+
+namespace LinearBehavior
+
+variable {ι : Type u} {κ : Type v} {μ : Type w}
+
+/-!
+
+## D. Feedback-solution relations
+
+-/
+
+/-- The linear map extracting the incident/outgoing pair from an external-input/solution pair. -/
+def feedbackForwardStateMap :
+    (ModeAmplitude μ × ModeAmplitude (ι ⊕ κ)) →ₗ[ℂ]
+      (ModeAmplitude ι × ModeAmplitude κ) where
+  toFun := fun pair => (pair.2.restrictInl, pair.2.restrictInr)
+  map_add' := by
+    intro first second
+    apply Prod.ext
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rfl
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rfl
+  map_smul' := by
+    intro scalar pair
+    apply Prod.ext
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rfl
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rfl
+
+/-- The linear map presenting `outgoing ⊕ external` and incident amplitudes to a return
+behavior. -/
+def feedbackReturnStateMap :
+    (ModeAmplitude μ × ModeAmplitude (ι ⊕ κ)) →ₗ[ℂ]
+      (ModeAmplitude (κ ⊕ μ) × ModeAmplitude ι) where
+  toFun := fun pair => (pair.2.restrictInr.directSum pair.1, pair.2.restrictInl)
+  map_add' := by
+    intro first second
+    apply Prod.ext
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rcases index with index | index <;> rfl
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rfl
+  map_smul' := by
+    intro scalar pair
+    apply Prod.ext
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rcases index with index | index <;> rfl
+    · apply WithLp.ofLp_injective 2
+      funext index
+      rfl
+
+/-- The relation retaining every state that simultaneously satisfies a forward behavior and a
+return behavior.
+
+The external input has modes `μ`. A returned state has incident coordinates `ι` in its left
+summand and outgoing coordinates `κ` in its right summand. The forward relation is tested on the
+incident/outgoing pair, while the return relation receives `outgoing ⊕ external` and must
+reproduce the incident amplitude. This construction asserts neither existence nor uniqueness of a
+state.
+-/
+def feedbackSolutions (forward : LinearBehavior ι κ)
+    (returnBehavior : LinearBehavior (κ ⊕ μ) ι) : LinearBehavior μ (ι ⊕ κ) :=
+  forward.comap feedbackForwardStateMap ⊓
+    returnBehavior.comap feedbackReturnStateMap
+
+/-- Feedback-solution membership states the forward and return constraints on the two state
+summands. -/
+@[simp]
+lemma mem_feedbackSolutions_iff (forward : LinearBehavior ι κ)
+    (returnBehavior : LinearBehavior (κ ⊕ μ) ι) (input : ModeAmplitude μ)
+    (state : ModeAmplitude (ι ⊕ κ)) :
+    (input, state) ∈ forward.feedbackSolutions returnBehavior ↔
+      (state.restrictInl, state.restrictInr) ∈ forward ∧
+        (state.restrictInr.directSum input, state.restrictInl) ∈ returnBehavior := by
+  simp only [feedbackSolutions, Submodule.mem_inf, Submodule.mem_comap]
+  rfl
+
+/-- On an explicitly joined state, feedback-solution membership is exactly the forward relation
+and the return relation fed by `outgoing ⊕ external`. -/
+lemma mem_feedbackSolutions_directSum_iff (forward : LinearBehavior ι κ)
+    (returnBehavior : LinearBehavior (κ ⊕ μ) ι) (input : ModeAmplitude μ)
+    (incident : ModeAmplitude ι) (outgoing : ModeAmplitude κ) :
+    (input, incident.directSum outgoing) ∈ forward.feedbackSolutions returnBehavior ↔
+      (incident, outgoing) ∈ forward ∧
+        (outgoing.directSum input, incident) ∈ returnBehavior := by
+  rw [mem_feedbackSolutions_iff, ModeAmplitude.restrictInl_directSum,
+    ModeAmplitude.restrictInr_directSum]
+
+end LinearBehavior
 
 end
 

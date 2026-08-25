@@ -424,14 +424,19 @@ Ownership rules:
   embeds linear maps and finite mode transforms as graphs, and proves identity, relational series,
   and independent parallel composition laws. It characterizes total single-valued behaviors,
   extracts their unique complex-linear maps behind an explicit proof gate, and proves graph round
-  trips plus identity, series, and parallel functionality closure. Its concrete regressions
-  distinguish cascade order, partial and multivalued behavior, singular functionality, and
-  disjoint parallel branches without assigning physical realizability, causality, passivity, or
-  losslessness.
+  trips plus identity, series, and parallel functionality closure. Its source-neutral feedback
+  construction retains every complete state satisfying paired forward and return relations. Its
+  concrete regressions distinguish cascade order, partial and multivalued behavior, singular
+  functionality, and disjoint parallel branches without assigning physical realizability,
+  causality, passivity, or losslessness.
 - `Optics.Network.RectangularBehavior` supplies algebraic copy, coherent sum, heterogeneous branch
   selection, and direct-coefficient weighted split/combine graphs. The three-four-five regression
   proves a one-sided identity and a nonidentity reverse-order idempotent with nonzero kernel, while
   exact modal-power sentinels prevent interpreting copy or coherent sum as passive wiring.
+- `Optics.Network.FlatNetlist` owns heterogeneous components and proof-carrying connections on one
+  aggregate boundary. It derives `S`, `C`, `E_in`, `E_out`, and `E_outᴴ`, retains all complete
+  feedback states, and projects their external relation without assuming existence, uniqueness,
+  or an inverse.
 - `ClassicalMechanics.WaveEquation.VectorCalculus` and `SpaceAndTime.Space.CrossProduct` now supply
   the dimension-generic plane-wave divergence, three-dimensional plane-wave curl, Euclidean
   cross-product bilinearity, vector triple-product identities, and the inner product of two cross
@@ -1860,14 +1865,17 @@ derived views of the same component behavior, not illicit multiplication of scat
   explicit ownership of every physical port and local mode;
 - [x] block-diagonal assembly of heterogeneous component scattering matrices, with exact
   same-component, cross-component-zero, and componentwise amplitude-action laws;
-- [ ] a routing transform `C : A_out → A_in`, an input exposure `E_in : U → A_in`, and an output
+- [x] a routing transform `C : A_out → A_in`, an input exposure `E_in : U → A_in`, and an output
   exposure `E_out : Y → A_out`, each derived from typed endpoint selections;
 - [x] proofs of the exposure isometries and projection identities, and of routing/exposure
   disjointness and completeness;
-- [ ] derivation of `b = S*a`, `a = C*b + E_in*u`, `y = E_outᴴ*b`, and
+- [x] derivation of `b = S*a`, `a = C*b + E_in*u`, `y = E_outᴴ*b`, and
   `(I - C*S)*a = E_in*u`;
-- [ ] a singular-safe `FlatNetlist.behavior` defined by existential internal amplitudes, together
-  with a theorem that it equals relational composition of the assembled component behaviors; and
+- [x] a singular-safe `FlatNetlist.behavior` defined by existential internal amplitudes, together
+  with a theorem that it is the relational composition of the assembled component graph, return
+  relation, state projection, and external readout;
+- [ ] a dependent-family theorem identifying the assembled component graph with parallel
+  composition of every individual component graph; and
 - [ ] invariance under internal-channel reordering.
 
 Exit: network equations come from a typed netlist rather than being supplied independently.
@@ -2490,7 +2498,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
-| N4 network equations | in progress | N1/O2, N2a, N3 | component-family assembly is complete; flat relational semantics and shaped equations remain |
+| N4 network equations | in progress | N1/O2, N2a, N3 | derived maps, aggregate component graph, singular-safe complete/external relations, exact shaped and implicit feedback equations, and the N-11 singular regression are complete; the dependent local-component graph bridge and internal-channel reordering remain |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
@@ -2599,9 +2607,10 @@ human verification recorded in `tbd.md`.
    complete incident and outgoing coordinate decompositions. The expression `C b + E_in u` has
    exact connected/external action and normalized modal power equal to connected outgoing power
    plus external incident power. This is not a network energy balance. The empty-mode fixture
-   proves that an unconnected physical port need not create a channel. Continue toward
-   network-equation semantics without treating these boundary maps as source, detector, or
-   feedback models and without encoding feedback as ordinary scattering-matrix multiplication.
+   proves that an unconnected physical port need not create a channel. These boundary maps now
+   feed the source-neutral `FlatNetlist` relational semantics while remaining coordinate maps,
+   rather than source or detector models; no feedback inverse or ordinary scattering-matrix
+   multiplication is introduced.
    The N3 core now represents implicit complex-linear behavior independently of invertibility,
    embeds maps and mode transforms as graphs, and proves identity, existential series, independent
    parallel, graph-composition, matrix-cascade, and block-diagonal laws. Its regressions distinguish
@@ -2618,9 +2627,13 @@ human verification recorded in `tbd.md`.
    multiplication from relational series, and supplies singular-safe right-load termination with
    exact response formulas. N4 has begun with dependent component-owned port/channel sums,
    canonical channel reassociation, and block-diagonal scattering with exact entry and mixed-action
-   laws. Continue with the implicit relation `b = S a`, `a = C b + E_in u`,
-   `y = E_outᴴ b` built from that assembly and the now-complete boundary API. Do not use an
-   inverse to define that behavior; well-posed elimination belongs to N5.
+   laws. N4 now derives the aggregate component graph and shaped maps from the same typed data,
+   retains every complete state satisfying `b = S a` and `a = C b + E_in u`, projects the
+   singular-safe relation `y = E_outᴴ b`, and proves the equivalent implicit equation
+   `(1 - C * S) a = E_in u` without inversion. Its shared-link regression has invertible local
+   component matrices but both multiple zero-input solutions and an unsolvable input. Continue
+   with the dependent local-component graph bridge and internal-channel reordering; well-posed
+   elimination belongs to N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
