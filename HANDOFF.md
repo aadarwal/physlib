@@ -14,11 +14,17 @@ listed below for the conductor to apply at merge.
 
 | Slice | Content | Status |
 |---|---|---|
-| 1 | Causal sequences, unilateral transform, ROC (absolute vs conditional), linearity, shift laws, first difference, z-scaling, unit impulse | **done** |
-| 2 | ROC exterior-of-circle shape, geometric sequence, conditional-but-not-absolute counterexample | pending |
-| 3 | Linear constant-coefficient difference equations to rational transfer functions | pending |
-| 4 | Stability: poles, unit circle, BIBO (directions proved stated explicitly) | pending |
-| 5 | Regressions: first-order all-pass and a two-pole example | pending |
+| 1 | Causal sequences, unilateral transform, ROC (absolute vs conditional), linearity, shift laws, first difference, z-scaling, unit impulse | **done** (`340de28a`) |
+| 2 | Modulus-only absolute convergence, exterior-of-circle ROC shape, reciprocal power series, unit step, geometric sequence, and the conditional-but-not-absolute witness | **done** |
+| 3 | Linear constant-coefficient difference equations to rational transfer functions; general IIR; the audited second-order low-pass; first-order all-pass regression | pending |
+| 4 | Stability: poles, the unit circle, BIBO, with the proved directions stated explicitly; two-pole regression | pending |
+| 5 | Inverse transform and uniqueness (JAL'18 Thms. 15-17), built on the `IsExteriorOfCircle` lemmas | pending — **now in scope**, see the scope note below |
+
+The slice-5 change follows the controller's decision of 2026-08-25: the corrected `goal.md`
+(merged `bf0a4063`) names ITP'14 **and** JAL'18, including the inverse transform and uniqueness,
+as the parity targets. The earlier "inverse and uniqueness out of scope" reading of `goal.md`
+§S5 is superseded. The original slice-5 regressions (first-order all-pass, two-pole) move into
+slices 3 and 4, where their supporting theory lives.
 
 ---
 
@@ -115,6 +121,105 @@ throughout.
 
 ---
 
+---
+
+## Slice 2 — files
+
+- `Physlib/Mathematics/ZTransform/Convergence.lean` (215 lines)
+- `Physlib/Mathematics/ZTransform/ConvergenceRegression.lean` (205 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all four)
+
+```
+public import Physlib.Mathematics.ZTransform.Basic
+public import Physlib.Mathematics.ZTransform.BasicRegression
+public import Physlib.Mathematics.ZTransform.Convergence
+public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+```
+
+Import order matters only in that `Convergence` needs `Basic` and `ConvergenceRegression` needs
+`Convergence`; alphabetical order already satisfies both.
+
+### Slice 2 — declarations
+
+`Physlib/Mathematics/ZTransform/Convergence.lean`, namespace `Physlib.ZTransform`:
+
+**A. Absolute convergence depends only on the modulus** — `norm_seriesTerm`,
+`summable_seriesTerm_of_norm_le`, `ne_zero_of_norm_le`.
+
+**B. The region of convergence as an exterior of a circle** — `ROC_mem_of_mem_of_norm_le`,
+`ROC_mem_of_mem_of_norm_eq`, `IsExteriorOfCircle`, `IsExteriorOfCircle.nonempty`,
+`isExteriorOfCircle_ROC`, `isExteriorOfCircle_ROC_iff`.
+
+**C. The transform as a power series in the reciprocal variable** — `transform_inv`,
+`summable_pow_iff_inv_mem_ROC`.
+
+**D. The unit step** — `unitStep`, `unitStep_isCausal`, `seriesTerm_unitStep`,
+`summable_seriesTerm_unitStep_iff`, `ROC_unitStep`, `transform_unitStep`.
+
+**E. The geometric sequence** — `geometricSeq`, `geometricSeq_natCast`, `geometricSeq_isCausal`,
+`ROC_geometricSeq`, `transform_geometricSeq`.
+
+`Physlib/Mathematics/ZTransform/ConvergenceRegression.lean`, same namespace: `harmonicSeq`,
+`harmonicSeq_isCausal`, `seriesTerm_harmonicSeq_neg_one`, `norm_seriesTerm_harmonicSeq_neg_one`,
+`not_summable_seriesTerm_harmonicSeq`, `neg_one_notMem_ROC_harmonicSeq`,
+`neg_one_mem_condROC_harmonicSeq`, `ROC_ssubset_condROC_harmonicSeq`,
+`exists_ROC_ssubset_condROC`, `self_notMem_ROC_geometricSeq`, `two_mul_mem_ROC_geometricSeq`,
+`transform_geometricSeq_half`, `one_notMem_ROC_unitStep`, `I_notMem_ROC_unitStep`,
+`two_mul_I_mem_ROC_unitStep`.
+
+### What slice 2 proves that the sources do not
+
+1. **Absolute convergence depends on `z` only through `‖z‖`.** `summable_seriesTerm_of_norm_le`
+   propagates absolute convergence outward under the **non-strict** inequality `‖w‖ ≤ ‖z‖`, by
+   direct comparison of term norms. No boundedness or Abel argument is used. Consequently the
+   region of convergence is proved invariant under rotation (`ROC_mem_of_mem_of_norm_eq`), which
+   the usual strict-inequality statement does not give.
+2. **The regions of convergence of the unit step and of the geometric sequence are computed
+   exactly**, as set equalities `ROC unitStep = {z | 1 < ‖z‖}` and
+   `ROC (geometricSeq a) = {z | ‖a‖ < ‖z‖}` for `a ≠ 0`, not merely shown to contain an
+   exterior. `self_notMem_ROC_geometricSeq` pins the boundary as excluded.
+3. **The absolute and conditional regions are proved different sets**, not merely defined
+   differently — see the T-03 row below.
+
+### Slice 2 gates
+
+Same gate set as slice 1, all clean: build; `lean -Dwarn.sorry=false -Dweak.says.verify=true`
+on each of the four files gives zero output; the Batteries declaration linter set run
+module-scoped over all four modules passes; the `module_doc_lint` and `style_lint` rules re-run
+locally pass; no `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats`; no
+`Physlib.Optics` import anywhere; imports minimal
+(`Mathlib.Analysis.SpecificLimits.Normed` turned out to be transitively available through
+`Basic` and was dropped from `Convergence.lean`).
+
+### Slice 2 — milestone and ledger rows
+
+`goal.md` §H.4 S5:
+
+- "absolute-summability/BIBO stability results and their relation to poles and the region of
+  convergence" — the **region-of-convergence half** is done: `isExteriorOfCircle_ROC_iff`,
+  `ROC_mem_of_mem_of_norm_le`, and the exact regions for the step and geometric sequences. Poles,
+  BIBO, and the causal rational class are slice 4.
+- The conditional/absolute distinction bullet is now fully discharged, not partially: see T-03.
+
+`goal.md` §I.3 regressions:
+
+- **T-03** ("conditional and absolute convergence regions are not identified") — **discharged**.
+  `ROC_ssubset_condROC_harmonicSeq` proves `ROC harmonicSeq ⊂ condROC harmonicSeq`, with
+  `exists_ROC_ssubset_condROC` as the existential form. The witness is `1 / (n + 1)` at `z = -1`:
+  the alternating harmonic series converges, and the harmonic series does not. A development that
+  defined one region and called it the other fails this file.
+
+Parity ledger:
+
+- **ZT-08 (partial)** — JAL'18 Def. 19 (`exterior_circle`, p. 893) is reached as
+  `IsExteriorOfCircle` (the source's `0 < R` form is kept) together with
+  `isExteriorOfCircle_ROC_iff`, which is the "three ROC-shape lemmas" content. The inverse
+  transform itself (Thm. 15) is slice 5; `transform_inv` and `summable_pow_iff_inv_mem_ROC` are
+  the substitution `u = z⁻¹` that Thm. 15 differentiates, so slice 5 starts from them.
+- JAL'18 Table 1 (p. 888), unit step and geometric entries — reached exactly, as set equalities.
+
+
 ## Milestone and ledger rows touched by slice 1
 
 `goal.md` §H.4 S5 bullets satisfied so far:
@@ -158,24 +263,26 @@ Parity ledger rows (`~/src/aadarwal/physlib-parity/PARITY-LEDGER.md`):
 - JAL'18 Def. 14 / Thm. 12 p. 888 (Dirac delta) — reached: `unitImpulse`,
   `transform_unitImpulse`.
 
-### One correction for the parity ledger
+### Literature defect found by this lane, and resolved (ZT-03)
 
-`HOL-CORPUS.md` §7.1 renders ITP'14 Theorem 5 (left shift) as
-`z^m F(z) − Σ_{n=0}^{m−1} f n z^{−n}`. That expression is not the left-shift law: taking
-`f = δ` and `m = 1` it gives `z − 1`, whereas `Z{δ[n+1]}` is `0` because the advanced impulse
-has no nonnegative-index sample. The correct statement, and the one proved here as
-`transform_advance`, is
+`transform_advance` did not match the left-shift law as printed in ITP'14. The parity lane
+checked the PDFs at character level and confirmed: **ITP'14 p. 489 prints the advance law
+incorrectly, in both equation (5) and Theorem 5**, with the startup sum outside the `z ^ m`
+factor. That printed form is not provable. At `f` the unit impulse and `m = 1` it evaluates to
+`z - 1`, whereas the advanced unit impulse has no nonnegative-index sample and so has unilateral
+transform `0`. **JAL'18 p. 885 Theorem 5 states it correctly** and matches
+`Physlib.ZTransform.transform_advance` exactly:
 
 ```
 transform (advance m f) z = z ^ m * (transform f z - ∑ n ∈ Finset.range m, seriesTerm f z n)
 ```
 
-that is, the `z^m` factor multiplies the startup sum too. This agrees with Oppenheim and
-Schafer, *Discrete-Time Signal Processing*, 3rd ed., ch. 3. The regression
-`transform_advance_unitImpulse_eq` instantiates the proved law at `f = δ`, `m = 1` and gets `0`.
-Whether `HOL-CORPUS.md` §7.1 is an abbreviation in the corpus note or a genuine transcription of
-the paper is **not** something this lane verified against the ITP'14 PDF; the ledger row ZT-03
-should be re-checked against the source before the claim "parity" is published.
+Resolution applied here: the statement is unchanged; the module doc of
+`Physlib/Mathematics/ZTransform/Basic.lean` now cites **JAL'18 Thm. 5 (p. 885)** as the parity
+target for the advance law and records ITP'14's printed form as unprovable, with the impulse
+evaluation as the reason. `transform_advance_unitImpulse_eq` in the regression file instantiates
+the proved law at that point and obtains `0`. Ledger row ZT-03 should cite JAL'18 for the left
+shift and keep ITP'14 only for the right shift (Thm. 6 p. 490, which is correct as printed).
 
 ### Deliberate departures from the sources, recorded in the module docs
 
@@ -186,12 +293,12 @@ should be re-checked against the source before the claim "parity" is published.
    This file uses a two-sided index `ℤ → ℂ` and states causality as `IsCausal`, so that the
    advance law can be stated without silently discarding the negative-index samples.
 
-### Open scope question for the human (unchanged from `HOL-CORPUS.md` §7.2)
+### Scope note: inverse and uniqueness are in scope (resolved 2026-08-25)
 
-`goal.md` §S5 says "Inverse-transform uniqueness is not required for source parity unless a
-later mandatory ledger row needs it." That sentence was written against ITP'14. The journal
-version of record, JAL'18, has the inverse transform (Thm. 15) and uniqueness (Thm. 16) via
-`exterior_circle`. Ledger rows ZT-08 and ZT-09 are marked "scope decision required". This lane
-is proceeding on the current `goal.md` scope, that is **without** inverse or uniqueness, and
-will not start them without an explicit decision. Slice 2 does build the `exterior_circle` ROC
-shape lemmas, which are the prerequisite for either.
+`goal.md` §S5 previously read "Inverse-transform uniqueness is not required for source parity
+unless a later mandatory ledger row needs it", written against ITP'14. The controller has since
+confirmed that the corrected `goal.md` (merged `bf0a4063`) names ITP'14 **and** JAL'18, including
+the inverse transform (Thm. 15) and uniqueness (Thm. 16), as parity targets. Ledger rows ZT-08
+and ZT-09 are therefore live work, scheduled as slice 5 and to be built on the
+`IsExteriorOfCircle` lemmas and `transform_inv` delivered in slice 2. Nothing about slices 3 and
+4 changes.

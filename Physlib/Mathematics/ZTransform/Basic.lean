@@ -65,19 +65,27 @@ summability hypothesis it needs, and no theorem in this file asserts a value at 
 The statement list follows U. Siddique, M. Y. Mahmoud, and S. Tahar, "On the Formalization of
 Z-Transform in HOL", ITP 2014, LNCS 8558, pp. 483-498: Definition 8 (Z-transform, p. 488),
 Definition 9 (region of convergence, p. 488), Theorems 2-3 (region-of-convergence linear
-combination and scaling, p. 488), Theorem 4 (linearity, p. 489), Theorem 5 (left shift, p. 489),
-Theorem 6 (right shift, p. 490), Theorem 7 (first difference, p. 490), and Theorems 8-9 (scaling
-in the z domain, p. 491).
+combination and scaling, p. 488), Theorem 4 (linearity, p. 489), Theorem 6 (right shift, p. 490),
+Theorem 7 (first difference, p. 490), and Theorems 8-9 (scaling in the z domain, p. 491).
 
-The unit impulse and its transform follow the journal version, U. Siddique, M. Y. Mahmoud, and
-S. Tahar, "Formal Analysis of Discrete-Time Systems using z-Transform", Journal of Applied
-Logics 5(4), 2018, pp. 875-907, Definition 14 and Theorem 12 (p. 888).
+The left-shift law `transform_advance` follows the journal version instead, U. Siddique,
+M. Y. Mahmoud, and S. Tahar, "Formal Analysis of Discrete-Time Systems using z-Transform",
+Journal of Applied Logics 5(4), 2018, pp. 875-907, Theorem 5 (p. 885). The conference version
+prints the law with the startup sum outside the `z ^ m` factor, in both equation (5) and
+Theorem 5 on page 489; that printed form is false and cannot be proved. At `f` the unit impulse
+and `m = 1` it evaluates to `z - 1`, whereas the advanced unit impulse has no nonnegative-index
+sample and therefore has unilateral transform `0`. The journal statement, which is the one proved
+here, keeps `z ^ m` in front of the startup sum. The companion regression file instantiates the
+proved law at that same point and obtains `0`.
 
-Two deliberate departures from those sources are recorded here. First, both sources define the
-region of convergence by summability, that is absolutely, and neither names a conditional region;
-this file names both and proves only the inclusion that holds. Second, the sources index
-sequences so that causality is a side condition on a one-sided index set, while this file uses a
-two-sided index set and states causality as `IsCausal`.
+The unit impulse and its transform also follow the journal version, Definition 14 and Theorem 12
+(p. 888).
+
+Two deliberate departures from both sources are recorded here. First, both define the region of
+convergence by summability, that is absolutely, and neither names a conditional region; this file
+names both and proves only the inclusion that holds. Second, the sources index sequences so that
+causality is a side condition on a one-sided index set, while this file uses a two-sided index
+set and states causality as `IsCausal`.
 
 A textbook reference for the same statement list is A. V. Oppenheim and R. W. Schafer,
 *Discrete-Time Signal Processing*, 3rd ed., Pearson, 2010, chapter 3.
