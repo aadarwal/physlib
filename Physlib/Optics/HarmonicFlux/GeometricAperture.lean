@@ -17,10 +17,10 @@ This file represents an aperture as a measurable spatial region contained in the
 oriented affine plane. Its area measure is the two-dimensional Hausdorff measure of ambient
 three-dimensional Euclidean space restricted to that region.
 
-Unlike an arbitrary profile weight, this construction has a geometric surface-area meaning. The
-Hausdorff normalization agrees with ordinary two-dimensional Lebesgue volume on Euclidean planes,
-and restriction localizes it to the supplied measurable aperture region. A later field connector
-may integrate directly on ambient `Space`; points outside the aperture have zero measure.
+Unlike an arbitrary profile weight, this uses Mathlib's geometric two-dimensional Hausdorff
+measure; restriction localizes it to the supplied measurable aperture region. A later field
+connector may integrate directly on ambient `Space`; points outside the aperture have zero
+measure. No parameterized-surface pullback or Jacobian theorem is asserted here.
 
 This file does not select an incident or outgoing role, orient the scalar area measure, or assert
 regularity of the region boundary. Orientation enters only when a flux integrand pairs with the
