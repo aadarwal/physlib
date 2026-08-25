@@ -26,7 +26,8 @@ conductor's, not this lane's. Slice 5 leaves it a clean hook and attempts nothin
 | 5 | `ofCoefficientMatrix` hook, plus the edge-indexed multigraph structure with `toMatrix` | **done** |
 | 7 | Mason's formula in general | **done** in loop-family form |
 | 7b | Forward-path repackaging of the numerator | **done** — Mason's rule closed in its classical form |
-| 6 | Optional: edge-based enumeration closing regression G-02 by proof | pending — attempt after slice 7 |
+| 6 | Edge-based enumeration closing regression G-02 by proof | **done** |
+| 8 | Distinguished terminals, and definition-level G-01/G-03 regressions | pending — scheduled by the controller |
 
 ---
 
@@ -726,6 +727,91 @@ minimal.
 **Physlib-original.** FMICS'15 Definition 4 (p. 168) and NSV'16 Definition 6 (p. 37) *define* the
 gain by Mason's formula. Here it is a **theorem** about the node equations, proved equal to the
 entry of the inverse system matrix. No fetched source states that equality.
+
+---
+
+## Slice 6 — files
+
+- `Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean` (231 lines)
+- `Physlib/Mathematics/SignalFlowGraph/EdgeEnumerationRegression.lean` (114 lines)
+
+Registrations, appended to the cumulative list:
+
+```
+public import Physlib.Mathematics.SignalFlowGraph.EdgeEnumeration
+public import Physlib.Mathematics.SignalFlowGraph.EdgeEnumerationRegression
+```
+
+### G-02 closed by proof
+
+The whole slice runs on one distributive law. An entry of the gain matrix is the sum of the gains
+of the edges joining an ordered pair of nodes, so a **product** of entries is a **sum over choices
+of one edge per factor**. `Finset.prod_sum` over `Finset.pi` is exactly that, and it gives:
+
+- `familyGain_toMatrix`: a node-level family gain is the sum over its edge-level refinements;
+- `pathGain_toMatrix`: a node-level path gain is the sum over the edge lists refining it.
+
+From those, `edgeGraphDet_eq_det : edgeGraphDet Γ = (systemMatrix Γ.toMatrix).det` and
+`edgeMasonGain_eq_gain : edgeMasonNumerator Γ s t / edgeGraphDet Γ = gain Γ.toMatrix s t` follow
+as corollaries of the node-level theorems, not as new arguments. **Everything above the
+enumeration is inherited.**
+
+The regression then closes the row. `card_refiningEdgeLists_parallelPair = 2` and
+`card_refiningEdgeLists_singleEdge = 1` on the very pair of multigraphs whose gain matrices slice 5
+proved equal. So:
+
+- the gain matrix **cannot** separate two parallel edges from one edge carrying their sum
+  (slice 5, proved);
+- the edge-level enumeration **does** separate them (this slice, proved);
+- and every value computed from either enumeration agrees (`pathGain_toMatrix` instantiated).
+
+That is exactly what `goal.md` section I.3 row G-02 asks for: distinct parallel branches remain
+distinct **through the enumeration**, with nothing lost in what the enumeration computes. **G-02
+is met.**
+
+### Slice 6 — declarations
+
+`Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean`, namespace `Physlib.SignalFlowGraph`:
+
+**A. Edge refinements of a loop family** — `edgeChoices`, `edgeFamilyGain`, `familyGain_toMatrix`.
+
+**B. The edge-level graph determinant** — `edgeGraphDetOn`, `edgeGraphDet`,
+`edgeGraphDetOn_eq_graphDetOn`, `edgeGraphDet_eq_det`.
+
+**C. Edge lists refining a node path** — `refiningEdgeLists`, `refiningEdgeLists_singleton`,
+`refiningEdgeLists_pair`, `edgeListGain`, `edgeListGain_cons`, `pathGain_toMatrix`.
+
+**D. Mason's formula at the edge level** — `edgeMasonNumerator`, `edgeMasonNumerator_eq`,
+`edgeMasonGain_eq_gain`.
+
+`Physlib/Mathematics/SignalFlowGraph/EdgeEnumerationRegression.lean`, same namespace:
+`card_refiningEdgeLists_parallelPair`, `card_refiningEdgeLists_singleEdge`,
+`refiningEdgeLists_ne`, `sum_edgeListGain_parallelPair`, `sum_edgeListGain_singleEdge`,
+`edgeGraphDet_parallelPair_eq_singleEdge`.
+
+### A note on what the refinement does and does not buy
+
+The refinement is **exact on values**: no edge-level statement here is stronger than its
+node-level counterpart. The gain is entirely in what the enumeration *distinguishes*, not in what
+it *computes*, and the module doc says so. Claiming otherwise would misrepresent the slice.
+
+### Slice 6 gates
+
+Build clean; `lean -Dwarn.sorry=false -Dweak.says.verify=true` gives zero output on all fifteen
+files; the Batteries declaration linter set run module-scoped over all fifteen modules passes; the
+`module_doc_lint` and `style_lint` rules pass; no `sorry`, `axiom`, `native_decide`, or
+`set_option maxHeartbeats`; no `Physlib.Optics` import; imports minimal. Every declaration is a
+`lemma`, per the stated house convention.
+
+The two cardinality regressions were first written with `decide`, which fails on statements
+carrying free complex variables; they are proved instead by identifying the refinement set with an
+image of the edge set, which is correct and general in the gains.
+
+### Parity classification for slice 6
+
+**Physlib-original.** The sources carry branches as list entries and so distinguish parallel
+branches by construction; see FMICS'15 Definitions 1-3 (pp. 167-168). No fetched source relates a
+branch-level enumeration to a node-level one, which is the reduction proved here.
 
 ### Slice 1 gates
 
