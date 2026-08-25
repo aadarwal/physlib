@@ -1,6 +1,7 @@
 # HANDOFF — lane N5F/N5H
 
-Branch: `optics/n5f-n5h` (branched from `optics/development` at `48015bbf`).
+Branch: `optics/n5f-n5h` (branched from `optics/development` at `48015bbf`, most recently merged
+through `9a9e273b`).
 Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-n5f-n5h`.
 Source parity: Physlib-original. The HOL corpus has no parameterized-compilation or hierarchical
 flattening development; there is no source file to mirror and no parity row to claim.
@@ -13,17 +14,19 @@ flattening development; there is no source file to mirror and no parity row to c
 | `Physlib/Optics/Network/ParameterizedResponse.lean` | N5F slices 1–3 | see below |
 | `Physlib/Optics/Network/ParameterizedResponseRegression.lean` | N5F regressions | see below |
 | `Physlib/Optics/Network/Hierarchical.lean` | N5H slices 4-6 | see below |
+| `Physlib/Optics/Network/HierarchicalRegression.lean` | N-08 fixture | gate green |
 
-No existing file was edited. `Physlib.lean`, `Physlib/Optics/API-map.yaml`, `goal.md`, and
-`tbd.md` are untouched in every commit.
+This lane modifies no existing Lean source module. `Physlib.lean` is restored byte-for-byte after
+each registration gate and is never committed by this lane; this handoff is updated to record the
+fixture. Changes to other tracked files in the branch came from merging `optics/development`.
 
 ## Gate evidence
 
-Batch 1 was gated after merging `optics/development` (`7fbad549`) into this branch. The shipped
-declaration linters resolve declarations through the `Physlib` module registry, so they cannot see
-an unregistered module. To make the gate real, the four registrations below were added to
-`Physlib.lean` **temporarily**, the gate was run, and the file was then restored byte-for-byte and
-never committed (`git diff Physlib.lean` is empty at the cutoff). With the modules registered:
+The shipped declaration linters resolve declarations through the `Physlib` module registry, so
+they cannot see an unregistered module. To make the gate real, the five registrations below were
+added to `Physlib.lean` **temporarily**, the gate was run, and the file was then restored
+byte-for-byte and never committed (`git diff Physlib.lean` is empty at the cutoff). With the
+modules registered:
 
 ```
 lake build Physlib                → exit 0, no errors, no warnings
@@ -32,7 +35,7 @@ lake exe sorry_lint               → exit 0
 lake exe runPhyslibLinters        → exit 0, "Linting passed for Physlib."
 ```
 
-Additional checks run directly on the four files: no `sorry`, `axiom`, `native_decide`,
+Additional checks run directly on the five files: no `sorry`, `axiom`, `native_decide`,
 `maxHeartbeats`, or `Lean.ofReduceBool`; every line at most 100 characters; a docstring on every
 declaration; `scripts/lint-style.py` clean.
 
@@ -43,6 +46,7 @@ Add to `Physlib.lean`, in the existing alphabetical blocks:
 ```
 public import Physlib.Mathematics.LinearAlgebra.Matrix.Analytic
 public import Physlib.Optics.Network.Hierarchical
+public import Physlib.Optics.Network.HierarchicalRegression
 public import Physlib.Optics.Network.ParameterizedResponse
 public import Physlib.Optics.Network.ParameterizedResponseRegression
 ```
@@ -112,6 +116,14 @@ outside it have no proved response.
 - `FlatNetlist.packagedScattering` and `FlatNetlist.toOrientedModeTransform_packagedScattering`:
   a verified subsystem as one scattering component, gated on well-posedness and using only the
   canonical `Incident.channelEquiv` / `Outgoing.channelEquiv` endpoint pairing.
+- `hierarchicalRegression_mem_flatten_behavior` — the hand-expanded `165` response satisfies the
+  flattened netlist's component, incident-assembly, and readout equations directly.
+- `hierarchicalRegression_mem_outerClosure` — the canonically relabelled same external pair
+  satisfies the outer closure's three membership equations and the inner netlist's own behavior.
+- `hierarchicalRegression_flatten_output_forced` — every flattened solution forces
+  `y(output) = 165 * u(input)`.
+- `hierarchicalRegression_misLifted_not_mem_flatten_behavior` — the explicit response with `165`
+  placed on the wrong external port is rejected.
 
 ## goal.md rows
 
@@ -131,11 +143,13 @@ outside it have no proved response.
 - I.3 row **N-10** — `parameterizedResponseRegression_mem_compileBehavior_iff_solve`, gated on the
   well-posed domain as goal.md requires; `parameterizedResponseRegression_mem_compileBehavior_iff`
   is its response-domain corollary.
-- I.3 row **N-08** is **not yet claimed**. The general theorem is proved
-  (`PortConnectionFamily.closeBehavior_append` and, at netlist level,
-  `HierarchicalNetlist.flatten_behavior_eq`), but the row's failure mode is
-  "subsystem-boundary or port-lift errors", and the doctrine requires a concrete fixture that
-  could fail. That fixture is in progress and is not in this batch; see "Remaining in this lane".
+- I.3 row **N-08 — CLAIMED**. `hierarchicalRegression_mem_flatten_behavior` and
+  `hierarchicalRegression_mem_outerClosure` establish the same hand-expanded external pair from
+  the two semantics' own equations without invoking either semantic equality theorem. The forcing
+  lemma and `hierarchicalRegression_misLifted_not_mem_flatten_behavior` supply the required
+  subsystem-boundary/port-lift negative control. In particular,
+  `hierarchicalRegression_incidentAssembly_apply_outputLink` exercises the outer port lift by
+  mating the third component's link input to the second component's remaining boundary output.
 
 ## Explicit non-claims
 
@@ -172,18 +186,6 @@ second, so a sync costs no rebuild either.
   `PortConnectionFamily.closeBehavior_append_congr`: with both connection families held fixed, the
   flattened relation depends on the inner components only through the inner stage's closed
   relation. The module doc withholds both stronger statements explicitly.
-- The hierarchical regression fixture that `I.3` row `N-08` requires
-  (`Physlib/Optics/Network/HierarchicalRegression.lean`, in progress, not in this batch). Its
-  shape is settled: a three-component chain wired in two stages, with an inner connection joining
-  the first two components' link ports and an outer connection joining the second component's
-  remaining boundary port to the third, leaving one external channel on each end. All components
-  are reflectionless with distinct forward and backward transmissions, so the flattened network is
-  the exact integer two-port `y(out) = 165 * u(in)`, `y(in) = 182 * u(out)`; the asymmetry is what
-  a port-lift error would disturb. The fixture proves the same hand-computed pair is a member both
-  of `flatten.behavior` (from the flattened netlist's own three channel equations) and of the outer
-  closure of `innerNetlist.behavior` (from the closure's own three equations), neither routed
-  through `flatten_behavior_eq` or `behavior_eq_closeBehavior`, plus a mis-lifted-port negative
-  control. Until it lands, row `N-08` is not claimed.
 - N5F slice 3 could be strengthened from `ContinuousAt`/`AnalyticAt` at a point to `ContinuousOn`/
   `AnalyticOnNhd` on an open subset of the solve domain; the pointwise forms are what is proved.
 
