@@ -20,8 +20,9 @@ permutation fixes are the self-loops of the family; and the loop gains are read 
 products along the cycles. The number of loops is therefore the number of fixed points inside `T`
 plus the number of nontrivial cycles.
 
-The graph determinant is the alternating sum `1 - Σ L₁ + Σ L₂ - Σ L₃ + ⋯` over all such families,
-written as one sum over vertex sets and permutations weighted by `(-1)` to the number of loops.
+The graph determinant is the alternating sum `1 - Σ L₁ + Σ L₂ - Σ L₃ + ⋯` over all such
+families, written as one sum over vertex sets and permutations weighted by `(-1)` to the number
+of loops.
 Unwinding it on a two-element vertex set gives the product of two self-loop gains minus the gain
 of the two-cycle, which is the expected second-order term.
 
@@ -32,6 +33,11 @@ nothing because a repetition-free list over a finite node type is no longer than
 The enumeration is genuinely executable: it uses no choice, so small examples are settled by
 `decide` rather than by an argument. The cofactor of a path is the graph determinant of the
 vertex set the path does not touch.
+
+These enumerations range over the complete finite node type; they take no separate topology
+argument. A missing or zero-gain edge is represented by a zero matrix entry, which makes every
+term using it vanish algebraically. This is sufficient for the determinant identities below, but
+it is not an executable enumeration of the actual edges of an explicit multigraph.
 
 Nothing here is proved equal to a determinant or to a gain; this file only builds the
 combinatorial objects and their elementary properties. The identification with `det (1 - G)` and
@@ -72,8 +78,8 @@ Definition 6 (p. 37). Those sources enumerate elementary circuits and forward ci
 branch list and define Mason's gain as a quotient; they do not relate either to a determinant.
 
 Two representational differences are recorded. First, the sources carry a graph as a list of
-branches `ℕ × ℂ × ℕ`, so a loop is a list of branches; here a family of non-touching loops is a
-permutation, which makes vertex-disjointness structural instead of a checked side condition, at
+branches `ℕ × ℂ × ℕ`, so a loop is a list of branches. Here a family of non-touching loops is a
+permutation, making vertex-disjointness structural instead of a checked side condition, at
 the cost of not distinguishing parallel edges. That cost is the subject of the non-claim below.
 Second, the sources define the determinant only through their enumeration; here it is defined
 directly as the alternating sum over families, which is what `goal.md` section H.4 S6 asks for.
@@ -116,7 +122,8 @@ lemma mem_loopFamilies {T : Finset ι} {σ : Equiv.Perm ι} :
     σ ∈ loopFamilies T ↔ σ.support ⊆ T := by
   simp [loopFamilies]
 
-/-- The identity permutation is the empty family on any vertex set. -/
+/-- The identity permutation is the family of the self-loops indexed by the vertex set. On the
+empty vertex set this is the empty family. -/
 lemma one_mem_loopFamilies (T : Finset ι) : (1 : Equiv.Perm ι) ∈ loopFamilies T := by
   simp
 
@@ -130,7 +137,7 @@ permutation, together with the nontrivial cycles. -/
 def loopCount (T : Finset ι) (σ : Equiv.Perm ι) : ℕ :=
   (T.card - σ.support.card) + Multiset.card σ.cycleType
 
-/-- The empty family on a vertex set has one self-loop per vertex. -/
+/-- The identity family on a vertex set has one self-loop per vertex. -/
 @[simp]
 lemma loopCount_one (T : Finset ι) : loopCount T 1 = T.card := by
   simp [loopCount]
@@ -266,8 +273,10 @@ cofactor. -/
 noncomputable def masonNumerator (G : Matrix ι ι ℂ) (s t : ι) : ℂ :=
   ∑ p ∈ forwardPaths s t, pathGain G p * pathCofactor G p
 
-/-- Mason's quotient. No theorem in this file relates it to
-`Physlib.SignalFlowGraph.gain`; that identification is proved separately. -/
-noncomputable def masonGain (G : Matrix ι ι ℂ) (s t : ι) : ℂ := masonNumerator G s t / graphDet G
+/-- Mason's forward-path quotient. Division is totalized when the graph determinant vanishes;
+its solved-response interpretation therefore requires a nonzero graph determinant. No theorem in
+this file relates it to `Physlib.SignalFlowGraph.gain`; that identification is proved separately. -/
+noncomputable def masonGain (G : Matrix ι ι ℂ) (s t : ι) : ℂ :=
+  masonNumerator G s t / graphDet G
 
 end Physlib.SignalFlowGraph

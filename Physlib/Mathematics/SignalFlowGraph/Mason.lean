@@ -78,9 +78,9 @@ of a repetition-free list and `Equiv.Perm.toList` for its inverse. What then rem
 count of the same kind as `neg_one_pow_card_mul_sign`, together with the factorisation of the
 family gain along the orbit. The cost is the cycle bookkeeping, not the idea.
 
-Until that lands, the companion regression file discharges the identity on representative graphs
-by computing both sides, which is what `goal.md` section I.3 rows G-01 and G-03 ask for, and no
-general claim is made.
+Until that lands, the companion regression file specializes the forward-path computation and the
+proved determinant bridge on small graphs. It does not independently evaluate the loop-family
+definition, so `goal.md` section I.3 rows G-01 and G-03 remain only partially exercised.
 
 The representational limitation of the previous file also carries over: loops are node-level, so
 parallel edges are not distinguished.
@@ -106,7 +106,8 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Summing over the loop families of a vertex set is summing over all permutations with the
 others zeroed out. -/
 lemma sum_loopFamilies (T : Finset ι) (f : Equiv.Perm ι → ℂ) :
-    ∑ σ ∈ loopFamilies T, f σ = ∑ σ : Equiv.Perm ι, if σ.support ⊆ T then f σ else 0 :=
+    ∑ σ ∈ loopFamilies T, f σ
+      = ∑ σ : Equiv.Perm ι, if σ.support ⊆ T then f σ else 0 :=
   Finset.sum_filter _ _
 
 /-- The identity part of the Leibniz expansion contributes one exactly when the permutation is
@@ -185,7 +186,7 @@ theorem graphDet_eq_det (G : Matrix ι ι ℂ) : graphDet G = (systemMatrix G).d
   · rw [if_neg h, if_neg h, mul_zero, mul_zero]
 
 /-- A nonvanishing graph determinant is exactly unique solvability of the node equations. -/
-theorem graphDet_ne_zero_iff (G : Matrix ι ι ℂ) :
+lemma graphDet_ne_zero_iff (G : Matrix ι ι ℂ) :
     graphDet G ≠ 0 ↔ ∀ b : ι → ℂ, ∃! x, IsNodeSolution G b x := by
   rw [graphDet_eq_det, existsUnique_isNodeSolution_iff, isUnit_iff_ne_zero]
 
@@ -195,29 +196,25 @@ theorem graphDet_ne_zero_iff (G : Matrix ι ι ℂ) :
 
 -/
 
-/-- The gain between two nodes is a cofactor of the system matrix divided by the graph
-determinant. This is Mason's formula with the numerator in determinant form; expressing that
-numerator as a sum over forward paths is a separate identity. -/
-theorem gain_eq_adjugate_div_graphDet (G : Matrix ι ι ℂ) (s t : ι) :
+/-- The totalized inverse entry between two nodes is a cofactor divided by the graph determinant.
+At a zero determinant both inverse and division are Mathlib's totalized algebraic expressions;
+interpreting either side as a solved response requires `graphDet G ≠ 0`. Expressing the numerator
+as a sum over forward paths is a separate identity. -/
+lemma gain_eq_adjugate_div_graphDet (G : Matrix ι ι ℂ) (s t : ι) :
     gain G s t = (systemMatrix G).adjugate t s / graphDet G := by
   rw [gain, Matrix.inv_def, graphDet_eq_det, Matrix.smul_apply, Ring.inverse_eq_inv,
     div_eq_inv_mul, smul_eq_mul]
 
-/-- The cofactor written as the determinant of the system matrix with one row replaced. -/
-theorem adjugate_systemMatrix_apply (G : Matrix ι ι ℂ) (s t : ι) :
-    (systemMatrix G).adjugate t s = ((systemMatrix G).updateRow s (Pi.single t 1)).det :=
-  Matrix.adjugate_apply _ _ _
-
 /-- Mason's quotient computes the gain exactly when the forward-path sum computes the cofactor.
 This isolates the one identity that the forward-path half of Mason's formula still needs. -/
-theorem gain_eq_masonGain_iff (G : Matrix ι ι ℂ) (s t : ι) (h : graphDet G ≠ 0) :
+lemma gain_eq_masonGain_iff (G : Matrix ι ι ℂ) (s t : ι) (h : graphDet G ≠ 0) :
     gain G s t = masonGain G s t ↔ masonNumerator G s t = (systemMatrix G).adjugate t s := by
   rw [gain_eq_adjugate_div_graphDet, masonGain, div_eq_div_iff h h]
   exact ⟨fun hx => by field_simp at hx; linear_combination -hx,
     fun hx => by rw [hx]⟩
 
 /-- Where the forward-path sum computes the cofactor, Mason's quotient is the gain. -/
-theorem gain_eq_masonGain (G : Matrix ι ι ℂ) (s t : ι) (h : graphDet G ≠ 0)
+lemma gain_eq_masonGain (G : Matrix ι ι ℂ) (s t : ι) (h : graphDet G ≠ 0)
     (hnum : masonNumerator G s t = (systemMatrix G).adjugate t s) :
     gain G s t = masonGain G s t :=
   (gain_eq_masonGain_iff G s t h).mpr hnum

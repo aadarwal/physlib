@@ -26,9 +26,10 @@ edge type with source, target, and gain maps, so both distinctions survive: the 
 edge type and is fixed independently of what the gains happen to be. Its gain matrix is obtained
 by summing the parallel edges.
 
-That summing map is genuinely lossy, and the companion regression file proves it: two parallel
-edges of gains `a` and `b` and a single edge of gain `a + b` have the same gain matrix. So the
-multigraph layer is not decoration; it carries information the matrix layer provably does not.
+That summing representation is genuinely lossy: the companion regression file exhibits two
+distinguishable edge-indexed presentations, two parallel edges of gains `a` and `b` and one edge
+of gain `a + b`, with the same gain matrix. So the multigraph layer is not decoration; it carries
+information the matrix layer does not.
 
 ## ii. Key results
 
@@ -37,8 +38,8 @@ multigraph layer is not decoration; it carries information the matrix layer prov
 - `Physlib.SignalFlowGraph.systemMatrix_ofSystemMatrix`: the round trip.
 - `Physlib.SignalFlowGraph.graphDet_ofSystemMatrix`: the graph determinant is `det M`.
 - `Physlib.SignalFlowGraph.gain_ofSystemMatrix`: the gains are the entries of `M⁻¹`.
-- `Physlib.SignalFlowGraph.Multigraph`: a finite directed weighted multigraph with explicit edge
-  identity.
+- `Physlib.SignalFlowGraph.Multigraph`: a directed weighted multigraph with explicit edge
+  identity; finiteness is requested only by finite enumeration operations.
 - `Physlib.SignalFlowGraph.Multigraph.toMatrix`: its gain matrix, summing parallel edges.
 - `Physlib.SignalFlowGraph.Multigraph.toMatrix_apply`: the entry is the sum of the gains of the
   edges joining that ordered pair of nodes.
@@ -55,11 +56,12 @@ Section A is the hook `goal.md` section H.4 S6 calls "extraction from suitable s
 models". It deliberately stops at the linear algebra: the theorem that this agrees with the
 network semantics of the typed netlist layer belongs to that layer and is not attempted here.
 
-Section B supplies the "finite directed weighted multigraph with distinguished input/output nodes
-and explicit edge identity, so parallel paths are not collapsed" and "topology independent of
-whether a symbolic or evaluated edge weight happens to be zero" bullets of the same section. The
-source development carries a graph as a list of branches `ℕ × ℂ × ℕ`; see U. Siddique,
-S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal Processing Systems",
+Section B supplies explicit edge identity and topology independent of whether a symbolic or
+evaluated edge weight happens to be zero. It does **not** store distinguished input/output nodes,
+and its current path and loop enumeration is not edge-indexed, so it is only a foundation for the
+larger S6 multigraph requirement. The source development carries a graph as a list of branches
+`ℕ × ℂ × ℕ`; see U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic
+Signal Processing Systems",
 FMICS 2015, LNCS 9128, Definition 1 (p. 167). A separate edge type is the same idea with the
 branch index made a first-class parameter rather than a list position.
 
@@ -94,33 +96,28 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 stands. -/
 def ofCoefficientMatrix (A : Matrix ι ι ℂ) : Matrix ι ι ℂ := A
 
-omit [DecidableEq ι] in
-/-- The node equations of the graph of a coefficient matrix are the original equations. -/
-theorem isNodeSolution_ofCoefficientMatrix (A : Matrix ι ι ℂ) (b x : ι → ℂ) :
-    IsNodeSolution (ofCoefficientMatrix A) b x ↔ x = A *ᵥ x + b := Iff.rfl
-
 /-- A linear system `M x = b` becomes a gain matrix by taking the complement of `M`. -/
 def ofSystemMatrix (M : Matrix ι ι ℂ) : Matrix ι ι ℂ := 1 - M
 
 omit [Fintype ι] in
 /-- The system matrix of the graph of a linear system is that system's matrix. -/
 @[simp]
-theorem systemMatrix_ofSystemMatrix (M : Matrix ι ι ℂ) :
+lemma systemMatrix_ofSystemMatrix (M : Matrix ι ι ℂ) :
     systemMatrix (ofSystemMatrix M) = M := by
   rw [systemMatrix, ofSystemMatrix, sub_sub_cancel]
 
 /-- The node equations of the graph of a linear system are that linear system. -/
-theorem isNodeSolution_ofSystemMatrix (M : Matrix ι ι ℂ) (b x : ι → ℂ) :
+lemma isNodeSolution_ofSystemMatrix (M : Matrix ι ι ℂ) (b x : ι → ℂ) :
     IsNodeSolution (ofSystemMatrix M) b x ↔ M *ᵥ x = b := by
   rw [isNodeSolution_iff, systemMatrix_ofSystemMatrix]
 
 /-- The graph determinant of the graph of a linear system is that system's determinant, so the
 loop sum of the extracted graph is computed by an ordinary determinant. -/
-theorem graphDet_ofSystemMatrix (M : Matrix ι ι ℂ) : graphDet (ofSystemMatrix M) = M.det := by
+lemma graphDet_ofSystemMatrix (M : Matrix ι ι ℂ) : graphDet (ofSystemMatrix M) = M.det := by
   rw [graphDet_eq_det, systemMatrix_ofSystemMatrix]
 
 /-- The gains of the graph of a linear system are the entries of that system's inverse. -/
-theorem gain_ofSystemMatrix (M : Matrix ι ι ℂ) (s t : ι) :
+lemma gain_ofSystemMatrix (M : Matrix ι ι ℂ) (s t : ι) :
     gain (ofSystemMatrix M) s t = M⁻¹ t s := by
   rw [gain, systemMatrix_ofSystemMatrix]
 
@@ -136,10 +133,11 @@ variable {ι E : Type*}
 
 -/
 
-/-- A finite directed weighted multigraph on a node type: a separate edge type carrying a source,
-a target, and a gain. Parallel edges are distinct because they are distinct elements of the edge
+/-- A directed weighted multigraph on a node type: a separate edge type carrying a source, a
+target, and a gain. Parallel edges are distinct because they are distinct elements of the edge
 type, and the topology is fixed by the source and target maps independently of the gains, so an
-edge of gain zero is still an edge. -/
+edge of gain zero is still an edge. Operations that enumerate edges separately request a finite
+edge type. -/
 structure Multigraph (ι : Type*) (E : Type*) where
   /-- The tail of each edge. -/
   source : E → ι
@@ -161,16 +159,6 @@ lemma Multigraph.mem_edgesBetween [DecidableEq ι] [Fintype E] {Γ : Multigraph 
 /-- Replacing the gains of a multigraph leaves its topology untouched. -/
 def Multigraph.setGain (Γ : Multigraph ι E) (g : E → ℂ) : Multigraph ι E :=
   { Γ with gain := g }
-
-/-- Replacing the gains keeps every edge's tail. -/
-@[simp]
-lemma Multigraph.setGain_source (Γ : Multigraph ι E) (g : E → ℂ) :
-    (Γ.setGain g).source = Γ.source := rfl
-
-/-- Replacing the gains keeps every edge's head. -/
-@[simp]
-lemma Multigraph.setGain_target (Γ : Multigraph ι E) (g : E → ℂ) :
-    (Γ.setGain g).target = Γ.target := rfl
 
 /-- Replacing the gains keeps the edges joining each ordered pair of nodes, so the topology does
 not depend on which gains happen to vanish. -/

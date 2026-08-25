@@ -1478,10 +1478,40 @@ PR unless maintainers explicitly ask to retain it.
   `E_outᴴ * S * (1 - C * S)⁻¹ * E_in`, wiring invariance uses literal feedback equality and
   canonical identity-on-ambient-channel external relabelling, and the rectangular response is not
   called a `ScatteringMatrix` without a proved external input/output pairing and completeness law.
+- [ ] Human-check the algebraic N7-0 reflectionless two-port substrate before upstreaming. Confirm
+  that `bL = T_rl aR` and `bR = T_lr aL`, hence the matrix blocks are exactly
+  `[[0, T_rl], [T_lr, 0]]`; that the heterogeneous `Unit`/`Fin 2` regression pins both directional
+  placements. Zero reflection is not an impedance-matching derivation, arbitrary directional
+  transforms do not assert reciprocity, raw sum labels are not component-owned physical ports,
+  and this substrate is not yet propagation, delay, attenuation, coupling, or material
+  realization.
+- [ ] Human-check the stacked N7-0 modal-power classification separately. Confirm that the output
+  identities are decompositions rather than unconditional conservation; that the passive and
+  lossless iff laws concern only normalized modal power; that the two unit phases are not inverse
+  transforms; and that the gain-two failure uses a complete two-port input rather than assuming
+  the classifier's converse. Upstream this layer and its regressions only after the algebraic
+  behavior/realization stack.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
+
+## Ray and transfer source checks
+
+- [ ] Human-check the R1/R2 source map before upstreaming. In Siddique's 2015 thesis, Def. 3.7 on
+  printed p. 44 states the interface relation and table 3.1 on printed p. 47 gives the same folded
+  plane/spherical reflection and refraction matrices used by `ParaxialInterface.transferMatrix`.
+  The output-angle-reversal transform in section D is therefore a Physlib coordinate operation,
+  not the thesis convention. Independently map the thesis's convex/concave radius vocabulary on
+  printed p. 98 to Physlib's outgoing-side signed radius before attaching those geometric labels.
+- [ ] Keep totalized algebra separate from physical ray use. A downstream physical statement must
+  supply forward and non-grazing ray hypotheses where needed, positive refractive indices,
+  nonnegative gaps or lens thickness, nonzero curved-surface radii, and nonzero focal length.
+  Complete the range- and side-guarded bridge from `MeridionalRay.cos_signedIncidenceAngle` to
+  E5b's unoriented exact incidence angle rather than identifying signed angles from cosine alone.
+- [ ] Split an upstream R1/R2 proposal into focused stacks. The exact worker cutoff grouped the
+  physical/paraxial ray foundation, its regressions, the transfer/system layer, and its regressions
+  into a fork-integration batch larger than the review guideline; those remain separable concepts.
 
 ## Source and license checks
 
@@ -1511,6 +1541,31 @@ PR unless maintainers explicitly ask to retain it.
   range was not recovered from the older `PhysLean` archive during the E1 audit.
 - [ ] Replace source decimal examples by exact values or certified intervals before using them as
   regression evidence.
+- [ ] Add JAL'18 Theorem 15's literal Taylor-coefficient inverse formula after exhibiting the
+  reciprocal-variable transform as an analytic power series with its radius of convergence. The
+  current `tendsto_inversion_cobounded` recovers every sample by limits at infinity and reaches the
+  inversion content, but it does not claim the source's iterated-derivative presentation.
+- [ ] Split any upstream S5 proposal into focused stacked concepts: inversion/uniqueness,
+  convolution, and causal recurrence-solution existence. The fork retained the controller's exact
+  final worker cutoff for integration, but that batch is intentionally broader than one upstream
+  Physlib PR.
+
+## Signal-flow graph source and upstream checks
+
+- [ ] Human-check every S6 bibliography claim under `AI-POLICY.md` section 2.1 before upstreaming,
+  including FMICS 2015 Definitions 1 and 3--4 on printed pp. 167--168 and NSV 2016 Definition 6
+  on printed p. 37. In particular, verify which source objects store distinguished input/output
+  nodes and confirm that the closing-permutation bridge is a Physlib construction rather than a
+  source theorem.
+- [ ] Keep S6 partial until the forward-path numerator is proved equal to the routed-loop-family
+  numerator, edge-indexed enumeration retains parallel branches, distinguished terminals are
+  represented, direct definition-level G-01/G-03 regressions are present, and extraction is proved
+  to agree with N5's typed netlist equations. The current cofactor quotient and inverse formula
+  are totalized algebra at zero determinant; solved-response claims require nonvanishing.
+- [ ] Split the fork's S6 integration batch into focused upstream proposals. At minimum separate
+  node equations, node-level combinatorics, determinant/cofactor identities, extraction with edge
+  identity, and regressions. Split the 263-line `PathCycle.lean` further into the path-closing-cycle
+  construction and the disjoint-family gain/loop-count layer.
 
 ## Validation before an upstream proposal
 

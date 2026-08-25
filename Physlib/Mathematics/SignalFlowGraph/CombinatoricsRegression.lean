@@ -65,14 +65,14 @@ noncomputable section
 
 /-- On three nodes the forward paths from the first to the last are the direct hop and the one
 through the middle node. -/
-theorem forwardPaths_fin_three :
+lemma forwardPaths_fin_three :
     forwardPaths (0 : Fin 3) 2 = {[0, 2], [0, 1, 2]} := by decide
 
 /-- On two nodes there is exactly one forward path from the first to the second. -/
-theorem forwardPaths_fin_two : forwardPaths (0 : Fin 2) 1 = {[0, 1]} := by decide
+lemma forwardPaths_fin_two : forwardPaths (0 : Fin 2) 1 = {[0, 1]} := by decide
 
 /-- A node is joined to itself by the trivial path alone. -/
-theorem forwardPaths_self_fin_two : forwardPaths (0 : Fin 2) 0 = {[0]} := by decide
+lemma forwardPaths_self_fin_two : forwardPaths (0 : Fin 2) 0 = {[0]} := by decide
 
 /-!
 
@@ -82,14 +82,14 @@ theorem forwardPaths_self_fin_two : forwardPaths (0 : Fin 2) 0 = {[0]} := by dec
 
 /-- The gain along the two-hop path is the product of its two edge gains, in the order that reads
 each edge from its tail to its head. -/
-theorem pathGain_fin_three (G : Matrix (Fin 3) (Fin 3) ℂ) :
+lemma pathGain_fin_three (G : Matrix (Fin 3) (Fin 3) ℂ) :
     pathGain G [0, 1, 2] = G 1 0 * G 2 1 := by
   rw [pathGain_cons_cons, pathGain_cons_cons, pathGain_singleton, mul_one, mul_comm]
 
 /-- A path that visits every node leaves no vertices for loops, so its cofactor is one. This fixes
 the orientation of the cofactor: it is the determinant of the vertices the path does **not**
 touch. -/
-theorem pathCofactor_spanning (G : Matrix (Fin 3) (Fin 3) ℂ) :
+lemma pathCofactor_spanning (G : Matrix (Fin 3) (Fin 3) ℂ) :
     pathCofactor G [0, 1, 2] = 1 := by
   have hcompl : (Finset.univ : Finset (Fin 3)) \ ([0, 1, 2] : List (Fin 3)).toFinset = ∅ := by
     decide
@@ -97,7 +97,7 @@ theorem pathCofactor_spanning (G : Matrix (Fin 3) (Fin 3) ℂ) :
 
 /-- The direct hop on three nodes leaves the middle node free, so its cofactor is the graph
 determinant of that single vertex. -/
-theorem pathCofactor_direct (G : Matrix (Fin 3) (Fin 3) ℂ) :
+lemma pathCofactor_direct (G : Matrix (Fin 3) (Fin 3) ℂ) :
     pathCofactor G [0, 2] = graphDetOn G {1} := by
   have hcompl : (Finset.univ : Finset (Fin 3)) \ ([0, 2] : List (Fin 3)).toFinset = {1} := by
     decide
@@ -111,7 +111,7 @@ theorem pathCofactor_direct (G : Matrix (Fin 3) (Fin 3) ℂ) :
 
 /-- The numerator of Mason's formula for the two-node feedback graph is its single forward path
 gain. The determinant that divides it is identified in a later file. -/
-theorem masonNumerator_twoNodeLoop (a b : ℂ) :
+lemma masonNumerator_twoNodeLoop (a b : ℂ) :
     masonNumerator (twoNodeLoop a b) 0 1 = a := by
   have hcompl : (Finset.univ : Finset (Fin 2)) \ ([0, 1] : List (Fin 2)).toFinset = ∅ := by
     decide

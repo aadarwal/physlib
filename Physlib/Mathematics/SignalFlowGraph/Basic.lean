@@ -20,8 +20,8 @@ node is the sum of the injected input there and the gains along the incoming edg
 
 The whole file is linear algebra. The node equation is equivalent to `(1 - G) *ᵥ x = b`, so it has
 exactly one solution for every input exactly when `1 - G` is invertible, and that solution is
-`(1 - G)⁻¹ *ᵥ b`. The gain from a source node to a sink node is the corresponding entry of
-`(1 - G)⁻¹`, and the response to an arbitrary input is the superposition of those gains.
+`(1 - G)⁻¹ *ᵥ b`. Under this gate, the response from a source node to a sink node is the
+corresponding entry of `(1 - G)⁻¹`, and an arbitrary response is their superposition.
 
 Both directions of the solvability criterion are proved. If `1 - G` is singular then some nonzero
 vector is annihilated by it, so the zero input already has two solutions; uniqueness therefore
@@ -32,10 +32,10 @@ fails, and the criterion is not merely sufficient.
 - `Physlib.SignalFlowGraph.IsNodeSolution`: the node equation `x = G *ᵥ x + b`.
 - `Physlib.SignalFlowGraph.systemMatrix`: the matrix `1 - G`.
 - `Physlib.SignalFlowGraph.isNodeSolution_iff`: the node equation as `(1 - G) *ᵥ x = b`.
-- `Physlib.SignalFlowGraph.nodeSolution`: the solution `(1 - G)⁻¹ *ᵥ b`.
+- `Physlib.SignalFlowGraph.nodeSolution`: the algebraic inverse expression `(1 - G)⁻¹ *ᵥ b`.
 - `Physlib.SignalFlowGraph.existsUnique_isNodeSolution_iff`: unique solvability for every input is
   exactly invertibility of `1 - G`.
-- `Physlib.SignalFlowGraph.gain`: the gain from a source node to a sink node.
+- `Physlib.SignalFlowGraph.gain`: the totalized inverse-system entry from source to sink.
 - `Physlib.SignalFlowGraph.nodeSolution_eq_sum_gain`: superposition of the gains.
 
 ## iii. Table of contents
@@ -48,9 +48,9 @@ fails, and the criterion is not merely sufficient.
 
 This file supplies the "node-equation semantics and adjacency matrix" and the "equality with the
 corresponding entry of `(1 - A)⁻¹`" requirements of `goal.md` section H.4 S6. The topological
-requirements of that section, namely paths, loops, touching and non-touching loop families, the
-graph determinant, and Mason's formula, are developed in later files and nothing here anticipates
-them.
+requirements of that section are only partly developed in later files: they provide node-level
+paths and loop families, the graph determinant, and a routed-loop-family/cofactor quotient, while
+edge-level enumeration and the general forward-path Mason identity remain open.
 
 The source development is S. M. Beillahi, U. Siddique, and S. Tahar, "On the Formalization of
 Signal-Flow-Graphs in HOL", Technical Report, Concordia University, November 2014, and
@@ -60,7 +60,7 @@ S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal Process
 FMICS 2015, LNCS 9128, pp. 162-177, Definition 1 (p. 167). Those sources carry a graph as a list
 of branches and define Mason's gain by executable enumeration; they do not state a node-equation
 semantics or relate the gain to a matrix inverse. This file is therefore not a parity claim: it
-is the linear-algebra layer that the later Mason theorem is proved to agree with.
+is the linear-algebra layer that the later routed-loop-family/cofactor theorem agrees with.
 
 Two things are deliberately not claimed. First, a gain matrix records only the **total** gain
 between an ordered pair of nodes, so it does not by itself distinguish parallel edges, and its
@@ -98,7 +98,7 @@ def IsNodeSolution (G : Matrix ι ι ℂ) (b x : ι → ℂ) : Prop := x = G *�
 def systemMatrix (G : Matrix ι ι ℂ) : Matrix ι ι ℂ := 1 - G
 
 /-- The node equation written as a linear system for the system matrix. -/
-theorem isNodeSolution_iff : IsNodeSolution G b x ↔ systemMatrix G *ᵥ x = b := by
+lemma isNodeSolution_iff : IsNodeSolution G b x ↔ systemMatrix G *ᵥ x = b := by
   rw [IsNodeSolution, systemMatrix, sub_mulVec, one_mulVec, sub_eq_iff_eq_add,
     add_comm b (G *ᵥ x)]
 
@@ -112,25 +112,27 @@ lemma isNodeSolution_zero (G : Matrix ι ι ℂ) : IsNodeSolution G 0 0 := by
 
 -/
 
-/-- The solution of the node equation, given by the inverse system matrix. Outside the invertible
-case this is Mathlib's junk inverse and no theorem below refers to it. -/
-def nodeSolution (G : Matrix ι ι ℂ) (b : ι → ℂ) : ι → ℂ := (systemMatrix G)⁻¹ *ᵥ b
+/-- The algebraic inverse expression for the node equation. When the system matrix is invertible,
+`isNodeSolution_nodeSolution` proves that this is the unique solution. At a singular matrix,
+Mathlib's inverse is totalized and this expression has no solution semantics by itself. -/
+def nodeSolution (G : Matrix ι ι ℂ) (b : ι → ℂ) : ι → ℂ :=
+  (systemMatrix G)⁻¹ *ᵥ b
 
 /-- Where the system matrix is invertible, the constructed vector solves the node equation. -/
-theorem isNodeSolution_nodeSolution (h : IsUnit (systemMatrix G).det) (b : ι → ℂ) :
+lemma isNodeSolution_nodeSolution (h : IsUnit (systemMatrix G).det) (b : ι → ℂ) :
     IsNodeSolution G b (nodeSolution G b) := by
   rw [isNodeSolution_iff, nodeSolution, mulVec_mulVec, mul_nonsing_inv _ h, one_mulVec]
 
 /-- Where the system matrix is invertible, every solution of the node equation is the constructed
 one. -/
-theorem eq_nodeSolution (h : IsUnit (systemMatrix G).det) (hx : IsNodeSolution G b x) :
+lemma eq_nodeSolution (h : IsUnit (systemMatrix G).det) (hx : IsNodeSolution G b x) :
     x = nodeSolution G b := by
   rw [isNodeSolution_iff] at hx
   rw [nodeSolution, ← hx, mulVec_mulVec, nonsing_inv_mul _ h, one_mulVec]
 
 /-- Where the system matrix is invertible, the node equation has exactly one solution for every
 input. -/
-theorem existsUnique_isNodeSolution (h : IsUnit (systemMatrix G).det) (b : ι → ℂ) :
+lemma existsUnique_isNodeSolution (h : IsUnit (systemMatrix G).det) (b : ι → ℂ) :
     ∃! x, IsNodeSolution G b x :=
   ⟨nodeSolution G b, isNodeSolution_nodeSolution h b, fun _ hx => eq_nodeSolution h hx⟩
 
@@ -154,18 +156,21 @@ theorem existsUnique_isNodeSolution_iff (G : Matrix ι ι ℂ) :
 
 -/
 
-/-- The gain from a source node to a sink node: the entry of the inverse system matrix that maps
-a unit injection at the source to the signal at the sink. -/
+/-- The inverse-system entry from a source node to a sink node. When the system matrix is
+invertible this maps a unit source injection to the solved sink signal. At a singular matrix it
+is only Mathlib's totalized inverse entry, not a solved network response. -/
 def gain (G : Matrix ι ι ℂ) (s t : ι) : ℂ := (systemMatrix G)⁻¹ t s
 
-/-- The gain is the sink component of the solution driven by a unit injection at the source. -/
-theorem gain_eq_nodeSolution (G : Matrix ι ι ℂ) (s t : ι) :
+/-- The gain is the sink component of the algebraic inverse expression driven by a unit injection
+at the source. Its solution interpretation requires an invertible system matrix. -/
+lemma gain_eq_nodeSolution (G : Matrix ι ι ℂ) (s t : ι) :
     gain G s t = nodeSolution G (Pi.single s 1) t := by
   rw [gain, nodeSolution, mulVec_single_one]
   rfl
 
-/-- Superposition: the solution for an arbitrary input is the input-weighted sum of the gains. -/
-theorem nodeSolution_eq_sum_gain (G : Matrix ι ι ℂ) (b : ι → ℂ) (t : ι) :
+/-- The algebraic inverse expression for an arbitrary input is the input-weighted sum of the
+inverse entries. Under invertibility this is superposition of the unique solved response. -/
+lemma nodeSolution_eq_sum_gain (G : Matrix ι ι ℂ) (b : ι → ℂ) (t : ι) :
     nodeSolution G b t = ∑ s, gain G s t * b s := by
   rw [nodeSolution]
   rfl

@@ -181,6 +181,14 @@ Requirements:
     done: false
     location: N/A
 
+  - description: "The algebraic N7-0 core gives a reflectionless typed two-port an independent amplitude-level behavior and realizes it by the exact zero-reflection block scattering matrix with separately oriented directional transforms. A heterogeneous typed-scattering regression pins block and endpoint orientation, direct independent-behavior membership, concrete realized-graph membership, and rejection of a wrong local-mode order. This core makes no power, propagation, matching, reciprocity, physical-port, or material-realization claim."
+    done: true
+    location: "Physlib/Optics/Components/ReflectionlessTwoPort.lean (Optics.ReflectionlessTwoPort.outputMap, Optics.ReflectionlessTwoPort.outputMap_apply, Optics.ReflectionlessTwoPort.behavior, Optics.ReflectionlessTwoPort.mem_behavior_iff, Optics.ReflectionlessTwoPort.scattering, Optics.ReflectionlessTwoPort.scattering_toLinearMap_apply, Optics.ReflectionlessTwoPort.scattering_toTwoPortScatteringTransform_toLinearMap_apply, Optics.ReflectionlessTwoPort.scattering_realizes_behavior); Physlib/Optics/Components/ReflectionlessTwoPortRegression.lean (Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_outputMap, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_mem, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_wrong_not_mem, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_scattering_action, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_realized_mem)"
+
+  - description: "The N7-0 modal-power layer derives the exact specification-level and realized output-power decompositions and classifies passivity and losslessness by iff statements on both directional transforms. Two unit-modulus directions whose composition is not identity give conditional normalized-modal-power preservation, while an explicit complete-input modal-amplitude-gain-two witness violates passivity without relying on the classifier's converse. These are normalized modal statements, not electromagnetic normalization or physical-channel-completeness claims."
+    done: true
+    location: "Physlib/Optics/Components/ReflectionlessTwoPortPower.lean (Optics.ReflectionlessTwoPort.behavior_output_power, Optics.ReflectionlessTwoPort.power_scattering_toLinearMap_apply, Optics.ReflectionlessTwoPort.scattering_isPassive, Optics.ReflectionlessTwoPort.scattering_isPassive_iff, Optics.ReflectionlessTwoPort.scattering_isLossless, Optics.ReflectionlessTwoPort.scattering_isLossless_iff); Physlib/Optics/Components/ReflectionlessTwoPortPowerRegression.lean (Optics.ReflectionlessTwoPort.reflectionlessTwoPortPhase_outputMap, Optics.ReflectionlessTwoPort.reflectionlessTwoPortPhase_mem, Optics.ReflectionlessTwoPort.reflectionlessTwoPortPhase_directional_mul_ne_one, Optics.ReflectionlessTwoPort.reflectionlessTwoPortPhase_isLossless, Optics.ReflectionlessTwoPort.reflectionlessTwoPortPhase_outgoing_power, Optics.ReflectionlessTwoPort.reflectionlessTwoPortGainTwo_not_isPassive)"
+
   - description: "The component library shall represent polarizers and wave plates as one-way mode transforms and matched propagation delays, attenuators, mirrors, ideal directional couplers, beam splitters, and dielectric interfaces as multiport scattering devices, with explicit physical validity conditions."
     done: false
     location: N/A
@@ -193,7 +201,60 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "For responses rational in the delay variable `q = exp (-s * τ) = z⁻¹`, the API shall connect finite-mode networks to rational transfer functions and, where a discrete-time model is intended, to difference equations and the Z-transform with explicit region-of-convergence and stability hypotheses, without assuming rationality in physical frequency."
+  - description: "The neutral mathematics API provides causal two-sided complex sequences, a summation-defined unilateral Z-transform, distinct conditional and absolute regions of convergence with a strict-subset witness, shift and first-difference laws with startup terms, finite-delay recurrences and rational transfer functions, explicit proved directions among absolute summability, BIBO stability, Schur stability, poles, and the ROC, sample recovery by limits at infinity, causal uniqueness with a counterexample showing why causality is necessary, the absolutely convergent convolution theorem, and existence and uniqueness of causal solutions to strictly causal recurrences. Exact regressions cover geometric, all-pass, low-pass, unstable one-pole, stable two-pole, convolution, and recursively constructed one-pole cases. The literal Taylor-coefficient form of JAL'18 Theorem 15 is recorded as a remaining source-form gap; no connection to an optical network or physical frequency is claimed here."
+    done: true
+    location: >-
+      Physlib/Mathematics/ZTransform/Basic.lean (Physlib.ZTransform.IsCausal,
+      Physlib.ZTransform.zeroExtend, Physlib.ZTransform.transform, Physlib.ZTransform.ROC,
+      Physlib.ZTransform.condROC, Physlib.ZTransform.transform_delay,
+      Physlib.ZTransform.transform_advance, Physlib.ZTransform.transform_firstDifference);
+      Physlib/Mathematics/ZTransform/BasicRegression.lean
+      (Physlib.ZTransform.transform_delay_ne_of_not_isCausal,
+      Physlib.ZTransform.transform_advance_ne_without_startup);
+      Physlib/Mathematics/ZTransform/Convergence.lean
+      (Physlib.ZTransform.isExteriorOfCircle_ROC_iff, Physlib.ZTransform.transform_inv,
+      Physlib.ZTransform.ROC_unitStep, Physlib.ZTransform.ROC_geometricSeq);
+      Physlib/Mathematics/ZTransform/ConvergenceRegression.lean
+      (Physlib.ZTransform.ROC_ssubset_condROC_harmonicSeq);
+      Physlib/Mathematics/ZTransform/Convolution.lean
+      (Physlib.ZTransform.transform_convolution, Physlib.ZTransform.mem_ROC_convolution,
+      Physlib.ZTransform.eq_of_isCausal_of_convolution_unitImpulse_eq);
+      Physlib/Mathematics/ZTransform/ConvolutionRegression.lean
+      (Physlib.ZTransform.transform_convolution_geometricSeq,
+      Physlib.ZTransform.eq_of_convolution_geometricSeq_eq,
+      Physlib.ZTransform.convolution_not_commutative_regression);
+      Physlib/Mathematics/ZTransform/DifferenceEquation.lean
+      (Physlib.ZTransform.IsRecurrenceSolution, Physlib.ZTransform.transferFunction,
+      Physlib.ZTransform.transform_isRecurrenceSolution);
+      Physlib/Mathematics/ZTransform/DifferenceEquationRegression.lean
+      (Physlib.ZTransform.norm_transferFunction_allPass,
+      Physlib.ZTransform.transferFunction_lowPass_one,
+      Physlib.ZTransform.transferFunction_lowPass_neg_one);
+      Physlib/Mathematics/ZTransform/Existence.lean
+      (Physlib.ZTransform.recurrenceSolution,
+      Physlib.ZTransform.existsUnique_causal_isRecurrenceSolution,
+      Physlib.ZTransform.transform_recurrenceSolution);
+      Physlib/Mathematics/ZTransform/ExistenceRegression.lean
+      (Physlib.ZTransform.recurrenceSolution_onePole,
+      Physlib.ZTransform.transform_recurrenceSolution_onePole_eq);
+      Physlib/Mathematics/ZTransform/Inverse.lean
+      (Physlib.ZTransform.tendsto_transform_cobounded,
+      Physlib.ZTransform.tendsto_inversion_cobounded,
+      Physlib.ZTransform.eq_of_isCausal_of_transform_eqOn);
+      Physlib/Mathematics/ZTransform/InverseRegression.lean
+      (Physlib.ZTransform.transform_shiftedImpulse_eq,
+      Physlib.ZTransform.shiftedImpulse_ne_unitImpulse,
+      Physlib.ZTransform.exists_common_ROC_transform_eqOn_but_ne,
+      Physlib.ZTransform.eq_geometricSeq_of_transform_eq);
+      Physlib/Mathematics/ZTransform/Stability.lean
+      (Physlib.ZTransform.IsAbsSummable, Physlib.ZTransform.IsBIBOStable,
+      Physlib.ZTransform.IsSchurStable, Physlib.ZTransform.isBIBOStable_of_isAbsSummable,
+      Physlib.ZTransform.closedExterior_subset_iirROC_of_isSchurStable);
+      Physlib/Mathematics/ZTransform/StabilityRegression.lean
+      (Physlib.ZTransform.not_isSchurStable_onePole_two,
+      Physlib.ZTransform.candidatePoles_twoPole, Physlib.ZTransform.isSchurStable_twoPole)
+
+  - description: "For finite-mode network responses rational in the formal delay variable `q = exp (-s * τ) = z⁻¹`, the API shall connect the compiled optical-network response to rational transfer functions and, where a discrete-time model is intended, to the completed difference-equation and Z-transform layer on their common evaluation domain, without assuming rationality in physical frequency."
     done: false
     location: N/A
 
