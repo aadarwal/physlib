@@ -289,13 +289,11 @@ lemma allPassRationalNetlist_compile_eq (p : AllPass.Parameters) (q : ℂ)
     (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * q) :
     (allPassRationalNetlist p).compile (fun _ => q) = AllPass.netlist p := by
   have hScattering := allPassRationalComponents_scattering_eq p q hLoop
-  change
-    ({ components :=
-        { Component := AllPass.Component
-          portFamily := AllPass.componentPortFamily
-          scattering := (allPassRationalComponents p).scattering (fun _ => q) }
-      Connection := AllPass.Connection
-      connections := AllPass.connections p } : FlatNetlist) = AllPass.netlist p
+  change FlatNetlist.mk
+      { Component := AllPass.Component
+        portFamily := AllPass.componentPortFamily
+        scattering := (allPassRationalComponents p).scattering (fun _ => q) }
+      AllPass.Connection (AllPass.connections p) = AllPass.netlist p
   rw [hScattering]
   rfl
 
