@@ -384,6 +384,8 @@ public import Physlib.Optics.Polarization.RelativePhaseStokes
 public import Physlib.Optics.Polarization.Stokes
 public import Physlib.Optics.Rays.Basic
 public import Physlib.Optics.Rays.BasicRegression
+public import Physlib.Optics.Rays.E5bBridge
+public import Physlib.Optics.Rays.E5bBridgeRegression
 public import Physlib.Optics.Rays.Gaussian
 public import Physlib.Optics.Rays.GaussianRegression
 public import Physlib.Optics.Rays.Imaging
