@@ -171,6 +171,17 @@ public import Physlib.Mathematics.RationalFunction.CoefficientsRegression
 public import Physlib.Mathematics.Resolvent
 public import Physlib.Mathematics.SO3.Basic
 public import Physlib.Mathematics.SchurTriangulation
+public import Physlib.Mathematics.SignalFlowGraph.Basic
+public import Physlib.Mathematics.SignalFlowGraph.BasicRegression
+public import Physlib.Mathematics.SignalFlowGraph.Combinatorics
+public import Physlib.Mathematics.SignalFlowGraph.CombinatoricsRegression
+public import Physlib.Mathematics.SignalFlowGraph.Extraction
+public import Physlib.Mathematics.SignalFlowGraph.ExtractionRegression
+public import Physlib.Mathematics.SignalFlowGraph.Mason
+public import Physlib.Mathematics.SignalFlowGraph.MasonRegression
+public import Physlib.Mathematics.SignalFlowGraph.Numerator
+public import Physlib.Mathematics.SignalFlowGraph.NumeratorRegression
+public import Physlib.Mathematics.SignalFlowGraph.PathCycle
 public import Physlib.Mathematics.SpecialFunctions.PhysHermite
 public import Physlib.Mathematics.Trigonometry.Tanh
 public import Physlib.Mathematics.VariationalCalculus.Basic

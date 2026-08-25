@@ -2218,6 +2218,14 @@ is deliberately not claimed and remains recorded in `tbd.md`.
 - equality with the corresponding entry of `(I - A)⁻¹`; and
 - extraction from suitable scalar network models.
 
+Current fork status: the neutral matrix layer now supplies node equations, unique-solvability
+equivalence, node-list path and permutation-family enumerations, the graph-determinant/system-
+determinant identity, a routed-loop-family/cofactor quotient, linear-system extraction, and an
+edge-indexed multigraph-to-matrix map. S6 remains incomplete: distinguished terminals,
+edge-indexed path/cycle enumeration with parallel branches, the general equality between the
+forward-path and routed-loop-family numerators, independent definition-level G-01/G-03 audits,
+and agreement with the N5 typed-netlist semantics are still open.
+
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
 families, and parallel edges as distinct branches. A simple digraph that collapses parallel edges
@@ -2646,7 +2654,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | blocked | N5, finite graph audit | combinatorial/matrix equivalence |
+| S6 Mason | in progress: neutral matrix/cofactor foundation integrated; forward-path bijection, edge enumeration, and N5 agreement open | N5, finite graph audit | combinatorial/matrix equivalence |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |

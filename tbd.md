@@ -1550,6 +1550,23 @@ PR unless maintainers explicitly ask to retain it.
   final worker cutoff for integration, but that batch is intentionally broader than one upstream
   Physlib PR.
 
+## Signal-flow graph source and upstream checks
+
+- [ ] Human-check every S6 bibliography claim under `AI-POLICY.md` section 2.1 before upstreaming,
+  including FMICS 2015 Definitions 1 and 3--4 on printed pp. 167--168 and NSV 2016 Definition 6
+  on printed p. 37. In particular, verify which source objects store distinguished input/output
+  nodes and confirm that the closing-permutation bridge is a Physlib construction rather than a
+  source theorem.
+- [ ] Keep S6 partial until the forward-path numerator is proved equal to the routed-loop-family
+  numerator, edge-indexed enumeration retains parallel branches, distinguished terminals are
+  represented, direct definition-level G-01/G-03 regressions are present, and extraction is proved
+  to agree with N5's typed netlist equations. The current cofactor quotient and inverse formula
+  are totalized algebra at zero determinant; solved-response claims require nonvanishing.
+- [ ] Split the fork's S6 integration batch into focused upstream proposals. At minimum separate
+  node equations, node-level combinatorics, determinant/cofactor identities, extraction with edge
+  identity, and regressions. Split the 263-line `PathCycle.lean` further into the path-closing-cycle
+  construction and the disjoint-family gain/loop-count layer.
+
 ## Validation before an upstream proposal
 
 - [ ] Run `lake-lock exe cache get` and `lake-lock build` from a clean checkout of the proposed
