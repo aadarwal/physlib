@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.MeasureTheory.Integral.Bochner.SumMeasure
 public import Physlib.Optics.HarmonicFlux.Aperture
 
 /-!
