@@ -273,7 +273,7 @@ Requirements:
       Optics.MachZehnder.balanced_phase_factor_ratio_eq_output_ratio);
       Physlib/Optics/Systems/MachZehnder/Regression.lean
 
-  - description: "The all-pass portion models a one-bus microring as an explicit FlatNetlist assembled from the common directional-coupler and fixed-carrier matched-propagation components. Its complete-state well-posedness is proved equivalent to the exact nonzero denominator 1 - t*gamma, with a singular-incident kernel witness for the converse. N5 elimination derives the through response t + crossCoefficient^2*gamma/(1 - t*gamma), and the unitary-coupler specialization gives (t - gamma)/(1 - t*gamma). The totalized round-trip and through-transfer tsums acquire their geometric-series meaning only under norm (t*gamma) < 1, where they are proved equal to the algebraic response. Exact 3-4-5 resonance and antiresonance regressions independently pin denominators 7/10 and 13/10, responses 1/7 and 11/13, and the resonance series 10/7. The umbrella remains incomplete: add-drop topology/response, power observables, critical coupling, rejection ratio, free spectral range, dispersion/group-delay, and any DATE/SysCon parity bridge are not yet supplied."
+  - description: "The all-pass portion models a one-bus microring as an explicit FlatNetlist assembled from the common directional-coupler and fixed-carrier matched-propagation components. Its complete-state well-posedness is equivalent to 1 - t*gamma != 0, and N5 elimination derives the through response and its contraction-gated round-trip-series form. The add-drop portion models a four-port two-bus ring from two couplers and two fixed-carrier half arcs, with the equal attenuation/phase split explicitly fixing a model and drop-port reference plane. Its complete-state well-posedness is equivalent to 1 - t1*t2*gamma != 0, with a singular-incident kernel witness for the converse; N5 derives both through and drop responses, their unitary-coupler standard forms, and their contraction-gated series forms. Exact 3-4-5 regressions independently pin the all-pass and add-drop channel equations, denominators, responses, and convergent series. The umbrella remains incomplete: power observables and balance, extrema, critical coupling, rejection ratio, identifiability, free spectral range, dispersion/group-delay, reciprocity, and any DATE/SysCon parity bridge are not yet supplied."
     done: false
     location: >-
       Physlib/Optics/Systems/Microring/AllPass.lean
@@ -297,7 +297,34 @@ Requirements:
       Optics.AllPass.allPassRegression_resonance_roundTripSeries,
       Optics.AllPass.allPassRegression_resonance_response_eq_series,
       Optics.AllPass.allPassRegression_antiresonance_denominator,
-      Optics.AllPass.allPassRegression_antiresonance_throughTransfer)
+      Optics.AllPass.allPassRegression_antiresonance_throughTransfer);
+      Physlib/Optics/Systems/Microring/AddDropNetwork.lean
+      (Optics.AddDrop.Parameters, Optics.AddDrop.Parameters.roundTripCoefficient,
+      Optics.AddDrop.Parameters.loopGain, Optics.AddDrop.Parameters.denominator,
+      Optics.AddDrop.Parameters.HasNonzeroDenominator,
+      Optics.AddDrop.Parameters.IsContractive, Optics.AddDrop.Parameters.IsValid,
+      Optics.AddDrop.throughTransfer, Optics.AddDrop.dropTransfer,
+      Optics.AddDrop.throughTransfer_eq_standard,
+      Optics.AddDrop.dropTransfer_eq_standard, Optics.AddDrop.netlist,
+      Optics.AddDrop.connections_pairs);
+      Physlib/Optics/Systems/Microring/AddDrop.lean
+      (Optics.AddDrop.isWellPosed_of_hasNonzeroDenominator,
+      Optics.AddDrop.not_isWellPosed_of_denominator_eq_zero,
+      Optics.AddDrop.isWellPosed_iff, Optics.AddDrop.response_through,
+      Optics.AddDrop.response_drop, Optics.AddDrop.roundTripSeries,
+      Optics.AddDrop.throughTransferSeries, Optics.AddDrop.dropTransferSeries,
+      Optics.AddDrop.response_through_eq_roundTripSeries,
+      Optics.AddDrop.response_drop_eq_roundTripSeries);
+      Physlib/Optics/Systems/Microring/AddDropRegression.lean
+      (Optics.AddDrop.addDropRegression_connections_pairs,
+      Optics.AddDrop.addDropRegression_resonance_denominator,
+      Optics.AddDrop.addDropRegression_resonance_throughTransfer,
+      Optics.AddDrop.addDropRegression_resonance_dropTransfer,
+      Optics.AddDrop.addDropRegression_resonance_responseTransform_entry_through,
+      Optics.AddDrop.addDropRegression_resonance_responseTransform_entry_drop,
+      Optics.AddDrop.addDropRegression_resonance_roundTripSeries,
+      Optics.AddDrop.addDropRegression_antiresonance_denominator,
+      Optics.AddDrop.addDropRegression_antiresonance_throughTransfer)
 
   - description: "The neutral mathematics API provides causal two-sided complex sequences, a summation-defined unilateral Z-transform, distinct conditional and absolute regions of convergence with a strict-subset witness, shift and first-difference laws with startup terms, finite-delay recurrences and rational transfer functions, explicit proved directions among absolute summability, BIBO stability, Schur stability, poles, and the ROC, sample recovery by limits at infinity, causal uniqueness with a counterexample showing why causality is necessary, the absolutely convergent convolution theorem, and existence and uniqueness of causal solutions to strictly causal recurrences. Exact regressions cover geometric, all-pass, low-pass, unstable one-pole, stable two-pole, convolution, and recursively constructed one-pole cases. The literal Taylor-coefficient form of JAL'18 Theorem 15 is recorded as a remaining source-form gap; no connection to an optical network or physical frequency is claimed here."
     done: true

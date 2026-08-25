@@ -435,6 +435,9 @@ public import Physlib.Optics.Rays.TransferRegression
 public import Physlib.Optics.Systems.MachZehnder.Basic
 public import Physlib.Optics.Systems.MachZehnder.Construction
 public import Physlib.Optics.Systems.MachZehnder.Regression
+public import Physlib.Optics.Systems.Microring.AddDrop
+public import Physlib.Optics.Systems.Microring.AddDropNetwork
+public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
 public import Physlib.Optics.Systems.Microring.AllPassRegression
 public import Physlib.Optics.Systems.PolarizerRetarder
