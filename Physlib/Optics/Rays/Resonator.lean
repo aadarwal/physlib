@@ -12,9 +12,9 @@ public import Physlib.Optics.Rays.Gaussian
 
 ## i. Overview
 
-Stability here is what the source makes it: a statement that the ray stays bounded under
-arbitrarily many round trips, with the bounds chosen before the number of round trips. It is not a
-trace inequality. The trace inequality is a *criterion*, and
+Stability here is a matrix-level analogue of the source's bounded-ray condition: the ray stays
+bounded under arbitrarily many powers of one round-trip matrix, with the bounds chosen before the
+number of round trips. It is not a trace inequality. The trace inequality is a *criterion*, and
 `Optics.isStable_of_abs_trace_lt_two` is the theorem that it implies boundedness.
 
 The proof is by a conserved quantity rather than by diagonalisation. A unimodular ray-transfer
@@ -32,28 +32,35 @@ not. Both are exhibited in `Physlib.Optics.Rays.ResonatorRegression`. So the fam
 interior `0 < g₁ g₂ < 1`; the endpoints must be decided one at a time, and this file does not
 claim them in general.
 
-Reflection bookkeeping. The round trips here are built in the folded convention of
-`Physlib.Optics.Rays.Basic`, which the parity lane confirms is the source's own. The direction
-reversal at a mirror is therefore already inside the mirror matrix, and the radii are **not**
-negated on the reversed leg: doing both would count the same reversal twice.
-`Optics.resonatorRegression_negated_radii_not_isStable` makes that load-bearing,
-by showing the doubly-counted convention turns a stable cavity into an unstable one. Because the
-folded mirrors have determinant `1`, the determinant hypothesis of the stability theorem is met
-directly.
+Reflection bookkeeping. The round trips here take `R₁` and `R₂` directly as the local signed
+radii at their two respective mirror encounters in the folded convention fixed by
+`Physlib.Optics.Rays.Basic`; they do not implement a generic reverse-list traversal.
+`Optics.resonatorRegression_negated_radii_not_isStable` shows that negating those supplied radii
+instead produces a different, unstable cavity. It does not identify that altered model with an
+explicit output-angle coordinate reversal: such an identification would require a separate
+covariance theorem for propagation and reflection. Because folded mirrors have determinant `1`,
+the determinant hypothesis of the stability theorem is met directly.
 
 Explicit non-claims. There is no field, power, loss, gain, or mode-volume content here, and no
 diffraction: a resonator that is stable in this sense confines rays, which is not the same as
 supporting a low-loss mode. Nothing is claimed about resonance frequencies or longitudinal modes.
+The explicit eigenparameter formula is a totalized algebraic candidate outside the strict trace
+domain; only the proof-gated eigenbeam is given physical meaning.
+Generic source-style reverse-list unfolding, its validity predicate, and its connection to matrix
+powers remain open, so this file does not claim literal parity with the source stability predicate.
 
 ## ii. Key results
 
 - `Optics.IsStable`: stability as boundedness of the ray under arbitrarily many round trips.
+- `Optics.IsFixedRay` and `Optics.IsFixedBeam`: named matrix-level fixed-point predicates.
 - `Optics.rayInvariant_rayTransfer`: the conserved quadratic form, up to the determinant.
 - `Optics.isStable_of_abs_trace_lt_two`: the trace criterion implies stability.
 - `Optics.twoMirror_trace`: the two-mirror round-trip trace is `4 g₁ g₂ - 2`.
 - `Optics.isStable_twoMirror`: a two-mirror cavity with `0 < g₁ g₂ < 1` is stable.
-- `Optics.exists_gaussian_eigenmode`: a subcritical resonator has a Gaussian eigenmode, whose
+- `Optics.gaussianEigenbeam`: a subcritical resonator has a proof-gated Gaussian eigenbeam, whose
   beam parameter is a root of the same quadratic that the ray invariant is built from.
+- `Optics.transform_gaussianEigenbeam`: the full beam, including its wavelength, is fixed by one
+  round trip.
 
 ## iii. Table of contents
 
@@ -68,8 +75,8 @@ supporting a low-loss mode. Nothing is claimed about resonance frequencies or lo
 - B. E. A. Saleh and M. C. Teich, *Fundamentals of Photonics*, 3rd edition, chapter 10, for the
   resonator stability condition and the `g` parameters.
 - M. U. Siddique, *Formal Analysis of Geometrical Optics using Theorem Proving*, PhD thesis,
-  Concordia University, 2015, chapter 5, definition 5.5 and theorems 5.6 to 5.7, for the
-  boundedness definition of stability and the trace criterion.
+  Concordia University, 2015, chapter 5, definition 5.5 and theorem 5.7, for the source
+  boundedness predicate and trace criterion to which the matrix-level results here are related.
 
 -/
 
@@ -99,17 +106,25 @@ lemma roundTripRay_succ (M : RayTransferMatrix) (r : ParaxialRay) (n : ℕ) :
     roundTripRay M r (n + 1) = rayTransfer M (roundTripRay M r n) := by
   rw [roundTripRay, roundTripRay, pow_succ', rayTransfer_mul]
 
-/-- **Stability of a resonator**, in the source's sense: for every incoming ray there are bounds,
-chosen in advance, that the height and the angle never exceed however many round trips the ray
-makes.
+/-- **Matrix-level stability of a resonator:** for every incoming ray there are bounds, chosen in
+advance, that the height and the angle never exceed however many matrix round trips the ray makes.
 
-This is a statement about the ray, not about the matrix. The trace criterion of section C is a
-sufficient condition for it, and is not the definition.
+This is a statement about every ray under powers of one matrix. The trace criterion of section C
+is a sufficient condition for it, and is not the definition. A future source-parity bridge must
+relate source-style unfolded resonator lists and their validity antecedent to these powers.
 -/
 def IsStable (M : RayTransferMatrix) : Prop :=
   ∀ r : ParaxialRay, ∃ heightBound angleBound : ℝ, ∀ n : ℕ,
     |(roundTripRay M r n).height| ≤ heightBound ∧
       |(roundTripRay M r n).angle| ≤ angleBound
+
+/-- A paraxial ray is fixed by one application of a round-trip matrix. -/
+def IsFixedRay (M : RayTransferMatrix) (r : ParaxialRay) : Prop := rayTransfer M r = r
+
+/-- A Gaussian beam is fixed by a round-trip matrix when the determinant preserves its wavelength
+and the complex ABCD action preserves its beam parameter. -/
+def IsFixedBeam (M : RayTransferMatrix) (b : GaussianBeam) : Prop :=
+  M.det = 1 ∧ abcdTransform M b.q = b.q
 
 /-!
 
@@ -191,9 +206,9 @@ lemma entry_one_zero_ne_zero_of_abs_rayTrace_lt_two (M : RayTransferMatrix) (hde
 
 /-- **The trace criterion for resonator stability.**
 
-A resonator whose round-trip matrix is unimodular and has strictly subcritical trace is stable in
-the boundedness sense of `Optics.IsStable`. The hypotheses are exactly the source's: unit
-determinant and a strict trace bound.
+A round-trip matrix that is unimodular and has strictly subcritical trace is stable in the
+boundedness sense of `Optics.IsStable`. This is the matrix-level algebraic core related to the
+source criterion; it does not supply the source's unfolded-system validity theorem.
 -/
 theorem isStable_of_abs_trace_lt_two (M : RayTransferMatrix) (hdet : M.det = 1)
     (htr : |rayTrace M| < 2) : IsStable M := by
@@ -253,8 +268,8 @@ def gParameter (d R : ℝ) : ℝ := 1 - d / R
 /-- A two-mirror resonator round trip: traverse the cavity, reflect off the far mirror, traverse
 back, reflect off the near mirror.
 
-The mirrors are the folded-convention ones, so the direction reversal is already inside each
-mirror matrix and the radii are **not** negated on the return leg.
+The locally folded model takes `R₁` and `R₂` directly as the signed radii at their respective
+mirror encounters; this definition does not implement generic reverse-list unfolding.
 -/
 def twoMirrorRoundTrip (d R₁ R₂ : ℝ) : List ParaxialComponent :=
   [⟨⟨1, d⟩, ParaxialInterface.sphericalMirror R₂⟩,
@@ -281,9 +296,8 @@ lemma twoMirror_matrix (d R₁ R₂ : ℝ) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ �
 
 /-- **The two-mirror round-trip trace is `4 g₁ g₂ - 2`.**
 
-This is where the reflection bookkeeping has to be right. The folded mirrors already contain the
-direction reversal, so the radii keep their signs on the return leg; negating them as well would
-compute the round trip of the negated radii, which
+This is where the signed-radius convention has to be applied consistently. Negating both stored
+radii computes the round trip of a different cavity, which
 `Optics.resonatorRegression_negated_radii_not_isStable` shows changes a stable cavity into an
 unstable one.
 -/
@@ -297,7 +311,7 @@ theorem twoMirror_trace (d R₁ R₂ : ℝ) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ �
 
 /-- The two-mirror round trip is unimodular, so the determinant hypothesis of the stability
 criterion is met directly in the folded convention. -/
-theorem twoMirror_det (d R₁ R₂ : ℝ) (hd : 0 ≤ d) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
+lemma twoMirror_det (d R₁ R₂ : ℝ) (hd : 0 ≤ d) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
     (ParaxialSystem.matrix (twoMirrorRoundTrip d R₁ R₂) ⟨1, 0⟩).det = 1 := by
   rw [ParaxialSystem.det_matrix _ _ (twoMirrorRoundTrip_isValid d R₁ R₂ hd hR₁ hR₂)
     (by
@@ -340,19 +354,24 @@ lemma rayInvariant_eq_ratio (M : RayTransferMatrix) (r : ParaxialRay) (h : r.ang
   rw [rayInvariant]
   field_simp
 
-/-- The complex beam parameter of the Gaussian eigenmode of a subcritical resonator. -/
-def gaussianEigenparameter (M : RayTransferMatrix) : ℂ :=
+/-- The totalized algebraic candidate for a subcritical resonator's Gaussian eigenparameter.
+
+Outside the hypotheses `M.det = 1` and `|rayTrace M| < 2`, division by the lower-left entry and
+the square root are merely totalized real operations. In particular this candidate is zero for
+the stable boundary matrices `1` and `-1`, where the physical fixed parameter is nonunique.
+-/
+def gaussianEigenparameterCandidate (M : RayTransferMatrix) : ℂ :=
   ((M 0 0 - M 1 1) / (2 * M 1 0) : ℝ) +
     (√(4 - rayTrace M ^ 2) / (2 * |M 1 0|) : ℝ) * Complex.I
 
 /-- The eigenmode parameter lies in the physical domain. -/
-lemma im_gaussianEigenparameter_pos (M : RayTransferMatrix) (hdet : M.det = 1)
-    (htr : |rayTrace M| < 2) : 0 < (gaussianEigenparameter M).im := by
+lemma im_gaussianEigenparameterCandidate_pos (M : RayTransferMatrix) (hdet : M.det = 1)
+    (htr : |rayTrace M| < 2) : 0 < (gaussianEigenparameterCandidate M).im := by
   have hC : M 1 0 ≠ 0 := entry_one_zero_ne_zero_of_abs_rayTrace_lt_two M hdet htr
   have h4 : 0 < 4 - rayTrace M ^ 2 := by
     obtain ⟨hlow, hhigh⟩ := abs_lt.mp htr
     nlinarith [hlow, hhigh]
-  rw [gaussianEigenparameter]
+  rw [gaussianEigenparameterCandidate]
   simp only [Complex.add_im, Complex.ofReal_im, Complex.mul_im, Complex.ofReal_re, Complex.I_im,
     Complex.I_re, mul_one, mul_zero, add_zero, zero_add]
   exact div_pos (Real.sqrt_pos.mpr h4) (by positivity)
@@ -379,10 +398,10 @@ lemma quadratic_of_relations (M : RayTransferMatrix) (u v : ℝ) (hC : M 1 0 ≠
   · linear_combination v * hu
 
 /-- The eigenmode parameter is a root of the eigenmode quadratic. -/
-lemma quadratic_gaussianEigenparameter (M : RayTransferMatrix) (hdet : M.det = 1)
+lemma quadratic_gaussianEigenparameterCandidate (M : RayTransferMatrix) (hdet : M.det = 1)
     (htr : |rayTrace M| < 2) :
-    (M 1 0 : ℂ) * gaussianEigenparameter M ^ 2 +
-      ((M 1 1 : ℂ) - (M 0 0 : ℂ)) * gaussianEigenparameter M - (M 0 1 : ℂ) = 0 := by
+    (M 1 0 : ℂ) * gaussianEigenparameterCandidate M ^ 2 +
+      ((M 1 1 : ℂ) - (M 0 0 : ℂ)) * gaussianEigenparameterCandidate M - (M 0 1 : ℂ) = 0 := by
   have hC : M 1 0 ≠ 0 := entry_one_zero_ne_zero_of_abs_rayTrace_lt_two M hdet htr
   have habsne : |M 1 0| ≠ 0 := abs_ne_zero.mpr hC
   have h4 : 0 < 4 - rayTrace M ^ 2 := by
@@ -397,30 +416,79 @@ lemma quadratic_gaussianEigenparameter (M : RayTransferMatrix) (hdet : M.det = 1
     rw [div_pow, hsq, mul_pow, habs, rayTrace]
     field_simp
     ring
-  rw [gaussianEigenparameter]
+  rw [gaussianEigenparameterCandidate]
   exact quadratic_of_relations M _ _ hC hu hv hdetEq
 
-/-- **A subcritical resonator has a Gaussian eigenmode.**
+/-- **A subcritical resonator has a physical fixed Gaussian beam parameter.**
 
-The round trip fixes a beam parameter in the physical domain, so the resonator supports a Gaussian
-mode that reproduces itself. Its parameter is a root of the same quadratic whose value on a ray is
-the conserved `Optics.rayInvariant`, which is the agreement between the ray and Gaussian pictures
-that `goal.md` §H.5 R5 asks for.
+The round trip fixes a parameter in the upper half-plane. It is a root of the same quadratic whose
+value on a ray is the conserved `Optics.rayInvariant`. The later `gaussianEigenbeam` construction
+lifts this parameter to a complete stored beam.
 -/
-theorem abcdTransform_gaussianEigenparameter (M : RayTransferMatrix) (hdet : M.det = 1)
+lemma abcdTransform_gaussianEigenparameterCandidate (M : RayTransferMatrix) (hdet : M.det = 1)
     (htr : |rayTrace M| < 2) :
-    abcdTransform M (gaussianEigenparameter M) = gaussianEigenparameter M := by
-  have him := im_gaussianEigenparameter_pos M hdet htr
-  have hden := abcdDenominator_ne_zero M (gaussianEigenparameter M) him (by rw [hdet]; norm_num)
-  have hq := quadratic_gaussianEigenparameter M hdet htr
+    abcdTransform M (gaussianEigenparameterCandidate M) =
+      gaussianEigenparameterCandidate M := by
+  have him := im_gaussianEigenparameterCandidate_pos M hdet htr
+  have hden := abcdDenominator_ne_zero M (gaussianEigenparameterCandidate M) him
+    (by rw [hdet]; norm_num)
+  have hq := quadratic_gaussianEigenparameterCandidate M hdet htr
   rw [abcdTransform, div_eq_iff hden, abcdDenominator]
   linear_combination -hq
 
-/-- A subcritical resonator supports a Gaussian mode that reproduces itself on a round trip. -/
-theorem exists_gaussian_eigenmode (M : RayTransferMatrix) (hdet : M.det = 1)
+/-- A subcritical resonator has a physical Gaussian eigenparameter. -/
+lemma exists_gaussian_eigenparameter (M : RayTransferMatrix) (hdet : M.det = 1)
     (htr : |rayTrace M| < 2) : ∃ q : ℂ, 0 < q.im ∧ abcdTransform M q = q :=
-  ⟨gaussianEigenparameter M, im_gaussianEigenparameter_pos M hdet htr,
-    abcdTransform_gaussianEigenparameter M hdet htr⟩
+  ⟨gaussianEigenparameterCandidate M, im_gaussianEigenparameterCandidate_pos M hdet htr,
+    abcdTransform_gaussianEigenparameterCandidate M hdet htr⟩
+
+/-- A Gaussian eigenbeam of a subcritical resonator, at any positive wavelength. Both the
+physical beam domain and the fixed-point equation are certified by the strict trace hypotheses. -/
+def gaussianEigenbeam (M : RayTransferMatrix) (hdet : M.det = 1)
+    (htr : |rayTrace M| < 2) (wavelength : ℝ) (hWavelength : 0 < wavelength) : GaussianBeam where
+  wavelength := wavelength
+  q := gaussianEigenparameterCandidate M
+  wavelength_pos := hWavelength
+  q_im_pos := im_gaussianEigenparameterCandidate_pos M hdet htr
+
+/-- **The complete Gaussian eigenbeam is fixed by one resonator round trip.** Because the
+round-trip determinant is one, both its wavelength and its complex beam parameter are unchanged. -/
+lemma transform_gaussianEigenbeam (M : RayTransferMatrix) (hdet : M.det = 1)
+    (htr : |rayTrace M| < 2) (wavelength : ℝ) (hWavelength : 0 < wavelength) :
+    (gaussianEigenbeam M hdet htr wavelength hWavelength).transform M
+        (show 0 < M.det by rw [hdet]; norm_num) =
+      gaussianEigenbeam M hdet htr wavelength hWavelength := by
+  apply GaussianBeam.ext
+  · simp [GaussianBeam.transform, gaussianEigenbeam, hdet]
+  · simp [GaussianBeam.transform, gaussianEigenbeam,
+      abcdTransform_gaussianEigenparameterCandidate M hdet htr]
+
+/-- A subcritical resonator supports a complete Gaussian beam that reproduces itself after one
+round trip. -/
+theorem exists_gaussian_eigenbeam (M : RayTransferMatrix) (hdet : M.det = 1)
+    (htr : |rayTrace M| < 2) :
+    ∃ b : GaussianBeam,
+      b.transform M (show 0 < M.det by rw [hdet]; norm_num) = b :=
+  ⟨gaussianEigenbeam M hdet htr 1 one_pos,
+    transform_gaussianEigenbeam M hdet htr 1 one_pos⟩
+
+/-- The proof-gated Gaussian eigenbeam satisfies the named fixed-beam predicate. -/
+lemma isFixedBeam_gaussianEigenbeam (M : RayTransferMatrix) (hdet : M.det = 1)
+    (htr : |rayTrace M| < 2) (wavelength : ℝ) (hWavelength : 0 < wavelength) :
+    IsFixedBeam M (gaussianEigenbeam M hdet htr wavelength hWavelength) :=
+  ⟨hdet, abcdTransform_gaussianEigenparameterCandidate M hdet htr⟩
+
+/-- **The strict trace criterion gives both bounded-ray stability and a fixed Gaussian beam.**
+
+This is the combined matrix-level result behind regression R-04. It keeps determinant one and the
+strict trace domain explicit and reaches the named ray-stability and fixed-beam predicates.
+-/
+lemma isStable_and_exists_isFixedBeam_of_abs_trace_lt_two (M : RayTransferMatrix)
+    (hdet : M.det = 1) (htr : |rayTrace M| < 2) :
+    IsStable M ∧ ∃ b : GaussianBeam, IsFixedBeam M b := by
+  refine ⟨isStable_of_abs_trace_lt_two M hdet htr,
+    gaussianEigenbeam M hdet htr 1 one_pos, ?_⟩
+  exact isFixedBeam_gaussianEigenbeam M hdet htr 1 one_pos
 
 end
 

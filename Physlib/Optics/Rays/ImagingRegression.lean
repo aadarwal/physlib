@@ -22,15 +22,18 @@ vacuous specification would pass.
 
 The sharpest fixture is a single spherical refracting surface, whose nodal points both lie at its
 centre of curvature while its principal points lie at the vertex. That configuration separates
-the two notions, which coincide for every system in a single medium, and it checks the sign
-convention of the distances at the same time: the object-side nodal distance comes out negative
-because the point lies *downstream* of the entrance.
+the two notions, which coincide as physical specifications for every nonzero-power system in a
+single medium, and it checks the sign convention of the distances at the same time: the
+object-side nodal distance comes out negative because the point lies *downstream* of the entrance.
 
 ## ii. Key results
 
 - `Optics.imagingRegression_thinLens_isBackFocalDistance` and
   `Optics.imagingRegression_thinLens_not_isBackFocalDistance`: the focal-distance specification is
   satisfied by the formula and refuted by a wrong value.
+- `Optics.imagingRegression_thinLens_isFrontFocalDistance` and
+  `Optics.imagingRegression_thinLens_arePrincipalDistances`: the other cardinal-point
+  specifications are exercised independently of their raw formulas.
 - `Optics.imagingRegression_sphericalSurface_nodal_at_centre`: the nodal points of a single
   refracting surface lie at its centre of curvature while its principal points lie at the vertex.
 - `Optics.imagingRegression_sphericalSurface_nodal_ne_principal`: the two notions are genuinely
@@ -100,13 +103,26 @@ lemma imagingRegression_thinLens_not_isBackFocalDistance :
   simp only [rayTransfer_height, shiftedMatrix_zero_zero, shiftedMatrix_zero_one, hA, hC] at h1
   norm_num at h1
 
+/-- The front focal distance of the regression lens satisfies its behavioural specification. -/
+lemma imagingRegression_thinLens_isFrontFocalDistance :
+    IsFrontFocalDistance (thinLensMatrix 1) 1 := by
+  have h := isFrontFocalDistance_frontFocalDistance (thinLensMatrix 1)
+    imagingRegression_thinLensMatrix_power
+  rwa [imagingRegression_thinLens_focalDistances.2] at h
+
+/-- The two zero principal distances satisfy the independent principal-plane specification. -/
+lemma imagingRegression_thinLens_arePrincipalDistances :
+    ArePrincipalDistances (thinLensMatrix 1) 0 0 :=
+  thinLensMatrix_arePrincipalDistances 1 one_ne_zero
+
 /-- A thin lens has both principal planes and both nodal planes at the lens itself. -/
 lemma imagingRegression_thinLens_cardinalPoints :
     objectPrincipalDistance (thinLensMatrix 1) = 0 ∧
       imagePrincipalDistance (thinLensMatrix 1) = 0 ∧
       objectNodalDistance (thinLensMatrix 1) = 0 ∧
       imageNodalDistance (thinLensMatrix 1) = 0 := by
-  obtain ⟨hPrincipalObject, hPrincipalImage⟩ := thinLensMatrix_principalDistances 1
+  obtain ⟨hPrincipalObject, hPrincipalImage⟩ :=
+    thinLensMatrix_principalDistances 1
   obtain ⟨hNodalObject, hNodalImage⟩ :=
     nodal_eq_principal_of_det_eq_one (thinLensMatrix 1) (det_thinLensMatrix 1)
   exact ⟨hPrincipalObject, hPrincipalImage, hNodalObject.trans hPrincipalObject,
@@ -136,15 +152,15 @@ lemma imagingRegression_twoFocalLengths_magnification :
 the focal planes are both `1`, and their product is the square of the focal length. -/
 lemma imagingRegression_newton :
     (2 - frontFocalDistance (thinLensMatrix 1)) * (2 - backFocalDistance (thinLensMatrix 1)) =
-      effectiveFocalLength (thinLensMatrix 1) ^ 2 := by
+      imageSpaceEffectiveFocalLength (thinLensMatrix 1) ^ 2 := by
   refine newton_imaging_equation_of_det_eq_one (thinLensMatrix 1)
     imagingRegression_thinLensMatrix_power (det_thinLensMatrix 1) 2 2
     imagingRegression_twoFocalLengths_isConjugate
 
-/-- The effective focal length of the regression lens is its focal length. -/
-lemma imagingRegression_effectiveFocalLength :
-    effectiveFocalLength (thinLensMatrix 1) = 1 := by
-  rw [effectiveFocalLength, imagingRegression_thinLensMatrix_entries.2.2.1]
+/-- The image-space effective focal length of the regression lens is its focal length. -/
+lemma imagingRegression_imageSpaceEffectiveFocalLength :
+    imageSpaceEffectiveFocalLength (thinLensMatrix 1) = 1 := by
+  rw [imageSpaceEffectiveFocalLength, imagingRegression_thinLensMatrix_entries.2.2.1]
   norm_num
 
 /-!
@@ -196,7 +212,8 @@ lemma imagingRegression_sphericalSurface_nodal_at_centre :
   norm_num
 
 /-- The nodal and principal planes of the regression surface are different, because it changes
-refractive index. Systems in a single medium cannot separate the two notions. -/
+refractive index. Nonzero-power systems in a single medium cannot separate the two physical
+specifications. -/
 lemma imagingRegression_sphericalSurface_nodal_ne_principal :
     objectNodalDistance imagingRegressionSurface ≠
       objectPrincipalDistance imagingRegressionSurface := by
@@ -210,6 +227,25 @@ lemma imagingRegression_sphericalSurface_areNodalDistances :
   obtain ⟨hObject, hImage, -, -⟩ := imagingRegression_sphericalSurface_nodal_at_centre
   have h := areNodalDistances imagingRegressionSurface imagingRegressionSurface_power
   rwa [hObject, hImage] at h
+
+/-- The principal distances of the refracting-surface fixture satisfy their behavioural
+specification. -/
+lemma imagingRegression_sphericalSurface_arePrincipalDistances :
+    ArePrincipalDistances imagingRegressionSurface 0 0 := by
+  obtain ⟨-, -, hObject, hImage⟩ :=
+    imagingRegression_sphericalSurface_nodal_at_centre
+  have h := arePrincipalDistances imagingRegressionSurface imagingRegressionSurface_power
+  rwa [hObject, hImage] at h
+
+/-- Reversing the sign of the object-side nodal distance fails the nodal specification. -/
+lemma imagingRegression_sphericalSurface_wrongNodalSign :
+    ¬ AreNodalDistances imagingRegressionSurface 1 1 := by
+  intro hWrong
+  have hUnique :=
+    (areNodalDistances_unique imagingRegressionSurface imagingRegressionSurface_power 1 1
+      hWrong).1
+  rw [imagingRegression_sphericalSurface_nodal_at_centre.1] at hUnique
+  norm_num at hUnique
 
 /-!
 
