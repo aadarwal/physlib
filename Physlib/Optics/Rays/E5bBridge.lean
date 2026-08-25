@@ -35,11 +35,15 @@ range hypothesis, and every result below that asserts one carries it.
 
 Section A builds the ambient direction of a meridional ray from a side normal and a unit tangent,
 which is what makes the correspondence constructive rather than assumed. Sections C and D then
-carry the two physical laws across. The refraction result is the one that matters for the rest of
-the development: the small-angle bound of `Physlib.Optics.Rays.Basic` was stated against a Snell
-law written down by hand, and `Optics.abs_paraxialSnell_sub_le_snellLaw` re-establishes it against
-the Snell law *derived* from electric phase matching, so the paraxial approximation now rests on
-the electromagnetic development rather than on a stipulated law.
+carry the two physical laws across, and section E states the refraction results about a ray rather
+than about the interface's own phase angles.
+
+What the refraction results do and do not say, precisely: **the Snell law that the paraxial bound
+is measured against is derived from Maxwell.** They do *not* say that ray refraction is derived
+from Maxwell. The small-angle bound of `Physlib.Optics.Rays.Basic` was stated against a Snell law
+written down by hand; `Optics.abs_paraxialSnell_sub_le_snellLaw` re-establishes it with that
+hypothesis discharged by electric phase matching. The paraxial law itself remains a model law, and
+a phase direction remains a phase direction.
 
 Explicit non-claims. A phase direction is not a ray: the interface theory is careful that its
 phase angles assert nothing about group velocity, energy flux, or outgoing behaviour, and nothing
@@ -63,6 +67,8 @@ ray.
   development's exact refraction angle of the incident phase angle.
 - `Optics.abs_paraxialSnell_sub_le_snellLaw`: the paraxial refraction law holds to within the
   cubic bound of `Physlib.Optics.Rays.Basic`, against the *derived* Snell law.
+- `Optics.RealisesIncidentPhaseDirection` and
+  `Optics.abs_paraxialSnell_sub_le_snellLaw_meridional`: the same bound, stated about the ray.
 
 ## iii. Table of contents
 
@@ -70,6 +76,7 @@ ray.
 - B. The incidence-angle correspondence
 - C. Reflection
 - D. Refraction
+- E. Refraction stated about a ray
 
 ## iv. References
 
@@ -315,6 +322,119 @@ theorem exactRefractionAngle_incidentPhaseAngle
     field_simp
     linarith [hSnell]
   rw [exactRefractionAngle, hratio, Real.arcsin_sin hlower hupper]
+
+/-!
+
+## E. Refraction stated about a ray
+
+-/
+
+/-- A side-relative angle is unchanged by positive rescaling, because the underlying unoriented
+angle is. -/
+lemma angleToSide_smul_of_pos {d : ℕ} (plane : OrientedAffineHyperplane d)
+    (side : OrientedAffineHyperplane.Side) (v : EuclideanSpace ℝ (Fin d)) {c : ℝ} (hc : 0 < c) :
+    plane.angleToSide side (c • v) = plane.angleToSide side v := by
+  rw [OrientedAffineHyperplane.angleToSide, OrientedAffineHyperplane.angleToSide,
+    InnerProductGeometry.angle_smul_left_of_pos _ _ hc]
+
+/-- A meridional ray *realises* a configuration's incident phase direction when the configuration's
+incident phase vector points along the ray's ambient direction.
+
+Only the direction is constrained, so the positive scale factor is existentially part of the data:
+a phase vector carries a magnitude that a ray does not.
+-/
+def RealisesIncidentPhaseDirection (configuration : PlanarDielectricWaveConfiguration)
+    (r : MeridionalRay) (normalAngle : ℝ) (tangent : EuclideanSpace ℝ (Fin 3)) : Prop :=
+  ∃ c : ℝ, 0 < c ∧
+    configuration.incident.waveVector.phaseVector =
+      c • meridionalDirection configuration.interface.plane .positive tangent
+        (r.signedIncidenceAngle normalAngle)
+
+/-- **The realising ray's signed incidence angle is the configuration's incident phase angle.** -/
+theorem incidentPhaseAngle_eq_signedIncidenceAngle
+    {configuration : PlanarDielectricWaveConfiguration} {r : MeridionalRay} {normalAngle : ℝ}
+    {tangent : EuclideanSpace ℝ (Fin 3)}
+    (hrealises : RealisesIncidentPhaseDirection configuration r normalAngle tangent)
+    (htangentNorm : ‖tangent‖ = 1)
+    (htangentNormal : configuration.interface.plane.normalComponent tangent = 0)
+    (hlower : 0 ≤ r.signedIncidenceAngle normalAngle)
+    (hupper : r.signedIncidenceAngle normalAngle ≤ π) :
+    configuration.incidentPhaseAngle = r.signedIncidenceAngle normalAngle := by
+  obtain ⟨c, hc, hphase⟩ := hrealises
+  rw [PlanarDielectricWaveConfiguration.incidentPhaseAngle,
+    ClassicalMechanics.ComplexWaveVector.phaseAngleToSide, hphase,
+    angleToSide_smul_of_pos _ _ _ hc]
+  exact angleToSide_meridionalDirection_signedIncidenceAngle _ _ _ r normalAngle htangentNorm
+    htangentNormal hlower hupper
+
+/-- **The configuration's transmitted phase angle is the ray development's exact refraction of the
+realising ray's angle.** -/
+theorem transmittedPhaseAngle_eq_exactRefractionAngle_signedIncidenceAngle
+    {configuration : PlanarDielectricWaveConfiguration} {r : MeridionalRay} {normalAngle : ℝ}
+    {tangent : EuclideanSpace ℝ (Fin 3)}
+    (h : configuration.IsElectricPhaseMatched)
+    (reference : Electromagnetism.HomogeneousIsotropicMedium)
+    (hIncidentDispersion : configuration.incident.IsDispersionMatched
+      configuration.interface.negativeMedium)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentAttenuation : configuration.incident.waveVector.attenuationVector = 0)
+    (hTransmittedAttenuation : configuration.transmitted.waveVector.attenuationVector = 0)
+    (hTransmittedLower : -(π / 2) ≤ configuration.transmittedPhaseAngle)
+    (hTransmittedUpper : configuration.transmittedPhaseAngle ≤ π / 2)
+    (hrealises : RealisesIncidentPhaseDirection configuration r normalAngle tangent)
+    (htangentNorm : ‖tangent‖ = 1)
+    (htangentNormal : configuration.interface.plane.normalComponent tangent = 0)
+    (hlower : 0 ≤ r.signedIncidenceAngle normalAngle)
+    (hupper : r.signedIncidenceAngle normalAngle ≤ π) :
+    exactRefractionAngle
+        (configuration.interface.negativeMedium.refractiveIndexRelativeTo reference)
+        (configuration.interface.positiveMedium.refractiveIndexRelativeTo reference)
+        (r.signedIncidenceAngle normalAngle) = configuration.transmittedPhaseAngle := by
+  rw [← incidentPhaseAngle_eq_signedIncidenceAngle hrealises htangentNorm htangentNormal hlower
+    hupper]
+  exact exactRefractionAngle_incidentPhaseAngle h reference hIncidentDispersion
+    hTransmittedDispersion hIncidentAttenuation hTransmittedAttenuation hTransmittedLower
+    hTransmittedUpper
+
+/-- **The paraxial refraction bound, about a ray.**
+
+This is `Optics.abs_paraxialSnell_sub_le_snellLaw` with the interface's own incident phase angle
+replaced by the signed incidence angle of a ray that realises the incident phase direction. It is
+the form in which the bound is a statement about the ray development rather than about the
+interface theory alone.
+
+It still says only that the Snell law the bound is measured against is derived; the paraxial law
+being bounded remains a model law.
+-/
+theorem abs_paraxialSnell_sub_le_snellLaw_meridional
+    {configuration : PlanarDielectricWaveConfiguration} {r : MeridionalRay} {normalAngle : ℝ}
+    {tangent : EuclideanSpace ℝ (Fin 3)}
+    (h : configuration.IsElectricPhaseMatched)
+    (reference : Electromagnetism.HomogeneousIsotropicMedium)
+    (hIncidentDispersion : configuration.incident.IsDispersionMatched
+      configuration.interface.negativeMedium)
+    (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
+      configuration.interface.positiveMedium)
+    (hIncidentAttenuation : configuration.incident.waveVector.attenuationVector = 0)
+    (hTransmittedAttenuation : configuration.transmitted.waveVector.attenuationVector = 0)
+    (hrealises : RealisesIncidentPhaseDirection configuration r normalAngle tangent)
+    (htangentNorm : ‖tangent‖ = 1)
+    (htangentNormal : configuration.interface.plane.normalComponent tangent = 0)
+    (hlower : 0 ≤ r.signedIncidenceAngle normalAngle)
+    (hupper : r.signedIncidenceAngle normalAngle ≤ π) :
+    |configuration.interface.negativeMedium.refractiveIndexRelativeTo reference *
+          r.signedIncidenceAngle normalAngle -
+        configuration.interface.positiveMedium.refractiveIndexRelativeTo reference *
+          configuration.transmittedPhaseAngle| ≤
+      (configuration.interface.negativeMedium.refractiveIndexRelativeTo reference *
+            |r.signedIncidenceAngle normalAngle| ^ 3 +
+          configuration.interface.positiveMedium.refractiveIndexRelativeTo reference *
+            |configuration.transmittedPhaseAngle| ^ 3) / 6 := by
+  rw [← incidentPhaseAngle_eq_signedIncidenceAngle hrealises htangentNorm htangentNormal hlower
+    hupper]
+  exact abs_paraxialSnell_sub_le_snellLaw h reference hIncidentDispersion hTransmittedDispersion
+    hIncidentAttenuation hTransmittedAttenuation
 
 end
 
