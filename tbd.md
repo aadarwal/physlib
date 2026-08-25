@@ -1581,8 +1581,24 @@ PR unless maintainers explicitly ask to retain it.
   resonance fixture independently pins both the channel equations and the convergent series.
   This slice proves no add-drop response, power observable, critical coupling, bandwidth,
   causality, dispersion, group delay, material model, or DATE/SysCon parity bridge.
-- [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
-  making either formula the foundational composition rule.
+- [ ] Human-check the S1 Mach--Zehnder extension before upstreaming. Confirm that the explicit
+  feed-forward `FlatNetlist` contains exactly two N7 directional couplers and two fixed-carrier
+  matched-propagation arms, that unconditional well-posedness follows from the channel equations,
+  and that both amplitudes are derived through N5 rather than stored. Audit the phase-zero and
+  phase-`π` dark ports against the declared `-I` cross-coupler gauge. Attenuation is physical only
+  under `Parameters.IsValid`; `ModeAmplitude.power` is normalized modal power under the E3b
+  bridge hypotheses. This is a Physlib extension with no HOL source and proves no time-domain
+  delay, dispersion, polarization, reciprocity, material model, or physical time-reversed pairing.
+- [ ] Complete the X-01 bridge between the local two-port Redheffer route and the independent
+  `FlatNetlist`/N5H route. The gate-free relational series, explicit pivot
+  `1 - Rl₂ * Rr₁`, proof-gated noncommutative formula, reflection-free specialization, and
+  relation-level reflection-free/singular regressions plus a noncommuting matrix-order sentinel
+  are implemented, but no theorem yet identifies them with `FlatNetlist.behavior` or
+  `closeBehavior` for the same two-device wiring. Prove that
+  agreement first, then identify the N5 response with `redhefferStar` on the common gate and pin a
+  hand-expanded pair of `ReflectionlessTwoPort` components. Associativity, an identity element,
+  and minimality of the pivot gate remain separate non-claims. Mason/N5 agreement remains the
+  other open S6/X-01 cross-semantics step; neither formula is foundational composition semantics.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
 

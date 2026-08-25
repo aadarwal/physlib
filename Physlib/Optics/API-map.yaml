@@ -173,13 +173,38 @@ Requirements:
     done: true
     location: "Physlib/Optics/Network/FlatNetlistElimination.lean (Optics.FlatNetlist.incidentSolutionBlockFormula, Optics.FlatNetlist.outgoingSolutionBlockFormula, Optics.FlatNetlist.solutionBlockFormula, Optics.FlatNetlist.responseBlockFormula, Optics.FlatNetlist.incidentSolutionBlockFormula_apply, Optics.FlatNetlist.outgoingSolutionBlockFormula_apply, Optics.FlatNetlist.solutionBlockFormula_apply, Optics.FlatNetlist.responseBlockFormula_apply, Optics.FlatNetlist.feedbackOperator_mul_incidentSolutionBlockFormula, Optics.FlatNetlist.responseBlockFormula_eq, Optics.FlatNetlist.toBehavior_solutionBlockFormula, Optics.FlatNetlist.toBehavior_responseBlockFormula, Optics.FlatNetlist.solutionTransform, Optics.FlatNetlist.responseTransform, Optics.FlatNetlist.toBehavior_solutionTransform, Optics.FlatNetlist.toBehavior_responseTransform, Optics.FlatNetlist.solutionTransform_eq_blockFormula, Optics.FlatNetlist.responseTransform_eq_blockFormula, Optics.FlatNetlist.mem_solutionBehavior_iff_eq_solutionTransform, Optics.FlatNetlist.mem_behavior_iff_eq_responseTransform, Optics.FlatNetlist.isWellPosed_withConnections_iff, Optics.FlatNetlist.responseTransform_withConnections); Physlib/Optics/Network/FlatNetlistEliminationRegression.lean (Optics.flatNetlistEliminationRegressionFeedback, Optics.flatNetlistEliminationRegressionInverse, Optics.flatNetlistEliminationRegressionResponse, Optics.flatNetlistEliminationRegression_feedbackOperator_eq, Optics.flatNetlistEliminationRegression_feedback_mul_inverse, Optics.flatNetlistEliminationRegression_inverse_mul_feedback, Optics.flatNetlistEliminationRegression_isWellPosed, Optics.flatNetlistEliminationRegression_feedbackInverse_eq, Optics.flatNetlistEliminationRegression_inputExposure_eq, Optics.flatNetlistEliminationRegression_outputReadout_eq, Optics.flatNetlistEliminationRegression_inverse_mul_inputExposure, Optics.flatNetlistEliminationRegression_scattering_mul_incidentSolution, Optics.flatNetlistEliminationRegression_outputReadout_mul_outgoingSolution, Optics.flatNetlistEliminationRegression_responseTransform_eq, Optics.flatNetlistEliminationRegression_response_asymmetric, Optics.flatNetlistRegression_not_isWellPosed, Optics.flatNetlistEliminationRegression_symmConnections_isWellPosed, Optics.flatNetlistEliminationRegression_responseTransform_symmConnections, Optics.flatNetlistRegression_symmConnections_not_isWellPosed)"
 
-  - description: "The API shall specialize a typed rectangular netlist response to a square external scattering matrix only after proving an external input/output pairing and completeness theorem, and shall prove passivity, losslessness, and reciprocity only under their respective normalization and convention hypotheses."
-    done: false
-    location: N/A
+  - description: "A well-posed flat netlist is packaged as a square scattering matrix on its exact external-channel complement by the canonical incident/outgoing wrapper equivalences. The response entries and graph behavior are preserved exactly, and component passivity or losslessness closes through the wiring equations. This is a nominal identity-on-channel pairing and structural completeness statement; it supplies no physical time-reversed pairing, reciprocity, causality, or reference-plane convention."
+    done: true
+    location: "Physlib/Optics/Network/Conservation.lean (Optics.FlatNetlist.externalScatteringMatrix, Optics.FlatNetlist.externalScatteringMatrix_apply, Optics.FlatNetlist.externalScatteringMatrix_isPassive, Optics.FlatNetlist.externalScatteringMatrix_isLossless, Optics.FlatNetlist.externalScatteringMatrix_isLossless_of_components_isLossless); Physlib/Optics/Network/Hierarchical.lean (Optics.FlatNetlist.packagedScattering, Optics.FlatNetlist.toOrientedModeTransform_packagedScattering, Optics.FlatNetlist.packagedScattering_toModeTransform_apply, Optics.FlatNetlist.toBehavior_toOrientedModeTransform_packagedScattering, Optics.FlatNetlist.mem_behavior_iff_packagedScattering)"
 
-  - description: "The API shall derive ordinary series cascade and Redheffer star products from the common relational feedback equations, with the relevant feedback-block invertibility hypothesis explicit and reflective feedback kept distinct from one-way matrix multiplication."
+  - description: "The foundational two-port series operation is the singular-safe relational composition of complete backward-first middle states. Its exact membership law retains the four component equations and an existential internal state without using an inverse. Under the explicit sufficient bijectivity gate for the typed feedback block 1 - Rl2*Rr1, the behavior-derived Redheffer star transform is proved equal to the exact noncommutative four-block formula. Zero facing reflections reduce this formula to ordinary directional cascade multiplication, with the later left-to-right transform on the left. Relation-level fixtures pin both directional products and preserve a nonunique zero-pivot behavior; separate formula fixtures pin all four reflective blocks. This local route is not yet proved equal to the same wiring through FlatNetlist/N5H, so X-01 remains open. No converse minimality, associativity, identity, complete-scattering matrix multiplication, contraction, reciprocity, passivity, losslessness, or physical realization is inferred."
     done: false
-    location: N/A
+    location: >-
+      Physlib/Optics/Network/TwoPortSeries.lean
+      (Optics.TwoPortScatteringBehavior.redhefferSeries,
+      Optics.TwoPortScatteringBehavior.mem_toBackwardFirst_redhefferSeries_iff,
+      Optics.TwoPortScatteringTransform.redhefferSeriesBehavior,
+      Optics.TwoPortScatteringTransform.mem_toBackwardFirst_redhefferSeriesBehavior_iff);
+      Physlib/Optics/Network/TwoPortRedheffer.lean
+      (Optics.TwoPortScatteringTransform.redhefferFeedbackBlock,
+      Optics.TwoPortScatteringTransform.HasBijectiveRedhefferFeedback,
+      Optics.TwoPortScatteringTransform.redhefferFeedbackInverse,
+      Optics.TwoPortScatteringTransform.redhefferBlockFormula);
+      Physlib/Optics/Network/TwoPortRedhefferRealization.lean
+      (Optics.TwoPortScatteringTransform.toBehavior_redhefferBlockFormula);
+      Physlib/Optics/Network/TwoPortRedhefferStar.lean
+      (Optics.TwoPortScatteringTransform.redhefferStar,
+      Optics.TwoPortScatteringTransform.toBehavior_redhefferStar,
+      Optics.TwoPortScatteringTransform.redhefferStar_eq_blockFormula);
+      Physlib/Optics/Network/TwoPortCascade.lean
+      (Optics.TwoPortScatteringTransform.reflectionFreeSeriesCascade,
+      Optics.TwoPortScatteringTransform.rightToLeftTransmission_reflectionFreeSeriesCascade,
+      Optics.TwoPortScatteringTransform.leftToRightTransmission_reflectionFreeSeriesCascade);
+      Physlib/Optics/Network/TwoPortRedhefferRegression.lean;
+      Physlib/Optics/Network/TwoPortSeriesRegression.lean
+      (Optics.TwoPortSeriesRegression.reflectionFree_relational_member,
+      Optics.TwoPortSeriesRegression.singular_relational_outputs_nonunique);
+      Physlib/Optics/Network/TwoPortCascadeRegression.lean
 
   - description: "The algebraic N7-0 core gives a reflectionless typed two-port an independent amplitude-level behavior and realizes it by the exact zero-reflection block scattering matrix with separately oriented directional transforms. A heterogeneous typed-scattering regression pins block and endpoint orientation, direct independent-behavior membership, concrete realized-graph membership, and rejection of a wrong local-mode order. This core makes no power, propagation, matching, reciprocity, physical-port, or material-realization claim."
     done: true
@@ -225,9 +250,28 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The API shall model a Mach-Zehnder interferometer by composing the common component definitions and prove its complex transfer amplitudes, output powers, and lossless power balance."
-    done: false
-    location: N/A
+  - description: "The Mach-Zehnder Physlib extension is an explicit feed-forward FlatNetlist containing exactly two N7 directional couplers and two N7 matched-propagation arms. Its complete-state N5 well-posedness is proved for every parameter record, and both complex output amplitudes are derived from responseTransform rather than stored as a formula. Balanced specializations prove both output powers, phase-zero and phase-pi dark ports in the declared -I coupler gauge, normalized-modal lossless power balance through the N6 external-scattering theorem, coherent/incoherent coherency wrappers, and recovery of the relative arm phase factor from a nonzero input. Independent channel-equation regressions pin both named phase points. This is not HOL parity and makes no polarization, dispersion, time-domain delay, material, reciprocity, or physical time-reversed-port claim."
+    done: true
+    location: >-
+      Physlib/Optics/Systems/MachZehnder/Construction.lean
+      (Optics.MachZehnder.Parameters, Optics.MachZehnder.Parameters.IsValid,
+      Optics.MachZehnder.Parameters.IsLossless, Optics.MachZehnder.components,
+      Optics.MachZehnder.connections, Optics.MachZehnder.netlist,
+      Optics.MachZehnder.externalChannelEquiv, Optics.MachZehnder.isWellPosed,
+      Optics.MachZehnder.feedbackOperator_det_ne_zero,
+      Optics.MachZehnder.output_amplitudes);
+      Physlib/Optics/Systems/MachZehnder/Basic.lean
+      (Optics.MachZehnder.output_powers, Optics.MachZehnder.balancedCoupler,
+      Optics.MachZehnder.balancedParameters,
+      Optics.MachZehnder.balanced_output_amplitudes,
+      Optics.MachZehnder.balanced_output_powers,
+      Optics.MachZehnder.balanced_phase_zero_dark_port,
+      Optics.MachZehnder.balanced_phase_pi_dark_port,
+      Optics.MachZehnder.externalScatteringMatrix_isLossless,
+      Optics.MachZehnder.lossless_output_power_balance,
+      Optics.MachZehnder.balanced_output_power_balance,
+      Optics.MachZehnder.balanced_phase_factor_ratio_eq_output_ratio);
+      Physlib/Optics/Systems/MachZehnder/Regression.lean
 
   - description: "The all-pass portion models a one-bus microring as an explicit FlatNetlist assembled from the common directional-coupler and fixed-carrier matched-propagation components. Its complete-state well-posedness is proved equivalent to the exact nonzero denominator 1 - t*gamma, with a singular-incident kernel witness for the converse. N5 elimination derives the through response t + crossCoefficient^2*gamma/(1 - t*gamma), and the unitary-coupler specialization gives (t - gamma)/(1 - t*gamma). The totalized round-trip and through-transfer tsums acquire their geometric-series meaning only under norm (t*gamma) < 1, where they are proved equal to the algebraic response. Exact 3-4-5 resonance and antiresonance regressions independently pin denominators 7/10 and 13/10, responses 1/7 and 11/13, and the resonance series 10/7. The umbrella remains incomplete: add-drop topology/response, power observables, critical coupling, rejection ratio, free spectral range, dispersion/group-delay, and any DATE/SysCon parity bridge are not yet supplied."
     done: false

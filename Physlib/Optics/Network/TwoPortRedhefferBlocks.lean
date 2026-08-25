@@ -15,21 +15,25 @@ public import Physlib.Optics.Network.TwoPortRedheffer
 This file completes the named block API for the proof-gated Redheffer formula. The lower blocks
 retain the exact noncommutative order forced by the internal forward/backward wave types.
 
-## ii. Scope
+Scope:
 
 These are algebraic identities for the declared backward-wave pivot. They make no commutativity,
 reciprocity, passivity, losslessness, or physical-realization claim.
 
-## iii. Key results
+## ii. Key results
 
 - `TwoPortScatteringTransform.leftToRightTransmission_redhefferBlockFormula`.
 - `TwoPortScatteringTransform.rightReflection_redhefferBlockFormula`.
 - `TwoPortScatteringTransform.redhefferFeedbackBlock_apply`.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Lower Redheffer blocks
 - B. Feedback-block action
+
+## iv. References
+
+This typed block API is Physlib-original; no external source is used here.
 
 -/
 

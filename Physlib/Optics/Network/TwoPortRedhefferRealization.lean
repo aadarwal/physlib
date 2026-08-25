@@ -17,29 +17,36 @@ behavior whenever the named feedback pivot is bijective. The proof solves only t
 backward-wave equation and checks both component laws; the block formula is not taken as the
 definition of composition.
 
-## ii. Scope
+Scope:
 
 The result is fixed-frequency complex-linear algebra. It introduces no commutativity,
 reciprocity, passivity, losslessness, convergence, or physical-realization assumption.
 
+## ii. Key results
+
+- `TwoPortScatteringTransform.toBehavior_redhefferBlockFormula`: the block formula realizes the
+  relational series behavior.
+
+## iii. Table of contents
+
+- A. Internal-equation equivalence
+- B. Realization of relational series composition
+
+## iv. References
+
+This realization proof is Physlib-original; no external source is used here.
+
 -/
 
 @[expose] public section
-
 namespace Optics
 noncomputable section
-
 universe u v w
-
 namespace TwoPortScatteringTransform
 variable {ι : Type u} {κ : Type v} {μ : Type w}
-
 /-!
-
 ## A. Internal-equation equivalence
-
 -/
-
 private lemma redhefferBlockEquations_iff_internalEquations
     [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
     [Fintype μ] [DecidableEq μ]
@@ -141,13 +148,9 @@ private lemma redhefferBlockEquations_iff_internalEquations
       simp only [ModeTransform.toLinearMap_mul_apply, backward, inverse, source, map_add,
         LinearMap.add_apply]
       abel_nf
-
 /-!
-
 ## B. Behavioral realization
-
 -/
-
 /-- The Redheffer block formula has exactly the relational series behavior after backward-first
 regrouping. -/
 lemma toBackwardFirstBehavior_redhefferBlockFormula
@@ -193,8 +196,5 @@ lemma toBehavior_redhefferBlockFormula
       TwoPortScatteringBehavior.toScattering_toBackwardFirst _
 
 end TwoPortScatteringTransform
-
 end
-
-
 end Optics
