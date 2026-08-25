@@ -248,6 +248,16 @@ abbrev ModeTransform.toLinearMap {ι κ : Type*} [Fintype ι] [DecidableEq ι]
     (T : ModeTransform ι κ) : ModeAmplitude ι →ₗ[ℂ] ModeAmplitude κ :=
   Matrix.toEuclideanLin T
 
+/-- A product of mode transforms acts by applying the right transform first and the left transform
+second. -/
+lemma ModeTransform.toLinearMap_mul_apply {ι κ μ : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
+    (left : ModeTransform κ μ) (right : ModeTransform ι κ)
+    (amplitude : ModeAmplitude ι) :
+    ModeTransform.toLinearMap (left * right : ModeTransform ι μ) amplitude =
+      left.toLinearMap (right.toLinearMap amplitude) := by
+  simp only [ModeTransform.toLinearMap, Matrix.toLpLin_mul_same, LinearMap.comp_apply]
+
 /-- A mode transform is power-preserving when it preserves total modal power for every input. -/
 def ModeTransform.IsPowerPreserving {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     (T : ModeTransform ι κ) : Prop :=
@@ -265,6 +275,23 @@ feedback interconnection. -/
 def ModeTransform.directSum {ι κ μ ν : Type*} (T : ModeTransform ι κ)
     (U : ModeTransform μ ν) : ModeTransform (ι ⊕ μ) (κ ⊕ ν) :=
   Matrix.fromBlocks T 0 0 U
+
+/-- A transform assembled from four blocks acts by the corresponding two coupled block
+equations. -/
+lemma ModeTransform.fromBlocks_apply {ι κ μ ν : Type*}
+    [Fintype ι] [DecidableEq ι] [Fintype μ] [DecidableEq μ]
+    (A : ModeTransform ι κ) (B : ModeTransform μ κ)
+    (C : ModeTransform ι ν) (D : ModeTransform μ ν)
+    (a : ModeAmplitude ι) (b : ModeAmplitude μ) :
+    ModeTransform.toLinearMap
+        (Matrix.fromBlocks A B C D : ModeTransform (ι ⊕ μ) (κ ⊕ ν)) (a.directSum b) =
+      (A.toLinearMap a + B.toLinearMap b).directSum
+        (C.toLinearMap a + D.toLinearMap b) := by
+  apply WithLp.ofLp_injective 2
+  funext i
+  rcases i with i | i
+  · simp [ModeAmplitude.directSum, Matrix.toLpLin_apply, Matrix.fromBlocks_mulVec]
+  · simp [ModeAmplitude.directSum, Matrix.toLpLin_apply, Matrix.fromBlocks_mulVec]
 
 /-- A block-diagonal transform acts independently on the two direct-sum amplitude families. -/
 lemma ModeTransform.directSum_apply {ι κ μ ν : Type*} [Fintype ι] [DecidableEq ι]
