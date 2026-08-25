@@ -517,11 +517,13 @@ Ownership rules:
   complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
-- [ ] the paired-external scattering specialization, series/Redheffer laws, and physical network
-  conservation/reciprocity results; generic mode embeddings, typed connection families, ambient
-  routing, external exposure/readout, implicit behaviors, wiring invariance, and the proof-gated
-  finite complete-state eliminator with a rectangular external response are complete;
-- [ ] reusable beam splitters, couplers, delays, mirrors, interferometers, and microrings;
+- [ ] a physical time-reversed external-port pairing, convention-aware reciprocity, and X-01
+  agreement between the singular-safe two-port Redheffer route and FlatNetlist/N5H elimination;
+  canonical external scattering packaging, the local Redheffer construction, and normalized modal
+  network conservation are complete;
+- [ ] reusable beam splitters, mirrors, polarization components, and dielectric-interface
+  scattering; fixed-carrier propagation, a directional coupler, Mach--Zehnder, and one-bus
+  all-pass microring slices are complete;
 - [ ] difference-equation, Z-transform, transfer-function, signal-flow, and Mason layers; and
 - [ ] ray, imaging, Gaussian-beam, and resonator libraries.
 
@@ -1192,13 +1194,15 @@ files; the separate P5b follow-up supplies the first two for its propagating pla
 Candidate location: the Optics normalization bridge beside E3b, not the Jones core file.
 
 Status: in progress on the fork. The propagating material-wave irradiance and actual mean-flux
-slice is complete; normalized modal power remains blocked on E3b's flux-normalized mode family.
+slice is complete, and E3b now supplies the conditional flux-normalized propagating-mode family;
+the polarizer-specific transport to normalized modal power remains to be proved.
 
 Deliverables:
 
 - [x] translate P5a's squared-Jones-intensity theorem to irradiance for the plane-wave family covered
   by E3b; and
-- [ ] translate it to `ModeAmplitude.power` only for the proved flux-normalized mode family.
+- [ ] translate it through E3b to `ModeAmplitude.power` only for the proved flux-normalized mode
+  family.
 
 The completed first slice proves single- and sequential-polarizer irradiance laws, arbitrary-input
 irradiance contraction, and Malus' law directly for the actual one-period-averaged Poynting vector.
@@ -1208,8 +1212,8 @@ model: the discarded component's fate and the component's internal, reflected, a
 thermal fields are not modeled. Local infinite-plane-wave irradiance is not aperture or modal
 power, and contraction alone is not called electromagnetic passivity.
 
-Exit pending: physical Malus power becomes a corollary of P5a plus E3b rather than a second
-intensity definition once the normalized-mode deliverable is complete.
+Exit pending: make physical Malus power a corollary of P5a plus the completed E3b normalization
+bridge rather than a second intensity definition.
 
 #### P6a. Retarder and wave-plate core
 
@@ -1421,7 +1425,7 @@ Exit achieved: instantaneous real electromagnetic energy flow exists independent
 finite-mode conventions. The results are pointwise differential laws; harmonic averaging,
 integrated boundary flux, irradiance, and modal power remain E3b.
 
-#### E3b. Harmonic flux and Optics normalization — in progress
+#### E3b. Harmonic flux and Optics normalization — complete on the declared finite synthesis image
 
 Owner: Optics, importing E3a.
 
@@ -1449,7 +1453,7 @@ Owner: Optics, importing E3a.
 - [x] an explicit map from raw Jones field amplitudes to material plane-wave irradiance; and
 - [x] an explicit map from a declared normalized measured profile family to
   `ModeAmplitude.power` on its finite synthesis image; and
-- [ ] a physical specialization connecting that abstract profile family to Maxwell-qualified,
+- [x] a physical specialization connecting that abstract profile family to Maxwell-qualified,
   common-positive-frequency propagating modes, with an explicit aperture parameterization or
   justified geometric area measure and an integrated actual one-period Poynting-flux theorem.
 
@@ -1522,9 +1526,21 @@ raw Jones coordinates are power normalized, or that omitted and evanescent chann
 ordinary positive modal power. Exact unequal-cell and nonorthogonal regressions make the measure,
 slot convention, role signs, coherent terms, and mutual-orthogonality requirement load-bearing.
 
-Exit pending: “lossless” and “power balance” become electromagnetic statements only after the
-abstract measured-profile family is connected to Maxwell-qualified propagating modes, a justified
-aperture measure, and actual one-period integrated Poynting flux.
+The physical specialization now packages zero-attenuation, transverse, dispersion-matched complex
+plane-wave carriers in one homogeneous medium at a common positive angular frequency. Complex
+modal coordinates scale carrier phasors before ordinary-real realization; finite synthesis is
+proved to remain a source-free fixed-medium Maxwell solution. Its actual one-period Poynting mean
+is then integrated either against the earlier supplied profile measure or against a
+`GeometricAperture`'s ambient two-dimensional Hausdorff measure restricted to a measurable planar
+region. Under the same explicit pairwise integrability, mutual flux orthogonality, unit
+normalization, and incident/outgoing role hypotheses, the resulting actual integrated flux is the
+appropriate signed `ModeAmplitude.power`. Exact singleton regressions pin the `E`/`H` convention,
+complex coefficient phase, arbitrary period start, Maxwell preservation, and the value `25` for
+the coordinate `3 + 4 I`.
+
+Exit achieved on the supplied finite synthesis image. This does not prove modal completeness,
+absence of omitted channels, raw-Jones normalization, interface boundary laws, or positive-power
+semantics for evanescent or absorptive channels.
 
 #### E4a. Planar interface and local boundary semantics
 
@@ -2010,12 +2026,16 @@ kernel semantics; a noncomputable complex matrix inverse is not the sole oracle.
   `E_outᴴ * S * (I - C*S)⁻¹ * E_in`, with every domain and codomain shape visible;
 - [x] agreement of those formulas with the singular-safe relational semantics, plus invariance of
   well-posedness and covariance of the response under wiring-preserving presentation changes;
-- [ ] a separate square scattering specialization, only under an external input/output pairing and
-  completeness theorem;
-- [ ] series cascade as a specialization; and
+- [x] a separate square scattering specialization on the exact external-channel complement,
+  using the canonical incident/outgoing wrapper pairing while explicitly withholding any
+  time-reversed physical-port or reciprocity claim;
+- [x] reflection-free series cascade as a specialization, with the later directional
+  transmission block on the left; and
 - [ ] Redheffer star products for declared matched block partitions, with the particular feedback
   block's invertibility hypothesis stated explicitly and reflective feedback kept distinct from
-  one-way cascade.
+  one-way cascade. The singular-safe relation, proof-gated matrix formula, and relation-level
+  regressions are complete; agreement with the same two-device wiring through
+  `FlatNetlist`/N5H remains the X-01 exit.
 
 Exit: the solver works whenever the finite network is uniquely solvable, without imposing a norm
 contraction as a necessary condition.
@@ -2147,26 +2167,36 @@ proofs. Reciprocity extensions are added only after N2b/N6b conventions are avai
 Exit: microring formulas are consequences of a physically parameterized component realization,
 not the defining fields of a formula container.
 
-#### S1. Mach-Zehnder interferometer — Physlib extension, no HOL source
+#### S1. Mach-Zehnder interferometer — complete Physlib extension, no HOL source
 
 No Concordia source defines or analyzes a Mach--Zehnder interferometer; SysCon'15 mentions it only
 as a motivating citation (p. 562). S1 is valuable system verification, but it is not a parity row.
 
-- depend on the N5 solver and the N6a/N7 conservation and component laws, rather than supplying an
+- [x] depend on the N5 solver and the N6a/N7 conservation and component laws, rather than supplying an
   interferometer-specific transfer formula;
-- construct it solely from two couplers and two arms;
-- prove complex output amplitudes and both output powers;
-- prove lossless power balance; and
-- specialize to balanced, dark-port, and phase-sensing cases.
+- [x] construct it solely from two couplers and two arms;
+- [x] prove complex output amplitudes and both output powers;
+- [x] prove lossless power balance; and
+- [x] specialize to balanced, dark-port, and phase-sensing cases.
 
-#### S2. All-pass and add-drop microring resonators
+The implementation is an explicit feed-forward `FlatNetlist`; its N5 well-posedness is proved for
+every parameter record, and the closed amplitudes are derived from `responseTransform`. Balanced
+phase-zero and phase-`π` regressions independently follow the channel equations, while N6 supplies
+the all-phase normalized-modal power balance. The phase-ratio theorem identifies the relative arm
+phase factor under a nonzero-input hypothesis. This is not a HOL-parity claim and supplies no
+time-domain delay, dispersion, polarization, reciprocity, or material model.
 
-- depend on N5/N5F, N6a, and the proved N7 coupler/delay component laws;
-- construct each ring as an explicit feedback network;
-- derive through/drop transfer amplitudes from N5;
-- state exact denominator/well-posedness conditions;
-- prove the multiple-round-trip geometric series only under its convergence condition; and
-- prove equality between the series and algebraic-elimination views where both apply.
+#### S2. All-pass and add-drop microring resonators — all-pass slice complete
+
+- [x] construct the one-bus all-pass ring as an explicit `FlatNetlist` from the proved N7
+  directional coupler and matched-propagation components;
+- [x] derive its through transfer amplitude from the N5 response transform;
+- [x] prove well-posedness exactly equivalent to `1 - t * gamma ≠ 0`, including a singular-input
+  kernel witness for the converse;
+- [x] prove the multiple-round-trip geometric series only under `‖t * gamma‖ < 1` and identify
+  it with the algebraic-elimination response where both views apply;
+- [ ] construct the two-bus add-drop ring as an explicit feedback network; and
+- [ ] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
 
 #### S3. Ring observables
 
@@ -2479,8 +2509,8 @@ corpus reports no numerical or simulation cross-validation of a formalized resul
 | B-01 | contraction feedback series converges to the algebraic inverse response | unjustified geometric series |
 | B-02 | a noncontractive but invertible feedback example remains well posed | contraction treated as necessary |
 | B-03 | the source-mapped nested feedback/sum/pickoff identity follows from common behavior semantics | block-algebra orientation error |
-| S-01 | **Physlib extension:** balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
-| S-02 | microring elimination and convergent round-trip series agree | feedback orientation errors |
+| S-01 | **Physlib extension met:** balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
+| S-02 | **all-pass met:** elimination and the contractive round-trip series agree; add-drop remains | feedback orientation errors |
 | S-03 | microring transfer, power, resonance, and rejection specializations | hidden nondegeneracy assumptions |
 | S-04 | physical add-drop realization yields the exact transfer response | disconnected ring formula |
 | S-05 | add-drop power and rejection ratio satisfy their positivity and logarithm domains | amplitude/power or dB-convention error |
@@ -2656,7 +2686,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P3c Poincare classification | done | P3b-1, P3b-2 | closed-ball, boundary/interior, exact phase-fiber, rank-one factorization, orbit-quotient, and canonical-axis suites |
 | P4 deterministic Mueller | done | P1a, P2a, P3a, P3b-1 | transported real action, Pauli trace/reality, cone, algebra, unitary, and regression suites |
 | P5a Jones polarizer/Malus | done | P1a, P2b, P3b-2, P4 | projection, contraction, coherent/intensity Malus, coherency, arbitrary-Stokes Mueller, and convention-regression suites |
-| P5b physical Malus bridge | in progress | P5a, E3b | propagating material-wave irradiance and actual mean-flux Malus laws complete; normalized-mode power remains |
+| P5b physical Malus bridge | in progress | P5a, E3b | propagating material-wave irradiance and actual mean-flux Malus laws complete; transport through the completed normalized-mode bridge remains |
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
@@ -2666,7 +2696,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, interface-oriented side-decaying carrier geometry, its complex-bilinear s/p frame, transverse positive-medium Maxwell qualification, and named nonzero half-space evanescence are complete; separate outgoing semantics remain |
 | E3s cross-product divergence | done | Space derivative API | pointwise and function-level real three-dimensional div-cross identity under first differentiability |
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
-| E3b Optics normalization | in progress | O1, P1a, E2, E3a | local peak-phasor averaging, propagating material-wave irradiance, signed propagating and positive-normal-decay flux, and the abstract measured-profile pairing/synthesis-to-modal-power bridge are complete; the Maxwell-qualified propagating-family, geometric-aperture, actual-field connector remains |
+| E3b Optics normalization | complete on finite synthesis image | O1, P1a, E2, E3a | common-positive-frequency propagating Maxwell families, finite complex synthesis, actual one-period integrated Poynting flux, restricted two-dimensional Hausdorff aperture area, and signed modal-power identification are complete; no modal completeness claim |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
 | E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
@@ -2679,20 +2709,20 @@ current integration base; a designed package whose prerequisite is merely active
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
-| N5 elimination | in progress | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, hostile well-posed and singular fixtures, and wiring covariance are complete; scattering specialization, series, and Redheffer remain |
-| N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
-| N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
-| N6a conservation | blocked | N2a, N5; E3b for physical meaning | passive/lossless composition closure suite |
+| N5 elimination | in progress: local Redheffer route complete, X-01 bridge open | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, and proof-gated Redheffer realization are complete; agreement with FlatNetlist/N5H composition remains |
+| N5F parameterized compilation | in progress | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
+| N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening construction, well-posed subsystem packaging, close behavior, and append assembly laws are complete; hierarchical/flattened semantic equality remains |
+| N6a conservation | done | N2a, N5; E3b for physical meaning | exact wiring power balance, componentwise passive/lossless closure, and lossless external scattering matrix |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
-| N6c coherent/incoherent observables | blocked | P2a, N5, N6a | coherency transport and decorrelation suite |
+| N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
-| S1 Mach-Zehnder (Physlib extension) | blocked | N5, N6a, N7 | transfer and power suite; no HOL source |
-| S2/S3 microrings | blocked | S0, N5, N5F, N6a, N7 | pointwise response and observable suite |
+| S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
+| S2/S3 microrings | in progress: all-pass amplitude/series slice complete | S0, N5, N5F, N6a, N7 | explicit one-bus netlist, exact solve gate, N5 through response, and contractive round-trip-series agreement complete; add-drop and observable suite remain |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: neutral matrix/cofactor foundation integrated; forward-path bijection, edge enumeration, and N5 agreement open | N5, finite graph audit | combinatorial/matrix equivalence |
+| S6 Mason | in progress: neutral matrix/cofactor, classical forward-path formula, edge enumeration, distinguished terminals, and definition-level regressions integrated; N5 agreement remains | N5, finite graph audit | combinatorial/matrix equivalence |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
