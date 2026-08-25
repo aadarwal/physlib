@@ -20,6 +20,10 @@ and identifies it with the previously proved four-block formula.
 
 `redhefferStar` is proof-gated and composes reflective scattering systems. It is not ordinary
 matrix multiplication, a chain-matrix product, a reciprocity statement, or a convergence result.
+The gate is sufficient for external functionality; no converse, minimality, associativity, or
+identity theorem is asserted.
+Agreement with the independent `FlatNetlist`/N5H elimination route has not yet been proved; that
+is the open X-01 bridge.
 
 ## iii. Key definitions and results
 

@@ -22,6 +22,8 @@ formula.
 Rows and columns of each travelling-wave scattering transform are ordered left then right. The
 chosen pivot acts on the internal backward-wave family. Its inverse is proof-gated; no total
 matrix inverse, norm-contraction criterion, reciprocity, or commutativity assumption is used.
+Bijectivity is a sufficient gate for extracting the external matrix; no converse or minimality
+claim about external functionality is made.
 
 ## iii. Key definitions and results
 
@@ -67,8 +69,8 @@ def redhefferFeedbackBlock [Fintype κ] [DecidableEq κ]
     ModeTransform (BackwardWave κ) (BackwardWave κ) :=
   1 - second.leftReflection * first.rightReflection
 
-/-- The exact solvability gate used to extract the Redheffer scattering matrix from the
-singular-safe series behavior. -/
+/-- The explicit sufficient solvability gate used to extract the Redheffer scattering matrix from
+the singular-safe series behavior. No converse from external functionality is asserted. -/
 def HasBijectiveRedhefferFeedback [Fintype κ] [DecidableEq κ]
     (first : TwoPortScatteringTransform ι κ)
     (second : TwoPortScatteringTransform κ μ) : Prop :=
