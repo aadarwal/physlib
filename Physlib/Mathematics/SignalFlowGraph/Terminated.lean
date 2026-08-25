@@ -19,17 +19,27 @@ between them.
 
 The packaging is thin on purpose: every theorem here is an instance of one already proved. The
 transfer function is the entry of the inverse system matrix, it is the algebraic expression driven
-by a unit injection at the input, it is Mason's quotient over forward paths, and it is the
-edge-level Mason quotient over a multigraph refining it. Those four descriptions of the same
-number are what the terminals make it possible to state without naming the two nodes again.
+by a unit injection at the input, it is the loop-family quotient, it is Mason's quotient over
+forward paths, and it is the edge-level Mason quotient over a multigraph refining it. Those five
+descriptions of the same number are what the terminals make it possible to state without naming
+the two nodes again.
 
-Three of those four identities are unconditional, and it matters why. `transfer` is defined from
-Mathlib's inverse, which is totalized: it returns a value at a singular matrix rather than
-failing. So the unconditional identities are statements about that totalized expression, not
-about a network response. The transfer function acquires its solved-response meaning only where
-the system matrix is invertible, and `transfer_eq_of_isNodeSolution` is the statement that carries
-it: under invertibility the transfer function is the output component of the unique signal vector
-solving the node equations. Away from invertibility no such reading is claimed here.
+The five do not all carry the same hypothesis, and the split is worth stating exactly. Three are
+unconditional: `transfer_eq_inv`, `transfer_eq_nodeSolution` and
+`transfer_eq_cyclicNumerator_div`. Two require a nonvanishing graph determinant: both Mason
+identities, `transfer_eq_masonGain` over forward paths and
+`Multigraph.transfer_terminate_eq_edgeMason` (with `TerminatedMultigraph.transfer_eq_edgeMason`)
+at edge level. The reason for the asymmetry is that a Mason quotient divides by the graph
+determinant, whereas the other three do not.
+
+That an identity is unconditional does not make it a statement about a network. `transfer` is
+defined from Mathlib's inverse, which is totalized: it returns a value at a singular matrix rather
+than failing. So the three unconditional identities equate totalized expressions, and the two
+Mason identities are gated only to keep their denominator away from zero. Neither kind asserts a
+response. The transfer function acquires its solved-response meaning only where the system matrix
+is invertible, and that is carried by the two `transfer_eq_of_isNodeSolution` lemmas, one for each
+structure: under invertibility the transfer function is the output component of the unique signal
+vector solving the node equations. Away from invertibility no such reading is claimed here.
 
 A multigraph is terminated by choosing the two nodes, and the resulting transfer function is
 computed by its own edge-level enumeration, in which parallel edges stay distinct. Two ways of
@@ -91,7 +101,8 @@ an instance of one already proved, and none is stronger. No claim is made that t
 output nodes are distinct, or that either lies on any loop. `transfer` **is** defined at every
 gain matrix, including one whose graph determinant vanishes, because Mathlib's inverse is
 totalized; what is not claimed there is that the value it returns is a network response. Only
-`transfer_eq_of_isNodeSolution`, which is gated on invertibility, asserts a response reading.
+the two `transfer_eq_of_isNodeSolution` lemmas, gated on invertibility, assert a response
+reading.
 
 This file is neutral mathematics and imports no physics.
 
@@ -147,7 +158,9 @@ lemma TerminatedGraph.transfer_eq_nodeSolution (S : TerminatedGraph ι) :
 /-- Where the system matrix is invertible, the transfer function is the output component of a
 signal vector solving the node equations under a unit injection at the input. Since such a
 solution is unique there, this is the statement that gives the transfer function its meaning as a
-network response, and it is the only identity in this file that asserts one. -/
+network response. It is the only identity in the `TerminatedGraph` API that asserts one;
+`TerminatedMultigraph.transfer_eq_of_isNodeSolution` is its counterpart for a graph that has kept
+its edges. -/
 lemma TerminatedGraph.transfer_eq_of_isNodeSolution (S : TerminatedGraph ι)
     (h : IsUnit (systemMatrix S.gainMatrix).det) {x : ι → ℂ}
     (hx : IsNodeSolution S.gainMatrix (Pi.single S.input 1) x) :

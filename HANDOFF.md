@@ -1019,6 +1019,43 @@ No new modules, so the registration list is unchanged from slice 8.
 - No `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import.
 - All new declarations are `lemma`, per the house convention.
 
+## Slice 8c — two prose corrections in `Terminated.lean`
+
+Reviewer verdict D2 closed all three of the slice 8b findings. Two prose blockers remained. Both
+are documentation-only; the diff touches no declaration, no statement and no proof.
+
+**1. The hypothesis split was miscounted.** The overview listed four descriptions of the transfer
+function and said three of them were unconditional. Both halves were wrong. The list of four
+silently omitted `transfer_eq_cyclicNumerator_div`, and of the four it did list, two are
+unconditional rather than three. The file now states the split exactly, and the correct shape is
+five descriptions, three plus two:
+
+- Unconditional: `transfer_eq_inv`, `transfer_eq_nodeSolution`,
+  `transfer_eq_cyclicNumerator_div`.
+- Requiring `graphDet ≠ 0`: **both** Mason identities — `transfer_eq_masonGain` over forward
+  paths, and `Multigraph.transfer_terminate_eq_edgeMason` together with
+  `TerminatedMultigraph.transfer_eq_edgeMason` at edge level.
+
+The reason for the asymmetry is now stated too: a Mason quotient divides by the graph determinant
+and the other three do not. The file also keeps the separate point that being unconditional is
+not the same as describing a network — the three unconditional identities equate totalized
+expressions, and the two Mason identities are gated only to keep a denominator away from zero.
+Neither kind asserts a response.
+
+**2. The uniqueness claim about response readings was wrong once a second structure existed.**
+`TerminatedGraph.transfer_eq_of_isNodeSolution` was documented as "the only identity in this file"
+asserting a response reading. That was true when it was written and was falsified by slice 8b
+itself, which added `TerminatedMultigraph.transfer_eq_of_isNodeSolution`. The docstring now claims
+only to be the sole such identity in the `TerminatedGraph` API and names its counterpart, and the
+references section speaks of the two lemmas rather than one.
+
+### Slice 8c gates
+
+- `lake-lock build` — clean; per-file `lean` checks on all seventeen — zero output; module-scoped
+  Batteries linters on all seventeen — passed; `module_doc_lint` and `style_lint` — clean.
+- Diff verified doc-only: no line beginning a `lemma`, `def`, `structure`, `omit`, attribute or
+  tactic was added or removed.
+
 ### Slice 1 gates
 
 - `lake-lock build` of both modules — clean.
