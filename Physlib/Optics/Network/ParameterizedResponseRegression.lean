@@ -19,15 +19,20 @@ component. The first component is a fixed nonreciprocal two-port with internal r
 `value`. The wiring joins the two link ports, leaving one external channel on each component.
 
 Everything about the resulting network is pinned exactly. The internal operator `1 - C * S` has a
-displayed sparse matrix whose exact inverse exists precisely when `1 - I * value ≠ 0`, and the
-external response is the exact rational family
+displayed sparse matrix whose exact inverse exists precisely when `1 - I * value ≠ 0`, and on that
+algebraic solve domain the total-inverse formula is the exact rational family
 
 ```text
 (1 - I * value)⁻¹ * [[2 * value, 2], [1, I]]
 ```
 
-in exposed order `(A.ext, B.ext)`. The response is therefore a genuine spectral family with a pole
-at `value = -I`, obtained from the network semantics rather than postulated.
+in exposed order `(A.ext, B.ext)`, obtained from the network semantics rather than postulated.
+
+`value = -I` is a **singular parameter**: an explicit kernel witness proves that the internal
+operator is not injective there, so the network is not well posed and no response of any kind is
+defined. That is a candidate pole of the response family and nothing more. No pole theorem is
+proved here — no statement about a limit, an order, a residue, or a Laurent expansion — and the
+word *pole* is therefore avoided below.
 
 The parameter-validity data is deliberately not the algebraic solve condition. The second
 component's stored reflection law is declared valid only where `‖value‖ ≤ 1`. Both inclusions
@@ -48,10 +53,14 @@ free-spectral-range or resonance-linewidth statement is made.
 
 - `parameterizedResponseRegression_feedbackOperator_eq`: the exact compiled internal operator.
 - `parameterizedResponseRegression_solveDomain_eq`: the algebraic solve domain is exactly
-  `1 - I * value ≠ 0`, with the pole excluded by an explicit kernel witness.
-- `parameterizedResponseRegression_unguardedResponse_eq`: the exact rational response family.
-- `parameterizedResponseRegression_mem_compileBehavior_iff`: parameter evaluation commutes with
-  compilation and `N5` elimination, stated against the exact response matrix (`N-10`).
+  `1 - I * value ≠ 0`, with the singular parameter excluded by an explicit kernel witness.
+- `parameterizedResponseRegression_unguardedResponse_eq`: the exact rational family taken by the
+  algebraic total-inverse formula on the solve domain.
+- `parameterizedResponseRegression_mem_compileBehavior_iff_solve`: parameter evaluation commutes
+  with compilation and `N5` elimination on the well-posed domain, stated against the exact matrix
+  (`N-10`).
+- `parameterizedResponseRegression_mem_compileBehavior_iff`: its physical corollary on the
+  response domain.
 - `parameterizedResponseRegression_responseDomain_ssubset_solveDomain` and
   `parameterizedResponseRegression_responseDomain_ssubset_validityDomain`: both inclusions of the
   physical response domain are strict.
@@ -62,8 +71,8 @@ free-spectral-range or resonance-linewidth statement is made.
 
 - A. A parameterized shared-link network
 - B. The exact internal operator and its inverse
-- C. The algebraic solve domain and its pole
-- D. The exact rational response and evaluation commutation
+- C. The algebraic solve domain and its singular parameter
+- D. The exact rational family and evaluation commutation
 - E. Strictness of both response-domain inclusions
 
 -/
@@ -463,7 +472,7 @@ lemma parameterizedResponseRegression_adjugate_mul_feedback (value : ℂ) :
   all_goals try ring
 
 /-- The displayed internal operator followed by its displayed inverse is the identity away from
-the pole. -/
+the singular parameter. -/
 lemma parameterizedResponseRegression_feedback_mul_inverse (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0) :
     parameterizedResponseRegressionFeedback value *
@@ -473,7 +482,7 @@ lemma parameterizedResponseRegression_feedback_mul_inverse (value : ℂ)
     inv_mul_cancel₀ hValue, one_smul]
 
 /-- The displayed inverse followed by the displayed internal operator is the identity away from
-the pole. -/
+the singular parameter. -/
 lemma parameterizedResponseRegression_inverse_mul_feedback (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0) :
     parameterizedResponseRegressionInverse value *
@@ -484,11 +493,12 @@ lemma parameterizedResponseRegression_inverse_mul_feedback (value : ℂ)
 
 /-!
 
-## C. The algebraic solve domain and its pole
+## C. The algebraic solve domain and its singular parameter
 
 -/
 
-/-- Away from the pole the parameterized network is well posed, with no contraction assumption. -/
+/-- Away from the singular parameter the parameterized network is well posed, with no contraction
+assumption. -/
 lemma parameterizedResponseRegression_mem_solveDomain (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0) :
     value ∈ parameterizedResponseRegression.solveDomain := by
@@ -509,8 +519,8 @@ lemma parameterizedResponseRegression_mem_solveDomain (value : ℂ)
     (congrArg (parameterizedResponseRegressionInverse value).toLinearMap hEqual)).trans
     (hLeft second)
 
-/-- The kernel witness at the pole: unit amplitude on the second link endpoint and `value` on the
-first. -/
+/-- The kernel witness at the singular parameter: unit amplitude on the second link endpoint and
+`value` on the first. -/
 def parameterizedResponseRegressionKernel (value : ℂ) :
     ModeAmplitude parameterizedResponseRegression.IncidentIndex :=
   WithLp.toLp 2 fun endpoint =>
@@ -527,7 +537,7 @@ lemma parameterizedResponseRegressionKernel_ne_zero (value : ℂ) :
     (fun amplitude => amplitude (Incident.mk parameterizedResponseRegressionBLink)) hKernel
   simp [parameterizedResponseRegressionKernel] at hCoordinate
 
-/-- At the pole the internal operator annihilates the kernel witness. -/
+/-- At the singular parameter the internal operator annihilates the kernel witness. -/
 lemma parameterizedResponseRegression_feedbackOperator_kernel (value : ℂ)
     (hValue : 1 - Complex.I * value = 0) :
     (parameterizedResponseRegressionFeedback value).toLinearMap
@@ -548,8 +558,8 @@ lemma parameterizedResponseRegression_feedbackOperator_kernel (value : ℂ)
       parameterizedResponseRegressionFeedback,
       parameterizedResponseRegressionKernel]
 
-/-- At the pole the parameterized network is not well posed: the total inverse must not be used
-there. -/
+/-- At the singular parameter the parameterized network is not well posed: the total inverse must
+not be used there. -/
 lemma parameterizedResponseRegression_not_mem_solveDomain (value : ℂ)
     (hValue : 1 - Complex.I * value = 0) :
     value ∉ parameterizedResponseRegression.solveDomain := by
@@ -567,7 +577,7 @@ lemma parameterizedResponseRegression_not_mem_solveDomain (value : ℂ)
     exact parameterizedResponseRegression_feedbackOperator_kernel value hValue
   exact parameterizedResponseRegressionKernel_ne_zero value (hInjective hZero)
 
-/-- The algebraic solve domain is exactly the complement of the pole. -/
+/-- The algebraic solve domain is exactly the complement of the singular parameter. -/
 lemma parameterizedResponseRegression_solveDomain_eq :
     parameterizedResponseRegression.solveDomain = {value : ℂ | 1 - Complex.I * value ≠ 0} := by
   ext value
@@ -578,7 +588,7 @@ lemma parameterizedResponseRegression_solveDomain_eq :
 
 /-!
 
-## D. The exact rational response and evaluation commutation
+## D. The exact rational family and evaluation commutation
 
 -/
 
@@ -619,7 +629,11 @@ def parameterizedResponseRegressionUnnormalizedResponse (value : ℂ) :
   | true, false => 1
   | true, true => Complex.I
 
-/-- The exact external response family: an explicit rational matrix with a single pole. -/
+/-- The exact rational family taken by the network's algebraic total-inverse formula.
+
+It is a response only where the physical response domain says so; on the rest of the solve domain
+it is the algebraic block formula and nothing more.
+-/
 def parameterizedResponseRegressionResponse (value : ℂ) :
     ModeTransform parameterizedResponseRegression.ExternalIncident
       parameterizedResponseRegression.ExternalOutgoing :=
@@ -698,7 +712,9 @@ lemma parameterizedResponseRegression_outputReadout_mul_outgoingSolution (value 
       parameterizedResponseRegressionOutgoingSolution,
       parameterizedResponseRegressionUnnormalizedResponse]
 
-/-- The exact rational response family, valid at every algebraically solvable parameter value. -/
+/-- The algebraic total-inverse formula takes this exact rational value at every algebraically
+solvable parameter. No claim of physical validity is made here; stored component validity is a
+separate and strictly stronger condition. -/
 theorem parameterizedResponseRegression_unguardedResponse_eq (value : ℂ)
     (hValue : 1 - Complex.I * value ≠ 0) :
     parameterizedResponseRegression.unguardedResponse value =
@@ -714,7 +730,7 @@ theorem parameterizedResponseRegression_unguardedResponse_eq (value : ℂ)
     parameterizedResponseRegression_scattering_mul_incidentSolution,
     parameterizedResponseRegression_outputReadout_mul_outgoingSolution]
 
-/-- The proof-gated response on the physical domain is the same exact rational family. -/
+/-- On the physical response domain the proof-gated response is the same exact rational matrix. -/
 theorem parameterizedResponseRegression_response_eq {value : ℂ}
     (hValue : value ∈ parameterizedResponseRegression.responseDomain) :
     parameterizedResponseRegression.response hValue =
@@ -723,17 +739,34 @@ theorem parameterizedResponseRegression_response_eq {value : ℂ}
   exact parameterizedResponseRegression_unguardedResponse_eq value
     ((Set.ext_iff.mp parameterizedResponseRegression_solveDomain_eq value).mp hValue.1)
 
-/-- Parameter evaluation commutes with compilation and `N5` elimination: at every parameter of the
-physical response domain, the compiled singular-safe relational semantics is exactly the graph of
-the exact rational response matrix. This is regression row `N-10`. -/
+/-- Parameter evaluation commutes with compilation and `N5` elimination on the well-posed domain:
+at every algebraically solvable parameter, the compiled singular-safe relational semantics is
+exactly the graph of the exact rational matrix. This is regression row `N-10`.
+
+The gate is `solveDomain`, which is what the milestone asks for. Gating it on `responseDomain`
+instead would lose real cases: `2` is algebraically solvable and outside the declared validity
+domain, and the equality still holds there.
+-/
+theorem parameterizedResponseRegression_mem_compileBehavior_iff_solve (value : ℂ)
+    (hValue : 1 - Complex.I * value ≠ 0)
+    (input : ModeAmplitude parameterizedResponseRegression.ExternalIncident)
+    (output : ModeAmplitude parameterizedResponseRegression.ExternalOutgoing) :
+    (input, output) ∈ (parameterizedResponseRegression.compile value).behavior ↔
+      output = (parameterizedResponseRegressionResponse value).toLinearMap input := by
+  rw [← parameterizedResponseRegression_unguardedResponse_eq value hValue]
+  exact parameterizedResponseRegression.mem_compileBehavior_iff_unguardedResponse
+    (parameterizedResponseRegression_mem_solveDomain value hValue) input output
+
+/-- The physical corollary of `N-10` on the response domain. -/
 theorem parameterizedResponseRegression_mem_compileBehavior_iff {value : ℂ}
     (hValue : value ∈ parameterizedResponseRegression.responseDomain)
     (input : ModeAmplitude parameterizedResponseRegression.ExternalIncident)
     (output : ModeAmplitude parameterizedResponseRegression.ExternalOutgoing) :
     (input, output) ∈ (parameterizedResponseRegression.compile value).behavior ↔
-      output = (parameterizedResponseRegressionResponse value).toLinearMap input := by
-  rw [← parameterizedResponseRegression_response_eq hValue]
-  exact parameterizedResponseRegression.mem_compileBehavior_iff_response hValue input output
+      output = (parameterizedResponseRegressionResponse value).toLinearMap input :=
+  parameterizedResponseRegression_mem_compileBehavior_iff_solve value
+    ((Set.ext_iff.mp parameterizedResponseRegression_solveDomain_eq value).mp hValue.1)
+    input output
 
 /-- The response is asymmetric away from the degenerate parameter, so a transposed external
 transfer matrix is detected. -/
@@ -757,16 +790,16 @@ lemma parameterizedResponseRegression_response_asymmetric (value : ℂ)
 
 -/
 
-/-- The pole lies in the declared validity domain, since its modulus is one. -/
-lemma parameterizedResponseRegression_pole_mem_validityDomain :
+/-- The singular parameter lies in the declared validity domain, since its modulus is one. -/
+lemma parameterizedResponseRegression_singularParameter_mem_validityDomain :
     (-Complex.I) ∈ parameterizedResponseRegressionComponents.validityDomain := by
   intro component
   cases component
   · trivial
   · simp
 
-/-- The pole is not algebraically solvable. -/
-lemma parameterizedResponseRegression_pole_not_mem_solveDomain :
+/-- The singular parameter is not algebraically solvable. -/
+lemma parameterizedResponseRegression_singularParameter_not_mem_solveDomain :
     (-Complex.I) ∉ parameterizedResponseRegression.solveDomain := by
   apply parameterizedResponseRegression_not_mem_solveDomain
   simp [Complex.I_mul_I]
@@ -805,9 +838,9 @@ theorem parameterizedResponseRegression_responseDomain_ssubset_validityDomain :
       parameterizedResponseRegressionComponents.validityDomain := by
   refine ⟨parameterizedResponseRegression.responseDomain_subset_validityDomain, ?_⟩
   intro hSubset
-  exact parameterizedResponseRegression_pole_not_mem_solveDomain
+  exact parameterizedResponseRegression_singularParameter_not_mem_solveDomain
     (parameterizedResponseRegression.responseDomain_subset_solveDomain
-      (hSubset parameterizedResponseRegression_pole_mem_validityDomain))
+      (hSubset parameterizedResponseRegression_singularParameter_mem_validityDomain))
 
 /-- The unit-imaginary reflection lies in the physical response domain. -/
 lemma parameterizedResponseRegression_i_mem_responseDomain :

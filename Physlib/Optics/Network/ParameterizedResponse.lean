@@ -48,9 +48,18 @@ Those belong to the system milestone and must be derived from this response, not
 independently postulated formula.
 
 `unguardedResponse` is written with Mathlib's total matrix inverse purely to obtain a function of
-the parameter with no proof argument, so that regularity can be stated. Away from the response
-domain its value is the junk inverse of a singular matrix and is never claimed to be a response;
-every physical statement about it carries a `responseDomain` hypothesis.
+the parameter with no proof argument, so that regularity can be stated. Its meaning differs across
+three regions of the parameter space, and the difference is deliberate.
+
+* Outside `solveDomain` the middle factor is Mathlib's junk value for the inverse of a singular
+  matrix, and the whole expression means nothing at all.
+* On `solveDomain \ validityDomain` the middle factor is a genuine algebraic inverse and the
+  expression is the exact `N5` block formula, but no component's stored model is claimed to hold
+  there, so it is not a physical response. The regression exhibits such a parameter.
+* On `responseDomain` it agrees with the proof-gated `response`.
+
+Accordingly the algebraic statements about it carry a `solveDomain` hypothesis and the physical
+ones a `responseDomain` hypothesis; the words *physical response* are reserved for the latter.
 
 ## iii. Key definitions and results
 
@@ -67,8 +76,10 @@ every physical statement about it carries a `responseDomain` hypothesis.
 - `ParameterizedNetlist.response`: the proof-gated external response on the physical domain.
 - `ParameterizedNetlist.response_eq_blockFormula`: evaluation commutes with compilation and
   elimination.
-- `ParameterizedNetlist.mem_compileBehavior_iff_response`: the compiled singular-safe relational
-  semantics is the graph of the response at every parameter of the domain.
+- `ParameterizedNetlist.mem_compileBehavior_iff_unguardedResponse`: on the algebraic solve domain
+  the compiled singular-safe relational semantics is the graph of the total-inverse formula.
+- `ParameterizedNetlist.mem_compileBehavior_iff_response`: its physical corollary on the response
+  domain.
 - `ParameterizedNetlist.unguardedResponse_eq_response`: the total-inverse formula agrees with the
   proof-gated response exactly on the domain.
 - `ParameterizedNetlist.response_reparameterize`: response evaluation commutes with substitution
@@ -508,23 +519,6 @@ lemma toBehavior_response {value : Param} (hValue : value ∈ netlist.responseDo
     (netlist.response hValue).toBehavior = (netlist.compile value).behavior :=
   (netlist.compile value).toBehavior_responseTransform hValue.1
 
-/-- On the physical response domain, the compiled relational semantics is evaluation of the
-response. This is the exact statement that parameter evaluation commutes with compilation and
-`N5` elimination. -/
-lemma mem_compileBehavior_iff_response {value : Param}
-    (hValue : value ∈ netlist.responseDomain)
-    (input : ModeAmplitude netlist.ExternalIncident)
-    (output : ModeAmplitude netlist.ExternalOutgoing) :
-    (input, output) ∈ (netlist.compile value).behavior ↔
-      output = (netlist.response hValue).toLinearMap input :=
-  (netlist.compile value).mem_behavior_iff_eq_responseTransform hValue.1 input output
-
-/-- Applying the response solves the compiled network equations at that parameter. -/
-lemma response_apply_mem_compileBehavior {value : Param}
-    (hValue : value ∈ netlist.responseDomain)
-    (input : ModeAmplitude netlist.ExternalIncident) :
-    (input, (netlist.response hValue).toLinearMap input) ∈ (netlist.compile value).behavior :=
-  (netlist.mem_compileBehavior_iff_response hValue input _).mpr rfl
 
 /-- The response does not depend on which proof of domain membership is supplied. -/
 lemma response_congr {value : Param} (first second : value ∈ netlist.responseDomain) :
@@ -576,6 +570,41 @@ lemma unguardedResponse_eq_response {value : Param}
     netlist.unguardedResponse value = netlist.response hValue := by
   rw [netlist.unguardedResponse_eq_blockFormula hValue.1,
     netlist.response_eq_blockFormula hValue]
+
+/-- On the algebraic solve domain, the compiled singular-safe relational semantics is exactly
+evaluation of the algebraic total-inverse formula.
+
+This is the commutation statement on the well-posed domain: wherever the compiled network is
+uniquely solvable, evaluating the parameter, compiling, and eliminating give the same relation,
+whether or not any component's stored model is claimed to hold there.
+-/
+lemma mem_compileBehavior_iff_unguardedResponse {value : Param}
+    (hSolve : value ∈ netlist.solveDomain)
+    (input : ModeAmplitude netlist.ExternalIncident)
+    (output : ModeAmplitude netlist.ExternalOutgoing) :
+    (input, output) ∈ (netlist.compile value).behavior ↔
+      output = (netlist.unguardedResponse value).toLinearMap input := by
+  rw [netlist.unguardedResponse_eq_blockFormula hSolve,
+    ← (netlist.compile value).toBehavior_responseBlockFormula hSolve]
+  exact ModeTransform.mem_toBehavior_iff_toLinearMap _ _ _
+
+/-- On the physical response domain, the compiled relational semantics is evaluation of the
+proof-gated response: the physical corollary of the solve-domain commutation statement. -/
+lemma mem_compileBehavior_iff_response {value : Param}
+    (hValue : value ∈ netlist.responseDomain)
+    (input : ModeAmplitude netlist.ExternalIncident)
+    (output : ModeAmplitude netlist.ExternalOutgoing) :
+    (input, output) ∈ (netlist.compile value).behavior ↔
+      output = (netlist.response hValue).toLinearMap input := by
+  rw [← netlist.unguardedResponse_eq_response hValue]
+  exact netlist.mem_compileBehavior_iff_unguardedResponse hValue.1 input output
+
+/-- Applying the response solves the compiled network equations at that parameter. -/
+lemma response_apply_mem_compileBehavior {value : Param}
+    (hValue : value ∈ netlist.responseDomain)
+    (input : ModeAmplitude netlist.ExternalIncident) :
+    (input, (netlist.response hValue).toLinearMap input) ∈ (netlist.compile value).behavior :=
+  (netlist.mem_compileBehavior_iff_response hValue input _).mpr rfl
 
 /-- The response at a parameter of the physical domain is the exact four-factor elimination
 product `E_outᴴ * S * (1 - C * S)⁻¹ * E_in`, with only the component law evaluated at that
@@ -697,10 +726,13 @@ lemma continuousAt_feedbackOperator {value : Param}
   exact hMap.continuousAt.comp hScattering
 
 /-- On the algebraic solve domain, continuity of the stored component data gives continuity of the
-external response.
+algebraic total-inverse formula.
 
-Only the total-inverse formula can be spoken of as a function of the parameter; on the response
-domain it agrees with the proof-gated response.
+This is a statement about `unguardedResponse` under the algebraic gate alone. It does not claim
+continuity of a physical response: no component's stored validity is assumed, and on the part of
+the solve domain where validity fails there is no physical response to be continuous. The physical
+statement is this one restricted to `responseDomain`, where `unguardedResponse_eq_response`
+applies.
 -/
 theorem continuousAt_unguardedResponse {value : Param}
     (hComponents : netlist.ComponentEntriesContinuousAt value)
@@ -797,11 +829,13 @@ lemma analyticAt_feedbackOperator_entry {value : Param}
       analyticAt_const.mul (hScattering middle input))
 
 /-- On the algebraic solve domain, analyticity of the stored component data gives entrywise
-analyticity of the external response.
+analyticity of the algebraic total-inverse formula.
 
-The inverse factor is handled by Mathlib's determinant/adjugate presentation of the matrix
-inverse: `Matrix.inv_def` reduces it to a reciprocal determinant, which is analytic exactly
-because the solve domain forbids a vanishing determinant.
+As with continuity, the gate here is algebraic only: this is not a claim that a physical response
+is analytic, and it becomes one only on `responseDomain`. The inverse factor is handled by
+Mathlib's determinant/adjugate presentation of the matrix inverse: `Matrix.inv_def` reduces it to
+a reciprocal determinant, which is analytic exactly because the solve domain forbids a vanishing
+determinant.
 -/
 theorem analyticAt_unguardedResponse_entry {value : Param}
     (hComponents : netlist.ComponentEntriesAnalyticAt value)

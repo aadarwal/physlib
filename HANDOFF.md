@@ -70,15 +70,23 @@ Bind these, not their unfoldings:
 - `ParameterizedNetlist.responseDomain` — physical (`solveDomain ∩ validityDomain`).
 - `ParameterizedNetlist.response` — proof-gated; takes `value ∈ responseDomain`.
 - `ParameterizedNetlist.unguardedResponse` — the same formula written with Mathlib's total matrix
-  inverse, so that regularity can be stated as a function of the parameter. **Never quote this as
-  a response without a `solveDomain`/`responseDomain` hypothesis**; use
-  `unguardedResponse_eq_blockFormula` (solve gate) or `unguardedResponse_eq_response` (physical
-  gate).
-- `ParameterizedNetlist.mem_compileBehavior_iff_response` — the `N-10` commutation statement.
+  inverse, so that regularity can be stated as a function of the parameter. Its meaning has three
+  regions: outside `solveDomain` it is Mathlib's junk inverse and means nothing; on
+  `solveDomain \ validityDomain` it is a genuine algebraic inverse and the exact `N5` block
+  formula, but no component's model is claimed there, so it is not a physical response; on
+  `responseDomain` it is the response. **Never quote it as a response without a
+  `responseDomain` hypothesis**; use `unguardedResponse_eq_blockFormula` (algebraic, solve gate)
+  or `unguardedResponse_eq_response` (physical gate).
+- `ParameterizedNetlist.mem_compileBehavior_iff_unguardedResponse` — the `N-10` commutation
+  statement, gated on `solveDomain`, which is the domain goal.md asks for.
+- `ParameterizedNetlist.mem_compileBehavior_iff_response` — its physical corollary on
+  `responseDomain`.
 - `ParameterizedNetlist.continuousAt_unguardedResponse`,
-  `ParameterizedNetlist.analyticAt_unguardedResponse_entry` — regularity, each requiring a
-  `solveDomain` hypothesis and a corresponding hypothesis on the stored component entries
-  (`ComponentEntriesContinuousAt` / `ComponentEntriesAnalyticAt`).
+  `ParameterizedNetlist.analyticAt_unguardedResponse_entry` — regularity **of the algebraic
+  total-inverse formula**, each requiring a `solveDomain` hypothesis and a corresponding hypothesis
+  on the stored component entries (`ComponentEntriesContinuousAt` / `ComponentEntriesAnalyticAt`).
+  These are not claims that a physical response is continuous or analytic; that follows only after
+  restricting to `responseDomain`.
 
 For the validation harness (SAX comparison): the object to compare against a simulator sweep is
 `unguardedResponse` restricted to `responseDomain`, entry `(Outgoing.mk out, Incident.mk inp)`
@@ -92,7 +100,12 @@ outside it have no proved response.
 - `PortConnection.liftBoundary` — an outer connection on ambient ports, mode equivalence verbatim.
 - `PortConnectionFamily.append` — two-stage wiring; **takes no well-posedness hypothesis**.
 - `PortConnectionFamily.appendChannelEquiv`, `.appendUnconnectedPortEquiv`,
-  `.appendExternalChannelEquiv`.
+  `.appendExternalChannelEquiv`, `.append_mateEquiv_inl`, `.append_mateEquiv_inr`.
+- `PortConnectionFamily.closeBehavior` / `.mem_closeBehavior_iff` and
+  `FlatNetlist.behavior_eq_closeBehavior` — wiring an abstract oriented boundary behavior,
+  singular-safe, with `FlatNetlist.behavior` exhibited as an instance.
+- `PortConnectionFamily.append_incidentAssembly_apply_inner` / `_apply_outer` / `_apply_external`
+  — the flattened incident assembly stage by stage.
 - `HierarchicalNetlist`, `.innerNetlist`, `.flatten`, `.flattenExternalChannelEquiv`,
   `.flattenConnectedChannelEquiv`.
 - `FlatNetlist.packagedScattering` and `FlatNetlist.toOrientedModeTransform_packagedScattering`:
@@ -125,7 +138,8 @@ outside it have no proved response.
 - No passivity, losslessness, reciprocity, causality, rationality in any variable, or
   electromagnetic normalization is asserted anywhere in this lane (invariants E.6, E.9).
 - `unguardedResponse` outside `solveDomain` is Mathlib's junk inverse and is never a response.
-- N5H flattening asserts nothing yet about semantics; see "Remaining" below.
+- N5H flattening asserts nothing yet about semantics, and associativity is not proved; both are
+  withheld explicitly in the `Hierarchical` module doc as well as here.
 
 ## Worktree note for other lanes
 

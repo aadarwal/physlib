@@ -13,9 +13,11 @@ public import Physlib.Optics.Network.FlatNetlistElimination
 ## i. Overview
 
 A hierarchical network wires components in two stages. An inner connection family closes some of
-the component channels into verified subsystems; an outer connection family then wires the
-channels those subsystems still expose. This file makes the two stages first-class and shows that
-the pair is exactly one flat connection family on the same components.
+the component channels into subsystems; an outer connection family then wires the channels those
+subsystems still expose. A subsystem here is a grouping of wiring and nothing more: no subsystem
+is asserted to be solvable, and the word *verified* is used below only where a well-posedness
+proof is actually supplied. This file makes the two stages first-class and shows that the pair is
+exactly one flat connection family on the same components.
 
 The boundary of an inner family is itself a typed physical-port family: its ports are the inner
 family's structurally unconnected ports and its mode fibers are the ambient mode fibers over those
@@ -34,14 +36,31 @@ together with the outer connected channels, and the channels it leaves external 
 the outer family's external channels. Mode fibers and mode equivalences are carried through
 unchanged, so no convention is silently renegotiated by flattening.
 
+Two further layers are supplied. A child is packaged as a single scattering component *only after*
+its well-posedness is proved, on its already-paired external channels. And the singular-safe
+relational closure of an abstract oriented boundary behavior by a connection family is made
+explicit, with `FlatNetlist.behavior` exhibited as an instance of it; the flattened incident
+assembly is then read off stage by stage on inner-connected, outer-connected, and fully external
+coordinates.
+
 ## ii. Scope
 
-This file supplies the wiring layer of hierarchical composition. It defines no semantics beyond
-reusing `FlatNetlist`, asserts no relationship between the hierarchical and flattened relational
-behaviors, and packages no child as a functional component. In particular nothing here assumes,
-implies, or requires that any child subsystem is well posed, passive, lossless, reciprocal, or
-causal, and no reference plane, phase gauge, or port-direction convention is changed: the lifted
-outer connections carry the ambient ports and the outer mode equivalences verbatim.
+This file supplies the wiring layer of hierarchical composition together with the relational
+closure operation and the proof-gated packaging of one child.
+
+Two results the `N5H` contract asks for are deliberately **not** claimed here.
+
+* Equality of hierarchical relational semantics with flattened-netlist semantics (goal.md row
+  `N-08`) is not proved. Sections G and H supply the closure operation and the stage-by-stage
+  reading of the flattened assembly that such a proof needs, and nothing in this file asserts the
+  equality itself.
+* Associativity and invariance of `append` for reusing a subsystem are not proved.
+
+Beyond that, nothing here assumes, implies, or requires that any child subsystem is well posed,
+passive, lossless, reciprocal, or causal, except in `packagedScattering` and its consequences,
+which take well-posedness as an explicit hypothesis and still assert none of the other four. No
+reference plane, phase gauge, or port-direction convention is changed: the lifted outer connections
+carry the ambient ports and the outer mode equivalences verbatim.
 
 ## iii. Key definitions and results
 
@@ -58,8 +77,15 @@ outer connections carry the ambient ports and the outer mode equivalences verbat
   outer family's external ports and channels.
 - `HierarchicalNetlist` and `HierarchicalNetlist.flatten`: a two-stage network and its flattened
   netlist.
-- `FlatNetlist.packagedScattering`: a proof-gated packaging of a verified subsystem as a single
+- `FlatNetlist.packagedScattering`: a proof-gated packaging of a well-posed subsystem as a single
   scattering component on its own external channels.
+- `PortConnectionFamily.closeBehavior` and `PortConnectionFamily.mem_closeBehavior_iff`: the
+  singular-safe relational closure of an abstract oriented boundary behavior by a connection
+  family, and its three shaped equations.
+- `FlatNetlist.behavior_eq_closeBehavior`: a flat netlist's external behavior is that closure
+  applied to its assembled component graph.
+- `PortConnectionFamily.append_incidentAssembly_apply_inner`, `..._apply_outer`, and
+  `..._apply_external`: the flattened incident assembly read off stage by stage.
 
 ## iv. Table of contents
 
@@ -68,7 +94,9 @@ outer connections carry the ambient ports and the outer mode equivalences verbat
 - C. Two-stage wiring and flattening
 - D. Flattened connected and external channels
 - E. Hierarchical netlists
-- F. Packaging a verified subsystem as one component
+- F. Packaging a well-posed subsystem as one component
+- G. Relational closure of an abstract boundary behavior
+- H. The flattened incident assembly, stage by stage
 
 -/
 
@@ -367,7 +395,9 @@ variable (netlist : HierarchicalNetlist.{u, v, w, x})
 
 /-- The inner subsystem stage presented as an ordinary flat netlist.
 
-This is the verified-subsystem layer: the same components, wired only by the inner stage.
+This is the subsystem layer: the same components, wired only by the inner stage. It is not
+asserted to be well posed; that is a separate hypothesis, supplied where `packagedScattering` is
+used.
 -/
 def innerNetlist : FlatNetlist.{u, v, w, x} where
   components := netlist.components
@@ -408,7 +438,7 @@ end HierarchicalNetlist
 
 /-!
 
-## F. Packaging a verified subsystem as one component
+## F. Packaging a well-posed subsystem as one component
 
 -/
 
@@ -463,7 +493,7 @@ lemma packagedScattering_toModeTransform_apply (hWellPosed : netlist.IsWellPosed
 
 /-- The packaged component reproduces the subsystem's singular-safe relational semantics exactly.
 
-A verified subsystem may therefore be reused as one component without changing what the fully
+A well-posed subsystem may therefore be reused as one component without changing what the fully
 expanded channel equations say about it.
 -/
 lemma toBehavior_toOrientedModeTransform_packagedScattering
@@ -482,6 +512,267 @@ lemma mem_behavior_iff_packagedScattering (hWellPosed : netlist.IsWellPosed)
         input := by
   rw [← netlist.toBehavior_toOrientedModeTransform_packagedScattering hWellPosed,
     ModeTransform.mem_toBehavior_iff_toLinearMap]
+
+end FlatNetlist
+
+/-!
+
+## G. Relational closure of an abstract boundary behavior
+
+-/
+
+namespace PortConnectionFamily
+
+variable {P : PortModeFamily.{u, v}} {ι : Type w} (family : PortConnectionFamily P ι)
+variable [Fintype P.Channel] [Fintype family.Channel]
+
+/-- Classical equality on ambient channels, kept local to the relational closure. -/
+local instance closureChannelDecidableEq : DecidableEq P.Channel := Classical.decEq _
+
+/-- Classical equality on connected channels, kept local to the relational closure. -/
+local instance closureConnectedChannelDecidableEq : DecidableEq family.Channel :=
+  Classical.decEq _
+
+/-- The external channels of a finite connection family are finite. -/
+local instance closureExternalChannelFintype : Fintype family.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The relational form of `a = C b + E_in u` for a connection family.
+
+Internal routing and external injection act independently in parallel, after which algebraic
+coherent sum adds their two incident-space outputs. This use of coherent sum is vector addition,
+not a physical combiner component.
+-/
+def incidentAssemblyBehavior :
+    LinearBehavior (Outgoing P.Channel ⊕ Incident family.ExternalChannel)
+      (Incident P.Channel) :=
+  (family.partialRouting.toBehavior.parallel
+    family.externalIncidentInjection.toBehavior).series
+    (LinearBehavior.coherentSum : LinearBehavior (Incident P.Channel ⊕ Incident P.Channel)
+      (Incident P.Channel))
+
+/-- The relational incident assembly is exactly `a = C b + E_in u`. -/
+@[simp]
+lemma mem_incidentAssemblyBehavior_iff
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident family.ExternalChannel))
+    (incident : ModeAmplitude (Incident P.Channel)) :
+    (outgoing.directSum external, incident) ∈ family.incidentAssemblyBehavior ↔
+      incident = family.incidentAssembly outgoing external := by
+  constructor
+  · rintro ⟨middle, hParallel, hSum⟩
+    rw [LinearBehavior.mem_parallel_iff] at hParallel
+    simp only [ModeAmplitude.restrictInl_directSum,
+      ModeAmplitude.restrictInr_directSum] at hParallel
+    rcases hParallel with ⟨hRouting, hExposure⟩
+    change middle.restrictInl = family.partialRouting.toLinearMap outgoing at hRouting
+    change middle.restrictInr =
+      family.externalIncidentInjection.toLinearMap external at hExposure
+    rw [LinearBehavior.mem_coherentSum_iff] at hSum
+    rw [hRouting, hExposure] at hSum
+    simpa only [PortConnectionFamily.incidentAssembly] using hSum
+  · intro hIncident
+    refine ⟨(family.partialRouting.toLinearMap outgoing).directSum
+      (family.externalIncidentInjection.toLinearMap external), ?_, ?_⟩
+    · rw [LinearBehavior.mem_parallel_iff]
+      simp only [ModeAmplitude.restrictInl_directSum,
+        ModeAmplitude.restrictInr_directSum]
+      exact ⟨rfl, rfl⟩
+    · rw [LinearBehavior.mem_coherentSum_iff,
+        ModeAmplitude.restrictInl_directSum,
+        ModeAmplitude.restrictInr_directSum]
+      simpa only [PortConnectionFamily.incidentAssembly] using hIncident
+
+/-- Every complete boundary state compatible with an abstract boundary behavior and this
+family's return relation. No existence or uniqueness of a state is asserted. -/
+def closedSolutionBehavior
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)) :
+    LinearBehavior (Incident family.ExternalChannel)
+      (Incident P.Channel ⊕ Outgoing P.Channel) :=
+  behavior.feedbackSolutions family.incidentAssemblyBehavior
+
+/-- A displayed closed-solution state satisfies exactly the boundary relation and `a = C b + E_in
+u`. -/
+@[simp]
+lemma mem_closedSolutionBehavior_directSum_iff
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident family.ExternalChannel))
+    (incident : ModeAmplitude (Incident P.Channel))
+    (outgoing : ModeAmplitude (Outgoing P.Channel)) :
+    (external, incident.directSum outgoing) ∈ family.closedSolutionBehavior behavior ↔
+      (incident, outgoing) ∈ behavior ∧
+        incident = family.incidentAssembly outgoing external := by
+  rw [closedSolutionBehavior, LinearBehavior.mem_feedbackSolutions_directSum_iff,
+    family.mem_incidentAssemblyBehavior_iff]
+
+/-- Wiring an abstract oriented boundary behavior by a connection family, singular-safe.
+
+Nothing here assumes that the closed relation is total, single valued, or well posed, and no
+inverse is formed. `FlatNetlist.behavior` is the instance of this construction at the assembled
+component graph.
+-/
+def closeBehavior (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)) :
+    LinearBehavior (Incident family.ExternalChannel) (Outgoing family.ExternalChannel) :=
+  ((family.closedSolutionBehavior behavior).series
+    (LinearBehavior.selectRight :
+      LinearBehavior (Incident P.Channel ⊕ Outgoing P.Channel) (Outgoing P.Channel))).series
+    family.externalOutgoingReadout.toBehavior
+
+/-- Closure membership is exactly the three shaped equations, with the component law replaced by
+an arbitrary boundary relation. -/
+lemma mem_closeBehavior_iff
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (input : ModeAmplitude (Incident family.ExternalChannel))
+    (output : ModeAmplitude (Outgoing family.ExternalChannel)) :
+    (input, output) ∈ family.closeBehavior behavior ↔
+      ∃ incident outgoing,
+        (incident, outgoing) ∈ behavior ∧
+          incident = family.incidentAssembly outgoing input ∧
+          output = family.externalOutgoingReadout.toLinearMap outgoing := by
+  constructor
+  · rintro ⟨outgoing, ⟨state, hSolution, hSelect⟩, hReadout⟩
+    rw [LinearBehavior.mem_selectRight_iff] at hSelect
+    rw [ModeTransform.mem_toBehavior_iff_toLinearMap] at hReadout
+    have hState : state = state.restrictInl.directSum state.restrictInr :=
+      (ModeAmplitude.directSum_restrict state).symm
+    have hSolution' :
+        (input, state.restrictInl.directSum state.restrictInr) ∈
+          family.closedSolutionBehavior behavior := by
+      rw [← hState]
+      exact hSolution
+    rcases (family.mem_closedSolutionBehavior_directSum_iff behavior _ _ _).mp hSolution' with
+      ⟨hBoundary, hIncident⟩
+    refine ⟨state.restrictInl, state.restrictInr, hBoundary, hIncident, ?_⟩
+    change outgoing = state.restrictInr at hSelect
+    change output = family.externalOutgoingReadout.toLinearMap outgoing at hReadout
+    rw [hSelect] at hReadout
+    exact hReadout
+  · rintro ⟨incident, outgoing, hBoundary, hIncident, hOutput⟩
+    refine ⟨outgoing, ⟨incident.directSum outgoing, ?_, ?_⟩, ?_⟩
+    · exact (family.mem_closedSolutionBehavior_directSum_iff behavior _ _ _).mpr
+        ⟨hBoundary, hIncident⟩
+    · rw [LinearBehavior.mem_selectRight_iff, ModeAmplitude.restrictInr_directSum]
+    · exact (ModeTransform.mem_toBehavior_iff_toLinearMap _ _ _).mpr hOutput
+
+omit [Fintype P.Channel] in
+/-- The family mate of a flattened inner-stage channel is the inner mate. -/
+lemma append_mateEquiv_inl {κ : Type x}
+    (inner : PortConnectionFamily P ι)
+    (outer : PortConnectionFamily inner.externalPortModeFamily κ)
+    (index : ι) (local' : (inner.connection index).LocalChannel) :
+    (inner.append outer).mateEquiv ⟨Sum.inl index, local'⟩ =
+      ⟨Sum.inl index, (inner.connection index).mateEquiv local'⟩ := rfl
+
+omit [Fintype P.Channel] in
+/-- The family mate of a flattened outer-stage channel is the outer mate. -/
+lemma append_mateEquiv_inr {κ : Type x}
+    (inner : PortConnectionFamily P ι)
+    (outer : PortConnectionFamily inner.externalPortModeFamily κ)
+    (index : κ) (local' : (outer.connection index).LocalChannel) :
+    (inner.append outer).mateEquiv ⟨Sum.inr index, local'⟩ =
+      ⟨Sum.inr index, (outer.connection index).mateEquiv local'⟩ := by
+  rcases local' with mode | mode <;> rfl
+
+end PortConnectionFamily
+
+/-!
+
+## H. The flattened incident assembly, stage by stage
+
+-/
+
+namespace PortConnectionFamily
+
+variable {P : PortModeFamily.{u, v}} {ι : Type w} {κ : Type x}
+variable (inner : PortConnectionFamily P ι)
+variable (outer : PortConnectionFamily inner.externalPortModeFamily κ)
+variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype outer.Channel]
+
+/-- Classical equality on ambient channels, kept local to the two-stage layer. -/
+local instance twoStageChannelDecidableEq : DecidableEq P.Channel := Classical.decEq _
+
+/-- The external channels of a finite inner stage are finite. -/
+local instance twoStageInnerExternalChannelFintype : Fintype inner.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The boundary channels exposed by a finite inner stage are finite. -/
+local instance twoStageBoundaryChannelFintype :
+    Fintype inner.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ inner.boundaryChannelEquiv.symm
+
+/-- The connected channels of the flattened family are finite. -/
+local instance twoStageAppendChannelFintype : Fintype (inner.append outer).Channel :=
+  Fintype.ofEquiv _ (inner.appendChannelEquiv outer).symm
+
+/-- Classical equality on the flattened connected channels. -/
+local instance twoStageAppendChannelDecidableEq :
+    DecidableEq (inner.append outer).Channel := Classical.decEq _
+
+/-- On an inner-connected coordinate the flattened assembly is the inner stage's own routing.
+
+The outer stage and the external input are invisible there: a subsystem's internal wiring is not
+renegotiated by the wiring that reuses the subsystem.
+-/
+lemma append_incidentAssembly_apply_inner
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel))
+    (channel : inner.Channel) :
+    (inner.append outer).incidentAssembly outgoing external
+        (Incident.mk (inner.channelEmbedding channel)) =
+      outgoing (Outgoing.mk (inner.channelEmbedding (inner.mateEquiv channel))) := by
+  rcases channel with ⟨index, local'⟩
+  rw [← inner.append_channelEmbedding_inl outer index local',
+    (inner.append outer).incidentAssembly_apply_connected_channel,
+    inner.append_mateEquiv_inl outer, inner.append_channelEmbedding_inl outer]
+  rfl
+
+/-- On an outer-connected coordinate the flattened assembly is the outer stage's routing of the
+inner stage's boundary amplitudes. -/
+lemma append_incidentAssembly_apply_outer
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel))
+    (channel : outer.Channel) :
+    (inner.append outer).incidentAssembly outgoing external
+        (Incident.mk
+          ((inner.boundaryChannelEquiv (outer.channelEmbedding channel) :
+            inner.ExternalChannel) : P.Channel)) =
+      outgoing (Outgoing.mk
+        ((inner.boundaryChannelEquiv (outer.channelEmbedding (outer.mateEquiv channel)) :
+          inner.ExternalChannel) : P.Channel)) := by
+  rcases channel with ⟨index, local'⟩
+  rw [← inner.append_channelEmbedding_inr outer index local',
+    (inner.append outer).incidentAssembly_apply_connected_channel,
+    inner.append_mateEquiv_inr outer]
+  exact congrArg (WithLp.ofLp outgoing)
+    (congrArg Outgoing.mk
+      (inner.append_channelEmbedding_inr outer index
+        ((outer.connection index).mateEquiv local')))
+
+/-- On a fully external coordinate the flattened assembly is exactly the external input. -/
+lemma append_incidentAssembly_apply_external
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident (inner.append outer).ExternalChannel))
+    (channel : (inner.append outer).ExternalChannel) :
+    (inner.append outer).incidentAssembly outgoing external (Incident.mk channel.1) =
+      external (Incident.mk channel) :=
+  (inner.append outer).incidentAssembly_apply_external outgoing external channel
+
+end PortConnectionFamily
+
+namespace FlatNetlist
+
+variable (netlist : FlatNetlist.{u, v, w, x})
+variable [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
+
+/-- A flat netlist's singular-safe external behavior is the relational closure of its assembled
+component graph by its wiring. -/
+lemma behavior_eq_closeBehavior :
+    netlist.behavior = netlist.connections.closeBehavior netlist.componentBehavior := by
+  ext ⟨input, output⟩
+  rw [netlist.mem_behavior_iff_componentBehavior,
+    netlist.connections.mem_closeBehavior_iff]
 
 end FlatNetlist
 
