@@ -1177,6 +1177,20 @@ PR unless maintainers explicitly ask to retain it.
   and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
   complex-amplitude regressions. The connected fork milestone may remain integrated while the
   human review and maintainer-facing split are pending.
+- [x] Begin N4 with dependent component-owned physical-port and channel sums, an explicit
+  reassociation equivalence, and dependent block-diagonal scattering. Prove the cast-free indexed
+  versus aggregate entry bridge, exact same-component and cross-component-zero entries, and the
+  arbitrary-input component restriction law. Keep component-family data nonfinite and require
+  finite-dimensional instances only where matrix action needs them.
+- [x] Add a heterogeneous component-family regression with one scalar channel and one two-mode
+  component. Reuse the same local port label under different component tags, retain a nonsymmetric
+  nonreal two-mode block, test all four cross-component entries, and pin the mixed aggregate
+  output as `(4 + 3 I, 12 + 16 I, 18 + 26 I)`.
+- [ ] Before upstreaming component-family assembly, prepare a stack in this order: the generic
+  dependent block-diagonal action lemma in `Mode/Embedding`; aggregate component/port/channel types
+  and reassociation; assembled scattering and exact laws; then the hostile heterogeneous
+  regression. Human-check that cross-component zeros mean only absence of direct pre-wiring
+  scattering, not termination, absorption, passivity, losslessness, or solved feedback.
 - [x] Define implicit complex-linear component behavior independently of invertibility, embed
   arbitrary complex-linear maps and finite mode transforms as graph behaviors, and prove identity,
   relational series, independent parallel, graph-composition, matrix-cascade, and block-diagonal
