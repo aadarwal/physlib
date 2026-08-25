@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Network.FlatNetlistRegression
 public import Physlib.Optics.Network.Hierarchical
 
 /-!
@@ -14,21 +13,21 @@ public import Physlib.Optics.Network.Hierarchical
 ## i. Overview
 
 A three-component chain is wired in two stages. The inner stage joins the first component's link
-port to the second component's link port, so the inner subsystem is a genuine two-component
-netlist with a nontrivial boundary. The outer stage then wires the second component's remaining
-boundary port to the third component, leaving exactly two channels external: one on the first
-component and one on the third.
+port to the second component's link port. The inner netlist retains all three components, while
+its wiring connects a two-component subgraph and leaves a nontrivial boundary. The outer stage
+then wires the second component's remaining boundary port to the third component, leaving exactly
+two channels external: one on the first component and one on the third.
 
-Every component is reflectionless with distinct forward and backward transmissions, so the
-flattened network is an exact integer two-port with
+Every component is reflectionless with distinct forward and backward transmissions. Flattened
+solutions force the forward sentinel
 
 ```text
-y(output) = 165 * u(input), y(input) = 182 * u(output)
+y(output) = 165 * u(input)
 ```
 
-and the two coefficients differ. That asymmetry is the point: a subsystem-boundary or port-lift
-error that exchanged the two external channels, or that attached the outer connection to the wrong
-boundary port, would change one of those numbers.
+The non-unit, nonreciprocal component coefficients keep the wiring order visible: a
+subsystem-boundary or port-lift error that attached the outer connection to the wrong boundary port
+would change the forced product.
 
 ## ii. Key results
 
@@ -37,7 +36,7 @@ normalized optical components. Nothing here asserts well-posedness of either sta
 proved below are memberships in singular-safe relations.
 
 The fixture proves the hand-expanded pair satisfies both the flattened netlist equations and the
-outer closure equations. Its forcing lemma and negative control detect a subsystem-boundary or
+outer closure equations. Its forcing law and negative control detect a subsystem-boundary or
 port-lift error. Together these results provide concrete evidence for `goal.md` I.3 row `N-08`.
 
 ## iii. Table of contents
@@ -86,13 +85,18 @@ instance : Fintype HierarchicalRegressionComponent where
   elems := {.inputStage, .linkStage, .outputStage}
   complete := fun component => by cases component <;> decide
 
+/-- Each fixture component has one outward port and one link port, each carrying one mode. -/
+abbrev hierarchicalRegressionPortFamily : PortModeFamily where
+  Port := Bool
+  Mode := fun _ => Unit
+
 /-- The fixture component matrices.
 
 In local `[outward, link]` port order they are `[[0, 2], [3, 0]]`, `[[0, 5], [7, 0]]`, and
 `[[0, 11], [13, 0]]`: reflectionless, with distinct forward and backward transmissions.
 -/
 def hierarchicalRegressionScattering (component : HierarchicalRegressionComponent) :
-    ScatteringMatrix flatNetlistRegressionPortFamily.Channel where
+    ScatteringMatrix hierarchicalRegressionPortFamily.Channel where
   toModeTransform := fun output input =>
     match component, output.1, input.1 with
     | .inputStage, false, true => 2
@@ -106,7 +110,7 @@ def hierarchicalRegressionScattering (component : HierarchicalRegressionComponen
 /-- The three fixture components before any wiring. -/
 abbrev hierarchicalRegressionComponents : ScatteringComponentFamily where
   Component := HierarchicalRegressionComponent
-  portFamily := fun _ => flatNetlistRegressionPortFamily
+  portFamily := fun _ => hierarchicalRegressionPortFamily
   scattering := hierarchicalRegressionScattering
 
 /-- The inner stage's single connection joins the first two components' link ports. -/
@@ -229,14 +233,6 @@ local instance hierarchicalRegressionFlattenChannelFintype :
 local instance hierarchicalRegressionFlattenChannelDecidableEq :
     DecidableEq hierarchicalRegression.flatten.Channel :=
   hierarchicalRegressionAggregateChannelDecidableEq
-
-/-- A fixture component's local channels are just its two ports. -/
-def hierarchicalRegressionLocalChannelEquiv :
-    Bool ≃ flatNetlistRegressionPortFamily.Channel where
-  toFun := fun port => ⟨port, ()⟩
-  invFun := fun channel => channel.1
-  left_inv := fun _ => rfl
-  right_inv := by rintro ⟨port, mode⟩; cases mode; rfl
 
 /-- Connected channels of the flattened fixture are finite in the appended-family spelling. -/
 local instance hierarchicalRegressionAppendChannelFintype :
