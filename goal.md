@@ -2286,8 +2286,9 @@ parity ledger is discharged by a public declaration and regression.
 
 Lane ownership: a separate controller-managed worker develops R1--R5. The spine agent skips
 implementation in that lane and reviews and merges exact completed cutoffs presented by the
-controller. The R1/R2 ray and transfer foundations are integrated; the E5b cross-layer bridge and
-R3--R5 remain open.
+controller. The R1--R5 foundational slices are integrated. The E5b cross-layer bridge, R3's
+representative subsystem, source-style resonator unfolding, and the additional R5 resonator
+topologies remain open, so this milestone is still in progress.
 
 #### R1. Physical and paraxial rays
 
@@ -2658,7 +2659,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
-| R1--R5 ray/beam foundations | in progress: R1/R2 core integrated; E5b bridge and R3--R5 open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
+| R1--R5 ray/beam foundations | in progress: the R1--R5 foundational slices are integrated, including proved paraxial approximation error, component-derived ABCD systems, cardinal-point specifications, physical-domain Gaussian transport, matrix-level bounded-ray stability, two-mirror boundary fixtures, and a proof-gated fixed Gaussian beam; the E5b bridge, an R3 representative subsystem, source-style resonator unfolding, ring and phase-conjugate resonators, and selected source case studies remain open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 
 ## O. Overall completion checklist

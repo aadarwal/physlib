@@ -44,6 +44,8 @@ Conventions are fixed once here and used unchanged by every later ray module.
   propagation direction of a meridional ray is `(sin θ, cos θ)`.
 - A surface radius of curvature is positive when the centre of curvature lies on the outgoing
   side of the surface, which is downstream in the locally folded coordinate after the interface.
+  This outgoing-side sign rule is derived from the matrix entries used here; the source thesis
+  does not state it explicitly.
   Comparing signed radii with a source using convex/concave labels therefore needs an explicit
   convention map.
 - Reflection uses the *folded* convention: after a mirror the axis is re-referenced to the new
