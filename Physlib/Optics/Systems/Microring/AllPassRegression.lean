@@ -21,7 +21,7 @@ transfer definition. A separate response fixture solves the N5 channel equations
 point, so changing the explicit feedback pairing can break the check. A second independent fixture
 sums the concrete geometric series with loop gain `3 / 10`.
 
-“Resonance” and “antiresonance” below name the zero- and half-turn phase points. These fixtures do
+“Resonance” and “antiresonance” below name the zero- and half-turn phase points. The fixtures do
 not prove an extremum, minimum, or global resonance characterization.
 
 These are fixed-carrier normalized modal-amplitude checks. They make no frequency-sweep,

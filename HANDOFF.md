@@ -4,7 +4,7 @@
 
 - Branch: `optics/s2-microring`
 - Slice: S2 all-pass explicit feedback network
-- Integration base at cutoff: `optics/development` at `b9ac5c65`
+- Integration base at cutoff: `optics/development` at `410b4359`
 
 ## Files
 
