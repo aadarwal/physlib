@@ -268,6 +268,53 @@ lemma ModeTransform.rangeProjector_apply_of_not_mem_range {ι κ : Type*} [Finty
     Matrix.toLpLin_mul_same, LinearMap.comp_apply]
   exact ModeTransform.zeroExtension_apply_of_not_mem_range embedding _ ambient hAmbient
 
+/-- The range projectors of two embeddings that form a sum partition resolve the ambient
+identity. -/
+lemma ModeTransform.rangeProjector_add_rangeProjector_eq_one
+    {ι μ κ : Type*} [Fintype ι] [Fintype μ] [Fintype κ] [DecidableEq κ]
+    (left : ι ↪ κ) (right : μ ↪ κ) (partition : ι ⊕ μ ≃ κ)
+    (hLeft : ∀ mode, partition (Sum.inl mode) = left mode)
+    (hRight : ∀ mode, partition (Sum.inr mode) = right mode) :
+    ModeTransform.rangeProjector left + ModeTransform.rangeProjector right =
+      (1 : ModeTransform κ κ) := by
+  classical
+  apply (Matrix.toLpLin 2 2).injective
+  simp only [map_add, Matrix.toLpLin_one]
+  ext amplitude ambient
+  change
+    (ModeTransform.rangeProjector left).toLinearMap amplitude ambient +
+        (ModeTransform.rangeProjector right).toLinearMap amplitude ambient =
+      amplitude ambient
+  rcases hPartition : partition.symm ambient with selected | selected
+  · have hAmbient : ambient = left selected := by
+      calc
+        ambient = partition (partition.symm ambient) := (partition.apply_symm_apply ambient).symm
+        _ = partition (Sum.inl selected) := congrArg partition hPartition
+        _ = left selected := hLeft selected
+    subst ambient
+    rw [ModeTransform.rangeProjector_apply_image]
+    rw [ModeTransform.rangeProjector_apply_of_not_mem_range]
+    · simp
+    · rintro ⟨other, hOther⟩
+      have hImpossible : Sum.inl selected = Sum.inr other := partition.injective <| by
+        rw [hLeft selected, hRight other]
+        exact hOther.symm
+      cases hImpossible
+  · have hAmbient : ambient = right selected := by
+      calc
+        ambient = partition (partition.symm ambient) := (partition.apply_symm_apply ambient).symm
+        _ = partition (Sum.inr selected) := congrArg partition hPartition
+        _ = right selected := hRight selected
+    subst ambient
+    rw [ModeTransform.rangeProjector_apply_of_not_mem_range,
+      ModeTransform.rangeProjector_apply_image]
+    · simp
+    · rintro ⟨other, hOther⟩
+      have hImpossible : Sum.inl other = Sum.inr selected := partition.injective <| by
+        rw [hLeft other, hRight selected]
+        exact hOther
+      cases hImpossible
+
 /-- The selected-coordinate range projector is a self-adjoint idempotent. -/
 lemma ModeTransform.rangeProjector_isStarProjection {ι κ : Type*} [Fintype ι]
     [Fintype κ] [DecidableEq κ] (embedding : ι ↪ κ) :
