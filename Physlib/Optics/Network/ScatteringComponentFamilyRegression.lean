@@ -35,6 +35,7 @@ model termination or absorption.
 - B. Aggregate channel reassociation
 - C. Exact block-diagonal entries
 - D. Mixed-amplitude action
+- E. Componentwise behavior
 
 -/
 
@@ -415,6 +416,183 @@ lemma scatteringComponentFamilyRegression_action_right :
   ring_nf
   rw [Complex.I_sq]
   ring
+
+/-!
+
+## E. Componentwise behavior
+
+-/
+
+/-- The exact raw aggregate output of the mixed input. -/
+def scatteringComponentFamilyRegressionOutput :
+    ModeAmplitude scatteringComponentFamilyRegression.aggregatePortModeFamily.Channel :=
+  WithLp.toLp 2 fun
+    | ⟨⟨false, ()⟩, ()⟩ => 4 + 3 * Complex.I
+    | ⟨⟨true, ()⟩, false⟩ => 12 + 16 * Complex.I
+    | ⟨⟨true, ()⟩, true⟩ => 18 + 26 * Complex.I
+
+/-- The three exact coordinate action laws assemble into one aggregate output identity. -/
+lemma scatteringComponentFamilyRegression_assembled_action :
+    scatteringComponentFamilyRegression.assembledScatteringMatrix.toModeTransform.toLinearMap
+        scatteringComponentFamilyRegressionInput =
+      scatteringComponentFamilyRegressionOutput := by
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨⟨component, port⟩, mode⟩
+  cases component
+  · cases port
+    cases mode
+    exact scatteringComponentFamilyRegression_action_scalar
+  · cases port
+    cases mode
+    · exact scatteringComponentFamilyRegression_action_left
+    · exact scatteringComponentFamilyRegression_action_right
+
+/-- The mixed input in the nominal incident endpoint space. -/
+def scatteringComponentFamilyRegressionIncident :
+    ModeAmplitude
+      (Incident scatteringComponentFamilyRegression.aggregatePortModeFamily.Channel) :=
+  ModeAmplitude.reindex Incident.channelEquiv.symm
+    scatteringComponentFamilyRegressionInput
+
+/-- The exact mixed output in the nominal outgoing endpoint space. -/
+def scatteringComponentFamilyRegressionOutgoing :
+    ModeAmplitude
+      (Outgoing scatteringComponentFamilyRegression.aggregatePortModeFamily.Channel) :=
+  ModeAmplitude.reindex Outgoing.channelEquiv.symm
+    scatteringComponentFamilyRegressionOutput
+
+/-- The exact heterogeneous input/output pair satisfies every local component graph. -/
+lemma scatteringComponentFamilyRegression_componentwiseBehavior_mem :
+    (scatteringComponentFamilyRegressionIncident,
+        scatteringComponentFamilyRegressionOutgoing) ∈
+      scatteringComponentFamilyRegression.componentwiseBehavior := by
+  rw [ScatteringComponentFamily.mem_componentwiseBehavior_iff_equations]
+  intro component
+  have hAssembled :
+      ModeTransform.toLinearMap
+          scatteringComponentFamilyRegression.assembledScatteringMatrix.toOrientedModeTransform
+          scatteringComponentFamilyRegressionIncident =
+        scatteringComponentFamilyRegressionOutgoing := by
+    rw [scatteringComponentFamilyRegressionIncident,
+      scatteringComponentFamilyRegressionOutgoing,
+      ScatteringMatrix.toLinearMap_toOrientedModeTransform,
+      ModeAmplitude.reindex_reindex_symm,
+      scatteringComponentFamilyRegression_assembled_action]
+  rw [← hAssembled]
+  exact
+    ScatteringComponentFamily.assembledScatteringMatrix_toOrientedModeTransform_apply_component
+      scatteringComponentFamilyRegression scatteringComponentFamilyRegressionIncident component
+
+/-- A hostile output that copies the first two-mode value into the scalar component while leaving
+the two-mode component correct. -/
+def scatteringComponentFamilyRegressionWrongComponentOutgoing :
+    ModeAmplitude
+      (Outgoing scatteringComponentFamilyRegression.aggregatePortModeFamily.Channel) :=
+  ModeAmplitude.reindex Outgoing.channelEquiv.symm <|
+    WithLp.toLp 2 fun
+      | ⟨⟨false, ()⟩, ()⟩ => 12 + 16 * Complex.I
+      | ⟨⟨true, ()⟩, false⟩ => 12 + 16 * Complex.I
+      | ⟨⟨true, ()⟩, true⟩ => 18 + 26 * Complex.I
+
+/-- The wrong-component output nevertheless restricts correctly to the entire two-mode
+component. -/
+lemma scatteringComponentFamilyRegression_wrongComponent_restrict_twoMode :
+    scatteringComponentFamilyRegressionWrongComponentOutgoing.restrictEmbedding
+        (Outgoing.relabelEmbedding
+          (scatteringComponentFamilyRegression.componentChannelEmbedding true)) =
+      scatteringComponentFamilyRegressionOutgoing.restrictEmbedding
+        (Outgoing.relabelEmbedding
+          (scatteringComponentFamilyRegression.componentChannelEmbedding true)) := by
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨⟨port, mode⟩⟩
+  cases port
+  cases mode <;> rfl
+
+/-- Satisfying the two-mode block cannot compensate for violating the scalar component graph. -/
+lemma scatteringComponentFamilyRegression_wrongComponent_not_mem :
+    (scatteringComponentFamilyRegressionIncident,
+        scatteringComponentFamilyRegressionWrongComponentOutgoing) ∉
+      scatteringComponentFamilyRegression.componentwiseBehavior := by
+  intro hMember
+  have hComponent :=
+    (ScatteringComponentFamily.mem_componentwiseBehavior_iff_equations
+      scatteringComponentFamilyRegression scatteringComponentFamilyRegressionIncident
+        scatteringComponentFamilyRegressionWrongComponentOutgoing).mp hMember false
+  have hExpected :=
+    ScatteringComponentFamily.assembledScatteringMatrix_toOrientedModeTransform_apply_component
+      scatteringComponentFamilyRegression scatteringComponentFamilyRegressionIncident false
+  have hRestriction := hComponent.trans hExpected.symm
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Outgoing.mk scatteringComponentFamilyRegressionScalarLocal))
+      hRestriction
+  rw [scatteringComponentFamilyRegressionWrongComponentOutgoing,
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform,
+    scatteringComponentFamilyRegressionIncident,
+    ModeAmplitude.reindex_reindex_symm] at hCoordinate
+  change 12 + 16 * Complex.I =
+    scatteringComponentFamilyRegression.assembledScatteringMatrix.toModeTransform.toLinearMap
+      scatteringComponentFamilyRegressionInput scatteringComponentFamilyRegressionScalar
+    at hCoordinate
+  rw [scatteringComponentFamilyRegression_action_scalar] at hCoordinate
+  have hReal := congrArg Complex.re hCoordinate
+  norm_num at hReal
+
+/-- A hostile output that keeps the scalar component correct but exchanges the two local output
+coordinates of the nonsymmetric component. -/
+def scatteringComponentFamilyRegressionWrongModeOutgoing :
+    ModeAmplitude
+      (Outgoing scatteringComponentFamilyRegression.aggregatePortModeFamily.Channel) :=
+  ModeAmplitude.reindex Outgoing.channelEquiv.symm <|
+    WithLp.toLp 2 fun
+      | ⟨⟨false, ()⟩, ()⟩ => 4 + 3 * Complex.I
+      | ⟨⟨true, ()⟩, false⟩ => 18 + 26 * Complex.I
+      | ⟨⟨true, ()⟩, true⟩ => 12 + 16 * Complex.I
+
+/-- The wrong-mode output still restricts correctly to the scalar component. -/
+lemma scatteringComponentFamilyRegression_wrongMode_restrict_scalar :
+    scatteringComponentFamilyRegressionWrongModeOutgoing.restrictEmbedding
+        (Outgoing.relabelEmbedding
+          (scatteringComponentFamilyRegression.componentChannelEmbedding false)) =
+      scatteringComponentFamilyRegressionOutgoing.restrictEmbedding
+        (Outgoing.relabelEmbedding
+          (scatteringComponentFamilyRegression.componentChannelEmbedding false)) := by
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨⟨port, mode⟩⟩
+  cases port
+  cases mode
+  rfl
+
+/-- Correct scalar behavior cannot compensate for swapping the two-mode component coordinates. -/
+lemma scatteringComponentFamilyRegression_wrongMode_not_mem :
+    (scatteringComponentFamilyRegressionIncident,
+        scatteringComponentFamilyRegressionWrongModeOutgoing) ∉
+      scatteringComponentFamilyRegression.componentwiseBehavior := by
+  intro hMember
+  have hComponent :=
+    (ScatteringComponentFamily.mem_componentwiseBehavior_iff_equations
+      scatteringComponentFamilyRegression scatteringComponentFamilyRegressionIncident
+        scatteringComponentFamilyRegressionWrongModeOutgoing).mp hMember true
+  have hExpected :=
+    ScatteringComponentFamily.assembledScatteringMatrix_toOrientedModeTransform_apply_component
+      scatteringComponentFamilyRegression scatteringComponentFamilyRegressionIncident true
+  have hRestriction := hComponent.trans hExpected.symm
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Outgoing.mk scatteringComponentFamilyRegressionLeftLocal))
+      hRestriction
+  rw [scatteringComponentFamilyRegressionWrongModeOutgoing,
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform,
+    scatteringComponentFamilyRegressionIncident,
+    ModeAmplitude.reindex_reindex_symm] at hCoordinate
+  change 18 + 26 * Complex.I =
+    scatteringComponentFamilyRegression.assembledScatteringMatrix.toModeTransform.toLinearMap
+      scatteringComponentFamilyRegressionInput scatteringComponentFamilyRegressionLeft
+    at hCoordinate
+  rw [scatteringComponentFamilyRegression_action_left] at hCoordinate
+  have hReal := congrArg Complex.re hCoordinate
+  norm_num at hReal
 
 end
 

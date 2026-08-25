@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Mode.Embedding
+public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.Port
 
 /-!
@@ -23,12 +24,18 @@ aggregate port family. Local scattering matrices are assembled with `Matrix.bloc
 then relabeled along that equivalence. Exact same-component, cross-component, and amplitude-action
 laws show that the result is componentwise block-diagonal scattering before wiring.
 
+The same family also has an order-free relational description: an aggregate incident/outgoing
+pair is admitted exactly when its restriction to every component belongs to that component's
+oriented scattering graph. This componentwise relation is proved equal to the graph of the
+assembled transform.
+
 ## ii. Scope
 
 This file assembles only component boundary laws. It does not select internal connections, expose
 external channels, solve feedback equations, or assert passivity, losslessness, reciprocity,
 causality, bandwidth, or electromagnetic power normalization. Finiteness is absent from the stored
-family data and is required only by finite-dimensional amplitude-action results.
+family data. It enters only when finite-dimensional matrix actions or local graph behaviors are
+formed; the boundary-restriction map itself is dimension-independent.
 
 ## iii. Key results
 
@@ -44,12 +51,17 @@ family data and is required only by finite-dimensional amplitude-action results.
   scatter directly into one another.
 - `ScatteringComponentFamily.assembledScatteringMatrix_apply_component`: each component output is
   determined only by the incident amplitude restricted to that component.
+- `ScatteringComponentFamily.componentwiseBehavior`: simultaneous satisfaction of every local
+  oriented component graph.
+- `ScatteringComponentFamily.componentwiseBehavior_eq_assembledScatteringMatrix_toBehavior`: the
+  componentwise relation is exactly the assembled block-diagonal graph.
 
 ## iv. Table of contents
 
 - A. Component families and aggregate channels
 - B. Dependent block-diagonal scattering
 - C. Componentwise amplitude action
+- D. Dependent component behavior
 
 -/
 
@@ -266,6 +278,151 @@ lemma assembledScatteringMatrix_apply_component
   rw [ModeTransform.blockDiagonal'_apply, hRestrict]
 
 end Finite
+
+/-!
+
+## D. Dependent component behavior
+
+-/
+
+/-- The linear restriction of an aggregate incident/outgoing state to one component boundary. -/
+def componentBoundaryRestriction (component : family.Component) :
+    (ModeAmplitude (Incident family.aggregatePortModeFamily.Channel) ×
+        ModeAmplitude (Outgoing family.aggregatePortModeFamily.Channel)) →ₗ[ℂ]
+      (ModeAmplitude (Incident (family.portFamily component).Channel) ×
+        ModeAmplitude (Outgoing (family.portFamily component).Channel)) :=
+  (ModeAmplitude.restrictEmbeddingLinearMap
+    (Incident.relabelEmbedding (family.componentChannelEmbedding component))).prodMap
+      (ModeAmplitude.restrictEmbeddingLinearMap
+        (Outgoing.relabelEmbedding (family.componentChannelEmbedding component)))
+
+/-- Boundary restriction returns the incident and outgoing amplitudes selected by the component's
+channel embedding. -/
+@[simp]
+lemma componentBoundaryRestriction_apply (component : family.Component)
+    (state : ModeAmplitude (Incident family.aggregatePortModeFamily.Channel) ×
+      ModeAmplitude (Outgoing family.aggregatePortModeFamily.Channel)) :
+    family.componentBoundaryRestriction component state =
+      (state.1.restrictEmbedding
+          (Incident.relabelEmbedding (family.componentChannelEmbedding component)),
+        state.2.restrictEmbedding
+          (Outgoing.relabelEmbedding (family.componentChannelEmbedding component))) := by
+  simp only [componentBoundaryRestriction, LinearMap.prodMap_apply,
+    ModeAmplitude.restrictEmbeddingLinearMap_apply]
+
+section LocalFinite
+
+variable [∀ component, Fintype (family.portFamily component).Channel]
+
+/-- The order-free aggregate behavior requiring every component's restricted boundary state to
+satisfy its local scattering graph. -/
+def componentwiseBehavior :
+    LinearBehavior (Incident family.aggregatePortModeFamily.Channel)
+      (Outgoing family.aggregatePortModeFamily.Channel) :=
+  ⨅ component,
+    (family.scattering component).toOrientedModeTransform.toBehavior.comap
+      (family.componentBoundaryRestriction component)
+
+/-- Componentwise behavior membership is exactly local graph membership at every component. -/
+@[simp]
+lemma mem_componentwiseBehavior_iff
+    (incident : ModeAmplitude (Incident family.aggregatePortModeFamily.Channel))
+    (outgoing : ModeAmplitude (Outgoing family.aggregatePortModeFamily.Channel)) :
+    (incident, outgoing) ∈ family.componentwiseBehavior ↔
+      ∀ component,
+        (incident.restrictEmbedding
+            (Incident.relabelEmbedding (family.componentChannelEmbedding component)),
+          outgoing.restrictEmbedding
+            (Outgoing.relabelEmbedding (family.componentChannelEmbedding component))) ∈
+          (family.scattering component).toOrientedModeTransform.toBehavior := by
+  simp only [componentwiseBehavior, Submodule.mem_iInf, Submodule.mem_comap,
+    componentBoundaryRestriction_apply]
+
+variable [∀ component, DecidableEq (family.portFamily component).Channel]
+
+/-- Componentwise behavior membership is exactly the family of local scattering equations. -/
+lemma mem_componentwiseBehavior_iff_equations
+    (incident : ModeAmplitude (Incident family.aggregatePortModeFamily.Channel))
+    (outgoing : ModeAmplitude (Outgoing family.aggregatePortModeFamily.Channel)) :
+    (incident, outgoing) ∈ family.componentwiseBehavior ↔
+      ∀ component,
+        outgoing.restrictEmbedding
+            (Outgoing.relabelEmbedding (family.componentChannelEmbedding component)) =
+          (family.scattering component).toOrientedModeTransform.toLinearMap
+            (incident.restrictEmbedding
+              (Incident.relabelEmbedding (family.componentChannelEmbedding component))) := by
+  rw [family.mem_componentwiseBehavior_iff]
+  simp only [ModeTransform.mem_toBehavior_iff_toLinearMap]
+
+end LocalFinite
+
+section FiniteBehavior
+
+variable [Fintype family.Component] [DecidableEq family.Component]
+  [∀ component, Fintype (family.portFamily component).Channel]
+  [∀ component, DecidableEq (family.portFamily component).Channel]
+  [Fintype family.aggregatePortModeFamily.Channel]
+  [DecidableEq family.aggregatePortModeFamily.Channel]
+
+/-- Restricting the assembled oriented action to one component gives exactly that component's
+oriented scattering action on the restricted incident amplitude. -/
+lemma assembledScatteringMatrix_toOrientedModeTransform_apply_component
+    (incident : ModeAmplitude (Incident family.aggregatePortModeFamily.Channel))
+    (component : family.Component) :
+    ModeAmplitude.restrictEmbedding
+        (Outgoing.relabelEmbedding (family.componentChannelEmbedding component))
+        (family.assembledScatteringMatrix.toOrientedModeTransform.toLinearMap incident) =
+      (family.scattering component).toOrientedModeTransform.toLinearMap
+        (incident.restrictEmbedding
+          (Incident.relabelEmbedding (family.componentChannelEmbedding component))) := by
+  have hIncident :
+      (ModeAmplitude.reindex Incident.channelEquiv incident).restrictEmbedding
+          (family.componentChannelEmbedding component) =
+        ModeAmplitude.reindex Incident.channelEquiv
+          (incident.restrictEmbedding
+            (Incident.relabelEmbedding (family.componentChannelEmbedding component))) := by
+    apply WithLp.ofLp_injective 2
+    funext input
+    rfl
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨output⟩
+  rw [ScatteringMatrix.toLinearMap_toOrientedModeTransform,
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform]
+  simp only [ModeAmplitude.restrictEmbedding_apply, ModeAmplitude.reindex_apply,
+    Equiv.symm_symm, Outgoing.channelEquiv_apply, Outgoing.relabelEmbedding_apply]
+  rw [family.assembledScatteringMatrix_apply_component, hIncident]
+
+/-- The order-free componentwise relation is exactly the assembled block-diagonal graph. -/
+lemma componentwiseBehavior_eq_assembledScatteringMatrix_toBehavior :
+    family.componentwiseBehavior =
+      family.assembledScatteringMatrix.toOrientedModeTransform.toBehavior := by
+  ext state
+  rcases state with ⟨incident, outgoing⟩
+  rw [family.mem_componentwiseBehavior_iff_equations,
+    ModeTransform.mem_toBehavior_iff_toLinearMap]
+  constructor
+  · intro hComponents
+    apply WithLp.ofLp_injective 2
+    funext endpoint
+    rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+    let output : (family.portFamily component).Channel := ⟨port, mode⟩
+    have hLocal := congrArg (fun amplitude => amplitude (Outgoing.mk output))
+      (hComponents component)
+    have hAssembled := congrArg (fun amplitude => amplitude (Outgoing.mk output))
+      (family.assembledScatteringMatrix_toOrientedModeTransform_apply_component
+        incident component)
+    change outgoing
+        (Outgoing.mk (family.componentChannelEmbedding component output)) = _ at hLocal
+    change family.assembledScatteringMatrix.toOrientedModeTransform.toLinearMap incident
+        (Outgoing.mk (family.componentChannelEmbedding component output)) = _ at hAssembled
+    exact hLocal.trans hAssembled.symm
+  · intro hOutgoing component
+    rw [hOutgoing]
+    exact family.assembledScatteringMatrix_toOrientedModeTransform_apply_component
+      incident component
+
+end FiniteBehavior
 
 end ScatteringComponentFamily
 

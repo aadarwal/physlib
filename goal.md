@@ -395,10 +395,11 @@ Ownership rules:
   consequences without assigning support or outgoing semantics.
 - `Optics.Interfaces.PlanarDielectric.SupercriticalPolarization` supplies the canonical
   negative-radicand Jones connector and its exact nonzero-data characterization.
-- `Optics.Mode.Embedding` supplies restriction and zero extension along finite mode-family
-  embeddings, their selected identity and ambient range projector, and passive zero extension of
-  rectangular transforms. It deliberately treats omitted coordinates as algebraically discarded
-  modal data rather than as physical absorption.
+- `Optics.Mode.Embedding` supplies dimension-independent bundled amplitude restriction, together
+  with restriction and zero extension transforms along finite mode-family embeddings, their
+  selected identity and ambient range projector, and passive zero extension of rectangular
+  transforms. It deliberately treats omitted coordinates as algebraically discarded modal data
+  rather than as physical absorption.
 - `Optics.Network.Port` supplies dependent port/channel families, nominal incident and outgoing
   endpoint types, presentation-independent local bidirectional connections, the typed scattering
   adapter, and convention-free unit-gain routing with its exact local `C * S` action order. It
@@ -1766,9 +1767,10 @@ definitions.
 O2 now supplies the converse characterizations, parallel closure, convention-free coordinate
 changes, and sparse restriction/zero-extension maps required by the network layer.
 
-- [x] restriction and zero extension along mode embeddings, with exact coordinate action,
-  `R * E = 1`, an ambient star range projector `E * R`, and the correct isometry, contraction,
-  passivity, arbitrary-input action, exact output-power, and zero-extended-transform laws;
+- [x] dimension-independent bundled amplitude restriction and finite-dimensional restriction and
+  zero extension along mode embeddings, with exact coordinate action, `R * E = 1`, an ambient
+  star range projector `E * R`, and the correct isometry, contraction, passivity, arbitrary-input
+  action, exact output-power, and zero-extended-transform laws;
 - [x] the exact restriction-power boundary: ambient modal power is preserved precisely when every
   omitted coordinate has zero amplitude;
 
@@ -1874,8 +1876,9 @@ derived views of the same component behavior, not illicit multiplication of scat
 - [x] a singular-safe `FlatNetlist.behavior` defined by existential internal amplitudes, together
   with a theorem that it is the relational composition of the assembled component graph, return
   relation, state projection, and external readout;
-- [ ] a dependent-family theorem identifying the assembled component graph with parallel
-  composition of every individual component graph; and
+- [x] an order-free dependent-family relation requiring every individual component graph,
+  proved equal to the assembled component graph as the typed analogue of parallel composition;
+  and
 - [ ] invariance under internal-channel reordering.
 
 Exit: network equations come from a typed netlist rather than being supplied independently.
@@ -2498,7 +2501,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
-| N4 network equations | in progress | N1/O2, N2a, N3 | derived maps, aggregate component graph, singular-safe complete/external relations, exact shaped and implicit feedback equations, and the N-11 singular regression are complete; the dependent local-component graph bridge and internal-channel reordering remain |
+| N4 network equations | in progress | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, and the N-11 singular regression are complete; internal-channel reordering remains |
 | N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
@@ -2631,9 +2634,10 @@ human verification recorded in `tbd.md`.
    retains every complete state satisfying `b = S a` and `a = C b + E_in u`, projects the
    singular-safe relation `y = E_outᴴ b`, and proves the equivalent implicit equation
    `(1 - C * S) a = E_in u` without inversion. Its shared-link regression has invertible local
-   component matrices but both multiple zero-input solutions and an unsolvable input. Continue
-   with the dependent local-component graph bridge and internal-channel reordering; well-posed
-   elimination belongs to N5.
+   component matrices but both multiple zero-input solutions and an unsolvable input. The
+   order-free componentwise relation now proves that the assembled graph is exactly simultaneous
+   satisfaction of every canonically restricted local component graph. Continue with
+   internal-channel reordering; well-posed elimination belongs to N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a

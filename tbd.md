@@ -1148,7 +1148,8 @@ PR unless maintainers explicitly ask to retain it.
   use of matrix multiplication as physical feedback composition.
 - [x] Define convention-free modal relabeling and unit-complex coordinate rephasing, including
   covariance and preservation of modal power, passivity, and losslessness.
-- [x] Define restriction and zero extension along finite mode embeddings. Prove exact selected and
+- [x] Bundle dimension-independent amplitude restriction as a complex-linear map, then define
+  restriction and zero extension transforms along finite mode embeddings. Prove exact selected and
   omitted-coordinate action, `R * E = 1`, the ambient star projector `E * R`, zero-extension
   isometry and power preservation, restriction/projector passivity, arbitrary-input action and
   exact output power, passive zero extension of rectangular transforms, and that restriction
@@ -1186,6 +1187,10 @@ PR unless maintainers explicitly ask to retain it.
   component. Reuse the same local port label under different component tags, retain a nonsymmetric
   nonreal two-mode block, test all four cross-component entries, and pin the mixed aggregate
   output as `(4 + 3 I, 12 + 16 I, 18 + 26 I)`.
+- [x] Give heterogeneous component assembly an order-free relational semantics on the aggregate
+  typed boundary. Prove that simultaneous membership in every canonically restricted local graph
+  is exactly the assembled block-diagonal graph. Reject both a cross-component value substitution
+  and a local-mode swap while pinning which untouched component restriction remains correct.
 - [x] Add the source-neutral `LinearBehavior.feedbackSolutions` construction and singular-safe
   `FlatNetlist` relational semantics. Derive `S`, `C`, `E_in`, `E_out`, and `E_outᴴ` from the owned
   component/connection data, retain complete incident/outgoing states, project the external
@@ -1369,10 +1374,11 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Human-check the mode-embedding semantics before upstreaming. Recheck the non-prefix
   `Bool ↪ Fin 3` fixture, the omitted coordinate-one amplitude of power five, strict restriction
   loss, zero-extension isometry, the passive nonidentity ambient projector, and the genuinely
-  complex nonsymmetric zero-extended action `[3 - I, 0, 11 - I]`. Confirm that restriction is not
-  described as physical absorption, zero extension is not described as surjective or unitary,
-  `E * R` is not collapsed to the ambient identity, and the exact power-equality iff has no hidden
-  surjectivity or nonempty-family premise. For
+  complex nonsymmetric zero-extended action `[3 - I, 0, 11 - I]`. Confirm that
+  `restrictEmbeddingLinearMap_apply` is the definitional (`rfl`) coordinate-restriction identity,
+  that restriction is not described as physical absorption, zero extension is not described as
+  surjective or unitary, `E * R` is not collapsed to the ambient identity, and the exact
+  power-equality iff has no hidden surjectivity or nonempty-family premise. For
   `rangeProjector_add_rangeProjector_eq_one`, confirm that the supplied sum equivalence identifies
   the two embeddings on both summands and therefore proves both disjointness and exhaustive
   coverage; the theorem makes no claim for embeddings that are merely disjoint.
