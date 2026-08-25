@@ -18,6 +18,7 @@ series boundary and its connected middle channels.
 ## ii. Key results
 
 - `TwoPortSeriesNetlist.aggregateChannelEquiv`: nested component channels equal the boundary.
+- `TwoPortSeriesNetlist.netlistComponentFintype`: the canonical family has two components.
 - `TwoPortSeriesNetlist.netlistChannelFintype`: finiteness of the aggregate boundary.
 - `TwoPortSeriesNetlist.connectedChannelFintype`: finiteness of the middle connection.
 
@@ -102,31 +103,6 @@ noncomputable instance netlistComponentChannelFintype
     Fintype ((netlist first second).components.portFamily component).Channel :=
   componentChannelFintype first second component
 
-/-- Every local channel family stored by the canonical netlist has decidable equality. -/
-instance netlistComponentChannelDecidableEq
-    [DecidableEq left] [DecidableEq middle] [DecidableEq right]
-    (first : ScatteringMatrix (left ⊕ middle))
-    (second : ScatteringMatrix (middle ⊕ right))
-    (component : (netlist first second).components.Component) :
-    DecidableEq ((netlist first second).components.portFamily component).Channel :=
-  componentChannelDecidableEq first second component
-
-/-- The assembled component-family boundary is finite in the pinned nested-sum coordinates. -/
-noncomputable instance componentsAggregateChannelFintype
-    [Fintype left] [Fintype middle] [Fintype right]
-    (first : ScatteringMatrix (left ⊕ middle))
-    (second : ScatteringMatrix (middle ⊕ right)) :
-    Fintype (components first second).aggregatePortModeFamily.Channel :=
-  Fintype.ofEquiv ((left ⊕ middle) ⊕ (middle ⊕ right))
-    (aggregateChannelEquiv first second)
-
-/-- The assembled component-family boundary has decidable equality. -/
-instance componentsAggregateChannelDecidableEq
-    [Fintype left] [Fintype middle] [Fintype right]
-    (first : ScatteringMatrix (left ⊕ middle))
-    (second : ScatteringMatrix (middle ⊕ right)) :
-    DecidableEq (components first second).aggregatePortModeFamily.Channel := Classical.decEq _
-
 /-- The aggregate component boundary is finite when all three mode families are finite. -/
 noncomputable instance netlistChannelFintype [Fintype left] [Fintype middle]
     [Fintype right] (first : ScatteringMatrix (left ⊕ middle))
@@ -155,21 +131,6 @@ instance connectedChannelDecidableEq [DecidableEq middle]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right)) :
     DecidableEq (netlist first second).ConnectedChannel := Classical.decEq _
-
-set_option linter.checkUnivs false in
-/-- The singleton connection family's two oriented middle channels are finite. -/
-noncomputable instance connectionsChannelFintype [Fintype middle]
-    (first : ScatteringMatrix (left ⊕ middle))
-    (second : ScatteringMatrix (middle ⊕ right)) :
-    Fintype (connections first second).Channel := by
-  change Fintype (Σ _ : Unit, middle ⊕ middle)
-  infer_instance
-
-/-- The singleton connection family's oriented middle channels have decidable equality. -/
-instance connectionsChannelDecidableEq [DecidableEq middle]
-    (first : ScatteringMatrix (left ⊕ middle))
-    (second : ScatteringMatrix (middle ⊕ right)) :
-    DecidableEq (connections first second).Channel := Classical.decEq _
 
 end TwoPortSeriesNetlist
 
