@@ -366,8 +366,8 @@ every source.
 
 ## Slice 5 — files
 
-- `Physlib/Mathematics/SignalFlowGraph/Extraction.lean` (172 lines)
-- `Physlib/Mathematics/SignalFlowGraph/ExtractionRegression.lean` (146 lines)
+- `Physlib/Mathematics/SignalFlowGraph/Extraction.lean` (206 lines)
+- `Physlib/Mathematics/SignalFlowGraph/ExtractionRegression.lean` (157 lines)
 
 ### Registrations needed in `Physlib.lean` (cumulative, all eight)
 
