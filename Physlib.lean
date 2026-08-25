@@ -179,6 +179,14 @@ public import Physlib.Mathematics.VariationalCalculus.HasVarAdjoint
 public import Physlib.Mathematics.VariationalCalculus.HasVarGradient
 public import Physlib.Mathematics.VariationalCalculus.IsLocalizedfunctionTransform
 public import Physlib.Mathematics.VariationalCalculus.IsTestFunction
+public import Physlib.Mathematics.ZTransform.Basic
+public import Physlib.Mathematics.ZTransform.BasicRegression
+public import Physlib.Mathematics.ZTransform.Convergence
+public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+public import Physlib.Mathematics.ZTransform.DifferenceEquation
+public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+public import Physlib.Mathematics.ZTransform.Stability
+public import Physlib.Mathematics.ZTransform.StabilityRegression
 public import Physlib.Meta.AllFilePaths
 public import Physlib.Meta.Basic
 public import Physlib.Meta.Informal.Basic
