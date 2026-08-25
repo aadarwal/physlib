@@ -40,8 +40,12 @@ Conventions are fixed once here and used unchanged by every later ray module.
   of it. Ray height is the first coordinate, positive on one fixed side of the axis.
 - A ray angle is the signed angle between the propagation direction and the axis, so that the
   propagation direction of a meridional ray is `(sin θ, cos θ)`.
-- A surface radius of curvature is positive when the centre of curvature lies downstream of the
-  surface.
+- A surface radius of curvature is positive when the centre of curvature lies on the *outgoing*
+  side of the surface. For a refracting surface that is downstream; for a mirror in the folded
+  convention below it is the reflected side. This single rule is consistent with both the
+  refracting entry `(n₀ - n₁) / (n₁ R)` and the reflecting entry `-2 / R` of
+  `Physlib.Optics.Rays.Transfer`. It is *derived* from those entries rather than quoted: the
+  source development states the entries but never states the rule.
 - Reflection uses the *folded* convention: after a mirror the axis is re-referenced to the new
   propagation direction. A plane mirror therefore acts as the identity on `(height, angle)`, and
   a mirror does not change the refractive index. The alternative unfolded convention, in which a
@@ -354,7 +358,8 @@ component whose paraxial matrix is known but not derived here; its validity cond
 requires the entries to satisfy the index-ratio determinant law, which the source does not
 impose.
 
-Radii of curvature are signed, positive when the centre of curvature lies downstream.
+Radii of curvature are signed, positive when the centre of curvature lies on the outgoing side of
+the surface, as fixed in the module documentation.
 -/
 inductive ParaxialInterface where
   /-- Refraction at a plane surface separating two media. -/

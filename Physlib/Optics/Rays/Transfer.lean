@@ -265,6 +265,18 @@ lemma ParaxialInterface.det_transferMatrix_phaseConjugate (n₀ n₁ : ℝ) :
 /-- The angle-reversal matrix relating the folded and unfolded reflection conventions. -/
 def angleReversal : RayTransferMatrix := !![1, 0; 0, -1]
 
+/-- Reversing the ray angle twice is the identity.
+
+This is the guard against double-counting the direction reversal. A treatment that keeps the
+reversal explicit, as this one does, must *not* also negate the radii when unfolding: doing both
+would apply the same physical reversal twice. See the round-trip regression in
+`Physlib.Optics.Rays.TransferRegression`.
+-/
+@[simp]
+lemma angleReversal_mul_self : angleReversal * angleReversal = 1 := by
+  rw [angleReversal, Matrix.mul_fin_two, Matrix.one_fin_two]
+  norm_num
+
 /-- The unfolded-convention matrix of an interface: the folded matrix followed by the reversal
 that re-references the axis to the incoming propagation direction.
 
