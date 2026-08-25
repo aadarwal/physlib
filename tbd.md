@@ -1221,9 +1221,11 @@ PR unless maintainers explicitly ask to retain it.
   `Decidable` for its public specification, so any future optimized checker must be proved
   equivalent rather than treated as an independent oracle.
 - [ ] Complete N4C with generic executable `S`, `C`, `E_in`, and `E_out` matrices and prove their
-  entrywise evaluation agrees with the derived N4 maps. Then add the proof-exact rational-function
-  finite-delay backend and its denominator-guarded evaluation theorem without introducing an
-  inverse, determinant, or well-posedness assumption before N5.
+  entrywise evaluation agrees with the derived N4 maps. Account explicitly for proof-irrelevance
+  between the compiled constructive `DecidableEq` instances and N4's locally chosen classical
+  instances. Then add an executable normalized coefficient-list representation with a proof-exact
+  interpretation into rational functions and a denominator-guarded evaluation theorem, without
+  introducing an inverse, determinant, or well-posedness assumption before N5.
 - [ ] Human-check before upstreaming that `WiringEquiv`, rather than an index permutation alone,
   is the public hypothesis; that the ambient port family is fixed; and that component relabelling
   and mode-phase gauge are excluded covariance statements. Confirm independently that the

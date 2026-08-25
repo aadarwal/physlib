@@ -1897,8 +1897,9 @@ Exit: network equations come from a typed netlist rather than being supplied ind
   N4's derived map types rather than stored as an unverified direction flag;
 - [ ] executable construction of `S`, `C`, `E_in`, and `E_out`;
 - [ ] a soundness theorem equating compiled equations with N4's flat relational semantics;
-- [ ] an algebraic backend over an appropriate field, with exact rational-function instantiation for
-  finite-delay responses; and
+- [ ] an algebraic backend over an appropriate field, with an executable normalized coefficient
+  representation and a proof-exact rational-function interpretation for finite-delay responses;
+  and
 - [ ] evaluation into `ℂ` away from every required denominator, proved to commute with compilation.
 
 Exit: exact executable fixtures test an implementation that is proved correct with respect to the
