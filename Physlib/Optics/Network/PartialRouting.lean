@@ -167,6 +167,23 @@ lemma partialRouting_entry_of_outgoing_not_mem_range
     family.outgoingChannelEmbedding family.incidentChannelEmbedding
   simpa only [family.outgoing_mk_mem_range_channelEmbedding_iff]
 
+/-- A connected outgoing column has one unit entry, at its exact ambient incident mate. -/
+lemma partialRouting_entry_connected_column [Fintype family.Channel]
+    [DecidableEq family.Channel] [DecidableEq P.Channel]
+    (incident : P.Channel) (channel : family.Channel) :
+    family.partialRouting (Incident.mk incident)
+        (Outgoing.mk (family.channelEmbedding channel)) =
+      if incident = family.channelEmbedding (family.mateEquiv channel) then 1 else 0 := by
+  by_cases hIncident : incident ∈ Set.range family.channelEmbedding
+  · rcases hIncident with ⟨output, rfl⟩
+    rw [family.partialRouting_entry_connected, family.idealRouting_entry]
+    simp only [EmbeddingLike.apply_eq_iff_eq]
+  · rw [family.partialRouting_entry_of_incident_not_mem_range incident hIncident]
+    have hNe : incident ≠ family.channelEmbedding (family.mateEquiv channel) := by
+      intro hEqual
+      exact hIncident ⟨family.mateEquiv channel, hEqual.symm⟩
+    rw [if_neg hNe]
+
 /-!
 
 ## C. Exact amplitude action
