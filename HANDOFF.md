@@ -104,4 +104,12 @@ Files:
 
 ### Gates
 
-Pending the post-sync chained Slice 1 gate; the registry will be restored byte-for-byte afterward.
+- `Physlib`, all three Slice 1 modules with `-DwarningAsError=true`, and
+  `lake exe runPhyslibLinters` passed in one locked chain after temporary registration.
+- `lake exe lint_all` was also run. Its first pass exposed two redundant local finiteness
+  assumptions in `Evaluation.lean`; those were removed, and the rebuilt registry linter passed.
+- `./scripts/lint-style.sh` reported only existing repository-wide exceptions outside
+  `Physlib/Optics/Systems/DelayTransfer/`; the three Slice 1 files had no finding.
+- `Physlib.lean` was restored to SHA-256
+  `0d5ec1b20338c18c602bbf933d560b0f1dc913759bf2024dcba893d49d8f5bf4` after both temporary
+  registrations.
