@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.Matrix.PosDef
+public import Physlib.Mathematics.LinearAlgebra.Matrix.PosSemidefTrace
 public import Physlib.Optics.Network.Conservation
 public import Physlib.Optics.Polarization.Coherency
 
@@ -53,11 +53,15 @@ proved to exist.
 - `CoherencyMatrix.channelPower`: the per-channel power observable, a diagonal entry.
 - `CoherencyMatrix.trace_eq_sum_channelPower`: total power is the sum of channel powers.
 - `CoherencyMatrix.map_ofAmplitude`: coherent transport agrees with amplitude transport.
+- `CoherencyMatrix.map_toMatrix_apply`: every transported entry as an explicit double sum.
 - `CoherencyMatrix.incoherentSum`: the second-order data of decorrelated contributions.
+- `CoherencyMatrix.ofChannelPowers`: diagonal incoherent data from declared channel powers.
+- `CoherencyMatrix.channelPower_map_ofChannelPowers`: diagonal inputs transport with no cross
+  term.
 - `CoherencyMatrix.channelPower_map_incoherentSum`: decorrelated channel powers are additive.
 - `CoherencyMatrix.channelPower_map_ofAmplitude_add`: coherent channel power with its explicit
   interference term.
-- `CoherencyMatrix.channelPower_map_sub_channelPower_map_incoherentSum`: the interference term is
+- `CoherencyMatrix.channelPower_map_ofAmplitude_add_sub_incoherentSum`: the interference term is
   exactly the coherent-minus-decorrelated difference.
 - `CoherencyMatrix.trace_map_le_of_isPassive` and
   `CoherencyMatrix.trace_map_of_isPowerPreserving`: passivity and conservation of transport.
@@ -67,7 +71,7 @@ proved to exist.
 
 - A. Second-order data of a mode amplitude
 - B. Coherency transport by a mode transform
-- C. Decorrelated superposition
+- C. Decorrelated superposition, including diagonal incoherent inputs
 - D. The interference cross term
 - E. Passivity and conservation of coherency transport
 - F. Network response coherency
@@ -165,6 +169,21 @@ lemma map_ofAmplitude {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
       (star (Matrix.mulVec transform (WithLp.ofLp amplitude)))
   rw [Matrix.mul_vecMulVec, Matrix.vecMulVec_mul, ← Matrix.star_mulVec]
 
+/-- Every entry of transported coherency data, as an explicit double sum.
+
+The row index of `transform` is an output channel and its column index an input channel, so the
+left factor carries the output row and the conjugated right factor carries the output column. A
+reversed orientation or a dropped conjugation changes this formula. -/
+lemma map_toMatrix_apply {ι κ : Type*} [Fintype ι] [Finite κ]
+    (coherency : CoherencyMatrix ι) (transform : ModeTransform ι κ) (row column : κ) :
+    (coherency.map transform).toMatrix row column =
+      ∑ second : ι, ∑ first : ι,
+        transform row first * coherency.toMatrix first second *
+          star (transform column second) := by
+  rw [CoherencyMatrix.map_toMatrix, Matrix.mul_apply]
+  refine Finset.sum_congr rfl fun second _ => ?_
+  rw [Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.sum_mul]
+
 /-- The channel powers of transported coherent data are the transported amplitude moduli. -/
 lemma channelPower_map_ofAmplitude {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     (amplitude : ModeAmplitude ι) (transform : ModeTransform ι κ) (channel : κ) :
@@ -224,6 +243,76 @@ lemma map_incoherentSum {ι κ : Type*} [Fintype ι] [Fintype κ]
 
 /-!
 
+### C.1. Diagonal incoherent inputs
+
+-/
+
+/-- The coherency data of channels carrying declared powers with no mutual correlation.
+
+This is the diagonal incoherent input of the network-observables milestone: every off-diagonal
+entry is zero, so no two channels share any second-order correlation. Positive semidefiniteness
+comes from the nonnegativity of the declared channel powers alone. -/
+def ofChannelPowers {ι : Type*} [DecidableEq ι] (powers : ι → ℝ)
+    (hPowers : ∀ channel, 0 ≤ powers channel) : CoherencyMatrix ι where
+  toMatrix := Matrix.diagonal fun channel => ((powers channel : ℝ) : ℂ)
+  posSemidef :=
+    Matrix.posSemidef_diagonal_iff.mpr fun channel =>
+      Complex.nonneg_iff.mpr ⟨by simpa using hPowers channel, by simp⟩
+
+/-- Diagonal incoherent data is the diagonal matrix of the declared channel powers. -/
+@[simp]
+lemma ofChannelPowers_toMatrix {ι : Type*} [DecidableEq ι] (powers : ι → ℝ)
+    (hPowers : ∀ channel, 0 ≤ powers channel) :
+    (ofChannelPowers powers hPowers).toMatrix =
+      Matrix.diagonal fun channel => ((powers channel : ℝ) : ℂ) := rfl
+
+/-- A diagonal incoherent entry off the diagonal vanishes: distinct channels are uncorrelated. -/
+lemma ofChannelPowers_apply_of_ne {ι : Type*} [DecidableEq ι] (powers : ι → ℝ)
+    (hPowers : ∀ channel, 0 ≤ powers channel) {row column : ι} (hChannel : row ≠ column) :
+    (ofChannelPowers powers hPowers).toMatrix row column = 0 := by
+  rw [ofChannelPowers_toMatrix, Matrix.diagonal_apply_ne _ hChannel]
+
+/-- The channel powers of diagonal incoherent data are the declared powers. -/
+@[simp]
+lemma ofChannelPowers_channelPower {ι : Type*} [DecidableEq ι] (powers : ι → ℝ)
+    (hPowers : ∀ channel, 0 ≤ powers channel) (channel : ι) :
+    (ofChannelPowers powers hPowers).channelPower channel = powers channel := by
+  rw [channelPower, ofChannelPowers_toMatrix, Matrix.diagonal_apply_eq, Complex.ofReal_re]
+
+/-- The total power of diagonal incoherent data is the sum of the declared channel powers. -/
+@[simp]
+lemma ofChannelPowers_trace {ι : Type*} [Fintype ι] [DecidableEq ι] (powers : ι → ℝ)
+    (hPowers : ∀ channel, 0 ≤ powers channel) :
+    (ofChannelPowers powers hPowers).trace = ∑ channel : ι, powers channel := by
+  rw [trace_eq_sum_channelPower]
+  exact Finset.sum_congr rfl fun channel _ =>
+    ofChannelPowers_channelPower powers hPowers channel
+
+/-- Transporting a diagonal incoherent input weights each input channel's power by the squared
+modulus of the corresponding transform entry, with no interference cross term.
+
+The sum runs over input channels only. A cross term between two distinct input channels would
+require a nonzero off-diagonal entry in the input coherency, which diagonal data does not have. -/
+lemma channelPower_map_ofChannelPowers {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
+    (powers : ι → ℝ) (hPowers : ∀ channel, 0 ≤ powers channel)
+    (transform : ModeTransform ι κ) (channel : κ) :
+    ((ofChannelPowers powers hPowers).map transform).channelPower channel =
+      ∑ input : ι, powers input * Complex.normSq (transform channel input) := by
+  have hEntry :
+      ((ofChannelPowers powers hPowers).map transform).toMatrix channel channel =
+        ((∑ input : ι, powers input * Complex.normSq (transform channel input) : ℝ) : ℂ) := by
+    rw [CoherencyMatrix.map_toMatrix, ofChannelPowers_toMatrix, Matrix.mul_assoc,
+      Matrix.mul_apply, Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun input _ => ?_
+    rw [Matrix.diagonal_mul, Matrix.conjTranspose_apply, RCLike.star_def, Complex.ofReal_mul]
+    rw [show ((Complex.normSq (transform channel input) : ℝ) : ℂ) =
+        transform channel input * (starRingEnd ℂ) (transform channel input) from
+      (Complex.mul_conj _).symm]
+    ring
+  rw [channelPower, hEntry, Complex.ofReal_re]
+
+/-!
+
 ## D. The interference cross term
 
 -/
@@ -261,8 +350,10 @@ lemma channelPower_map_ofAmplitude_add {ι κ : Type*} [Fintype ι] [DecidableEq
 /-- The interference term is exactly the coherent-minus-decorrelated difference in every output
 channel.
 
-This makes the cross term a proved quantity rather than a modelling convenience: it vanishes
-exactly when the supplied second-order data is the decorrelated sum. -/
+This makes the cross term a proved quantity rather than a modelling convenience. It is an
+identity, not a criterion: the difference is this term, and no converse is claimed. In particular
+the term can vanish for a particular pair without the data being decorrelated, and a transform
+that annihilates both contributions kills it for every pair. -/
 lemma channelPower_map_ofAmplitude_add_sub_incoherentSum
     {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     (first second : ModeAmplitude ι) (transform : ModeTransform ι κ) (channel : κ) :
@@ -281,48 +372,6 @@ lemma channelPower_map_ofAmplitude_add_sub_incoherentSum
 
 -/
 
-/-- The trace of a product of positive-semidefinite matrices is nonnegative.
-
-The proof diagonalizes the right factor and uses that congruence preserves positive
-semidefiniteness, so every diagonal weight and every eigenvalue in the resulting sum is
-nonnegative. -/
-lemma trace_mul_nonneg_of_posSemidef {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {left right : Matrix ι ι ℂ} (hLeft : left.PosSemidef) (hRight : right.PosSemidef) :
-    0 ≤ (left * right).trace := by
-  classical
-  have hCongruence :
-      ((hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ * left *
-        (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)).PosSemidef := by
-    simpa only [Matrix.conjTranspose_conjTranspose] using
-      hLeft.conjTranspose_mul_mul_same (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)
-  have hRightEq :
-      right = (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ) *
-          Matrix.diagonal (fun index : ι => ((hRight.1.eigenvalues index : ℝ) : ℂ)) *
-            (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ := by
-    conv_lhs => rw [hRight.1.spectral_theorem]
-    rfl
-  have hReassociate :
-      left * ((hRight.1.eigenvectorUnitary : Matrix ι ι ℂ) *
-          Matrix.diagonal (fun index : ι => ((hRight.1.eigenvalues index : ℝ) : ℂ)) *
-            (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ) =
-        left * (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ) *
-            Matrix.diagonal (fun index : ι => ((hRight.1.eigenvalues index : ℝ) : ℂ)) *
-          (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ := by
-    simp only [Matrix.mul_assoc]
-  have hCycle :
-      (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ *
-          (left * (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ) *
-            Matrix.diagonal (fun index : ι => ((hRight.1.eigenvalues index : ℝ) : ℂ))) =
-        (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ)ᴴ * left *
-            (hRight.1.eigenvectorUnitary : Matrix ι ι ℂ) *
-          Matrix.diagonal (fun index : ι => ((hRight.1.eigenvalues index : ℝ) : ℂ)) := by
-    simp only [Matrix.mul_assoc]
-  rw [hRightEq, hReassociate, Matrix.trace_mul_comm, hCycle]
-  simp only [Matrix.trace, Matrix.diag_apply, Matrix.mul_diagonal]
-  refine Finset.sum_nonneg fun index _ => ?_
-  refine mul_nonneg hCongruence.diag_nonneg ?_
-  exact Complex.nonneg_iff.mpr ⟨by simpa using hRight.eigenvalues_nonneg index, by simp⟩
-
 /-- Coherency transport through a passive mode transform never increases total power. -/
 lemma trace_map_le_of_isPassive {ι κ : Type*} [Fintype ι] [DecidableEq ι] [Fintype κ]
     [DecidableEq κ] (coherency : CoherencyMatrix ι) {transform : ModeTransform ι κ}
@@ -334,7 +383,7 @@ lemma trace_map_le_of_isPassive {ι κ : Type*} [Fintype ι] [DecidableEq ι] [F
       hTransform
   have hNonneg :
       0 ≤ (coherency.toMatrix * ((1 : ModeTransform ι ι) - transformᴴ * transform)).trace :=
-    trace_mul_nonneg_of_posSemidef coherency.posSemidef hDefect
+    Matrix.PosSemidef.trace_mul_nonneg coherency.posSemidef hDefect
   have hExpand :
       (coherency.toMatrix * ((1 : ModeTransform ι ι) - transformᴴ * transform)).trace =
         Matrix.trace coherency.toMatrix -

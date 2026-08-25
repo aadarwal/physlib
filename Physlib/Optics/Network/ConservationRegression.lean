@@ -14,9 +14,12 @@ public import Physlib.Optics.Network.FlatNetlistEliminationRegression
 ## i. Overview
 
 Two reflectionless two-port components are wired through one internal link. Each component matrix
-is unitary in its own right, with the second carrying a quarter-turn phase so that a transposed or
-conjugated convention is detectable. The fixture reuses the shared-link topology of the existing
-flat-netlist regressions and adds the two conservation checks required by row `N-03`.
+is unitary in its own right, with the second carrying a quarter-turn phase, so a dropped or
+conjugated transmission phase is detected by the exact response anchor. The netlist response is
+symmetric, so it does *not* detect a transposed convention; the separate coherency-transport
+fixture of section G is asymmetric and mixing and does. The netlist fixture reuses the shared-link
+topology of the existing flat-netlist regressions and adds the two conservation checks required by
+row `N-03`.
 
 The first check proves that the complete external scattering matrix is unitary *from* component
 unitarity, through `FlatNetlist.externalScatteringMatrix_isLossless_of_components_isLossless`,
@@ -43,6 +46,7 @@ electromagnetic flux, or that the fixture is reciprocal.
 - D. System losslessness from component unitarity
 - E. The hand-computed external response
 - F. Coherent and decorrelated two-input power
+- G. A mixing, asymmetric coherency-transport fixture
 
 -/
 
@@ -753,7 +757,10 @@ lemma conservationRegressionResponse_column_b_power :
   norm_num [conservationRegressionResponse]
 
 /-- The cascade is a pure exchange with a quarter-turn phase, so a dropped or conjugated
-transmission phase is detected. -/
+transmission phase is detected by these two entries.
+
+The response is symmetric, so transposition is *not* detected here; section G supplies an
+asymmetric fixture for that. -/
 lemma conservationRegressionResponse_cross_entries :
     conservationRegressionResponse (Outgoing.mk conservationRegressionExternalA)
         (Incident.mk conservationRegressionExternalB) = Complex.I ∧
@@ -794,28 +801,182 @@ lemma conservationRegression_incoherentSum_channelPower
           (CoherencyMatrix.ofAmplitude second)).channelPower channel :=
   CoherencyMatrix.channelPower_map_incoherentSum _ _ _ channel
 
-/-- The decorrelated result is not vacuous: the same two contributions taken coherently give a
-strictly larger total output power whenever the contribution is nonzero. -/
-lemma conservationRegression_coherent_ne_incoherentSum
+/-- The decorrelated result is not vacuous: two identical contributions taken coherently give a
+strictly larger total output power than the same pair taken decorrelated, whenever the
+contribution is nonzero. -/
+lemma conservationRegression_incoherentSum_trace_lt_coherent
     (amplitude : ModeAmplitude conservationRegression.ExternalIncident)
     (hAmplitude : amplitude ≠ 0) :
     (conservationRegression.responseCoherency conservationRegression_isWellPosed
-        (CoherencyMatrix.ofAmplitude (amplitude + amplitude))).trace ≠
-      (conservationRegression.responseCoherency conservationRegression_isWellPosed
         ((CoherencyMatrix.ofAmplitude amplitude).incoherentSum
-          (CoherencyMatrix.ofAmplitude amplitude))).trace := by
-  rw [conservationRegression.responseCoherency_trace_of_isPowerPreserving
+          (CoherencyMatrix.ofAmplitude amplitude))).trace <
+      (conservationRegression.responseCoherency conservationRegression_isWellPosed
+        (CoherencyMatrix.ofAmplitude (amplitude + amplitude))).trace := by
+  rw [conservationRegression_incoherentSum_trace,
+    conservationRegression.responseCoherency_trace_of_isPowerPreserving
       conservationRegression_isWellPosed
       conservationRegression_scatteringTransform_isPowerPreserving,
-    conservationRegression_incoherentSum_trace, CoherencyMatrix.ofAmplitude_trace]
+    CoherencyMatrix.ofAmplitude_trace]
   have hDouble : amplitude + amplitude = (2 : ℂ) • amplitude := (two_smul ℂ amplitude).symm
   have hPositive : 0 < amplitude.power :=
     lt_of_le_of_ne amplitude.power_nonneg
       (fun hZero => hAmplitude ((ModeAmplitude.power_eq_zero_iff amplitude).mp hZero.symm))
   rw [hDouble, ModeAmplitude.power_smul]
   simp only [Complex.normSq_ofNat]
-  intro hEqual
   linarith
+
+/-!
+
+## G. A mixing, asymmetric coherency-transport fixture
+
+The netlist response of sections D and E is a pure exchange, so it is symmetric and mixes nothing:
+it cannot distinguish `H * Gamma * Hᴴ` from `Hᴴ * Gamma * H` or from an untransposed congruence.
+This section therefore transports hand-computed second-order data through an explicit transform
+that is both mixing and asymmetric, and pins every entry of the result.
+
+-/
+
+/-- An explicit mixing, asymmetric transform `[[1, 1], [2, I]]` on two channels.
+
+Every output channel depends on both input channels, and the transform is not symmetric, so a
+transposed or wrongly oriented congruence changes the transported data. -/
+def conservationCoherencyRegressionTransform : ModeTransform (Fin 2) (Fin 2) :=
+  ![![1, 1], ![2, Complex.I]]
+
+/-- The fixture transform is not symmetric. -/
+lemma conservationCoherencyRegressionTransform_asymmetric :
+    conservationCoherencyRegressionTransform 0 1 ≠
+      conservationCoherencyRegressionTransform 1 0 := by
+  norm_num [conservationCoherencyRegressionTransform]
+
+/-- Two decorrelated input channels carrying declared powers `1` and `2`. -/
+def conservationCoherencyRegressionPowers : Fin 2 → ℝ := ![1, 2]
+
+/-- The declared input channel powers are nonnegative. -/
+lemma conservationCoherencyRegressionPowers_nonneg (channel : Fin 2) :
+    0 ≤ conservationCoherencyRegressionPowers channel := by
+  fin_cases channel <;> norm_num [conservationCoherencyRegressionPowers]
+
+/-- Two decorrelated input channels each carrying unit power. -/
+def conservationCoherencyRegressionUnitPowers : Fin 2 → ℝ := ![1, 1]
+
+/-- The unit input channel powers are nonnegative. -/
+lemma conservationCoherencyRegressionUnitPowers_nonneg (channel : Fin 2) :
+    0 ≤ conservationCoherencyRegressionUnitPowers channel := by
+  fin_cases channel <;> norm_num [conservationCoherencyRegressionUnitPowers]
+
+/-- The coherent superposition of the two unit contributions, one per input channel. -/
+def conservationCoherencyRegressionAmplitude : ModeAmplitude (Fin 2) :=
+  WithLp.toLp 2 ![1, 1]
+
+/-- The coherent fixture amplitude has unit amplitude in each input channel. -/
+@[simp]
+lemma conservationCoherencyRegressionAmplitude_apply (channel : Fin 2) :
+    conservationCoherencyRegressionAmplitude channel = ![1, 1] channel := rfl
+
+/-- The conjugate transpose of the fixture transform, written out. -/
+def conservationCoherencyRegressionAdjoint : ModeTransform (Fin 2) (Fin 2) :=
+  ![![1, 2], ![1, -Complex.I]]
+
+/-- The displayed adjoint really is the conjugate transpose of the fixture transform. -/
+lemma conservationCoherencyRegressionAdjoint_eq :
+    conservationCoherencyRegressionAdjoint =
+      Matrix.conjTranspose conservationCoherencyRegressionTransform := by
+  ext row column
+  fin_cases row <;> fin_cases column <;>
+    norm_num [conservationCoherencyRegressionAdjoint, conservationCoherencyRegressionTransform,
+      Matrix.conjTranspose, Matrix.transpose, Matrix.map, Matrix.of_apply, Complex.ext_iff]
+
+/-- The exact transported coherency of the diagonal incoherent input, entry by entry.
+
+The off-diagonal entries carry the sign that distinguishes `H * Gamma * Hᴴ` from an untransposed
+congruence, and the diagonal entries distinguish it from the reversed orientation. -/
+lemma conservationCoherencyRegression_diagonal_map_apply (row column : Fin 2) :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+          conservationCoherencyRegressionPowers_nonneg).map
+        conservationCoherencyRegressionTransform).toMatrix row column =
+      ![![3, 2 - 2 * Complex.I], ![2 + 2 * Complex.I, 6]] row column := by
+  rw [CoherencyMatrix.map_toMatrix_apply]
+  fin_cases row <;> fin_cases column <;>
+    norm_num [conservationCoherencyRegressionTransform, conservationCoherencyRegressionPowers,
+      Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply, Complex.ext_iff]
+
+/-- The first output channel of the diagonal incoherent input carries power three. -/
+lemma conservationCoherencyRegression_diagonal_channelPower_zero :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+          conservationCoherencyRegressionPowers_nonneg).map
+        conservationCoherencyRegressionTransform).channelPower 0 = 3 := by
+  rw [CoherencyMatrix.channelPower, conservationCoherencyRegression_diagonal_map_apply]
+  norm_num
+
+/-- The second output channel of the diagonal incoherent input carries power six. -/
+lemma conservationCoherencyRegression_diagonal_channelPower_one :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+          conservationCoherencyRegressionPowers_nonneg).map
+        conservationCoherencyRegressionTransform).channelPower 1 = 6 := by
+  rw [CoherencyMatrix.channelPower, conservationCoherencyRegression_diagonal_map_apply]
+  norm_num
+
+/-- Total output power for the diagonal incoherent input is nine, the weighted sum of the squared
+transform moduli with no interference cross term between the two input channels. -/
+lemma conservationCoherencyRegression_diagonal_trace :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+          conservationCoherencyRegressionPowers_nonneg).map
+        conservationCoherencyRegressionTransform).trace = 9 := by
+  rw [CoherencyMatrix.trace_eq_sum_channelPower, Fin.sum_univ_two,
+    conservationCoherencyRegression_diagonal_channelPower_zero,
+    conservationCoherencyRegression_diagonal_channelPower_one]
+  norm_num
+
+/-- Negative control: the reversed congruence `Hᴴ * Gamma * H` gives nine in the first output
+channel where the correct one gives three, so this regression detects a reversed transport
+orientation. -/
+lemma conservationCoherencyRegression_reversed_orientation :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+          conservationCoherencyRegressionPowers_nonneg).map
+        conservationCoherencyRegressionAdjoint).toMatrix 0 0 ≠
+      ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionPowers
+            conservationCoherencyRegressionPowers_nonneg).map
+          conservationCoherencyRegressionTransform).toMatrix 0 0 := by
+  rw [CoherencyMatrix.map_toMatrix_apply, conservationCoherencyRegression_diagonal_map_apply]
+  norm_num [conservationCoherencyRegressionAdjoint, conservationCoherencyRegressionPowers,
+    Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply, Complex.ext_iff]
+
+/-- The coherent superposition of the two unit contributions gives output channel power four in
+the first channel: the two unit powers plus an interference term of two. -/
+lemma conservationCoherencyRegression_coherent_channelPower_zero :
+    ((CoherencyMatrix.ofAmplitude conservationCoherencyRegressionAmplitude).map
+        conservationCoherencyRegressionTransform).channelPower 0 = 4 := by
+  rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
+  norm_num [conservationCoherencyRegressionTransform, Fin.sum_univ_two]
+
+/-- The same two contributions taken decorrelated give output channel power two in the first
+channel: the interference term is exactly the difference. -/
+lemma conservationCoherencyRegression_decorrelated_channelPower_zero :
+    ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionUnitPowers
+          conservationCoherencyRegressionUnitPowers_nonneg).map
+        conservationCoherencyRegressionTransform).channelPower 0 = 2 := by
+  rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
+  norm_num [conservationCoherencyRegressionTransform, conservationCoherencyRegressionUnitPowers,
+    Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply]
+
+/-- In the second output channel the same coherent and decorrelated inputs agree, both at five,
+because that channel's interference term happens to vanish.
+
+This is why the cross-term identity is stated as an identity and not as a criterion: a vanishing
+cross term does not imply that the input data was decorrelated. -/
+lemma conservationCoherencyRegression_channelPower_one_agree :
+    ((CoherencyMatrix.ofAmplitude conservationCoherencyRegressionAmplitude).map
+          conservationCoherencyRegressionTransform).channelPower 1 = 5 ∧
+      ((CoherencyMatrix.ofChannelPowers conservationCoherencyRegressionUnitPowers
+            conservationCoherencyRegressionUnitPowers_nonneg).map
+          conservationCoherencyRegressionTransform).channelPower 1 = 5 := by
+  constructor
+  · rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
+    norm_num [conservationCoherencyRegressionTransform, Fin.sum_univ_two]
+  · rw [CoherencyMatrix.channelPower, CoherencyMatrix.map_toMatrix_apply]
+    norm_num [conservationCoherencyRegressionTransform, conservationCoherencyRegressionUnitPowers,
+      Fin.sum_univ_two, Matrix.diagonal, Matrix.of_apply]
 
 end
 
