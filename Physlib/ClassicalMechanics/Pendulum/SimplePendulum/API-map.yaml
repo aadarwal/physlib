@@ -58,8 +58,8 @@ Requirements:
 
   - description: The API contains the equilibria of the pendulum as solutions, together with the separatrix energy and the below/above-threshold energy bounds.
     done: true
-    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.equationOfMotion_const_zero, SimplePendulum.equationOfMotion_const_pi, SimplePendulum.isSolution_const_zero, SimplePendulum.isSolution_const_pi, SimplePendulum.separatrixEnergy, SimplePendulum.neg_one_lt_cos_of_energy_lt, SimplePendulum.deriv_ne_zero_of_energy_gt)
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Equilibria.lean (SimplePendulum.equationOfMotion_const_zero, SimplePendulum.equationOfMotion_const_pi, SimplePendulum.isSolution_const_zero, SimplePendulum.isSolution_const_pi, SimplePendulum.separatrixEnergy, SimplePendulum.neg_one_lt_cos_of_energy_lt, SimplePendulum.deriv_ne_zero_of_energy_gt)
 
   - description: The API contains the invariance of the lifted dynamics under shifting the angle by whole turns.
     done: true
-    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/Basic.lean (SimplePendulum.equationOfMotion_add_int_mul_two_pi, SimplePendulum.energy_add_int_mul_two_pi, SimplePendulum.isSolution_add_int_mul_two_pi)
+    location: Physlib/ClassicalMechanics/Pendulum/SimplePendulum/LiftInvariance.lean (SimplePendulum.equationOfMotion_add_int_mul_two_pi, SimplePendulum.energy_add_int_mul_two_pi, SimplePendulum.isSolution_add_int_mul_two_pi)
