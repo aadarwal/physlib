@@ -2212,19 +2212,28 @@ two fixed-carrier half arcs. Its complete-state well-posedness is equivalent to
 `1 - t₁ * t₂ * gamma ≠ 0`; N5 elimination derives both transfer amplitudes. Their totalized
 round-trip series acquire the geometric-series interpretation only under contraction. The equal
 half-arc attenuation/phase split fixes a model and a drop-port reference-plane convention. Power
-observables, extrema, identifiability, free spectral range, reciprocity, and source-parity bridges
-remain S3 or later work.
+observables, gated parameter recovery, rejection ratios, and nondispersive free spectral range are
+supplied by S3 below. Extrema, reciprocity, material dispersion, and source-parity bridges remain
+later work.
 
-#### S3. Ring observables
+#### S3. Ring observables — complete as a Physlib layer; source bridge remains separate
 
-- derive observables from the S2 pointwise N5F response and the N6a/N7 normalization and conservation
-  theorems;
-- through/drop power responses;
-- lossless power balance;
-- resonance and antiresonance conditions;
-- critical coupling and extinction conditions;
-- rejection ratio with positive numerator/denominator and explicit log convention; and
-- free spectral range under an explicit nondispersive or group-index hypothesis.
+- [x] derive observables from the S2 pointwise N5F response and the N6a/N7 normalization and
+  conservation theorems;
+- [x] through/drop power responses;
+- [x] lossless power balance;
+- [x] named resonance and antiresonance phase conditions;
+- [x] critical coupling and extinction conditions;
+- [x] rejection ratio with positive numerator/denominator and explicit log convention; and
+- [x] free spectral range under an explicit nondispersive group-index hypothesis.
+
+The observable powers are squared moduli of the S2 response amplitudes, while lossless balance is
+routed through N6 componentwise conservation. Critical-coupling extinction has a converse under
+the stated parameter gates, and parameter recovery is phase-resolved or explicitly
+critical-coupling-gated rather than an intensity-only identifiability claim. Frequency periodicity
+uses N5F's response domain and a constant group-index model. Resonance and antiresonance are named
+phase conditions, not extremum theorems; no bandwidth, linewidth, quality factor, response-derived
+group delay, reciprocity, material realization, or DATE/SysCon parity bridge is inferred.
 
 #### S4. Delay-variable transfer functions
 
@@ -2528,9 +2537,9 @@ corpus reports no numerical or simulation cross-validation of a formalized resul
 | B-03 | the source-mapped nested feedback/sum/pickoff identity follows from common behavior semantics | block-algebra orientation error |
 | S-01 | **Physlib extension met:** balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
 | S-02 | **met:** all-pass and add-drop elimination agree with their contractive round-trip series | feedback orientation errors |
-| S-03 | microring transfer, power, resonance, and rejection specializations | hidden nondegeneracy assumptions |
+| S-03 | **met:** microring transfer, power, named-phase, critical-coupling, and rejection specializations | hidden nondegeneracy assumptions |
 | S-04 | **met:** the physical add-drop realization yields both exact transfer responses | disconnected ring formula |
-| S-05 | add-drop power and rejection ratio satisfy their positivity and logarithm domains | amplitude/power or dB-convention error |
+| S-05 | **met:** add-drop power and rejection ratio satisfy their positivity and logarithm domains | amplitude/power or dB-convention error |
 | S-06 | the audited eight-node DCDR response agrees between elimination and Mason gain | graph topology or path/loop error |
 | S-07 | DCDR pole/zero/stability theorems include the audited unstable parameter case | cancellation or strictness error |
 | S-08 | **Physlib extension:** the `M × N` lattice flattening agrees with its row/column decomposition | hierarchy or cascade-index error |
@@ -2735,7 +2744,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
-| S2/S3 microrings | in progress: all-pass and add-drop amplitude/series slices complete | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 through/drop responses, and contractive round-trip-series agreement complete; observable, identifiability, FSR, and source-parity suites remain |
+| S2/S3 microrings | in progress: S2 amplitudes/series and S3 observables complete; source bridge open | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated round-trip series, N6 power balance, named phase conditions, critical coupling, gated parameter recovery, rejection ratios, and nondispersive FSR are complete; source parity and the remaining S0/S4+ integrations remain |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |

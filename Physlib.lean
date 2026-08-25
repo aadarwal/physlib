@@ -452,6 +452,10 @@ public import Physlib.Optics.Systems.Microring.AddDropNetwork
 public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
 public import Physlib.Optics.Systems.Microring.AllPassRegression
+public import Physlib.Optics.Systems.Microring.Observables
+public import Physlib.Optics.Systems.Microring.ObservablesFrequency
+public import Physlib.Optics.Systems.Microring.ObservablesPower
+public import Physlib.Optics.Systems.Microring.ObservablesRegression
 public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic

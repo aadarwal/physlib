@@ -1594,6 +1594,17 @@ PR unless maintainers explicitly ask to retain it.
   slice proves no power observable or balance, extrema, critical coupling, rejection ratio,
   identifiability, free spectral range, bandwidth, causality, dispersion, group delay, material
   model, reciprocity or time-reversed pairing, or DATE/SysCon parity bridge.
+- [ ] Human-check the S3 microring observables before upstreaming. Confirm that through and drop
+  powers are squared moduli of the N5-derived S2 amplitudes, and that lossless balance reaches the
+  result only through N6 componentwise losslessness. Audit the named resonance and antiresonance
+  phase conditions without reading them as extrema, the exact critical-coupling gates, the
+  positive-power domain and `10 * logb 10` convention of both rejection ratios, and the explicit
+  phase-resolved or critical-coupling hypotheses on parameter recovery. Check that the N5F free
+  spectral range uses the constant positive group-index model and stays inside `responseDomain`.
+  The exact rational powers, extinction/recovery controls, and one-FSR response-domain fixture are
+  regressions, not a DATE/SysCon source bridge. No bandwidth, linewidth, quality factor,
+  response-derived group delay, reciprocity, material model, or intensity-only identifiability is
+  claimed.
 - [ ] Human-check the S1 Mach--Zehnder extension before upstreaming. Confirm that the explicit
   feed-forward `FlatNetlist` contains exactly two N7 directional couplers and two fixed-carrier
   matched-propagation arms, that unconditional well-posedness follows from the channel equations,

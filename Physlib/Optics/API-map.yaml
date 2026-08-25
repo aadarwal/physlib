@@ -293,7 +293,7 @@ Requirements:
       Optics.MachZehnder.balanced_phase_factor_ratio_eq_output_ratio);
       Physlib/Optics/Systems/MachZehnder/Regression.lean
 
-  - description: "The all-pass portion models a one-bus microring as an explicit FlatNetlist assembled from the common directional-coupler and fixed-carrier matched-propagation components. Its complete-state well-posedness is equivalent to 1 - t*gamma != 0, and N5 elimination derives the through response and its contraction-gated round-trip-series form. The add-drop portion models a four-port two-bus ring from two couplers and two fixed-carrier half arcs, with the equal attenuation/phase split explicitly fixing a model and drop-port reference plane. Its complete-state well-posedness is equivalent to 1 - t1*t2*gamma != 0, with a singular-incident kernel witness for the converse; N5 derives both through and drop responses, their unitary-coupler standard forms, and their contraction-gated series forms. Exact 3-4-5 regressions independently pin the all-pass and add-drop channel equations, denominators, responses, and convergent series. The umbrella remains incomplete: power observables and balance, extrema, critical coupling, rejection ratio, identifiability, free spectral range, dispersion/group-delay, reciprocity, and any DATE/SysCon parity bridge are not yet supplied."
+  - description: "The all-pass and add-drop portions model one- and two-bus microrings as explicit FlatNetlists assembled from the common directional-coupler and fixed-carrier matched-propagation components. Their complete-state well-posedness is equivalent to the exact scalar feedback-denominator gates, and N5 elimination derives the through/drop responses and contraction-gated round-trip-series forms. The S3 layer derives squared-modulus powers, routes lossless through/drop balance through N6 component conservation, names resonance and antiresonance phase conditions, proves gated critical-coupling extinction and recovery, fixes positive-domain base-ten decibel rejection ratios, and proves through/drop power periodicity under an explicit constant group-index N5F model on responseDomain. Exact rational, critical-coupling, and one-FSR regressions pin these statements independently. The umbrella remains incomplete: named phase conditions are not extrema; bandwidth, linewidth, quality factor, response-derived group delay, reciprocity, material realization, source-level S0 agreement, and every DATE/SysCon parity bridge remain open."
     done: false
     location: >-
       Physlib/Optics/Systems/Microring/AllPass.lean
@@ -344,7 +344,38 @@ Requirements:
       Optics.AddDrop.addDropRegression_resonance_responseTransform_entry_drop,
       Optics.AddDrop.addDropRegression_resonance_roundTripSeries,
       Optics.AddDrop.addDropRegression_antiresonance_denominator,
-      Optics.AddDrop.addDropRegression_antiresonance_throughTransfer)
+      Optics.AddDrop.addDropRegression_antiresonance_throughTransfer);
+      Physlib/Optics/Systems/Microring/ObservablesPower.lean
+      (Optics.AddDrop.throughPower, Optics.AddDrop.dropPower,
+      Optics.AddDrop.throughPower_eq_closedForm, Optics.AddDrop.dropPower_eq_closedForm,
+      Optics.AddDrop.Parameters.IsResonant, Optics.AddDrop.Parameters.IsAntiresonant,
+      Optics.AddDrop.Parameters.IsCriticallyCoupled,
+      Optics.AddDrop.criticalCoupling_extinction,
+      Optics.AddDrop.criticalCoupling_of_extinction,
+      Optics.AddDrop.throughRejectionRatioDB, Optics.AddDrop.dropRejectionRatioDB,
+      Optics.AddDrop.attenuation_eq_of_antiresonant_field,
+      Optics.AddDrop.inputCrossAmplitude_eq_sqrt_of_resonant_extinction,
+      Optics.AddDrop.lossless_through_drop_power_balance);
+      Physlib/Optics/Systems/Microring/ObservablesFrequency.lean
+      (Optics.AddDrop.parameterizedNetlist,
+      Optics.AddDrop.mem_parameterizedNetlist_responseDomain_iff,
+      Optics.AddDrop.parameterizedNetlist_response_through_power_eq_closedForm,
+      Optics.AddDrop.parameterizedNetlist_response_drop_power_eq_closedForm,
+      Optics.AddDrop.NondispersiveGroupIndexModel.angularFSR,
+      Optics.AddDrop.NondispersiveGroupIndexModel.frequencyFSR,
+      Optics.AddDrop.NondispersiveGroupIndexModel.add_angularFSR_mem_responseDomain,
+      Optics.AddDrop.NondispersiveGroupIndexModel.nondispersive_throughPower_periodic_of_mem,
+      Optics.AddDrop.NondispersiveGroupIndexModel.nondispersive_dropPower_periodic_of_mem);
+      Physlib/Optics/Systems/Microring/ObservablesRegression.lean
+      (Optics.AddDrop.observablesRegression_resonance_throughPower,
+      Optics.AddDrop.observablesRegression_resonance_dropPower,
+      Optics.AddDrop.observablesRegression_antiresonance_throughPower,
+      Optics.AddDrop.observablesRegression_antiresonance_dropPower,
+      Optics.AddDrop.observablesRegression_critical_extinction,
+      Optics.AddDrop.observablesRegression_critical_lossless_powerBalance,
+      Optics.AddDrop.observablesRegression_antiresonance_recovers_attenuation,
+      Optics.AddDrop.observablesRegression_angularFSR,
+      Optics.AddDrop.observablesRegression_n5f_resonance_throughPower)
 
   - description: "The neutral mathematics API provides causal two-sided complex sequences, a summation-defined unilateral Z-transform, distinct conditional and absolute regions of convergence with a strict-subset witness, shift and first-difference laws with startup terms, finite-delay recurrences and rational transfer functions, explicit proved directions among absolute summability, BIBO stability, Schur stability, poles, and the ROC, sample recovery by limits at infinity, causal uniqueness with a counterexample showing why causality is necessary, the absolutely convergent convolution theorem, and existence and uniqueness of causal solutions to strictly causal recurrences. Exact regressions cover geometric, all-pass, low-pass, unstable one-pole, stable two-pole, convolution, and recursively constructed one-pole cases. The literal Taylor-coefficient form of JAL'18 Theorem 15 is recorded as a remaining source-form gap; no connection to an optical network or physical frequency is claimed here."
     done: true
