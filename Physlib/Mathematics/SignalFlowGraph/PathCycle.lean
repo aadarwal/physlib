@@ -16,15 +16,15 @@ public import Physlib.Mathematics.SignalFlowGraph.Numerator
 The numerator of Mason's formula has two presentations. In
 `Physlib.Mathematics.SignalFlowGraph.Numerator` it is a sum over the families of pairwise
 non-touching loops that close through the sink; classically it is a sum over forward paths from
-the source to the sink. The two are the same objects seen differently: a closing family is a
-permutation routing the sink to the source, and deleting the closing edge from the orbit of the
-sink leaves exactly a forward path.
+the source to the sink. The intended correspondence reads a closing family as a permutation
+routing the sink to the source and deletes the closing edge from the sink's orbit to obtain a
+forward path.
 
-This file proves the content of that correspondence. The gain along a repetition-free path is the
-family gain of the cyclic permutation of its nodes, restricted to the nodes other than its last;
-a path cycle and a loop family supported off the path are disjoint permutations; their product
-follows the path on the path and the family off it; the family gain of the product splits as the
-path gain times the family gain; and the product has exactly one loop more than the family.
+This file proves summand-level ingredients for that correspondence. The gain along a
+repetition-free path is the family gain of the cyclic permutation of its nodes, restricted to the
+nodes other than its last; a path cycle and a loop family supported off the path are disjoint
+permutations; their product follows the path on the path and the family off it; the family gain
+of the product splits; and the product has exactly one loop more than the family.
 
 What is **not** proved here is the index bijection that turns those facts into the identity
 `masonNumerator = cyclicNumerator`. See the references section for exactly what remains.
@@ -52,12 +52,12 @@ What is **not** proved here is the index bijection that turns those facts into t
 The correspondence being formalized is the classical reading of Mason's rule, in which each
 forward path from source to sink, together with a family of loops touching none of it, contributes
 one term. See U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic
-Signal Processing Systems", FMICS 2015, LNCS 9128, Definitions 3-4 (p. 168). The sources
-enumerate forward circuits directly and never form the closing permutation, so nothing here has a
-source counterpart; this file is Physlib-original.
+Signal Processing Systems", FMICS 2015, LNCS 9128, Definitions 3-4 (p. 168). The
+closing-permutation bridge lemmas and their Lean proofs are Physlib additions; the cited source
+must be checked by the human author under `AI-POLICY.md` section 2.1 before upstream use.
 
 Deliberately not claimed, and stated exactly. The identity
-`masonNumerator G s t = cyclicNumerator G s t` is **not proved**. What remains is only the index
+`masonNumerator G s t = cyclicNumerator G s t` is **not proved**. A remaining central step is the
 bijection between
 
 * triples of a forward path `p`, a vertex set `T'` disjoint from it, and a family `σ'` supported
@@ -65,8 +65,9 @@ bijection between
 * pairs of a vertex set `T` containing the sink and a family `σ` supported in `T` with
   `σ t = s`,
 
-given in one direction by `T = p.toFinset ∪ T'` and `σ = p.formPerm * σ'`. Every summand identity
-that bijection has to respect is proved in this file. The inverse direction sends `σ` to the
+given in one direction by `T = p.toFinset ∪ T'` and `σ = p.formPerm * σ'`. The file proves the
+current gain, disjointness, and loop-count ingredients, but not the bijection or resulting sum
+identity. The intended inverse direction sends `σ` to the
 rotation of `Equiv.Perm.toList σ t`; note that `Equiv.Perm.formPerm_toList` together with
 `List.formPerm_rotate_one` recovers `p.formPerm = σ.cycleOf t` immediately, so no round trip
 through `Equiv.Perm.toList` is needed, and the support condition on the residual family follows
@@ -91,20 +92,6 @@ variable {ι : Type*} [DecidableEq ι]
 ## A. Reading the last node of a path
 
 -/
-omit [DecidableEq ι] in
-/-- Reading the last node off a nonempty list. -/
-lemma eq_getLast_of_getLast? {x : ι} {l : List ι} {z : ι} (hz : (x :: l).getLast? = some z) :
-    z = (x :: l).getLast (List.cons_ne_nil x l) :=
-  Option.some_injective _
-    (hz.symm.trans (List.getLast?_eq_some_getLast (List.cons_ne_nil x l)))
-
-omit [DecidableEq ι] in
-/-- The last node of a nonempty list belongs to it. -/
-lemma mem_of_getLast? {x : ι} {l : List ι} {z : ι} (hz : (x :: l).getLast? = some z) :
-    z ∈ x :: l := by
-  rw [eq_getLast_of_getLast? hz]
-  exact List.getLast_mem _
-
 /-!
 
 ## B. The gain along a path is a family gain
@@ -114,7 +101,10 @@ lemma mem_of_getLast? {x : ι} {l : List ι} {z : ι} (hz : (x :: l).getLast? = 
 /-- The successor of the last node of a repetition-free list is its head. -/
 lemma formPerm_apply_last {x : ι} {l : List ι} {z : ι} (hz : (x :: l).getLast? = some z) :
     (x :: l).formPerm z = x := by
-  rw [eq_getLast_of_getLast? hz]
+  have hzlast : z = (x :: l).getLast (List.cons_ne_nil x l) :=
+    Option.some_injective _
+      (hz.symm.trans (List.getLast?_eq_some_getLast (List.cons_ne_nil x l)))
+  rw [hzlast]
   exact List.formPerm_apply_getLast x l
 
 /-- Away from the last node, adding a node at the front does not change the successor. -/
@@ -148,7 +138,12 @@ lemma pathGain_eq_familyGain (G : Matrix ι ι ℂ) :
       intro z hp hz
       have hz' : (y :: l').getLast? = some z := by rwa [List.getLast?_cons_cons] at hz
       have hxnot : x ∉ y :: l' := by simpa using (List.nodup_cons.mp hp).1
-      have hzmem : z ∈ y :: l' := mem_of_getLast? hz'
+      have hzmem : z ∈ y :: l' := by
+        have hzlast : z = (y :: l').getLast (List.cons_ne_nil y l') :=
+          Option.some_injective _
+            (hz'.symm.trans (List.getLast?_eq_some_getLast (List.cons_ne_nil y l')))
+        rw [hzlast]
+        exact List.getLast_mem _
       have hxz : x ≠ z := fun hcon => hxnot (hcon ▸ hzmem)
       have hxnotS : x ∉ (y :: l').toFinset.erase z := fun hcon =>
         hxnot (List.mem_toFinset.mp (Finset.mem_of_mem_erase hcon))

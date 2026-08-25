@@ -23,9 +23,9 @@ the sink to the source; the surviving ones expand exactly as before, except over
 than the sink, and adjoining the sink to each vertex set turns those terms into loop families that
 close through it. The extra minus sign is the one lost vertex in the exponent.
 
-This completes Mason's gain formula as a calculation about a linear system: both the numerator and
-the denominator are explicit finite sums over loop families, and their ratio is the entry of the
-inverse system matrix.
+This proves a routed-loop-family/cofactor form of Mason's algebraic quotient: both numerator and
+denominator are explicit finite sums over loop families, and their ratio is the totalized inverse
+entry. Its solved-response meaning requires a nonzero graph determinant.
 
 What is not proved here is the repackaging of the numerator's families as forward paths. That is a
 change of presentation, not of content, and it is what
@@ -57,11 +57,11 @@ S. M. Beillahi, U. Siddique, and S. Tahar, NSV 2016, LNCS 10152, Definition 6 (p
 is Physlib-original.
 
 Deliberately not claimed. `Physlib.SignalFlowGraph.masonNumerator`, the sum over forward paths, is
-still **not** proved equal to this numerator. The two differ only in how the closing family is
-presented: here as a permutation that routes the sink to the source, there as the forward path
-obtained by deleting the closing edge from the orbit of the sink. The remaining obligation is
-therefore `masonNumerator G s t = cyclicNumerator G s t`, which is a repackaging along
-`List.formPerm` and `Equiv.Perm.toList`, and it is not proved. Nothing here asserts it.
+still **not** proved equal to this numerator. The intended bridge presents a closing family here
+as a permutation routing the sink to the source and there as a forward path obtained by deleting
+the closing edge from the sink's orbit. The remaining obligation is
+`masonNumerator G s t = cyclicNumerator G s t`, together with the required index bijection along
+`List.formPerm` and `Equiv.Perm.toList`; it is not proved. Nothing here asserts it.
 
 This file is neutral mathematics and imports no physics.
 
@@ -132,7 +132,8 @@ lemma prod_updateRow (G : Matrix ι ι ℂ) (s t : ι) (σ : Equiv.Perm ι) :
   · rw [if_pos h, ← Finset.prod_erase_mul _ _ (Finset.mem_univ t), h, Matrix.updateRow_self,
       Pi.single_eq_same, mul_one]
     refine Finset.prod_congr rfl fun i hi => ?_
-    have hne : σ i ≠ s := fun hcon => (Finset.mem_erase.mp hi).1 (σ.injective (hcon.trans h.symm))
+    have hne : σ i ≠ s := fun hcon =>
+      (Finset.mem_erase.mp hi).1 (σ.injective (hcon.trans h.symm))
     exact congrFun (Matrix.updateRow_ne hne) i
   · rw [if_neg h]
     refine Finset.prod_eq_zero (Finset.mem_univ (σ.symm s)) ?_
@@ -214,8 +215,9 @@ theorem cyclicNumerator_eq_adjugate (G : Matrix ι ι ℂ) (s t : ι) :
       · rw [if_neg hsupp, if_neg hsupp, mul_zero, neg_zero]
     · rw [if_neg hrt, if_neg hrt, neg_zero]
 
-/-- Mason's formula in loop-family form: the gain between two nodes is the numerator over the
-graph determinant, both explicit alternating sums over families of pairwise non-touching loops. -/
+/-- The totalized inverse entry in loop-family form: the numerator over the graph determinant,
+both explicit alternating sums over families of pairwise non-touching loops. Its interpretation
+as a solved transfer requires a nonzero graph determinant. -/
 theorem gain_eq_cyclicNumerator_div_graphDet (G : Matrix ι ι ℂ) (s t : ι) :
     gain G s t = cyclicNumerator G s t / graphDet G := by
   rw [gain_eq_adjugate_div_graphDet, cyclicNumerator_eq_adjugate]

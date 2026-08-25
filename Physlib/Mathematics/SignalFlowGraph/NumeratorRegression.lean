@@ -13,15 +13,14 @@ public import Physlib.Mathematics.SignalFlowGraph.Numerator
 
 ## i. Overview
 
-The two-node feedback graph is carried through the loop-family form of Mason's formula. Its
-numerator is the forward gain and its denominator is one minus the loop gain, and the quotient
-agrees with the entry of the inverse system matrix that was computed from the adjugate in the
-first regression file.
+The two-node feedback graph specializes the general cofactor theorem for the routed-loop-family
+numerator. Its numerator is the forward gain and its denominator is one minus the loop gain, and
+the quotient agrees algebraically with the totalized inverse entry from the first regression
+file. This is not an independent evaluation of the routed-family definition.
 
-The same example also settles, for this graph, the one identity that the general development
-still leaves open: the forward-path sum and the loop-family sum agree. So the open statement is
-not merely plausible, it has a proved instance, and the two presentations of the numerator have
-been checked against each other on a graph where both are computable.
+The same example settles, for this graph, the one identity that the general development still
+leaves open: the forward-path sum and the routed-loop-family cofactor expression agree. It is a
+proved specialization, while a definition-level routed-family enumeration remains open.
 
 ## ii. Key results
 
@@ -61,13 +60,14 @@ open Matrix
 -/
 
 /-- The loop-family numerator of the two-node feedback graph is its forward gain. -/
-theorem cyclicNumerator_twoNodeLoop (a b : ℂ) :
+lemma cyclicNumerator_twoNodeLoop (a b : ℂ) :
     cyclicNumerator (twoNodeLoop a b) 0 1 = a := by
   rw [cyclicNumerator_eq_adjugate, systemMatrix_twoNodeLoop, adjugate_fin_two_of]
   simp
 
-/-- Mason's formula in loop-family form for the two-node feedback graph. -/
-theorem gain_eq_cyclicNumerator_div_twoNodeLoop (a b : ℂ) :
+/-- The totalized loop-family quotient for the two-node feedback graph. Its solved-response
+interpretation requires `1 - a * b ≠ 0`. -/
+lemma gain_eq_cyclicNumerator_div_twoNodeLoop (a b : ℂ) :
     gain (twoNodeLoop a b) 0 1 = a / (1 - a * b) := by
   rw [gain_eq_cyclicNumerator_div_graphDet, cyclicNumerator_twoNodeLoop, graphDet_twoNodeLoop]
 
@@ -80,12 +80,12 @@ theorem gain_eq_cyclicNumerator_div_twoNodeLoop (a b : ℂ) :
 /-- For the two-node feedback graph the forward-path sum and the loop-family sum agree. This is an
 instance of the identity that the general development leaves open, so the open statement is
 supported by a proved case rather than only by its plausibility. -/
-theorem masonNumerator_eq_cyclicNumerator_twoNodeLoop (a b : ℂ) :
+lemma masonNumerator_eq_cyclicNumerator_twoNodeLoop (a b : ℂ) :
     masonNumerator (twoNodeLoop a b) 0 1 = cyclicNumerator (twoNodeLoop a b) 0 1 := by
   rw [masonNumerator_twoNodeLoop, cyclicNumerator_twoNodeLoop]
 
 /-- Consequently Mason's quotient in path form and in loop-family form agree for this graph. -/
-theorem masonGain_eq_cyclicNumerator_div_twoNodeLoop (a b : ℂ) :
+lemma masonGain_eq_cyclicNumerator_div_twoNodeLoop (a b : ℂ) :
     masonGain (twoNodeLoop a b) 0 1
       = cyclicNumerator (twoNodeLoop a b) 0 1 / graphDet (twoNodeLoop a b) := by
   rw [masonGain, masonNumerator_eq_cyclicNumerator_twoNodeLoop]

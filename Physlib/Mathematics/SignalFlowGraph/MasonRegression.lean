@@ -13,19 +13,15 @@ public import Physlib.Mathematics.SignalFlowGraph.Mason
 
 ## i. Overview
 
-The single feedback loop is checked end to end, and the point of the check is that the two sides
-are reached by routes that never meet. The left side is the entry `a / (1 - a * b)` of the inverse
-system matrix, computed from the adjugate of a two-by-two matrix. The right side is the quotient
-of a path sum by a loop sum: the numerator came from the decidable enumeration of forward paths
-and the denominator from the alternating sum over families of non-touching loops. Neither
-computation mentions the other, so their agreement is evidence rather than restatement.
+The single feedback loop is checked end to end. The inverse-system entry and forward-path
+numerator are computed separately; the denominator is then obtained through the general theorem
+identifying the loop-family sum with the system determinant. This is a specialization of the
+proved bridge, not an independent definition-level evaluation of the loop-family enumeration.
 
-The remaining examples audit the loop families themselves. Three disjoint self-loops produce all
-three orders of the alternating sum with the expected signs. A two-node graph carrying both
-self-loops and a two-cycle produces three first-order loops but only **one** second-order term,
-because the two-cycle touches both self-loops and so forms a non-touching pair with neither; a
-development that summed over all pairs of loops rather than over non-touching pairs would get an
-extra term here and fail.
+The remaining examples specialize the determinant bridge to the expected closed forms. Three
+disjoint self-loops produce all three alternating orders. A two-node matrix with both self-loop
+and two-cycle entries has one second-order self-loop product. Direct evaluation of the
+`loopFamilies` definition remains separate regression work.
 
 The last example returns to unit loop gain, where the graph determinant vanishes, and connects it
 to the failure of unique solvability proved in the first regression file.
@@ -48,9 +44,10 @@ to the failure of unique solvability proved in the first regression file.
 
 ## iv. References
 
-The agreement checked in section A is `goal.md` section I.3 regression row G-01, "Mason gain
-equals the matrix-inverse transfer for representative graphs". The audits in section B are row
-G-03, "self-loops, touching loops, and non-touching loop families have the audited gains/signs".
+Section A partially exercises `goal.md` section I.3 regression row G-01 by combining the
+forward-path computation with the proved determinant bridge. Section B checks expected matrix
+specializations of that bridge, but does not independently discharge row G-03's definition-level
+loop-family audit.
 
 Row G-02, "distinct parallel branches remain distinct in compilation and Mason enumeration", is
 **not** addressed here and cannot be, because the loops and paths of this development are
@@ -78,24 +75,23 @@ open Matrix
 -/
 
 /-- The loop sum for the two-node feedback graph is one minus its loop gain. -/
-theorem graphDet_twoNodeLoop (a b : ℂ) : graphDet (twoNodeLoop a b) = 1 - a * b := by
+lemma graphDet_twoNodeLoop (a b : ℂ) : graphDet (twoNodeLoop a b) = 1 - a * b := by
   rw [graphDet_eq_det, det_systemMatrix_twoNodeLoop]
 
 /-- Mason's quotient for the two-node feedback graph. -/
-theorem masonGain_twoNodeLoop (a b : ℂ) :
+lemma masonGain_twoNodeLoop (a b : ℂ) :
     masonGain (twoNodeLoop a b) 0 1 = a / (1 - a * b) := by
   rw [masonGain, masonNumerator_twoNodeLoop, graphDet_twoNodeLoop]
 
-/-- The matrix-inverse gain and Mason's quotient agree for the single feedback loop. The left side
-was computed from the adjugate of the system matrix and the right side from a forward-path sum
-divided by a loop sum, with no step in common. -/
-theorem gain_eq_masonGain_twoNodeLoop (a b : ℂ) :
+/-- The totalized matrix-inverse expression and Mason quotient agree for the single feedback
+loop. When `1 - a * b ≠ 0`, this equality has solved-response semantics. -/
+lemma gain_eq_masonGain_twoNodeLoop (a b : ℂ) :
     gain (twoNodeLoop a b) 0 1 = masonGain (twoNodeLoop a b) 0 1 := by
   rw [gain_twoNodeLoop, masonGain_twoNodeLoop]
 
 /-- Equivalently, the forward-path sum computes the cofactor of the system matrix for this
 graph. -/
-theorem masonNumerator_eq_adjugate_twoNodeLoop {a b : ℂ} (h : a * b ≠ 1) :
+lemma masonNumerator_eq_adjugate_twoNodeLoop {a b : ℂ} (h : a * b ≠ 1) :
     masonNumerator (twoNodeLoop a b) 0 1 = (systemMatrix (twoNodeLoop a b)).adjugate 1 0 := by
   have hdet : graphDet (twoNodeLoop a b) ≠ 0 := by
     rw [graphDet_twoNodeLoop]
@@ -111,9 +107,9 @@ theorem masonNumerator_eq_adjugate_twoNodeLoop {a b : ℂ} (h : a * b ≠ 1) :
 /-- Three disjoint self-loops. -/
 def diagThree (c d e : ℂ) : Matrix (Fin 3) (Fin 3) ℂ := !![c, 0, 0; 0, d, 0; 0, 0, e]
 
-/-- Three disjoint self-loops produce all three orders of the alternating sum, with alternating
-signs: the single loops, the three non-touching pairs, and the one non-touching triple. -/
-theorem graphDet_diagThree (c d e : ℂ) :
+/-- The determinant bridge specializes on three diagonal entries to the expected three orders of
+the alternating sum. -/
+lemma graphDet_diagThree (c d e : ℂ) :
     graphDet (diagThree c d e)
       = 1 - (c + d + e) + (c * d + c * e + d * e) - c * d * e := by
   rw [graphDet_eq_det, systemMatrix]
@@ -128,14 +124,13 @@ theorem graphDet_diagThree (c d e : ℂ) :
 /-- A two-node graph carrying both self-loops and a two-cycle. -/
 def fullTwoNode (c d f g : ℂ) : Matrix (Fin 2) (Fin 2) ℂ := !![c, f; g, d]
 
-/-- The graph with two self-loops and a two-cycle has three first-order loops but only one
-second-order term. The two-cycle touches both self-loops, so it pairs with neither; a development
-that summed over all pairs of loops instead of over non-touching pairs would produce extra terms
-here. -/
-theorem graphDet_fullTwoNode (c d f g : ℂ) :
+/-- The determinant bridge specializes on a full two-node matrix to the expected self-loop and
+two-cycle expression. -/
+lemma graphDet_fullTwoNode (c d f g : ℂ) :
     graphDet (fullTwoNode c d f g) = 1 - c - d - f * g + c * d := by
   rw [graphDet_eq_det, systemMatrix]
-  have hmat : (1 : Matrix (Fin 2) (Fin 2) ℂ) - fullTwoNode c d f g = !![1 - c, -f; -g, 1 - d] := by
+  have hmat : (1 : Matrix (Fin 2) (Fin 2) ℂ) - fullTwoNode c d f g
+      = !![1 - c, -f; -g, 1 - d] := by
     ext i j
     fin_cases i <;> fin_cases j <;> simp [fullTwoNode]
   rw [hmat, det_fin_two_of]
@@ -149,12 +144,12 @@ theorem graphDet_fullTwoNode (c d f g : ℂ) :
 
 /-- At unit loop gain the graph determinant vanishes, which is the loop-side reading of the
 failure of unique solvability recorded in the first regression file. -/
-theorem graphDet_twoNodeLoop_one : graphDet (twoNodeLoop 1 1) = 0 := by
+lemma graphDet_twoNodeLoop_one : graphDet (twoNodeLoop 1 1) = 0 := by
   rw [graphDet_twoNodeLoop]
   ring
 
 /-- At unit loop gain the node equations do not have a unique solution for every input. -/
-theorem not_existsUnique_of_graphDet_twoNodeLoop_one :
+lemma not_existsUnique_of_graphDet_twoNodeLoop_one :
     ¬ ∀ v : Fin 2 → ℂ, ∃! x, IsNodeSolution (twoNodeLoop 1 1) v x := by
   rw [← graphDet_ne_zero_iff]
   exact fun hcon => hcon graphDet_twoNodeLoop_one
