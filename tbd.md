@@ -1165,12 +1165,18 @@ PR unless maintainers explicitly ask to retain it.
   Prove exact connected, omitted-row, omitted-column, arbitrary-input, and selected-input action;
   both connected range-projector Gram laws; exact output power; global normalized-modal passivity;
   and power equality precisely on inputs supported on connected outgoing channels.
-- [x] Define the explicit external-channel complement and its typed incident injection. Prove the
-  complete connected/external channel partition, identify external channels with the dependent
-  sum of modes over unconnected ports, and prove exact injection, Gram, isometry, `C b + E u`
-  coordinate, and additive normalized-power laws. Preserve the empty-mode channel-versus-port
-  distinction. Do not mark the broad netlist API-map requirement complete before the remaining
-  netlist invariants exist.
+- [x] Define the explicit external-channel complement, typed incident injection `E_in`, outgoing
+  exposure `E_out`, and restriction readout `E_outᴴ`. Prove complete connected/external endpoint
+  partitions, identify external channels with the dependent sum of modes over unconnected ports,
+  and prove exact action, Gram, isometry, cross-zero, projector-completeness, `C b + E_in u`, and
+  additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. Do not
+  mark the broad netlist API-map requirement complete before the remaining netlist invariants
+  exist.
+- [ ] Before upstreaming the external-output completion, prepare a stack in this order: the neutral
+  complementary-range-projector lemma in `Mode/Embedding`; outgoing endpoint partition, exposure,
+  and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
+  complex-amplitude regressions. The connected fork milestone may remain integrated while the
+  human review and maintainer-facing split are pending.
 - [x] Define implicit complex-linear component behavior independently of invertibility, embed
   arbitrary complex-linear maps and finite mode transforms as graph behaviors, and prove identity,
   relational series, independent parallel, graph-composition, matrix-cascade, and block-diagonal
@@ -1300,21 +1306,23 @@ PR unless maintainers explicitly ask to retain it.
   preserved iff every complement outgoing amplitude vanishes. The strict-decrease witness and
   connected equality witness must not be summarized as a strict contraction. Confirm that an empty
   exposed port need not create a complement channel.
-- [ ] Human-check the external-channel complement and incident injection before upstreaming.
+- [ ] Human-check the external-channel complement and both endpoint exposures before upstreaming.
   Confirm that `ExternalChannel` means external only to the selected connection-family range, not
   spatial exterior, radiation, physical accessibility, or completeness of an electromagnetic mode
   basis. Recheck the connected/external partition equivalence, the equivalence with the dependent
   sum of modes over unconnected ports, and the nonempty fixture's unique exposed channel. Verify
-  the external coefficient `2 + I`, its power five before and after injection, the connected zero,
-  the `C b + E u` connected value `2 + I`, external value one, and total normalized modal power
-  six. In the empty-fiber fixture confirm simultaneously that the third physical port is
+  the incident coefficient `2 + I`, its power five before and after injection, the connected zero,
+  the outgoing coefficient `3 - 2I`, its exact unconjugated adjoint readout, both cross-zero laws,
+  both connected/external projector sums, the `C b + E_in u` connected value `2 + I`, external
+  value one, and total normalized modal power six. In the empty-fiber fixture confirm
+  simultaneously that the third physical port is
   unconnected, the connected-channel embedding is surjective, and the external-channel type is
-  empty. Treat `E` as coordinate zero extension, not a source, termination, detector, boundary
-  condition, or feedback solution. Confirm `Eᴴ * E = 1` while `E * Eᴴ` is the external range
-  projector and generally not the ambient identity; do not call `E` unitary, surjective, or a
-  lossless device. Complement outgoing power omitted by `C b` is not absorption, and external
-  outgoing readout remains future work. The broad netlist and elimination requirements remain
-  open.
+  empty. Treat `E_in` and `E_out` as coordinate zero extensions, and `E_outᴴ` as coordinate
+  restriction—not as a source, termination, detector, boundary condition, or feedback solution.
+  Confirm `E_outᴴ * E_out = 1` while `E_out * E_outᴴ` is the external outgoing range projector;
+  the analogous incident laws hold for `E_in`. Do not call either exposure unitary, surjective, or
+  a lossless device. Complement outgoing power omitted by `C b` is not absorption. The broad
+  netlist and elimination requirements remain open.
 - [ ] Human-check the implicit linear-behavior layer before upstreaming. Confirm that membership
   orders amplitudes as `(input, output)`, `first.series second` hides one exact intermediate
   amplitude, and its transform graph and extracted functional map compose as `second * first` and
@@ -1336,7 +1344,10 @@ PR unless maintainers explicitly ask to retain it.
   complex nonsymmetric zero-extended action `[3 - I, 0, 11 - I]`. Confirm that restriction is not
   described as physical absorption, zero extension is not described as surjective or unitary,
   `E * R` is not collapsed to the ambient identity, and the exact power-equality iff has no hidden
-  surjectivity or nonempty-family premise.
+  surjectivity or nonempty-family premise. For
+  `rangeProjector_add_rangeProjector_eq_one`, confirm that the supplied sum equivalence identifies
+  the two embeddings on both summands and therefore proves both disjointness and exhaustive
+  coverage; the theorem makes no claim for embeddings that are merely disjoint.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
 - [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
@@ -1352,9 +1363,9 @@ PR unless maintainers explicitly ask to retain it.
   the ambient norm inherited by the raw matrix alias is not that operator norm.
 - [x] Represent component behavior independently of invertibility, with graph behaviors only as a
   proved functional specialization.
-- [ ] For network equations `b = S a` and `a = C b + E u`, define well-posedness by unique
-  solvability of `(1 - C * S) a = E u`; a contraction estimate may be sufficient but must not be
-  necessary.
+- [ ] For network equations `b = S a`, `a = C b + E_in u`, and `y = E_outᴴ b`, define
+  well-posedness by unique internal solvability of `(1 - C * S) a = E_in u`; a contraction estimate
+  may be sufficient but must not be necessary.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,

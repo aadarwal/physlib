@@ -14,8 +14,9 @@ public import Physlib.Optics.Network.PartialRoutingRegression
 ## i. Overview
 
 The existing dependent three-port fixture has four connected channels and one external channel.
-This file identifies that complement exactly, tests the incident injection with a genuinely complex
-coefficient, and checks the coordinate and power laws of the expression `C b + E u`.
+This file identifies that complement exactly, distinguishes incident injection from outgoing
+exposure, tests complex output readout without conjugating the amplitude, and checks the coordinate
+and power laws of the expression `C b + E_in u`.
 
 A second valid three-port family gives its unconnected third port an empty mode fiber. Its connected
 channel embedding is surjective even though the third physical port is unused. This fixes the
@@ -23,15 +24,16 @@ channel-versus-port distinction: an unconnected empty port contributes no extern
 
 ## ii. Scope
 
-These are finite normalized-coordinate regressions. The external injection supplies no source,
-termination, outgoing extraction, electromagnetic normalization, or feedback solution.
+These are finite normalized-coordinate regressions. The external endpoint transforms supply no
+source, termination, detector, electromagnetic normalization, or feedback solution.
 
 ## iii. Table of contents
 
 - A. The sole nonempty external channel
 - B. Exact incident injection
-- C. The assembled `C b + E u` incident amplitude
-- D. An unconnected port with an empty mode fiber
+- C. Exact outgoing exposure and readout
+- D. The assembled `C b + E_in u` incident amplitude
+- E. An unconnected port with an empty mode fiber
 
 -/
 
@@ -159,7 +161,180 @@ lemma externalChannelRegression_injection_power :
 
 /-!
 
-## C. The assembled `C b + E u` incident amplitude
+## C. Exact outgoing exposure and readout
+
+-/
+
+/-- The external outgoing exposure has unit gain at the exposed coordinate. -/
+lemma externalChannelRegression_outgoingInjection_entry_exposed :
+    partialRoutingRegressionFamily.externalOutgoingInjection
+        (Outgoing.mk partialRoutingRegressionExposed)
+        (Outgoing.mk partialRoutingRegressionExternal) = 1 := by
+  exact partialRoutingRegressionFamily.externalOutgoingInjection_entry_external _
+
+/-- The external outgoing exposure has zero gain into a connected coordinate. -/
+lemma externalChannelRegression_outgoingInjection_entry_connected :
+    partialRoutingRegressionFamily.externalOutgoingInjection
+        (Outgoing.mk partialRoutingRegressionWestZero)
+        (Outgoing.mk partialRoutingRegressionExternal) = 0 := by
+  change partialRoutingRegressionFamily.externalOutgoingInjection
+      (Outgoing.mk (partialRoutingRegressionFamily.channelEmbedding
+        partialRoutingRegressionConnectedWestZero))
+      (Outgoing.mk partialRoutingRegressionExternal) = 0
+  exact partialRoutingRegressionFamily.externalOutgoingInjection_entry_connected _ _
+
+/-- A genuinely complex external outgoing amplitude used to test exposure and readout. -/
+def externalChannelRegressionOutgoingPulse :
+    ModeAmplitude (Outgoing partialRoutingRegressionFamily.ExternalChannel) :=
+  PiLp.single 2 (Outgoing.mk partialRoutingRegressionExternal) (3 - 2 * Complex.I)
+
+/-- Outgoing exposure preserves the complex coefficient at the ambient external coordinate. -/
+lemma externalChannelRegression_outgoingInjection_apply_exposed :
+    partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+        externalChannelRegressionOutgoingPulse
+          (Outgoing.mk partialRoutingRegressionExposed) = 3 - 2 * Complex.I := by
+  change partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+      externalChannelRegressionOutgoingPulse
+        (Outgoing.mk partialRoutingRegressionExternal.1) = 3 - 2 * Complex.I
+  rw [partialRoutingRegressionFamily.externalOutgoingInjection_apply_external]
+  simp [externalChannelRegressionOutgoingPulse]
+
+/-- Outgoing exposure vanishes at a connected ambient coordinate. -/
+lemma externalChannelRegression_outgoingInjection_apply_connected :
+    partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+        externalChannelRegressionOutgoingPulse
+          (Outgoing.mk partialRoutingRegressionWestZero) = 0 := by
+  change partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+      externalChannelRegressionOutgoingPulse
+        (Outgoing.mk (partialRoutingRegressionFamily.channelEmbedding
+          partialRoutingRegressionConnectedWestZero)) = 0
+  exact partialRoutingRegressionFamily.externalOutgoingInjection_apply_connected _ _
+
+/-- Adjoint readout after exposure returns the exact complex outgoing amplitude, with no complex
+conjugation. -/
+lemma externalChannelRegression_outgoingReadout_afterInjection :
+    partialRoutingRegressionFamily.externalOutgoingReadout.toLinearMap
+        (partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+          externalChannelRegressionOutgoingPulse) =
+      externalChannelRegressionOutgoingPulse := by
+  rw [← ModeTransform.toLinearMap_mul_apply,
+    partialRoutingRegressionFamily.externalOutgoingReadout_mul_externalOutgoingInjection]
+  simp
+
+/-- In particular, output readout retains the coefficient `3 - 2i` rather than conjugating it. -/
+lemma externalChannelRegression_outgoingReadout_coefficient :
+    partialRoutingRegressionFamily.externalOutgoingReadout.toLinearMap
+        (partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+          externalChannelRegressionOutgoingPulse)
+          (Outgoing.mk partialRoutingRegressionExternal) = 3 - 2 * Complex.I := by
+  rw [externalChannelRegression_outgoingReadout_afterInjection]
+  simp [externalChannelRegressionOutgoingPulse]
+
+/-- The connected complex pulse included in the ambient outgoing coordinate space. -/
+def externalChannelRegressionConnectedOutgoing :
+    ModeAmplitude (Outgoing partialRoutingRegressionPortFamily.Channel) :=
+  (ModeTransform.zeroExtension
+    partialRoutingRegressionFamily.outgoingChannelEmbedding).toLinearMap
+      partialRoutingRegressionConnectedPulse
+
+/-- An ambient outgoing amplitude with independent connected and external complex coefficients. -/
+def externalChannelRegressionMixedOutgoing :
+    ModeAmplitude (Outgoing partialRoutingRegressionPortFamily.Channel) :=
+  externalChannelRegressionConnectedOutgoing +
+    partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+      externalChannelRegressionOutgoingPulse
+
+/-- External output readout rejects the connected ambient outgoing subspace. -/
+lemma externalChannelRegression_outgoingReadout_connected_eq_zero :
+    partialRoutingRegressionFamily.externalOutgoingReadout.toLinearMap
+        externalChannelRegressionConnectedOutgoing = 0 := by
+  rw [partialRoutingRegressionFamily.externalOutgoingReadout_apply]
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨external⟩
+  rw [ModeAmplitude.restrictEmbedding_apply]
+  apply ModeTransform.zeroExtension_apply_of_not_mem_range
+  intro hConnected
+  rw [partialRoutingRegressionFamily.outgoing_mk_mem_range_channelEmbedding_iff]
+    at hConnected
+  exact external.2 hConnected
+
+/-- Readout of a mixed ambient outgoing amplitude keeps only the external coefficient. -/
+lemma externalChannelRegression_outgoingReadout_mixed :
+    partialRoutingRegressionFamily.externalOutgoingReadout.toLinearMap
+        externalChannelRegressionMixedOutgoing =
+      externalChannelRegressionOutgoingPulse := by
+  rw [externalChannelRegressionMixedOutgoing, map_add,
+    externalChannelRegression_outgoingReadout_connected_eq_zero,
+    externalChannelRegression_outgoingReadout_afterInjection]
+  simp
+
+/-- Routing of the same mixed amplitude keeps the connected coefficient at its exact mate. -/
+lemma externalChannelRegression_routing_mixed_connected :
+    partialRoutingRegressionFamily.partialRouting.toLinearMap
+        externalChannelRegressionMixedOutgoing
+          (Incident.mk partialRoutingRegressionEastFalse) = 2 + Complex.I := by
+  rw [externalChannelRegressionMixedOutgoing, map_add, PiLp.add_apply]
+  change partialRoutingRegressionFamily.partialRouting.toLinearMap
+          externalChannelRegressionConnectedOutgoing
+          (Incident.mk partialRoutingRegressionEastFalse) +
+      partialRoutingRegressionFamily.partialRouting.toLinearMap
+          (partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+            externalChannelRegressionOutgoingPulse)
+          (Incident.mk partialRoutingRegressionEastFalse) = 2 + Complex.I
+  have hExternal :
+      partialRoutingRegressionFamily.partialRouting.toLinearMap
+          (partialRoutingRegressionFamily.externalOutgoingInjection.toLinearMap
+            externalChannelRegressionOutgoingPulse) = 0 := by
+    rw [← ModeTransform.toLinearMap_mul_apply,
+      partialRoutingRegressionFamily.partialRouting_mul_externalOutgoingInjection]
+    simp
+  rw [hExternal, PiLp.zero_apply, add_zero]
+  simpa only [externalChannelRegressionConnectedOutgoing] using
+    partialRoutingRegression_connectedPulse_action
+
+/-- Routing of the mixed amplitude still vanishes at the external incident coordinate. -/
+lemma externalChannelRegression_routing_mixed_external :
+    partialRoutingRegressionFamily.partialRouting.toLinearMap
+        externalChannelRegressionMixedOutgoing
+          (Incident.mk partialRoutingRegressionExposed) = 0 :=
+  partialRoutingRegressionFamily.partialRouting_apply_of_incident_not_mem_range
+    externalChannelRegressionMixedOutgoing partialRoutingRegressionExposed
+      partialRoutingRegression_exposed_not_mem_range
+
+/-- Internal routing annihilates the complete external outgoing exposure. -/
+lemma externalChannelRegression_routing_mul_outgoingInjection :
+    partialRoutingRegressionFamily.partialRouting *
+      partialRoutingRegressionFamily.externalOutgoingInjection = 0 :=
+  partialRoutingRegressionFamily.partialRouting_mul_externalOutgoingInjection
+
+/-- External incident readout annihilates the complete internal-routing range. -/
+lemma externalChannelRegression_incidentReadout_mul_routing :
+    Matrix.conjTranspose partialRoutingRegressionFamily.externalIncidentInjection *
+      partialRoutingRegressionFamily.partialRouting = 0 :=
+  partialRoutingRegressionFamily.externalIncidentInjection_conjTranspose_mul_partialRouting
+
+/-- Connected and external outgoing projectors resolve the five ambient coordinates. -/
+lemma externalChannelRegression_outgoing_projector_completeness :
+    Matrix.conjTranspose partialRoutingRegressionFamily.partialRouting *
+        partialRoutingRegressionFamily.partialRouting +
+      partialRoutingRegressionFamily.externalOutgoingInjection *
+        Matrix.conjTranspose partialRoutingRegressionFamily.externalOutgoingInjection = 1 :=
+  PortConnectionFamily.partialRouting_conjTranspose_mul_self_add_externalOutgoingProjector
+    partialRoutingRegressionFamily
+
+/-- Connected and external incident projectors resolve the five ambient coordinates. -/
+lemma externalChannelRegression_incident_projector_completeness :
+    partialRoutingRegressionFamily.partialRouting *
+        Matrix.conjTranspose partialRoutingRegressionFamily.partialRouting +
+      partialRoutingRegressionFamily.externalIncidentInjection *
+        Matrix.conjTranspose partialRoutingRegressionFamily.externalIncidentInjection = 1 :=
+  PortConnectionFamily.partialRouting_mul_conjTranspose_add_externalIncidentProjector
+    partialRoutingRegressionFamily
+
+/-!
+
+## D. The assembled `C b + E_in u` incident amplitude
 
 -/
 
@@ -227,7 +402,7 @@ lemma externalChannelRegression_assembly_power :
 
 /-!
 
-## D. An unconnected port with an empty mode fiber
+## E. An unconnected port with an empty mode fiber
 
 -/
 
