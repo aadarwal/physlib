@@ -282,8 +282,8 @@ lemma append_channelEmbedding_inl (index : ι)
 lemma append_channelEmbedding_inr (index : κ)
     (local' : (outer.connection index).LocalChannel) :
     (inner.append outer).channelEmbedding ⟨Sum.inr index, local'⟩ =
-      ((inner.boundaryChannelEquiv (outer.channelEmbedding ⟨index, local'⟩)
-        : inner.ExternalChannel) : P.Channel) := by
+      ((inner.boundaryChannelEquiv
+        (outer.channelEmbedding ⟨index, local'⟩) : inner.ExternalChannel) : P.Channel) := by
   rcases local' with mode | mode <;> rfl
 
 /-- The flattened family leaves unconnected exactly the ports the outer family leaves
