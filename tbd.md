@@ -1491,6 +1491,45 @@ PR unless maintainers explicitly ask to retain it.
   transforms; and that the gain-two failure uses a complete two-port input rather than assuming
   the classifier's converse. Upstream this layer and its regressions only after the algebraic
   behavior/realization stack.
+- [ ] Human-check the fixed-carrier matched-propagation core before upstreaming. Confirm that its
+  coefficient is `a * exp (-I * phi)` in Physlib's positive-time convention, that both directions
+  use the same coefficient as an explicit model choice rather than a reciprocity result, and that
+  "matched" means only same-mode transmission with zero declared reflection. It is a
+  point-frequency phase law, not a time delay, group-delay, causality, dispersion, bandwidth,
+  material, or impedance-matching theorem. The algebraic scattering law still uses raw typed
+  two-port channel labels; audit the separately stacked component-owned physical-port bridge
+  before claiming automatic `ScatteringComponentFamily` plug-in completeness. Upstream the
+  algebraic behavior/realization stack before either physical-port or modal-power transport.
+- [ ] Human-check the matched-propagation physical-port presentation separately. Confirm that
+  `Port.left` and `Port.right` are distinct owned ports, each carrying a separately tagged copy of
+  the same declared mode family, and that
+  `channelEquiv` sends the raw left summand to the physical left port and the raw right summand to
+  the physical right port, and that both endpoint equivalences point from split coordinates to
+  physical channels. Confirm the behavior remains independently specified under transport, the
+  scattering graph realizes it, and the one-component family uses the public physical scattering
+  law without another relabeling. The physical wrapper adds no power or source claim by itself.
+- [ ] Human-check the matched-propagation physical modal-power transport after the physical core.
+  Confirm that amplitude relabeling preserves normalized modal power and that passivity and
+  losslessness are transported iff-invariant coordinate properties. Do not treat owned ports as
+  an electromagnetic normalization, omitted-channel completeness theorem, or material-loss model.
+- [ ] Independently verify the DATE 2014 and SysCon 2015 source bridge for propagation notation.
+  In particular, check whether the source `alpha` is a power-attenuation coefficient and its
+  `tau = exp (-alpha * Lc / 2)` is consequently a field-amplitude factor; audit the phase sign,
+  transfer-chain direction, port order, and reference-plane mapping before citing either source.
+  Do not identify the source continuity state with Physlib's incident-to-outgoing scattering law.
+- [ ] Human-check the ideal directional-coupler convention before upstreaming. Confirm that
+  `crossCoefficient = -I * k`, the mixer is `(t*x - I*k*y, -I*k*x + t*y)`, and the same mixer in
+  both propagation directions is an explicit model choice rather than a reciprocity theorem.
+  Check that `t² + k² ≤ 1` is exactly the normalized-modal passivity gate, equality is the
+  lossless gate, and nonnegative `t` and `k` are a canonical parameter convention rather than a
+  prerequisite for the algebraic cancellation. The four owned ports must remain independently
+  wireable; do not collapse the two arms into modes of one physical port.
+- [ ] Independently audit the directional-coupler source classification. The HOL corpus and the
+  DATE/SysCon materials use coupler coefficients inside system formulas but do not prove this
+  reusable behavior, realization, or power API. Update parity-ledger item IP-00 to point to the
+  shipped Physlib API while retaining its `no source` classification. Audit the source `-j`
+  sign and port order before citing it as motivation, and do not mark the separate beam-splitter,
+  reciprocity, material, bandwidth, or electromagnetic-normalization work complete.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
@@ -1512,6 +1551,26 @@ PR unless maintainers explicitly ask to retain it.
 - [ ] Split an upstream R1/R2 proposal into focused stacks. The exact worker cutoff grouped the
   physical/paraxial ray foundation, its regressions, the transfer/system layer, and its regressions
   into a fork-integration batch larger than the review guideline; those remain separable concepts.
+- [ ] Human-check the R3 cardinal-point source map before upstreaming. Confirm the shifted
+  object/image reference-plane signs, the distinct object- and image-space effective focal lengths
+  when `det M ≠ 1`, and every nonzero-power hypothesis against the cited primary source. The
+  implemented layer supplies behavioral specifications, realization, and uniqueness, but the
+  representative ophthalmic or telescope subsystem in `goal.md` remains open.
+- [ ] Human-check the R4 Gaussian source map before upstreaming. Confirm the positive-imaginary
+  `q` convention, wavelength scaling across unequal-index systems, carrier sign, waist and
+  wavefront-radius totalizations, and the paraxial-Helmholtz convention. The regressions connect
+  the `q` transport, beam width, and differential equation to the same stored beam; they do not
+  claim aperture power, polarization, higher modes, or a quantified Helmholtz-approximation error.
+- [ ] Human-check the R5 source and scope map before upstreaming. The shipped slice proves
+  matrix-power boundedness, a determinant-one strict-trace sufficient criterion, exact two-mirror
+  boundary cases, and a proof-gated fixed Gaussian beam. It is a matrix-level analogue rather than
+  literal parity with the source's reverse-list resonator unfolding and validity predicate. Keep
+  generic source-style unfolding, ring and phase-conjugate resonators, the fibre-ring case study,
+  Sylvester/Chebyshev powers, and the selected source case suites open.
+- [ ] Split upstream R3, R4, and R5 proposals by coherent concept. The fork integration batches
+  group theory files with large regression suites beyond the review-size guideline; preserve the
+  independently reviewable imaging, Gaussian-domain/transport, stability, two-mirror, and fixed-
+  beam layers rather than presenting the combined merge as one upstream change.
 
 ## Source and license checks
 

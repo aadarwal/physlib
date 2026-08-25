@@ -2067,9 +2067,9 @@ than by silently deleting phase-sensitive cross terms from complex amplitudes.
 
 #### N7. Reusable finite-mode components
 
-The reusable coupler, beam-splitter, and delay laws in this package are Physlib-original. The HOL
-corpus uses coupler and propagation coefficients as bare scalars inside larger formulas and proves
-no independently reusable component law for them.
+The reusable coupler, beam-splitter, and fixed-carrier propagation laws in this package are
+Physlib-original. The HOL corpus uses coupler and propagation coefficients as bare scalars inside
+larger formulas and proves no independently reusable component law for them.
 
 - [x] an algebraic reflectionless two-port substrate with arbitrary directional mode transforms,
   independently stated amplitude equations and an exact zero-reflection block realization; this
@@ -2079,9 +2079,25 @@ no independently reusable component law for them.
   classifications, with the directional hypotheses proved necessary as well as sufficient;
 - basic component definitions may start after N2a and the O2 direct-sum/reindexing support, before
   the general eliminator is complete;
-- matched propagation delay and attenuation;
+- [x] the algebraic fixed-carrier matched-propagation phase and normalized-modal-amplitude
+  transmission law on typed two-port channel labels, with independent directional equations, a
+  zero-reflection scattering realization, exact modal-power scaling, passivity in the valid
+  amplitude range, and losslessness at unit amplitude;
+- [x] the matched-propagation physical-port presentation, with owned left/right mode fibers,
+  pinned raw-to-physical channel coordinates, transported independent behavior and scattering,
+  exact realization, modal-power transport, and direct `ScatteringComponentFamily` consumption;
+- [x] an ideal real-quadrature directional-coupler law with explicit `-I` cross phase,
+  independent bidirectional behavior, reflectionless scattering realization, exact `t² + k²`
+  normalized-modal-power factor, passive/unitary parameter predicates, and losslessness;
+- [x] its four independently wireable physical-port presentation, pinned nested channel order,
+  exact behavior and scattering transport, and direct `ScatteringComponentFamily` consumption;
+- [ ] component-owned physical-port packaging for the remaining beam-splitter, mirror,
+  polarization, and interface primitives consumed by `ScatteringComponentFamily`;
+- [ ] frequency-parameterized propagation and actual time/group-delay statements under N5F, with
+  their frequency-domain, causality, and dispersion hypotheses explicit;
 - mirror and termination;
-- ideal directional coupler and beam splitter with explicit unitary parameter constraints;
+- a named beam-splitter specialization with its own optical-port behavior and explicit unitary
+  parameter constraints, rather than an alias claimed to satisfy the independent-specification rule;
 - polarization components embedded into multimode channels;
 - dielectric interface scattering connected to E6;
 - an independent behavioral specification for every component, followed by a realization lemma
@@ -2286,8 +2302,9 @@ parity ledger is discharged by a public declaration and regression.
 
 Lane ownership: a separate controller-managed worker develops R1--R5. The spine agent skips
 implementation in that lane and reviews and merges exact completed cutoffs presented by the
-controller. The R1/R2 ray and transfer foundations are integrated; the E5b cross-layer bridge and
-R3--R5 remain open.
+controller. The R1--R5 foundational slices are integrated. The E5b cross-layer bridge, R3's
+representative subsystem, source-style resonator unfolding, and the additional R5 resonator
+topologies remain open, so this milestone is still in progress.
 
 #### R1. Physical and paraxial rays
 
@@ -2647,7 +2664,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N6a conservation | blocked | N2a, N5; E3b for physical meaning | passive/lossless composition closure suite |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
 | N6c coherent/incoherent observables | blocked | P2a, N5, N6a | coherency transport and decorrelation suite |
-| N7 components | blocked | N2a, O2; E6 only for interface specialization | specification, realization, passivity, and losslessness suite |
+| N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
 | S1 Mach-Zehnder (Physlib extension) | blocked | N5, N6a, N7 | transfer and power suite; no HOL source |
 | S2/S3 microrings | blocked | S0, N5, N5F, N6a, N7 | pointwise response and observable suite |
@@ -2658,7 +2675,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
-| R1--R5 ray/beam foundations | in progress: R1/R2 core integrated; E5b bridge and R3--R5 open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
+| R1--R5 ray/beam foundations | in progress: the R1--R5 foundational slices are integrated, including proved paraxial approximation error, component-derived ABCD systems, cardinal-point specifications, physical-domain Gaussian transport, matrix-level bounded-ray stability, two-mirror boundary fixtures, and a proof-gated fixed Gaussian beam; the E5b bridge, an R3 representative subsystem, source-style resonator unfolding, ring and phase-conjugate resonators, and selected source case studies remain open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 
 ## O. Overall completion checklist

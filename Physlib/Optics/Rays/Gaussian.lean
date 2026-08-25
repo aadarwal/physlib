@@ -19,30 +19,33 @@ Rayleigh range positive, and it makes the ABCD denominator nonvanishing.
 
 The last point is the reason the domain is built into `Optics.GaussianBeam` rather than left as a
 side condition. The source development states the ABCD law `q' = (A q + B) / (C q + D)` with no
-hypothesis on the denominator. Here `Optics.abcdDenominator_ne_zero` *proves* the denominator is
+hypothesis on the denominator. Here `Optics.abcdDenominator_ne_zero` *proves* the condition left
+implicit there: the denominator is
 nonzero: if `C q + D` vanished then, `C` and `D` being real and `q.im` positive, `C` would vanish
-and then `D` too, which a system of nonzero determinant cannot do. So the missing hypothesis is
-not added as an assumption; it is discharged on the physical domain.
+and then `D` too, which a system of nonzero determinant cannot do. The condition is therefore
+discharged on the physical domain rather than added as an assumption.
 
 `Optics.im_abcdTransform_pos` is the companion domain statement: a system of positive determinant
 maps the physical domain into itself, because the imaginary part transforms by the determinant
-divided by the squared modulus of the denominator. Since a valid system has determinant
-`n₀ / n₁ > 0`, no application has to re-establish that its output beam is physical.
+divided by the squared modulus of the denominator. A valid system has determinant `n₀ / n₁ > 0`
+when it contains no phase-conjugating interface. The certified wrapper
+`Optics.GaussianBeam.transformSystem` discharges that condition from system validity.
 
-The wavelength transforms too. A system that changes refractive index changes the wavelength in
-the medium by the same ratio, so `GaussianBeam.transform` multiplies it by the determinant. That
-is what makes the beam radius continuous across a plane refracting surface, which
+The wavelength transforms too. For a valid non-phase-conjugating optical system, changing the
+refractive index changes the wavelength in the medium by the determinant's index ratio. The raw
+`GaussianBeam.transform` accepts any real matrix of positive determinant; its wavelength scaling
+has this optical interpretation only through `GaussianBeam.transformSystem`. The scaling makes
+the beam radius continuous across a plane refracting surface, as
 `Optics.beamRadius_transform_of_entries` records.
 
 Two further points where this development and its source differ, both recorded so the parity
 ledger can be audited rather than guessed at.
 
-First, the source's free-form interface constructor is unconditionally valid, so it admits a
-*singular* matrix, and with a total division the ABCD law would then assert `q' = 0`, which is
-physically wrong. The corresponding constructor here, `ParaxialInterface.prescribed`, carries the
-index-ratio determinant condition in its validity predicate, so a singular matrix is rejected as
-invalid rather than silently producing a zero beam parameter. That is a documented improvement
-over the source, and `Physlib.Optics.Rays.GaussianRegression` exhibits the rejected case.
+First, `ParaxialInterface.prescribed` carries the index-ratio determinant condition in its
+validity predicate, so a singular prescribed matrix is rejected rather than silently producing a
+zero beam parameter through totalized division. `Physlib.Optics.Rays.GaussianRegression` exhibits
+both the rejection and the junk algebraic result. No claim is made here about whether the source
+admits that same singular component; that comparison requires a separate source audit.
 
 Second, the positivity conditions live in different places. The source embeds them in its beam
 predicates; here they are fields of `Optics.GaussianBeam`. A port that hoists them onto theorem
@@ -58,11 +61,15 @@ to the Helmholtz equation, and this file makes no claim about that further step.
 ## ii. Key results
 
 - `Optics.abcdDenominator_ne_zero`: the ABCD denominator cannot vanish on the physical domain,
-  discharging the hypothesis the source omits.
+  discharging the condition the source leaves implicit.
 - `Optics.im_abcdTransform`: the imaginary part transforms by the determinant.
 - `Optics.im_abcdTransform_pos`: a system of positive determinant preserves the physical domain.
 - `Optics.GaussianBeam.inv_q_eq`: `1 / q = 1 / R - i λ / (π w²)`, tying the beam radius and
   wavefront curvature to the beam parameter.
+- `Optics.GaussianBeam.carrierWavenumber_mul_wavelength`: the wavelength and carrier wavenumber
+  of one beam obey `k λ = 2 π`.
+- `Optics.GaussianBeam.transformSystem`: transport through a valid ordered system with no
+  phase-conjugating interface.
 - `Optics.GaussianBeam.beamRadius_translation_of_isAtWaist`: `w(z) = w₀ √(1 + (z / z_R)²)`,
   derived from the ABCD law rather than defined.
 - `Optics.GaussianBeam.isAtWaist_transform_outputWaistDistance` and
@@ -122,6 +129,14 @@ structure GaussianBeam where
   /-- The physical domain of the complex beam parameter. -/
   q_im_pos : 0 < q.im
 
+/-- Two Gaussian beams are equal when their wavelengths and complex beam parameters agree. -/
+@[ext]
+lemma GaussianBeam.ext {b₁ b₂ : GaussianBeam} (hWavelength : b₁.wavelength = b₂.wavelength)
+    (hQ : b₁.q = b₂.q) : b₁ = b₂ := by
+  cases b₁
+  cases b₂
+  simp_all
+
 namespace GaussianBeam
 
 variable (b : GaussianBeam)
@@ -157,6 +172,26 @@ lemma rayleighRange_eq : b.rayleighRange = π * b.waistRadius ^ 2 / b.wavelength
   rw [waistRadius, Real.sq_sqrt (le_of_lt (div_pos (mul_pos b.wavelength_pos b.rayleighRange_pos)
     pi_pos))]
   field_simp
+
+/-- The carrier wavenumber corresponding to the beam wavelength, `k = 2 π / λ`. -/
+def carrierWavenumber : ℝ := 2 * π / b.wavelength
+
+/-- A physical beam has positive carrier wavenumber. -/
+lemma carrierWavenumber_pos : 0 < b.carrierWavenumber :=
+  div_pos (mul_pos two_pos pi_pos) b.wavelength_pos
+
+/-- The carrier wavenumber and wavelength of one beam obey `k λ = 2 π`. -/
+lemma carrierWavenumber_mul_wavelength :
+    b.carrierWavenumber * b.wavelength = 2 * π := by
+  rw [carrierWavenumber]
+  field_simp [b.wavelength_pos.ne']
+
+/-- The waist radius, Rayleigh range, and carrier wavenumber obey `w₀² = 2 z_R / k`. -/
+lemma waistRadius_sq_eq_two_mul_rayleighRange_div_carrierWavenumber :
+    b.waistRadius ^ 2 = 2 * b.rayleighRange / b.carrierWavenumber := by
+  rw [waistRadius, Real.sq_sqrt (le_of_lt
+    (div_pos (mul_pos b.wavelength_pos b.rayleighRange_pos) pi_pos)), carrierWavenumber]
+  field_simp [b.wavelength_pos.ne', pi_ne_zero]
 
 /-!
 
@@ -207,9 +242,9 @@ lemma inv_q_eq :
 /-- The wavefront radius of curvature at the reference plane.
 
 The curvature above is the primitive notion, because it is defined at the waist where the
-wavefront is plane and the radius is infinite. The radius needs a side condition, and it is the
-one the source carries in the corresponding place: the source's `R (z)` divides by `z`, and the
-condition here is that `q.re`, which is that `z`, is nonzero.
+physical radius is infinite. This total Lean function evaluates to zero at the waist because real
+division is totalized; no physical zero-radius interpretation is intended there. Results about
+this radius therefore require `q.re ≠ 0`.
 -/
 def wavefrontRadius : ℝ := Complex.normSq b.q / b.q.re
 
@@ -292,13 +327,13 @@ lemma im_abcdTransform (M : RayTransferMatrix) (q : ℂ) :
   field_simp
   ring
 
-/-- **A system of positive determinant preserves the physical domain.**
+/-- **A matrix of positive determinant preserves the physical domain.**
 
-This is the domain proof `goal.md` §R4 asks for. A valid optical system has determinant
-`n₀ / n₁ > 0`, so the output beam of a valid system is automatically physical and no application
-has to re-establish it.
+This is the domain proof `goal.md` §R4 asks for. A valid optical system containing no
+phase-conjugating interface has determinant `n₀ / n₁ > 0`; `GaussianBeam.transformSystem` is the
+physical entry point that derives this premise from system validity.
 -/
-theorem im_abcdTransform_pos (M : RayTransferMatrix) (q : ℂ) (hq : 0 < q.im)
+lemma im_abcdTransform_pos (M : RayTransferMatrix) (q : ℂ) (hq : 0 < q.im)
     (hdet : 0 < M.det) : 0 < (abcdTransform M q).im := by
   have hden := abcdDenominator_ne_zero M q hq hdet.ne'
   rw [im_abcdTransform M q]
@@ -306,11 +341,12 @@ theorem im_abcdTransform_pos (M : RayTransferMatrix) (q : ℂ) (hq : 0 < q.im)
 
 namespace GaussianBeam
 
-/-- **The complex ABCD law.** A Gaussian beam transported through a system of positive
+/-- **The algebraic complex ABCD law.** A Gaussian beam transformed by a real matrix of positive
 determinant.
 
-The wavelength is multiplied by the determinant because a system that changes refractive index
-changes the wavelength in the medium by the same ratio.
+The wavelength is multiplied by the determinant. This has the optical index-ratio interpretation
+only when `M` is certified as the matrix of a valid non-phase-conjugating system; use
+`GaussianBeam.transformSystem` for that physical entry point.
 -/
 def transform (b : GaussianBeam) (M : RayTransferMatrix) (hdet : 0 < M.det) : GaussianBeam where
   wavelength := b.wavelength * M.det
@@ -325,6 +361,16 @@ lemma transform_wavelength (b : GaussianBeam) (M : RayTransferMatrix) (hdet : 0 
 @[simp]
 lemma transform_q (b : GaussianBeam) (M : RayTransferMatrix) (hdet : 0 < M.det) :
     (b.transform M hdet).q = abcdTransform M b.q := rfl
+
+/-- Transport a Gaussian beam through a valid ordered optical system containing no
+phase-conjugating interface. The positive determinant required by the raw ABCD transform is
+derived from the system's refractive-index law. -/
+def transformSystem (b : GaussianBeam) (cs : List ParaxialComponent) (exitGap : ParaxialGap)
+    (hValid : ParaxialSystem.IsValid cs exitGap)
+    (hNoPhaseConjugate : ∀ c ∈ cs,
+      c.interface ≠ ParaxialInterface.phaseConjugate) : GaussianBeam :=
+  b.transform (ParaxialSystem.matrix cs exitGap)
+    (ParaxialSystem.det_matrix_pos cs exitGap hValid hNoPhaseConjugate)
 
 /-- **A component with `A = 1` and `B = 0` leaves the beam radius unchanged.**
 
@@ -436,7 +482,7 @@ def outputWaistDistance (b : GaussianBeam) (M : RayTransferMatrix) (hdet : 0 < M
 
 /-- **The output waist location.** Propagating the output beam by `outputWaistDistance` reaches
 its waist. -/
-theorem isAtWaist_transform_outputWaistDistance (b : GaussianBeam) (M : RayTransferMatrix)
+lemma isAtWaist_transform_outputWaistDistance (b : GaussianBeam) (M : RayTransferMatrix)
     (hdet : 0 < M.det) :
     ((b.transform M hdet).transform (translationMatrix (b.outputWaistDistance M hdet))
       (det_translationMatrix_pos _)).IsAtWaist := by
@@ -447,7 +493,7 @@ theorem isAtWaist_transform_outputWaistDistance (b : GaussianBeam) (M : RayTrans
 beam parameter has the stated real and imaginary parts, which give the output waist location and
 Rayleigh range in closed form.
 -/
-theorem transform_q_of_isAtWaist (b : GaussianBeam) (h : b.IsAtWaist) (M : RayTransferMatrix)
+lemma transform_q_of_isAtWaist (b : GaussianBeam) (h : b.IsAtWaist) (M : RayTransferMatrix)
     (hdet : 0 < M.det) :
     (b.transform M hdet).q.re =
         (M 0 1 * M 1 1 + M 0 0 * M 1 0 * b.rayleighRange ^ 2) /
@@ -548,6 +594,27 @@ lemma waistBeamParameter_ne_zero {zR : ℝ} (hzR : 0 < zR) (z : ℝ) :
   rw [waistBeamParameter_im] at him
   exact hzR.ne' him
 
+/-- For a beam whose current plane is its waist, the analytic waist parameter at `z = 0` is the
+beam's stored complex parameter. -/
+lemma GaussianBeam.waistBeamParameter_zero_eq_q (b : GaussianBeam) (h : b.IsAtWaist) :
+    waistBeamParameter b.rayleighRange 0 = b.q := by
+  apply Complex.ext
+  · simpa [waistBeamParameter] using h.symm
+  · simp [waistBeamParameter, GaussianBeam.rayleighRange]
+
+/-- For a beam initially at its waist, the analytic parameter at every axial position is exactly
+the parameter obtained from the ABCD translation law. -/
+lemma GaussianBeam.transform_translationMatrix_q_eq_waistBeamParameter
+    (b : GaussianBeam) (h : b.IsAtWaist) (z : ℝ) :
+    (b.transform (translationMatrix z) (det_translationMatrix_pos z)).q =
+      waistBeamParameter b.rayleighRange z := by
+  rw [GaussianBeam.transform_translationMatrix_q]
+  apply Complex.ext
+  · change b.q.re = 0 at h
+    have hre : b.q.re + z = z := by rw [h, zero_add]
+    simpa [waistBeamParameter] using hre
+  · simp [waistBeamParameter, GaussianBeam.rayleighRange]
+
 /-- The coefficient of the transverse quadratic in the exponent of the fundamental Gaussian
 beam, written as a product so that it differentiates through the reciprocal of the beam
 parameter. -/
@@ -571,6 +638,12 @@ def gaussianAmplitude (k zR x y z : ℝ) : ℂ :=
   (waistBeamParameter zR z)⁻¹ *
     Complex.exp (gaussianExponentCoefficient k zR z * ((x : ℂ) ^ 2 + (y : ℂ) ^ 2))
 
+/-- The fundamental waist-centred amplitude associated with a Gaussian beam's own carrier
+wavenumber and Rayleigh range. Its current `q` agrees with this field at `z = 0` when the beam is
+at its waist, by `GaussianBeam.waistBeamParameter_zero_eq_q`. -/
+def GaussianBeam.waistAmplitude (b : GaussianBeam) : ℝ → ℝ → ℝ → ℂ :=
+  gaussianAmplitude b.carrierWavenumber b.rayleighRange
+
 /-- **The paraxial Helmholtz equation.**
 
 The convention is fixed here and is not the only one in use: the Laplacian is the **transverse**
@@ -581,10 +654,10 @@ equation, and nothing here is a claim about those.
 
 One divergence from the source is a typing choice, not a physical one, and it goes against this
 development. The source types its amplitude on complex arguments and quantifies its verification
-over complex `x`, `y`, and `z`, which is an artifact of the complex-differentiation tactic it
-uses; it therefore asserts strictly more instances than the statement here, which takes real
-transverse and axial coordinates and real derivatives. The version here is the physically faithful
-one and the logically narrower one on that axis, so it is not the same statement.
+over complex `x`, `y`, and `z`, while the statement here takes real transverse and axial
+coordinates and real derivatives. The source therefore asserts strictly more instances. The
+version here is the physically faithful one and the logically narrower one on that axis, so it is
+not the same statement.
 -/
 def SatisfiesParaxialHelmholtz (k : ℝ) (u : ℝ → ℝ → ℝ → ℂ) : Prop :=
   ∀ x y z : ℝ,
@@ -676,6 +749,12 @@ theorem gaussianAmplitude_satisfiesParaxialHelmholtz {zR : ℝ} (hzR : 0 < zR) (
   rw [hx, hy, hz, gaussianExponentCoefficient]
   field_simp
   ring
+
+/-- A beam's associated waist-centred amplitude solves the paraxial Helmholtz equation at that
+same beam's carrier wavenumber. -/
+lemma GaussianBeam.waistAmplitude_satisfiesParaxialHelmholtz (b : GaussianBeam) :
+    SatisfiesParaxialHelmholtz b.carrierWavenumber b.waistAmplitude :=
+  gaussianAmplitude_satisfiesParaxialHelmholtz b.rayleighRange_pos b.carrierWavenumber
 
 end
 

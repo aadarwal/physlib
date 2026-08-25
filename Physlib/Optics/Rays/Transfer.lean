@@ -265,10 +265,8 @@ def angleReversal : RayTransferMatrix := !![1, 0; 0, -1]
 
 /-- Reversing the output-angle coordinate twice is the identity.
 
-This is the guard against double-counting a reflection's direction reversal. A treatment that
-keeps the reversal explicit as a coordinate operation, as this one does, must *not* also negate
-the radii on the reversed leg: doing both applies the same physical reversal twice. See the
-two-mirror round-trip regression in `Physlib.Optics.Rays.TransferRegression`.
+This is an algebraic statement about two adjacent coordinate changes. It does not say that
+reversals separated by propagation cancel, and it is not a two-mirror round-trip theorem.
 -/
 @[simp]
 lemma angleReversal_mul_self : angleReversal * angleReversal = 1 := by
@@ -380,6 +378,12 @@ lemma headIndex_pos : ∀ (cs : List ParaxialComponent) (exitGap : ParaxialGap),
   | [], _, h => h.index_pos
   | _ :: _, _, h => h.1.index_pos
 
+/-- A valid ordered system is left through a positive refractive index. -/
+lemma exitIndex_pos : ∀ (cs : List ParaxialComponent) (exitGap : ParaxialGap),
+    IsValid cs exitGap → 0 < exitGap.index
+  | [], _, h => h.index_pos
+  | _ :: cs, exitGap, h => exitIndex_pos cs exitGap h.2.2
+
 /-!
 
 ## F. The system ray-transfer theorem
@@ -437,6 +441,14 @@ lemma det_matrix : ∀ (cs : List ParaxialComponent) (exitGap : ParaxialGap),
         ih exitGap hRest (fun d hd => hpc d (List.mem_cons_of_mem c hd)),
         ParaxialInterface.det_transferMatrix hInterface (hpc c List.mem_cons_self), headIndex]
       field_simp
+
+/-- A valid ordered system without a phase-conjugating interface has positive determinant. -/
+lemma det_matrix_pos (cs : List ParaxialComponent) (exitGap : ParaxialGap)
+    (hValid : IsValid cs exitGap)
+    (hNoPhaseConjugate : ∀ c ∈ cs, c.interface ≠ ParaxialInterface.phaseConjugate) :
+    0 < (matrix cs exitGap).det := by
+  rw [det_matrix cs exitGap hValid hNoPhaseConjugate]
+  exact div_pos (headIndex_pos cs exitGap hValid) (exitIndex_pos cs exitGap hValid)
 
 /-!
 
