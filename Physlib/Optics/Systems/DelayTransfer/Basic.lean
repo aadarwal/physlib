@@ -25,10 +25,17 @@ at a point where a nonzero polynomial becomes zero. The retained denominator the
 the exact pointwise `evaluationDomain`, while `toRational` records the represented element of the
 polynomial quotient field.
 
+On the common domain of two retained presentations, equality of their `toRational` values implies
+equality of their pointwise evaluations. Thus the explicit denominator is domain data, not a
+second equality notion for rational functions.
+
 The physical substitutions are separate named maps. `laplaceEvaluation delays s` sends the
 `i`-th formal variable to `exp (-s * delays i)`. `zInverseEvaluation z` sends the single formal
 delay to `z⁻¹`. Neither definition identifies Laplace frequency, discrete `z`, or physical
 angular frequency.
+
+At `z = 0`, `zInverseEvaluation` uses the field's totalized inverse. It has no reciprocal-Z
+interpretation there.
 
 ## ii. Key definitions and results
 
@@ -37,6 +44,8 @@ angular frequency.
 - `formalDelay`: the fraction-field image of one polynomial indeterminate.
 - `RationalModel`: an explicit regularity-auditable presentation of a rational function.
 - `RationalModel.evaluationDomain`: points where the retained denominator is nonzero.
+- `RationalModel.eval_eq_of_toRational_eq`: presentation-independent evaluation on a common
+  regular domain.
 - `laplaceEvaluation`: the substitution `q_i = exp (-s * τ_i)`.
 - `zInverseEvaluation`: the one-delay substitution `q = z⁻¹`.
 
@@ -52,7 +61,8 @@ This module implements the convention required by `goal.md` section E.8 and sect
 It is source-neutral. Delay variables are formal, and no declaration says that a rational function
 of them is rational in physical frequency. Such a statement would require a separate propagation
 and dispersion model. No pole, zero, resonance, stability, causality, or global phase claim is
-made here.
+made here. This module does not construct a symbolically eliminated external response in the
+fraction field; that requires a separate determinant/adjugate development.
 -/
 
 @[expose] public section
@@ -131,6 +141,35 @@ lemma eval_eq (model : RationalModel n) (value : DelayTuple n) :
     model.eval value =
       MvPolynomial.eval value model.numerator /
         MvPolynomial.eval value model.denominator := rfl
+
+/-- Equal fraction-field values have equal evaluations wherever both retained denominators are
+nonzero. -/
+lemma eval_eq_of_toRational_eq (first second : RationalModel n) (value : DelayTuple n)
+    (hRational : first.toRational = second.toRational)
+    (hFirst : value ∈ first.evaluationDomain)
+    (hSecond : value ∈ second.evaluationDomain) :
+    first.eval value = second.eval value := by
+  have hFirstMap :
+      algebraMap (DelayPolynomial n) (DelayRational n) first.denominator ≠ 0 := by
+    intro hZero
+    apply first.denominator_ne_zero
+    apply FaithfulSMul.algebraMap_injective (DelayPolynomial n) (DelayRational n)
+    simpa using hZero
+  have hSecondMap :
+      algebraMap (DelayPolynomial n) (DelayRational n) second.denominator ≠ 0 := by
+    intro hZero
+    apply second.denominator_ne_zero
+    apply FaithfulSMul.algebraMap_injective (DelayPolynomial n) (DelayRational n)
+    simpa using hZero
+  have hCrossMap := (div_eq_div_iff hFirstMap hSecondMap).mp hRational
+  have hCross :
+      first.numerator * second.denominator =
+        second.numerator * first.denominator := by
+    apply FaithfulSMul.algebraMap_injective (DelayPolynomial n) (DelayRational n)
+    simpa only [map_mul] using hCrossMap
+  have hCrossEval := congrArg (MvPolynomial.eval value) hCross
+  exact (div_eq_div_iff hFirst hSecond).2 (by
+    simpa only [MvPolynomial.eval_mul] using hCrossEval)
 
 /-- A polynomial viewed as a rational model with denominator one. -/
 def ofPolynomial (polynomial : DelayPolynomial n) : RationalModel n where

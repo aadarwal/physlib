@@ -18,6 +18,11 @@ finite family of formal delays. Its conversion to `ParameterizedComponentFamily`
 models pointwise. Component validity is the conjunction of the independently stored physical
 model predicate and nonvanishing of every retained rational denominator.
 
+Entry regularity and network solvability are independent gates. Regular component entries need
+not make the feedback operator invertible. Conversely, an algebraically well-posed evaluated
+network can lie outside `responseDomain` because a removable retained denominator excludes that
+presentation point.
+
 `RationalNetlist` adds parameter-independent N5F wiring. Its `solveDomain` and `responseDomain`
 are abbreviations of the N5F domains, not a second elimination procedure. The central commutation
 lemma is a direct specialization of
@@ -58,7 +63,8 @@ claim. Outside `solveDomain`, N5F's total inverse is meaningless; on
 Delay variables remain formal. This file does not assert rational dependence on physical
 frequency, does not identify candidate singularities with transfer-function poles, and makes no
 causality, stability, resonance, group-delay, or dispersion claim. No elimination argument is
-reproved here.
+reproved here. In particular, symbolic rational elimination of the external response is future
+work; this module only evaluates retained component presentations pointwise into N5F.
 -/
 
 @[expose] public section
