@@ -127,6 +127,12 @@ lemma wiringInvarianceRegression_symm_channelEmbedding_aLink :
         ⟨(), Sum.inr ()⟩ =
       flatNetlistRegressionALink := rfl
 
+/-- In the exchanged presentation, the relabelled first link is still mated to the second link. -/
+lemma wiringInvarianceRegression_symm_mateEquiv_aLink :
+    wiringInvarianceRegressionSymmNetlist.connections.mateEquiv
+        ⟨(), Sum.inr ()⟩ =
+      (⟨(), Sum.inl ()⟩ : wiringInvarianceRegressionSymmNetlist.ConnectedChannel) := rfl
+
 /-- Endpoint presentation exchange leaves the ambient routing matrix literally unchanged. -/
 lemma wiringInvarianceRegression_symm_routingTransform :
     wiringInvarianceRegressionSymmNetlist.routingTransform =
@@ -160,15 +166,31 @@ lemma wiringInvarianceRegression_symm_routing_entry_self :
   exact flatNetlistRegression.connections.idealRouting_entry_self
     flatNetlistRegressionConnectedA
 
-/-- The canonically transported first external channel of the exchanged presentation. -/
+/-- The first ambient external channel remains outside the exchanged connection range. -/
+lemma wiringInvarianceRegression_symm_aExternal_not_mem_range :
+    flatNetlistRegressionAExternal ∉
+      Set.range wiringInvarianceRegressionSymmNetlist.connections.channelEmbedding := by
+  simpa only [PortConnectionFamily.WiringEquiv.range_channelEmbedding_eq
+    wiringInvarianceRegressionSymm] using flatNetlistRegression_aExternal_not_mem_range
+
+/-- The second ambient external channel remains outside the exchanged connection range. -/
+lemma wiringInvarianceRegression_symm_bExternal_not_mem_range :
+    flatNetlistRegressionBExternal ∉
+      Set.range wiringInvarianceRegressionSymmNetlist.connections.channelEmbedding := by
+  simpa only [PortConnectionFamily.WiringEquiv.range_channelEmbedding_eq
+    wiringInvarianceRegressionSymm] using flatNetlistRegression_bExternal_not_mem_range
+
+/-- The independently packaged first external channel of the exchanged presentation. -/
 abbrev wiringInvarianceRegressionSymmExternalA :
     wiringInvarianceRegressionSymmNetlist.ExternalChannel :=
-  wiringInvarianceRegressionSymm.externalChannelEquiv flatNetlistRegressionExternalA
+  ⟨flatNetlistRegressionAExternal,
+    wiringInvarianceRegression_symm_aExternal_not_mem_range⟩
 
-/-- The canonically transported second external channel of the exchanged presentation. -/
+/-- The independently packaged second external channel of the exchanged presentation. -/
 abbrev wiringInvarianceRegressionSymmExternalB :
     wiringInvarianceRegressionSymmNetlist.ExternalChannel :=
-  wiringInvarianceRegressionSymm.externalChannelEquiv flatNetlistRegressionExternalB
+  ⟨flatNetlistRegressionBExternal,
+    wiringInvarianceRegression_symm_bExternal_not_mem_range⟩
 
 /-- The transported external output of the endpoint-exchanged fixture. -/
 def wiringInvarianceRegressionSymmOutput (t : ℂ) :
@@ -204,11 +226,8 @@ lemma wiringInvarianceRegression_symm_output_aExternal :
       2 + Complex.I := by
   rw [wiringInvarianceRegressionSymmOutput, ModeAmplitude.reindex_apply]
   change flatNetlistRegressionOutput (2 + Complex.I)
-      (wiringInvarianceRegressionSymm.externalOutgoingEquiv.symm
-        (wiringInvarianceRegressionSymm.externalOutgoingEquiv
-          (Outgoing.mk flatNetlistRegressionExternalA))) = _
-  rw [Equiv.symm_apply_apply,
-    flatNetlistRegression_output_apply_aExternal]
+      (Outgoing.mk flatNetlistRegressionExternalA) = _
+  rw [flatNetlistRegression_output_apply_aExternal]
 
 /-- For `t = 2 + I`, the transported second external output remains `4 + 2I`. -/
 lemma wiringInvarianceRegression_symm_output_bExternal :
@@ -217,11 +236,8 @@ lemma wiringInvarianceRegression_symm_output_bExternal :
       4 + 2 * Complex.I := by
   rw [wiringInvarianceRegressionSymmOutput, ModeAmplitude.reindex_apply]
   change flatNetlistRegressionOutput (2 + Complex.I)
-      (wiringInvarianceRegressionSymm.externalOutgoingEquiv.symm
-        (wiringInvarianceRegressionSymm.externalOutgoingEquiv
-          (Outgoing.mk flatNetlistRegressionExternalB))) = _
-  rw [Equiv.symm_apply_apply,
-    flatNetlistRegression_output_apply_bExternal]
+      (Outgoing.mk flatNetlistRegressionExternalB) = _
+  rw [flatNetlistRegression_output_apply_bExternal]
   ring
 
 /-- Endpoint exchange preserves multivaluedness of the complete singular solution relation. -/
@@ -335,18 +351,26 @@ lemma wiringInvarianceRegression_reindex_routingTransform :
     (flatNetlistRegression.connections.reindex wiringInvarianceRegressionIndexEquiv)
       wiringInvarianceRegressionReindex
 
-/-- A nonreal singular solution transports across the connection-index type change. -/
-lemma wiringInvarianceRegression_reindex_solution :
+/-- Every singular zero-input solution transports across the connection-index type change. -/
+lemma wiringInvarianceRegression_reindex_solution (t : ℂ) :
     (ModeAmplitude.reindex wiringInvarianceRegressionReindex.externalIncidentEquiv 0,
-        (flatNetlistRegressionIncident (2 + Complex.I)).directSum
-          (flatNetlistRegressionOutgoing (2 + Complex.I))) ∈
+        (flatNetlistRegressionIncident t).directSum
+          (flatNetlistRegressionOutgoing t)) ∈
       wiringInvarianceRegressionReindexedNetlist.solutionBehavior :=
   (FlatNetlist.mem_solutionBehavior_withConnections_iff
     (flatNetlistRegression.connections.reindex wiringInvarianceRegressionIndexEquiv)
       wiringInvarianceRegressionReindex 0
-        (flatNetlistRegressionIncident (2 + Complex.I))
-        (flatNetlistRegressionOutgoing (2 + Complex.I))).mpr
-          (flatNetlistRegression_solution (2 + Complex.I))
+        (flatNetlistRegressionIncident t)
+        (flatNetlistRegressionOutgoing t)).mpr
+          (flatNetlistRegression_solution t)
+
+/-- Changing the connection-index type preserves the singular relation's multivaluedness. -/
+lemma wiringInvarianceRegression_reindex_solutionBehavior_not_singleValued :
+    ¬wiringInvarianceRegressionReindexedNetlist.solutionBehavior.IsSingleValued := by
+  intro hSingleValued
+  apply flatNetlistRegression_solutionState_zero_ne_one
+  exact hSingleValued (wiringInvarianceRegression_reindex_solution 0)
+    (wiringInvarianceRegression_reindex_solution 1)
 
 /-- The hostile input still has no complete solution after changing the index type. -/
 lemma wiringInvarianceRegression_reindex_badInput_no_solution :
