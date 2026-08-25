@@ -1171,8 +1171,9 @@ PR unless maintainers explicitly ask to retain it.
   partitions, identify external channels with the dependent sum of modes over unconnected ports,
   and prove exact action, Gram, isometry, cross-zero, projector-completeness, `C b + E_in u`, and
   additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. The
-  later `FlatNetlist` construction now closes the broad structural API-map requirement; executable
-  well-formedness checking and semantic compilation remain separate N4C work.
+  later `FlatNetlist` construction now closes the broad structural API-map requirement. N4C's
+  finite data, reflected well-formedness check, and proof-carrying kernel construction are now
+  complete; executable matrix assembly and entrywise semantic soundness remain separate work.
 - [ ] Before upstreaming the external-output completion, prepare a stack in this order: the neutral
   complementary-range-projector lemma in `Mode/Embedding`; outgoing endpoint partition, exposure,
   and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
@@ -1203,6 +1204,28 @@ PR unless maintainers explicitly ask to retain it.
   reindexing and endpoint-presentation exchange; keep `S`, `C`, and `1 - C * S` literally equal
   on the fixed component boundary, and transport only the external subtype labels. Exercise the
   theorem on the singular N-11 relation without functionality or inverse hypotheses.
+- [x] Begin N4C with natural-number sizes and dependent `Fin` indices for components, ports, mode
+  fibers, incidences, local gains, and finite bidirectional physical connections. Store both mode
+  maps, decide their two inverse laws and global physical-endpoint injectivity, reflect the Boolean
+  check exactly to the specification, and compile successful data through a coefficient ring
+  homomorphism into the existing proof-carrying `FlatNetlist`. Retain constructive finite and
+  decidable instances for the compiled channel families.
+- [x] Add hostile N4C construction tests over exact integer coefficients: accept a one-link and a
+  disjoint two-link fixture plus a nontrivial two-mode swap; reject self-wiring, first-first,
+  second-second, and mixed-end port reuse, both orientations of unequal mode cardinality, and an
+  equal-cardinality non-inverse table. Pin connection fields and asymmetric local gain orientation,
+  and prove that checked compilation returns `none` for malformed data.
+- [ ] Human-check before upstreaming that stored connections are bidirectional physical wires,
+  not directed routes. `Incident` and `Outgoing` occur only in N4's derived maps; no discarded
+  direction flag is accepted as evidence. Confirm that `wellFormed` is the exhaustive finite
+  `Decidable` for its public specification, so any future optimized checker must be proved
+  equivalent rather than treated as an independent oracle.
+- [ ] Complete N4C with generic executable `S`, `C`, `E_in`, and `E_out` matrices and prove their
+  entrywise evaluation agrees with the derived N4 maps. Account explicitly for proof-irrelevance
+  between the compiled constructive `DecidableEq` instances and N4's locally chosen classical
+  instances. Then add an executable normalized coefficient-list representation with a proof-exact
+  interpretation into rational functions and a denominator-guarded evaluation theorem, without
+  introducing an inverse, determinant, or well-posedness assumption before N5.
 - [ ] Human-check before upstreaming that `WiringEquiv`, rather than an index permutation alone,
   is the public hypothesis; that the ambient port family is fixed; and that component relabelling
   and mode-phase gauge are excluded covariance statements. Confirm independently that the
