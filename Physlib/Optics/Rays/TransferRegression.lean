@@ -39,8 +39,6 @@ fold rather than by multiplying matrices by hand.
   vanishing `B` entry and transverse magnification `-1`.
 - `Optics.transferRegression_det_indexStep`: the telescoped determinant law on a system that
   changes refractive index.
-- `Optics.transferRegression_roundTrip_trace`: the two-mirror round-trip trace is `4 g₁ g₂ - 2`,
-  the convention guard against double-counting the reflection direction reversal.
 
 ## iii. Table of contents
 
@@ -327,86 +325,6 @@ lemma transferRegression_outputAngleReversed_sphericalMirror (n : ℝ) :
       !![1, 0; 1, -1] := by
   rw [ParaxialInterface.outputAngleReversedTransferMatrix_sphericalMirror]
   norm_num
-
-/-- A two-mirror round trip: travel the cavity length, reflect off the far mirror, travel back,
-reflect off the near mirror. -/
-def transferRegressionRoundTrip (d R₁ R₂ : ℝ) : List ParaxialComponent :=
-  [⟨⟨1, d⟩, ParaxialInterface.sphericalMirror R₂⟩,
-    ⟨⟨1, d⟩, ParaxialInterface.sphericalMirror R₁⟩]
-
-/-- The two-mirror round trip is a valid system for a nonnegative cavity length and nonzero mirror
-radii. -/
-lemma transferRegressionRoundTrip_isValid (d R₁ R₂ : ℝ) (hd : 0 ≤ d) (hR₁ : R₁ ≠ 0)
-    (hR₂ : R₂ ≠ 0) :
-    ParaxialSystem.IsValid (transferRegressionRoundTrip d R₁ R₂) ⟨1, 0⟩ := by
-  refine ⟨⟨?_, ?_⟩, ⟨?_, ?_, ?_⟩, ⟨?_, ?_⟩, ⟨?_, ?_, ?_⟩, ?_, ?_⟩ <;>
-    norm_num [transferRegressionRoundTrip, ParaxialSystem.headIndex, hd, hR₁, hR₂]
-
-/-- **The two-mirror round-trip trace.** The trace of the round-trip matrix is `4 g₁ g₂ - 2` with
-`gᵢ = 1 - d / Rᵢ`.
-
-This is the convention guard the reflection bookkeeping needs. The direction reversal at a mirror
-is absorbed into the mirror matrix by the folded convention used here, and can also be applied
-explicitly as a coordinate operation by
-`ParaxialInterface.outputAngleReversedTransferMatrix`; but it must not be counted twice. A treatment
-that keeps the reversal explicit *and* negates the radii on unfolding computes the round trip of
-the negated radii instead, and `transferRegression_roundTrip_negated_radii` shows that changes the
-answer in a way a single-mirror check cannot see.
--/
-lemma transferRegression_roundTrip_matrix (d R₁ R₂ : ℝ) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
-    ParaxialSystem.matrix (transferRegressionRoundTrip d R₁ R₂) ⟨1, 0⟩ =
-      !![1 - 2 * d / R₂, 2 * d - 2 * d ^ 2 / R₂;
-        -2 / R₁ + 4 * d / (R₁ * R₂) - 2 / R₂,
-        1 - 2 * d / R₂ - 4 * d / R₁ + 4 * d ^ 2 / (R₁ * R₂)] := by
-  simp only [transferRegressionRoundTrip, ParaxialSystem.matrix,
-    ParaxialInterface.transferMatrix, ParaxialGap.transferMatrix]
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_two] <;> field_simp <;> ring
-
-/-- **The two-mirror round-trip trace.** The trace of the round-trip matrix is `4 g₁ g₂ - 2` with
-`gᵢ = 1 - d / Rᵢ`. -/
-lemma transferRegression_roundTrip_trace (d R₁ R₂ : ℝ) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
-    ParaxialSystem.matrix (transferRegressionRoundTrip d R₁ R₂) ⟨1, 0⟩ 0 0 +
-        ParaxialSystem.matrix (transferRegressionRoundTrip d R₁ R₂) ⟨1, 0⟩ 1 1 =
-      4 * (1 - d / R₁) * (1 - d / R₂) - 2 := by
-  rw [transferRegression_roundTrip_matrix d R₁ R₂ hR₁ hR₂]
-  norm_num
-  field_simp
-  ring
-
-/-- The round trip has unit determinant, so the determinant hypothesis of the source's stability
-theorem is met directly in the folded convention used here. -/
-lemma transferRegression_roundTrip_det (d R₁ R₂ : ℝ) (hd : 0 ≤ d) (hR₁ : R₁ ≠ 0) (hR₂ : R₂ ≠ 0) :
-    (ParaxialSystem.matrix (transferRegressionRoundTrip d R₁ R₂) ⟨1, 0⟩).det = 1 := by
-  rw [ParaxialSystem.det_matrix _ _ (transferRegressionRoundTrip_isValid d R₁ R₂ hd hR₁ hR₂)
-    (by
-      intro c hc
-      fin_cases hc <;> exact fun h => ParaxialInterface.noConfusion h)]
-  norm_num [ParaxialSystem.headIndex, transferRegressionRoundTrip]
-
-/-- **The double-counting sentinel.** For a cavity of length `1` between two mirrors of radius `2`
-the round-trip trace is `-1`, inside the stable band `[-2, 2]`; negating both radii, which is what
-counting the reflection reversal twice amounts to, gives `7` instead.
-
-A single-mirror check cannot see this: it is only the round trip that exposes the compensating
-pair of conventions.
--/
-lemma transferRegression_roundTrip_negated_radii :
-    ParaxialSystem.matrix (transferRegressionRoundTrip 1 2 2) ⟨1, 0⟩ 0 0 +
-        ParaxialSystem.matrix (transferRegressionRoundTrip 1 2 2) ⟨1, 0⟩ 1 1 = -1 ∧
-      ParaxialSystem.matrix (transferRegressionRoundTrip 1 (-2) (-2)) ⟨1, 0⟩ 0 0 +
-        ParaxialSystem.matrix (transferRegressionRoundTrip 1 (-2) (-2)) ⟨1, 0⟩ 1 1 = 7 := by
-  constructor
-  · rw [transferRegression_roundTrip_trace 1 2 2 (by norm_num) (by norm_num)]
-    norm_num
-  · rw [transferRegression_roundTrip_trace 1 (-2) (-2) (by norm_num) (by norm_num)]
-    norm_num
-
-/-- Two explicit direction reversals compose to the identity, which is why an even number of
-mirrors returns the round trip to the folded convention unchanged. -/
-lemma transferRegression_twoReversals : angleReversal * angleReversal = 1 :=
-  angleReversal_mul_self
 
 /-!
 

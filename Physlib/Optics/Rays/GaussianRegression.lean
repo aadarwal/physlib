@@ -24,11 +24,10 @@ physical domain entirely, so the ABCD law is not a map of Gaussian beams for it.
 component that is the exception to the index-ratio determinant law in
 `Physlib.Optics.Rays.Transfer`, and the two exceptions are the same fact seen twice.
 
-The singular-matrix sentinel closes a gap in the source. There the free-form interface constructor
-is unconditionally valid, so it admits a singular matrix; with a total division the ABCD law then
-asserts that the outgoing beam parameter is zero. Here validity rejects it, and both halves are
-exhibited: the matrix fails `IsValid`, and applying the formula to it anyway would indeed produce
-the junk value.
+The singular-matrix sentinel checks the boundary of Physlib's own model. Validity rejects the
+singular prescribed matrix, and applying the totalized ABCD formula to it anyway produces the
+junk value zero. No claim about whether the source accepts that same component is made without a
+separate source audit.
 
 ## ii. Key results
 
@@ -40,8 +39,10 @@ the junk value.
 - `Optics.gaussianRegression_singular_not_isValid` and
   `Optics.gaussianRegression_singular_would_be_junk`: the singular matrix is rejected by validity,
   and what would go wrong without that.
-- `Optics.gaussianRegression_helmholtz`: the regression beam solves the paraxial Helmholtz
-  equation.
+- `Optics.gaussianRegression_sameBeamParameter`: free propagation gives the same `q(z)` used by
+  the analytic field at every axial position.
+- `Optics.gaussianRegression_helmholtz`: the field associated with the regression beam solves the
+  paraxial Helmholtz equation at that beam's own carrier wavenumber.
 
 ## iii. Table of contents
 
@@ -125,6 +126,15 @@ lemma gaussianRegression_not_isAtWaist_after_propagation :
   rw [GaussianBeam.IsAtWaist, GaussianBeam.transform_translationMatrix_q]
   simp [gaussianRegressionBeam]
 
+/-- The phase sign of free propagation is pinned at the beam-parameter level: translating the
+regression beam by one gives `q = 1 + i`, not `-1 + i`. -/
+lemma gaussianRegression_translation_q :
+    (gaussianRegressionBeam.transform (translationMatrix 1)
+      (det_translationMatrix_pos 1)).q = 1 + Complex.I := by
+  rw [GaussianBeam.transform_translationMatrix_q]
+  simp [gaussianRegressionBeam]
+  ring
+
 /-- **A thin lens does not change the beam radius**, whatever its focal length: it reshapes the
 wavefront, not the spot. -/
 lemma gaussianRegression_thinLens_beamRadius (f : ℝ) :
@@ -133,6 +143,16 @@ lemma gaussianRegression_thinLens_beamRadius (f : ℝ) :
       gaussianRegressionBeam.beamRadius :=
   GaussianBeam.beamRadius_transform_of_entries gaussianRegressionBeam (thinLensMatrix f)
     (by rw [det_thinLensMatrix]; norm_num) rfl rfl
+
+/-- The unit positive thin lens sends `q = i` to `(-1 + i) / 2`. This exact value distinguishes
+the sign of the lower-left lens entry. -/
+lemma gaussianRegression_thinLens_q :
+    (gaussianRegressionBeam.transform (thinLensMatrix 1)
+      (by rw [det_thinLensMatrix]; norm_num)).q = (-1 + Complex.I) / 2 := by
+  rw [GaussianBeam.transform_q, abcdTransform, abcdDenominator]
+  apply Complex.ext <;>
+    norm_num [thinLensMatrix, gaussianRegressionBeam, Complex.div_re, Complex.div_im,
+      Complex.normSq_apply]
 
 /-!
 
@@ -160,11 +180,8 @@ lemma gaussianRegression_phaseConjugate_leaves_domain (n : ℝ) :
   rw [abcdTransform, abcdDenominator, ParaxialInterface.transferMatrix]
   norm_num [gaussianRegressionBeam, Complex.div_im]
 
-/-- **A singular prescribed component is rejected by validity.**
-
-The source's corresponding constructor is unconditionally valid, so it admits this matrix. Here
-the index-ratio determinant condition excludes it.
--/
+/-- **A singular prescribed component is rejected by Physlib's validity predicate.** The
+index-ratio determinant condition excludes it. -/
 lemma gaussianRegression_singular_not_isValid (n₀ n₁ : ℝ) :
     ¬ (ParaxialInterface.prescribed 0 0 0 0).IsValid n₀ n₁ := by
   rintro ⟨hn₀, hn₁, hdet⟩
@@ -174,13 +191,17 @@ lemma gaussianRegression_singular_not_isValid (n₀ n₁ : ℝ) :
 /-- **What the rejection prevents.** Applied to the singular matrix the ABCD formula returns the
 junk value zero, which is not a beam parameter at all: its imaginary part is not positive. -/
 lemma gaussianRegression_singular_would_be_junk :
-    abcdDenominator (!![0, 0; 0, 0] : RayTransferMatrix) gaussianRegressionBeam.q = 0 ∧
-      abcdTransform (!![0, 0; 0, 0] : RayTransferMatrix) gaussianRegressionBeam.q = 0 := by
+    abcdDenominator
+        ((ParaxialInterface.prescribed 0 0 0 0).transferMatrix 1 1)
+        gaussianRegressionBeam.q = 0 ∧
+      abcdTransform
+        ((ParaxialInterface.prescribed 0 0 0 0).transferMatrix 1 1)
+        gaussianRegressionBeam.q = 0 := by
   constructor
   · rw [abcdDenominator]
-    norm_num
+    norm_num [ParaxialInterface.transferMatrix]
   · rw [abcdTransform, abcdDenominator]
-    norm_num
+    norm_num [ParaxialInterface.transferMatrix]
 
 /-!
 
@@ -188,11 +209,18 @@ lemma gaussianRegression_singular_would_be_junk :
 
 -/
 
-/-- **Regression R-03, the wave-equation half.** The `q`-parameter Gaussian of unit Rayleigh range
-solves the paraxial Helmholtz equation at every wavenumber. -/
-lemma gaussianRegression_helmholtz (k : ℝ) :
-    SatisfiesParaxialHelmholtz k (gaussianAmplitude k 1) :=
-  gaussianAmplitude_satisfiesParaxialHelmholtz one_pos k
+/-- The regression beam's carrier wavenumber is `2π`, because its wavelength is one. -/
+lemma gaussianRegression_carrierWavenumber :
+    gaussianRegressionBeam.carrierWavenumber = 2 * π := by
+  rw [GaussianBeam.carrierWavenumber]
+  simp [gaussianRegressionBeam]
+
+/-- **Regression R-03, the wave-equation half.** The amplitude associated with the regression
+beam solves the paraxial Helmholtz equation at that same beam's carrier wavenumber. -/
+lemma gaussianRegression_helmholtz :
+    SatisfiesParaxialHelmholtz gaussianRegressionBeam.carrierWavenumber
+      gaussianRegressionBeam.waistAmplitude :=
+  gaussianRegressionBeam.waistAmplitude_satisfiesParaxialHelmholtz
 
 /-- The beam parameter used by the Helmholtz solution is the one the beam algebra uses: at the
 waist plane it is purely imaginary with the Rayleigh range as imaginary part. -/
@@ -200,6 +228,23 @@ lemma gaussianRegression_waistBeamParameter :
     waistBeamParameter 1 0 = Complex.I ∧
       waistBeamParameter 1 0 = gaussianRegressionBeam.q := by
   refine ⟨?_, ?_⟩ <;> simp [waistBeamParameter, gaussianRegressionBeam]
+
+/-- The beam parameter in the analytic field and the parameter produced by ABCD propagation are
+the same at every axial position, not merely at the waist. -/
+lemma gaussianRegression_sameBeamParameter (z : ℝ) :
+    (gaussianRegressionBeam.transform (translationMatrix z)
+        (det_translationMatrix_pos z)).q = waistBeamParameter 1 z := by
+  rw [GaussianBeam.transform_translationMatrix_q_eq_waistBeamParameter
+    gaussianRegressionBeam gaussianRegressionBeam_isAtWaist z,
+    gaussianRegressionBeam_rayleighRange]
+
+/-- The same beam's wavelength, waist radius, and Rayleigh range obey the carrier-width relation
+used by the analytic Gaussian field. -/
+lemma gaussianRegression_sameBeamWidth :
+    gaussianRegressionBeam.waistRadius ^ 2 =
+      2 * gaussianRegressionBeam.rayleighRange /
+        gaussianRegressionBeam.carrierWavenumber :=
+  gaussianRegressionBeam.waistRadius_sq_eq_two_mul_rayleighRange_div_carrierWavenumber
 
 end
 
