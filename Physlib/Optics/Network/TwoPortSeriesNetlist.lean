@@ -9,12 +9,13 @@ public import Physlib.Optics.Network.FlatNetlist
 public import Physlib.Optics.Network.TwoPortScattering
 
 /-!
-# Canonical flat netlist for two two-port components in series
+# A chosen canonical flat netlist for two two-port components in series
 
 ## i. Overview
 
-This file packages two arbitrary typed scattering matrices as separately owned physical
-two-port components and joins exactly their middle ports.
+This file chooses one canonical builder that packages two arbitrary typed scattering matrices as
+separately owned physical two-port components and joins exactly their middle ports. It does not
+classify every two-device flat netlist up to an equivalence.
 
 ## ii. Key results
 
@@ -148,7 +149,7 @@ def connections (first : ScatteringMatrix (left ⊕ middle))
     · exact Bool.noConfusion (congrArg Sigma.fst equality)
     · rfl
 
-/-- The canonical flat netlist of two scattering components joined in series. -/
+/-- The chosen canonical flat netlist of two scattering components joined in series. -/
 def netlist (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right)) : FlatNetlist where
   components := components first second

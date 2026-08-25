@@ -5,12 +5,13 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.TwoPortRedhefferRegression
 public import Physlib.Optics.Network.TwoPortSeriesNetlistBehavior
 public import Physlib.Optics.Network.TwoPortSeriesRegression
 
 /-!
-# Singular regression for the canonical two-port series netlist
+# Singular regression for the chosen canonical two-port series netlist
 
 ## i. Overview
 
@@ -20,8 +21,9 @@ distinct complete and external relational solutions for zero incident waves.
 ## ii. Key results
 
 - `TwoPortSeriesNetlistSingularRegression.not_hasBijectiveFeedback`: the pivot gate fails.
-- `TwoPortSeriesNetlistSingularRegression.externalBehavior_outputs_nonunique`: the canonical
-  FlatNetlist relation nevertheless retains both solutions.
+- `TwoPortSeriesNetlistSingularRegression.not_isWellPosed`: the FlatNetlist gate fails too.
+- `TwoPortSeriesNetlistSingularRegression.externalBehavior_outputs_nonunique`: the chosen
+  FlatNetlist builder nevertheless retains both solutions.
 
 ## iii. Table of contents
 
@@ -78,7 +80,7 @@ lemma second_toTwoPortScatteringTransform :
   rcases output with ⟨⟨⟩⟩ | ⟨⟨⟩⟩ <;>
     rcases input with ⟨⟨⟩⟩ | ⟨⟨⟩⟩ <;> rfl
 
-/-- The canonical physical fixture fails the Redheffer matrix-extraction gate. -/
+/-- The chosen physical fixture fails the Redheffer matrix-extraction gate. -/
 lemma not_hasBijectiveFeedback :
     ¬first.toTwoPortScatteringTransform.HasBijectiveRedhefferFeedback
       second.toTwoPortScatteringTransform := by
@@ -88,6 +90,13 @@ lemma not_hasBijectiveFeedback :
 /-- The zero-input singular fixture's outer outgoing amplitude at loop value `value`. -/
 def outerOutput (value : ℂ) : ModeAmplitude (Outgoing Unit ⊕ Outgoing Unit) :=
   (scatteringBackwardFirstLinearEquiv.symm (scalarState value 0, scalarState 0 0)).2
+
+/-- The zero and unit loop values produce distinct typed outer outputs. -/
+lemma outerOutput_zero_ne_one : outerOutput 0 ≠ outerOutput 1 := by
+  intro hEqual
+  have hCoordinate := congrArg
+    (fun output => output (Sum.inl (Outgoing.mk ()))) hEqual
+  norm_num [outerOutput, scalarState, scalarAmplitude] at hCoordinate
 
 /-!
 
@@ -148,6 +157,17 @@ lemma flatNetlist_member (value : ℂ) :
       TwoPortSeriesNetlist.externalOutgoingReadout_aggregateOutgoing first second
         (0 : ModeAmplitude (Incident Unit ⊕ Incident Unit)) (outerOutput value) shared
 
+/-- The chosen FlatNetlist builder is not well posed at the reflective unit loop. -/
+lemma not_isWellPosed :
+    ¬(TwoPortSeriesNetlist.netlist first second).IsWellPosed := by
+  intro hWellPosed
+  have hOutputsEqual :=
+    ((TwoPortSeriesNetlist.netlist first second).behavior_isFunctional hWellPosed).2
+      (flatNetlist_member 0) (flatNetlist_member 1)
+  exact outerOutput_zero_ne_one
+    ((ModeAmplitude.reindex
+      (TwoPortSeriesNetlist.externalOutgoingEquiv first second).symm).injective hOutputsEqual)
+
 /-- The typed external behavior retains two distinct outputs at the singular pivot. -/
 lemma externalBehavior_outputs_nonunique :
     (0, outerOutput 0) ∈ TwoPortSeriesNetlist.externalBehavior first second ∧
@@ -158,10 +178,7 @@ lemma externalBehavior_outputs_nonunique :
     simpa only [map_zero] using flatNetlist_member 0
   · rw [TwoPortSeriesNetlist.externalBehavior, LinearBehavior.mem_reindex_iff]
     simpa only [map_zero] using flatNetlist_member 1
-  · intro hEqual
-    have hCoordinate := congrArg
-      (fun output => output (Sum.inl (Outgoing.mk ()))) hEqual
-    norm_num [outerOutput, scalarState, scalarAmplitude] at hCoordinate
+  · exact outerOutput_zero_ne_one
 
 end TwoPortSeriesNetlistSingularRegression
 
