@@ -1183,8 +1183,9 @@ PR unless maintainers explicitly ask to retain it.
   and prove exact action, Gram, isometry, cross-zero, projector-completeness, `C b + E_in u`, and
   additive normalized-power laws. Preserve the empty-mode channel-versus-port distinction. The
   later `FlatNetlist` construction now closes the broad structural API-map requirement. N4C's
-  finite data, reflected well-formedness check, and proof-carrying kernel construction are now
-  complete; executable matrix assembly and entrywise semantic soundness remain separate work.
+  finite data, reflected well-formedness check, proof-carrying kernel construction, executable
+  matrix assembly, and entrywise semantic soundness are now complete; its normalized coefficient
+  backend and guarded evaluation layer remain separate work.
 - [ ] Before upstreaming the external-output completion, prepare a stack in this order: the neutral
   complementary-range-projector lemma in `Mode/Embedding`; outgoing endpoint partition, exposure,
   and readout; routing/exposure orthogonality and projector completeness; then the focused mixed
@@ -1231,12 +1232,22 @@ PR unless maintainers explicitly ask to retain it.
   direction flag is accepted as evidence. Confirm that `wellFormed` is the exhaustive finite
   `Decidable` for its public specification, so any future optimized checker must be proved
   equivalent rather than treated as an independent oracle.
-- [ ] Complete N4C with generic executable `S`, `C`, `E_in`, and `E_out` matrices and prove their
-  entrywise evaluation agrees with the derived N4 maps. Account explicitly for proof-irrelevance
-  between the compiled constructive `DecidableEq` instances and N4's locally chosen classical
-  instances. Then add an executable normalized coefficient-list representation with a proof-exact
-  interpretation into rational functions and a denominator-guarded evaluation theorem, without
-  introducing an inverse, determinant, or well-posedness assumption before N5.
+- [x] Complete N4C's matrix layer with generic executable `S`, `C`, `E_in`, `E_out`, transposed
+  readout, and `1 - C * S`; prove entrywise evaluation agrees with the derived N4 maps and that
+  the three evaluated matrix equations are exactly the singular-safe external relation. The
+  explicit finite enumerations account for proof-irrelevance against N4's local classical
+  instances. Hostile exact fixtures retain two distinct zero-input outputs, send nonzero input
+  `(1, -1)` to `(0, 2)`, keep external columns out of internal routing, and distinguish a
+  three-mode forward cycle from its inverse.
+- [ ] Human-check before upstreaming every N4C matrix shape and orientation: rows are outputs,
+  columns are inputs, `C` maps outgoing channels to incident mates, `E_in` injects external
+  incidents, and output readout is `E_outᵀ`. Confirm independently that coefficient evaluation and
+  relabelling identify all four raw matrices with the N4 typed maps, and that the semantic theorem
+  retains every singular solution rather than selecting one by an implicit inverse.
+- [ ] Complete N4C's coefficient layer with an executable normalized coefficient-list
+  representation, a proof-exact rational-function interpretation, and a denominator-guarded
+  evaluation theorem that commutes with compilation. Do not introduce an inverse, determinant,
+  or well-posedness assumption before N5.
 - [ ] Human-check before upstreaming that `WiringEquiv`, rather than an index permutation alone,
   is the public hypothesis; that the ambient port family is fixed; and that component relabelling
   and mode-phase gauge are excluded covariance statements. Confirm independently that the

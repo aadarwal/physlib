@@ -1968,8 +1968,11 @@ Exit: network equations come from a typed netlist rather than being supplied ind
   endpoint injectivity, rejecting self-wiring, same-side or mixed-end reuse, and wire-level
   fan-out. Connections are bidirectional data; incident/outgoing channel direction is enforced by
   N4's derived map types rather than stored as an unverified direction flag;
-- [ ] executable construction of `S`, `C`, `E_in`, and `E_out`;
-- [ ] a soundness theorem equating compiled equations with N4's flat relational semantics;
+- [x] executable construction of `S`, `C`, `E_in`, `E_out`, and the transposed output readout,
+  together with the implicit matrix `1 - C * S`;
+- [x] a soundness theorem equating the evaluated compiled matrix equations with N4's flat
+  relational semantics, including a singular multivalued regression at zero external input, a
+  nonzero-input exposure witness, and a non-self-inverse three-mode routing cycle;
 - [ ] an algebraic backend over an appropriate field, with an executable normalized coefficient
   representation and a proof-exact rational-function interpretation for finite-delay responses;
   and
@@ -2618,7 +2621,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
-| N4C certified compiler | in progress | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, and hostile construction tests are complete; generic executable `S`, `C`, `E_in`, `E_out`, entrywise soundness, and the rational-function evaluation layer remain |
+| N4C certified compiler | in progress | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, and hostile singular regressions are complete; the normalized rational-function backend and guarded evaluation layer remain |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
 | N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
@@ -2777,9 +2780,12 @@ human verification recorded in `tbd.md`.
    relabellings now leave ambient routing and feedback literally equal and transport the complete
    external behavior canonically, even for the singular fixture. N4 is complete. N4C now has a
    finite executable data model, an exact reflected checker for inverse mode tables and unique
-   physical endpoints, and proof-carrying compilation into the same relational kernel. Continue
-   with generic executable `S`, `C`, `E_in`, and `E_out` plus entrywise semantic soundness; keep
-   well-posed elimination in N5.
+   physical endpoints, proof-carrying compilation into the same relational kernel, generic
+   executable `S`, `C`, `E_in`, `E_out`, transposed readout and `1 - C * S`, and an exact bridge
+   from evaluated matrix equations to the singular-safe external relation. Its executable
+   regression preserves two different outputs at zero input. Continue with the normalized
+   coefficient backend and denominator-guarded rational-function evaluation; keep well-posed
+   elimination in N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
