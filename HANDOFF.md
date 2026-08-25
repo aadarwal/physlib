@@ -16,7 +16,8 @@ one place the ray layering rule is lifted: `Physlib/Optics/Rays/E5bBridge.lean` 
 | `de4be782` | Side-convention docstring fix, already merged as `48015bbf` |
 | `23d3b6fe` | The refraction results stated about a ray |
 | `f5b8c2b7` | R5 corrective slice: withhold RS-04, RS-06, RS-07 by name |
-| (this one) | Meridional-plane existence, and the provenance correction below |
+| `f8ce8a8c` | Meridional-plane existence, and the provenance correction below |
+| (this one) | One meridional plane for all three waves, and the C2 corrections |
 
 ## Registrations needed in `Physlib.lean`
 
@@ -143,8 +144,26 @@ Section F, existence of the realising ray:
 
   E5b's `transmitted_phaseVector_mem_incidencePlane` does **not** supply this. It is a membership
   statement — the transmitted phase vector lies in the span of the incident phase vector and the
-  normal — not a construction of a tangent. It is complementary, and it is what would let the same
-  meridional plane serve the transmitted wave; that extension is not done here.
+  normal — not a construction of a tangent. It is complementary, and section G below uses it.
+
+- `Optics.realisesIncidentPhaseDirection_of_tangentialProjection_eq_zero` — at normal incidence
+  *every* tangent realises the incident direction, with no unit-norm or in-interface hypothesis
+  needed at all, because the tangential term of the ambient direction vanishes identically. This
+  is the precise form of "the plane is undetermined, not absent", and it establishes that
+  existence never depended on non-normal incidence; only the canonical choice of tangent does.
+
+Section G, one meridional plane for all three waves:
+
+- `Optics.meridionalPlaneSpan`, `Optics.meridionalPlaneSpan_eq` (the span built from the canonical
+  tangent is the span built from the phase vector), `Optics.mem_meridionalPlaneSpan_self`.
+- `Optics.transmitted_phaseVector_mem_meridionalPlaneSpan` and
+  `Optics.reflected_electricAmplitude_eq_zero_or_phaseVectors_mem_meridionalPlaneSpan` — the
+  constructed plane contains the transmitted and, away from the interface theory's own
+  zero-amplitude alternative, the reflected phase vectors. That disjunction is preserved, not
+  discharged.
+
+  This is a statement about **spans of phase vectors**. It assigns no ray, direction of travel, or
+  outgoing role to the transmitted or reflected labels.
 
 ### `Physlib.Optics.Rays.E5bBridgeRegression`
 
@@ -185,6 +204,12 @@ predicate is stipulated, not derived from the integral Maxwell equations, so thi
 a **stated boundary condition**, not to Maxwell. Maxwell enters only through the half-space
 plane-wave solutions. Closing it to Maxwell waits on E4b.
 
+The correction had to be made twice. The first attempt was applied to the two docstrings but not
+to the module overview, because the editing script asserted on a later hunk and discarded its
+earlier edits before writing — and the result was not re-checked by grep. The review caught the
+surviving sentence. The gate run for this commit now greps the file for the phrase explicitly, so
+that failure mode is covered rather than trusted.
+
 **Closes:** `goal.md` §H.5 R1 bullet 4. The ledger row GO-02 recorded the paraxial law as
 "postulated" in the source with a Physlib target of "stronger — limit or explicit assumption **+ EM
 bridge**". The limit and the explicit cubic bound were delivered in R1; the bridge is this lane.
@@ -197,10 +222,12 @@ Maxwell".
 1. **A phase direction is not a ray.** The interface theory is explicit that its phase angles assert
    nothing about group velocity, energy flux, or outgoing behaviour. Nothing here upgrades them.
    The correspondence is geometric only.
-2. **The meridional plane is constructed only away from normal incidence.** Section F builds the
-   tangent and the realising ray for any configuration whose incident phase vector has nonzero
-   tangential projection. At exactly normal incidence there is no plane of incidence to construct,
-   and nothing is claimed there.
+2. **Non-normal incidence is needed for the *canonical* tangent, not for existence.** Section F
+   normalises the tangential projection, which is why it needs that projection nonzero. It is not
+   a condition for a meridional plane or a realising ray to exist: at normal incidence every
+   tangent realises the incident direction, so the plane is *undetermined*, not absent. An earlier
+   version of this note and of the module doc said non-normality was "the condition under which a
+   plane of incidence exists at all", which is false and has been corrected.
 3. **Curved surfaces are untouched.** The paraxial laws for spherical surfaces remain model laws.
    This bridge covers the *planar* interface only, which is the one E5b models.
 4. **No field, power, or polarization** is assigned to a ray anywhere in the ray development.

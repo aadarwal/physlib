@@ -31,12 +31,17 @@ would be visible as a changed coordinate.
 - `Optics.e5bBridgeRegression_reflected_direction`: the reflected direction is `(3/5, 0, -4/5)`.
 - `Optics.e5bBridgeRegression_reflected_angleToSide`: the reflected ray makes the same angle into
   the outgoing side.
+- `Optics.e5bBridgeRegression_incidenceTangent`: the canonical tangent constructed from the
+  fixture phase vector is the fixture tangent.
+- `Optics.e5bBridgeRegression_meridionalPlane_proper`: the meridional plane is a proper subspace,
+  so it is a genuine constraint.
 
 ## iii. Table of contents
 
 - A. The fixture
 - B. Incidence
 - C. Reflection
+- D. The canonical tangent and the meridional plane
 
 ## iv. References
 
@@ -174,6 +179,75 @@ lemma e5bBridgeRegression_reflected_angleToSide :
   angleToSide_vectorReflection_meridionalDirection _ _ _ _ e5bBridgeRegressionTangent_norm
     e5bBridgeRegressionTangent_normalComponent e5bBridgeRegressionAngle_mem.1
     e5bBridgeRegressionAngle_mem.2
+
+/-!
+
+## D. The canonical tangent and the meridional plane
+
+-/
+
+/-- The fixture incident phase vector, the exact `3-4-5` direction. -/
+def e5bBridgeRegressionPhase : EuclideanSpace ℝ (Fin 3) := WithLp.toLp 2 ![3 / 5, 0, 4 / 5]
+
+/-- The tangential projection of the fixture phase vector is `(3/5, 0, 0)`. -/
+lemma e5bBridgeRegression_tangentialProjection :
+    e5bBridgeRegressionPlane.tangentialProjection e5bBridgeRegressionPhase =
+      WithLp.toLp 2 ![3 / 5, 0, 0] := by
+  rw [OrientedAffineHyperplane.tangentialProjection, OrientedAffineHyperplane.normalComponent,
+    OrientedAffineHyperplane.normalVector, e5bBridgeRegressionPlane, e5bBridgeRegressionNormal,
+    e5bBridgeRegressionPhase]
+  ext i
+  fin_cases i <;> simp [Space.basis, PiLp.inner_apply, Fin.sum_univ_three]
+
+/-- That projection is `3 / 5` times the fixture tangent. -/
+lemma e5bBridgeRegression_tangentialProjection_smul :
+    e5bBridgeRegressionPlane.tangentialProjection e5bBridgeRegressionPhase =
+      (3 / 5 : ℝ) • e5bBridgeRegressionTangent := by
+  rw [e5bBridgeRegression_tangentialProjection, e5bBridgeRegressionTangent]
+  ext i
+  fin_cases i <;> simp
+
+/-- Its norm is `3 / 5`. -/
+lemma e5bBridgeRegression_tangentialProjection_norm :
+    ‖e5bBridgeRegressionPlane.tangentialProjection e5bBridgeRegressionPhase‖ = 3 / 5 := by
+  rw [e5bBridgeRegression_tangentialProjection_smul, norm_smul,
+    e5bBridgeRegressionTangent_norm, mul_one, Real.norm_eq_abs]
+  norm_num
+
+/-- The fixture is not at normal incidence. -/
+lemma e5bBridgeRegression_tangentialProjection_ne_zero :
+    e5bBridgeRegressionPlane.tangentialProjection e5bBridgeRegressionPhase ≠ 0 := by
+  intro hzero
+  have hnorm := e5bBridgeRegression_tangentialProjection_norm
+  rw [hzero, norm_zero] at hnorm
+  norm_num at hnorm
+
+/-- **The canonical tangent constructed from the fixture phase vector is the fixture tangent.**
+
+This ties the general construction of section F to coordinates: the normalised tangential
+projection of `(3/5, 0, 4/5)` against a third-coordinate normal is exactly `(1, 0, 0)`.
+-/
+lemma e5bBridgeRegression_incidenceTangent :
+    incidenceTangent e5bBridgeRegressionPlane e5bBridgeRegressionPhase =
+      e5bBridgeRegressionTangent := by
+  rw [incidenceTangent, e5bBridgeRegression_tangentialProjection_norm,
+    e5bBridgeRegression_tangentialProjection_smul, smul_smul,
+    show ((3 : ℝ) / 5)⁻¹ * (3 / 5) = 1 by norm_num, one_smul]
+
+/-- **The meridional plane is a proper subspace.**
+
+The second coordinate axis is not in it, so the plane is a genuine constraint on the three phase
+vectors rather than a statement that holds vacuously.
+-/
+lemma e5bBridgeRegression_meridionalPlane_proper :
+    WithLp.toLp 2 ![(0 : ℝ), 1, 0] ∉
+      meridionalPlaneSpan e5bBridgeRegressionPlane e5bBridgeRegressionPhase := by
+  rw [meridionalPlaneSpan, e5bBridgeRegression_incidenceTangent, Submodule.mem_span_pair]
+  rintro ⟨a, b, hab⟩
+  have h := congrArg (fun v : EuclideanSpace ℝ (Fin 3) => v 1) hab
+  rw [e5bBridgeRegressionTangent, OrientedAffineHyperplane.normalVector,
+    e5bBridgeRegressionPlane, e5bBridgeRegressionNormal] at h
+  simp [Space.basis] at h
 
 end
 
