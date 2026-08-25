@@ -34,6 +34,11 @@ The enumeration is genuinely executable: it uses no choice, so small examples ar
 `decide` rather than by an argument. The cofactor of a path is the graph determinant of the
 vertex set the path does not touch.
 
+These enumerations range over the complete finite node type; they take no separate topology
+argument. A missing or zero-gain edge is represented by a zero matrix entry, which makes every
+term using it vanish algebraically. This is sufficient for the determinant identities below, but
+it is not an executable enumeration of the actual edges of an explicit multigraph.
+
 Nothing here is proved equal to a determinant or to a gain; this file only builds the
 combinatorial objects and their elementary properties. The identification with `det (1 - G)` and
 Mason's formula are separate.

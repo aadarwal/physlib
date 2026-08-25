@@ -60,8 +60,8 @@ Section B supplies explicit edge identity and topology independent of whether a 
 evaluated edge weight happens to be zero. It does **not** store distinguished input/output nodes,
 and its current path and loop enumeration is not edge-indexed, so it is only a foundation for the
 larger S6 multigraph requirement. The source development carries a graph as a list of branches
-`ℕ × ℂ × ℕ`; see U. Siddique,
-S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal Processing Systems",
+`ℕ × ℂ × ℕ`; see U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic
+Signal Processing Systems",
 FMICS 2015, LNCS 9128, Definition 1 (p. 167). A separate edge type is the same idea with the
 branch index made a first-class parameter rather than a list position.
 
