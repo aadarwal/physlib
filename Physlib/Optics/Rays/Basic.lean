@@ -371,7 +371,8 @@ component whose paraxial matrix is known but not derived here; its validity cond
 requires the entries to satisfy the index-ratio determinant law, which the source does not
 impose.
 
-Radii of curvature are signed, positive when the centre of curvature lies downstream.
+Radii of curvature are signed, positive when the centre of curvature lies on the outgoing side of
+the surface, as fixed in the module documentation.
 -/
 inductive ParaxialInterface where
   /-- Refraction at a plane surface separating two media. -/

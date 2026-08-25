@@ -263,6 +263,18 @@ lemma ParaxialInterface.det_transferMatrix_phaseConjugate (n₀ n₁ : ℝ) :
 /-- The coordinate transform that preserves ray height and reverses the output angle. -/
 def angleReversal : RayTransferMatrix := !![1, 0; 0, -1]
 
+/-- Reversing the output-angle coordinate twice is the identity.
+
+This is the guard against double-counting a reflection's direction reversal. A treatment that
+keeps the reversal explicit as a coordinate operation, as this one does, must *not* also negate
+the radii on the reversed leg: doing both applies the same physical reversal twice. See the
+two-mirror round-trip regression in `Physlib.Optics.Rays.TransferRegression`.
+-/
+@[simp]
+lemma angleReversal_mul_self : angleReversal * angleReversal = 1 := by
+  rw [angleReversal, Matrix.mul_fin_two, Matrix.one_fin_two]
+  norm_num
+
 /-- The transfer matrix obtained by reversing the output-angle coordinate.
 
 `Physlib.Optics.Rays.Basic` fixes the folded convention, in which a plane mirror is the identity.
