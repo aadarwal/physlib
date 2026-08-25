@@ -93,8 +93,9 @@ S-01 regressions:
 - `Optics.MachZehnder.machZehnderRegression_power_balance`
 - `Optics.MachZehnder.machZehnderRegression_phase_factor_ratio`
 
-The literature-level Mach--Zehnder transfer and power results use `theorem`; supporting results use
-`lemma`, following `AGENTS.md:11` and the controller amendment.
+Only `Optics.MachZehnder.output_amplitudes`, the headline literature-known Mach--Zehnder transfer
+result, uses `theorem`. Power corollaries, specializations, and regression fixtures use `lemma`,
+following `AGENTS.md:11` and the controller amendment.
 
 ## N7 declarations consumed
 

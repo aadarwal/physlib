@@ -84,7 +84,7 @@ lemma machZehnderRegression_carrierPhaseFactor_points :
 
 /-- Row `S-01`: hand expansion of the N5 transfer at equal zero phases gives a dark first output
 and a negative-quadrature second output. -/
-theorem machZehnderRegression_phase_zero_output_amplitudes (input : ℂ) :
+lemma machZehnderRegression_phase_zero_output_amplitudes (input : ℂ) :
     ((netlist balancedPhaseZero).responseTransform
           (isWellPosed balancedPhaseZero)).toLinearMap
         (leftInput balancedPhaseZero input 0)
@@ -131,7 +131,7 @@ lemma machZehnderRegression_phase_zero_dark_port (input : ℂ) :
 
 /-- Row `S-01`: hand expansion at a lower-arm phase of `π` sends the input to the first output
 and makes the second output dark. -/
-theorem machZehnderRegression_phase_pi_output_amplitudes (input : ℂ) :
+lemma machZehnderRegression_phase_pi_output_amplitudes (input : ℂ) :
     ((netlist balancedPhasePi).responseTransform
           (isWellPosed balancedPhasePi)).toLinearMap
         (leftInput balancedPhasePi input 0)

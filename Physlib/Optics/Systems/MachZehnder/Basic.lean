@@ -64,7 +64,7 @@ namespace MachZehnder
 
 /-- The two right-output normalized modal powers are the squared moduli of the amplitudes
 extracted by N5. -/
-theorem output_powers (p : Parameters) (first second : ℂ) :
+lemma output_powers (p : Parameters) (first second : ℂ) :
     Complex.normSq
         (((netlist p).responseTransform (isWellPosed p)).toLinearMap
           (leftInput p first second) (externalOutgoingEquiv p .outputFirst)) =
@@ -184,7 +184,7 @@ The first output senses the arm-phase-factor difference; the second senses their
 negative-quadrature phase fixed by N7 at
 `Physlib/Optics/Components/DirectionalCoupler.lean:68-77`.
 -/
-theorem balanced_output_amplitudes (upperPhase lowerPhase : Real.Angle) (input : ℂ) :
+lemma balanced_output_amplitudes (upperPhase lowerPhase : Real.Angle) (input : ℂ) :
     ((netlist (balancedParameters upperPhase lowerPhase)).responseTransform
           (isWellPosed (balancedParameters upperPhase lowerPhase))).toLinearMap
         (leftInput (balancedParameters upperPhase lowerPhase) input 0)
@@ -221,7 +221,7 @@ theorem balanced_output_amplitudes (upperPhase lowerPhase : Real.Angle) (input :
     ring
 
 /-- The balanced output powers expose the cosine of the arm phase difference. -/
-theorem balanced_output_powers (upperPhase lowerPhase : Real.Angle) (input : ℂ) :
+lemma balanced_output_powers (upperPhase lowerPhase : Real.Angle) (input : ℂ) :
     Complex.normSq
         (((netlist (balancedParameters upperPhase lowerPhase)).responseTransform
             (isWellPosed (balancedParameters upperPhase lowerPhase))).toLinearMap
@@ -284,7 +284,7 @@ lemma balancedPhasePi_isLossless : balancedPhasePi.IsLossless :=
 
 /-- At the balanced equal-phase point, the first output is dark and the second carries the input
 with N7's negative-quadrature phase. -/
-theorem balanced_phase_zero_output_amplitudes (input : ℂ) :
+lemma balanced_phase_zero_output_amplitudes (input : ℂ) :
     ((netlist balancedPhaseZero).responseTransform
           (isWellPosed balancedPhaseZero)).toLinearMap
         (leftInput balancedPhaseZero input 0)
@@ -319,7 +319,7 @@ lemma balanced_phase_zero_dark_port (input : ℂ) :
 
 /-- At a lower-arm phase of `π`, the first balanced output carries the input and the second is
 dark. -/
-theorem balanced_phase_pi_output_amplitudes (input : ℂ) :
+lemma balanced_phase_pi_output_amplitudes (input : ℂ) :
     ((netlist balancedPhasePi).responseTransform
           (isWellPosed balancedPhasePi)).toLinearMap
         (leftInput balancedPhasePi input 0)
@@ -398,7 +398,7 @@ lemma responseTransform_isPowerPreserving (p : Parameters) (hp : p.IsLossless) :
 /-- For nonzero first-port excitation, the ratio of the two arm phase factors is recoverable from
 the two balanced complex outputs. Thus the arm phase difference is identifiable modulo the
 `Real.Angle` period. -/
-theorem balanced_phase_factor_ratio_eq_output_ratio
+lemma balanced_phase_factor_ratio_eq_output_ratio
     (upperPhase lowerPhase : Real.Angle) (input : ℂ) (hInput : input ≠ 0) :
     let firstOutput :=
       ((netlist (balancedParameters upperPhase lowerPhase)).responseTransform
@@ -429,7 +429,7 @@ theorem balanced_phase_factor_ratio_eq_output_ratio
 
 set_option maxHeartbeats 800000 in
 /-- A left-incident field produces no reflected amplitudes at either left external port. -/
-theorem reflected_amplitudes_eq_zero (p : Parameters) (first second : ℂ) :
+lemma reflected_amplitudes_eq_zero (p : Parameters) (first second : ℂ) :
     ((netlist p).responseTransform (isWellPosed p)).toLinearMap
           (leftInput p first second) (externalOutgoingEquiv p .inputFirst) = 0 ∧
       ((netlist p).responseTransform (isWellPosed p)).toLinearMap
