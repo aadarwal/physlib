@@ -807,6 +807,14 @@ The two cardinality regressions were first written with `decide`, which fails on
 carrying free complex variables; they are proved instead by identifying the refinement set with an
 image of the edge set, which is correct and general in the gains.
 
+### Sync before the slice 6 cutoff
+
+`optics/development` (`48015bbf`) was merged into this branch before the cutoff, per the standing
+rule. Clean merge, no conflicts: the only incoming changes were new `Physlib/Optics/Rays` files
+from another lane, and no `SignalFlowGraph` file was touched, so nothing needed adapting.
+Everything was rebuilt and every gate rerun after the merge. `HANDOFF.md` survived this merge,
+since the 7b batch that removes it downstream has not been merged yet.
+
 ### Parity classification for slice 6
 
 **Physlib-original.** The sources carry branches as list entries and so distinguish parallel
