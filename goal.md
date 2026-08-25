@@ -2071,6 +2071,12 @@ The reusable coupler, beam-splitter, and delay laws in this package are Physlib-
 corpus uses coupler and propagation coefficients as bare scalars inside larger formulas and proves
 no independently reusable component law for them.
 
+- [x] an algebraic reflectionless two-port substrate with arbitrary directional mode transforms,
+  independently stated amplitude equations and an exact zero-reflection block realization; this
+  is not yet a matched propagation, coupler, beam-splitter, physical-port, reciprocity, or
+  material-realization law;
+- [ ] its stacked exact normalized-modal-power decomposition and passivity/losslessness
+  classifications, with the directional hypotheses proved necessary as well as sufficient;
 - basic component definitions may start after N2a and the O2 direct-sum/reindexing support, before
   the general eliminator is complete;
 - matched propagation delay and attenuation;

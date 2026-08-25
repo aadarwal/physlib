@@ -1478,6 +1478,19 @@ PR unless maintainers explicitly ask to retain it.
   `E_outᴴ * S * (1 - C * S)⁻¹ * E_in`, wiring invariance uses literal feedback equality and
   canonical identity-on-ambient-channel external relabelling, and the rectangular response is not
   called a `ScatteringMatrix` without a proved external input/output pairing and completeness law.
+- [ ] Human-check the algebraic N7-0 reflectionless two-port substrate before upstreaming. Confirm
+  that `bL = T_rl aR` and `bR = T_lr aL`, hence the matrix blocks are exactly
+  `[[0, T_rl], [T_lr, 0]]`; that the heterogeneous `Unit`/`Fin 2` regression pins both directional
+  placements. Zero reflection is not an impedance-matching derivation, arbitrary directional
+  transforms do not assert reciprocity, raw sum labels are not component-owned physical ports,
+  and this substrate is not yet propagation, delay, attenuation, coupling, or material
+  realization.
+- [ ] Human-check the stacked N7-0 modal-power classification separately. Confirm that the output
+  identities are decompositions rather than unconditional conservation; that the passive and
+  lossless iff laws concern only normalized modal power; that the two unit phases are not inverse
+  transforms; and that the gain-two failure uses a complete two-port input rather than assuming
+  the classifier's converse. Upstream this layer and its regressions only after the algebraic
+  behavior/realization stack.
 - [ ] Derive Redheffer and Mason formulas from the common linear-equation semantics rather than
   making either formula the foundational composition rule.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,

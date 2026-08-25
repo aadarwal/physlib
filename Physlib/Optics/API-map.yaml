@@ -181,6 +181,14 @@ Requirements:
     done: false
     location: N/A
 
+  - description: "The algebraic N7-0 core gives a reflectionless typed two-port an independent amplitude-level behavior and realizes it by the exact zero-reflection block scattering matrix with separately oriented directional transforms. A heterogeneous typed-scattering regression pins block and endpoint orientation, direct independent-behavior membership, concrete realized-graph membership, and rejection of a wrong local-mode order. This core makes no power, propagation, matching, reciprocity, physical-port, or material-realization claim."
+    done: true
+    location: "Physlib/Optics/Components/ReflectionlessTwoPort.lean (Optics.ReflectionlessTwoPort.outputMap, Optics.ReflectionlessTwoPort.outputMap_apply, Optics.ReflectionlessTwoPort.behavior, Optics.ReflectionlessTwoPort.mem_behavior_iff, Optics.ReflectionlessTwoPort.scattering, Optics.ReflectionlessTwoPort.scattering_toLinearMap_apply, Optics.ReflectionlessTwoPort.scattering_toTwoPortScatteringTransform_toLinearMap_apply, Optics.ReflectionlessTwoPort.scattering_realizes_behavior); Physlib/Optics/Components/ReflectionlessTwoPortRegression.lean (Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_outputMap, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_mem, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_wrong_not_mem, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_scattering_action, Optics.ReflectionlessTwoPort.reflectionlessTwoPortRectangular_realized_mem)"
+
+  - description: "The N7-0 modal-power layer shall derive the exact specification-level and realized output-power decompositions and classify passivity and losslessness by iff statements on both directional transforms, with non-inverse unit phases and an explicit modal-amplitude-gain-two witness guarding the hypotheses."
+    done: false
+    location: N/A
+
   - description: "The component library shall represent polarizers and wave plates as one-way mode transforms and matched propagation delays, attenuators, mirrors, ideal directional couplers, beam splitters, and dielectric interfaces as multiport scattering devices, with explicit physical validity conditions."
     done: false
     location: N/A
