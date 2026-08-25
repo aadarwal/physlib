@@ -278,22 +278,24 @@ lemma toConnection_right (evaluate : R →+* ℂ) (h : data.WellFormed)
 @[simp]
 lemma toConnection_modeEquiv_apply (evaluate : R →+* ℂ) (h : data.WellFormed)
     (index : data.Connection) (mode : data.shape.Mode (data.connection index).first) :
-    ((data.toConnection evaluate h index).modeEquiv :
-      (data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
+    @DFunLike.coe
+      ((data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
           (data.connection index).first ≃
         (data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
-          (data.connection index).second) mode =
+          (data.connection index).second)
+      _ _ _ (data.toConnection evaluate h index).modeEquiv mode =
       (data.connection index).modeMap mode := rfl
 
 /-- A compiled connection applies the exact certified inverse mode map in reverse. -/
 @[simp]
 lemma toConnection_modeEquiv_symm_apply (evaluate : R →+* ℂ) (h : data.WellFormed)
     (index : data.Connection) (mode : data.shape.Mode (data.connection index).second) :
-    ((data.toConnection evaluate h index).modeEquiv :
-      (data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
-          (data.connection index).first ≃
-        (data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
-          (data.connection index).second).symm mode =
+    (@Equiv.symm
+      ((data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
+        (data.connection index).first)
+      ((data.toComponentFamily evaluate).aggregatePortModeFamily.Mode
+        (data.connection index).second)
+      (data.toConnection evaluate h index).modeEquiv) mode =
       (data.connection index).modeInv mode := rfl
 
 /-- Compile certified finite connections into a proof-carrying connection family. -/
