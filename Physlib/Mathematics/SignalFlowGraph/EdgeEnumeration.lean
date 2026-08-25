@@ -224,7 +224,7 @@ lemma edgeMasonNumerator_eq (Γ : Multigraph ι E) (s t : ι) :
 /-- **Mason's gain formula at the edge level.** Where the graph determinant does not vanish, the
 gain between two nodes is the edge-level numerator over the edge-level determinant, both summed
 over enumerations in which parallel edges stay distinct. -/
-lemma edgeMasonGain_eq_gain (Γ : Multigraph ι E) (s t : ι) (h : graphDet Γ.toMatrix ≠ 0) :
+theorem edgeMasonGain_eq_gain (Γ : Multigraph ι E) (s t : ι) (h : graphDet Γ.toMatrix ≠ 0) :
     edgeMasonNumerator Γ s t / edgeGraphDet Γ = gain Γ.toMatrix s t := by
   rw [edgeMasonNumerator_eq, edgeGraphDet, edgeGraphDetOn_eq_graphDetOn, ← graphDet]
   exact masonGain_eq_gain Γ.toMatrix s t h
