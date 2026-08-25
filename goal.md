@@ -2186,7 +2186,7 @@ the all-phase normalized-modal power balance. The phase-ratio theorem identifies
 phase factor under a nonzero-input hypothesis. This is not a HOL-parity claim and supplies no
 time-domain delay, dispersion, polarization, reciprocity, or material model.
 
-#### S2. All-pass and add-drop microring resonators — all-pass slice complete
+#### S2. All-pass and add-drop microring resonators — amplitude/series slices complete
 
 - [x] construct the one-bus all-pass ring as an explicit `FlatNetlist` from the proved N7
   directional coupler and matched-propagation components;
@@ -2195,8 +2195,16 @@ time-domain delay, dispersion, polarization, reciprocity, or material model.
   kernel witness for the converse;
 - [x] prove the multiple-round-trip geometric series only under `‖t * gamma‖ < 1` and identify
   it with the algebraic-elimination response where both views apply;
-- [ ] construct the two-bus add-drop ring as an explicit feedback network; and
-- [ ] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
+- [x] construct the two-bus add-drop ring as an explicit feedback network; and
+- [x] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
+
+The add-drop implementation is a four-port `FlatNetlist` made from two directional couplers and
+two fixed-carrier half arcs. Its complete-state well-posedness is equivalent to
+`1 - t₁ * t₂ * gamma ≠ 0`; N5 elimination derives both transfer amplitudes. Their totalized
+round-trip series acquire the geometric-series interpretation only under contraction. The equal
+half-arc attenuation/phase split fixes a model and a drop-port reference-plane convention. Power
+observables, extrema, identifiability, free spectral range, reciprocity, and source-parity bridges
+remain S3 or later work.
 
 #### S3. Ring observables
 
@@ -2510,9 +2518,9 @@ corpus reports no numerical or simulation cross-validation of a formalized resul
 | B-02 | a noncontractive but invertible feedback example remains well posed | contraction treated as necessary |
 | B-03 | the source-mapped nested feedback/sum/pickoff identity follows from common behavior semantics | block-algebra orientation error |
 | S-01 | **Physlib extension met:** balanced Mach-Zehnder outputs and power balance | coupler phase convention errors |
-| S-02 | **all-pass met:** elimination and the contractive round-trip series agree; add-drop remains | feedback orientation errors |
+| S-02 | **met:** all-pass and add-drop elimination agree with their contractive round-trip series | feedback orientation errors |
 | S-03 | microring transfer, power, resonance, and rejection specializations | hidden nondegeneracy assumptions |
-| S-04 | physical add-drop realization yields the exact transfer response | disconnected ring formula |
+| S-04 | **met:** the physical add-drop realization yields both exact transfer responses | disconnected ring formula |
 | S-05 | add-drop power and rejection ratio satisfy their positivity and logarithm domains | amplitude/power or dB-convention error |
 | S-06 | the audited eight-node DCDR response agrees between elimination and Mason gain | graph topology or path/loop error |
 | S-07 | DCDR pole/zero/stability theorems include the audited unstable parameter case | cancellation or strictness error |
@@ -2718,7 +2726,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
-| S2/S3 microrings | in progress: all-pass amplitude/series slice complete | S0, N5, N5F, N6a, N7 | explicit one-bus netlist, exact solve gate, N5 through response, and contractive round-trip-series agreement complete; add-drop and observable suite remain |
+| S2/S3 microrings | in progress: all-pass and add-drop amplitude/series slices complete | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 through/drop responses, and contractive round-trip-series agreement complete; observable, identifiability, FSR, and source-parity suites remain |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |

@@ -1581,6 +1581,19 @@ PR unless maintainers explicitly ask to retain it.
   resonance fixture independently pins both the channel equations and the convergent series.
   This slice proves no add-drop response, power observable, critical coupling, bandwidth,
   causality, dispersion, group delay, material model, or DATE/SysCon parity bridge.
+- [ ] Human-check the S2 add-drop microring slice before upstreaming. Confirm that the explicit
+  four-port `FlatNetlist` contains two directional couplers and two fixed-carrier half arcs, and
+  that all four internal connection pairs are pinned. Audit the modeling split
+  `halfArcAttenuation = sqrt fieldAttenuation` and `halfArcPhase = phase / 2`, including its
+  drop-port reference-plane convention. Complete-state well-posedness must be equivalent to
+  `1 - t1 * t2 * gamma != 0`, with the converse supplied by the displayed singular-incident
+  kernel rather than an inverse assumption. Check that N5 derives both through and drop responses,
+  and that contraction is only a sufficient gate for interpreting the totalized `tsum`s as
+  round-trip series. The exact resonance fixture pins denominator `91 / 100`, through `45 / 91`,
+  drop `-32 / 91`, and series `100 / 91`; the antiresonance denominator is `109 / 100`. This
+  slice proves no power observable or balance, extrema, critical coupling, rejection ratio,
+  identifiability, free spectral range, bandwidth, causality, dispersion, group delay, material
+  model, reciprocity or time-reversed pairing, or DATE/SysCon parity bridge.
 - [ ] Human-check the S1 Mach--Zehnder extension before upstreaming. Confirm that the explicit
   feed-forward `FlatNetlist` contains exactly two N7 directional couplers and two fixed-carrier
   matched-propagation arms, that unconditional well-posedness follows from the channel equations,
