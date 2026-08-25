@@ -16,7 +16,7 @@ listed below for the conductor to apply at merge.
 |---|---|---|
 | 1 | Causal sequences, unilateral transform, ROC (absolute vs conditional), linearity, shift laws, first difference, z-scaling, unit impulse | **done** (`340de28a`) |
 | 2 | Modulus-only absolute convergence, exterior-of-circle ROC shape, reciprocal power series, unit step, geometric sequence, and the conditional-but-not-absolute witness | **done** |
-| 3 | Linear constant-coefficient difference equations to rational transfer functions; general IIR; the audited second-order low-pass; first-order all-pass regression | pending |
+| 3 | Linear constant-coefficient difference equations to rational transfer functions; general IIR; the audited second-order low-pass; first-order all-pass regression | **done** |
 | 4 | Stability: poles, the unit circle, BIBO, with the proved directions stated explicitly; two-pole regression | pending |
 | 5 | Inverse transform and uniqueness (JAL'18 Thms. 15-17), built on the `IsExteriorOfCircle` lemmas | pending — **now in scope**, see the scope note below |
 
@@ -219,6 +219,160 @@ Parity ledger:
   the substitution `u = z⁻¹` that Thm. 15 differentiates, so slice 5 starts from them.
 - JAL'18 Table 1 (p. 888), unit step and geometric entries — reached exactly, as set equalities.
 
+
+---
+
+## Slice 3 — files
+
+- `Physlib/Mathematics/ZTransform/DifferenceEquation.lean` (338 lines)
+- `Physlib/Mathematics/ZTransform/DifferenceEquationRegression.lean` (265 lines)
+
+### Registrations needed in `Physlib.lean` (cumulative, all six)
+
+```
+public import Physlib.Mathematics.ZTransform.Basic
+public import Physlib.Mathematics.ZTransform.BasicRegression
+public import Physlib.Mathematics.ZTransform.Convergence
+public import Physlib.Mathematics.ZTransform.ConvergenceRegression
+public import Physlib.Mathematics.ZTransform.DifferenceEquation
+public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+```
+
+Alphabetical order satisfies the dependency order.
+
+### Slice 3 — declarations
+
+`Physlib/Mathematics/ZTransform/DifferenceEquation.lean`, namespace `Physlib.ZTransform`:
+
+**A. Transforms of finite sums of sequences** — `seriesTerm_zero_fun`,
+`summable_seriesTerm_finsetSum`, `transform_finsetSum`.
+
+**B. Finite delay combinations and their symbols** — `delayCombination`, `delaySymbol`,
+`delayCombination_eq_sum`, `IsCausal.delayCombination`,
+`summable_seriesTerm_delayCombination`, `transform_delayCombination`.
+
+**C. Linear constant-coefficient difference equations** — `IsRecurrenceSolution`,
+`IsRecurrenceSolution.apply`, `transform_isRecurrenceSolution`.
+
+**D. Uniqueness of the causal solution** — `eq_of_isRecurrenceSolution`.
+
+**E. The transfer function and its region of convergence** — `transferFunction`, `iirROC`,
+`transform_eq_transferFunction_mul`, `transform_eq_transferFunction_mul_of_mem_iirROC`,
+`transferFunction_eq_div`.
+
+**F. The frequency-response substitution** — `inv_exp`, `transform_exp`,
+`transferFunction_exp`, `transferFunction_eq_norm_mul_exp_arg`.
+
+`Physlib/Mathematics/ZTransform/DifferenceEquationRegression.lean`, same namespace:
+`onePoleFeedback`, `onePoleFeedback_one`, `onePoleFeedforward`, `onePoleFeedforward_zero`,
+`unitImpulse_zero`, `geometricSeq_zero`, `isRecurrenceSolution_geometricSeq`,
+`transferFunction_onePole`, `transform_geometricSeq_eq_transferFunction_mul`,
+`allPassFeedback`, `allPassFeedback_one`, `allPassFeedforward`, `allPassFeedforward_zero`,
+`allPassFeedforward_one`, `transferFunction_allPass`, `norm_ofReal_add_eq_norm_one_add_mul`,
+`norm_transferFunction_allPass`, `lowPassFeedback`, `lowPassFeedback_one`,
+`lowPassFeedback_two`, `lowPassFeedforward`, `lowPassFeedforward_zero`,
+`lowPassFeedforward_one`, `lowPassFeedforward_two`, `zero_notMem_lowPass_lags`,
+`delaySymbol_lowPassFeedforward`, `delaySymbol_lowPassFeedback`,
+`transferFunction_lowPass_one`, `transferFunction_lowPass_neg_one`.
+
+### Design decisions in slice 3, and the hypotheses made explicit
+
+1. **The cleared identity is proved before the quotient.**
+   `transform_isRecurrenceSolution` states
+   `(1 - delaySymbol s α z⁻¹) * transform y z = delaySymbol t β z⁻¹ * transform x z`
+   and needs **no** nondegeneracy hypothesis at all. Dividing is a separate theorem,
+   `transform_eq_transferFunction_mul`, whose hypothesis `1 - delaySymbol s α z⁻¹ ≠ 0` is
+   explicit. The sources state the quotient directly. This ordering is what keeps the
+   nondegeneracy visible rather than buried in a definition.
+2. **Lags are an arbitrary `Finset ℕ`, not a list.** The sources index coefficients by lists and
+   impose "the head of the feedback list is zero" as a structural constraint. Here that is
+   `0 ∉ s`, and it is used **only** where it is actually needed, namely in
+   `eq_of_isRecurrenceSolution`. It is not needed to transform the equation.
+3. **Uniqueness of the causal solution is proved and has no counterpart in the sources.**
+   `eq_of_isRecurrenceSolution`: if `0 ∉ s`, two causal solutions driven by the same input are
+   equal. The zero initial conditions come from causality, so this is the "linear recurrences
+   with initial conditions" content of `goal.md` §H.4 S5, in its causal special case.
+4. **Rationality is rationality in `z⁻¹`, never in a physical frequency.** `transferFunction` is
+   a ratio of two polynomials in `z⁻¹`. The only bridge offered towards a delay variable is
+   `transform_exp` and `transferFunction_exp`, the substitution `z = exp w`, which are
+   identities about evaluation and assert nothing about a physical model.
+
+### Two explicit non-claims in slice 3
+
+- **No existence theorem for a causal solution.** Every transfer-function statement is
+  conditional on being handed a solution. To show the theory is not vacuous, the regression file
+  exhibits a solved case: `isRecurrenceSolution_geometricSeq` proves the causal geometric
+  sequence solves `y n = a * y (n - 1) + x n` driven by the unit impulse, and
+  `transform_geometricSeq_eq_transferFunction_mul` shows its transform, computed independently
+  in slice 2 by summing a geometric series, equals the transfer function times the input
+  transform. Two independent routes meet. Constructing solutions in general is deferred and is
+  flagged below.
+- **A denominator zero is only a candidate pole.** No theorem here says the transfer function
+  has a pole at a zero of `1 - delaySymbol s α z⁻¹`, because a numerator zero at the same point
+  can cancel it. This matches `goal.md` §S4's insistence on the same distinction; the
+  cancellation analysis is slice 4 work.
+
+### Slice 3 gates
+
+Same set, all clean: build; `lean -Dwarn.sorry=false -Dweak.says.verify=true` on each of the six
+files gives zero output; the Batteries declaration linter set run module-scoped over all six
+modules passes; `module_doc_lint` and `style_lint` rules re-run locally pass; no `sorry`,
+`axiom`, `native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import; imports
+minimal (both new files needed every import they declare).
+
+### Slice 3 — milestone and ledger rows
+
+`goal.md` §H.4 S5:
+
+- "finite convolution and linear recurrences with initial conditions" — the recurrence half is
+  done (`IsRecurrenceSolution`, `eq_of_isRecurrenceSolution`); a general finite-convolution
+  theorem `transform (x ⋆ h) = transform x * transform h` is **not** yet proved and is listed
+  below as remaining work.
+- "recurrence-to-transfer theorem under summability and initial-condition hypotheses" — done:
+  `transform_isRecurrenceSolution`, `transform_eq_transferFunction_mul`.
+- "general IIR and frequency-response theorems, including the audited second-order low-pass
+  regression" — done: `transferFunction`, `iirROC`, `transferFunction_exp`,
+  `transferFunction_eq_norm_mul_exp_arg`, and the low-pass regressions.
+- "connection between coefficient recurrences and the formal power-series view" — partially:
+  `transform_inv` (slice 2) records the transform as the power series `∑ f n u ^ n` in
+  `u = z⁻¹`. A `PowerSeries ℂ` valued map is **not** built; see remaining work.
+
+`goal.md` §I.3 regressions:
+
+- **T-02** ("recurrence, rational transfer function, and network response agree") — the first two
+  agree, proved on a solved case by `transform_geometricSeq_eq_transferFunction_mul`. The
+  network-response leg belongs to the S-track and is not this lane's to close.
+- **T-04** ("general IIR and audited second-order low-pass responses follow from recurrence
+  semantics") — done. The low-pass uses the source's exact rationals, feedback
+  `[0, 1.194, -0.436]` and feedforward `[0.0605, 0.121, 0.0605]`, as exact rationals and not
+  floating point. Two exact values are proved: gain exactly `1` at `z = 1`, and gain exactly `0`
+  at `z = -1`. The first detects a sign error in the feedback symbol; the second is the Nyquist
+  null that makes it a low-pass.
+- **T-05** ("the selected `q = z⁻¹` translation commutes with evaluation") — the mathematical
+  half is done, `transform_exp` and `transferFunction_exp`. Tying `q` to `exp (-s * τ)` for a
+  physical `τ` is S-track work.
+
+Parity ledger:
+
+- **ZT-05** (ITP'14 Def. 10 + Thm. 11 + Lemma 4, p. 492) — reached, and strengthened by the
+  division-free form plus `eq_of_isRecurrenceSolution`.
+- **ZT-06** (ITP'14 Defs. 11-13 + Thms. 12-13, pp. 494-496) — reached: `transferFunction`,
+  `iirROC`, `transferFunction_eq_div`, `transferFunction_exp`,
+  `transferFunction_eq_norm_mul_exp_arg`.
+- **ZT-07** (ITP'14 Def. 14 + Thm. 14, pp. 496-497) — reached as an audited regression with the
+  source's exact rational coefficients.
+
+### Remaining work in this lane after slice 3
+
+- Slice 4: poles and zeros after cancellation, Schur stability, and BIBO. Note ledger row ZT-10:
+  **no fetched source has a Schur-stability or BIBO theorem**, so that slice is Physlib-original
+  and its statements should be reviewed on their own merits, not against a source.
+- Slice 5: inverse transform and uniqueness (JAL'18 Thms. 15-17), on the `IsExteriorOfCircle`
+  lemmas and `transform_inv`.
+- Not yet scheduled, and worth a decision: a general finite-convolution theorem, an existence
+  theorem for causal solutions of a strictly causal recurrence, and a `PowerSeries ℂ` valued
+  formal-power-series map. All three are named in `goal.md` §H.4 S5. None is needed by slices 4
+  or 5, so they can be a slice 6 or dropped by explicit decision.
 
 ## Milestone and ledger rows touched by slice 1
 
