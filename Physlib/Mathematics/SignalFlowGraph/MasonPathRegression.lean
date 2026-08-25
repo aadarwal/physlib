@@ -22,14 +22,19 @@ direct computation gave, rather than replacing it.
 
 The orbit path is also evaluated. The permutation that swaps the two nodes routes the sink back
 to the source, and its orbit path is the two-node forward path; that is what the bijection
-attaches to the closing family, and it is checked here by computation rather than by an argument.
+attaches to the closing family, and it is settled here by evaluation, so the check does not lean
+on the recovery lemma it exercises. A second statement records that the recovery lemma delivers
+the same list.
 
 ## ii. Key results
 
 - `Physlib.SignalFlowGraph.masonGain_twoNodeLoop_eq_gain`: Mason's quotient is the gain for the
   single feedback loop, now as an instance of the general theorem.
+- `Physlib.SignalFlowGraph.masonGain_twoNodeLoop_eq`: and it takes the value computed directly
+  before the general theorem existed.
 - `Physlib.SignalFlowGraph.orbitPath_swap`: the orbit path of the closing family of the two-node
-  feedback graph is its forward path.
+  feedback graph is its forward path, settled by evaluation.
+- `Physlib.SignalFlowGraph.orbitPath_swap_eq_recovery`: the recovery lemma agrees with it.
 
 ## iii. Table of contents
 
@@ -72,11 +77,6 @@ lemma masonGain_twoNodeLoop_eq {a b : ℂ} (h : a * b ≠ 1) :
     masonGain (twoNodeLoop a b) 0 1 = a / (1 - a * b) := by
   rw [masonGain_twoNodeLoop_eq_gain h, gain_twoNodeLoop]
 
-/-- The forward-path numerator is the cofactor for this graph, now unconditionally. -/
-lemma masonNumerator_eq_adjugate_twoNodeLoop' (a b : ℂ) :
-    masonNumerator (twoNodeLoop a b) 0 1 = (systemMatrix (twoNodeLoop a b)).adjugate 1 0 :=
-  masonNumerator_eq_adjugate _ 0 1
-
 /-!
 
 ## B. The orbit path of a closing family
@@ -88,19 +88,14 @@ lemma swap_apply_one : (Equiv.swap (0 : Fin 2) 1) 1 = 0 := by
   rw [Equiv.swap_apply_right]
 
 /-- The orbit path of that closing family is the two-node forward path, which is what the
-bijection attaches to it. -/
-lemma orbitPath_swap : orbitPath (Equiv.swap (0 : Fin 2) 1) 1 = [0, 1] := by
-  have hne : (Equiv.swap (0 : Fin 2) 1) 1 ≠ 1 := by
-    rw [swap_apply_one]
-    decide
-  have hnd : ([0, 1] : List (Fin 2)).Nodup := by decide
-  have hhead : ([0, 1] : List (Fin 2)).head? = some 0 := rfl
-  have hlast : ([0, 1] : List (Fin 2)).getLast? = some 1 := rfl
-  have hform : ([0, 1] : List (Fin 2)).formPerm = Equiv.swap 0 1 := List.formPerm_pair 0 1
-  have hdisj : Disjoint (1 : Equiv.Perm (Fin 2)).support ([0, 1] : List (Fin 2)).toFinset := by
-    simp
-  have := orbitPath_mul (p := ([0, 1] : List (Fin 2))) (τ := 1) (s := 0) (t := 1)
-    hnd hhead hlast hdisj
-  rwa [hform, mul_one] at this
+bijection attaches to it. This is settled by evaluation, so it does not lean on the recovery
+lemma it is meant to exercise. -/
+lemma orbitPath_swap : orbitPath (Equiv.swap (0 : Fin 2) 1) 1 = [0, 1] := by decide
+
+/-- The recovery lemma delivers the same list on this instance, so the two agree where they
+overlap. -/
+lemma orbitPath_swap_eq_recovery :
+    orbitPath ((([0, 1] : List (Fin 2)).formPerm) * 1) 1 = [0, 1] :=
+  orbitPath_mul (by decide) rfl rfl (by simp)
 
 end Physlib.SignalFlowGraph

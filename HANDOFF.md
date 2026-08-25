@@ -27,7 +27,7 @@ conductor's, not this lane's. Slice 5 leaves it a clean hook and attempts nothin
 | 7 | Mason's formula in general | **done** in loop-family form |
 | 7b | Forward-path repackaging of the numerator | **done** — Mason's rule closed in its classical form |
 | 6 | Edge-based enumeration closing regression G-02 by proof | **done** |
-| 8 | Distinguished terminals, and definition-level G-01/G-03 regressions | pending — scheduled by the controller |
+| 8 | Reviewer fixes, distinguished terminals, definition-level G-01/G-03 regressions | **in progress** |
 
 ---
 
@@ -820,6 +820,131 @@ since the 7b batch that removes it downstream has not been merged yet.
 **Physlib-original.** The sources carry branches as list entries and so distinguish parallel
 branches by construction; see FMICS'15 Definitions 1-3 (pp. 167-168). No fetched source relates a
 branch-level enumeration to a node-level one, which is the reduction proved here.
+
+---
+
+## Slice 8 — reviewer fixes, terminals, definition-level regressions
+
+### The reviewer's five findings on `e3c79c09`
+
+The verdict was NOT READY **on regressions and prose, not on the mathematics**; the reviewer
+confirmed `masonGain_eq_gain` is the classical statement with the advertised hypothesis and that
+G-02 is implemented beyond representation level. The five findings are handled as follows.
+
+**1. No-teeth value regression — fixed.** `EdgeEnumerationRegression` claimed to have "evaluated"
+the refinement sum to `a + b` but in fact restated `pathGain_toMatrix` twice and routed the
+determinant comparison through `toMatrix`. The file now proves `sum_refining_parallelPair` and
+`sum_refining_singleEdge` **from the enumeration itself** — identifying the refinement set with an
+image of the edge set and taking the gain of a one-edge list — with no appeal to
+`pathGain_toMatrix` or `toMatrix_parallelPair_eq_singleEdge`. Only afterwards does
+`pathGain_toMatrix_parallelPair` show the hand-expanded value meets the general theorem, so the
+two routes to `a + b` share no step. A swapped gain, an omitted branch, or a wrong edge-list
+product now fails the file. The module doc was rewritten to describe what is actually proved.
+
+**2. Prose bug — fixed.** The old `refiningEdgeLists_ne` quantified an arbitrary `c` while its
+docstring claimed the two gain matrices were equal, which holds only at `c = a + b`. The statement
+is now specialised to `c = a + b` and renamed `card_refiningEdgeLists_ne`, and the docstring names
+the lemma that supplies the matrix equality.
+
+**3. Overstated independence — fixed.** `orbitPath_swap` was advertised as checked "by
+computation" but was proved by invoking `orbitPath_mul`, the recovery lemma it exists to exercise.
+It is now proved `by decide`, and a separate `orbitPath_swap_eq_recovery` records that the
+recovery lemma delivers the same list, so the two are compared rather than conflated.
+
+**4. Empty regression — removed.** `masonNumerator_eq_adjugate_twoNodeLoop'` was a bare
+specialisation of the general lemma with no regression content. Deleted.
+
+**5. Long lines — not applicable, with evidence.** The five flagged lines are 92 to 100
+**characters** but 101 to 104 **bytes**. The repo's `longLineLinter` tests `l.length`, which in
+Lean 4 counts codepoints, not bytes. Empirically the merged tree contains 48 lines that are at
+most 100 characters and more than 100 bytes, and the maximum **character** length across merged
+`Physlib/Optics` files is exactly 100. So the operative rule is characters and these lines comply;
+the finding appears to come from a byte-based measurement. Nothing was changed, because a
+cosmetic edit here would imply a rule that the repo does not enforce. If the intent is a stricter
+byte budget, say so and I will reflow them.
+
+### Distinguished terminals
+
+`Physlib/Mathematics/SignalFlowGraph/Terminated.lean`. `TerminatedGraph` packages a gain matrix
+with a distinguished `input` and `output`, and `transfer` is the gain between them. The packaging
+is thin on purpose and the module doc says so: every result is an instance of one already proved.
+What the terminals buy is that the same number can be named four ways without repeating the two
+nodes — `transfer_eq_nodeSolution` (the output signal under a unit injection at the input),
+`transfer_eq_inv` (an entry of the inverse system matrix), `transfer_eq_masonGain` (Mason's
+quotient over forward paths), and `transfer_eq_cyclicNumerator_div` (the loop-family quotient).
+`Multigraph.terminate` terminates a multigraph, and
+`Multigraph.transfer_terminate_eq_edgeMason` computes its transfer function by the edge-level
+enumeration in which parallel edges stay distinct.
+
+This is **parity of representation** with the sources: FMICS'15 Definition 1 (p. 167) carries the
+input and output node numbers in its graph record. The four identifications have no source
+counterpart.
+
+### Definition-level G-01 and G-03
+
+`Physlib/Mathematics/SignalFlowGraph/DefinitionRegression.lean`. The existing regressions compute
+a determinant through `graphDet_eq_det` and a gain through the adjugate, so they exercise the
+theorems but not the definitions those theorems are about. This file reaches the same values by
+routes that do not pass through them.
+
+- The loop families on two nodes are **enumerated and settled by evaluation**:
+  `univ_finset_fin_two`, `loopFamilies_fin_two_empty/_zero/_one/_univ`,
+  `loopCount_fin_two_univ_one`, `loopCount_fin_two_univ_swap`.
+- `graphDet_fin_two` expands the graph determinant on two nodes **directly from the alternating
+  sum**, giving `1 - G 0 0 - G 1 1 + G 0 0 * G 1 1 - G 1 0 * G 0 1`.
+- `graphDet_fin_two_eq_det` then shows that expansion equals `det (1 - G)`. That is a **second,
+  independent proof of the general identity restricted to two nodes**: an error inside
+  `graphDet_eq_det` would be caught here.
+- `graphDet_twoNodeLoop_direct` and `graphDet_fullTwoNode_direct` give the audited G-03 values
+  from the definition, meeting the values obtained elsewhere through `det`.
+- For G-01, `isNodeSolution_twoNodeLoop_explicit` exhibits an explicit signal vector and verifies
+  it satisfies the node equations under a unit injection; uniqueness then forces
+  `gain_twoNodeLoop_direct : gain (twoNodeLoop a b) 0 1 = a / (1 - a * b)` **from the semantics,
+  with no matrix inverse involved**. The same value was obtained elsewhere from a two-by-two
+  adjugate.
+
+### Files in slice 8
+
+New:
+
+- `Physlib/Mathematics/SignalFlowGraph/Terminated.lean` (     164 lines)
+- `Physlib/Mathematics/SignalFlowGraph/DefinitionRegression.lean` (     191 lines)
+
+Edited for the reviewer's findings:
+
+- `Physlib/Mathematics/SignalFlowGraph/EdgeEnumerationRegression.lean` (     144 lines) — findings 1, 2
+- `Physlib/Mathematics/SignalFlowGraph/MasonPathRegression.lean` (     101 lines) — findings 3, 4
+
+Registrations, appended to the cumulative list:
+
+```
+public import Physlib.Mathematics.SignalFlowGraph.Terminated
+public import Physlib.Mathematics.SignalFlowGraph.DefinitionRegression
+```
+
+### Parity classification for slice 8
+
+**Parity of representation** for `TerminatedGraph`: FMICS'15 Definition 1 (p. 167) carries the
+input and output node numbers inside the graph record, so a terminated graph is the source's own
+object. The four identifications of `transfer` — node solution, inverse entry, Mason quotient,
+loop-family quotient — have no source counterpart and are **Physlib-original**.
+
+`DefinitionRegression` is **test material, not a parity row**. Its one mathematically substantive
+entry is `graphDet_fin_two_eq_det`, an independent second proof of the general identity restricted
+to two nodes, which is **stronger** than anything in the sources only in that the sources have no
+determinant identity at all.
+
+### Slice 8 gates
+
+- `lake-lock build` of all seventeen modules — clean.
+- `lake-lock env lean -Dwarn.sorry=false -Dweak.says.verify=true <file>` on each of the seventeen —
+  zero output.
+- Module-scoped Batteries declaration linters over all seventeen modules — passed.
+- `module_doc_lint` and `style_lint` rules run locally on all seventeen — clean. One genuine
+  101-character line in `Terminated.lean` was found and reflowed; see finding 5 above for why the
+  five lines the reviewer flagged are not in this category.
+- No `sorry`, `axiom`, `native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import.
+- Every new declaration in both new files is a `lemma`, per the house convention.
 
 ### Slice 1 gates
 
