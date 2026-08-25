@@ -1198,6 +1198,19 @@ PR unless maintainers explicitly ask to retain it.
 - [x] Add the hostile N-11 shared-link regression: both local component matrices have explicit
   two-sided inverses, while zero input has distinct complete states and external outputs, the
   feedback operator has a nonzero kernel witness, and a separate external input has no solution.
+- [x] Prove N4 wiring-presentation invariance through a `WiringEquiv` that preserves both the
+  ambient connected-channel embedding and mate pairing. Instantiate it with connection-index
+  reindexing and endpoint-presentation exchange; keep `S`, `C`, and `1 - C * S` literally equal
+  on the fixed component boundary, and transport only the external subtype labels. Exercise the
+  theorem on the singular N-11 relation without functionality or inverse hypotheses.
+- [ ] Human-check before upstreaming that `WiringEquiv`, rather than an index permutation alone,
+  is the public hypothesis; that the ambient port family is fixed; and that component relabelling
+  and mode-phase gauge are excluded covariance statements. Confirm independently that the
+  canonical external equivalence preserves each underlying ambient channel.
+- [ ] Add the non-involutive connection-index direction sentinel when the first at-least-three-link
+  MZI fixture exists, and add a two-mode same-range/different-mate negative fixture that shows why
+  `mateEquiv_apply` is necessary. A singleton reindex and an involutive endpoint flip cannot
+  distinguish a permutation from its inverse, while the current scalar link cannot vary its mate.
 - [ ] Before upstreaming flat-netlist semantics, prepare a focused stack for the source-neutral
   feedback relation, netlist data and derived maps, compositional external semantics, and hostile
   singular regression. Human-check state order, `C * S`, `E_outᴴ`, partial/multivalued behavior,
@@ -1523,6 +1536,13 @@ PR unless maintainers explicitly ask to retain it.
   docstring-token emulation found no new missing word after prose rewording. The full linter
   reproduced only the known unrelated repository style and transitive-import baselines; neither
   functional-behavior Optics module appeared in either failure list.
+- [x] The 2026-08-25 N4 wiring-invariance run passed cache retrieval, the 4,710-job `Physlib`
+  build (including every `LinearBehavior` and two-port importer), focused warning-free source and
+  regression elaboration, both Physlib and QuantumInfo declaration linters, public-file import,
+  illegal-import, alpha-import, duplicate-tag, sorry/pseudo-attribution, committed-state style,
+  whitespace, forbidden-term, and API-map gates. The Optics API map resolved 2,479 names with no
+  missing file or declaration. The full linter reproduced only the known unrelated repository
+  style and transitive-import baselines; no changed Optics module appeared in either failure list.
 
 ## Milestone gates
 

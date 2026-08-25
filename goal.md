@@ -1879,7 +1879,11 @@ derived views of the same component behavior, not illicit multiplication of scat
 - [x] an order-free dependent-family relation requiring every individual component graph,
   proved equal to the assembled component graph as the typed analogue of parallel composition;
   and
-- [ ] invariance under internal-channel reordering.
+- [x] invariance under wiring-preserving relabelling of connected channels, instantiated by
+  connection-index reindexing and endpoint-presentation exchange. The ambient `C` and
+  `1 - C * S` are literally equal; external layers are equal up to the canonical
+  identity-on-channels relabelling. Component reordering and phase gauge remain separate
+  covariance statements.
 
 Exit: network equations come from a typed netlist rather than being supplied independently.
 
@@ -2501,8 +2505,8 @@ current integration base; a designed package whose prerequisite is merely active
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, and relational right-load termination with exact well-posedness and loaded-response formulas are complete; netlist agreement remains |
-| N4 network equations | in progress | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, and the N-11 singular regression are complete; internal-channel reordering remains |
-| N4C certified compiler | blocked | N4 | executable assembly and semantic soundness |
+| N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
+| N4C certified compiler | ready | N4 | executable assembly and semantic soundness |
 | N5 elimination | blocked | N4, N4C | unique-solvability/inverse/external-map suite |
 | N5F parameterized compilation | blocked | N5, N7 parameterized components | pointwise response-domain theorem suite |
 | N5H hierarchy/flattening | blocked | N4, N5 | hierarchy-to-flat semantic equality |
@@ -2636,8 +2640,10 @@ human verification recorded in `tbd.md`.
    `(1 - C * S) a = E_in u` without inversion. Its shared-link regression has invertible local
    component matrices but both multiple zero-input solutions and an unsolvable input. The
    order-free componentwise relation now proves that the assembled graph is exactly simultaneous
-   satisfaction of every canonically restricted local component graph. Continue with
-   internal-channel reordering; well-posed elimination belongs to N5.
+   satisfaction of every canonically restricted local component graph. Wiring-preserving
+   relabellings now leave ambient routing and feedback literally equal and transport the complete
+   external behavior canonically, even for the singular fixture. N4 is complete; continue with the
+   certified N4C compiler, while well-posed elimination remains in N5.
 3. Preserve P3c's proved boundary. Its unit-Jones result is an algebraic orbit-set equivalence,
    not a topological equivalence or a continuous choice of representatives; any topology upgrade
    must separately prove continuity and quotient-topology results. Unit Jones intensity remains a
