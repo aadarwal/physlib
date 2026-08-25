@@ -24,7 +24,8 @@ conductor's, not this lane's. Slice 5 leaves it a clean hook and attempts nothin
 | 3 | Mason's theorem, and `Δ = det (1 - G)` | **done**, with the forward-path half of the numerator explicitly withheld |
 | 4 | Regressions: single loop, two non-touching loops, the touching case, `Δ = 0` | **done**, delivered with slice 3 |
 | 5 | `ofCoefficientMatrix` hook, plus the edge-indexed multigraph structure with `toMatrix` | **done** |
-| 7 | Mason's formula in general | **done** in loop-family form; the forward-path repackaging of the numerator remains |
+| 7 | Mason's formula in general | **done** in loop-family form |
+| 7b | Forward-path repackaging of the numerator | **partial** — all summand identities proved, index bijection not |
 | 6 | Optional: edge-based enumeration closing regression G-02 by proof | pending — attempt after slice 7 |
 
 ---
@@ -575,6 +576,76 @@ forward-path repackaging or for slice 6, and that choice is the controller's.
 Definitions 3-4 (p. 168) and NSV'16 Definition 6 (p. 37) define it through the executable
 enumeration of forward circuits, and neither states a determinant or inverse-matrix
 identification.
+
+---
+
+## Slice 7b — files, and an honest stop
+
+- `Physlib/Mathematics/SignalFlowGraph/PathCycle.lean` (263 lines)
+
+Registration, appended to the cumulative list:
+
+```
+public import Physlib.Mathematics.SignalFlowGraph.PathCycle
+```
+
+### What is proved
+
+Every piece of *mathematical content* in the correspondence between a forward path and the loop
+family that closes through the sink:
+
+- `pathGain_eq_familyGain`: the gain along a repetition-free path is the family gain of the cyclic
+  permutation of its nodes, restricted to the nodes other than its last. This was the lemma named
+  as the crux in the slice 7 report, and it is proved.
+- `disjoint_formPerm`: a path cycle and a family supported off the path are disjoint
+  permutations.
+- `mul_apply_of_mem`, `mul_apply_of_notMem`: their product follows the path on the path and the
+  family off it.
+- `familyGain_union`: the family gain of a disjoint union splits into the two factors.
+- `loopCount_mul`: the product has **exactly one loop more** than the family, in both the
+  degenerate case where the path is a single node and the general case.
+- Supporting: `eq_getLast_of_getLast?`, `mem_of_getLast?`, `formPerm_apply_last`,
+  `formPerm_cons_apply`, `support_formPerm_toFinset`.
+
+Every summand identity that the reindexing has to respect is therefore available.
+
+### What is not proved, and why I stopped
+
+`masonNumerator G s t = cyclicNumerator G s t` is **not proved**. What remains is exactly the
+index bijection between
+
+* triples of a forward path `p`, a vertex set `T'` disjoint from it, and a family `σ'` supported
+  in `T'`; and
+* pairs of a vertex set `T` containing the sink and a family `σ` supported in `T` with
+  `σ t = s`,
+
+given forwards by `T = p.toFinset ∪ T'` and `σ = p.formPerm * σ'`.
+
+I stopped at the bijection rather than at the stop-limit, and the reason is a judgement rather
+than an obstacle: the remaining work is index bookkeeping over a three-level and a two-level
+`Finset.sigma`, which I estimate at 120 to 200 further lines with the highest iteration count of
+anything in the lane, and the S6 batch is being held on this slice. Reporting the exact remaining
+scope is worth more to the controller than continuing silently. Nothing is blocked; the work is
+well defined.
+
+**The route is now materially de-risked compared with the slice 3 write-up.** The inverse map
+sends `σ` to the rotation of `Equiv.Perm.toList σ t`, and the earlier worry was a round trip
+through `toList`. That round trip is **not needed**: `Equiv.Perm.formPerm_toList` together with
+`List.formPerm_rotate_one` gives `p.formPerm = σ.cycleOf t` directly, and the support condition on
+the residual family `σ' = (σ.cycleOf t)⁻¹ * σ` follows from `σ` agreeing with `σ.cycleOf t` on
+that orbit. The degenerate case where the source equals the sink, in which the path is the single
+node and the cycle is the identity, must be taken separately; `loopCount_mul` already handles that
+split on the summand side.
+
+### Slice 7b gates
+
+Build clean; `lean -Dwarn.sorry=false -Dweak.says.verify=true` gives zero output on all eleven
+files; the Batteries declaration linter set run module-scoped over all eleven modules passes; the
+`module_doc_lint` and `style_lint` rules re-run locally pass; no `sorry`, `axiom`,
+`native_decide`, or `set_option maxHeartbeats`; no `Physlib.Optics` import; imports minimal.
+
+There is **no `sorry` anywhere**: the unproved identity is not stated as a declaration, only
+described in the module doc. A reader of the file cannot mistake it for proved.
 
 ### Slice 1 gates
 
