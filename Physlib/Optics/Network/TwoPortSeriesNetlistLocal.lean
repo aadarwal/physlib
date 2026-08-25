@@ -52,7 +52,7 @@ variable {left middle right : Type u}
 
 /-- Restricting the aggregate state to the first component recovers its scattering pair. -/
 lemma firstBoundary_aggregateState
-    [Fintype left] [Fintype middle] [Fintype right]
+    [Fintype left] [Fintype middle]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (leftState : BackwardFirstTravellingWaveState left)
@@ -80,7 +80,7 @@ lemma firstBoundary_aggregateState
 
 /-- Restricting the aggregate state to the second component recovers its scattering pair. -/
 lemma secondBoundary_aggregateState
-    [Fintype left] [Fintype middle] [Fintype right]
+    [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (leftState : BackwardFirstTravellingWaveState left)

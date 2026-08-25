@@ -78,7 +78,7 @@ lemma externalCloseBehavior_eq_redhefferSeriesBehavior
 /-- Relabeling the N5 response graph to typed outer coordinates recovers the external netlist
 behavior from which that response was extracted. -/
 lemma toBehavior_responseTransform_reindex
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
+    [Fintype left] [DecidableEq left] [Fintype middle]
     [Fintype right] [DecidableEq right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))

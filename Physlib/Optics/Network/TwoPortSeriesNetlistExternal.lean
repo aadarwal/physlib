@@ -126,9 +126,8 @@ noncomputable instance externalChannelFintype [Fintype left] [Fintype middle] [F
     Fintype (netlist first second).ExternalChannel :=
   (netlist first second).eliminationExternalChannelFintype
 
-/-- External channels have decidable equality through their canonical coordinates. -/
-instance externalChannelDecidableEq [Fintype left] [Fintype middle] [Fintype right]
-    (first : ScatteringMatrix (left ⊕ middle))
+/-- External channels have classically decidable equality in their canonical coordinates. -/
+instance externalChannelDecidableEq (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right)) :
     DecidableEq (netlist first second).ExternalChannel := Classical.decEq _
 

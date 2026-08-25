@@ -50,8 +50,7 @@ variable {left middle right : Type u}
 
 /-- The first component's exposed left incident coordinate is supplied by the external input. -/
 lemma incidentAssembly_apply_firstLeft
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [DecidableEq middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (outgoing : ModeAmplitude (netlist first second).OutgoingIndex)
@@ -65,8 +64,7 @@ lemma incidentAssembly_apply_firstLeft
 
 /-- The first component's middle incident coordinate is supplied by the second component. -/
 lemma incidentAssembly_apply_firstMiddle
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [DecidableEq middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (outgoing : ModeAmplitude (netlist first second).OutgoingIndex)
@@ -80,8 +78,7 @@ lemma incidentAssembly_apply_firstMiddle
 
 /-- The second component's middle incident coordinate is supplied by the first component. -/
 lemma incidentAssembly_apply_secondMiddle
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [DecidableEq middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (outgoing : ModeAmplitude (netlist first second).OutgoingIndex)
@@ -95,8 +92,7 @@ lemma incidentAssembly_apply_secondMiddle
 
 /-- The second component's exposed right incident coordinate is supplied by the external input. -/
 lemma incidentAssembly_apply_secondRight
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [DecidableEq middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (outgoing : ModeAmplitude (netlist first second).OutgoingIndex)
@@ -146,8 +142,7 @@ lemma aggregateIncident_eq_incidentAssembly
 
 /-- External readout of the aggregate outgoing state is exactly the typed outer output. -/
 lemma externalOutgoingReadout_aggregateOutgoing
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (input : ModeAmplitude (Incident left ⊕ Incident right))

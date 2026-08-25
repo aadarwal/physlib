@@ -89,8 +89,7 @@ lemma incident_apply_right_of_assembly_eq
 
 /-- The external readout equation fixes the exposed left outgoing amplitude. -/
 lemma outgoing_apply_left_of_readout_eq
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (output : ModeAmplitude (Outgoing left ⊕ Outgoing right))
@@ -108,8 +107,7 @@ lemma outgoing_apply_left_of_readout_eq
 
 /-- The external readout equation fixes the exposed right outgoing amplitude. -/
 lemma outgoing_apply_right_of_readout_eq
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (output : ModeAmplitude (Outgoing left ⊕ Outgoing right))

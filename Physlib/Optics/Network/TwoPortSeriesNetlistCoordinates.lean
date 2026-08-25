@@ -111,9 +111,8 @@ noncomputable instance netlistChannelFintype [Fintype left] [Fintype middle]
   Fintype.ofEquiv ((left ⊕ middle) ⊕ (middle ⊕ right))
     (aggregateChannelEquiv first second)
 
-/-- The aggregate component boundary has decidable equality in finite coordinates. -/
-instance netlistChannelDecidableEq [Fintype left] [Fintype middle] [Fintype right]
-    (first : ScatteringMatrix (left ⊕ middle))
+/-- The aggregate component boundary has classically decidable equality. -/
+instance netlistChannelDecidableEq (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right)) :
     DecidableEq (netlist first second).Channel := Classical.decEq _
 
@@ -126,9 +125,8 @@ noncomputable instance connectedChannelFintype [Fintype middle]
   change Fintype (Σ _ : Unit, middle ⊕ middle)
   infer_instance
 
-/-- The two middle connection channels have decidable equality. -/
-instance connectedChannelDecidableEq [DecidableEq middle]
-    (first : ScatteringMatrix (left ⊕ middle))
+/-- The two middle connection channels have classically decidable equality. -/
+instance connectedChannelDecidableEq (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right)) :
     DecidableEq (netlist first second).ConnectedChannel := Classical.decEq _
 
