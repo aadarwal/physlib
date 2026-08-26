@@ -242,7 +242,9 @@ lemma passiveCase_coherentNumeratorPolynomial_expansion :
     DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
     DCDRSourceBridge.passiveCaseSourceParameters, DirectionalCoupler.crossCoefficient,
     passiveCoherentNumerator]
-  simp
+  simp only [Nat.ofNat_nonneg, Real.sqrt_div, Complex.ofReal_div, neg_mul, map_neg,
+    map_mul, Complex.ofReal_one, map_one, one_mul, mul_neg, neg_neg, eval_add,
+    eval_mul, eval_C, eval_X, eval_sub, eval_one, eval_neg, eval_pow]
   ring_nf
   rw [hThrough, hThroughFour, hNine, hNineFour, hTenInvTwo, hTenInvFour,
     show Complex.I ^ 2 = (-1 : ℂ) by norm_num [pow_two, Complex.I_mul_I],
@@ -856,7 +858,7 @@ lemma passivePrintedTheoremFourConditions :
       nlinarith
     rw [Complex.sqrt_of_nonneg hNonnegative, Complex.norm_real,
       Real.norm_eq_abs]
-    change |Real.sqrt (41 / 50)| ≤ 1
+    simp only [Complex.div_ofNat_re, Complex.re_ofNat]
     rw [abs_of_nonneg hSqrtNonnegative]
     exact hBound
   · norm_num
