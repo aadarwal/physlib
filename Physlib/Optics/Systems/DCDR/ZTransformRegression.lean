@@ -506,7 +506,6 @@ lemma zRegression_stable_causalTransform_I :
     norm_num [pow_succ, Complex.I_mul_I]]
   ring
 
-
 /-- Generic reciprocal reindexing gives the raw compiled response's nonreal value.
 
 The transported formal-coordinate value is expanded independently in `PolesRegression`.

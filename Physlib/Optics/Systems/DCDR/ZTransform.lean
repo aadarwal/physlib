@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Mathematics.ZTransform.Existence
-public import Physlib.Mathematics.ZTransform.Stability
 public import Physlib.Optics.Systems.DCDR.Poles
 
 /-!
