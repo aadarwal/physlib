@@ -23,6 +23,8 @@ derivatives with the corresponding Euclidean directional derivatives.
 - `Space.distributionOfEuclideanCoordinates`: view a Euclidean distribution as a distribution on
   `Space d`.
 - `Space.distDeriv_distributionOfEuclideanCoordinates_apply`: coordinate-derivative covariance.
+- `Space.distDeriv_smulRight_apply`: a constant output coefficient passes through a spatial
+  distributional derivative.
 
 ## iii. Table of contents
 
@@ -96,6 +98,15 @@ lemma distDeriv_distributionOfEuclideanCoordinates_apply {F : Type}
       (Space.basis.repr (Space.basis i))
   conv_rhs =>
     rw [fderiv_fun_comp _ η.differentiableAt (by fun_prop)]
+  simp
+
+/-- A constant output coefficient passes through a spatial distributional derivative. -/
+lemma distDeriv_smulRight_apply {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {d : ℕ} (i : Fin d) (u : (Space d) →d[ℝ] ℝ) (c : F)
+    (η : SchwartzMap (Space d) ℝ) :
+    distDeriv i (u.smulRight c) η = distDeriv i u η • c := by
+  rw [distDeriv_apply, Physlib.Distribution.fderivD_apply, distDeriv_apply,
+    Physlib.Distribution.fderivD_apply]
   simp
 
 end
