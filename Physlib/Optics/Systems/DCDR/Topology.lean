@@ -34,8 +34,10 @@ with its exact assembled component entry and its routed input and output coordin
 The complete N7 netlist is bidirectional, while the source graph records the forward boundary
 coordinates only. No claim identifies the eight-node matrix with the complete `C * S` feedback
 graph, whose coordinates also include the reverse direction and the propagation-component
-boundaries. The source's incoherent power coefficients `k` and `1-k` are likewise not silently
-identified with N7 field amplitudes; that convention bridge is separate.
+boundaries. FMICS'15 p. 172 states that its coherent branch uses `sqrt (1-k)` and
+`-I * sqrt k`, but defers that analysis to its unavailable reference [3]. Thus coherent N7
+`t`/`-I*k` is the source's own unprinted coherent branch; the printed incoherent `1-k`/`k` model
+is a different case, compared only if reference [3] surfaces.
 
 This is a fixed-carrier, single-mode topology. Power means normalized modal power, not
 electromagnetic power. The formal bridge requires a finite family satisfying the integrability,
