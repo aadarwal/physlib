@@ -370,7 +370,10 @@ lemma incidentAssembly_rephase [Fintype family.Channel]
     change family.incidentAssembly
           (ModeAmplitude.rephase gauge.outgoing outgoing)
           (ModeAmplitude.rephase (family.externalGauge gauge).incident external)
-          (Incident.mk externalChannel.1) = _
+          (Incident.mk externalChannel.1) =
+        ModeAmplitude.rephase gauge.incident
+          (family.incidentAssembly outgoing external)
+          (Incident.mk externalChannel.1)
     rw [family.incidentAssembly_apply_external,
       ModeAmplitude.rephase_apply,
       ModeAmplitude.rephase_apply,
