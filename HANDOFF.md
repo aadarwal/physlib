@@ -1,661 +1,269 @@
-# S7C slice 4b: NSV'16 PANDA Vernier
+# S7C slice 5: DATE row and Physlib-original rectangular lattice
 
 ## Cutoff and synchronization
 
-This AA2 cutoff repairs all three reviewer blockers for the PANDA Vernier slice and parity rows
-IP-13 and IP-14. The exact required sync target was
-`6f474de29aeec37d454a69e6398540470d4e56df`. It was merged in
-`f8afe43b88ea560f2ec8129c8c31605d50967e6c` before the implementation and is an ancestor of the
-gated source head `aaaa25edb2493105c97941d09410e388b2c85384`.
-
-The implementation consists of nine new, unregistered modules:
-
-- `Physlib/Optics/Systems/Cascade/PandaNetlist.lean` (468 lines);
-- `Physlib/Optics/Systems/Cascade/PandaGraph.lean` (344 lines);
-- `Physlib/Optics/Systems/Cascade/PandaBridge.lean` (602 lines);
-- `Physlib/Optics/Systems/Cascade/PandaRealization.lean` (1383 lines);
-- `Physlib/Optics/Systems/Cascade/PandaResponse.lean` (706 lines);
-- `Physlib/Optics/Systems/Cascade/PandaResponseBridge.lean` (191 lines);
-- `Physlib/Optics/Systems/Cascade/PandaMason.lean` (110 lines);
-- `Physlib/Optics/Systems/Cascade/PandaTopologyRegression.lean` (400 lines); and
-- `Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean` (1407 lines).
-
-All are below the 1500-line module cap. `Physlib.lean` is intentionally unchanged in the cutoff.
-
-## Source transcription and scope
-
-The source text is the layout-preserving extraction at `scratchpad/papers/NSV16.txt`.
-
-- Lines 541-554 print Definition 11 as an 18-node list of 24 directed triples.
-- Lines 558-573 print Theorem 5, the input-to-through quotient.
-- Lines 578-591 print Theorem 6, the input-to-drop quotient.
-- Lines 568 and 580 give exactly four complex hypotheses:
-  `c1^2 + s1^2 = 1`, `c2^2 + s2^2 = 1`, `cr^2 + sr^2 = 1`, and
-  `cl^2 + sl^2 = 1`.
-- Lines 353-356 and 539 call the source PANDA SFG undirected and cite the branch between source
-  nodes 10 and 5.
-- Lines 609-612 say that the authors found missing parts in three transfer functions in reference
-  [10] and a sign mismatch in reference [1]. They do not identify an error in their own Theorem 5
-  or 6.
-
-Accordingly, `HasSourceCouplerNormalization` is exactly the four printed complex square-sum
-hypotheses. Physlib reproduces the two printed numerators and their common denominator without a
-forced correction. The extra hypotheses on the comparison theorems are explicitly cross-model or
-response-semantic gates: the N7/source coupler dictionary, the IP-12 principal-root selection,
-nonzero printed denominator, and invertibility of the oriented graph.
-
-The paper's undirected graph is not silently identified with the Physlib graph. `signalMultigraph`
-is the 18-node, 24-edge orientation printed in Definition 11; in one-based source numbering it
-contains the `10 -> 5` branch but not a separately inserted `5 -> 10` edge. The complete N7
-`FlatNetlist` remains bidirectional. The relational bridge therefore certifies a zero-reverse
-forward sector, not equality with an undirected-edge closure.
-
-## Construction and bridge
-
-`PandaNetlist` defines an explicit N7 `FlatNetlist` with four directional couplers, four main-ring
-quarter delays, four side-ring half delays, fourteen proof-carrying connections, and the four
-external channels input, through, add, and drop.
-
-`PandaGraph` defines `Node = Fin 18` and `Edge = Fin 24`; `node_card` and `edge_card` prove the
-source counts. Every `edgeGain` is certified by `edgeGain_eq_n7ScatteringEntry` to be an entry of
-the assembled N7 component scattering transform.
-
-`PandaBridge` supplies physical routing and the eighteen scalar equations. In particular:
-
-- `connectionForwardPorts_eq_connection` checks all fourteen netlist wires;
-- `edgeInput_routedBoundary` and `edgeOutput_routedBoundary` certify every indexed endpoint;
-- `edge_routedN7Certificate` bundles endpoint routing with N7 gain ownership; and
-- `isNodeSolution_iff_forwardEquations` identifies the raw graph equation with all eighteen
-  displayed scalar equations.
-
-`PandaRealization` then proves the complete DCDR-shaped relational bridge. Its
-`liftedOutgoing_eq_scatteringTransform` checks all 32 actual component outputs, and
-`liftedIncident_eq_incidentAssembly` checks both endpoints of all fourteen wires plus all four
-external channels. The resulting statement at
-`Physlib/Optics/Systems/Cascade/PandaRealization.lean:1364-1383` is:
-
-```text
-isNodeSolution_iff_exists_netlistRealization:
-  IsNodeSolution (signalFlowGraph p) (signalInput input) state <->
-    exists incident outgoing,
-      outgoing = (netlist p).scatteringTransform.toLinearMap incident /\
-      incident = (netlist p).connections.incidentAssembly
-        outgoing (inputAmplitude p input) /\
-      forwardState p incident outgoing = state
-```
-
-This theorem reaches the actual `FlatNetlist` scattering and wiring semantics; neither side is a
-matrix defined by resumming the retained edge table. The construction is the zero-reverse sector
-of the complete bidirectional N7 netlist.
-
-Finally, `throughTransfer_eq_responseTransform` and `dropTransfer_eq_responseTransform` at
-`Physlib/Optics/Systems/Cascade/PandaResponseBridge.lean:106-189` open
-`FlatNetlist.behavior` through `FlatNetlist.mem_behavior_iff_equations`
-(`Physlib/Optics/Network/FlatNetlist.lean:487-500`). Under both the actual N5 well-posedness gate
-and the independently exposed directed-graph determinant gate, they identify the two terminated
-directed responses with the corresponding entries of the actual `netlist.responseTransform`.
-
-## Mason instantiations and source theorems
-
-There are two deliberately distinct Mason layers.
-
-`PandaMason` instantiates the generic `FlatNetlistMason` construction on the full N7 netlist. Its
-automatically extracted feedback graph contains the complete N5 coordinates. The exact common
-domain is the iff
-
-```text
-feedbackSignalFlowGraph_graphDet_ne_zero_iff:
-  graphDet (netlist p).feedbackSignalFlowGraph != 0 <-> (netlist p).IsWellPosed.
-```
-
-On that domain, `responseTransform_entry_through_eq_mason` and
-`responseTransform_entry_drop_eq_mason` identify the behavior-derived N5 entries with the generic
-Mason entries. These are instantiations, not new literature theorems.
-
-Separately, `PandaResponse` solves all eighteen oriented equations and proves the only two theorem
-declarations in the slice:
-
-```text
-nsv16_throughTransfer:
-  (throughTerminatedMultigraph p).transfer = sourceThroughTransfer s
-
-nsv16_dropTransfer:
-  (dropTerminatedMultigraph p).transfer = sourceDropTransfer s
-```
-
-Both carry the exact source normalization plus the dictionary, principal-root, denominator, and
-oriented-graph gates described above. `auditedThroughMasonResponse_eq_source` and
-`auditedDropMasonResponse_eq_source` are lemmas connecting the oriented edge-Mason quotients to
-the printed expressions on that same domain.
-
-The source denominator is solved without dividing by either side-ring factor. The only scalar
-division gate is `HasNonzeroSourceDenominator`; the sparse factorization is proved separately by
-`sourceDenominator_eq_factorized`.
-
-## Path, loop, and wiring audit
-
-`PandaTopologyRegression` enumerates five simple through paths, two simple drop paths, and six
-canonically based simple loops as topology sentinels. Its inventory has the following teeth:
-
-- the three cardinality lemmas are kernel `decide` proofs;
-- the soundness lemmas prove terminals, repetition freedom, closure where applicable, and actual
-  adjacency in the retained 24-edge topology;
-- `topology_path_refinements`, `topology_drop_path_refinements`, and
-  `topology_loop_refinements` give the exact indexed edge list for every path and loop;
-- the gain lemmas expand every retained coupler and propagation choice; and
-- `topology_loop_touch_audit` proves both touching and non-touching cases needed by Mason
-  cofactors.
-
-The asymmetric negative control cross-wires the two side-ring half joins while preserving both
-finite counts and all scalar gains. `topologyMiswiredMultigraph_ne` proves the graph changed, and
-`topology_miswired_rightDetour_not_refined` proves that the expected right-circulation refinement
-then disappears. The sentinel is gain-independent and can genuinely fail under mis-wiring.
-
-Completeness is discharged independently in `PandaResponseRegression`, not inferred from the
-hand-listed inventory. At the positive fixture:
-
-- `responseRegression_nonzeroFamily_eq_main` classifies every nonzero nonempty edge-level loop
-  family as the displayed main-ring family;
-- `responseRegression_edgeGraphDetOn` at
-  `Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:646-697` sums every node subset,
-  loop-family permutation, and parallel-edge choice and proves the only nonzero loop correction;
-- `responseRegression_supportedThroughPath_cases` and
-  `responseRegression_supportedDropPath_eq` prove converses for all simple forward paths having a
-  nonzero edge refinement;
-- `responseRegression_supportedThroughPaths` and `responseRegression_supportedDropPaths` at
-  `Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:962-1000` identify the complete
-  supported path finsets; and
-- `responseRegression_edgeMasonNumerator_through` and
-  `responseRegression_edgeMasonNumerator_drop` at
-  `Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:1122-1146` expand the complete
-  edge-level numerator sums, including refinements and cofactors, to `14/65` and `-48/65`.
-
-The determinant proof uses the generic edge-family identity at
-`Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean:135-138`; the numerator expansion starts
-from the actual `edgeMasonNumerator` definition at
-`Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean:213-216`.
-
-## Independent numeric anchors
-
-`PandaResponseRegression` uses a concrete positive parameter record and directly unfolds the raw
-24-edge coefficient matrix. The hand-expanded 18-coordinate state satisfies the node equation and
-has the two displayed coordinates. Separately, exhaustive edge enumeration gives
-
-```text
-edge graph determinant = 10/13
-through Mason numerator = 14/65
-drop Mason numerator = -48/65
-```
-
-`responseRegression_graphDet_ne_zero` and `responseRegression_nodeSolution_unique` at
-`Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:1201-1225` connect that independent
-determinant to the raw node solution. The generic terminated-solution rule cited at
-`Physlib/Mathematics/SignalFlowGraph/Terminated.lean:264-268` then gives, without either printed
-NSV theorem:
-
-```text
-responseRegression_throughTerminated = 7/25
-responseRegression_dropTerminated = -24/25
-```
-
-These are proved at
-`Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:1228-1256` from the hand-expanded
-state and the independent determinant. `responseRegression_rawNetlistBehavior` at
-`Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:1258-1280` pushes the same state
-through the actual relational bridge and constructs an actual N5 behavior output with through
-value `7/25` and drop value `-24/25`. Under the separately visible N5 solve gate,
-`responseRegression_n5Through` and `responseRegression_n5Drop` at
-`Physlib/Optics/Systems/Cascade/PandaResponseRegression.lean:1282-1300` pin the actual
-response-transform entries to those values. The source quotients are also expanded independently
-to the same values.
-
-The determinant-zero fixture uses identity through-coupling, zero cross-coupling, unit main-ring
-propagation, and zero side-ring propagation. Direct expansion gives a zero printed denominator and
-a nonzero homogeneous 18-coordinate solution. `responseRegression_singularGraphDet` derives that
-the oriented graph determinant is zero from this raw witness, rather than assuming or invoking a
-response comparison.
-
-## Parity discharge map
-
-- IP-13 (NSV'16 through): `nsv16_throughTransfer` at
-  `Physlib/Optics/Systems/Cascade/PandaResponse.lean:612-637` reproduces printed Theorem 5 under
-  `HasSourceCouplerDictionary`, the inherited `HasPrincipalRootSelection` branch gate, the four
-  printed `HasSourceCouplerNormalization` hypotheses, `HasNonzeroSourceDenominator`, and nonzero
-  directed graph determinant. Composing it with `throughTransfer_eq_responseTransform` at
-  `Physlib/Optics/Systems/Cascade/PandaResponseBridge.lean:106-145` adds the actual N5
-  `FlatNetlist.IsWellPosed` gate and yields the actual input-to-through response entry.
-- IP-14 (NSV'16 drop): `nsv16_dropTransfer` at
-  `Physlib/Optics/Systems/Cascade/PandaResponse.lean:639-668` reproduces printed Theorem 6 under
-  the identical dictionary, principal-root, four normalization, denominator, and directed-graph
-  gates. Composing it with `dropTransfer_eq_responseTransform` at
-  `Physlib/Optics/Systems/Cascade/PandaResponseBridge.lean:147-189` adds the actual N5 solve gate
-  and yields the actual input-to-drop response entry.
-
-The principal-root premise is not silently discharged: it is the PANDA form of the branch map
-already exposed for IP-12 at
-`Physlib/Optics/Systems/Microring/SourceBridgeSfg.lean:98-110`. The two N5 bridge lemmas do not
-claim that directed-graph invertibility and N5 well-posedness are equivalent.
-
-## Public declaration inventory
-
-All declarations below are in namespaces `Optics.Panda` or `Optics.Panda.Parameters`.
-
-### `PandaNetlist`
-
-```text
-Parameters
-Component
-componentPortFamily
-componentScattering
-components
-Connection
-connections
-netlist
-localChannelFintype
-localChannelDecidableEq
-componentsLocalChannelFintype
-componentsLocalChannelDecidableEq
-netlistComponentFintype
-netlistComponentDecidableEq
-netlistLocalChannelFintype
-netlistLocalChannelDecidableEq
-channelFintype
-channelDecidableEq
-connectionLocalChannelFintype
-connectedChannelFintype
-connectedChannelDecidableEq
-externalChannelFintype
-componentChannel
-input_not_connected
-through_not_connected
-add_not_connected
-drop_not_connected
-inputChannel
-throughChannel
-addChannel
-dropChannel
-inputChannel_ne_addChannel
-inputChannel_ne_throughChannel
-inputChannel_ne_dropChannel
-inputAmplitude
-inputAmplitude_apply_input
-inputAmplitude_apply_add
-inputAmplitude_apply_through
-inputAmplitude_apply_drop
-```
-
-### `PandaGraph`
-
-```text
-mainQuarterOneCoefficient
-mainQuarterTwoCoefficient
-mainQuarterThreeCoefficient
-mainQuarterFourCoefficient
-rightHalfOneCoefficient
-rightHalfTwoCoefficient
-leftHalfOneCoefficient
-leftHalfTwoCoefficient
-mainRoundTripCoefficient
-rightRoundTripCoefficient
-leftRoundTripCoefficient
-Node
-node_card
-Edge
-edge_card
-edgeSource
-edgeTarget
-edgeGain
-edgeN7InputChannel
-edgeN7OutputChannel
-scatteringTransform_entry_component
-edgeGain_eq_n7ScatteringEntry
-signalMultigraph
-coefficientMatrix
-signalFlowGraph
-throughTerminatedMultigraph
-dropTerminatedMultigraph
-terminatedMultigraph_terminals
-signalFlowGraph_eq_coefficientMatrix
-```
-
-### `PandaBridge`
-
-```text
-connectionNode
-connectionForwardPorts
-connectionForwardPorts_eq_connection
-nodeN7Channel
-connectionLeftMode
-connectionRightMode
-connectionLeftChannel
-connectionRightChannel
-RoutedBoundary
-routedBoundary_refl
-routedBoundary_connection_forward
-routedBoundary_connection_reverse
-connectionNode_routedBoundaries
-edgeInput_routedBoundary
-edgeOutput_routedBoundary
-edge_routedN7Certificate
-displayedAction
-coefficientMatrix_mulVec_eq_displayedAction
-signalInput
-ForwardEquations
-signalInput_eq_piecewise
-isNodeSolution_iff_forwardEquations
-```
-
-### `PandaRealization`
-
-```text
-CouplerLabel
-CouplerLabel.component
-CouplerLabel.parameters
-couplerChannel
-PropagationLabel
-PropagationLabel.component
-PropagationLabel.parameters
-propagationChannel
-forwardState
-liftedIncident
-liftedOutgoing
-liftedOutgoing_eq_scatteringTransform
-incidentAssembly_apply_connectionLeft
-incidentAssembly_apply_connectionRight
-incidentAssembly_apply_input
-incidentAssembly_apply_through
-incidentAssembly_apply_add
-incidentAssembly_apply_drop
-liftedIncident_eq_incidentAssembly
-PropagationLabel.inputConnection
-PropagationLabel.outputConnection
-PropagationLabel.upstreamChannel
-PropagationLabel.downstreamChannel
-propagationCoordinate_of_netlistEquations
-forwardState_lifted
-forwardEquations_of_netlistEquations
-forwardState_isNodeSolution_of_netlistEquations
-isNodeSolution_iff_exists_netlistRealization
-```
-
-### `PandaResponse`
-
-```text
-SourceParameters
-HasSourceCouplerDictionary
-HasPrincipalRootSelection
-HasSourceCouplerNormalization
-sourceDenominator
-HasNonzeroSourceDenominator
-sourceThroughNumerator
-sourceDropNumerator
-sourceThroughTransfer
-sourceDropTransfer
-auditedThroughMasonResponse
-auditedDropMasonResponse
-sourceDenominator_eq_factorized
-sourceThroughNumerator_eq_factorized
-sourceDropNumerator_eq_factorized
-sourceCrossCoefficient
-closedState
-sourceCrossCoefficient_sq
-closedState_forwardEquations
-signalInput_one_eq_single
-nsv16_throughTransfer
-nsv16_dropTransfer
-auditedThroughMasonResponse_eq_source
-auditedDropMasonResponse_eq_source
-```
-
-### `PandaResponseBridge`
-
-```text
-outputReadout_apply_through
-outputReadout_apply_drop
-responseTransform_apply_inputAmplitude_through
-responseTransform_apply_inputAmplitude_drop
-throughTransfer_eq_responseTransform
-dropTransfer_eq_responseTransform
-```
-
-### `PandaMason`
-
-```text
-masonThroughResponse
-masonDropResponse
-feedbackSignalFlowGraph_graphDet_ne_zero_iff
-responseTransform_entry_through_eq_mason
-responseTransform_entry_drop_eq_mason
-```
-
-### `PandaTopologyRegression`
-
-```text
-TopologyAdjacent
-topologyAdjacentDecidable
-topologyThroughDirect
-topologyThroughMainDirect
-topologyThroughRightCirculation
-topologyThroughLeftCirculation
-topologyThroughBothCirculations
-topologyThroughPaths
-topologyThroughPaths_card
-topologyDropDirect
-topologyDropRightCirculation
-topologyDropPaths
-topologyDropPaths_card
-topologyThroughPaths_sound
-topologyDropPaths_sound
-topologyRightLoop
-topologyLeftLoop
-topologyMainDirectLoop
-topologyMainRightLoop
-topologyMainLeftLoop
-topologyMainBothLoop
-topologyCanonicalLoops
-topologyCanonicalLoops_card
-topologyCanonicalLoops_sound
-topology_path_refinements
-topology_drop_path_refinements
-topology_loop_refinements
-topology_rightLoop_gain
-topology_leftLoop_gain
-topology_throughPath_gains
-topology_dropPath_gains
-topology_mainLoop_gains
-topology_loop_touch_audit
-topologyMiswiredEdgeTarget
-topologyMiswiredMultigraph
-topologyMiswiredSkeleton
-topology_miswired_join_sentinel
-topologyMiswiredMultigraph_ne
-topology_miswired_rightDetour_not_refined
-```
-
-### `PandaResponseRegression`
-
-```text
-responseRegressionPropagation
-responseRegressionParameters
-responseRegressionSource
-responseRegression_sourceDictionary
-responseRegression_sourceNormalization
-responseRegression_principalRootSelection
-responseRegression_sourceDenominator
-responseRegression_hasNonzeroSourceDenominator
-responseRegressionNodeRank
-responseRegressionNodeRank_lt
-responseRegressionMainLoopNodes
-responseRegressionMainLoopPermutation
-responseRegressionMainLoopEdge
-responseRegressionMainLoopChoice
-responseRegression_mainLoopPermutation_mem
-responseRegression_mainLoopChoice_mem
-responseRegression_mainLoopCount
-responseRegression_mainLoopFamilyGain
-responseRegression_mainLoopChoices
-responseRegression_mainFamilySum
-responseRegression_edgeGraphDetOn
-responseRegression_edgeGraphDet
-responseRegressionSupportedEdges
-responseRegression_edgeGain_ne_zero_iff
-ResponseRegressionNonzeroAdjacent
-ResponseRegressionPathSupported
-responseRegression_pathSupported_iff_isChain
-responseRegression_nonzeroAdjacent_zero
-responseRegression_nonzeroAdjacent_one
-responseRegression_nonzeroAdjacent_three
-responseRegression_nonzeroAdjacent_eight
-responseRegression_nonzeroAdjacent_nine
-responseRegression_nonzeroAdjacent_four
-responseRegression_nonzeroAdjacent_six
-responseRegression_nonzeroAdjacent_thirteen
-responseRegression_nonzeroAdjacent_fourteen
-responseRegression_not_nonzeroAdjacent_two
-responseRegression_not_nonzeroAdjacent_seven
-responseRegression_supportedThroughPath_cases
-responseRegression_supportedDropPath_eq
-responseRegressionSupportedThroughPaths
-responseRegressionSupportedDropPaths
-responseRegression_supportedThroughPaths
-responseRegression_supportedDropPaths
-responseRegression_throughNumerator_eq_supportedSum
-responseRegression_dropNumerator_eq_supportedSum
-responseRegression_refiningEdges_throughDirect
-responseRegression_refiningEdges_throughMain
-responseRegression_refiningEdges_dropDirect
-responseRegression_edgeListGain_throughDirect
-responseRegression_edgeListGain_throughMain
-responseRegression_edgeListGain_dropDirect
-responseRegression_throughDirectCofactor
-responseRegression_throughMainCofactor
-responseRegression_dropDirectCofactor
-responseRegression_edgeMasonNumerator_through
-responseRegression_edgeMasonNumerator_drop
-responseRegressionState
-responseRegression_rawNodeEquation
-responseRegression_isNodeSolution
-responseRegression_through
-responseRegression_drop
-responseRegression_graphDet
-responseRegression_graphDet_ne_zero
-responseRegression_nodeSolution_unique
-responseRegression_throughTerminated
-responseRegression_dropTerminated
-responseRegression_rawNetlistBehavior
-responseRegression_n5Through
-responseRegression_n5Drop
-responseRegression_sourceThrough
-responseRegression_sourceDrop
-responseRegressionSingularParameters
-responseRegressionSingularSource
-responseRegression_singularSourceDenominator
-responseRegressionSingularState
-responseRegression_singularState_ne_zero
-responseRegression_singularRawNodeEquation
-responseRegression_singularIsNodeSolution
-responseRegression_singularGraphDet
-```
-
-## Reviewer and validation bindings
-
-Suggested review order:
-
-1. `PandaNetlist.netlist`, `PandaGraph.edgeGain_eq_n7ScatteringEntry`, and the routing certificates
-   in `PandaBridge`;
-2. `PandaRealization.liftedOutgoing_eq_scatteringTransform`,
-   `liftedIncident_eq_incidentAssembly`, and
-   `isNodeSolution_iff_exists_netlistRealization`;
-3. the two actual response readouts in `PandaResponseBridge`;
-4. `PandaResponseRegression.responseRegression_edgeGraphDetOn`, supported-path classification,
-   and the two complete numerator expansions;
-5. the positive unique/terminated/N5 anchors and singular fixture in `PandaResponseRegression`;
-6. `PandaResponse.HasSourceCouplerNormalization`, `HasPrincipalRootSelection`, and the two NSV
-   theorems; and
-7. the full-N5 Mason instantiations and retained topology/mis-wire sentinels.
-
-The validation lane should bind at least these names:
-
-- graph counts: `node_card`, `edge_card`;
-- N7 derivation: `connectionForwardPorts_eq_connection`, `edge_routedN7Certificate`,
-  `liftedOutgoing_eq_scatteringTransform`, `liftedIncident_eq_incidentAssembly`, and
-  `isNodeSolution_iff_exists_netlistRealization`;
-- actual N5 response: `throughTransfer_eq_responseTransform`,
-  `dropTransfer_eq_responseTransform`;
-- common Mason domain: `feedbackSignalFlowGraph_graphDet_ne_zero_iff`;
-- printed comparisons: `nsv16_throughTransfer`, `nsv16_dropTransfer`;
-- oriented Mason comparisons: `auditedThroughMasonResponse_eq_source`,
-  `auditedDropMasonResponse_eq_source`;
-- exhaustive edge audit: `responseRegression_edgeGraphDetOn`,
-  `responseRegression_supportedThroughPaths`, `responseRegression_supportedDropPaths`,
-  `responseRegression_edgeMasonNumerator_through`, and
-  `responseRegression_edgeMasonNumerator_drop`;
-- topology sentinels: all three refinement lemmas, the three grouped gain lemmas, and
-  `topology_loop_touch_audit`;
-- mis-wire control: `topologyMiswiredMultigraph_ne`,
-  `topology_miswired_rightDetour_not_refined`;
-- positive anchor: `responseRegression_rawNodeEquation`, `responseRegression_graphDet_ne_zero`,
-  `responseRegression_nodeSolution_unique`, `responseRegression_throughTerminated`,
-  `responseRegression_dropTerminated`, `responseRegression_rawNetlistBehavior`,
-  `responseRegression_n5Through`, and `responseRegression_n5Drop`; and
-- singular anchor: `responseRegression_singularRawNodeEquation`,
-  `responseRegression_singularState_ne_zero`, `responseRegression_singularGraphDet`, and
-  `responseRegression_singularSourceDenominator`.
+This cutoff implements the lattice slice requested by goal.md section S7C and regression row S-08.
+The exact required sync target was
+`fe56bbc20c930747bee5b23905187d734f09f5e5`. It was merged in
+`cba99dc188576ab799682fab551c3dd0a4fe4003` before implementation. The later target
+`5fc99609` was announced with an explicit instruction not to force a mid-slice resync.
+
+The exact gated source head is
+`13827bb6092099f0a54152c4bcde7aafbae2a32c`. Its three slice commits are:
+
+- `e95c525fc7b5da803067dfc3f3c2203596e5f8ca`, module-doc normalization;
+- `0075a77ea12a3128c12cde40d79c704ed7788e62`, lattice implementation; and
+- `13827bb6092099f0a54152c4bcde7aafbae2a32c`, section-heading doc formatting.
+
+The implementation adds two unregistered modules:
+
+- `Physlib/Optics/Systems/Cascade/Lattice.lean` (1391 lines); and
+- `Physlib/Optics/Systems/Cascade/LatticeRegression.lean` (699 lines).
+
+Both are below the 1500-line cap. `Physlib.lean` is intentionally unchanged in this cutoff.
+
+## Source scope and classification
+
+The controlling goal text is:
+
+- goal.md:2434, "the source-backed uncoupled row-sublattice result";
+- goal.md:2435, "coupled row/column decompositions and the full `M × N` lattice theorem,
+  explicitly classified as Physlib-original rather than DATE'14 parity"; and
+- goal.md:2612, S-08: "Physlib extension: the `M × N` lattice flattening agrees with its
+  row/column decomposition".
+
+The corpus note at goal.md:153-155 says the lattice theorem is a Physlib extension and that
+DATE'14 proves only the uncoupled row sublattice. DATE14.txt:204-207 says that Figure 3 decomposes
+a two-dimensional lattice into an uncoupled row sublattice and a coupled column sublattice.
+Its Figure 3 caption at lines 236-238 describes:
+
+- a row sublattice consisting of a cascade of uncoupled MRRs periodically coupled to two side
+  waveguides; and
+- a column sublattice consisting of a linear cascade of mutually coupled MRRs.
+
+DATE14.txt:372-373 says only that analysis of the coupled cascade "follows the similar pattern".
+It supplies neither a formal coupled-column statement nor an `M × N` theorem. Parity IP-19
+therefore classifies the source as incomplete: the row half is DATE'14 parity, while the column
+and full lattice are the mandatory S7C Physlib extension.
+
+Accordingly:
+
+- Section A of `Lattice.lean` is the only DATE'14-parity content in this slice.
+- Sections B-E and all of S-08 are Physlib-original.
+- Every result introduced by the slice is a `lemma`; DATE'14 prints no lattice theorem.
+
+## A. Source-backed uncoupled row
+
+`DateUncoupledRowSublattice` at `Lattice.lean:86` stores exactly a list of existing
+`DateCascadeStage` values. Its behavior and composition at lines 93 and 98 are definitions by
+the existing heterogeneous cascade objects. It adds no ring, bus, or coupling physics.
+
+The wrapper transfers the already discharged DATE results:
+
+- `behavior_eq_composition_toBehavior` at `Lattice.lean:111` instantiates
+  `dateCascadeBehavior_eq_composition_toBehavior` from
+  `Heterogeneous.lean:227-241`;
+- `identical_composition_eq_pow` at `Lattice.lean:120` instantiates the identical-stage power
+  result from `Identical.lean:99-103`;
+- `identical_composition_eq_sylvesterClosedForm` at `Lattice.lean:129` instantiates the exact
+  Sylvester-domain result from `Identical.lean:336-343`;
+- `TerminationHypotheses` at `Lattice.lean:137` is the existing corrected termination domain
+  from `Termination.lean:321-330`;
+- `reflectivity_eq_neg_entry12_div_entry11` at `Lattice.lean:155` reuses the relational
+  reflection result from `Termination.lean:417-431`; and
+- `transmissivity_eq_one_div_entry11` at `Lattice.lean:166` reuses the relational transmission
+  result from `Termination.lean:433-447`.
+
+Thus IP-15 through IP-18 transfer to the row without a new derivation or expanded parity claim.
+The nonzero `M11` pivot remains part of the termination hypotheses.
+
+## B. Physlib-original coupled column
+
+`RectangularLatticeParameters` at `Lattice.lean:232` separates four-port ring-site scattering
+laws from the horizontal and vertical neighbouring-coupler parameters. The construction then
+provides explicit component and connection families:
+
+- `rectangularLatticeComponents` at line 285;
+- `rectangularHorizontalConnection` at line 385;
+- `rectangularVerticalConnection` at line 406;
+- `rectangularHorizontalConnections` at line 427; and
+- `rectangularVerticalConnections` at line 442.
+
+`rectangularCoupledColumnNetlist` at `Lattice.lean:635` is an explicit `FlatNetlist` for a
+selected column. It contains one supplied four-port ring law per row and a separate directional
+coupler between each pair of vertical neighbours. Its relational chain composition is
+`rectangularCoupledColumnComposition` at line 658.
+
+`rectangularCoupledColumn_behavior_eq_composition` at line 671 identifies the netlist behavior
+with that singular-safe relational connection closure. This is a generic netlist instantiation,
+not a DATE'14 statement and not a closed-form response.
+
+## C. Full M by N lattice and S-08
+
+The full lattice is one explicit `FlatNetlist`, not a behavior defined through either hierarchy.
+`rectangularLatticeNetlist` at `Lattice.lean:868` directly specifies:
+
+- all ring and coupler components;
+- the sum of horizontal and vertical connection labels; and
+- the appended physical connection family.
+
+The canonical ordering is row-first: horizontal links are closed before vertical links. This
+choice matches the direct connection-label order in the flat object. The alternate column-first
+presentation follows only after a proved wiring reindex; the two label types are not silently
+identified.
+
+The hierarchy and response API is:
+
+- `rectangularLatticeRowHierarchy` at line 724;
+- `rectangularLatticeColumnHierarchy` at line 738;
+- `rectangularRowColumnWiringEquiv` at line 1098;
+- `rectangularRowDecompositionBehavior` at line 1111;
+- `rectangularLatticeBehavior_eq_rowDecomposition` at line 1129;
+- `rectangularColumnDecompositionBehavior` at line 1146;
+- `rectangularColumnFlattenBehavior_eq_columnDecomposition` at line 1163;
+- `rectangularLatticeBehaviorInColumnCoordinates` at line 1233;
+- `rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex` at line 1251;
+- `rectangularColumnDecompositionInLatticeCoordinates` at line 1266; and
+- `rectangularLatticeBehavior_eq_columnDecomposition` at line 1284.
+
+These lemmas establish S-08 on the common relational domain without assuming well-posedness.
+The row-first flatten is literally the canonical flat lattice. The column-first flatten agrees
+after the explicit external-channel equivalence induced by connection-order reindexing.
+
+## Regression and failure controls
+
+`LatticeRegression.lean` uses a `2 × 2` fixture with distinct site coefficients
+`2 * row + column + 1`, hence the site array `[[1, 2], [3, 4]]`. Couplers also have distinct
+numbered parameters. The positive facts are expanded from the component, matrix, incident
+assembly, connection, and output-readout primitives; they do not invoke either production S-08
+behavior lemma.
+
+The main positive anchors are:
+
+- `latticeRegression_rawBehavior` at line 571, a direct witness in the canonical flat-netlist
+  relation;
+- `latticeRegression_outputEast` at line 584, whose selected response is `2`;
+- `latticeRegression_rowFlatten_site01West_entry` at line 589, a direct entry calculation;
+- `latticeRegression_columnFlatten_site01West_entry` at line 609, the independently selected
+  column-first entry calculation;
+- `latticeRegression_flatten_scattering_eq` at line 630, the directly reduced component-law
+  equality; and
+- `latticeRegression_selectedVerticalWire` and
+  `latticeRegression_selectedColumnFirstVerticalWire` at lines 637 and 644, direct wiring
+  anchors in the two label orders.
+
+The negative fixture deliberately swaps each site's row and column indices:
+
+- `latticeRegressionTransposedSites` at line 653;
+- `latticeRegressionMisindexedColumnHierarchy` at line 660;
+- `latticeRegression_misindexed_site01West_entry` at line 664, which computes `3` where the
+  correct flattened lattice computes `2`; and
+- `latticeRegression_misindexedFlatten_scattering_ne` at line 683, which proves the assembled
+  flattened component laws unequal.
+
+The negative proof is the required hierarchy/cascade-index sentinel: an index transposition
+cannot be hidden by the correct decomposition API. It proves a concrete `2 != 3` matrix-entry
+contradiction rather than testing a Boolean or reusing the production agreement lemma.
+
+## Module-doc normalization (doc-only)
+
+The literal module headings now used throughout this lane are:
+
+- `## i. Overview`;
+- `## ii. Key results`;
+- `## iii. Table of contents`; and
+- `## iv. References`.
+
+Each table of contents matches its module's lettered section headings exactly. Existing
+non-claims remain the first paragraph under `## iv. References`. The following existing-area
+modules received comment-only normalization, with no declarations or proofs changed:
+
+- `Heterogeneous.lean`;
+- `HeterogeneousRegression.lean`;
+- `Identical.lean`;
+- `IdenticalRegression.lean`;
+- `PandaBridge.lean`;
+- `PandaGraph.lean`;
+- `PandaMason.lean`;
+- `PandaNetlist.lean`;
+- `PandaRealization.lean`;
+- `PandaResponse.lean`;
+- `PandaResponseBridge.lean`;
+- `PandaResponseRegression.lean`;
+- `PandaTopologyRegression.lean`;
+- `SourceMappedSfg.lean`;
+- `SourceMappedSfgRegression.lean`;
+- `Termination.lean`; and
+- `TerminationRegression.lean`.
+
+The standalone lettered headings in the new `LatticeRegression.lean` were also formatted as
+module-doc comments. The heading-only commits preserve all existing declaration line numbers.
+
+The prior PANDA HANDOFF citation is corrected here: `responseRegression_graphDet` is at
+`PandaResponseRegression.lean:1201`, while
+`responseRegression_graphDet_ne_zero` is at `PandaResponseRegression.lean:1207`.
 
 ## Non-claims
 
-- No equality between the directed projection and the paper's undirected SFG is claimed.
-- No claim equates the full N5-extracted Mason graph with the 18-node projection.
-- No equivalence between the N5 well-posedness gate and directed-graph invertibility is claimed;
-  both are retained by every response-transform comparison.
-- The raw N5 behavior witness proves existence only; uniqueness is asserted only after supplying
-  the actual N5 well-posedness gate.
-- No additional or corrected version of NSV'16 Theorem 5 or 6 is claimed.
-- The totalized quotients have response meaning only on their stated nonzero/well-posed domains.
-- The singular fixture is not asserted to satisfy N7 component validity.
-- No DATE lattice, quadruple-ring lattice, coupled-lattice, or full `M x N` lattice result is
-  claimed.
-- No passivity, losslessness, reciprocity, impedance match, causality, convergence, stability,
-  resonance, bandwidth, dispersion, pole/zero location, insertion-loss model, material
-  realization, or measurement-validation claim is made.
-- No electromagnetic power claim is made. A later power interpretation remains normalized modal
-  power until the common-frequency Maxwell and aperture-flux hypotheses in
-  `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:60-90` are supplied.
-- Human verification of the bibliography and source transcription remains required by
-  `AI-POLICY.md`.
+- No coupled-column or full-lattice result is presented as DATE'14 parity.
+- No DATE'14 theorem is inferred from the phrase "follows the similar pattern".
+- No closed form is claimed for the mutually coupled column or full lattice.
+- No equality of differently labelled row-first and column-first channel types is claimed;
+  column-first comparison uses the proved reindexing equivalence.
+- No quadruple-ring row is introduced.
+- No physical-realization claim is made for the supplied algebraic site or coupler laws.
+- No passivity, losslessness, reciprocity, impedance matching, stability, causality,
+  convergence, resonance, bandwidth, dispersion, pole/zero, bending-loss, insertion-loss,
+  material, fabrication, or measurement-validation claim is made.
+- No electromagnetic-power claim is made. Power remains normalized modal power until the
+  hypotheses in `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93` are supplied.
+- Human verification of the source classification and intended physical model remains required
+  by `AI-POLICY.md`.
+
+## Reviewer map
+
+1. Read `Lattice.lean:70-175` for the source-backed row aliases and transferred IP-15--18 API.
+2. Read `Lattice.lean:620-676` for the explicit coupled-column netlist and relational behavior.
+3. Read `Lattice.lean:724-875` for both hierarchies and the independent full flat netlist.
+4. Read `Lattice.lean:1080-1301` for wiring reindexing and the two S-08 behavior equalities.
+5. Read `LatticeRegression.lean:438-645` for the raw positive behavior and primitive anchors.
+6. Read `LatticeRegression.lean:653-695` for the transposed-index negative control.
+7. Review the two doc-only commits separately; their changes are confined to comments.
 
 ## Exact validation record
 
-The exact implementation source head was
-`aaaa25edb2493105c97941d09410e388b2c85384`. One successful `lake-lock env bash` hold temporarily
-registered only the nine PANDA modules and ran:
+The exact implementation source head
+`13827bb6092099f0a54152c4bcde7aafbae2a32c` passed one chained
+`lake-lock env bash` gate. The gate temporarily registered only the two lattice modules and the
+nine unregistered PANDA dependencies, then ran:
 
 ```text
 lake exe cache get
-lake --wfail build <the nine PANDA modules>
+lake --wfail build <the eleven unregistered Cascade modules>
 lake exe runPhyslibLinters
 lake exe lint_all
 ./scripts/lint-style.sh
 git diff --check
-the banned-token, theorem-count, 100-codepoint, and 1500-line audits
+the banned-token, declaration-kind, codepoint, line-cap, module-doc, and import audits
 ```
 
 Results:
 
-- cache: no files to download; 8690 files already decompressed;
-- targeted warning-as-error build: passed, 2762 jobs;
+- cache: no downloads; 8690 files were already decompressed;
+- targeted warning-as-error build: passed, 2783 jobs;
 - `runPhyslibLinters`: Physlib and QuantumInfo passed;
-- `lint_all`: exited 0; the full build and declaration linters passed, and its advisory
-  repository-wide style/import inventories named no PANDA file;
+- `lint_all`: full build and declaration linters passed;
 - standalone committed-state `lint-style.sh`: passed;
 - `git diff --check`: passed;
-- no PANDA file contains `maxHeartbeats`, `native_decide`, `sorry`, `axiom`, or
+- the Cascade module-doc audit passed for all 19 lane modules;
+- repository-wide module-doc diagnostics were confined to older out-of-lane files on this sync;
+- the redundant-import audit named no Cascade module;
+- no changed Lean file contains `sorry`, `axiom`, `native_decide`, `maxHeartbeats`, or
   `Lean.ofReduceBool`;
-- every PANDA line is at most 100 Unicode codepoints and every module is below 1500 lines; and
-- `PandaResponse.lean` contains exactly two theorem declarations, the printed NSV'16 Theorems 5
-  and 6; both audited Mason comparisons are lemmas.
+- the new lattice modules contain zero `theorem` declarations;
+- every changed Lean line is at most 100 Unicode codepoints; and
+- every new module is below 1500 lines.
 
 The temporary registry was restored byte-identically. `Physlib.lean` had SHA-256
-`c6fcae741d8c29643e5ca027773ee5b1e30968c1a3731a26fef32764a4af7f48` before and after the gate.
-The implementation difference from the named sync target is confined to the PANDA modules; this
-final cutoff commit changes only `HANDOFF.md`.
+`88d1329fba21fc443261608300b3c922c4612d3cb4454a7f82e57e760aeaadb7` before and after the gate.
+This final cutoff child changes only `HANDOFF.md`.
