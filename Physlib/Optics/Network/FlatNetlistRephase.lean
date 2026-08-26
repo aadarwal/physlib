@@ -193,7 +193,7 @@ variable [Fintype P.Channel] [Fintype family.Channel]
 
 /-- The external complement is finite whenever the ambient and connected channel types are
 finite. -/
-local instance rephaseExternalChannelFintype : Fintype family.ExternalChannel := by
+private instance rephaseExternalChannelFintype : Fintype family.ExternalChannel := by
   classical
   infer_instance
 
