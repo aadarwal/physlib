@@ -322,6 +322,26 @@ lemma rephasedBehavior_isFunctional (gauge : ChannelEndGauge netlist.Channel)
     (netlist.connections.externalGauge gauge).incident
     (netlist.connections.externalGauge gauge).outgoing
 
+/-- Membership in the rephased response graph is membership in the rephased external relation. -/
+private lemma mem_toBehavior_rephase_responseTransform_iff
+    (gauge : ChannelEndGauge netlist.Channel)
+    (hMatched : netlist.connections.IsMatchedGauge gauge)
+    (hWellPosed : netlist.IsWellPosed)
+    (input : ModeAmplitude netlist.ExternalIncident)
+    (output : ModeAmplitude netlist.ExternalOutgoing) :
+    (input, output) ∈
+      ((netlist.responseTransform hWellPosed).rephase
+        (netlist.connections.externalGauge gauge).incident
+        (netlist.connections.externalGauge gauge).outgoing).toBehavior ↔
+      (input, output) ∈ netlist.rephasedBehavior gauge := by
+  classical
+  rw [ModeTransform.toBehavior_rephase,
+    netlist.rephasedBehavior_eq gauge hMatched]
+  simp only [LinearBehavior.mem_rephase_iff]
+  exact (ModeTransform.mem_toBehavior_iff_toLinearMap
+    (netlist.responseTransform hWellPosed) _ _).trans
+      (netlist.mem_behavior_iff_eq_responseTransform hWellPosed _ _).symm
+
 /-- The covariantly rephased original response has exactly the rephased external graph. -/
 lemma toBehavior_rephase_responseTransform
     (gauge : ChannelEndGauge netlist.Channel)
@@ -331,14 +351,9 @@ lemma toBehavior_rephase_responseTransform
         (netlist.connections.externalGauge gauge).incident
         (netlist.connections.externalGauge gauge).outgoing).toBehavior =
       netlist.rephasedBehavior gauge := by
-  classical
-  rw [ModeTransform.toBehavior_rephase,
-    netlist.rephasedBehavior_eq gauge hMatched]
   ext ⟨input, output⟩
-  simp only [LinearBehavior.mem_rephase_iff]
-  exact (ModeTransform.mem_toBehavior_iff_toLinearMap
-    (netlist.responseTransform hWellPosed) _ _).trans
-      (netlist.mem_behavior_iff_eq_responseTransform hWellPosed _ _).symm
+  exact netlist.mem_toBehavior_rephase_responseTransform_iff
+    gauge hMatched hWellPosed input output
 
 /-- The response transform extracted from the rephased singular-safe boundary relation.
 
@@ -480,6 +495,7 @@ private lemma mem_closeBehavior_append_rephase_eq_staged
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
   simp only [LinearBehavior.mem_rephase_iff]
   rw [inner.closeBehavior_append outer behavior]
+  exact Iff.rfl
 
 /-- Rephasing before flattened closure agrees with first using the established staged closure
 identity and then rephasing the final external boundary.
