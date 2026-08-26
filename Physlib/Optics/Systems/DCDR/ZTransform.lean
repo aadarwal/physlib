@@ -38,6 +38,8 @@ unit-normalized bridge at
 
 - `DCDR.causalOutput`: the causal solution selected by the polynomial recurrence.
 - `DCDR.zTransferROC`: its named absolute region of convergence.
+- `DCDR.mem_zTransferROC_of_lagTwoGeometric`: a strict two-lag geometric bound proves ROC
+  membership.
 - `DCDR.recurrenceDenominator_ne_zero_of_mem_zTransferROC`: the solve gate extracted from ROC
   membership.
 - `DCDR.zTransfer_eq_responseModel`: the recurrence transfer is the unit-delay rational quotient
@@ -110,6 +112,58 @@ lemma delaySymbol_zFeedforwardCoefficients (p : UnitDelayParameters) (q : ℂ) :
   rw [delaySymbol, zFeedforwardLags, zFeedforwardCoefficients,
     Polynomial.eval_eq_sum, Polynomial.sum_def]
 
+/-- The causal impulse kernel for a lag-two feedback coefficient `r ^ 2`.
+
+The average of ratios `r` and `-r` cancels every odd sample. Its even samples are the geometric
+sequence with ratio `r ^ 2`.
+-/
+def lagTwoGeometricImpulse (r : ℂ) : ℤ → ℂ :=
+  fun n => (1 / 2) * (geometricSeq r n + geometricSeq (-r) n)
+
+/-- The lag-two geometric impulse kernel is causal. -/
+lemma lagTwoGeometricImpulse_isCausal (r : ℂ) : IsCausal (lagTwoGeometricImpulse r) :=
+  ((geometricSeq_isCausal r).add (geometricSeq_isCausal (-r))).const_mul (1 / 2)
+
+/-- The lag-two kernel solves `y[n] = r^2 y[n-2] + delta[n]`. -/
+lemma lagTwoGeometricImpulse_step (r : ℂ) (n : ℤ) :
+    lagTwoGeometricImpulse r n =
+      r ^ 2 * lagTwoGeometricImpulse r (n - 2) + unitImpulse n := by
+  cases n with
+  | ofNat n =>
+      rcases n with _ | _ | n
+      · norm_num [lagTwoGeometricImpulse, geometricSeq_natCast, unitImpulse]
+      · norm_num [lagTwoGeometricImpulse, geometricSeq_natCast, unitImpulse]
+      · simp only [lagTwoGeometricImpulse, geometricSeq_natCast]
+        rw [show ((n + 2 : ℕ) : ℤ) - 2 = (n : ℤ) by omega,
+          geometricSeq_natCast]
+        simp only [unitImpulse, if_neg (by omega)]
+        ring
+  | negSucc n =>
+      have hn : -(n : ℤ) - 1 < 0 := by omega
+      have hnTwo : -(n : ℤ) - 1 - 2 < 0 := by omega
+      simp [lagTwoGeometricImpulse, geometricSeq_isCausal _ _ hn,
+        geometricSeq_isCausal _ _ hnTwo, unitImpulse, Int.negSucc_eq]
+
+/-- The lag-two geometric kernel has an absolutely convergent transform when
+`‖r‖ < ‖z‖`. Equivalently, its lag-two coefficient satisfies `‖r ^ 2‖ < ‖z‖ ^ 2`. -/
+lemma summable_seriesTerm_lagTwoGeometricImpulse {r z : ℂ} (hrz : ‖r‖ < ‖z‖) :
+    Summable (seriesTerm (lagTwoGeometricImpulse r) z) := by
+  have hz : 0 < ‖z‖ := lt_of_le_of_lt (norm_nonneg r) hrz
+  have hRatio : ‖r * z⁻¹‖ < 1 := by
+    rw [norm_mul, norm_inv, mul_inv, div_lt_one hz]
+    exact hrz
+  have hPositive : Summable (seriesTerm (geometricSeq r) z) := by
+    convert summable_geometric_of_norm_lt_one hRatio using 1
+    funext n
+    rw [seriesTerm, geometricSeq_natCast, mul_pow]
+  have hNegative : Summable (seriesTerm (geometricSeq (-r)) z) := by
+    have hNegativeRatio : ‖(-r) * z⁻¹‖ < 1 := by simpa using hRatio
+    convert summable_geometric_of_norm_lt_one hNegativeRatio using 1
+    funext n
+    rw [seriesTerm, geometricSeq_natCast, mul_pow]
+  exact summable_seriesTerm_const_mul (1 / 2)
+    (summable_seriesTerm_add hPositive hNegative)
+
 /-- The causal output selected by the coherent DCDR polynomial recurrence. -/
 def causalOutput (p : UnitDelayParameters) (input : ℤ → ℂ) : ℤ → ℂ :=
   recurrenceSolution (zFeedbackLags p) (zFeedforwardLags p)
@@ -128,6 +182,67 @@ lemma causalOutput_isRecurrenceSolution (p : UnitDelayParameters) {input : ℤ �
       (zFeedbackCoefficients p) (zFeedforwardCoefficients p) input
       (causalOutput p input) :=
   isRecurrenceSolution_recurrenceSolution (zero_notMem_zFeedbackLags p) hInput
+
+/-- A singleton lag-two DCDR recurrence has the finite-feedforward convolution of the lag-two
+geometric kernel as its causal impulse response. -/
+lemma causalOutput_eq_lagTwoGeometricImpulse (p : UnitDelayParameters) (r : ℂ)
+    (hLags : zFeedbackLags p = {2})
+    (hCoefficient : zFeedbackCoefficients p 2 = r ^ 2) :
+    causalOutput p unitImpulse =
+      delayCombination (zFeedforwardLags p) (zFeedforwardCoefficients p)
+        (lagTwoGeometricImpulse r) := by
+  apply eq_of_isRecurrenceSolution (zero_notMem_zFeedbackLags p)
+    (causalOutput_isCausal p unitImpulse)
+    ((lagTwoGeometricImpulse_isCausal r).delayCombination _ _)
+    (causalOutput_isRecurrenceSolution p unitImpulse_isCausal)
+  rw [IsRecurrenceSolution]
+  funext n
+  rw [hLags, delayCombination, Finset.sum_singleton, hCoefficient]
+  simp only [Pi.add_apply]
+  rw [delayCombination]
+  calc
+    (∑ k ∈ zFeedforwardLags p,
+        zFeedforwardCoefficients p k * lagTwoGeometricImpulse r (n - k)) =
+        ∑ k ∈ zFeedforwardLags p, zFeedforwardCoefficients p k *
+          (r ^ 2 * lagTwoGeometricImpulse r (n - k - 2) +
+            unitImpulse (n - k)) := by
+      apply Finset.sum_congr rfl
+      intro k _
+      rw [lagTwoGeometricImpulse_step]
+    _ = r ^ 2 *
+          (∑ k ∈ zFeedforwardLags p,
+            zFeedforwardCoefficients p k * lagTwoGeometricImpulse r (n - 2 - k)) +
+        ∑ k ∈ zFeedforwardLags p,
+          zFeedforwardCoefficients p k * unitImpulse (n - k) := by
+      ring
+
+/-- Strict lag-two geometric decay proves membership in the actual DCDR transfer ROC.
+
+The hypotheses expose the retained lag and its square root. The analytic inequality
+`‖r‖ < ‖z‖` is equivalent to `‖r ^ 2‖ < ‖z‖ ^ 2`; it is not an algebraic solve gate.
+-/
+lemma mem_zTransferROC_of_lagTwoGeometric (p : UnitDelayParameters) (r z : ℂ)
+    (hLags : zFeedbackLags p = {2})
+    (hCoefficient : zFeedbackCoefficients p 2 = r ^ 2)
+    (hrz : ‖r‖ < ‖z‖) : z ∈ zTransferROC p := by
+  have hz : z ≠ 0 := norm_ne_zero_iff.mp (ne_of_gt
+    (lt_of_le_of_lt (norm_nonneg r) hrz))
+  have hOutput : Summable (seriesTerm (causalOutput p unitImpulse) z) := by
+    rw [causalOutput_eq_lagTwoGeometricImpulse p r hLags hCoefficient]
+    exact summable_seriesTerm_delayCombination _ _
+      (summable_seriesTerm_lagTwoGeometricImpulse hrz)
+  have hRatio : ‖r * z⁻¹‖ < 1 := by
+    rw [norm_mul, norm_inv, mul_inv, div_lt_one (norm_pos_iff.mpr hz)]
+    exact hrz
+  have hDenominator :
+      1 - delaySymbol (zFeedbackLags p) (zFeedbackCoefficients p) z⁻¹ ≠ 0 := by
+    rw [hLags, delaySymbol, Finset.sum_singleton, hCoefficient]
+    intro hZero
+    have hOne : r ^ 2 * z⁻¹ ^ 2 = 1 := sub_eq_zero.mp hZero
+    have hNorm := congrArg norm hOne
+    rw [← mul_pow, norm_pow, norm_one] at hNorm
+    nlinarith [sq_nonneg ‖r * z⁻¹‖]
+  exact ⟨⟨⟨hz, summable_seriesTerm_unitImpulse z⟩, ⟨hz, hOutput⟩⟩, hDenominator⟩
 
 /-!
 
