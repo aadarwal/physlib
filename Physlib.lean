@@ -249,6 +249,8 @@ public import Physlib.Meta.TODO.Basic
 public import Physlib.Meta.TODO.Global
 public import Physlib.Meta.TransverseTactics
 public import Physlib.Optics.Basic
+public import Physlib.Optics.Components.BeamSplitter
+public import Physlib.Optics.Components.BeamSplitterPhysical
 public import Physlib.Optics.Components.DirectionalCoupler
 public import Physlib.Optics.Components.DirectionalCouplerPhysical
 public import Physlib.Optics.Components.DirectionalCouplerPhysicalFamilyRegression
@@ -267,6 +269,9 @@ public import Physlib.Optics.Components.MatchedPropagationPhysicalRegression
 public import Physlib.Optics.Components.MatchedPropagationPower
 public import Physlib.Optics.Components.MatchedPropagationPowerRegression
 public import Physlib.Optics.Components.MatchedPropagationRegression
+public import Physlib.Optics.Components.Mirror
+public import Physlib.Optics.Components.MirrorPhysical
+public import Physlib.Optics.Components.PhysicalPortSuiteRegression
 public import Physlib.Optics.Components.Polarizer
 public import Physlib.Optics.Components.Polarizer.Basic
 public import Physlib.Optics.Components.Polarizer.Coherency
