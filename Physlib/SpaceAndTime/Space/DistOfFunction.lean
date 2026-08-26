@@ -83,7 +83,7 @@ lemma distOfFunction_apply {d : ℕ} (f : Space d → F)
     distOfFunction f hf η = ∫ x, η x • f x := rfl
 
 /-- The distribution obtained by integrating a distribution-bounded function over a measurable
-set. -/
+set. Values of the supplied ambient function outside the set do not contribute. -/
 def distOfFunctionOn {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
     (f : Space d → F) (hf : IsDistBounded f) : (Space d) →d[ℝ] F :=
   distOfFunction (s.indicator f) (hf.indicator hs)

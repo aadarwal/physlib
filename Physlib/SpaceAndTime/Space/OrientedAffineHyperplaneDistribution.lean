@@ -13,9 +13,11 @@ public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
 
 ## i. Overview
 
-This file represents two independently supplied functions on the strict negative and positive
-sides of an oriented affine hyperplane as one ambient distribution. The carrier itself is omitted
-from both integrals; no boundary trace, surface source, or jump law is inserted by this definition.
+This file represents ambient extensions of two independently supplied side functions as one
+ambient distribution. Each extension contributes only on its corresponding strict open
+half-space, so its values on the carrier and the opposite side are ignored. The carrier itself is
+omitted from both integrals; no boundary trace, surface source, or jump law is inserted by this
+definition.
 
 ## ii. Key results
 
@@ -50,7 +52,8 @@ namespace OrientedAffineHyperplane
 -/
 
 /-- The ambient distribution obtained by integrating the negative- and positive-side functions
-over their respective strict open half-spaces. The hyperplane carrier belongs to neither term. -/
+over their respective strict open half-spaces. Values outside the selected side are ignored, and
+the hyperplane carrier belongs to neither term. -/
 def distOfSidewiseFunction {d : ℕ} (plane : OrientedAffineHyperplane d)
     (f : Side → Space d → F) (hf : ∀ side, IsDistBounded (f side)) :
     (Space d) →d[ℝ] F :=
