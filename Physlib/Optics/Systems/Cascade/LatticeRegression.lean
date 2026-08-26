@@ -446,7 +446,7 @@ lemma latticeRegression_mem_componentBehavior :
     ScatteringMatrix.toLinearMap_toOrientedModeTransform]
   apply WithLp.ofLp_injective 2
   funext localChannel
-  change (rectangularLatticeComponentPortFamily component).Channel at localChannel
+  change Outgoing (rectangularLatticeComponentPortFamily component).Channel at localChannel
   rcases localChannel with ⟨port, mode⟩
   rw [ModeAmplitude.reindex_apply]
   simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply,
@@ -538,7 +538,7 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
         ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
         latticeRegressionOutgoing, latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionHorizontalIncidentValue,
-        latticeRegressionHorizontalOutgoingValue]
+        latticeRegressionHorizontalOutgoingValue] <;> rfl
   · rcases vertical with ⟨⟨edge, column⟩, half⟩
     rcases edge with ⟨row, hRow⟩
     have hRowZero : row = 0 := by
@@ -558,7 +558,7 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
         ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
         latticeRegressionOutgoing, latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionVerticalIncidentValue,
-        latticeRegressionVerticalOutgoingValue]
+        latticeRegressionVerticalOutgoingValue] <;> rfl
 
 /-- The concrete incident amplitude is the canonical assembly of its outgoing field and input. -/
 lemma latticeRegression_incidentAssembly :
