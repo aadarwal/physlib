@@ -7,6 +7,10 @@ module
 
 public import Physlib.Optics.Components.BeamSplitterPhysical
 public import Physlib.Optics.Components.MirrorPhysical
+public import Physlib.Optics.Components.PolarizationScatteringPhysical
+public import Physlib.Optics.Components.Retarder.WavePlate
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringPhysical
+public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
 
 /-!
 # Regression for the component-owned physical-port suite
@@ -29,6 +33,13 @@ therefore proves a genuine output inequality. This sentinel can fail under endpo
 component-ownership, or component-index errors; Phase 9b can add fiber and side
 sentinels without altering it.
 
+Phase 9b leaves every Phase 9a declaration unchanged. Its separate mixed family combines a Jones
+quarter-wave plate with an s/p Fresnel interface. The raw inputs `(5, 6)` and
+`((1, 2), (3, 4))` produce `(5, -6I)` and `((11/5, -2/5), (7/5, 24/5))`. These values are expanded
+from the registered primitive matrices before any physical-port package is unfolded. A hostile
+interface swaps only the negative-side s/p output fiber, forcing `7/5` instead of `11/5` on the
+same mixed input.
+
 ## ii. Key results
 
 - `physicalPortSuite9a_beam_raw_action`: primitive `3/5`, `4/5` beam action.
@@ -37,6 +48,11 @@ sentinels without altering it.
 - `physicalPortSuite9a_aggregate_action`: exact mixed-family aggregate output.
 - `physicalPortSuite9a_hostile_aggregate_action`: exact swapped-endpoint output.
 - `physicalPortSuite9a_hostile_action_ne`: the hostile output differs on the same input.
+- `physicalPortSuite9b_polarization_raw_action`: primitive positive-quarter-wave-plate action.
+- `physicalPortSuite9b_interface_raw_action`: primitive full-vector s/p interface action.
+- `physicalPortSuite9b_indexed_action`: direct six-channel dependent block action.
+- `physicalPortSuite9b_aggregate_action`: exact mixed polarization/interface output.
+- `physicalPortSuite9b_hostile_action_ne`: a negative-side s/p swap changes the output.
 
 ## iii. Table of contents
 
@@ -45,12 +61,18 @@ sentinels without altering it.
 - C. Raw indexed and aggregate action
 - D. Hostile endpoint-swap family
 - E. Endpoint graph anchor and non-claims
+- F. Phase 9b primitive polarization and interface actions
+- G. Phase 9b mixed component family
+- H. Phase 9b hostile polarization-fiber swap
 
 ## iv. References
 
 All coefficients are algebraic sentinels and modal-amplitude bookkeeping, not electromagnetic
 power. No reciprocity, time reversal, reverse-incidence Maxwell law, modal completeness,
 propagation, causality, dispersion, material, coating, or physical realization is asserted.
+The polarization fixture uses Physlib's positive-time phase convention. The interface fixture uses
+the fork-declared full-vector p sign and the registered negative-side/positive-side kernel order;
+it does not assert the separately developed typed reciprocity or reference-plane laws.
 -/
 
 @[expose] public section
@@ -788,6 +810,142 @@ lemma physicalPortSuite9a_assembled_mem :
     physicalPortSuite9aIncident, ModeAmplitude.reindex_reindex_symm,
     physicalPortSuite9a_aggregate_action]
   rfl
+
+/-!
+## F. Phase 9b primitive polarization and interface actions
+-/
+
+open Electromagnetism
+
+/-- The negative-side fixture medium has wave admittance four. -/
+def physicalPortSuite9bNegativeMedium : HomogeneousIsotropicMedium where
+  ε := 16
+  μ := 1
+  ε_pos := by norm_num
+  μ_pos := by norm_num
+
+/-- The positive-side fixture medium has wave admittance one. -/
+def physicalPortSuite9bPositiveMedium : HomogeneousIsotropicMedium where
+  ε := 1
+  μ := 1
+  ε_pos := by norm_num
+  μ_pos := by norm_num
+
+/-- The negative-side fixture wave admittance is exactly four. -/
+lemma physicalPortSuite9b_negative_waveImpedance_inv :
+    physicalPortSuite9bNegativeMedium.waveImpedance⁻¹ = 4 := by
+  have hSqrt : Real.sqrt (1 / 16 : ℝ) = 1 / 4 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  norm_num [HomogeneousIsotropicMedium.waveImpedance,
+    physicalPortSuite9bNegativeMedium, hSqrt]
+
+/-- The positive-side fixture wave admittance is exactly one. -/
+lemma physicalPortSuite9b_positive_waveImpedance_inv :
+    physicalPortSuite9bPositiveMedium.waveImpedance⁻¹ = 1 := by
+  norm_num [HomogeneousIsotropicMedium.waveImpedance,
+    physicalPortSuite9bPositiveMedium]
+
+/-- The rational interface fixture reuses an established oriented plane with distinct media. -/
+def physicalPortSuite9bInterface : PlanarDielectricInterface where
+  plane := jonesBoundaryRegressionPlane
+  negativeMedium := physicalPortSuite9bNegativeMedium
+  positiveMedium := physicalPortSuite9bPositiveMedium
+
+/-- The fixture pins the flux factor and all four full-vector Fresnel coefficients. -/
+lemma physicalPortSuite9b_fresnel_values :
+    physicalPortSuite9bInterface.fresnelTransmissionFluxFactor 1 1 = 1 / 4 ∧
+      physicalPortSuite9bInterface.sFresnelReflectionCoefficient 1 1 = 3 / 5 ∧
+      physicalPortSuite9bInterface.sFresnelTransmissionCoefficient 1 1 = 8 / 5 ∧
+      physicalPortSuite9bInterface.pFresnelReflectionCoefficient 1 1 = -3 / 5 ∧
+      physicalPortSuite9bInterface.pFresnelTransmissionCoefficient 1 1 = 8 / 5 := by
+  norm_num [PlanarDielectricInterface.fresnelTransmissionFluxFactor,
+    PlanarDielectricInterface.sFresnelReflectionCoefficient,
+    PlanarDielectricInterface.sFresnelTransmissionCoefficient,
+    PlanarDielectricInterface.pFresnelReflectionCoefficient,
+    PlanarDielectricInterface.pFresnelTransmissionCoefficient,
+    PlanarDielectricInterface.sFresnelDenominator,
+    PlanarDielectricInterface.pFresnelDenominator,
+    physicalPortSuite9bInterface, physicalPortSuite9b_negative_waveImpedance_inv,
+    physicalPortSuite9b_positive_waveImpedance_inv]
+
+/-- Flux normalization converts the fixture's electric transmission `8/5` to `4/5`. -/
+lemma physicalPortSuite9b_normalized_transmission :
+    PlanarDielectricInterface.powerNormalizedFresnelTransmissionCoefficient
+      (1 / 4) (8 / 5) = 4 / 5 := by
+  have hSqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
+    rw [Real.sqrt_eq_iff_mul_self_eq] <;> norm_num
+  norm_num [PlanarDielectricInterface.powerNormalizedFresnelTransmissionCoefficient,
+    hSqrt]
+
+/-- The positive-quarter-wave-plate raw input has distinct nonzero Jones coordinates. -/
+def physicalPortSuite9bPolarizationRawInput : ModeAmplitude (Fin 2) :=
+  WithLp.toLp 2 ![5, 6]
+
+/-- The exact positive-time quarter-wave-plate raw output is `(5, -6I)`. -/
+def physicalPortSuite9bPolarizationRawOutput : ModeAmplitude (Fin 2) :=
+  WithLp.toLp 2 ![5, -6 * Complex.I]
+
+/-- Primitive Jones matrix multiplication gives the positive-time quarter-wave-plate output. -/
+lemma physicalPortSuite9b_polarization_raw_action :
+    (JonesMatrix.quarterWavePlate 0).entries.toEuclideanLin
+        physicalPortSuite9bPolarizationRawInput =
+      physicalPortSuite9bPolarizationRawOutput := by
+  rw [JonesMatrix.quarterWavePlate, JonesMatrix.linearRetarder_zero_axis_entries,
+    JonesMatrix.linearRetarderPhase_pi_div_two]
+  apply WithLp.ofLp_injective 2
+  funext output
+  fin_cases output <;>
+    simp [physicalPortSuite9bPolarizationRawInput,
+      physicalPortSuite9bPolarizationRawOutput, Matrix.toLpLin_apply,
+      Matrix.mulVec, dotProduct, Fin.sum_univ_two]
+  <;> ring
+
+/-- The raw interface input is nonzero in both sides of both polarization blocks. -/
+def physicalPortSuite9bInterfaceRawInput : ModeAmplitude (Fin 2 ⊕ Fin 2) :=
+  (WithLp.toLp 2 ![1, 2]).directSum (WithLp.toLp 2 ![3, 4])
+
+/-- The exact raw interface output retains all four independently checked coordinates. -/
+def physicalPortSuite9bInterfaceRawOutput : ModeAmplitude (Fin 2 ⊕ Fin 2) :=
+  (WithLp.toLp 2 ![11 / 5, -2 / 5]).directSum
+    (WithLp.toLp 2 ![7 / 5, 24 / 5])
+
+/-- The registered s kernel is the exact rational primitive matrix at the fixture. -/
+lemma physicalPortSuite9b_s_kernel :
+    (physicalPortSuite9bInterface.sFresnelScatteringKernel 1 1).toModeTransform =
+      !![(3 / 5 : ℂ), (4 / 5 : ℂ); (4 / 5 : ℂ), (-3 / 5 : ℂ)] := by
+  rcases physicalPortSuite9b_fresnel_values with ⟨hFactor, hRS, hTS, _, _⟩
+  ext output input
+  fin_cases output <;> fin_cases input <;>
+    simp [PlanarDielectricInterface.sFresnelScatteringKernel,
+      PlanarDielectricInterface.scalarFresnelScatteringKernel, hFactor, hRS, hTS,
+      physicalPortSuite9b_normalized_transmission]
+
+/-- The registered p kernel pins the fork-declared full-vector reflection sign. -/
+lemma physicalPortSuite9b_p_kernel :
+    (physicalPortSuite9bInterface.pFresnelScatteringKernel 1 1).toModeTransform =
+      !![(-3 / 5 : ℂ), (4 / 5 : ℂ); (4 / 5 : ℂ), (3 / 5 : ℂ)] := by
+  rcases physicalPortSuite9b_fresnel_values with ⟨hFactor, _, _, hRP, hTP⟩
+  ext output input
+  fin_cases output <;> fin_cases input <;>
+    simp [PlanarDielectricInterface.pFresnelScatteringKernel,
+      PlanarDielectricInterface.scalarFresnelScatteringKernel, hFactor, hRP, hTP,
+      physicalPortSuite9b_normalized_transmission]
+
+/-- Primitive block-matrix multiplication gives all four exact polarized-interface outputs. -/
+lemma physicalPortSuite9b_interface_raw_action :
+    ((physicalPortSuite9bInterface.sFresnelScatteringKernel 1 1).toModeTransform.directSum
+      (physicalPortSuite9bInterface.pFresnelScatteringKernel 1 1).toModeTransform).toLinearMap
+        physicalPortSuite9bInterfaceRawInput =
+      physicalPortSuite9bInterfaceRawOutput := by
+  rw [physicalPortSuite9b_s_kernel, physicalPortSuite9b_p_kernel]
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with output | output <;> fin_cases output <;>
+    simp [ModeTransform.directSum, physicalPortSuite9bInterfaceRawInput,
+      physicalPortSuite9bInterfaceRawOutput, ModeTransform.toLinearMap,
+      Matrix.toLpLin_apply, Matrix.mulVec, dotProduct, Fintype.sum_sum_type,
+      Fin.sum_univ_two]
+  <;> ring
 
 end
 
