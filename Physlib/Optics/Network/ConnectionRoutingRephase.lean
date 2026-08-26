@@ -357,8 +357,8 @@ lemma incidentAssembly_rephase [Fintype family.Channel]
   · rcases hConnected with ⟨connected, rfl⟩
     rw [family.incidentAssembly_apply_connected_channel,
       ModeAmplitude.rephase_apply,
-      family.incidentAssembly_apply_connected_channel,
-      ModeAmplitude.rephase_apply]
+      ModeAmplitude.rephase_apply,
+      family.incidentAssembly_apply_connected_channel]
     have hPhase := hMatched (family.mateEquiv connected)
     rw [family.mateEquiv_apply_apply] at hPhase
     exact congrArg
@@ -373,8 +373,8 @@ lemma incidentAssembly_rephase [Fintype family.Channel]
           (Incident.mk externalChannel.1) = _
     rw [family.incidentAssembly_apply_external,
       ModeAmplitude.rephase_apply,
-      family.incidentAssembly_apply_external,
-      ModeAmplitude.rephase_apply]
+      ModeAmplitude.rephase_apply,
+      family.incidentAssembly_apply_external]
     rfl
 
 end PortConnectionFamily
