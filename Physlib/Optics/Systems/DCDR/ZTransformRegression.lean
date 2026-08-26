@@ -88,7 +88,10 @@ lemma zRegression_loopPolynomial_expansion :
   norm_num [UnitDelayParameters.loopPolynomial, UnitDelayParameters.upperPolynomial,
     UnitDelayParameters.lowerPolynomial, UnitDelayParameters.feedbackPolynomial,
     zRegressionParameters, zRegressionCoupler,
-    DirectionalCoupler.crossCoefficient, Complex.I_sq]
+    DirectionalCoupler.crossCoefficient]
+  right
+  ring_nf
+  rw [Complex.I_sq]
   ring
 
 /-- The corresponding raw recurrence denominator is the unit polynomial. -/
@@ -109,7 +112,9 @@ lemma zRegression_responseNumeratorPolynomial_expansion :
     UnitDelayParameters.feedbackDrivePolynomial, UnitDelayParameters.upperPolynomial,
     UnitDelayParameters.lowerPolynomial, UnitDelayParameters.feedbackPolynomial,
     zRegressionParameters, zRegressionCoupler,
-    DirectionalCoupler.crossCoefficient, Complex.I_sq]
+    DirectionalCoupler.crossCoefficient]
+  ring_nf
+  rw [Complex.I_sq, Complex.I_pow_four]
   ring
 
 /-- The displayed stable numerator is nonzero. -/
@@ -235,16 +240,21 @@ lemma zRegression_crossSemanticsDomain :
   loopIsContractive := by simpa using zRegression_fixed_loopIsContractive
   mem_zTransferROC := zRegression_one_mem_zTransferROC
   noPoleCancellation := by
-    change zRegressionRationalReduction.NoPoleCancellation 1
-    exact zRegression_noPoleCancellation
+    simpa [zRegressionResponseReduction] using zRegression_noPoleCancellation
   mem_reducedEvaluationDomain := by
-    change (1 : ℂ) ∈ zRegressionReducedResponse.evaluationDomain
-    exact zRegression_one_mem_reducedEvaluationDomain
+    simpa [zRegressionResponseReduction, zRegressionRationalReduction] using
+      zRegression_one_mem_reducedEvaluationDomain
 
 /-- The fixed `q = 1` presentation has the scalar N5 solve gate supplied by the common domain. -/
 lemma zRegression_fixed_hasNonzeroDenominator :
     (zRegressionParameters.at (1 : ℂ)).HasNonzeroDenominator := by
   simpa using zRegression_crossSemanticsDomain.hasNonzeroDenominator
+
+/-- The exact fixed-carrier N5 well-posedness witness for the stable fixture. -/
+noncomputable def zRegressionWellPosed :
+    (netlist (zRegressionParameters.at (1 : ℂ))).IsWellPosed :=
+  isWellPosed_of_hasNonzeroDenominator
+    (zRegressionParameters.at (1 : ℂ)) zRegression_fixed_hasNonzeroDenominator
 
 /-!
 
@@ -276,24 +286,32 @@ lemma zRegression_rationalZEliminationResponse_one :
 /-- Direct fixed data show the selected direct gain is `-7/16`. -/
 lemma zRegression_fixed_directGain :
     (zRegressionParameters.at (1 : ℂ)).directGain = -7 / 16 := by
-  norm_num [Parameters.directGain, UnitDelayParameters.at,
-    zRegressionParameters, zRegressionCoupler,
-    DirectionalCoupler.crossCoefficient, Complex.I_sq]
+  rw [Parameters.directGain, UnitDelayParameters.lowerCoefficient_at,
+    UnitDelayParameters.upperCoefficient_at]
+  norm_num [UnitDelayParameters.at, zRegressionParameters, zRegressionCoupler,
+    DirectionalCoupler.crossCoefficient]
+  ring_nf
+  rw [Complex.I_sq]
+  norm_num
 
 /-- Direct fixed data show the selected feedback readout gain is `-(3/4) I`. -/
   lemma zRegression_fixed_feedbackReadoutGain :
     (zRegressionParameters.at (1 : ℂ)).feedbackReadoutGain =
       -(3 / 4) * Complex.I := by
-  norm_num [Parameters.feedbackReadoutGain, UnitDelayParameters.at, zRegressionParameters,
-    zRegressionCoupler, DirectionalCoupler.crossCoefficient]
+  rw [Parameters.feedbackReadoutGain, UnitDelayParameters.lowerCoefficient_at,
+    UnitDelayParameters.upperCoefficient_at]
+  norm_num [UnitDelayParameters.at, zRegressionParameters, zRegressionCoupler,
+    DirectionalCoupler.crossCoefficient]
   ring
 
 /-- Direct fixed data show the returning drive gain is `-(3/4) I`. -/
 lemma zRegression_fixed_feedbackDrive :
     (zRegressionParameters.at (1 : ℂ)).feedbackDrive =
       -(3 / 4) * Complex.I := by
-  norm_num [Parameters.feedbackDrive, UnitDelayParameters.at, zRegressionParameters,
-    zRegressionCoupler, DirectionalCoupler.crossCoefficient]
+  rw [Parameters.feedbackDrive, UnitDelayParameters.feedbackCoefficient_at,
+    UnitDelayParameters.lowerCoefficient_at, UnitDelayParameters.upperCoefficient_at]
+  norm_num [UnitDelayParameters.at, zRegressionParameters, zRegressionCoupler,
+    DirectionalCoupler.crossCoefficient]
   ring
 
 /-- Direct geometric-series expansion gives the common circulation value `-1`. -/
@@ -322,9 +340,7 @@ lemma zRegression_fixed_transfer :
 /-- Raw N7 elimination gives the selected fixed N5 value `-1`. -/
 lemma zRegression_eliminationResponse :
     eliminationResponse (zRegressionParameters.at (1 : ℂ))
-      (isWellPosed_of_hasNonzeroDenominator
-        (zRegressionParameters.at (1 : ℂ))
-          zRegression_fixed_hasNonzeroDenominator) = -1 := by
+      zRegressionWellPosed = -1 := by
   rw [eliminationResponse_eq_transfer]
   exact zRegression_fixed_transfer
 
@@ -339,9 +355,7 @@ lemma zRegression_masonResponse :
 /-- Canonical typed packaging preserves the selected N5 entry `-1`. -/
 lemma zRegression_packagedScattering_entry :
     ((netlist (zRegressionParameters.at (1 : ℂ))).packagedScattering
-      (isWellPosed_of_hasNonzeroDenominator
-        (zRegressionParameters.at (1 : ℂ))
-          zRegression_fixed_hasNonzeroDenominator)).toModeTransform
+      zRegressionWellPosed).toModeTransform
         (outputChannel (zRegressionParameters.at (1 : ℂ)))
         (inputChannel (zRegressionParameters.at (1 : ℂ))) = -1 := by
   exact zRegression_eliminationResponse
@@ -357,14 +371,10 @@ lemma zRegression_crossSemantics :
         zRegression_crossSemanticsDomain.mem_reciprocalZResponseDomain = -1 ∧
       circulationSeries zRegressionParameters 1 = -1 ∧
       eliminationResponse (zRegressionParameters.at (1 : ℂ))
-        (isWellPosed_of_hasNonzeroDenominator
-          (zRegressionParameters.at (1 : ℂ))
-            zRegression_fixed_hasNonzeroDenominator) = -1 ∧
+        zRegressionWellPosed = -1 ∧
       masonResponse (zRegressionParameters.at (1 : ℂ)) = -1 ∧
       ((netlist (zRegressionParameters.at (1 : ℂ))).packagedScattering
-        (isWellPosed_of_hasNonzeroDenominator
-          (zRegressionParameters.at (1 : ℂ))
-            zRegression_fixed_hasNonzeroDenominator)).toModeTransform
+        zRegressionWellPosed).toModeTransform
           (outputChannel (zRegressionParameters.at (1 : ℂ)))
           (inputChannel (zRegressionParameters.at (1 : ℂ))) = -1 ∧
       HasSelectedRelationalResponse (zRegressionParameters.at (1 : ℂ)) (-1) := by
@@ -440,9 +450,13 @@ lemma zRegression_active_loopGain :
 /-- Direct fixed data give the active fixture's direct gain `1/4`. -/
 lemma zRegression_active_directGain :
     (unstableAmplifierParameters.at (1 : ℂ)).directGain = 1 / 4 := by
-  norm_num [Parameters.directGain, unstableAmplifierParameters,
-    UnitDelayParameters.at, poleRegressionCoupler,
-    DirectionalCoupler.crossCoefficient, Complex.I_sq]
+  rw [Parameters.directGain, UnitDelayParameters.lowerCoefficient_at,
+    UnitDelayParameters.upperCoefficient_at]
+  norm_num [UnitDelayParameters.at, unstableAmplifierParameters,
+    poleRegressionCoupler, DirectionalCoupler.crossCoefficient]
+  ring_nf
+  rw [Complex.I_sq]
+  norm_num
 
 /-- The active loop's geometric power sequence is not summable. -/
 lemma zRegression_active_geometric_not_summable :
