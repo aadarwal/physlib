@@ -256,6 +256,8 @@ local instance replacementTargetAppendChannelFintype :
   Fintype.ofEquiv _
     (replacement.appendChannelEquiv (outer.transport boundary)).symm
 
+omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
+  [Fintype (inner.append outer).ExternalChannel] in
 /-- Closing a transported outer family and then presenting the final appended boundary is the
 same as first transporting the outer closure and then presenting that boundary. -/
 lemma transportedOuterClosure_reindex
@@ -286,6 +288,9 @@ lemma transportedOuterClosure_reindex
         (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm)
     (outer.closeBehavior_transport boundary boundaryBehavior)
 
+omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
+  [Fintype inner.ExternalChannel] [Fintype replacement.ExternalChannel]
+  [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel] in
 /-- The two routes from an outer external relation to the replacement's final boundary induce
 the same behavior relabelling. -/
 lemma replacementExternal_reindex
@@ -380,7 +385,9 @@ lemma replaceInnerFamily
           (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
         (Outgoing.relabelEquiv
           (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm := by
-            exact inner.transportedOuterClosure_reindex replacement boundary outer
+            exact transportedOuterClosure_reindex
+              (inner := inner) (replacement := replacement)
+              (boundary := boundary) (outer := outer)
               (inner.innerBoundaryBehavior behavior)
     _ = ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
           (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer).symm)
@@ -389,7 +396,9 @@ lemma replaceInnerFamily
           (inner.replacementExternalChannelEquiv replacement boundary outer))
         (Outgoing.relabelEquiv
           (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
-            exact inner.replacementExternal_reindex replacement boundary outer
+            exact replacementExternal_reindex
+              (inner := inner) (replacement := replacement)
+              (boundary := boundary) (outer := outer)
               (outer.closeBehavior (inner.innerBoundaryBehavior behavior))
 
 end PortConnectionFamily
