@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Network.Hierarchical
+public import Physlib.Optics.Network.LinearBehaviorReindex
 public import Physlib.Optics.Network.TwoPortSeriesNetlist
 public import Physlib.Optics.Systems.Cascade.Termination
 
@@ -54,9 +55,10 @@ connection labels are presented.
 The supplied site and coupling matrices are fixed-carrier algebraic component laws. No physical
 realization, coupled-lattice closed form, quadruple-ring result, passivity, losslessness,
 reciprocity, stability, resonance, bandwidth, dispersion, bending-loss, measurement, causality,
-or material claim is made. Power means normalized modal power, not electromagnetic power before
-the finite, common-frequency, pairwise-integrable, flux-orthogonal, unit-normalized profile bridge
-at `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`.
+or material claim is made. The identical-row `^ count` is matrix exponentiation, not an optical
+power observable. Any modal-power interpretation is not electromagnetic power before the finite,
+common-frequency, pairwise-integrable, flux-orthogonal, unit-normalized profile bridge at
+`Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`.
 
 DATE'14 Figure 3 is summarized at `HOL-CORPUS.md:210-216`. The paper proves only the uncoupled row
 sublattice and says only that the coupled case "follows the similar pattern". It prints no coupled
@@ -115,7 +117,8 @@ lemma behavior_eq_composition_toBehavior (row : DateUncoupledRowSublattice)
 
 /-- DATE'14 Thm. 4 transfers unchanged to an identical Figure 3(i) row.
 
-The reused power result is at `Physlib/Optics/Systems/Cascade/Identical.lean:99-103`.
+Here `^ count` is matrix exponentiation, not normalized modal power. The reused matrix-power result
+is at `Physlib/Optics/Systems/Cascade/Identical.lean:99-103`.
 -/
 lemma identical_composition_eq_pow (stage : DateCascadeStage) (count : ℕ) :
     (identical stage count).composition = stage.compositionMatrix ^ count :=
@@ -1175,67 +1178,13 @@ lemma rectangularColumnFlattenBehavior_eq_columnDecomposition {rows columns : �
     (rectangularLatticeColumnHierarchy p).outer
     (rectangularColumnHierarchyComponentBehavior p) input output
 
-/-- Relabel an amplitude while supplying both finite enumerations explicitly. -/
-def latticeAmplitudeReindex {input reindexedInput : Type*}
-    (inputFintype : Fintype input) (reindexedInputFintype : Fintype reindexedInput)
-    (inputEquiv : input ≃ reindexedInput) (amplitude : ModeAmplitude input) :
-    ModeAmplitude reindexedInput :=
-  @ModeAmplitude.reindex input reindexedInput inputFintype reindexedInputFintype
-    inputEquiv amplitude
-
-/-- Explicitly enumerated amplitude relabelling is inverted by the inverse equivalence. -/
-@[simp]
-lemma latticeAmplitudeReindex_symm_reindex {input reindexedInput : Type*}
-    (inputFintype : Fintype input) (reindexedInputFintype : Fintype reindexedInput)
-    (inputEquiv : input ≃ reindexedInput) (amplitude : ModeAmplitude input) :
-    latticeAmplitudeReindex reindexedInputFintype inputFintype inputEquiv.symm
-        (latticeAmplitudeReindex inputFintype reindexedInputFintype inputEquiv amplitude) =
-      amplitude := by
-  simpa only [latticeAmplitudeReindex] using
-    (@ModeAmplitude.reindex_symm_reindex input reindexedInput inputFintype
-      reindexedInputFintype inputEquiv amplitude)
-
-/-- Relabel a behavior while supplying all four finite enumerations explicitly. -/
-def latticeBehaviorReindex
-    {input output reindexedInput reindexedOutput : Type*}
-    (inputFintype : Fintype input) (reindexedInputFintype : Fintype reindexedInput)
-    (outputFintype : Fintype output) (reindexedOutputFintype : Fintype reindexedOutput)
-    (inputEquiv : input ≃ reindexedInput) (outputEquiv : output ≃ reindexedOutput)
-    (behavior : LinearBehavior input output) :
-    LinearBehavior reindexedInput reindexedOutput :=
-  @LinearBehavior.reindex input output reindexedInput reindexedOutput
-    inputFintype reindexedInputFintype outputFintype reindexedOutputFintype
-    inputEquiv outputEquiv behavior
-
-/-- Membership in an explicitly enumerated behavior relabelling. -/
-lemma mem_latticeBehaviorReindex_iff
-    {input output reindexedInput reindexedOutput : Type*}
-    (inputFintype : Fintype input) (reindexedInputFintype : Fintype reindexedInput)
-    (outputFintype : Fintype output) (reindexedOutputFintype : Fintype reindexedOutput)
-    (inputEquiv : input ≃ reindexedInput) (outputEquiv : output ≃ reindexedOutput)
-    (behavior : LinearBehavior input output)
-    (reindexedInputAmplitude : ModeAmplitude reindexedInput)
-    (reindexedOutputAmplitude : ModeAmplitude reindexedOutput) :
-    (reindexedInputAmplitude, reindexedOutputAmplitude) ∈
-        latticeBehaviorReindex inputFintype reindexedInputFintype outputFintype
-          reindexedOutputFintype inputEquiv outputEquiv behavior ↔
-      (latticeAmplitudeReindex reindexedInputFintype inputFintype inputEquiv.symm
-          reindexedInputAmplitude,
-        latticeAmplitudeReindex reindexedOutputFintype outputFintype outputEquiv.symm
-          reindexedOutputAmplitude) ∈ behavior := by
-  unfold latticeBehaviorReindex
-  simpa only [latticeAmplitudeReindex] using
-    (@LinearBehavior.mem_reindex_iff input output reindexedInput reindexedOutput
-      inputFintype reindexedInputFintype outputFintype reindexedOutputFintype
-      inputEquiv outputEquiv behavior reindexedInputAmplitude reindexedOutputAmplitude)
-
 /-- The canonical flat behavior transported to column-first external-channel coordinates. -/
 def rectangularLatticeBehaviorInColumnCoordinates {rows columns : ℕ}
     (p : RectangularLatticeParameters rows columns) :
     LinearBehavior
       (rectangularLatticeColumnHierarchy p).flatten.ExternalIncident
       (rectangularLatticeColumnHierarchy p).flatten.ExternalOutgoing :=
-  latticeBehaviorReindex
+  @LinearBehavior.reindex _ _ _ _
     (rectangularLatticeNetlistExternalIncidentFintype p)
     (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
     (rectangularLatticeNetlistExternalOutgoingFintype p)
@@ -1255,7 +1204,7 @@ lemma rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex {rows columns 
   change ((rectangularLatticeNetlist p).withConnections
     ((rectangularLatticeColumnHierarchy p).inner.append
       (rectangularLatticeColumnHierarchy p).outer)).behavior = _
-  unfold rectangularLatticeBehaviorInColumnCoordinates latticeBehaviorReindex
+  unfold rectangularLatticeBehaviorInColumnCoordinates
   exact FlatNetlist.behavior_withConnections
     (netlist := rectangularLatticeNetlist p)
     ((rectangularLatticeColumnHierarchy p).inner.append
@@ -1267,7 +1216,7 @@ def rectangularColumnDecompositionInLatticeCoordinates {rows columns : ℕ}
     (p : RectangularLatticeParameters rows columns) :
     LinearBehavior (rectangularLatticeNetlist p).ExternalIncident
       (rectangularLatticeNetlist p).ExternalOutgoing :=
-  latticeBehaviorReindex
+  @LinearBehavior.reindex _ _ _ _
     (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
     (rectangularLatticeNetlistExternalIncidentFintype p)
     (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
@@ -1285,104 +1234,33 @@ lemma rectangularLatticeBehavior_eq_columnDecomposition {rows columns : ℕ}
     (p : RectangularLatticeParameters rows columns) :
     (rectangularLatticeNetlist p).behavior =
       rectangularColumnDecompositionInLatticeCoordinates p := by
-  unfold rectangularColumnDecompositionInLatticeCoordinates
-  ext ⟨input, output⟩
-  let inputEquiv := (rectangularRowColumnWiringEquiv p).externalIncidentEquiv
-  let outputEquiv := (rectangularRowColumnWiringEquiv p).externalOutgoingEquiv
-  let columnInput := latticeAmplitudeReindex
+  have hForward : rectangularLatticeBehaviorInColumnCoordinates p =
+      rectangularColumnDecompositionBehavior p :=
+    (rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex p).symm.trans
+      (rectangularColumnFlattenBehavior_eq_columnDecomposition p)
+  have hBackward := congrArg
+    (fun behavior => @LinearBehavior.reindex _ _ _ _
+      (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
+      (rectangularLatticeNetlistExternalIncidentFintype p)
+      (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
+      (rectangularLatticeNetlistExternalOutgoingFintype p)
+      (rectangularRowColumnWiringEquiv p).externalIncidentEquiv.symm
+      (rectangularRowColumnWiringEquiv p).externalOutgoingEquiv.symm behavior)
+    hForward
+  have hRoundtrip := @LinearBehavior.reindex_symm_reindex
+    (rectangularLatticeNetlist p).ExternalIncident
+    (rectangularLatticeNetlist p).ExternalOutgoing
+    (rectangularLatticeColumnHierarchy p).flatten.ExternalIncident
+    (rectangularLatticeColumnHierarchy p).flatten.ExternalOutgoing
     (rectangularLatticeNetlistExternalIncidentFintype p)
-    (rectangularColumnFlattenConnectionsExternalIncidentFintype p) inputEquiv input
-  let columnOutput := latticeAmplitudeReindex
     (rectangularLatticeNetlistExternalOutgoingFintype p)
-    (rectangularColumnFlattenConnectionsExternalOutgoingFintype p) outputEquiv output
-  have hInputDoubleSymm : latticeAmplitudeReindex
-      (rectangularLatticeNetlistExternalIncidentFintype p)
-      (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
-      inputEquiv.symm.symm input = columnInput := by
-    rw [Equiv.symm_symm]
-  have hOutputDoubleSymm : latticeAmplitudeReindex
-      (rectangularLatticeNetlistExternalOutgoingFintype p)
-      (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
-      outputEquiv.symm.symm output = columnOutput := by
-    rw [Equiv.symm_symm]
-  have hInputRoundtrip : latticeAmplitudeReindex
-      (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
-      (rectangularLatticeNetlistExternalIncidentFintype p)
-      inputEquiv.symm columnInput = input := by
-    dsimp only [columnInput]
-    exact latticeAmplitudeReindex_symm_reindex _ _ inputEquiv input
-  have hOutputRoundtrip : latticeAmplitudeReindex
-      (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
-      (rectangularLatticeNetlistExternalOutgoingFintype p)
-      outputEquiv.symm columnOutput = output := by
-    dsimp only [columnOutput]
-    exact latticeAmplitudeReindex_symm_reindex _ _ outputEquiv output
-  have hDoubleSymmPair :
-      (latticeAmplitudeReindex
-          (rectangularLatticeNetlistExternalIncidentFintype p)
-          (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
-          inputEquiv.symm.symm input,
-        latticeAmplitudeReindex
-          (rectangularLatticeNetlistExternalOutgoingFintype p)
-          (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
-          outputEquiv.symm.symm output) = (columnInput, columnOutput) :=
-    Prod.ext hInputDoubleSymm hOutputDoubleSymm
-  have hRoundtripPair :
-      (latticeAmplitudeReindex
-          (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
-          (rectangularLatticeNetlistExternalIncidentFintype p)
-          inputEquiv.symm columnInput,
-        latticeAmplitudeReindex
-          (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
-          (rectangularLatticeNetlistExternalOutgoingFintype p)
-          outputEquiv.symm columnOutput) = (input, output) :=
-    Prod.ext hInputRoundtrip hOutputRoundtrip
-  have hInverse :
-      (input, output) ∈ rectangularColumnDecompositionInLatticeCoordinates p ↔
-        (columnInput, columnOutput) ∈ rectangularColumnDecompositionBehavior p := by
-    have hRaw := mem_latticeBehaviorReindex_iff
-      (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
-      (rectangularLatticeNetlistExternalIncidentFintype p)
-      (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
-      (rectangularLatticeNetlistExternalOutgoingFintype p)
-      inputEquiv.symm outputEquiv.symm
-      (rectangularColumnDecompositionBehavior p) input output
-    constructor
-    · intro hMember
-      have hRelabelled := hRaw.mp hMember
-      exact hDoubleSymmPair ▸ hRelabelled
-    · intro hMember
-      apply hRaw.mpr
-      exact hDoubleSymmPair.symm ▸ hMember
-  have hForward :
-      (columnInput, columnOutput) ∈ rectangularLatticeBehaviorInColumnCoordinates p ↔
-        (input, output) ∈ (rectangularLatticeNetlist p).behavior := by
-    have hRaw := mem_latticeBehaviorReindex_iff
-      (rectangularLatticeNetlistExternalIncidentFintype p)
-      (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
-      (rectangularLatticeNetlistExternalOutgoingFintype p)
-      (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
-      inputEquiv outputEquiv (rectangularLatticeNetlist p).behavior
-      columnInput columnOutput
-    constructor
-    · intro hMember
-      have hCanonical := hRaw.mp hMember
-      exact hRoundtripPair ▸ hCanonical
-    · intro hMember
-      apply hRaw.mpr
-      exact hRoundtripPair.symm ▸ hMember
-  constructor
-  · intro hCanonical
-    apply hInverse.mpr
-    have hRelabelled := hForward.mpr hCanonical
-    rw [← rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex p,
-      rectangularColumnFlattenBehavior_eq_columnDecomposition p] at hRelabelled
-    exact hRelabelled
-  · intro hDecomposition
-    have hRelabelled := hInverse.mp hDecomposition
-    rw [← rectangularColumnFlattenBehavior_eq_columnDecomposition p,
-      rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex p] at hRelabelled
-    exact hForward.mp hRelabelled
+    (rectangularColumnFlattenConnectionsExternalIncidentFintype p)
+    (rectangularColumnFlattenConnectionsExternalOutgoingFintype p)
+    (rectangularRowColumnWiringEquiv p).externalIncidentEquiv
+    (rectangularRowColumnWiringEquiv p).externalOutgoingEquiv
+    (rectangularLatticeNetlist p).behavior
+  unfold rectangularLatticeBehaviorInColumnCoordinates at hBackward
+  exact hRoundtrip.symm.trans hBackward
 
 end MicroringCascade
 
