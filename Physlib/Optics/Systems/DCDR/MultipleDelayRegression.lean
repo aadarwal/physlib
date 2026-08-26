@@ -21,7 +21,8 @@ The distinct-delay coherent fixture uses `(m1, m2, m3) = (2, 1, 3)`. Its selecte
 `-q / (1-q^4)`, with no cancellation. Its raw denominator has degree four and its reciprocal-`z`
 pole set, under `q = z⁻¹`, is proved directly to be `{1, -1, I, -I}`. Thus the pole count is
 exactly four and attains the denominator degree. This executable witness makes the slice-5
-at-most-two result visibly specific to the unit-delay family.
+at-most-two result at `Physlib/Optics/Systems/DCDR/SourceBridge.lean:154-162` visibly specific
+to the unit-delay family.
 
 The polynomial expansions, coprimality identity, four-root enumeration, and cardinality proof
 unfold the fixture data and use polynomial or complex-field primitives. They do not invoke the
@@ -50,6 +51,9 @@ coupler coefficient can make them fail.
 These algebraic fixtures do not claim physical resonance, coherent--incoherent equivalence, BIBO
 stability beyond S4P's gate, normalized-modal or electromagnetic power, causality or time-domain
 behavior, a physical-frequency interpretation, or any fact about the unavailable HOL script.
+
+S4P restricts its Schur/BIBO result to the proper causal one-pole class at
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:424-457`.
 
 FMICS'15 Eq. 3 prints verbatim: “The general expression for the photonic transmittance is given
 as follows: `T_i = t_{a_i} G_i z^{m_i}`.” This file uses the unit-attenuation formal-`q`

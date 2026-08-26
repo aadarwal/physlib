@@ -29,6 +29,10 @@ For `T_i = G_i*q^m_i`, the printed Theorem 3 numerator and denominator retain th
 amplitudes and the pinned `-I` cross gauge. No response, pole, or stability identity between
 those two polynomial models is asserted.
 
+The real unit-delay source dictionary being extended is at
+`Physlib/Optics/Systems/DCDR/SourceBridge.lean:197-237`; the pinned cross gauge is declared at
+`Physlib/Optics/Components/DirectionalCoupler.lean:63-79`.
+
 ## ii. Key results
 
 - `DCDRSourceBridge.MultipleDelaySourceParameters`: the eight-symbol source dictionary.
@@ -47,6 +51,9 @@ those two polynomial models is asserted.
 No result here claims physical resonance, coherent--incoherent equivalence, BIBO stability beyond
 S4P's stated gate, normalized-modal or electromagnetic power, causality or time-domain behavior,
 a physical-frequency interpretation, or any fact about the unavailable HOL script.
+
+S4P restricts its Schur/BIBO result to the proper causal one-pole class at
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:424-457`.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
 Processing Systems”, FMICS 2015, LNCS 9128, Equation 3, Theorem 3, and Table 1, pp. 169--174.
@@ -94,7 +101,8 @@ structure MultipleDelaySourceParameters where
   /-- Printed feedback-path delay exponent `m3`. -/
   m3 : ℕ
 
-/-- Forgetting the delay exponents recovers the slice-5 five-symbol dictionary. -/
+/-- Forgetting delays recovers the dictionary at
+`Physlib/Optics/Systems/DCDR/SourceBridge.lean:197-213`. -/
 def MultipleDelaySourceParameters.toSourceParameters
     (p : MultipleDelaySourceParameters) : SourceParameters where
   G1 := p.G1
@@ -103,7 +111,8 @@ def MultipleDelaySourceParameters.toSourceParameters
   k1 := p.k1
   k2 := p.k2
 
-/-- Embed a unit-delay source dictionary by setting all exponents literally to one. -/
+/-- Embed the dictionary at
+`Physlib/Optics/Systems/DCDR/SourceBridge.lean:197-213` with every exponent one. -/
 def SourceParameters.toMultipleDelaySourceParameters
     (p : SourceParameters) : MultipleDelaySourceParameters where
   G1 := p.G1
@@ -238,8 +247,11 @@ lemma MultipleDelaySourceParameters.printedDenominatorPolynomial_natDegree_le
           (max_le_max (by simp) hUpper)) hLower
     _ = max (p.m1 + p.m3) (p.m2 + p.m3) := by simp
 
-/-- Any reduced response with the printed denominator has no more reciprocal-`z` poles than its
-two path-pair degree bound, where `q = z⁻¹`. -/
+/-- Apply the reciprocal-`z` bound at
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:225-243` to this denominator.
+
+The coordinate legend is `q = z⁻¹`, and the resulting bound is the two path-pair degree shape.
+-/
 lemma MultipleDelaySourceParameters.finite_zPoles_and_ncard_le_delayShape
     (p : MultipleDelaySourceParameters)
     (response : DelayTransfer.ReducedRationalResponse)

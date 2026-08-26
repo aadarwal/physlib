@@ -17,6 +17,10 @@ three independent natural delay exponents. The upper, lower, and feedback path c
 `G1*q^m1`, `G2*q^m2`, and `G3*q^m3`. The same two coherent couplers, six connections,
 selected input, and selected output are retained.
 
+The unit-delay parameters and fixed-carrier path realization being extended are declared at
+`Physlib/Optics/Systems/DCDR/Poles.lean:82-110`; its rational N7 path family starts at
+`Physlib/Optics/Systems/DCDR/Poles.lean:274-324`.
+
 The one-delay family is the literal specialization `(m1, m2, m3) = (1, 1, 1)`. Pointwise
 compilation evaluates each retained polynomial path and recovers the existing coherent N7 flat
 netlist. Polynomial degree and reduction results live in `DCDR/MultipleDelayPolynomial.lean`;
@@ -42,6 +46,9 @@ the separate printed-source dictionary lives in `DCDR/MultipleDelaySource.lean`.
 No result here claims physical resonance, coherent--incoherent equivalence, BIBO stability beyond
 S4P's stated gate, normalized-modal or electromagnetic power, causality or time-domain behavior,
 a physical-frequency interpretation, or any fact about the unavailable HOL script.
+
+S4P restricts its Schur/BIBO result to the proper causal one-pole class at
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:424-457`.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
 Processing Systems”, FMICS 2015, LNCS 9128, Equation 3, Theorem 3, and Table 1, pp. 169--174.
@@ -315,7 +322,8 @@ lemma MultipleDelayParameters.responseModel_eval
 
 -/
 
-/-- Embed the existing one-delay family by setting all three exponents literally to one. -/
+/-- Embed the one-delay family from
+`Physlib/Optics/Systems/DCDR/Poles.lean:82-100` by setting every exponent to one. -/
 def UnitDelayParameters.toMultipleDelayParameters
     (p : UnitDelayParameters) : MultipleDelayParameters where
   firstCoupler := p.firstCoupler

@@ -16,8 +16,10 @@ This file derives the coherent numerator and denominator shapes of the multiple-
 The denominator degree is at most `max (m1 + m3) (m2 + m3)`; the numerator has the two direct
 path degrees and the three-path degree `m1 + m2 + m3`.
 
-`MultipleDelayResponseReduction` reuses S4's `RationalReduction` certificate. Actual poles are
-the reduced denominator roots in reciprocal `z`, with the coordinate legend `q = z⁻¹`.
+`MultipleDelayResponseReduction` reuses S4's `RationalReduction` certificate from
+`Physlib/Optics/Systems/DelayTransfer/Poles.lean:168-183`. Actual poles use the reduced
+reciprocal-`z` set and degree bound at
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:225-243`, with `q = z⁻¹`.
 Cancellation can lower, but cannot raise, the raw denominator degree.
 
 ## ii. Key results
@@ -39,6 +41,9 @@ Cancellation can lower, but cannot raise, the raw denominator degree.
 No result here claims physical resonance, coherent--incoherent equivalence, BIBO stability beyond
 S4P's stated gate, normalized-modal or electromagnetic power, causality or time-domain behavior,
 a physical-frequency interpretation, or any fact about the unavailable HOL script.
+
+S4P restricts its Schur/BIBO result to the proper causal one-pole class at
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:424-457`.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
 Processing Systems”, FMICS 2015, LNCS 9128, Theorem 3 and Table 1, pp. 173--174.
@@ -213,7 +218,8 @@ lemma MultipleDelayParameters.responseNumeratorPolynomial_natDegree_le
 
 -/
 
-/-- An S4 common-factor reduction tied to the selected multiple-delay response polynomials. -/
+/-- An S4 common-factor reduction
+(`Physlib/Optics/Systems/DelayTransfer/Poles.lean:168-183`) for this response. -/
 structure MultipleDelayResponseReduction (p : MultipleDelayParameters) where
   /-- The explicit S4 common-factor reduction. -/
   reduction : DelayTransfer.RationalReduction
@@ -226,7 +232,8 @@ namespace MultipleDelayResponseReduction
 
 variable {p : MultipleDelayParameters}
 
-/-- Actual poles are reduced denominator roots in reciprocal `z`, with `q = z⁻¹`. -/
+/-- Reduced reciprocal-`z` poles as defined in
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:225-243`. -/
 def actualPoles (certificate : MultipleDelayResponseReduction p) : Set ℂ :=
   certificate.reduction.reduced.zPoles
 
