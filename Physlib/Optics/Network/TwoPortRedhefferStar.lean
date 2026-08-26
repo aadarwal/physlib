@@ -22,8 +22,10 @@ Scope:
 matrix multiplication, a chain-matrix product, a reciprocity statement, or a convergence result.
 The gate is sufficient for external functionality; no converse, minimality, associativity, or
 identity theorem is asserted.
-Agreement with the independent `FlatNetlist`/N5H elimination route has not yet been proved; that
-is the open X-01 bridge.
+Agreement with both the independent `FlatNetlist`/N5H `closeBehavior` composition route and the N5
+elimination response is proved by
+`TwoPortSeriesNetlist.externalCloseBehavior_eq_redhefferSeriesBehavior` and
+`TwoPortSeriesNetlist.responseTransform_reindex_eq_redhefferStar`.
 
 ## ii. Key results
 

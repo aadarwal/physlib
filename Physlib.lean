@@ -275,6 +275,7 @@ public import Physlib.Optics.HarmonicFlux.Basic
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWave
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.GeometricAperture
+public import Physlib.Optics.HarmonicFlux.MaterialJonesMode
 public import Physlib.Optics.HarmonicFlux.MaterialWave
 public import Physlib.Optics.HarmonicFlux.MaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.ModePower
@@ -287,6 +288,7 @@ public import Physlib.Optics.HarmonicFlux.Pairing
 public import Physlib.Optics.HarmonicFlux.PairingAlgebra
 public import Physlib.Optics.HarmonicFlux.PairingRegression
 public import Physlib.Optics.HarmonicFlux.Polarizer
+public import Physlib.Optics.HarmonicFlux.PolarizerModePower
 public import Physlib.Optics.HarmonicFlux.PositiveNormalDecay
 public import Physlib.Optics.HarmonicFlux.PositiveNormalDecayRegression
 public import Physlib.Optics.HarmonicFlux.PropagatingMode
@@ -388,6 +390,17 @@ public import Physlib.Optics.Network.TwoPortScatteringChain
 public import Physlib.Optics.Network.TwoPortScatteringChainRegression
 public import Physlib.Optics.Network.TwoPortScatteringRegression
 public import Physlib.Optics.Network.TwoPortSeries
+public import Physlib.Optics.Network.TwoPortSeriesNetlist
+public import Physlib.Optics.Network.TwoPortSeriesNetlistBehavior
+public import Physlib.Optics.Network.TwoPortSeriesNetlistCoordinates
+public import Physlib.Optics.Network.TwoPortSeriesNetlistExternal
+public import Physlib.Optics.Network.TwoPortSeriesNetlistLocal
+public import Physlib.Optics.Network.TwoPortSeriesNetlistReconstruction
+public import Physlib.Optics.Network.TwoPortSeriesNetlistRegression
+public import Physlib.Optics.Network.TwoPortSeriesNetlistResponse
+public import Physlib.Optics.Network.TwoPortSeriesNetlistSingularRegression
+public import Physlib.Optics.Network.TwoPortSeriesNetlistState
+public import Physlib.Optics.Network.TwoPortSeriesNetlistWiring
 public import Physlib.Optics.Network.TwoPortSeriesRegression
 public import Physlib.Optics.Network.TwoPortTermination
 public import Physlib.Optics.Network.TwoPortTerminationRegression
@@ -441,6 +454,10 @@ public import Physlib.Optics.Systems.Microring.AddDropNetwork
 public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
 public import Physlib.Optics.Systems.Microring.AllPassRegression
+public import Physlib.Optics.Systems.Microring.Observables
+public import Physlib.Optics.Systems.Microring.ObservablesFrequency
+public import Physlib.Optics.Systems.Microring.ObservablesPower
+public import Physlib.Optics.Systems.Microring.ObservablesRegression
 public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic

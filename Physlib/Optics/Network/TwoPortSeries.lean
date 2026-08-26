@@ -24,8 +24,10 @@ plane adapter must be supplied before composition when the two middle boundaries
 coordinates. The travelling-wave ordering is the convention registered by
 `TwoPortScatteringChain`. This file does not assert functionality, passivity, losslessness,
 reciprocity, causality, associativity, an identity law, or a physical device realization.
-Agreement with the independent
-`FlatNetlist`/N5H composition route has not yet been proved; that is the open X-01 bridge.
+Agreement with both the independent `FlatNetlist`/N5H `closeBehavior` composition route and the N5
+elimination response is proved by
+`TwoPortSeriesNetlist.externalCloseBehavior_eq_redhefferSeriesBehavior` and
+`TwoPortSeriesNetlist.responseTransform_reindex_eq_redhefferStar`.
 
 ## ii. Key results
 

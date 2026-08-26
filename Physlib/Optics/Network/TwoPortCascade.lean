@@ -22,6 +22,10 @@ Only the two facing reflection blocks are assumed zero. The result does not infe
 matching, reciprocity, passivity, losslessness, causality, or absence of the two external
 reflections. Matrix multiplication is recovered for the directional transmission blocks, not for
 the complete reflective scattering matrices.
+Agreement with both the independent `FlatNetlist`/N5H `closeBehavior` composition route and the N5
+elimination response is proved by
+`TwoPortSeriesNetlist.externalCloseBehavior_eq_redhefferSeriesBehavior` and
+`TwoPortSeriesNetlist.responseTransform_reindex_eq_redhefferStar`.
 
 ## ii. Key results
 

@@ -1594,6 +1594,17 @@ PR unless maintainers explicitly ask to retain it.
   slice proves no power observable or balance, extrema, critical coupling, rejection ratio,
   identifiability, free spectral range, bandwidth, causality, dispersion, group delay, material
   model, reciprocity or time-reversed pairing, or DATE/SysCon parity bridge.
+- [ ] Human-check the S3 microring observables before upstreaming. Confirm that through and drop
+  powers are squared moduli of the N5-derived S2 amplitudes, and that lossless balance reaches the
+  result only through N6 componentwise losslessness. Audit the named resonance and antiresonance
+  phase conditions without reading them as extrema, the exact critical-coupling gates, the
+  positive-power domain and `10 * logb 10` convention of both rejection ratios, and the explicit
+  phase-resolved or critical-coupling hypotheses on parameter recovery. Check that the N5F free
+  spectral range uses the constant positive group-index model and stays inside `responseDomain`.
+  The exact rational powers, extinction/recovery controls, and one-FSR response-domain fixture are
+  regressions, not a DATE/SysCon source bridge. No bandwidth, linewidth, quality factor,
+  response-derived group delay, reciprocity, material model, or intensity-only identifiability is
+  claimed.
 - [ ] Human-check the S1 Mach--Zehnder extension before upstreaming. Confirm that the explicit
   feed-forward `FlatNetlist` contains exactly two N7 directional couplers and two fixed-carrier
   matched-propagation arms, that unconditional well-posedness follows from the channel equations,
@@ -1602,16 +1613,26 @@ PR unless maintainers explicitly ask to retain it.
   under `Parameters.IsValid`; `ModeAmplitude.power` is normalized modal power under the E3b
   bridge hypotheses. This is a Physlib extension with no HOL source and proves no time-domain
   delay, dispersion, polarization, reciprocity, material model, or physical time-reversed pairing.
-- [ ] Complete the X-01 bridge between the local two-port Redheffer route and the independent
-  `FlatNetlist`/N5H route. The gate-free relational series, explicit pivot
-  `1 - Rl₂ * Rr₁`, proof-gated noncommutative formula, reflection-free specialization, and
-  relation-level reflection-free/singular regressions plus a noncommuting matrix-order sentinel
-  are implemented, but no theorem yet identifies them with `FlatNetlist.behavior` or
-  `closeBehavior` for the same two-device wiring. Prove that
-  agreement first, then identify the N5 response with `redhefferStar` on the common gate and pin a
-  hand-expanded pair of `ReflectionlessTwoPort` components. Associativity, an identity element,
-  and minimality of the pivot gate remain separate non-claims. Mason/N5 agreement remains the
-  other open S6/X-01 cross-semantics step; neither formula is foundational composition semantics.
+- [x] Implement the local two-device X-01 bridge. The gate-free relational series is identified
+  with the canonical `FlatNetlist.behavior` and N5H `closeBehavior`; on the common well-posed
+  domain, the canonically reindexed N5 response equals `redhefferStar`. Independent
+  `ReflectionlessTwoPort` and singular reflective fixtures cross the raw netlist equations, and a
+  reflective star anchor reaches the result through relational membership rather than the block
+  formula.
+- [ ] Human-check the local X-01 bridge before upstreaming. Verify the physical-port order and
+  external-channel equivalence, the distinction between unconditional relational agreement and
+  the two explicit response gates, and the regular and nonunique singular fixtures. Confirm that
+  no converse minimality of the Redheffer pivot, associativity, identity, Mason/N5 agreement, or
+  broader ring/DCDR cross-semantics result is inferred.
+- [ ] Present X-01 upstream as stacked review slices: the physical two-port netlist, each coordinate
+  layer, relational agreement, response agreement, adversarial fixtures, and registration. The
+  development history is atomic by concept, but the eventual proposals should preserve the
+  per-module review surfaces below 200 lines wherever dependencies permit.
+- [ ] Add one transport operation for a `PortConnectionFamily` along an equivalence of port
+  families. This is the shared missing machinery behind both N5H inner-family replacement by an
+  equal boundary relation and literal three-stage append associativity; treat it as one gap, not
+  two. N-08 hierarchical/flattened equality and fixed-inner-wiring congruence are complete under
+  structural `Fintype` hypotheses only.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
 
