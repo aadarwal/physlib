@@ -23,6 +23,8 @@ field. Those are explicit downstream electromagnetic premises.
 ## ii. Key results
 
 - `PlanarSplitRectangleStokesRegularity`: local regularity on both closed half-rectangles.
+- `planarSplitRectangleFlux`: the oriented flux of independent vector densities over the two
+  half-rectangles.
 - `planarSplitRectangleOuterCirculation_eq_curlFlux_add_carrierJump`: the outer circulation is
   the sum of the two bulk curl fluxes and the retained carrier jump.
 
@@ -59,6 +61,17 @@ structure PlanarSplitRectangleStokesRegularity
   /-- Local regularity of the positive-side extension on the closed positive half-rectangle. -/
   positive : PlanarRectangleStokesRegularity positiveField center first second
     (-radius) 0 radius halfThickness
+
+/-- The sum of the two oriented vector-density flux integrals on a split rectangle. -/
+def planarSplitRectangleFlux
+    (negativeDensity positiveDensity : Space → EuclideanSpace ℝ (Fin 3))
+    (center first second : Space) (radius halfThickness : ℝ) : ℝ :=
+  (∫ u in -radius..radius, ∫ v in -halfThickness..0,
+      inner ℝ (negativeDensity (planarRectanglePoint center first second u v))
+        (basis.repr second ⨯ₑ₃ basis.repr first)) +
+    ∫ u in -radius..radius, ∫ v in 0..halfThickness,
+      inner ℝ (positiveDensity (planarRectanglePoint center first second u v))
+        (basis.repr second ⨯ₑ₃ basis.repr first)
 
 /-- The sum of the two oriented curl-flux integrals on the split rectangle. -/
 def planarSplitRectangleCurlFlux
