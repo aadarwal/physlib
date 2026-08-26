@@ -60,9 +60,9 @@ noncomputable section
 namespace Panda
 
 open Physlib.SignalFlowGraph
-
-/-! ## A. Retained adjacency -/
-
+/-!
+## A. Retained adjacency
+-/
 /-- Adjacency in the retained 24-edge topology, independent of all gains. -/
 def TopologyAdjacent (first second : Node) : Prop :=
   ∃ edge : Edge, edgeSource edge = first ∧ edgeTarget edge = second
@@ -72,9 +72,9 @@ instance topologyAdjacentDecidable (first second : Node) :
     Decidable (TopologyAdjacent first second) := by
   unfold TopologyAdjacent
   infer_instance
-
-/-! ## B. Through and drop paths -/
-
+/-!
+## B. Through and drop paths
+-/
 /-- The direct bus path to the through port. -/
 def topologyThroughDirect : List Node := [0, 2]
 
@@ -132,9 +132,9 @@ lemma topologyDropPaths_sound (path : List Node) (hPath : path ∈ topologyDropP
   simp only [topologyDropPaths, Finset.mem_insert, Finset.mem_singleton] at hPath
   rcases hPath with rfl | rfl
   all_goals decide
-
-/-! ## C. Canonically based simple loops -/
-
+/-!
+## C. Canonically based simple loops
+-/
 /-- The three-edge right side-ring loop, based at source node eleven. -/
 def topologyRightLoop : List Node := [10, 11, 12, 10]
 
@@ -170,9 +170,9 @@ lemma topologyCanonicalLoops_sound (loop : List Node) (hLoop : loop ∈ topology
   simp only [topologyCanonicalLoops, Finset.mem_insert, Finset.mem_singleton] at hLoop
   rcases hLoop with rfl | rfl | rfl | rfl | rfl | rfl
   all_goals decide
-
-/-! ## D. Edge-refinement teeth -/
-
+/-!
+## D. Edge-refinement teeth
+-/
 /-- All five through paths have exactly the displayed edge refinements. -/
 lemma topology_path_refinements (p : Parameters) :
     refiningEdgeLists (signalMultigraph p) topologyThroughDirect = { [0] } ∧
@@ -348,9 +348,9 @@ lemma topology_loop_touch_audit :
       ¬Disjoint topologyRightLoop.dropLast.toFinset topologyMainRightLoop.dropLast.toFinset ∧
       ¬Disjoint topologyLeftLoop.dropLast.toFinset topologyMainLeftLoop.dropLast.toFinset := by
   decide
-
-/-! ## E. Asymmetric mis-wiring sentinel -/
-
+/-!
+## E. Asymmetric mis-wiring sentinel
+-/
 /-- The wrong targets obtained by cross-wiring the two first-to-second half-ring joins. -/
 def topologyMiswiredEdgeTarget : Edge → Node := fun edge ↦
   if edge = 7 then 17 else if edge = 19 then 12 else edgeTarget edge

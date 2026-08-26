@@ -58,9 +58,9 @@ open scoped ComplexOrder
 namespace MicroringCascade
 
 open MicroringSourceBridge
-
-/-! ## A. Principal-root evaluations -/
-
+/-!
+## A. Principal-root evaluations
+-/
 /-- The principal complex square root of the positive quarter is the positive half. -/
 lemma sourceMappedSfgRegression_sqrt_quarter :
     Complex.sqrt (1 / 4 : ℂ) = 1 / 2 := by
@@ -84,9 +84,9 @@ lemma sourceMappedSfgRegression_sqrt_neg_quarter :
     Complex.sqrt_neg_of_nonneg hNonnegative,
     sourceMappedSfgRegression_sqrt_quarter]
   ring
-
-/-! ## B. Direct transfer anchors -/
-
+/-!
+## B. Direct transfer anchors
+-/
 /-- Direct source-quotient expansion at zero phase gives `-32/91`. -/
 lemma sourceMappedSfgRegression_zeroPhase_transfer :
     sfgAddDropStageTransfer AddDrop.addDropRegressionResonanceParameters = -32 / 91 := by
@@ -117,9 +117,9 @@ lemma sourceMappedSfgRegression_twoStage_list :
   simp [sfgAddDropStageTransfers,
     sourceMappedSfgRegression_zeroPhase_transfer,
     sourceMappedSfgRegression_halfTurn_transfer]
-
-/-! ## C. Independent raw-N5 anchor -/
-
+/-!
+## C. Independent raw-N5 anchor
+-/
 /-- The directly evaluated source quotient equals the independently eliminated N5 response
 entry at the zero-phase point.
 
@@ -137,9 +137,9 @@ lemma sourceMappedSfgRegression_zeroPhase_transfer_eq_rawN5 :
           (AddDrop.inputChannel AddDrop.addDropRegressionResonanceParameters)) := by
   rw [sourceMappedSfgRegression_zeroPhase_transfer,
     AddDrop.addDropRegression_resonance_responseTransform_entry_drop]
-
-/-! ## D. Branch-gate negative control -/
-
+/-!
+## D. Branch-gate negative control
+-/
 /-- The zero-phase fixture inhabits the principal-root/selected-half-arc comparison gate. -/
 lemma sourceMappedSfgRegression_zeroPhase_rootGate :
     Complex.sqrt AddDrop.addDropRegressionResonanceParameters.roundTripCoefficient =
@@ -169,9 +169,9 @@ lemma sourceMappedSfgRegression_halfTurn_transfer_ne_dropTransfer :
   intro hEqual
   have hImaginary := congrArg Complex.im hEqual
   norm_num at hImaginary
-
-/-! ## E. Denominator-zero control -/
-
+/-!
+## E. Denominator-zero control
+-/
 /-- Exact zero-denominator add-drop data with nonzero cross coefficients and unit arc factors. -/
 def sourceMappedSfgRegressionSingularParameters : AddDrop.Parameters where
   inputThroughAmplitude := 1

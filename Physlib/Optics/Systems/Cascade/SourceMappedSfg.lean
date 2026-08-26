@@ -56,9 +56,9 @@ noncomputable section
 namespace MicroringCascade
 
 open MicroringSourceBridge
-
-/-! ## A. Composed stage dictionary -/
-
+/-!
+## A. Composed stage dictionary
+-/
 /-- SFG-TR'14's add-drop transfer after the existing Physlib-to-source parameter map.
 
 This is function composition only; it introduces no new source graph or cascade interconnection.
@@ -72,9 +72,9 @@ lemma sfgAddDropStageTransfer_eq_dropTransfer (p : AddDrop.Parameters)
     (hSqrt : Complex.sqrt p.roundTripCoefficient = p.firstArcCoefficient) :
     sfgAddDropStageTransfer p = AddDrop.dropTransfer p :=
   sfgAddDropTransfer_eq_dropTransfer p hSqrt
-
-/-! ## B. Stagewise list comparison -/
-
+/-!
+## B. Stagewise list comparison
+-/
 /-- The source-mapped transfer attached independently to every listed add-drop stage. -/
 def sfgAddDropStageTransfers (stages : List AddDrop.Parameters) : List ℂ :=
   stages.map sfgAddDropStageTransfer

@@ -55,9 +55,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Fixed-carrier coefficients -/
-
+/-!
+## A. Fixed-carrier coefficients
+-/
 /-- The selected coefficient of the first main-ring quarter section. -/
 def Parameters.mainQuarterOneCoefficient (p : Parameters) : ℂ :=
   MatchedPropagation.transmissionCoefficient p.mainQuarterOne
@@ -102,9 +102,9 @@ def Parameters.rightRoundTripCoefficient (p : Parameters) : ℂ :=
 /-- The product of the two selected left-ring half coefficients. -/
 def Parameters.leftRoundTripCoefficient (p : Parameters) : ℂ :=
   p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient
-
-/-! ## B. Source node and edge indices -/
-
+/-!
+## B. Source node and edge indices
+-/
 /-- The 18 source-numbered PANDA coordinates, represented with zero-based `Fin` indices. -/
 abbrev Node := Fin 18
 
@@ -153,9 +153,9 @@ def edgeGain (p : Parameters) : Edge → ℂ :=
     (p.leftCoupler.throughAmplitude : ℂ),
     DirectionalCoupler.crossCoefficient p.leftCoupler,
     p.mainQuarterFourCoefficient]
-
-/-! ## C. N7 edge ownership -/
-
+/-!
+## C. N7 edge ownership
+-/
 /-- The physical N7 incident channel supplying each retained forward edge. -/
 def edgeN7InputChannel (p : Parameters) : Edge → (netlist p).Channel :=
   ![componentChannel p .inputCoupler ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
@@ -293,9 +293,9 @@ lemma edgeGain_eq_n7ScatteringEntry (p : Parameters) (edge : Edge) :
   · exact (directionalCoupler_forwardScatteringEntries p.leftCoupler).2.2.2.symm
   · exact (directionalCoupler_forwardScatteringEntries p.leftCoupler).2.2.1.symm
   · exact (matchedPropagation_forwardScatteringEntry p.mainQuarterFour).symm
-
-/-! ## D. Coefficient-matrix graph -/
-
+/-!
+## D. Coefficient-matrix graph
+-/
 /-- The 18-node, 24-edge forward projection owned by the PANDA N7 netlist. -/
 def signalMultigraph (p : Parameters) :
     Physlib.SignalFlowGraph.Multigraph Node Edge where

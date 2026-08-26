@@ -52,9 +52,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Component-indexed raw N7 equations -/
-
+/-!
+## A. Component-indexed raw N7 equations
+-/
 /-- The four directional-coupler components, used to state one family of local N7 laws. -/
 inductive CouplerLabel
   | input
@@ -519,9 +519,9 @@ private lemma scatteringEquation_propagation_right (p : Parameters)
       (propagation_physicalBehavior p .leftOne incident outgoing hScattering)
   · exact propagationPhysical_right p.leftHalfTwo _ _
       (propagation_physicalBehavior p .leftTwo incident outgoing hScattering)
-
-/-! ## B. Complete zero-reverse lift -/
-
+/-!
+## B. Complete zero-reverse lift
+-/
 /-- The eighteen retained coordinates projected from a complete N7 component-boundary state. -/
 def forwardState (p : Parameters) (incident : ModeAmplitude (netlist p).IncidentIndex)
     (outgoing : ModeAmplitude (netlist p).OutgoingIndex) : Node → ℂ :=
@@ -806,9 +806,9 @@ lemma liftedOutgoing_eq_scatteringTransform (p : Parameters) (input : ℂ)
     rw [scatteringEquation_propagation_right p .leftTwo (liftedIncident p state) _ rfl]
     simpa [liftedIncident, liftedOutgoing, propagationChannel, PropagationLabel.parameters,
       Parameters.leftHalfTwoCoefficient] using hForward.nodeSixteen
-
-/-! ## C. Physical routing -/
-
+/-!
+## C. Physical routing
+-/
 /-- Incident assembly at a wire's left endpoint reads its right outgoing endpoint. -/
 lemma incidentAssembly_apply_connectionLeft (p : Parameters) (connection : Connection)
     (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
@@ -1122,9 +1122,9 @@ lemma liftedIncident_eq_incidentAssembly (p : Parameters) (input : ℂ)
         (Incident.mk (connectionLeftChannel p .leftHalfTwoToCoupler))
     rw [incidentAssembly_apply_connectionLeft]
     rfl
-
-/-! ## D. Projection and relational equivalence -/
-
+/-!
+## D. Projection and relational equivalence
+-/
 /-- The wire entering a selected propagation component. -/
 def PropagationLabel.inputConnection : PropagationLabel → Connection
   | .mainOne => .inputToQuarterOne

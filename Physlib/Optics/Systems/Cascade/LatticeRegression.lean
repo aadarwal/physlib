@@ -50,9 +50,9 @@ namespace Optics
 noncomputable section
 
 namespace MicroringCascade
-
-/-! ## A. Distinct two-by-two fixture -/
-
+/-!
+## A. Distinct two-by-two fixture
+-/
 /-- A distinct scalar attached to every site of the `2 × 2` regression lattice. -/
 def latticeRegressionSiteWeight (row column : Fin 2) : ℂ :=
   (2 * row.val + column.val + 1 : ℕ)
@@ -271,9 +271,9 @@ def latticeRegressionOutput :
     ModeAmplitude (rectangularLatticeNetlist
       latticeRegressionParameters).ExternalOutgoing :=
   PiLp.single 2 (Outgoing.mk latticeRegressionExternalEast) 2
-
-/-! ## B. Direct positive flattening anchors -/
-
+/-!
+## B. Direct positive flattening anchors
+-/
 /-- A component-local entry expands directly through the concrete assembled family. -/
 lemma latticeRegression_scatteringEntry_component
     (component : (rectangularLatticeNetlist
@@ -646,9 +646,9 @@ lemma latticeRegression_selectedColumnFirstVerticalWire :
       (Sum.inl ((latticeRegressionForwardIndex, (0 : Fin 2)), false))).left =
         ⟨rectangularRingComponent 0 0, LatticeSitePort.south⟩ := by
   rfl
-
-/-! ## C. Transposed-index negative control -/
-
+/-!
+## C. Transposed-index negative control
+-/
 /-- A deliberately wrong decomposition lookup that exchanges each site's row and column indices. -/
 def latticeRegressionTransposedSites : RectangularLatticeParameters 2 2 where
   ringScattering row column := latticeRegressionSiteScattering column row

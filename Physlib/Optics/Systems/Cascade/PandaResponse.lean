@@ -73,9 +73,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Source dictionary and hypotheses -/
-
+/-!
+## A. Source dictionary and hypotheses
+-/
 /-- The NSV'16 PANDA symbols after collecting each printed field propagation factor. -/
 structure SourceParameters where
   /-- Printed main-ring round-trip factor `e^n`. -/
@@ -168,9 +168,9 @@ structure HasSourceCouplerNormalization (s : SourceParameters) : Prop where
   right : s.cr ^ 2 + s.sr ^ 2 = 1
   /-- Printed left-coupler hypothesis `cl^2 + sl^2 = 1`. -/
   left : s.cl ^ 2 + s.sl ^ 2 = 1
-
-/-! ## B. Printed source expressions -/
-
+/-!
+## B. Printed source expressions
+-/
 /-- The common denominator printed in NSV'16 Theorems 5 and 6. -/
 def sourceDenominator (s : SourceParameters) : ℂ :=
   1 - s.cl * s.leftRoundTrip - s.cr * s.rightRoundTrip -
@@ -245,9 +245,9 @@ lemma sourceDropNumerator_eq_factorized (s : SourceParameters) :
         (s.rightRoundTrip - s.cr) * (1 - s.cl * s.leftRoundTrip) := by
   rw [sourceDropNumerator]
   ring
-
-/-! ## C. Explicit forward solution -/
-
+/-!
+## C. Explicit forward solution
+-/
 /-- The negative-quadrature coefficient associated with a printed cross amplitude. -/
 def sourceCrossCoefficient (crossAmplitude : ℂ) : ℂ :=
   -Complex.I * crossAmplitude
@@ -595,9 +595,9 @@ lemma closedState_forwardEquations (p : Parameters) (s : SourceParameters) (inpu
       closedState_nodeSeventeen p s input hDictionary hRoot hNormalization hDenominator
     nodeEighteen :=
       closedState_nodeEighteen p s input hDictionary hRoot hNormalization hDenominator }
-
-/-! ## D. NSV'16 comparisons -/
-
+/-!
+## D. NSV'16 comparisons
+-/
 /-- Unit source injection is the singleton vector at printed node one. -/
 lemma signalInput_one_eq_single : signalInput 1 = Pi.single (0 : Node) 1 := by
   funext node
