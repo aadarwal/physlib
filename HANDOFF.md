@@ -4,8 +4,8 @@
 
 - Branch: `optics/s4-delay-transfer`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s4-delay-transfer`
-- Slice 4b is synchronized through registered `optics/development` head `9f23e522` by merge
-  commit `84c14b65`; the exact final post-sync gate head is recorded below.
+- Slice 4b is synchronized through `optics/development` head `f8e035ae` by merge commit
+  `ae5c29e7`; the exact final post-sync gate head is recorded below.
 - Slice 4 adds only the two new group-delay modules and refreshes this handoff note.
 
 ## Files and registrations requested
@@ -193,9 +193,8 @@ The compiled anchor fixes `t = 3/5`, `κ = 4/5`, `a = 1/2`, unit delay, and
 
 ## Gate record
 
-At source head `44d2ca28`, after synchronization merge `84c14b65` onto registered development
-head `9f23e522`, this single locked command exited successfully with temporary sorted
-registrations:
+At source head `ae5c29e7`, after synchronization onto development head `f8e035ae`, this single
+locked command exited successfully with temporary sorted registrations:
 
 ```text
 lake-lock env bash -c 'lake --wfail build <both group-delay modules> &&
@@ -207,4 +206,4 @@ QuantumInfo; and `lint_all` exited zero after registry coverage, legal-import, d
 sorry/pseudo-attribution, declaration-linter, and transitive-import checks. Its advisory style
 and transitive-import inventories named only pre-existing repository files, with neither
 group-delay module present. `Physlib.lean` was then restored byte-identically to SHA-256
-`c62a5ef374e7bb8b80ab49bd5186e1c9e6b0788d7d29136b488b2751826a166f`.
+`b481bad924b3229155e2d36fbb22303c5bd19b3bf1cc1d6b8423db83b3b1c010`.
