@@ -336,7 +336,9 @@ lemma toBehavior_rephase_responseTransform
     netlist.rephasedBehavior_eq gauge hMatched]
   ext ⟨input, output⟩
   simp only [LinearBehavior.mem_rephase_iff]
-  rw [netlist.toBehavior_responseTransform hWellPosed]
+  exact (ModeTransform.mem_toBehavior_iff_toLinearMap
+    (netlist.responseTransform hWellPosed) _ _).trans
+      (netlist.mem_behavior_iff_eq_responseTransform hWellPosed _ _).symm
 
 /-- The response transform extracted from the rephased singular-safe boundary relation.
 
@@ -459,6 +461,26 @@ local instance appendRephaseExternalChannelFintype :
   classical
   infer_instance
 
+/-- Pointwise staged covariance, isolated so finite-index instance normalization occurs before
+relation extensionality. -/
+private lemma mem_closeBehavior_append_rephase_eq_staged
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (gauge : ChannelEndGauge P.Channel)
+    (hMatched : (inner.append outer).IsMatchedGauge gauge)
+    (input : ModeAmplitude (Incident (inner.append outer).ExternalChannel))
+    (output : ModeAmplitude (Outgoing (inner.append outer).ExternalChannel)) :
+    (input, output) ∈ (inner.append outer).closeBehavior
+        (behavior.rephase gauge.incident gauge.outgoing) ↔
+      (input, output) ∈
+        ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm
+          (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm).rephase
+        ((inner.append outer).externalGauge gauge).incident
+        ((inner.append outer).externalGauge gauge).outgoing := by
+  rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
+  simp only [LinearBehavior.mem_rephase_iff]
+  rw [inner.closeBehavior_append outer behavior]
+
 /-- Rephasing before flattened closure agrees with first using the established staged closure
 identity and then rephasing the final external boundary.
 
@@ -474,9 +496,9 @@ lemma closeBehavior_append_rephase_eq_staged
           (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm).rephase
         ((inner.append outer).externalGauge gauge).incident
         ((inner.append outer).externalGauge gauge).outgoing := by
-  rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched,
-    inner.closeBehavior_append outer behavior]
-  rfl
+  ext ⟨input, output⟩
+  exact mem_closeBehavior_append_rephase_eq_staged inner outer
+    behavior gauge hMatched input output
 
 end Finite
 
