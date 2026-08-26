@@ -193,6 +193,18 @@ The compiled anchor fixes `t = 3/5`, `κ = 4/5`, `a = 1/2`, unit delay, and
 
 ## Gate record
 
-The original slice-4 cutoff `37600731`, descending from sync merge `62790fe8`, passed its chained
-build/lint gate with byte-identical `Physlib.lean` restoration. The slice-4b post-sync gate at the
-exact final cutoff head is pending and will replace this sentence before handoff.
+At source head `44d2ca28`, after synchronization merge `84c14b65` onto registered development
+head `9f23e522`, this single locked command exited successfully with temporary sorted
+registrations:
+
+```text
+lake-lock env bash -c 'lake --wfail build <both group-delay modules> &&
+  lake exe runPhyslibLinters && lake exe lint_all'
+```
+
+Both modules built with warnings as errors; `runPhyslibLinters` passed for Physlib and
+QuantumInfo; and `lint_all` exited zero after registry coverage, legal-import, duplicate-tag,
+sorry/pseudo-attribution, declaration-linter, and transitive-import checks. Its advisory style
+and transitive-import inventories named only pre-existing repository files, with neither
+group-delay module present. `Physlib.lean` was then restored byte-identically to SHA-256
+`c62a5ef374e7bb8b80ab49bd5186e1c9e6b0788d7d29136b488b2751826a166f`.
