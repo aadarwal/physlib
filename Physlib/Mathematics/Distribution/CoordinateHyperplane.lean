@@ -134,7 +134,6 @@ lemma coordinateNormalLine_eq_split_symm (d : ℕ) (i : Fin d.succ)
     coordinateNormalLine d i x r = (coordinateSplit d i).symm (r, x) :=
   (coordinateSplit_symm_eq_add d i r x).symm
 
-@[simp]
 lemma fderiv_coordinateNormalLine_apply (d : ℕ) (i : Fin d.succ)
     (x : EuclideanSpace ℝ (Fin d)) (r s : ℝ) :
     fderiv ℝ (coordinateNormalLine d i x) r s = coordinateNormalEmbedding d i s := by

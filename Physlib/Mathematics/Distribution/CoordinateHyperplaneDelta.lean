@@ -77,7 +77,6 @@ lemma coordinateHyperplaneDelta_apply (d : ℕ) (i : Fin d.succ)
   simp
 
 /-- In one ambient dimension, the coordinate-hyperplane delta evaluates at the origin. -/
-@[simp]
 lemma coordinateHyperplaneDelta_zero_apply
     (η : SchwartzMap (EuclideanSpace ℝ (Fin 1)) ℝ) :
     coordinateHyperplaneDelta 0 (Fin.last 0) η = η 0 := by
