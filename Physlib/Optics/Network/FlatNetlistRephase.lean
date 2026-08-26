@@ -193,7 +193,7 @@ variable [Fintype P.Channel] [Fintype family.Channel]
 
 /-- The external complement is finite whenever the ambient and connected channel types are
 finite. -/
-private instance rephaseExternalChannelFintype : Fintype family.ExternalChannel := by
+local instance rephaseExternalChannelFintype : Fintype family.ExternalChannel := by
   classical
   infer_instance
 
@@ -299,14 +299,12 @@ lemma rephasedBehavior_eq (gauge : ChannelEndGauge netlist.Channel)
         (netlist.connections.externalGauge gauge).incident
         (netlist.connections.externalGauge gauge).outgoing := by
   classical
+  ext ⟨input, output⟩
   rw [rephasedBehavior, rephasedComponentBehavior,
     netlist.connections.closeBehavior_rephase
       netlist.componentBehavior gauge hMatched]
-  have hExternalFintype :
-      rephaseExternalChannelFintype netlist.connections =
-        eliminationExternalChannelFintype netlist :=
-    Subsingleton.elim _ _
-  rw [hExternalFintype, ← netlist.behavior_eq_closeBehavior]
+  simp only [LinearBehavior.mem_rephase_iff]
+  rw [← netlist.behavior_eq_closeBehavior]
 
 /-!
 ## D. Well-posed response covariance
@@ -469,11 +467,6 @@ private lemma mem_closeBehavior_append_rephase_eq_staged
         ((inner.append outer).externalGauge gauge).outgoing := by
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
   simp only [LinearBehavior.mem_rephase_iff]
-  have hExternalFintype :
-      rephaseExternalChannelFintype (inner.append outer) =
-        twoStageAppendExternalChannelFintype inner outer :=
-    Subsingleton.elim _ _
-  rw [hExternalFintype]
   rw [inner.closeBehavior_append outer behavior]
 
 /-- Rephasing before flattened closure agrees with first using the established staged closure
