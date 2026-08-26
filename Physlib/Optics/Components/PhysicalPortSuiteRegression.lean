@@ -301,7 +301,8 @@ lemma physicalPortSuite9a_sum_indexed
   have hBeamPorts :
       physicalPortSuite9aBeamFirstLocal ≠ physicalPortSuite9aBeamSecondLocal := by
     intro hEqual
-    injection hEqual
+    have hPort := congrArg (fun channel => channel.1) hEqual
+    cases hPort
   have hFirst :
       physicalPortSuite9aBeamFirstIndexed ∉
         ({physicalPortSuite9aBeamSecondIndexed,
