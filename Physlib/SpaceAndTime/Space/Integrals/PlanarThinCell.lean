@@ -41,6 +41,7 @@ pointwise trace and is therefore an explicit hypothesis in the electromagnetic c
 ## iii. Table of contents
 
 - A. Normalized interval and square averages
+- A.1. Integrability of iterated cell integrals
 - B. Planar sample geometry
 - C. Thin-loop families
 - D. Pillbox families
@@ -90,6 +91,42 @@ def normalizedThinBoxIntegral (radius halfThickness : ℝ)
 the shared endpoint. -/
 def splitNormalIntegral (halfThickness : ℝ) (negative positive : ℝ → ℝ) : ℝ :=
   (∫ w in -halfThickness..0, negative w) + ∫ w in 0..halfThickness, positive w
+
+/-! ### A.1. Integrability of iterated cell integrals -/
+
+/-- Integrability on the symmetric interval used by a normalized cell average. -/
+def SymmetricIntervalIntegrable (radius : ℝ) (f : ℝ → ℝ) : Prop :=
+  IntervalIntegrable f MeasureTheory.volume (-radius) radius
+
+/-- Integrability on both open-side halves of a normal interval. -/
+def SplitNormalIntegrable (halfThickness : ℝ)
+    (negative positive : ℝ → ℝ) : Prop :=
+  IntervalIntegrable negative MeasureTheory.volume (-halfThickness) 0 ∧
+  IntervalIntegrable positive MeasureTheory.volume 0 halfThickness
+
+/-- Integrability of both levels of an iterated symmetric-square integral. -/
+def IteratedSquareIntegrable (radius : ℝ) (f : ℝ → ℝ → ℝ) : Prop :=
+  (∀ u, SymmetricIntervalIntegrable radius (f u)) ∧
+  SymmetricIntervalIntegrable radius
+    (fun u ↦ normalizedIntervalAverage radius (f u))
+
+/-- Integrability of a rectangle whose normal integral is split across the carrier. -/
+def SplitRectangleIntegrable (radius halfThickness : ℝ)
+    (negative positive : ℝ → ℝ → ℝ) : Prop :=
+  (∀ u, SplitNormalIntegrable halfThickness (negative u) (positive u)) ∧
+  SymmetricIntervalIntegrable radius fun u ↦
+    splitNormalIntegral halfThickness (negative u) (positive u)
+
+/-- Integrability of all three levels of a box whose normal integral is split across the
+carrier. -/
+def SplitBoxIntegrable (radius halfThickness : ℝ)
+    (negative positive : ℝ → ℝ → ℝ → ℝ) : Prop :=
+  (∀ u v, SplitNormalIntegrable halfThickness (negative u v) (positive u v)) ∧
+  (∀ u, SymmetricIntervalIntegrable radius fun v ↦
+    splitNormalIntegral halfThickness (negative u v) (positive u v)) ∧
+  SymmetricIntervalIntegrable radius fun u ↦
+    ∫ v in -radius..radius,
+      splitNormalIntegral halfThickness (negative u v) (positive u v)
 
 namespace OrientedAffineHyperplane
 
@@ -299,6 +336,61 @@ def spanningSurfaceAverage {plane : OrientedAffineHyperplane 3}
           (plane.positiveSideSample density.positive parameter x (u • tangent) v)
           (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))))
 
+/-- Integrability of a selected-side principal long-edge pullback. -/
+def SideLongEdgeIntegrable {plane : OrientedAffineHyperplane 3}
+    {tangent : plane.tangentSubmodule} (loop : PlanarThinLoopFamily plane tangent)
+    (side : OrientedAffineHyperplane.Side)
+    {P : Type*} (field : plane.SideField side P (EuclideanSpace ℝ (Fin 3)))
+    (parameter : P) (x : plane.carrier) (scale : ℕ) : Prop :=
+  SymmetricIntervalIntegrable (loop.radius scale) fun u ↦
+    inner ℝ
+      (field parameter
+        (plane.sidePoint side x (u • tangent) (loop.halfThickness scale)
+          (loop.halfThickness_pos scale)))
+      (tangent : EuclideanSpace ℝ (Fin 3))
+
+/-- Integrability of a boundary-line surface-current pullback. -/
+def SurfaceLineIntegrable {plane : OrientedAffineHyperplane 3}
+    {tangent : plane.tangentSubmodule} (loop : PlanarThinLoopFamily plane tangent)
+    {P : Type*} (source : plane.BoundaryField P plane.tangentSubmodule)
+    (parameter : P) (x : plane.carrier) (scale : ℕ) : Prop :=
+  SymmetricIntervalIntegrable (loop.radius scale) fun u ↦
+    inner ℝ
+      (source parameter (plane.tangentPoint x (u • tangent)) :
+        EuclideanSpace ℝ (Fin 3))
+      (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3)))
+
+/-- Integrability of all four half-pullbacks forming the two short-edge integrals. -/
+def ShortEdgesIntegrable {plane : OrientedAffineHyperplane 3}
+    {tangent : plane.tangentSubmodule} (loop : PlanarThinLoopFamily plane tangent)
+    {P : Type*} (field : plane.TwoSidedField P (EuclideanSpace ℝ (Fin 3)))
+    (parameter : P) (x : plane.carrier) (scale : ℕ) : Prop :=
+  let left := -(loop.radius scale) • tangent
+  let right := loop.radius scale • tangent
+  SplitNormalIntegrable (loop.halfThickness scale)
+      (fun v ↦ inner ℝ (plane.negativeSideSample field.negative parameter x left v)
+        plane.normalVector)
+      (fun v ↦ inner ℝ (plane.positiveSideSample field.positive parameter x left v)
+        plane.normalVector) ∧
+    SplitNormalIntegrable (loop.halfThickness scale)
+      (fun v ↦ inner ℝ (plane.negativeSideSample field.negative parameter x right v)
+        plane.normalVector)
+      (fun v ↦ inner ℝ (plane.positiveSideSample field.positive parameter x right v)
+        plane.normalVector)
+
+/-- Integrability of the split two-sided pullback on a thin loop's spanning rectangle. -/
+def SpanningSurfaceIntegrable {plane : OrientedAffineHyperplane 3}
+    {tangent : plane.tangentSubmodule} (loop : PlanarThinLoopFamily plane tangent)
+    {P : Type*} (density : plane.TwoSidedField P (EuclideanSpace ℝ (Fin 3)))
+    (parameter : P) (x : plane.carrier) (scale : ℕ) : Prop :=
+  SplitRectangleIntegrable (loop.radius scale) (loop.halfThickness scale)
+    (fun u v ↦ inner ℝ
+      (plane.negativeSideSample density.negative parameter x (u • tangent) v)
+      (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))))
+    (fun u v ↦ inner ℝ
+      (plane.positiveSideSample density.positive parameter x (u • tangent) v)
+      (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))))
+
 end PlanarThinLoopFamily
 
 /-! ## D. Pillbox families -/
@@ -389,6 +481,69 @@ def volumeAverage {plane : OrientedAffineHyperplane 3}
             (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent))
           (plane.positiveSideSample density.positive parameter x
             (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent))
+
+/-- Integrability of both levels of one selected-side principal-face pullback. -/
+def SideFaceIntegrable {plane : OrientedAffineHyperplane 3}
+    (pillbox : PlanarPillboxFamily plane) (side : OrientedAffineHyperplane.Side)
+    {P : Type*} (field : plane.SideField side P (EuclideanSpace ℝ (Fin 3)))
+    (parameter : P) (x : plane.carrier) (scale : ℕ) : Prop :=
+  IteratedSquareIntegrable (pillbox.radius scale) fun u v ↦
+    inner ℝ plane.normalVector
+      (field parameter
+        (plane.sidePoint side x
+          (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent)
+          (pillbox.halfThickness scale) (pillbox.halfThickness_pos scale)))
+
+/-- Integrability of both levels of a boundary-face surface-charge pullback. -/
+def SurfaceFaceIntegrable {plane : OrientedAffineHyperplane 3}
+    (pillbox : PlanarPillboxFamily plane) {P : Type*}
+    (source : plane.BoundaryField P ℝ) (parameter : P)
+    (x : plane.carrier) (scale : ℕ) : Prop :=
+  IteratedSquareIntegrable (pillbox.radius scale) fun u v ↦
+    source parameter
+      (plane.tangentPoint x
+        (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent))
+
+/-- Integrability of every split pullback on the four lateral pillbox faces. -/
+def LateralFacesIntegrable {plane : OrientedAffineHyperplane 3}
+    (pillbox : PlanarPillboxFamily plane)
+    {P : Type*} (field : plane.TwoSidedField P (EuclideanSpace ℝ (Fin 3)))
+    (parameter : P) (x : plane.carrier) (scale : ℕ) : Prop :=
+  let radius := pillbox.radius scale
+  let thickness := pillbox.halfThickness scale
+  let tangent := (pillbox.tangent : EuclideanSpace ℝ (Fin 3))
+  let quarterTurn :=
+    (plane.quarterTurnTangent pillbox.tangent : EuclideanSpace ℝ (Fin 3))
+  let splitFace (offset : ℝ → plane.tangentSubmodule)
+      (normal : EuclideanSpace ℝ (Fin 3)) :=
+    SplitRectangleIntegrable radius thickness
+      (fun u w ↦ inner ℝ
+        (plane.negativeSideSample field.negative parameter x (offset u) w) normal)
+      (fun u w ↦ inner ℝ
+        (plane.positiveSideSample field.positive parameter x (offset u) w) normal)
+  splitFace
+      (fun v ↦ radius • pillbox.tangent +
+        v • plane.quarterTurnTangent pillbox.tangent) tangent ∧
+    splitFace
+      (fun v ↦ -(radius) • pillbox.tangent +
+        v • plane.quarterTurnTangent pillbox.tangent) tangent ∧
+    splitFace
+      (fun u ↦ u • pillbox.tangent +
+        radius • plane.quarterTurnTangent pillbox.tangent) quarterTurn ∧
+    splitFace
+      (fun u ↦ u • pillbox.tangent +
+        -(radius) • plane.quarterTurnTangent pillbox.tangent) quarterTurn
+
+/-- Integrability of every level of a split two-sided pillbox-volume pullback. -/
+def VolumeIntegrable {plane : OrientedAffineHyperplane 3}
+    (pillbox : PlanarPillboxFamily plane) {P : Type*}
+    (density : plane.TwoSidedField P ℝ) (parameter : P)
+    (x : plane.carrier) (scale : ℕ) : Prop :=
+  SplitBoxIntegrable (pillbox.radius scale) (pillbox.halfThickness scale)
+    (fun u v w ↦ plane.negativeSideSample density.negative parameter x
+      (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)
+    (fun u v w ↦ plane.positiveSideSample density.positive parameter x
+      (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)
 
 end PlanarPillboxFamily
 
