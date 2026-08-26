@@ -790,6 +790,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Systems/PolarizerRetarder.lean (Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_act, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_map_coherency, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_mueller_act, Optics.JonesMatrix.quarterWavePlate_zero_comp_linearPolarizer_pi_div_four_act_horizontal)"
 
+  - description: "The physical polarizer-retarder layer realizes the ordered Jones cascade as a singleton propagating material-wave carrier and proves the cosine-squared law for material irradiance and the actual one-period mean Poynting vector. The retarder changes the selected output polarization without changing the analyzer's irradiance factor. The output family contains no built-in aperture-flux normalization, and this layer makes no complete-device, rejected-polarization, absorption, heating, partially polarized, or coherency-mixture claim."
+    done: true
+    location: "Physlib/Optics/Systems/PolarizerRetarderPhysical.lean (Optics.MaterialJonesMode.polarizerRetarderOutputFamily, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_scaledWave_eq, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_malus_materialPlaneWaveIrradiance, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_malus_intervalAverage_poyntingVector)"
+
   - description: "The public Electromagnetism API exposes the existing potential-derived, pointwise, three-dimensional Gauss-electric, Gauss-magnetic, Ampere, and Faraday laws with free-space constants and allowed sources through ordinary direct and root imports, without treating them as material, integral, or boundary equations."
     done: true
     location: "Physlib/Electromagnetism/ThreeDimension/MaxwellEquations.lean (Electromagnetism.ThreeDimension.gaussLawElectric, Electromagnetism.ThreeDimension.gaussLawMagnetic, Electromagnetism.ThreeDimension.ampereLaw, Electromagnetism.ThreeDimension.faradayLaw)"
