@@ -2714,18 +2714,18 @@ upstream ownership decision, record the exact decision needed and work on an ind
 
 ## L. Decision gates requiring explicit human confirmation
 
-- [ ] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
+- [x] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
   circular and `S₃` sign, including whether the observer looks along propagation or into the beam.
-- [ ] Confirm whether the first material-medium API should use current raw real field values or wait
+- [x] Confirm whether the first material-medium API should use current raw real field values or wait
   for a stronger dimensional-units refactor.
-- [ ] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
-- [ ] Confirm whether the initial planar-interface PR may state local boundary laws as named
+- [x] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
+- [x] Confirm whether the initial planar-interface PR may state local boundary laws as named
   hypotheses while their Maxwell-integral derivation is developed in a stacked Electromagnetism PR.
 - [ ] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
   coefficients scale full electric-vector amplitudes or tangential components.
 - [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
-- [ ] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
+- [x] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
   corroborating the four-wave arrows and behavior: states are backward-first, scattering
   `(aL, aR; bL, bR)` regroups as `((bL, aL), (aR, bR))`, and the left-to-right scattering
   conversion inverts the right-incident to left-outgoing block. The fork uses only
@@ -2734,14 +2734,16 @@ upstream ownership decision, record the exact decision needed and work on an ind
   power coupling coefficients.
 - [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
   startup term before S4/S5 identities are named.
-- [ ] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
+- [x] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
 - [ ] Confirm whether each stability condition is strict or non-strict and whether it concerns
   poles, zeros, an internal operator, BIBO behavior, or a source-specific named condition.
 - [ ] Replace source decimal examples by human-audited exact data or certified intervals and record
   every source assumption that the Lean statement strengthens, corrects, or rejects.
-- [ ] Confirm the exact HOL source licenses before adapting any source implementation.
+- [x] Confirm the exact HOL source licenses before adapting any source implementation.
 - [ ] Independently verify every bibliography item, URL, page range, and physics claim used in a PR.
-- [ ] Conduct all maintainer/reviewer communication and certify every contributed line.
+- [ ] Conduct all maintainer/reviewer communication and certify every contributed line. Deferred
+  HUMAN-ONLY; residual act: at the trigger, personally certify the exact chosen PR diff and conduct
+  every maintainer/reviewer communication.
 
 ## M. Risk register
 
