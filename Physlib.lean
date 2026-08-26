@@ -459,6 +459,8 @@ public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
 public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponse
 public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponseRegression
+public import Physlib.Optics.Systems.DelayTransfer.GroupDelay
+public import Physlib.Optics.Systems.DelayTransfer.GroupDelayRegression
 public import Physlib.Optics.Systems.DelayTransfer.Poles
 public import Physlib.Optics.Systems.DelayTransfer.PolesRegression
 public import Physlib.Optics.Systems.DelayTransfer.Stability
