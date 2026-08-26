@@ -1937,7 +1937,7 @@ changes, and sparse restriction/zero-extension maps required by the network laye
   preservation proved;
 - [x] covariance of ideal routing under input and output channel relabeling, including the exact
   exchanged-presentation routing law;
-- [ ] matched-gauge covariance of connection routing under channel-end rephasing; arbitrary
+- [x] matched-gauge covariance of connection routing under channel-end rephasing; arbitrary
   independent endpoint rephasings do not leave a unit-gain wire unchanged;
 - [x] convention-free port/network power, passivity, and losslessness predicates that do not
   require time-reversal data;
@@ -2115,7 +2115,7 @@ from the same network semantics at every frequency where the response is defined
   forcing, and a mis-lifted-port negative control;
 - [x] functional packaging of a child as a scattering/response component only after that child's
   well-posedness and external-channel pairing have been proved; and
-- [ ] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
+- [x] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
   port families. This single construction is needed both to replace an inner family by another
   with the same boundary relation and to state literal three-stage append associativity. The
   fixed-inner-wiring congruence is already complete. All current N-08 hypotheses are structural
