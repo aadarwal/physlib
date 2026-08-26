@@ -93,18 +93,24 @@ def latticeRegressionVerticalIncidentValue (column : Fin 2) :
   | ⟨.left, ()⟩ => if column.val = 1 then -18 * Complex.I else 0
   | ⟨.right, ()⟩ => 0
 
+/-- Local incident values at a ring site in the concrete solution. -/
+def latticeRegressionSiteIncidentValue (row column : Fin 2) :
+    LatticeSitePort → ℂ
+  | port =>
+    match row.val, column.val, port with
+    | 0, 0, .west => 1
+    | 0, 0, .east => 4
+    | 0, 1, .west => -6 * Complex.I
+    | 0, 1, .south => -90 * Complex.I
+    | 1, 1, .north => -126
+    | _, _, _ => 0
+
 /-- Componentwise incident values for the concrete canonical solution. -/
 def latticeRegressionIncidentValue :
     (component : RectangularLatticeComponent 2 2) →
       (rectangularLatticeComponentPortFamily component).Channel → ℂ
   | Sum.inl (row, column), ⟨port, ()⟩ =>
-      match row.val, column.val, port with
-      | 0, 0, .west => 1
-      | 0, 0, .east => 4
-      | 0, 1, .west => -6 * Complex.I
-      | 0, 1, .south => -90 * Complex.I
-      | 1, 1, .north => -126
-      | _, _, _ => 0
+      latticeRegressionSiteIncidentValue row column port
   | Sum.inr (Sum.inl (row, _edge)), channel => latticeRegressionHorizontalIncidentValue row channel
   | Sum.inr (Sum.inr (_edge, column)), channel =>
       latticeRegressionVerticalIncidentValue column channel
@@ -121,16 +127,22 @@ def latticeRegressionVerticalOutgoingValue (column : Fin 2) :
   | ⟨.left, ()⟩ => if column.val = 1 then -90 * Complex.I else 0
   | ⟨.right, ()⟩ => if column.val = 1 then -126 else 0
 
+/-- Local outgoing values at a ring site in the concrete solution. -/
+def latticeRegressionSiteOutgoingValue (row column : Fin 2) :
+    LatticeSitePort → ℂ
+  | port =>
+    match row.val, column.val, port with
+    | 0, 0, .east => 2
+    | 0, 1, .south => -18 * Complex.I
+    | 1, 1, .east => -630
+    | _, _, _ => 0
+
 /-- Componentwise outgoing values for the concrete canonical solution. -/
 def latticeRegressionOutgoingValue :
     (component : RectangularLatticeComponent 2 2) →
       (rectangularLatticeComponentPortFamily component).Channel → ℂ
   | Sum.inl (row, column), ⟨port, ()⟩ =>
-      match row.val, column.val, port with
-      | 0, 0, .east => 2
-      | 0, 1, .south => -18 * Complex.I
-      | 1, 1, .east => -630
-      | _, _, _ => 0
+      latticeRegressionSiteOutgoingValue row column port
   | Sum.inr (Sum.inl (row, _edge)), channel => latticeRegressionHorizontalOutgoingValue row channel
   | Sum.inr (Sum.inr (_edge, column)), channel =>
       latticeRegressionVerticalOutgoingValue column channel
@@ -165,6 +177,17 @@ def latticeRegressionTwoPortChannel :
     TwoPortSeriesNetlist.Port → (TwoPortSeriesNetlist.portFamily Unit Unit).Channel
   | .left => ⟨.left, ()⟩
   | .right => ⟨.right, ()⟩
+
+/-- A direct enumeration of the four site ports used in component sums. -/
+lemma latticeRegression_sitePort_sum (f : LatticeSitePort → ℂ) :
+    (∑ port, f port) = f .west + f .east + f .north + f .south := by
+  change Finset.univ.sum f = _
+  rw [show (Finset.univ : Finset LatticeSitePort) =
+      {.west, .east, .north, .south} by
+    ext port
+    cases port <;> simp]
+  simp
+  ring
 
 /-- A direct enumeration of the two single-mode channels of a series coupler. -/
 lemma latticeRegression_twoPort_sum
@@ -431,52 +454,75 @@ lemma latticeRegression_mem_componentBehavior :
     latticeRegressionParameters).mem_componentBehavior_iff_forall_component
       latticeRegressionIncident latticeRegressionOutgoing).2
   intro component
-  change RectangularLatticeComponent 2 2 at component
-  let _ : Fintype
-      ((rectangularLatticeComponents
-        latticeRegressionParameters).portFamily component).Channel := by
-    change Fintype (rectangularLatticeComponentPortFamily component).Channel
-    exact rectangularLatticeLocalChannelFintype latticeRegressionParameters component
-  change
-    (latticeRegressionIncident.restrictEmbedding
-        (Incident.relabelEmbedding
-          ((rectangularLatticeComponents
-            latticeRegressionParameters).componentChannelEmbedding component)),
-      latticeRegressionOutgoing.restrictEmbedding
-        (Outgoing.relabelEmbedding
-          ((rectangularLatticeComponents
-            latticeRegressionParameters).componentChannelEmbedding component))) ∈
-      ((rectangularLatticeComponents latticeRegressionParameters).scattering
-        component).toOrientedModeTransform.toBehavior
-  rcases component with ⟨row, column⟩ | (horizontal | vertical)
-  all_goals
-    rw [ModeTransform.mem_toBehavior_iff_toLinearMap,
-      ScatteringMatrix.toLinearMap_toOrientedModeTransform]
-    apply WithLp.ofLp_injective 2
-    funext localChannel
-    change Outgoing (rectangularLatticeComponentPortFamily _).Channel at localChannel
-    rcases localChannel with ⟨port, mode⟩
-    rw [ModeAmplitude.reindex_apply]
-    simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply,
-      ModeAmplitude.restrictEmbedding_apply]
-    rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
-  · change latticeRegressionOutgoingValue (Sum.inl (row, column)) ⟨port, mode⟩ =
-      ∑ input,
-        ((rectangularLatticeComponents latticeRegressionParameters).scattering
-            (Sum.inl (row, column))).toModeTransform ⟨port, mode⟩ input *
-          latticeRegressionIncidentValue (Sum.inl (row, column)) input
-    rw [Fintype.sum_equiv latticeSiteChannelEquiv _ _ (by intro input; rfl)]
-    fin_cases row <;> fin_cases column <;> cases port <;> cases mode <;>
-      simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
-        rectangularLatticeComponentScattering, latticeSitePhysicalScattering,
-        ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
-        ModeAmplitude.restrictEmbedding_apply, latticeRegressionSiteScattering,
-        latticeRegressionIncident, latticeRegressionOutgoing, latticeRegressionIncidentValue,
-        latticeRegressionOutgoingValue] <;> norm_num
-  · change latticeRegressionOutgoingValue (Sum.inr (Sum.inl horizontal)) ⟨port, mode⟩ =
-      ∑ input,
-        ((rectangularLatticeComponents latticeRegressionParameters).scattering
-            (Sum.inr (Sum.inl horizontal))).toModeTransform ⟨port, mode⟩ input *
+  let canonicalComponent : RectangularLatticeComponent 2 2 := component
+  let localFintype : Fintype
+      (rectangularLatticeComponentPortFamily canonicalComponent).Channel :=
+    rectangularLatticeLocalChannelFintype latticeRegressionParameters canonicalComponent
+  let _ : Fintype (rectangularLatticeComponentPortFamily canonicalComponent).Channel :=
+    localFintype
+  let localIncident :
+      ModeAmplitude (Incident (rectangularLatticeComponentPortFamily canonicalComponent).Channel) :=
+    WithLp.toLp 2 fun endpoint =>
+      latticeRegressionIncidentValue canonicalComponent endpoint.channel
+  let localOutgoing :
+      ModeAmplitude (Outgoing (rectangularLatticeComponentPortFamily canonicalComponent).Channel) :=
+    WithLp.toLp 2 fun endpoint =>
+      latticeRegressionOutgoingValue canonicalComponent endpoint.channel
+  change (localIncident, localOutgoing) ∈
+      (rectangularLatticeComponentScattering
+        latticeRegressionParameters canonicalComponent).toOrientedModeTransform.toBehavior
+  rw [ModeTransform.mem_toBehavior_iff_toLinearMap,
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform]
+  apply WithLp.ofLp_injective 2
+  funext localChannel
+  rw [ModeAmplitude.reindex_apply]
+  simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply]
+  rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
+  simp only [localIncident, localOutgoing]
+  rcases canonicalComponent with ⟨row, column⟩ | (horizontal | vertical)
+  · change Outgoing latticeSitePortFamily.Channel at localChannel
+    change Fintype latticeSitePortFamily.Channel at localFintype
+    generalize hPort : latticeSiteChannelEquiv.symm localChannel.channel = outputPort
+    have hOutput : latticeSiteChannelEquiv outputPort = localChannel.channel := by
+      rw [← hPort, latticeSiteChannelEquiv.apply_symm_apply]
+    rw [← hOutput]
+    change latticeRegressionSiteOutgoingValue row column outputPort =
+      ∑ input : latticeSitePortFamily.Channel,
+        (latticeSitePhysicalScattering
+            (latticeRegressionParameters.ringScattering row column)).toModeTransform
+              (latticeSiteChannelEquiv outputPort) input *
+          latticeRegressionSiteIncidentValue row column
+            (latticeSiteChannelEquiv.symm input)
+    simp only [latticeSitePhysicalScattering,
+      ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
+      Equiv.symm_apply_apply, latticeRegressionParameters]
+    let siteTerm (input : LatticeSitePort) : ℂ :=
+      (latticeRegressionSiteScattering row column).toModeTransform outputPort input *
+        latticeRegressionSiteIncidentValue row column input
+    change latticeRegressionSiteOutgoingValue row column outputPort =
+      ∑ input : latticeSitePortFamily.Channel,
+        siteTerm (latticeSiteChannelEquiv.symm input)
+    have hSiteSum :
+        (∑ input : latticeSitePortFamily.Channel,
+            siteTerm (latticeSiteChannelEquiv.symm input)) =
+          ∑ input : LatticeSitePort, siteTerm input := by
+      exact @Fintype.sum_equiv _ _ ℂ localFintype
+        (inferInstance : Fintype LatticeSitePort) _ latticeSiteChannelEquiv.symm
+        (fun input => siteTerm (latticeSiteChannelEquiv.symm input)) siteTerm
+        (by intro input; rfl)
+    rw [hSiteSum, latticeRegression_sitePort_sum]
+    cases outputPort <;> fin_cases row <;> fin_cases column <;>
+      simp [siteTerm, latticeRegressionSiteScattering,
+        latticeRegressionSiteIncidentValue, latticeRegressionSiteOutgoingValue] <;>
+        ring
+  · change Outgoing (TwoPortSeriesNetlist.portFamily Unit Unit).Channel at localChannel
+    rcases localChannel with ⟨⟨port, mode⟩⟩
+    change latticeRegressionOutgoingValue (Sum.inr (Sum.inl horizontal)) ⟨port, mode⟩ =
+      ∑ input : (TwoPortSeriesNetlist.portFamily Unit Unit).Channel,
+        (TwoPortSeriesNetlist.physicalScattering
+            (latticeCouplingScattering
+              (latticeRegressionParameters.horizontalCoupler
+                horizontal.1 horizontal.2))).toModeTransform ⟨port, mode⟩ input *
           latticeRegressionIncidentValue (Sum.inr (Sum.inl horizontal)) input
     rcases horizontal with ⟨row, edge⟩
     rcases edge with ⟨column, hColumn⟩
@@ -485,19 +531,24 @@ lemma latticeRegression_mem_componentBehavior :
       omega
     subst column
     rw [latticeRegression_twoPort_sum]
-    fin_cases row <;> cases port <;> cases mode <;>
-      simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
-        rectangularLatticeComponentScattering, TwoPortSeriesNetlist.physicalScattering,
+    fin_cases row <;> cases port <;> cases mode
+    all_goals
+      simp [latticeRegressionParameters, TwoPortSeriesNetlist.physicalScattering,
         ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
         latticeCouplingScattering, DirectionalCoupler.mixing, Matrix.fromBlocks,
-        ModeAmplitude.restrictEmbedding_apply, latticeRegressionCoupler,
-        latticeRegressionIncident, latticeRegressionOutgoing,
-        latticeRegressionIncidentValue, latticeRegressionOutgoingValue] <;>
-      norm_num <;> ring_nf
-  · change latticeRegressionOutgoingValue (Sum.inr (Sum.inr vertical)) ⟨port, mode⟩ =
-      ∑ input,
-        ((rectangularLatticeComponents latticeRegressionParameters).scattering
-            (Sum.inr (Sum.inr vertical))).toModeTransform ⟨port, mode⟩ input *
+        latticeRegressionCoupler, latticeRegressionIncidentValue,
+        latticeRegressionOutgoingValue, latticeRegressionHorizontalIncidentValue,
+        latticeRegressionHorizontalOutgoingValue, latticeRegressionTwoPortChannel,
+        TwoPortSeriesNetlist.channelEquiv, DirectionalCoupler.crossCoefficient]
+    all_goals ring_nf
+  · change Outgoing (TwoPortSeriesNetlist.portFamily Unit Unit).Channel at localChannel
+    rcases localChannel with ⟨⟨port, mode⟩⟩
+    change latticeRegressionOutgoingValue (Sum.inr (Sum.inr vertical)) ⟨port, mode⟩ =
+      ∑ input : (TwoPortSeriesNetlist.portFamily Unit Unit).Channel,
+        (TwoPortSeriesNetlist.physicalScattering
+            (latticeCouplingScattering
+              (latticeRegressionParameters.verticalCoupler
+                vertical.1 vertical.2))).toModeTransform ⟨port, mode⟩ input *
           latticeRegressionIncidentValue (Sum.inr (Sum.inr vertical)) input
     rcases vertical with ⟨edge, column⟩
     rcases edge with ⟨row, hRow⟩
@@ -506,15 +557,17 @@ lemma latticeRegression_mem_componentBehavior :
       omega
     subst row
     rw [latticeRegression_twoPort_sum]
-    fin_cases column <;> cases port <;> cases mode <;>
-      simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
-        rectangularLatticeComponentScattering, TwoPortSeriesNetlist.physicalScattering,
+    fin_cases column <;> cases port <;> cases mode
+    all_goals
+      simp [latticeRegressionParameters, TwoPortSeriesNetlist.physicalScattering,
         ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
         latticeCouplingScattering, DirectionalCoupler.mixing, Matrix.fromBlocks,
-        ModeAmplitude.restrictEmbedding_apply, latticeRegressionCoupler,
-        latticeRegressionIncident, latticeRegressionOutgoing,
-        latticeRegressionIncidentValue, latticeRegressionOutgoingValue] <;>
-      norm_num <;> ring_nf
+        latticeRegressionCoupler, latticeRegressionIncidentValue,
+        latticeRegressionOutgoingValue, latticeRegressionVerticalIncidentValue,
+        latticeRegressionVerticalOutgoingValue, latticeRegressionTwoPortChannel,
+        TwoPortSeriesNetlist.channelEquiv, DirectionalCoupler.crossCoefficient]
+    all_goals ring_nf
+    all_goals norm_num [Complex.I_sq]
 
 /-- Every canonical connected coordinate satisfies the mate equation directly. -/
 lemma latticeRegression_connectedEquation (connected : latticeRegressionConnections.Channel) :
@@ -548,7 +601,8 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
         PortConnectionFamily.append, PortConnection.mateEquiv,
         latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionHorizontalIncidentValue,
-        latticeRegressionHorizontalOutgoingValue] <;> rfl
+        latticeRegressionHorizontalOutgoingValue, latticeRegressionSiteIncidentValue,
+        latticeRegressionSiteOutgoingValue] <;> rfl
   · rcases vertical with ⟨⟨edge, column⟩, half⟩
     rcases edge with ⟨row, hRow⟩
     have hRowZero : row = 0 := by
@@ -565,7 +619,8 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
         PortConnection.liftBoundary, PortConnection.mateEquiv,
         latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionVerticalIncidentValue,
-        latticeRegressionVerticalOutgoingValue] <;> rfl
+        latticeRegressionVerticalOutgoingValue, latticeRegressionSiteIncidentValue,
+        latticeRegressionSiteOutgoingValue] <;> rfl
 
 /-- The concrete incident amplitude is the canonical assembly of its outgoing field and input. -/
 lemma latticeRegression_incidentAssembly :
