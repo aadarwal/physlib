@@ -73,11 +73,6 @@ instance topologyAdjacentDecidable (first second : Node) :
   unfold TopologyAdjacent
   infer_instance
 
-/-- Retained adjacency is equivalently the existence of an indexed source/target branch. -/
-lemma topologyAdjacent_iff (first second : Node) :
-    TopologyAdjacent first second ↔
-      ∃ edge : Edge, edgeSource edge = first ∧ edgeTarget edge = second := Iff.rfl
-
 /-! ## B. Through and drop paths -/
 
 /-- The direct bus path to the through port. -/

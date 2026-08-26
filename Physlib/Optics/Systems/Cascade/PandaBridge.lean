@@ -8,20 +8,18 @@ module
 public import Physlib.Optics.Systems.Cascade.PandaGraph
 
 /-!
-# Relational N7 bridge for the PANDA forward graph
+# N7 routing and equations for the PANDA forward graph
 
 ## i. Overview
 
-This file certifies that the 18-node PANDA graph is a forward projection of the explicit N7
-netlist. The certificate has two independent parts. First, `connectionForwardPorts_eq_connection`
-checks all fourteen boundary identifications against the actual `PortConnectionFamily`. Second,
-`coefficientMatrix_eq_netlistProjection` proves that every coefficient of the graph is the sum of
-the corresponding assembled N7 scattering entries. The intervening `edgeInput_routedBoundary`
-and `edgeOutput_routedBoundary` results certify each edge endpoint against those physical wires.
+This file supplies the routing and scalar-equation layers used by the complete relational bridge.
+`connectionForwardPorts_eq_connection` checks all fourteen boundary identifications against the
+actual `PortConnectionFamily`. The `edgeInput_routedBoundary` and `edgeOutput_routedBoundary`
+results certify each retained edge endpoint against those physical wires. The final section proves
+that the graph node equation is exactly the eighteen displayed scalar equations.
 
-The resulting relation `NetlistForwardRelation` is phrased only through that N7-entry matrix. Its
-equivalence with the graph node equation is the matrix-level bridge requested by the construction;
-no separately hand-parameterized graph is admitted.
+The complete component-scattering and incident-assembly equivalence is proved in
+`PandaRealization`; no matrix constructed by resumming the graph edges is used as a netlist proxy.
 
 This is a zero-reverse forward projection. The complete netlist is bidirectional, whereas NSV'16
 calls its source SFG undirected. The bridge neither deletes the N7 reverse coordinates nor claims
@@ -33,14 +31,12 @@ that the directed 18-node matrix equals an undirected-edge closure.
 - `Panda.edgeInput_routedBoundary`: every edge source reaches its local scattering input.
 - `Panda.edgeOutput_routedBoundary`: every local scattering output reaches its edge target.
 - `Panda.edge_routedN7Certificate`: bundled topology-and-gain ownership of every branch.
-- `Panda.coefficientMatrix_eq_netlistProjection`: matrix equality derived from N7 entries.
-- `Panda.isNodeSolution_iff_netlistForwardRelation`: relational graph/netlist certificate.
 - `Panda.isNodeSolution_iff_forwardEquations`: the 18 explicit forward equations.
 
 ## iii. Table of contents
 
 - A. Routing certificate
-- B. N7-entry coefficient projection
+- B. Sparse coefficient action
 - C. Explicit forward equations
 
 ## iv. References and non-claims
@@ -281,24 +277,7 @@ lemma edge_routedN7Certificate (p : Parameters) (edge : Edge) :
   exact ⟨edgeInput_routedBoundary p edge, edgeGain_eq_n7ScatteringEntry p edge,
     edgeOutput_routedBoundary p edge⟩
 
-/-! ## B. N7-entry coefficient projection -/
-
-/-- The forward coefficient matrix formed directly from assembled N7 component entries. -/
-noncomputable def netlistProjectionMatrix (p : Parameters) : Matrix Node Node ℂ :=
-  fun output input ↦
-    ∑ edge with edgeSource edge = input ∧ edgeTarget edge = output,
-      (netlist p).scatteringTransform
-        (Outgoing.mk (edgeN7OutputChannel p edge))
-        (Incident.mk (edgeN7InputChannel p edge))
-
-/-- The 24-edge coefficient matrix is exactly its assembled-N7-entry projection. -/
-lemma coefficientMatrix_eq_netlistProjection (p : Parameters) :
-    coefficientMatrix p = netlistProjectionMatrix p := by
-  ext output input
-  rw [coefficientMatrix, Physlib.SignalFlowGraph.Multigraph.toMatrix_apply]
-  apply Finset.sum_congr rfl
-  intro edge hEdge
-  exact edgeGain_eq_n7ScatteringEntry p edge
+/-! ## B. Sparse coefficient action -/
 
 /-- The sparse action of the retained edges in printed node order. -/
 def displayedAction (p : Parameters) (state : Node → ℂ) : Node → ℂ :=
@@ -496,20 +475,6 @@ lemma coefficientMatrix_mulVec_eq_displayedAction (p : Parameters) (state : Node
   · exact coefficientMatrix_mulVec_apply_fifteen p state
   · exact coefficientMatrix_mulVec_apply_sixteen p state
   · exact coefficientMatrix_mulVec_apply_seventeen p state
-
-/-- The forward N7 relation is the node equation of the netlist-entry projection matrix. -/
-def NetlistForwardRelation (p : Parameters) (input : ℂ) (state : Node → ℂ) : Prop :=
-  Physlib.SignalFlowGraph.IsNodeSolution
-    (netlistProjectionMatrix p) (fun node ↦ if node = 0 then input else 0) state
-
-/-- The graph node equation and the assembled-N7-entry forward relation are equivalent. -/
-lemma isNodeSolution_iff_netlistForwardRelation (p : Parameters) (input : ℂ)
-    (state : Node → ℂ) :
-    Physlib.SignalFlowGraph.IsNodeSolution (signalFlowGraph p)
-        (fun node ↦ if node = 0 then input else 0) state ↔
-      NetlistForwardRelation p input state := by
-  rw [NetlistForwardRelation, signalFlowGraph_eq_coefficientMatrix,
-    coefficientMatrix_eq_netlistProjection]
 
 /-! ## C. Explicit forward equations -/
 

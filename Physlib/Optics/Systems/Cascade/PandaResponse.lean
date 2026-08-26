@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Systems.Cascade.PandaBridge
+public import Physlib.Optics.Systems.Cascade.PandaRealization
 
 /-!
 # Source-formula response of the PANDA forward graph
@@ -76,7 +76,7 @@ namespace Panda
 
 /-! ## A. Source dictionary and hypotheses -/
 
-/-- The NSV'16 PANDA symbols after collecting each printed round-trip power into one factor. -/
+/-- The NSV'16 PANDA symbols after collecting each printed field propagation factor. -/
 structure SourceParameters where
   /-- Printed main-ring round-trip factor `e^n`. -/
   mainRoundTrip : ℂ

@@ -6,7 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Network.FlatNetlistMason
-public import Physlib.Optics.Systems.Cascade.PandaResponse
+public import Physlib.Optics.Systems.Cascade.PandaResponseBridge
 
 /-!
 # Mason semantics of the PANDA N7 netlist

@@ -29,8 +29,6 @@ branch cannot pass merely by retaining valid individual edge gains.
 - `Panda.liftedOutgoing_eq_scatteringTransform`: all component scattering equations.
 - `Panda.liftedIncident_eq_incidentAssembly`: all fourteen wires and four externals.
 - `Panda.isNodeSolution_iff_exists_netlistRealization`: the relational extraction equivalence.
-- `Panda.throughTransfer_eq_responseTransform`: oriented through response equals the N5 entry.
-- `Panda.dropTransfer_eq_responseTransform`: oriented drop response equals the N5 entry.
 
 ## iii. Table of contents
 
@@ -38,7 +36,6 @@ branch cannot pass merely by retaining valid individual edge gains.
 - B. Complete zero-reverse lift
 - C. Physical routing
 - D. Projection and relational equivalence
-- E. N5 response readout
 
 ## iv. Non-claims
 
@@ -328,7 +325,8 @@ private lemma couplerPhysical_leftSecond (q : DirectionalCoupler.Parameters)
     outgoing (Outgoing.mk ⟨DirectionalCoupler.Port.leftSecond, ()⟩) =
       DirectionalCoupler.crossCoefficient q *
           incident (Incident.mk ⟨DirectionalCoupler.Port.rightFirst, ()⟩) +
-        q.throughAmplitude * incident (Incident.mk ⟨DirectionalCoupler.Port.rightSecond, ()⟩) := by
+        q.throughAmplitude *
+          incident (Incident.mk ⟨DirectionalCoupler.Port.rightSecond, ()⟩) := by
   have hRaw := (DirectionalCoupler.mem_physicalBehavior_iff q _ _).mp hPhysical
   rw [DirectionalCoupler.mem_behavior_iff,
     DirectionalCoupler.mixing_toLinearMap_apply,
@@ -358,7 +356,8 @@ private lemma couplerPhysical_rightSecond (q : DirectionalCoupler.Parameters)
     outgoing (Outgoing.mk ⟨DirectionalCoupler.Port.rightSecond, ()⟩) =
       DirectionalCoupler.crossCoefficient q *
           incident (Incident.mk ⟨DirectionalCoupler.Port.leftFirst, ()⟩) +
-        q.throughAmplitude * incident (Incident.mk ⟨DirectionalCoupler.Port.leftSecond, ()⟩) := by
+        q.throughAmplitude *
+          incident (Incident.mk ⟨DirectionalCoupler.Port.leftSecond, ()⟩) := by
   have hRaw := (DirectionalCoupler.mem_physicalBehavior_iff q _ _).mp hPhysical
   rw [DirectionalCoupler.mem_behavior_iff,
     DirectionalCoupler.mixing_toLinearMap_apply,
@@ -645,12 +644,14 @@ lemma liftedOutgoing_eq_scatteringTransform (p : Parameters) (input : ℂ)
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .input .rightFirst))
     rw [scatteringEquation_coupler_rightFirst p .input (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeThree
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeThree
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .input .rightSecond)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .input .rightSecond))
     rw [scatteringEquation_coupler_rightSecond p .input (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeFour
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeFour
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .output .leftFirst)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .output .leftFirst))
@@ -665,12 +666,14 @@ lemma liftedOutgoing_eq_scatteringTransform (p : Parameters) (input : ℂ)
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .output .rightFirst))
     rw [scatteringEquation_coupler_rightFirst p .output (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeSeven
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeSeven
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .output .rightSecond)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .output .rightSecond))
     rw [scatteringEquation_coupler_rightSecond p .output (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeEight
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeEight
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .right .leftFirst)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .right .leftFirst))
@@ -685,12 +688,14 @@ lemma liftedOutgoing_eq_scatteringTransform (p : Parameters) (input : ℂ)
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .right .rightFirst))
     rw [scatteringEquation_coupler_rightFirst p .right (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeTen
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeTen
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .right .rightSecond)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .right .rightSecond))
     rw [scatteringEquation_coupler_rightSecond p .right (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeTwelve
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeTwelve
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .left .leftFirst)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .left .leftFirst))
@@ -705,12 +710,14 @@ lemma liftedOutgoing_eq_scatteringTransform (p : Parameters) (input : ℂ)
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .left .rightFirst))
     rw [scatteringEquation_coupler_rightFirst p .left (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeFifteen
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeFifteen
   · change liftedOutgoing p state (Outgoing.mk (couplerChannel p .left .rightSecond)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (couplerChannel p .left .rightSecond))
     rw [scatteringEquation_coupler_rightSecond p .left (liftedIncident p state) _ rfl]
-    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using hForward.nodeSeventeen
+    simpa [liftedIncident, liftedOutgoing, couplerChannel, CouplerLabel.parameters] using
+      hForward.nodeSeventeen
   · change liftedOutgoing p state (Outgoing.mk (propagationChannel p .mainOne .left)) =
       (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
         (Outgoing.mk (propagationChannel p .mainOne .left))
