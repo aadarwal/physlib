@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Systems.DCDR.PolesRegression
+public import Physlib.Optics.Systems.DCDR.ResponseRegression
 public import Physlib.Optics.Systems.DCDR.ZTransformBridge
 
 /-!
@@ -475,6 +476,76 @@ lemma zRegression_stable_causalTransform_I :
   rw [show (-Complex.I) ^ 3 = Complex.I by
     norm_num [pow_succ, Complex.I_mul_I]]
   ring
+
+/-- The fixed `q = -I` N5 solve gate, expanded from the stable denominator data. -/
+lemma zRegression_stable_fixed_hasNonzeroDenominator_I :
+    (stableUnitDelayParameters.at (-Complex.I)).HasNonzeroDenominator := by
+  rw [Parameters.HasNonzeroDenominator,
+    ← stableUnitDelayParameters.eval_denominatorPolynomial,
+    stable_denominatorPolynomial_expansion]
+  norm_num [stableDenominator, Complex.I_mul_I]
+
+/-- The hand-expanded eight-node state at the nonzero-loop point `q = -I`. -/
+def zRegressionStableFixedState : Node → ℂ :=
+  ![1, (5 / 4) * Complex.I, 8 / 5, -(1 / 20) * Complex.I,
+    -1 / 20, -(61 / 40) * Complex.I, -5 / 4, -(7 / 8) * Complex.I]
+
+/-- All eight raw N5 channel equations hold for the displayed nonzero-loop state. -/
+lemma zRegression_stable_fixed_forwardEquations_I :
+    ForwardEquations (stableUnitDelayParameters.at (-Complex.I)) 1
+      zRegressionStableFixedState := by
+  refine ⟨rfl, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
+    simp [zRegressionStableFixedState, UnitDelayParameters.at,
+      stableUnitDelayParameters, poleRegressionCoupler,
+      Parameters.upperCoefficient, Parameters.lowerCoefficient,
+      Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient] <;>
+    ring
+
+/-- The complete raw N5 relation independently reads `-(7/8) I` at `q = -I`.
+
+The proof lifts the displayed eight-equation state to all component channels and uses behavior
+functionality only to identify that realization with the compiled response. It does not invoke
+an elimination, rational-response, or Mason equality.
+-/
+lemma zRegression_stable_eliminationResponse_neg_I :
+    eliminationResponse (stableUnitDelayParameters.at (-Complex.I))
+        (isWellPosed_of_hasNonzeroDenominator
+          (stableUnitDelayParameters.at (-Complex.I))
+          zRegression_stable_fixed_hasNonzeroDenominator_I) =
+      -(7 / 8) * Complex.I := by
+  let p := stableUnitDelayParameters.at (-Complex.I)
+  let hWellPosed := isWellPosed_of_hasNonzeroDenominator p
+    zRegression_stable_fixed_hasNonzeroDenominator_I
+  have hNode : Physlib.SignalFlowGraph.IsNodeSolution (signalFlowGraph p)
+      (signalInput 1) zRegressionStableFixedState :=
+    (isNodeSolution_iff_forwardEquations p 1 zRegressionStableFixedState).mpr
+      zRegression_stable_fixed_forwardEquations_I
+  rcases (isNodeSolution_iff_exists_netlistRealization p 1
+      zRegressionStableFixedState).mp hNode with
+    ⟨incident, outgoing, hScattering, hAssembly, hProjection⟩
+  let output := (netlist p).outputReadout.toLinearMap outgoing
+  have hMember : (inputAmplitude p 1, output) ∈ (netlist p).behavior := by
+    apply ((netlist p).mem_behavior_iff_equations (inputAmplitude p 1) output).mpr
+    exact ⟨incident, outgoing, hScattering, hAssembly, rfl⟩
+  have hResponseMember : (inputAmplitude p 1, output) ∈
+      ((netlist p).responseTransform hWellPosed).toBehavior := by
+    rw [(netlist p).toBehavior_responseTransform hWellPosed]
+    exact hMember
+  have hOutput :=
+    ModeTransform.mem_toBehavior_iff_toLinearMap.mp hResponseMember
+  have hReadout := congrArg
+    (fun value ⇒ value (Outgoing.mk (outputChannel p))) hProjection
+  have hOutputValue : output (Outgoing.mk (outputChannel p)) =
+      -(7 / 8) * Complex.I := by
+    rw [outputReadout_apply_output]
+    simpa [zRegressionStableFixedState, forwardState] using hReadout
+  have hResponse := responseTransform_apply_inputAmplitude p hWellPosed 1
+  calc
+    eliminationResponse p hWellPosed =
+        output (Outgoing.mk (outputChannel p)) := by
+      rw [hOutput]
+      simpa using hResponse.symm
+    _ = -(7 / 8) * Complex.I := hOutputValue
 
 /-- The raw compiled reciprocal-Z response has the same independently expanded nonreal value. -/
 lemma zRegression_stable_rawCompiled_I :
