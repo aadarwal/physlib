@@ -226,22 +226,31 @@ PR unless maintainers explicitly ask to retain it.
   `E` and `H` and normal `D` and `B`, but does not remove bound polarization charge, bulk sources,
   or material response. `PlanarMacroscopicTrace` itself is pointwise carrier data obtained honestly
   from globally defined fields. E4b now separately supplies `PlanarMacroscopicSideFields` with
-  genuine full-open-half-space traces, but the local laws remain stipulated until the thin-cell
-  integral-Maxwell bridge is proved.
+  genuine full-open-half-space traces. `PlanarThinCell` proves the local laws conditionally from
+  the literal finite integral-Maxwell predicate and its explicit reduced regularity contract; the
+  remaining gap is constructing that integral premise from differential or weak Maxwell through
+  oriented Stokes/divergence machinery.
 - [ ] Human-check E4b's one-sided-trace convention before upstreaming. `oneSidedNhds` is the comap
   of ambient neighborhoods along the open-half-space subtype inclusion, and its ambient image is
   exactly `nhdsWithin` that full half-space. The explicit normal approach is only a convergence
   corollary, not the definition. One-sided traces and even independent source-free Maxwell
   extensions on both sides do not imply an interface jump law; the regression pins that negative
-  result. No limit-integral interchange, surface-source law, or thin-cell argument is claimed yet.
+  result. `IsPlanarIntegralMacroscopicMaxwell` now states the literal sourceful finite-cell laws
+  with explicit integrability, and `HasPlanarMaxwellThinCellRegularity` states every required
+  principal, lateral, short-edge, volume-source, surface-source, and flux-rate limit. Their proved
+  consequence has the positive-minus-negative `D` jump, `n × (H_positive - H_negative)` current
+  orientation, Faraday minus sign, and Ampere--Maxwell displacement-current plus sign; the
+  affine-time regression makes both derivative signs nonzero. No theorem yet obtains the literal
+  finite-cell premise from differential or weak Maxwell equations via Stokes/divergence.
 - [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
   complex-carrier candidates are off shell and retain independent positive frequencies and complex
   wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined
   incident-plus-reflected fields, with `D` and `H` formed in the negative medium;
   `positiveTrace` is the corresponding transmitted trace in the positive medium. These are not
   half-space restrictions or analytic one-sided traces. The role words are labels only, and the
-  absence of a positive-side incoming slot does not establish one-sided illumination. The local
-  predicates stipulate rather than derive the macroscopic laws. If
+  absence of a positive-side incoming slot does not establish one-sided illumination. This module
+  treats the local predicates as supplied; `IntegralBoundary` derives them conditionally from the
+  literal integral-Maxwell premise and thin-cell regularity. If
   `reflected.electricAmplitude = 0`, its frequency and wave vector remain unconstrained dummy data,
   so every later reflected-conservation result must retain the zero-amplitude disjunction. Confirm
   that the zero-free-surface-charge joint electric consequence combines exactly tangential `E` and
