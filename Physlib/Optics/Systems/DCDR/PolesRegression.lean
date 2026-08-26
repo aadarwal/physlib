@@ -36,6 +36,7 @@ modeled here.
 - `stableResponseReduction`, `unstableResponseReduction`: explicit no-cancellation reductions.
 - `stable_rationalZEliminationResponse_one`: proof-gated stable network response at `z = 1`.
 - `unstable_rationalZEliminationResponse_one`: proof-gated active network response at `z = 1`.
+- `unstableResponseReduction_zero_mem_actualZeros`: direct active reduced zero.
 - `stableReducedResponse_isSchurStable`: direct positive stability anchor.
 - `unstableReducedResponse_two_mul_I_mem_zPoles`: explicit outside pole.
 - `unstableReducedResponse_not_isSchurStable`: direct failure of the Schur premise.
@@ -490,6 +491,12 @@ lemma unstableResponseReduction_two_mul_I_mem_actualPoles :
     (2 : ℂ) * Complex.I ∈ unstableResponseReduction.actualPoles := by
   simpa [ResponseReduction.actualPoles, unstableResponseReduction,
     unstableRationalReduction] using unstableReducedResponse_two_mul_I_mem_zPoles
+
+/-- Direct numerator substitution shows that `q = 0` is a reduced zero of the active response. -/
+lemma unstableResponseReduction_zero_mem_actualZeros :
+    0 ∈ unstableResponseReduction.actualZeros := by
+  change unstableNumerator.eval 0 = 0
+  norm_num [unstableNumerator]
 
 end
 

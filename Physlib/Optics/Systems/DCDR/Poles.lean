@@ -656,6 +656,10 @@ namespace ResponseReduction
 
 variable {p : UnitDelayParameters}
 
+/-- Zeros of the certified reduced DCDR response. -/
+def actualZeros (certificate : ResponseReduction p) : Set ℂ :=
+  certificate.reduction.reduced.zeros
+
 /-- Reciprocal-coordinate poles of the certified reduced DCDR response. -/
 def actualPoles (certificate : ResponseReduction p) : Set ℂ :=
   certificate.reduction.reduced.zPoles
