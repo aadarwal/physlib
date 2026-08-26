@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Systems.DCDR.Poles
+public import Physlib.Optics.Systems.DCDR.SourceBridge
 
 /-!
 # Exact pole and stability regressions for the double-coupler double-ring
@@ -49,7 +49,7 @@ fixture. The source's own unprinted coherent branch is the one modeled here.
 
 ## iii. Table of contents
 
-- A. Printed incoherent audit predicate
+- A. Printed incoherent boundary audit
 - B. Exact coherent parameter fixtures
 - C. Hand-expanded rational data and reductions
 - D. Stable and unstable reciprocal-Z anchors
@@ -80,24 +80,9 @@ open Polynomial
 
 /-!
 
-## A. Printed incoherent audit predicate
+## A. Printed incoherent boundary audit
 
 -/
-
-/-- The complex expression appearing in FMICS'15 Theorem 4's printed incoherent conditions. -/
-def printedIncoherentStabilityExpression
-    (G1 G2 G3 k1 k2 : ℂ) : ℂ :=
-  k1 * k2 * G1 * G2 + (1 - k1) * (1 - k2) * G2 * G3
-
-/-- The two printed incoherent stability hypotheses, including the complex square root and the
-source's necessary nonzero condition for the displayed roots to be valid poles.
-
-The source uses the non-strict bound `≤ 1`; this is not S4's strict Schur predicate.
--/
-def PrintedIncoherentStabilityConditions
-    (G1 G2 G3 k1 k2 : ℂ) : Prop :=
-  ‖Complex.sqrt (printedIncoherentStabilityExpression G1 G2 G3 k1 k2)‖ ≤ 1 ∧
-    printedIncoherentStabilityExpression G1 G2 G3 k1 k2 ≠ 0
 
 /-- The printed source predicate admits its norm-one boundary point, so its non-strict bound does
 not imply the corresponding strict square-root bound. -/
