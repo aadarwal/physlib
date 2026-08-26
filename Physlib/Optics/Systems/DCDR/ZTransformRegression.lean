@@ -64,6 +64,11 @@ noncomputable section
 open Polynomial
 open Physlib.ZTransform
 
+/-- The regression uses the same finite external-channel instance as N5 elimination. -/
+local instance zRegressionExternalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  (netlist p).eliminationExternalChannelFintype
+
 /-!
 
 ## A. Exact stable fixture and rational data
@@ -390,6 +395,18 @@ lemma zRegression_packagedScattering_entry :
         (inputChannel (zRegressionParameters.at (1 : ℂ))) = -1 := by
   exact zRegression_eliminationResponse
 
+/-- The complete two-coordinate Mason output belongs to the original external relation.
+
+Unlike a selected-entry witness, this membership retains both outgoing external coordinates.
+-/
+lemma zRegression_masonOutput_mem_behavior :
+    (inputAmplitude (zRegressionParameters.at (1 : ℂ)) 1,
+        (netlist (zRegressionParameters.at (1 : ℂ))).masonResponseTransform.toLinearMap
+          (inputAmplitude (zRegressionParameters.at (1 : ℂ)) 1)) ∈
+      (netlist (zRegressionParameters.at (1 : ℂ))).behavior := by
+  exact (mem_behavior_iff_eq_masonResponseTransform
+    (zRegressionParameters.at (1 : ℂ)) zRegression_fixed_hasNonzeroDenominator _ _).2 rfl
+
 /-- Every applicable DCDR cross-semantics view meets at the exact value `-1`.
 
 The proof uses the independent anchors above and does not invoke `zCrossSemantics_agree`.
@@ -407,17 +424,18 @@ lemma zRegression_crossSemantics :
         zRegression_wellPosed).toModeTransform
           (outputChannel (zRegressionParameters.at (1 : ℂ)))
           (inputChannel (zRegressionParameters.at (1 : ℂ))) = -1 ∧
-      HasSelectedRelationalResponse (zRegressionParameters.at (1 : ℂ)) (-1) := by
+      (inputAmplitude (zRegressionParameters.at (1 : ℂ)) 1,
+          (netlist (zRegressionParameters.at (1 : ℂ))).masonResponseTransform.toLinearMap
+            (inputAmplitude (zRegressionParameters.at (1 : ℂ)) 1)) ∈
+        (netlist (zRegressionParameters.at (1 : ℂ))).behavior := by
   refine ⟨?_, zRegression_reducedResponse_one,
     zRegression_rationalZEliminationResponse_one,
     zRegression_circulationSeries_one, zRegression_eliminationResponse,
-    zRegression_masonResponse, zRegression_packagedScattering_entry, ?_⟩
+    zRegression_masonResponse, zRegression_packagedScattering_entry,
+    zRegression_masonOutput_mem_behavior⟩
   · rw [transform_causalImpulseResponse_eq_zTransfer
       zRegression_crossSemanticsDomain.mem_zTransferROC]
     exact zRegression_zTransfer_one
-  · simpa [zRegression_zTransfer_one] using
-      zTransfer_hasSelectedRelationalResponse zRegressionParameters 1
-        zRegression_crossSemanticsDomain.hasNonzeroDenominator
 
 /-!
 
