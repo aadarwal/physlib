@@ -1326,7 +1326,7 @@ lemma responseRegression_singularEdgeGraphDet :
   apply responseRegression_singularState_ne_zero
   exact hInjective (by simpa using hKernel)
 
-/-- The determinant has the signed expansion `1 - (-1) - 2 = 0` from the two touching loops. -/
+/-- Numeric determinant expansion `1 - (-1) - 2 = 0`, consistent with the two enumerated loops. -/
 lemma responseRegression_singularEdgeGraphDet_expansion :
     edgeGraphDet (signalMultigraph responseRegressionSingularParameters) =
       1 - edgeListGain
