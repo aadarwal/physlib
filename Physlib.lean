@@ -275,6 +275,7 @@ public import Physlib.Optics.HarmonicFlux.Basic
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWave
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.GeometricAperture
+public import Physlib.Optics.HarmonicFlux.MaterialJonesMode
 public import Physlib.Optics.HarmonicFlux.MaterialWave
 public import Physlib.Optics.HarmonicFlux.MaterialWaveRegression
 public import Physlib.Optics.HarmonicFlux.ModePower

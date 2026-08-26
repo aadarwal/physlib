@@ -438,13 +438,18 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The API connects finite complex modal coordinates to zero-attenuation, transverse, dispersion-matched plane-wave carriers in one homogeneous medium at a common positive angular frequency. Coefficients scale complex carrier amplitudes before ordinary-real realization; finite synthesis remains a source-free fixed-medium Maxwell solution. The actual one-period Poynting mean is integrated over either the abstract measured profile or a measurable planar GeometricAperture carrying restricted normalized two-dimensional Hausdorff measure. Under explicit pairwise integrability, mutual flux orthogonality, unit normalization, and incident/outgoing role hypotheses, the resulting signed actual integrated flux equals ModeAmplitude.power on the supplied finite synthesis image. Exact singleton regressions pin electric versus magnetic-field-strength phasors, complex coefficient phase, arbitrary period start, Maxwell preservation, and power twenty-five. No modal completeness, raw-Jones coercion, interface boundary, omitted-channel, evanescent-power, reciprocity, or device-losslessness claim is made."
+  - description: "The API connects finite complex modal coordinates to zero-attenuation, transverse, dispersion-matched plane-wave carriers in one homogeneous medium at a common positive angular frequency. Coefficients scale complex carrier amplitudes before ordinary-real realization; finite synthesis remains a source-free fixed-medium Maxwell solution. An explicit singleton material-Jones bridge proves that scaling a modal coordinate and scaling the framed Jones data give exactly the same complete complex carrier, without introducing a coercion or claiming flux normalization. The actual one-period Poynting mean is integrated over either the abstract measured profile or a measurable planar GeometricAperture carrying restricted normalized two-dimensional Hausdorff measure. Under explicit pairwise integrability, mutual flux orthogonality, unit normalization, and incident/outgoing role hypotheses, the resulting signed actual integrated flux equals ModeAmplitude.power on the supplied finite synthesis image. Exact singleton regressions pin electric versus magnetic-field-strength phasors, complex coefficient phase, arbitrary period start, Maxwell preservation, and power twenty-five. No modal completeness, raw-Jones coercion, interface boundary, omitted-channel, evanescent-power, reciprocity, or device-losslessness claim is made."
     done: true
     location: >-
       Physlib/Electromagnetism/ThreeDimension/MonochromaticPlaneWave/ComplexAmplitude.lean
       (Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave.scaleElectricAmplitude,
       Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave.scaleElectricAmplitude_magneticAmplitude,
       Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave.isMacroscopicMaxwellSolution_scaleElectricAmplitude);
+      Physlib/Optics/HarmonicFlux/MaterialJonesMode.lean
+      (Optics.MaterialJonesMode.family,
+      Optics.MaterialJonesMode.amplitude,
+      Optics.MaterialJonesMode.amplitude_power,
+      Optics.MaterialJonesMode.scaledWave_eq);
       Physlib/Optics/HarmonicFlux/PropagatingMode.lean
       (Optics.PropagatingHarmonicModeFamily,
       Optics.PropagatingHarmonicModeFamily.modeProfile,
