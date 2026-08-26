@@ -17,11 +17,11 @@ An asymmetric zero-feedback fixture obtains the N5 response from the complete ne
 It opens `toBehavior_responseTransform`, extracts the raw scattering and routing witnesses, and
 solves the eight projected equations in order. It never uses `eliminationResponse_eq_transfer`.
 
-The Mason side retains all eleven edge identities. Its denominator audit works directly on
-`edgeChoices`: every nonempty loop refinement contains the feedback edge, whose fixture gain is
-zero. Its numerator audit filters the executable forward-path enumeration to the four paths
-supported by those eleven edges and multiplies their edge lists directly. Neither audit uses
-`masonGain_eq_gain`, `edgeMasonGain_eq_gain`, or an elimination-response theorem.
+The Mason side retains all eleven edge identities. The positive response fixture has zero
+feedback, and its numerator audit filters the executable forward-path enumeration to the four
+supported paths. A second fixture has nonzero feedback: it lists the two touching cycles, their
+exact edge refinements, their unequal nonzero gains, and the signed determinant expansion. No
+anchor uses `masonGain_eq_gain`, `edgeMasonGain_eq_gain`, or an elimination-response theorem.
 
 A negative-control multigraph swaps the two first-coupler launch edges, matching the rewiring in
 `topologySwappedNetlist`. Its independently enumerated Mason response is unequal to the N5
@@ -39,6 +39,8 @@ Poynting-normalization bridge.
 - `DCDR.responseRegression_edgeMasonNumerator`: eleven-edge enumeration gives its numerator.
 - `DCDR.responseRegression_s06`: the two independently computed responses agree.
 - `DCDR.responseRegression_swappedEdge_fails_s06`: a launch-edge swap breaks that agreement.
+- `DCDR.responseRegression_singularEdgeGraphDet`: two touching loops annihilate the determinant.
+- `DCDR.responseRegression_singular_not_isWellPosed`: a raw homogeneous N5 state is nonunique.
 
 ## iii. Table of contents
 
@@ -46,6 +48,7 @@ Poynting-normalization bridge.
 - B. Direct loop-refinement audit
 - C. Direct forward-path audit
 - D. Miswired-edge negative control
+- E. Nonzero-feedback loop and singularity audit
 
 ## iv. References
 
@@ -996,6 +999,395 @@ lemma responseRegression_swappedEdge_fails_s06 :
   intro hEqual
   have hReal := congrArg Complex.re hEqual
   norm_num at hReal
+
+/-! ## E. Nonzero-feedback loop and singularity audit -/
+
+/-- An asymmetric nonzero-feedback fixture whose two touching loop gains sum to one. -/
+def responseRegressionSingularParameters : Parameters where
+  firstCoupler :=
+    { throughAmplitude := 1
+      crossAmplitude := 1 }
+  secondCoupler :=
+    { throughAmplitude := 1
+      crossAmplitude := 1 }
+  upperPath :=
+    { amplitudeTransmission := 1
+      carrierPathPhase := 0 }
+  lowerPath :=
+    { amplitudeTransmission := 2
+      carrierPathPhase := 0 }
+  feedbackPath :=
+    { amplitudeTransmission := 1
+      carrierPathPhase := 0 }
+
+/-- The nonzero-feedback fixture's eleven edge gains in source order. -/
+lemma responseRegression_singularEdgeGains :
+    edgeGain responseRegressionSingularParameters =
+      ![1, 1, 1, -Complex.I, 2, -Complex.I, -Complex.I, 1, -Complex.I, 1, 1] := by
+  funext edge
+  fin_cases edge <;>
+    simp [edgeGain, responseRegressionSingularParameters,
+      Parameters.upperCoefficient, Parameters.lowerCoefficient,
+      Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient,
+      MatchedPropagation.transmissionCoefficient,
+      MatchedPropagation.carrierPhaseFactor]
+
+/-- The upper touching loop has node cycle `1 → 2 → 5 → 6 → 1`. -/
+def responseRegressionUpperLoop : List Node := [1, 2, 5, 6, 1]
+
+/-- The lower touching loop has node cycle `1 → 3 → 4 → 6 → 1`. -/
+def responseRegressionLowerLoop : List Node := [1, 3, 4, 6, 1]
+
+/-- Supported simple paths from the feedback target back to its source. -/
+def responseRegressionSingularLoopStems : Finset (List Node) :=
+  (forwardPaths 1 6).filter fun path =>
+    (refiningEdgeLists (signalMultigraph responseRegressionSingularParameters) path).Nonempty
+
+/-- Adjacency in the nonzero-feedback fixture, independent of its gains. -/
+def responseRegressionSingularAdjacent (first second : Node) : Prop :=
+  ((signalMultigraph responseRegressionSingularParameters).edgesBetween first second).Nonempty
+
+/-- Singular-fixture refinement nonemptiness is consecutive retained-edge adjacency. -/
+lemma responseRegression_singularRefiningEdgeLists_nonempty_iff_isChain (path : List Node) :
+    (refiningEdgeLists (signalMultigraph responseRegressionSingularParameters) path).Nonempty ↔
+      path.IsChain responseRegressionSingularAdjacent := by
+  induction path with
+  | nil => simp [refiningEdgeLists]
+  | cons first rest ih =>
+      cases rest with
+      | nil => simp [refiningEdgeLists]
+      | cons second tail =>
+          constructor
+          · rintro ⟨edgeList, hEdgeList⟩
+            rw [refiningEdgeLists] at hEdgeList
+            rcases Finset.mem_biUnion.mp hEdgeList with ⟨edge, hEdge, hImage⟩
+            rcases Finset.mem_image.mp hImage with ⟨tailList, hTailList, rfl⟩
+            exact List.IsChain.cons_cons ⟨edge, hEdge⟩
+              (ih.mp ⟨tailList, hTailList⟩)
+          · intro hChain
+            obtain ⟨edge, hEdge⟩ := hChain.rel
+            obtain ⟨tailList, hTailList⟩ := ih.mpr hChain.tail
+            refine ⟨edge :: tailList, ?_⟩
+            rw [refiningEdgeLists]
+            exact Finset.mem_biUnion.mpr ⟨edge, hEdge,
+              Finset.mem_image.mpr ⟨tailList, hTailList, rfl⟩⟩
+
+/-- Singular node one has successors two and three. -/
+lemma responseRegression_singularAdjacent_one (next : Node) :
+    responseRegressionSingularAdjacent 1 next ↔ next = 2 ∨ next = 3 := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- Singular node two has only successor five. -/
+lemma responseRegression_singularAdjacent_two (next : Node) :
+    responseRegressionSingularAdjacent 2 next ↔ next = 5 := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- Singular node three has only successor four. -/
+lemma responseRegression_singularAdjacent_three (next : Node) :
+    responseRegressionSingularAdjacent 3 next ↔ next = 4 := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- Singular node four has successors six and seven. -/
+lemma responseRegression_singularAdjacent_four (next : Node) :
+    responseRegressionSingularAdjacent 4 next ↔ next = 6 ∨ next = 7 := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- Singular node five has successors six and seven. -/
+lemma responseRegression_singularAdjacent_five (next : Node) :
+    responseRegressionSingularAdjacent 5 next ↔ next = 6 ∨ next = 7 := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- Singular node six has only feedback successor one. -/
+lemma responseRegression_singularAdjacent_six (next : Node) :
+    responseRegressionSingularAdjacent 6 next ↔ next = 1 := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- Singular output node seven has no successor. -/
+lemma responseRegression_singularNotAdjacent_seven (next : Node) :
+    ¬responseRegressionSingularAdjacent 7 next := by
+  fin_cases next <;> unfold responseRegressionSingularAdjacent <;> decide
+
+/-- A singular-fixture chain reaching output node seven ends there. -/
+lemma responseRegression_singularChain_from_seven_eq_singleton {rest : List Node}
+    (hChain : (7 :: rest).IsChain responseRegressionSingularAdjacent) : rest = [] := by
+  cases rest with
+  | nil => rfl
+  | cons next tail =>
+      exact absurd hChain.rel (responseRegression_singularNotAdjacent_seven next)
+
+/-- Every supported simple feedback-return stem is one of the two displayed stems. -/
+lemma responseRegression_singularLoopStem_cases {path : List Node}
+    (hPath : path ∈ forwardPaths (1 : Node) 6)
+    (hRefinement :
+      (refiningEdgeLists (signalMultigraph responseRegressionSingularParameters)
+        path).Nonempty) :
+    path = [1, 2, 5, 6] ∨ path = [1, 3, 4, 6] := by
+  obtain ⟨hNodup, hHead, hLast⟩ := mem_forwardPaths_iff.mp hPath
+  have hChain :=
+    (responseRegression_singularRefiningEdgeLists_nonempty_iff_isChain path).mp hRefinement
+  rcases path with _ | ⟨first, rest⟩
+  · simp at hHead
+  have hFirst : first = 1 := by simpa using hHead
+  subst first
+  rcases rest with _ | ⟨second, rest⟩
+  · simp at hLast
+  rcases (responseRegression_singularAdjacent_one second).mp hChain.rel with rfl | rfl
+  · rcases rest with _ | ⟨third, rest⟩
+    · simp at hLast
+    have hThird := (responseRegression_singularAdjacent_two third).mp hChain.tail.rel
+    subst third
+    rcases rest with _ | ⟨fourth, rest⟩
+    · simp at hLast
+    rcases (responseRegression_singularAdjacent_five fourth).mp
+      hChain.tail.tail.rel with rfl | rfl
+    · rcases rest with _ | ⟨fifth, tail⟩
+      · exact Or.inl rfl
+      have hFifth := (responseRegression_singularAdjacent_six fifth).mp
+        hChain.tail.tail.tail.rel
+      subst fifth
+      simp at hNodup
+    · have hRest := responseRegression_singularChain_from_seven_eq_singleton
+        hChain.tail.tail.tail
+      subst rest
+      simp at hLast
+  · rcases rest with _ | ⟨third, rest⟩
+    · simp at hLast
+    have hThird := (responseRegression_singularAdjacent_three third).mp hChain.tail.rel
+    subst third
+    rcases rest with _ | ⟨fourth, rest⟩
+    · simp at hLast
+    rcases (responseRegression_singularAdjacent_four fourth).mp
+      hChain.tail.tail.rel with rfl | rfl
+    · rcases rest with _ | ⟨fifth, tail⟩
+      · exact Or.inr rfl
+      have hFifth := (responseRegression_singularAdjacent_six fifth).mp
+        hChain.tail.tail.tail.rel
+      subst fifth
+      simp at hNodup
+    · have hRest := responseRegression_singularChain_from_seven_eq_singleton
+        hChain.tail.tail.tail
+      subst rest
+      simp at hLast
+
+/-- Exactly two simple loop stems can close through feedback edge seven. -/
+lemma responseRegression_singularLoopStems :
+    responseRegressionSingularLoopStems = {[1, 2, 5, 6], [1, 3, 4, 6]} := by
+  ext path
+  simp only [responseRegressionSingularLoopStems, Finset.mem_filter]
+  constructor
+  · rintro ⟨hPath, hRefinement⟩
+    rcases responseRegression_singularLoopStem_cases hPath hRefinement with rfl | rfl <;>
+      simp
+  · intro hPath
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hPath
+    rcases hPath with rfl | rfl
+    all_goals
+      constructor
+      · apply mem_forwardPaths_iff.mpr
+        decide
+      · decide
+
+/-- Every nonempty singular-fixture loop refinement contains feedback edge seven. -/
+lemma responseRegression_singularEdgeChoice_contains_feedbackEdge
+    {nodes : Finset Node} {permutation : Equiv.Perm Node}
+    {choice : ∀ node ∈ nodes, Edge} (hNodes : nodes.Nonempty)
+    (hPermutation : permutation ∈ loopFamilies nodes)
+    (hChoice : choice ∈ edgeChoices
+      (signalMultigraph responseRegressionSingularParameters) nodes permutation) :
+    ∃ node, ∃ hNode : node ∈ nodes, choice node hNode = 7 := by
+  by_contra hMissing
+  push Not at hMissing
+  obtain ⟨node, hNode, hMax⟩ :=
+    Finset.exists_max_image nodes responseRegressionNodeRank hNodes
+  have hPermutationNode : permutation node ∈ nodes := by
+    by_cases hSupport : node ∈ permutation.support
+    · exact (mem_loopFamilies.mp hPermutation)
+        (Equiv.Perm.apply_mem_support.mpr hSupport)
+    · rw [Equiv.Perm.notMem_support.mp hSupport]
+      exact hNode
+  have hSelected := Finset.mem_pi.mp hChoice node hNode
+  have hEndpoints : edgeSource (choice node hNode) = node ∧
+      edgeTarget (choice node hNode) = permutation node := by
+    simpa [signalMultigraph] using hSelected
+  have hRank := responseRegressionNodeRank_lt (choice node hNode)
+    (hMissing node hNode)
+  rw [hEndpoints.1, hEndpoints.2] at hRank
+  exact (Nat.not_lt_of_ge (hMax (permutation node) hPermutationNode)) hRank
+
+/-- The upper loop is refined by exactly edges eight, one, six, and seven. -/
+lemma responseRegression_singularUpperLoopEdges :
+    refiningEdgeLists (signalMultigraph responseRegressionSingularParameters)
+        responseRegressionUpperLoop =
+      {[8, 1, 6, 7]} := by
+  decide
+
+/-- The lower loop is refined by exactly edges nine, four, ten, and seven. -/
+lemma responseRegression_singularLowerLoopEdges :
+    refiningEdgeLists (signalMultigraph responseRegressionSingularParameters)
+        responseRegressionLowerLoop =
+      {[9, 4, 10, 7]} := by
+  decide
+
+/-- The two loop node sets intersect exactly at nodes one and six. -/
+lemma responseRegression_singularLoops_touch :
+    responseRegressionUpperLoop.toFinset ∩ responseRegressionLowerLoop.toFinset = {1, 6} := by
+  decide
+
+/-- The upper loop's nonzero edge gain is `-1`. -/
+lemma responseRegression_singularUpperLoopGain :
+    edgeListGain (signalMultigraph responseRegressionSingularParameters) [8, 1, 6, 7] =
+      -1 := by
+  simp [edgeListGain, signalMultigraph, responseRegression_singularEdgeGains]
+
+/-- The lower loop's nonzero edge gain is `2`. -/
+lemma responseRegression_singularLowerLoopGain :
+    edgeListGain (signalMultigraph responseRegressionSingularParameters) [9, 4, 10, 7] =
+      2 := by
+  simp [edgeListGain, signalMultigraph, responseRegression_singularEdgeGains]
+
+/-- The two nonzero loop gains sum to the raw N5 feedback-loop coefficient. -/
+lemma responseRegression_singularLoopSum_eq_loopGain :
+    edgeListGain (signalMultigraph responseRegressionSingularParameters) [8, 1, 6, 7] +
+        edgeListGain (signalMultigraph responseRegressionSingularParameters) [9, 4, 10, 7] =
+      responseRegressionSingularParameters.loopGain := by
+  rw [responseRegression_singularUpperLoopGain,
+    responseRegression_singularLowerLoopGain]
+  norm_num [Parameters.loopGain, responseRegressionSingularParameters,
+    Parameters.upperCoefficient, Parameters.lowerCoefficient,
+    Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient,
+    MatchedPropagation.transmissionCoefficient,
+    MatchedPropagation.carrierPhaseFactor, Complex.I_sq]
+
+/-- The nonzero-feedback fixture has a zero raw N5 scalar denominator. -/
+lemma responseRegression_singularDenominator :
+    responseRegressionSingularParameters.denominator = 0 := by
+  norm_num [Parameters.denominator, Parameters.loopGain,
+    responseRegressionSingularParameters, Parameters.upperCoefficient,
+    Parameters.lowerCoefficient, Parameters.feedbackCoefficient,
+    DirectionalCoupler.crossCoefficient, MatchedPropagation.transmissionCoefficient,
+    MatchedPropagation.carrierPhaseFactor, Complex.I_sq]
+
+/-- A hand-written nonzero homogeneous state at the singular parameter point. -/
+def responseRegressionSingularState : Node → ℂ :=
+  ![0, 1, -Complex.I, 1, 2, -Complex.I, 1, -3 * Complex.I]
+
+/-- The hand-written singular state satisfies all eight homogeneous forward equations. -/
+lemma responseRegression_singularForwardEquations :
+    ForwardEquations responseRegressionSingularParameters 0
+      responseRegressionSingularState := by
+  refine ⟨rfl, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
+    simp [responseRegressionSingularState, responseRegressionSingularParameters,
+      Parameters.upperCoefficient, Parameters.lowerCoefficient,
+      Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient,
+      MatchedPropagation.transmissionCoefficient,
+      MatchedPropagation.carrierPhaseFactor] <;>
+    ring
+
+/-- The displayed homogeneous state is nonzero at node one. -/
+lemma responseRegression_singularState_ne_zero : responseRegressionSingularState ≠ 0 := by
+  intro hZero
+  have hCoordinate := congrFun hZero (1 : Node)
+  norm_num [responseRegressionSingularState] at hCoordinate
+
+/-- The displayed homogeneous state solves the certified eight-node graph equation. -/
+lemma responseRegression_singularIsNodeSolution :
+    IsNodeSolution (signalFlowGraph responseRegressionSingularParameters)
+      (signalInput 0) responseRegressionSingularState :=
+  (isNodeSolution_iff_forwardEquations responseRegressionSingularParameters 0
+    responseRegressionSingularState).mpr responseRegression_singularForwardEquations
+
+/-- The signed edge determinant vanishes at the nonzero-feedback singular fixture.
+
+The proof uses the displayed nonzero kernel vector and `edgeGraphDet_eq_det`, stated at
+`Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean:132-137`. It does not use either DCDR
+determinant/well-posedness iff.
+-/
+lemma responseRegression_singularEdgeGraphDet :
+    edgeGraphDet (signalMultigraph responseRegressionSingularParameters) = 0 := by
+  rw [edgeGraphDet_eq_det]
+  have hKernel :
+      (systemMatrix (signalMultigraph responseRegressionSingularParameters).toMatrix).mulVec
+          responseRegressionSingularState = 0 := by
+    have hNode := responseRegression_singularIsNodeSolution
+    rw [isNodeSolution_iff] at hNode
+    have hInput : signalInput (0 : ℂ) = 0 := by
+      funext node
+      fin_cases node <;> simp [signalInput]
+    rw [hInput] at hNode
+    simpa [signalFlowGraph, coefficientMatrix,
+      Physlib.SignalFlowGraph.ofCoefficientMatrix] using hNode
+  by_contra hDeterminant
+  have hInjective : Function.Injective
+      (systemMatrix
+        (signalMultigraph responseRegressionSingularParameters).toMatrix).mulVec := by
+    rw [Matrix.mulVec_injective_iff_isUnit, Matrix.isUnit_iff_isUnit_det,
+      isUnit_iff_ne_zero]
+    exact hDeterminant
+  apply responseRegression_singularState_ne_zero
+  exact hInjective (by simpa using hKernel)
+
+/-- The determinant has the signed expansion `1 - (-1) - 2 = 0` from the two touching loops. -/
+lemma responseRegression_singularEdgeGraphDet_expansion :
+    edgeGraphDet (signalMultigraph responseRegressionSingularParameters) =
+      1 - edgeListGain
+          (signalMultigraph responseRegressionSingularParameters) [8, 1, 6, 7] -
+        edgeListGain
+          (signalMultigraph responseRegressionSingularParameters) [9, 4, 10, 7] := by
+  rw [responseRegression_singularEdgeGraphDet,
+    responseRegression_singularUpperLoopGain,
+    responseRegression_singularLowerLoopGain]
+  norm_num
+
+/-- The concrete graph solution lifts to a nonzero raw homogeneous complete N5 realization. -/
+lemma responseRegression_singular_exists_raw_n5_state :
+    ∃ incident outgoing,
+      outgoing =
+        (netlist responseRegressionSingularParameters).scatteringTransform.toLinearMap incident ∧
+      incident =
+        (netlist responseRegressionSingularParameters).connections.incidentAssembly outgoing
+          (inputAmplitude responseRegressionSingularParameters 0) ∧
+      forwardState responseRegressionSingularParameters incident outgoing =
+        responseRegressionSingularState ∧
+      incident ≠ 0 := by
+  obtain ⟨incident, outgoing, hScattering, hAssembly, hProjection⟩ :=
+    (isNodeSolution_iff_exists_netlistRealization
+      responseRegressionSingularParameters 0 responseRegressionSingularState).mp
+        responseRegression_singularIsNodeSolution
+  refine ⟨incident, outgoing, hScattering, hAssembly, hProjection, ?_⟩
+  intro hIncident
+  have hOutgoing : outgoing = 0 := by
+    rw [hScattering, hIncident]
+    simp
+  apply responseRegression_singularState_ne_zero
+  rw [← hProjection, hIncident, hOutgoing]
+  funext node
+  fin_cases node <;> rfl
+
+/-- The concrete raw homogeneous N5 state disproves well-posedness without a production gate iff. -/
+lemma responseRegression_singular_not_isWellPosed :
+    ¬(netlist responseRegressionSingularParameters).IsWellPosed := by
+  rintro hWellPosed
+  obtain ⟨incident, outgoing, hScattering, hAssembly, _, hIncidentNonzero⟩ :=
+    responseRegression_singular_exists_raw_n5_state
+  have hInputZero : inputAmplitude responseRegressionSingularParameters 0 = 0 := by
+    ext endpoint
+    simp [inputAmplitude]
+  have hNonzeroSolution :
+      (0, incident.directSum outgoing) ∈
+        (netlist responseRegressionSingularParameters).solutionBehavior := by
+    apply ((netlist responseRegressionSingularParameters).mem_solutionBehavior_directSum_iff
+      0 incident outgoing).mpr
+    constructor
+    · exact ((netlist responseRegressionSingularParameters).mem_componentBehavior_iff
+        incident outgoing).mpr hScattering
+    · simpa [hInputZero] using hAssembly
+  have hZeroSolution :
+      (0, (0 : ModeAmplitude
+        (netlist responseRegressionSingularParameters).SolutionIndex)) ∈
+          (netlist responseRegressionSingularParameters).solutionBehavior :=
+    (netlist responseRegressionSingularParameters).solutionBehavior.zero_mem
+  have hStateZero := hWellPosed.2 hNonzeroSolution hZeroSolution
+  exact hIncidentNonzero (congrArg ModeAmplitude.restrictInl hStateZero)
 
 end DCDR
 
