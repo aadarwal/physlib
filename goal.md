@@ -2212,8 +2212,15 @@ time-domain delay, dispersion, polarization, reciprocity, or material model.
   kernel witness for the converse;
 - [x] prove the multiple-round-trip geometric series only under `‖t * gamma‖ < 1` and identify
   it with the algebraic-elimination response where both views apply;
+- [x] identify the exhaustive two-channel bus boundary, derive both directional response laws,
+  and prove that the singular-safe relabeled behavior equals an independently stated
+  reflectionless two-port law on the exact solve gate;
 - [x] construct the two-bus add-drop ring as an explicit feedback network; and
 - [x] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
+
+For the all-pass ring, the input-side and through-side bus channels exhaust the external boundary.
+The independently derived reverse response completes a typed left/right scattering law without
+assuming reciprocity; the matrix realization is functional only on the existing solve gate.
 
 The add-drop implementation is a four-port `FlatNetlist` made from two directional couplers and
 two fixed-carrier half arcs. Its complete-state well-posedness is equivalent to
@@ -2349,8 +2356,9 @@ this generic theorem. The all-pass ring now supplies the first system instance: 
 Mason response, and an independently defined two-node circulation model has determinant
 `1 - t * gamma` and reconstructs the same through response. No reduction from the complete graph
 is claimed. Direct path/loop enumeration and raw channel elimination meet independently at the
-exact `1 / 7` fixture. The chain and causal Z-transform legs remain separate gates, so X-01 is not
-yet complete.
+exact `1 / 7` fixture. Its exhaustive bus boundary and complete reflectionless typed scattering
+law are also identified on the same solve gate. The chain and causal Z-transform legs remain
+separate gates, so X-01 is not yet complete.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop

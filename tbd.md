@@ -1651,6 +1651,18 @@ PR unless maintainers explicitly ask to retain it.
   the internal Mason gain, and the reduced determinant is not confused with the complete
   bidirectional `C * S` determinant. This slice makes no chain, delay, causality, ROC, passivity,
   reciprocity, or complete X-01 claim.
+- [x] Identify the complete all-pass bus boundary and its typed scattering law. The input-side
+  `leftFirst` channel is the left summand and the through-side `rightFirst` channel is the right
+  summand; all other component channels are internal. The two directional responses are derived
+  separately from the raw component and routing equations, then the singular-safe relabeled
+  `FlatNetlist.behavior` is identified with an independently specified reflectionless two-port law
+  under exactly `Parameters.HasNonzeroDenominator`.
+- [ ] Human-check the all-pass typed two-port boundary before upstreaming. Confirm the external
+  channel exhaustiveness proof, the left/right endpoint order, the independent right-to-left loop
+  solve, and all four response entries. Equality of the two directional coefficients is a choice
+  of the selected bidirectional component models, not a reciprocity or physical time-reversal
+  theorem. This slice makes no chain-pivot, passivity, losslessness, delay, causality, ROC,
+  frequency, material, or complete X-01 claim.
 - [ ] Add one transport operation for a `PortConnectionFamily` along an equivalence of port
   families. This is the shared missing machinery behind both N5H inner-family replacement by an
   equal boundary relation and literal three-stage append associativity; treat it as one gap, not
