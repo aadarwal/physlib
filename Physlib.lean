@@ -492,6 +492,10 @@ public import Physlib.Optics.Systems.Cascade.TerminationRegression
 public import Physlib.Optics.Systems.DCDR.Bridge
 public import Physlib.Optics.Systems.DCDR.Graph
 public import Physlib.Optics.Systems.DCDR.Mason
+public import Physlib.Optics.Systems.DCDR.MultipleDelay
+public import Physlib.Optics.Systems.DCDR.MultipleDelayPolynomial
+public import Physlib.Optics.Systems.DCDR.MultipleDelayRegression
+public import Physlib.Optics.Systems.DCDR.MultipleDelaySource
 public import Physlib.Optics.Systems.DCDR.Netlist
 public import Physlib.Optics.Systems.DCDR.Observables
 public import Physlib.Optics.Systems.DCDR.ObservablesRegression
