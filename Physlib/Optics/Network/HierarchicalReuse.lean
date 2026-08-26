@@ -415,7 +415,8 @@ lemma replaceInnerFamily
     _ = _ := by
       convert replacementExternal_reindex
         inner replacement boundary outer
-        (outer.closeBehavior (inner.innerBoundaryBehavior behavior)) using 1 <;> rfl
+        (outer.closeBehavior (inner.innerBoundaryBehavior behavior)) using 1
+      all_goals rfl
 
 end PortConnectionFamily
 
