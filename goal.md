@@ -1568,9 +1568,9 @@ semantics for evanescent or absorptive channels.
   expose the appropriate predicate.
 
 This initial exact-wave slice uses pointwise restrictions of globally defined fields. It does not
-construct half-space-supported fields or analytic one-sided traces, establish genuine one-sided
-illumination, or package on-shellness; those require later propagation-role and branch hypotheses
-and E4b's analytic derivation.
+itself construct half-space-supported fields or analytic one-sided traces, establish genuine
+one-sided illumination, or package on-shellness. E4b now supplies the general full-half-space trace
+foundation; propagation roles and branches remain separate later hypotheses.
 
 Exit: the primitive independent-frequency ordinary-real pointwise boundary-data problem is stated
 honestly from explicit local laws, at the same abstraction level as the audited HOL interface work.
@@ -1579,10 +1579,12 @@ honestly from explicit local laws, at the same abstraction level as the audited 
 
 Owner: SpaceAndTime and Electromagnetism.
 
-- local domains, oriented surfaces, traces or restrictions, and the required regularity API;
-- integral curl and divergence laws with orientation and boundary hypotheses;
-- integral Maxwell equations with volume and surface sources; and
-- derivation that E4a's tangential and normal boundary predicates hold under the corresponding
+- [x] local open-half-space domains, genuine one-sided traces, and the continuous-restriction
+  constructor;
+- [ ] the thin-cell regularity and limit-interchange hypotheses needed beyond pointwise traces;
+- [ ] integral curl and divergence laws with orientation and boundary hypotheses;
+- [ ] integral Maxwell equations with volume and surface sources; and
+- [ ] derivation that E4a's tangential and normal boundary predicates hold under the corresponding
   thin-loop and pillbox limits.
 
 Exit: the local laws used by E5a/E5b/E6 become physical theorems from Maxwell equations. Physical
@@ -2769,8 +2771,8 @@ current integration base; a designed package whose prerequisite is merely active
 | E3s cross-product divergence | done | Space derivative API | pointwise and function-level real three-dimensional div-cross identity under first differentiability |
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
 | E3b Optics normalization | complete on finite synthesis image | O1, P1a, E2, E3a | common-positive-frequency propagating Maxwell families, finite complex synthesis, actual one-period integrated Poynting flux, restricted two-dimensional Hausdorff aperture area, and signed modal-power identification are complete; no modal completeness claim |
-| E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; analytic half-space traces and Maxwell derivation remain E4b, while genuine propagation roles remain E5b |
-| E4b derived boundary laws | blocked | E4a, oriented surfaces/integral Maxwell | Maxwell-to-local-boundary theorem |
+| E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; genuine propagation roles remain E5b |
+| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces and the sidewise-Maxwell non-implication regression are complete; thin-cell regularity, integral laws, and the Maxwell-to-local-boundary theorem remain |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection, angular reflection, the guarded phase-vector law of the plane of incidence, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |

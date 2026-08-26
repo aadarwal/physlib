@@ -55,6 +55,12 @@ negates its normal component, and preserves the angle when the reference side is
 - `OrientedAffineHyperplane.exists_tangent_vadd_eq_of_mem_carrier`: every carrier point is a
   tangential displacement of the stored point.
 - `OrientedAffineHyperplane.signedNormalCoordinate_sideRay`: exact side-normal parameterization.
+- `OrientedAffineHyperplane.sideApproach`: a point in a selected open half-space whose normal
+  distance tends to zero along `atTop`.
+- `OrientedAffineHyperplane.tendsto_sideApproachPoint_atTop`: the selected-side approach converges
+  to its boundary point.
+- `OrientedAffineHyperplane.mem_closure_openHalfSpace_of_mem_carrier`: every carrier point is in
+  the closure of either open half-space.
 - `OrientedAffineHyperplane.sin_angleToSide_mul_norm`: the tangential norm is the vector norm
   multiplied by the sine of its side-relative angle.
 - `OrientedAffineHyperplane.angleToSide_eq_pi_div_two_iff_normalComponent_eq_zero`: a vector is
@@ -346,6 +352,66 @@ lemma sideRay_mem_openHalfSpace (plane : OrientedAffineHyperplane d)
   calc
     0 < side.sign ^ 2 * u := by rw [side.sign_sq, one_mul]; exact hu
     _ = side.sign * (side.sign * u) := by ring
+
+/-- The ambient point obtained by approaching a carrier point from one selected side.
+
+The parameter is logarithmic: its normal distance from the plane is `exp (-u)`, so increasing
+`u` approaches the carrier while every finite parameter remains strictly inside the open
+half-space. -/
+def sideApproachPoint (plane : OrientedAffineHyperplane d) (side : Side)
+    (x : plane.carrier) (u : ℝ) : Space d :=
+  Real.exp (-u) • plane.sideNormalVector side +ᵥ (x : Space d)
+
+/-- The signed normal coordinate of a selected-side approach point. -/
+lemma signedNormalCoordinate_sideApproachPoint (plane : OrientedAffineHyperplane d)
+    (side : Side) (x : plane.carrier) (u : ℝ) :
+    plane.signedNormalCoordinate (plane.sideApproachPoint side x u) =
+      side.sign * Real.exp (-u) := by
+  rw [sideApproachPoint, plane.signedNormalCoordinate_vadd,
+    (plane.mem_carrier (x : Space d)).mp x.property, add_zero,
+    normalComponent, inner_smul_right]
+  change Real.exp (-u) * plane.normalComponent (plane.sideNormalVector side) = _
+  rw [plane.normalComponent_sideNormalVector]
+  ring
+
+/-- A selected-side approach point belongs to that open half-space. -/
+lemma sideApproachPoint_mem_openHalfSpace (plane : OrientedAffineHyperplane d)
+    (side : Side) (x : plane.carrier) (u : ℝ) :
+    plane.sideApproachPoint side x u ∈ plane.openHalfSpace side := by
+  change 0 < side.sign * plane.signedNormalCoordinate (plane.sideApproachPoint side x u)
+  rw [plane.signedNormalCoordinate_sideApproachPoint]
+  nlinarith [side.sign_sq, Real.exp_pos (-u)]
+
+/-- A selected-side approach point bundled in the corresponding open half-space. -/
+def sideApproach (plane : OrientedAffineHyperplane d) (side : Side)
+    (x : plane.carrier) (u : ℝ) : plane.openHalfSpace side :=
+  ⟨plane.sideApproachPoint side x u, plane.sideApproachPoint_mem_openHalfSpace side x u⟩
+
+/-- Forgetting the half-space membership of a selected-side approach recovers its ambient point. -/
+@[simp]
+lemma sideApproach_val (plane : OrientedAffineHyperplane d) (side : Side)
+    (x : plane.carrier) (u : ℝ) :
+    (plane.sideApproach side x u : Space d) = plane.sideApproachPoint side x u := rfl
+
+/-- The logarithmically parameterized selected-side approach converges to its boundary point. -/
+lemma tendsto_sideApproachPoint_atTop (plane : OrientedAffineHyperplane d)
+    (side : Side) (x : plane.carrier) :
+    Filter.Tendsto (plane.sideApproachPoint side x) Filter.atTop
+      (nhds (x : Space d)) := by
+  have hRadius : Filter.Tendsto (fun u : ℝ => Real.exp (-u)) Filter.atTop (nhds 0) :=
+    Real.tendsto_exp_neg_atTop_nhds_zero
+  change Filter.Tendsto
+    (fun u : ℝ => Real.exp (-u) • plane.sideNormalVector side +ᵥ (x : Space d))
+    Filter.atTop (nhds (x : Space d))
+  simpa only [zero_smul, zero_vadd] using
+    (hRadius.smul_const (plane.sideNormalVector side)).vadd_const (x : Space d)
+
+/-- Every carrier point lies in the closure of either selected open half-space. -/
+lemma mem_closure_openHalfSpace_of_mem_carrier (plane : OrientedAffineHyperplane d)
+    (side : Side) (x : plane.carrier) :
+    (x : Space d) ∈ closure (plane.openHalfSpace side) := by
+  exact mem_closure_of_tendsto (plane.tendsto_sideApproachPoint_atTop side x)
+    (Filter.Eventually.of_forall (plane.sideApproachPoint_mem_openHalfSpace side x))
 
 /-!
 

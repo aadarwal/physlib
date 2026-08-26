@@ -224,9 +224,16 @@ PR unless maintainers explicitly ask to retain it.
   The surface sources are free electric charge and an intrinsically tangent free electric current;
   no magnetic surface sources are modeled. Setting them to zero proves continuity of tangential
   `E` and `H` and normal `D` and `B`, but does not remove bound polarization charge, bulk sources,
-  or material response. `PlanarMacroscopicTrace` is pointwise carrier data obtained honestly from
-  globally defined fields, not yet an analytic one-sided trace, and these local laws are stipulated
-  rather than derived from integral Maxwell equations until E4b.
+  or material response. `PlanarMacroscopicTrace` itself is pointwise carrier data obtained honestly
+  from globally defined fields. E4b now separately supplies `PlanarMacroscopicSideFields` with
+  genuine full-open-half-space traces, but the local laws remain stipulated until the thin-cell
+  integral-Maxwell bridge is proved.
+- [ ] Human-check E4b's one-sided-trace convention before upstreaming. `oneSidedNhds` is the comap
+  of ambient neighborhoods along the open-half-space subtype inclusion, and its ambient image is
+  exactly `nhdsWithin` that full half-space. The explicit normal approach is only a convergence
+  corollary, not the definition. One-sided traces and even independent source-free Maxwell
+  extensions on both sides do not imply an interface jump law; the regression pins that negative
+  result. No limit-integral interchange, surface-source law, or thin-cell argument is claimed yet.
 - [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
   complex-carrier candidates are off shell and retain independent positive frequencies and complex
   wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined
