@@ -131,16 +131,16 @@ def DateParameters.couplerScattering (p : DateParameters) :
 /-- The left-reflection entry is DATE's reflectivity amplitude. -/
 @[simp]
 lemma DateParameters.couplerScattering_leftReflection (p : DateParameters) :
-    p.couplerScattering.leftReflection
-        (BackwardWave.mk ()) (ForwardWave.mk ()) = p.reflectivity := by
+    p.couplerScattering
+        (Sum.inl (Outgoing.mk ())) (Sum.inl (Incident.mk ())) = p.reflectivity := by
   simp [DateParameters.couplerScattering, DateParameters.couplerScatteringMatrix,
     DateParameters.coupler, DirectionalCoupler.mixing]
 
 /-- The right-to-left transmission entry is the N7 coefficient `-I*t`. -/
 @[simp]
 lemma DateParameters.couplerScattering_rightToLeftTransmission (p : DateParameters) :
-    p.couplerScattering.rightToLeftTransmission
-        (BackwardWave.mk ()) (BackwardWave.mk ()) =
+    p.couplerScattering
+        (Sum.inl (Outgoing.mk ())) (Sum.inr (Incident.mk ())) =
       -Complex.I * p.transmissivity := by
   simp [DateParameters.couplerScattering, DateParameters.couplerScatteringMatrix,
     DateParameters.coupler, DirectionalCoupler.mixing,
@@ -149,8 +149,8 @@ lemma DateParameters.couplerScattering_rightToLeftTransmission (p : DateParamete
 /-- The left-to-right transmission entry is the same N7 coefficient `-I*t`. -/
 @[simp]
 lemma DateParameters.couplerScattering_leftToRightTransmission (p : DateParameters) :
-    p.couplerScattering.leftToRightTransmission
-        (ForwardWave.mk ()) (ForwardWave.mk ()) =
+    p.couplerScattering
+        (Sum.inr (Outgoing.mk ())) (Sum.inl (Incident.mk ())) =
       -Complex.I * p.transmissivity := by
   simp [DateParameters.couplerScattering, DateParameters.couplerScatteringMatrix,
     DateParameters.coupler, DirectionalCoupler.mixing,
@@ -159,8 +159,8 @@ lemma DateParameters.couplerScattering_leftToRightTransmission (p : DateParamete
 /-- The right-reflection entry is DATE's reflectivity amplitude. -/
 @[simp]
 lemma DateParameters.couplerScattering_rightReflection (p : DateParameters) :
-    p.couplerScattering.rightReflection
-        (ForwardWave.mk ()) (BackwardWave.mk ()) = p.reflectivity := by
+    p.couplerScattering
+        (Sum.inr (Outgoing.mk ())) (Sum.inr (Incident.mk ())) = p.reflectivity := by
   simp [DateParameters.couplerScattering, DateParameters.couplerScatteringMatrix,
     DateParameters.coupler, DirectionalCoupler.mixing]
 
