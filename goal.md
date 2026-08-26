@@ -1976,6 +1976,10 @@ definition.
 Exit: the transfer/chain calculations used by the audited cascade and microring sources are
 derived views of the same component behavior, not illicit multiplication of scattering matrices.
 
+The convention-explicit, source-neutral N3T core is complete. Source-specific microring parameter
+dictionaries and the DATE/SysCon two- and four-port matrix specializations belong to S0 and S7C;
+they consume this API and do not reopen the generic chain-semantics milestone.
+
 #### N4. Scattering netlists and equations
 
 - [x] component-owned channel spaces used through the existing incident/outgoing wrappers, retaining
@@ -2736,7 +2740,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, `E_in`, `E_out`, adjoint readout, and both boundary projector decompositions are complete; matched-gauge covariance and convention-free network predicates remain |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
-| N3T chain semantics | in progress | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, relational right-load termination, and canonical two-device FlatNetlist/Redheffer agreement are complete; broader source/system integration remains |
+| N3T chain semantics | done | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, relational right-load termination, and canonical two-device FlatNetlist/Redheffer agreement; source-specific matrix specializations are S0/S7C consumers |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
 | N5 elimination | done | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, proof-gated Redheffer realization, and canonical FlatNetlist/N5H/common-domain response agreement are complete |
@@ -2746,7 +2750,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
 | N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
-| S0 physical microrings | blocked | N3T, N7 | independent ring behavior and primitive realization |
+| S0 physical microrings | unblocked | completed N3T core plus the N7 directional coupler and matched propagation | independent ring behavior, primitive realization, and source-specific chain views |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
 | S2/S3 microrings | in progress: S2 amplitudes/series and S3 observables complete; source bridge open | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated round-trip series, N6 power balance, named phase conditions, critical coupling, gated parameter recovery, rejection ratios, and nondispersive FSR are complete; source parity and the remaining S0/S4+ integrations remain |
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |

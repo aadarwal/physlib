@@ -1342,6 +1342,10 @@ PR unless maintainers explicitly ask to retain it.
 - [x] Conceptually separate the N3T foundation into focused modules: reversible two-port/scattering
   regrouping first, then proof-gated chain extraction and series, with each concept's regression
   fixtures kept beside its public layer and the connected files retained for end-to-end validation.
+- [x] Gate the source-neutral N3T core after both behavior-derived conversions, termination, and the
+  canonical two-device FlatNetlist/Redheffer bridge passed the full fork battery. Keep the
+  source-specific DATE/SysCon microring parameter dictionaries and matrix specializations in S0
+  and S7C rather than making those consumers part of the generic chain API.
 - [ ] Prepare those two N3T concepts as stacked upstream proposals after the convention and source
   ledger are independently verified, unless maintainers explicitly request one connected proposal;
   obtain maintainer agreement or split further if either proposal remains too large for review.
