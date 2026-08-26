@@ -344,7 +344,9 @@ lemma rephasedResponseTransform_eq
     netlist.rephasedBehavior_eq gauge hMatched]
   ext ⟨input, output⟩
   simp only [LinearBehavior.mem_rephase_iff]
-  rw [netlist.toBehavior_responseTransform]
+  exact (ModeTransform.mem_toBehavior_iff_toLinearMap
+    (netlist.responseTransform hWellPosed) _ _).trans
+      (netlist.mem_behavior_iff_eq_responseTransform hWellPosed _ _).symm
 
 end FlatNetlist
 
@@ -453,6 +455,7 @@ lemma closeBehavior_append_rephase_eq_staged
   ext ⟨input, output⟩
   simp only [LinearBehavior.mem_rephase_iff]
   rw [inner.closeBehavior_append outer behavior]
+  exact Iff.rfl
 
 end Finite
 
