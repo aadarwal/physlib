@@ -216,11 +216,11 @@ lemma linearBehaviorConservationRegression_hostile_mem :
         linearBehaviorConservationRegressionHostileOutput) ∈
       linearBehaviorConservationRegressionHostileBehavior := by
   rw [linearBehaviorConservationRegressionHostileBehavior,
-    ModeTransform.mem_toBehavior_iff]
+    ModeTransform.mem_toBehavior_iff_toLinearMap]
   apply WithLp.ofLp_injective 2
   funext output
   fin_cases output <;>
-    rw [Matrix.mulVec, dotProduct] <;>
+    rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply, Matrix.mulVec, dotProduct] <;>
     norm_num [linearBehaviorConservationRegressionHostile,
       linearBehaviorConservationRegressionInput,
       linearBehaviorConservationRegressionHostileOutput]
