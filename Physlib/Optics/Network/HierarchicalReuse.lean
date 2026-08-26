@@ -165,24 +165,22 @@ variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channe
 
 /-- The source external channels use their canonical finite subtype enumeration. -/
 local instance replacementSourceExternalChannelFintype : Fintype inner.ExternalChannel := by
-  classical
-  infer_instance
+  exact inner.twoStageInnerExternalChannelFintype
 
 /-- The replacement external channels use their canonical finite subtype enumeration. -/
 local instance replacementTargetExternalChannelFintype :
     Fintype replacement.ExternalChannel := by
-  classical
-  infer_instance
+  exact replacement.twoStageInnerExternalChannelFintype
 
 /-- The first inner boundary inherits the external-channel enumeration. -/
 local instance replacementSourceBoundaryChannelFintype :
     Fintype inner.externalPortModeFamily.Channel :=
-  Fintype.ofEquiv _ inner.boundaryChannelEquiv.symm
+  inner.twoStageBoundaryChannelFintype
 
 /-- The replacement boundary inherits its external-channel enumeration. -/
 local instance replacementTargetBoundaryChannelFintype :
     Fintype replacement.externalPortModeFamily.Channel :=
-  Fintype.ofEquiv _ replacement.boundaryChannelEquiv.symm
+  replacement.twoStageBoundaryChannelFintype
 
 /-- Equivalent transported closure relations induce equivalent behaviors on the dependent
 boundaries exposed to the next hierarchy stage. -/
@@ -253,26 +251,22 @@ variable [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel]
 
 /-- The source outer boundary uses its canonical finite subtype enumeration. -/
 local instance replacementSourceOuterExternalChannelFintype : Fintype outer.ExternalChannel := by
-  classical
-  infer_instance
+  exact inner.twoStageOuterExternalChannelFintype outer
 
 /-- The transported outer boundary uses its canonical finite subtype enumeration. -/
 local instance replacementTargetOuterExternalChannelFintype :
     Fintype (outer.transport boundary).ExternalChannel := by
-  classical
-  infer_instance
+  exact replacement.twoStageOuterExternalChannelFintype (outer.transport boundary)
 
 /-- The source appended boundary uses its canonical finite subtype enumeration. -/
 local instance replacementSourceAppendExternalChannelFintype :
     Fintype (inner.append outer).ExternalChannel := by
-  classical
-  infer_instance
+  exact inner.twoStageAppendExternalChannelFintype outer
 
 /-- The target appended boundary uses its canonical finite subtype enumeration. -/
 local instance replacementTargetAppendExternalChannelFintype :
     Fintype (replacement.append (outer.transport boundary)).ExternalChannel := by
-  classical
-  infer_instance
+  exact replacement.twoStageAppendExternalChannelFintype (outer.transport boundary)
 
 /-- The left flattened connected channels inherit the two finite stage enumerations. -/
 local instance replacementSourceAppendChannelFintype :
@@ -285,8 +279,7 @@ local instance replacementTargetAppendChannelFintype :
   Fintype.ofEquiv _
     (replacement.appendChannelEquiv (outer.transport boundary)).symm
 
-omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
-  [Fintype (inner.append outer).ExternalChannel] in
+omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel] in
 /-- Closing a transported outer family and then presenting the final appended boundary is the
 same as first transporting the outer closure and then presenting that boundary. -/
 lemma transportedOuterClosure_reindex
@@ -318,7 +311,6 @@ lemma transportedOuterClosure_reindex
     (outer.closeBehavior_transport boundary boundaryBehavior)
 
 omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
-  [Fintype inner.ExternalChannel] [Fintype replacement.ExternalChannel]
   [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel] in
 /-- The two routes from an outer external relation to the replacement's final boundary induce
 the same behavior relabelling. -/
