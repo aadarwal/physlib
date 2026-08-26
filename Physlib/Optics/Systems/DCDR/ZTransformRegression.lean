@@ -251,7 +251,7 @@ lemma zRegression_fixed_hasNonzeroDenominator :
   simpa using zRegression_crossSemanticsDomain.hasNonzeroDenominator
 
 /-- The exact fixed-carrier N5 well-posedness witness for the stable fixture. -/
-noncomputable def zRegressionWellPosed :
+lemma zRegression_wellPosed :
     (netlist (zRegressionParameters.at (1 : ℂ))).IsWellPosed :=
   isWellPosed_of_hasNonzeroDenominator
     (zRegressionParameters.at (1 : ℂ)) zRegression_fixed_hasNonzeroDenominator
@@ -295,7 +295,7 @@ lemma zRegression_fixed_directGain :
   norm_num
 
 /-- Direct fixed data show the selected feedback readout gain is `-(3/4) I`. -/
-  lemma zRegression_fixed_feedbackReadoutGain :
+lemma zRegression_fixed_feedbackReadoutGain :
     (zRegressionParameters.at (1 : ℂ)).feedbackReadoutGain =
       -(3 / 4) * Complex.I := by
   rw [Parameters.feedbackReadoutGain, UnitDelayParameters.lowerCoefficient_at,
@@ -337,12 +337,13 @@ lemma zRegression_fixed_transfer :
     zRegression_denominatorPolynomial_expansion]
   norm_num
 
-/-- Raw N7 elimination gives the selected fixed N5 value `-1`. -/
+/-- The raw-equation N5 elimination bridge gives the selected fixed value `-1`. -/
 lemma zRegression_eliminationResponse :
     eliminationResponse (zRegressionParameters.at (1 : ℂ))
-      zRegressionWellPosed = -1 := by
-  rw [eliminationResponse_eq_transfer]
-  exact zRegression_fixed_transfer
+      zRegression_wellPosed = -1 := by
+  exact (eliminationResponse_eq_transfer
+    (zRegressionParameters.at (1 : ℂ)) zRegression_fixed_hasNonzeroDenominator).trans
+      zRegression_fixed_transfer
 
 /-- G-04 gives the complete extracted Mason response value `-1`. -/
 lemma zRegression_masonResponse :
@@ -355,7 +356,7 @@ lemma zRegression_masonResponse :
 /-- Canonical typed packaging preserves the selected N5 entry `-1`. -/
 lemma zRegression_packagedScattering_entry :
     ((netlist (zRegressionParameters.at (1 : ℂ))).packagedScattering
-      zRegressionWellPosed).toModeTransform
+      zRegression_wellPosed).toModeTransform
         (outputChannel (zRegressionParameters.at (1 : ℂ)))
         (inputChannel (zRegressionParameters.at (1 : ℂ))) = -1 := by
   exact zRegression_eliminationResponse
@@ -371,10 +372,10 @@ lemma zRegression_crossSemantics :
         zRegression_crossSemanticsDomain.mem_reciprocalZResponseDomain = -1 ∧
       circulationSeries zRegressionParameters 1 = -1 ∧
       eliminationResponse (zRegressionParameters.at (1 : ℂ))
-        zRegressionWellPosed = -1 ∧
+        zRegression_wellPosed = -1 ∧
       masonResponse (zRegressionParameters.at (1 : ℂ)) = -1 ∧
       ((netlist (zRegressionParameters.at (1 : ℂ))).packagedScattering
-        zRegressionWellPosed).toModeTransform
+        zRegression_wellPosed).toModeTransform
           (outputChannel (zRegressionParameters.at (1 : ℂ)))
           (inputChannel (zRegressionParameters.at (1 : ℂ))) = -1 ∧
       HasSelectedRelationalResponse (zRegressionParameters.at (1 : ℂ)) (-1) := by
