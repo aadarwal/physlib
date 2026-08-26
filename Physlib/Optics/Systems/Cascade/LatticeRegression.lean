@@ -438,12 +438,24 @@ lemma latticeRegression_mem_componentBehavior :
       ((rectangularLatticeComponents
         latticeRegressionParameters).portFamily component).Channel
     exact rectangularLatticeLocalChannelFintype latticeRegressionParameters component
+  change
+    (latticeRegressionIncident.restrictEmbedding
+        (Incident.relabelEmbedding
+          ((rectangularLatticeComponents
+            latticeRegressionParameters).componentChannelEmbedding component)),
+      latticeRegressionOutgoing.restrictEmbedding
+        (Outgoing.relabelEmbedding
+          ((rectangularLatticeComponents
+            latticeRegressionParameters).componentChannelEmbedding component))) ∈
+      ((rectangularLatticeComponents latticeRegressionParameters).scattering
+        component).toOrientedModeTransform.toBehavior
   rcases component with ⟨row, column⟩ | (horizontal | vertical)
   all_goals
     rw [ModeTransform.mem_toBehavior_iff_toLinearMap,
       ScatteringMatrix.toLinearMap_toOrientedModeTransform]
     apply WithLp.ofLp_injective 2
     funext localChannel
+    change Outgoing (rectangularLatticeComponentPortFamily _).Channel at localChannel
     rcases localChannel with ⟨port, mode⟩
     rw [ModeAmplitude.reindex_apply]
     simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply,
