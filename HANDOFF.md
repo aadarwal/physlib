@@ -245,7 +245,8 @@ The validation lane should bind at least these public names:
 
 ## Gate record
 
-The slice is synchronized through development head `e52d83b7` by merge head `75bd0989`. At that
+The slice is synchronized through the controller-approved development head `cb6c5d2b` by merge
+head `1981979a`. At that
 post-sync source head, this single locked command exited successfully with temporary sorted
 registrations:
 
