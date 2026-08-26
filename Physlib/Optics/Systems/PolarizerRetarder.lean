@@ -6,7 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Components.Polarizer.Mueller
-public import Physlib.Optics.Components.Retarder.MuellerRegression
+public import Physlib.Optics.Components.Retarder.Mueller
 
 /-!
 # Polarizer-retarder systems
