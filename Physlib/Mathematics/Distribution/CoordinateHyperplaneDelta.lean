@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Mathematics.Distribution.CoordinateHyperplane
-public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 
 /-!
 # Coordinate hyperplane delta distributions

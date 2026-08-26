@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Mathematics.Distribution.CoordinateHyperplaneDelta
-public import Mathlib.MeasureTheory.Integral.Prod
 
 /-!
 # Coordinate Heaviside distributions
