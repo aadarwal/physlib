@@ -12,11 +12,14 @@ public import Physlib.Mathematics.Distribution.CoordinateHyperplane
 
 ## i. Overview
 
-This file defines integration over a coordinate hyperplane as a scalar distribution and proves
-the one-dimensional normal-line calculus used by the Heaviside derivative.
+This file pushes tangential distributions onto a coordinate hyperplane, specializes that
+construction to integration over the hyperplane, and proves the one-dimensional normal-line
+calculus used by the Heaviside derivative.
 
 ## ii. Key results
 
+- `Distribution.coordinateHyperplanePushforward`: a tangential distribution viewed as an ambient
+  distribution supported on the selected coordinate hyperplane.
 - `Distribution.coordinateHyperplaneDelta`: integration over a coordinate hyperplane.
 - `Distribution.integral_Ioi_fderiv_coordinateNormalLine`: the normal half-line integral.
 
@@ -57,12 +60,45 @@ lemma coordinateHyperplaneRestriction_apply (d : ℕ) (i : Fin d.succ)
     coordinateHyperplaneRestriction d i η x = η (coordinateHyperplaneEmbedding d i x) :=
   rfl
 
+/-- Push an `F`-valued tangential distribution onto the selected coordinate hyperplane by
+restricting each ambient test function to that hyperplane. -/
+def coordinateHyperplanePushforward {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    (d : ℕ) (i : Fin d.succ) (u : (EuclideanSpace ℝ (Fin d)) →d[ℝ] F) :
+    (EuclideanSpace ℝ (Fin d.succ)) →d[ℝ] F :=
+  u.comp (coordinateHyperplaneRestriction d i)
+
+@[simp]
+lemma coordinateHyperplanePushforward_apply {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ F]
+    (d : ℕ) (i : Fin d.succ) (u : (EuclideanSpace ℝ (Fin d)) →d[ℝ] F)
+    (η : SchwartzMap (EuclideanSpace ℝ (Fin d.succ)) ℝ) :
+    coordinateHyperplanePushforward d i u η = u (coordinateHyperplaneRestriction d i η) :=
+  rfl
+
+/-- Pushing forward a tangential point source places it at the corresponding point of the
+ambient coordinate hyperplane without changing its coefficient. -/
+lemma coordinateHyperplanePushforward_diracDelta' {F : Type}
+    [NormedAddCommGroup F] [NormedSpace ℝ F] (d : ℕ) (i : Fin d.succ)
+    (a : EuclideanSpace ℝ (Fin d)) (v : F) :
+    coordinateHyperplanePushforward d i (Distribution.diracDelta' ℝ a v) =
+      Distribution.diracDelta' ℝ (coordinateHyperplaneEmbedding d i a) v := by
+  ext η
+  rw [coordinateHyperplanePushforward_apply, Distribution.diracDelta'_apply,
+    Distribution.diracDelta'_apply, coordinateHyperplaneRestriction_apply]
+
 /-- The scalar distribution obtained by integrating a test function over the coordinate
 hyperplane `x i = 0`, with the Euclidean Lebesgue measure on the retained coordinates. -/
 def coordinateHyperplaneDelta (d : ℕ) (i : Fin d.succ) :
     Physlib.Distribution ℝ (EuclideanSpace ℝ (Fin d.succ)) ℝ :=
   (Distribution.const ℝ (EuclideanSpace ℝ (Fin d)) (1 : ℝ)).comp
     (coordinateHyperplaneRestriction d i)
+
+/-- Hyperplane Lebesgue integration is the pushforward of the constant tangential distribution
+with density one. -/
+lemma coordinateHyperplanePushforward_const_one (d : ℕ) (i : Fin d.succ) :
+    coordinateHyperplanePushforward d i
+        (Distribution.const ℝ (EuclideanSpace ℝ (Fin d)) (1 : ℝ)) =
+      coordinateHyperplaneDelta d i :=
+  rfl
 
 /-- Evaluating the coordinate-hyperplane delta is Lebesgue integration of the restricted test
 function over the retained coordinates. -/
