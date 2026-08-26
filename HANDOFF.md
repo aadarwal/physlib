@@ -293,10 +293,10 @@ is now one code span.
 
 ## Gate record
 
-The exact post-sync source head gated for slice 2 is
-`7c6a7bd2d2fc34415bef6dca3d58f4a74ebd4b8f`. It contains every Lean and substantive handoff
-change in this cutoff and has `aff2484e` as an ancestor. With all six cumulative S7C modules
-temporarily registered in sorted order, this single locked command exited successfully:
+The exact post-sync source head gated for slice 2b is
+`21ce2428418193fe95c64dd7ae3f4f9773da7dcf`. It contains every Lean and substantive handoff
+change in this cutoff and has `476405ce` as an ancestor. With all six cumulative S7C modules
+registered in sorted order, this single locked command exited successfully:
 
 ```text
 lake-lock env bash -c 'set -euo pipefail && lake exe cache get &&
@@ -315,14 +315,16 @@ lake-lock env bash -c 'set -euo pipefail && lake exe cache get &&
 - `lint_all` completed all seven stages and exited zero.
 - Its build, illegal-import, PhyslibAlpha-import, duplicate-tag, sorry/pseudo, and declaration
   linter stages passed.
-- The file-import inventory named only five pre-existing unregistered files: two under
+- The file-import inventory named six target-baseline unregistered files: three under
   `Physlib/Electromagnetism/**` and three under `Physlib/SpaceAndTime/**`. It named no S7C file.
 - The advisory style and transitive-import inventories contain only repository-baseline files and
-  no S7C file. The initially detected redundant direct Charpoly import was removed before this
-  recorded rerun.
-- The committed-state `./scripts/lint-style.sh` check passed at the exact source head.
+  no S7C file.
+- The committed-state `./scripts/lint-style.sh` check reports only the untouched target file
+  `Physlib/Optics/Systems/DCDR/Topology.lean` at 2,035 lines. Its blob is
+  `5e825661cc6a245fd0e58fc3607db8e5b81725e3` both here and at `476405ce`.
+- Direct `lint-style.py` checks pass on both touched S7C Lean files.
 - The temporary registry edit was restored byte-identically. Pre-edit and post-edit SHA-256 were
-  both `9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
+  both `1741548061db23303ec95ebe539feaa278fe777a8a70eb47e151e9171f29f263`.
 
 The final cutoff-record commit changes only this gate record; no Lean source differs from the
 exact gated source head above.
