@@ -866,7 +866,7 @@ lemma UnitDelayParameters.rationalEliminationResponse_eq_toMultipleDelayParamete
         ((p.mem_rationalNetlist_responseDomain_iff_toMultipleDelayParameters hp q).1 hOld) := by
   rw [rationalEliminationResponse_eq_responseModel,
     multipleDelayRationalEliminationResponse_eq_responseModel]
-  exact p.toMultipleDelayParameters_responseModel_eval_eq q |>.symm
+  exact (p.toMultipleDelayParameters_responseModel_eval_eq q).symm
 
 end DCDR
 
