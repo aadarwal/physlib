@@ -95,6 +95,17 @@ def dynTwoPortChannel :
   | .left => ⟨.left, ()⟩
   | .right => ⟨.right, ()⟩
 
+lemma dyn_twoPort_sum
+    (channelFintype : Fintype (TwoPortSeriesNetlist.portFamily Unit Unit).Channel)
+    (f : (TwoPortSeriesNetlist.portFamily Unit Unit).Channel → ℂ) :
+    (@Finset.univ _ channelFintype).sum f =
+      f (dynTwoPortChannel .left) + f (dynTwoPortChannel .right) := by
+  letI := channelFintype
+  rw [← Fintype.sum_equiv (TwoPortSeriesNetlist.channelEquiv Unit Unit)
+    (fun input => f (TwoPortSeriesNetlist.channelEquiv Unit Unit input)) f
+    (by intro input; rfl)]
+  simp [dynTwoPortChannel, TwoPortSeriesNetlist.channelEquiv]
+
 def dynRingChannel (row column : Fin 2) (port : LatticeSitePort) : DynChannel :=
   (rectangularLatticeComponents dynParameters).componentChannelEmbedding
     (rectangularRingComponent row column) (latticeSiteChannelEquiv port)
@@ -322,6 +333,7 @@ lemma dyn_mem_componentBehavior :
       apply Fin.ext
       omega
     subst column
+    rw [dyn_twoPort_sum]
     fin_cases row <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, dynParameters,
         rectangularLatticeComponentScattering, TwoPortSeriesNetlist.physicalScattering,
@@ -335,6 +347,7 @@ lemma dyn_mem_componentBehavior :
       apply Fin.ext
       omega
     subst row
+    rw [dyn_twoPort_sum]
     fin_cases column <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, dynParameters,
         rectangularLatticeComponentScattering, TwoPortSeriesNetlist.physicalScattering,
