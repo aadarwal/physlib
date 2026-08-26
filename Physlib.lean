@@ -544,6 +544,7 @@ public import Physlib.Optics.Systems.Microring.SourceBridgeSfg
 public import Physlib.Optics.Systems.Microring.SourceBridgeSysCon
 public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Optics.Systems.PolarizerRetarderPhysical
+public import Physlib.Optics.Systems.PolarizerRetarderPhysicalPower
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
 public import Physlib.Particles.BeyondTheStandardModel.RHN.AnomalyCancellation.Basic

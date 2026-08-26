@@ -794,6 +794,10 @@ Requirements:
     done: true
     location: "Physlib/Optics/Systems/PolarizerRetarderPhysical.lean (Optics.MaterialJonesMode.polarizerRetarderOutputFamily, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_scaledWave_eq, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_malus_materialPlaneWaveIrradiance, Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_malus_intervalAverage_poyntingVector)"
 
+  - description: "The normalized physical polarizer-retarder layer shall transport the same ordered carrier through separately proved incident and outgoing E3b aperture-flux normalizations, obtaining the actual integrated one-period normal-flux Malus law. The generic proof is present with both normalization hypotheses explicit; completion still requires a connected P1b horizontal-wave, pi/4-analyzer, positive-quarter-wave regression that independently pins the carrier phase, irradiance, modal power, and signed actual flux."
+    done: false
+    location: "Physlib/Optics/Systems/PolarizerRetarderPhysicalPower.lean (Optics.JonesMatrix.linearRetarder_comp_linearPolarizer_malus_integratedActualMeanNormalFlux)"
+
   - description: "The public Electromagnetism API exposes the existing potential-derived, pointwise, three-dimensional Gauss-electric, Gauss-magnetic, Ampere, and Faraday laws with free-space constants and allowed sources through ordinary direct and root imports, without treating them as material, integral, or boundary equations."
     done: true
     location: "Physlib/Electromagnetism/ThreeDimension/MaxwellEquations.lean (Electromagnetism.ThreeDimension.gaussLawElectric, Electromagnetism.ThreeDimension.gaussLawMagnetic, Electromagnetism.ThreeDimension.ampereLaw, Electromagnetism.ThreeDimension.faradayLaw)"
