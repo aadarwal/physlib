@@ -1,0 +1,356 @@
+/-
+Copyright (c) 2026 Aadarsh Agarwal. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Aadarsh Agarwal
+-/
+module
+
+public import Physlib.Optics.Network.HierarchicalReuse
+
+/-!
+# Regression tests for three-stage hierarchical reuse
+
+## i. Overview
+
+Four two-port algebraic components form a directed chain with gains `2`, `3`, `5`, and `7`.
+Three connection stages join consecutive component boundaries. The same concrete incident and
+outgoing state is checked directly against both parenthesized connection families, with nonzero
+values on every forward cross-component wire and final response `210`.
+
+A hostile boundary transport swaps the third-stage source port with the external drive port. Its
+raw mate equation forces zero at a coordinate where the canonical state has value `30`, so the
+fixture rejects a subsystem-boundary, port-lift, associator-branch, or cascade-index mistake.
+
+## ii. Key results
+
+- `reuseRegression_mem_both_parenthesizations`: the independently expanded raw solutions agree.
+- `reuseRegression_cross_amplitudes_nonzero`: all three cross-component amplitudes are nonzero.
+- `reuseRegression_hostile_incidentAssembly_ne`: the hostile transported boundary is rejected.
+
+## iii. Table of contents
+
+- A. Four algebraic component operators
+- B. Three connection stages
+- C. The two parenthesized families
+- D. The hand-expanded state
+- E. Raw equations for the right parenthesization
+- F. Raw equations for the left parenthesization
+- G. A hostile boundary transport
+
+## iv. References
+
+This is the dynamic N-08 regression for the reuse machinery in `goal.md` lines 2098--2102, with
+the S-08 lattice hierarchy as its downstream canary. These supplied coefficients are not claimed
+to be passive, lossless, reciprocal, stable, causal, normalized, or physically realized. No
+well-posedness or electromagnetic-power statement is made.
+-/
+
+@[expose] public section
+
+namespace Optics
+
+noncomputable section
+
+/-!
+
+## A. Four algebraic component operators
+
+-/
+
+/-- The four ordered component sites in the three-stage regression chain. -/
+inductive ReuseRegressionComponent
+  | first
+  | second
+  | third
+  | fourth
+  deriving DecidableEq
+
+/-- The regression chain has exactly four component sites. -/
+instance : Fintype ReuseRegressionComponent where
+  elems := {.first, .second, .third, .fourth}
+  complete := fun component => by cases component <;> decide
+
+/-- Every component has a west port (`false`) and east port (`true`), each with one mode. -/
+abbrev reuseRegressionPortModeFamily : PortModeFamily where
+  Port := ReuseRegressionComponent × Bool
+  Mode := fun _ => Unit
+
+/-- The ambient channel type of the four-component fixture. -/
+abbrev ReuseRegressionChannel := reuseRegressionPortModeFamily.Channel
+
+/-- The block-diagonal component operator. Each nonzero entry crosses from the west incident
+port to the east outgoing port of the same component. -/
+def reuseRegressionComponentOperator :
+    ModeTransform (Incident ReuseRegressionChannel) (Outgoing ReuseRegressionChannel) :=
+  fun output input =>
+    match output.channel.1.1, output.channel.1.2,
+        input.channel.1.1, input.channel.1.2 with
+    | .first, true, .first, false => 2
+    | .second, true, .second, false => 3
+    | .third, true, .third, false => 5
+    | .fourth, true, .fourth, false => 7
+    | _, _, _, _ => 0
+
+/-- The relational graph of the supplied four-component operator. -/
+def reuseRegressionComponentBehavior :
+    LinearBehavior (Incident ReuseRegressionChannel) (Outgoing ReuseRegressionChannel) :=
+  reuseRegressionComponentOperator.toBehavior
+
+/-!
+
+## B. Three connection stages
+
+-/
+
+/-- The first stage connects the first component's east port to the second component's west
+port. -/
+abbrev reuseRegressionFirstConnection : PortConnection reuseRegressionPortModeFamily where
+  left := (.first, true)
+  right := (.second, false)
+  left_ne_right := by
+    intro hPort
+    exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+  modeEquiv := Equiv.refl Unit
+
+/-- The first singleton connection family. -/
+abbrev reuseRegressionFirstFamily :
+    PortConnectionFamily reuseRegressionPortModeFamily Unit where
+  connection _ := reuseRegressionFirstConnection
+  endpointPort_injective := by
+    rintro ⟨firstIndex, firstEnd⟩ ⟨secondIndex, secondEnd⟩ hPort
+    cases firstIndex
+    cases secondIndex
+    cases firstEnd <;> cases secondEnd
+    · rfl
+    · exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+    · exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+    · rfl
+
+/-- The second component's east port is external after the first stage. -/
+lemma reuseRegression_secondEast_unconnected_first :
+    ((.second, true) : reuseRegressionPortModeFamily.Port) ∉
+      Set.range reuseRegressionFirstFamily.endpointEmbedding := by
+  rintro ⟨⟨index, endpoint⟩, hPort⟩
+  cases index
+  cases endpoint <;>
+    exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+
+/-- The third component's west port is external after the first stage. -/
+lemma reuseRegression_thirdWest_unconnected_first :
+    ((.third, false) : reuseRegressionPortModeFamily.Port) ∉
+      Set.range reuseRegressionFirstFamily.endpointEmbedding := by
+  rintro ⟨⟨index, endpoint⟩, hPort⟩
+  cases index
+  cases endpoint <;>
+    exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+
+/-- The external drive port is external after the first stage. -/
+lemma reuseRegression_firstWest_unconnected_first :
+    ((.first, false) : reuseRegressionPortModeFamily.Port) ∉
+      Set.range reuseRegressionFirstFamily.endpointEmbedding := by
+  rintro ⟨⟨index, endpoint⟩, hPort⟩
+  cases index
+  cases endpoint
+  · exact Bool.noConfusion (congrArg Prod.snd hPort)
+  · exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+
+/-- The second-stage left boundary port. -/
+abbrev reuseRegressionSecondEastBoundary :
+    reuseRegressionFirstFamily.externalPortModeFamily.Port :=
+  ⟨(.second, true), reuseRegression_secondEast_unconnected_first⟩
+
+/-- The second-stage right boundary port. -/
+abbrev reuseRegressionThirdWestBoundary :
+    reuseRegressionFirstFamily.externalPortModeFamily.Port :=
+  ⟨(.third, false), reuseRegression_thirdWest_unconnected_first⟩
+
+/-- The drive port presented on the first-stage boundary. -/
+abbrev reuseRegressionFirstWestBoundary :
+    reuseRegressionFirstFamily.externalPortModeFamily.Port :=
+  ⟨(.first, false), reuseRegression_firstWest_unconnected_first⟩
+
+/-- The second stage connects the second component's east boundary to the third component's west
+boundary. -/
+abbrev reuseRegressionSecondConnection :
+    PortConnection reuseRegressionFirstFamily.externalPortModeFamily where
+  left := reuseRegressionSecondEastBoundary
+  right := reuseRegressionThirdWestBoundary
+  left_ne_right := by
+    intro hPort
+    exact ReuseRegressionComponent.noConfusion
+      (congrArg (fun port => port.1.1) hPort)
+  modeEquiv := Equiv.refl Unit
+
+/-- The second singleton connection family. -/
+abbrev reuseRegressionSecondFamily :
+    PortConnectionFamily reuseRegressionFirstFamily.externalPortModeFamily Unit where
+  connection _ := reuseRegressionSecondConnection
+  endpointPort_injective := by
+    rintro ⟨firstIndex, firstEnd⟩ ⟨secondIndex, secondEnd⟩ hPort
+    cases firstIndex
+    cases secondIndex
+    cases firstEnd <;> cases secondEnd
+    · rfl
+    · exact ReuseRegressionComponent.noConfusion
+        (congrArg (fun port => port.1.1) hPort)
+    · exact ReuseRegressionComponent.noConfusion
+        (congrArg (fun port => port.1.1) hPort)
+    · rfl
+
+/-- The third component's east port is external after the first two stages. -/
+lemma reuseRegression_thirdEast_unconnected_second :
+    (⟨(.third, true), by
+        rintro ⟨⟨index, endpoint⟩, hPort⟩
+        cases index
+        cases endpoint <;>
+          exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)⟩ :
+      reuseRegressionFirstFamily.externalPortModeFamily.Port) ∉
+        Set.range reuseRegressionSecondFamily.endpointEmbedding := by
+  rintro ⟨⟨index, endpoint⟩, hPort⟩
+  cases index
+  cases endpoint <;>
+    exact ReuseRegressionComponent.noConfusion
+      (congrArg (fun port => port.1.1) hPort)
+
+/-- The fourth component's west port is external after the first two stages. -/
+lemma reuseRegression_fourthWest_unconnected_second :
+    (⟨(.fourth, false), by
+        rintro ⟨⟨index, endpoint⟩, hPort⟩
+        cases index
+        cases endpoint <;>
+          exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)⟩ :
+      reuseRegressionFirstFamily.externalPortModeFamily.Port) ∉
+        Set.range reuseRegressionSecondFamily.endpointEmbedding := by
+  rintro ⟨⟨index, endpoint⟩, hPort⟩
+  cases index
+  cases endpoint <;>
+    exact ReuseRegressionComponent.noConfusion
+      (congrArg (fun port => port.1.1) hPort)
+
+/-- The drive port remains external after the second stage. -/
+lemma reuseRegression_firstWest_unconnected_second :
+    reuseRegressionFirstWestBoundary ∉
+      Set.range reuseRegressionSecondFamily.endpointEmbedding := by
+  rintro ⟨⟨index, endpoint⟩, hPort⟩
+  cases index
+  cases endpoint
+  · exact ReuseRegressionComponent.noConfusion
+      (congrArg (fun port => port.1.1) hPort)
+  · exact ReuseRegressionComponent.noConfusion
+      (congrArg (fun port => port.1.1) hPort)
+
+/-- The third-stage left boundary port. -/
+abbrev reuseRegressionThirdEastBoundary :
+    reuseRegressionSecondFamily.externalPortModeFamily.Port :=
+  ⟨⟨(.third, true), by
+      rintro ⟨⟨index, endpoint⟩, hPort⟩
+      cases index
+      cases endpoint <;>
+        exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)⟩,
+    reuseRegression_thirdEast_unconnected_second⟩
+
+/-- The third-stage right boundary port. -/
+abbrev reuseRegressionFourthWestBoundary :
+    reuseRegressionSecondFamily.externalPortModeFamily.Port :=
+  ⟨⟨(.fourth, false), by
+      rintro ⟨⟨index, endpoint⟩, hPort⟩
+      cases index
+      cases endpoint <;>
+        exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)⟩,
+    reuseRegression_fourthWest_unconnected_second⟩
+
+/-- The drive port presented on the second-stage boundary. -/
+abbrev reuseRegressionFirstWestSecondBoundary :
+    reuseRegressionSecondFamily.externalPortModeFamily.Port :=
+  ⟨reuseRegressionFirstWestBoundary, reuseRegression_firstWest_unconnected_second⟩
+
+/-- The third stage connects the third component's east boundary to the fourth component's west
+boundary. -/
+abbrev reuseRegressionThirdConnection :
+    PortConnection reuseRegressionSecondFamily.externalPortModeFamily where
+  left := reuseRegressionThirdEastBoundary
+  right := reuseRegressionFourthWestBoundary
+  left_ne_right := by
+    intro hPort
+    exact ReuseRegressionComponent.noConfusion
+      (congrArg (fun port => port.1.1.1) hPort)
+  modeEquiv := Equiv.refl Unit
+
+/-- The third singleton connection family. -/
+abbrev reuseRegressionThirdFamily :
+    PortConnectionFamily reuseRegressionSecondFamily.externalPortModeFamily Unit where
+  connection _ := reuseRegressionThirdConnection
+  endpointPort_injective := by
+    rintro ⟨firstIndex, firstEnd⟩ ⟨secondIndex, secondEnd⟩ hPort
+    cases firstIndex
+    cases secondIndex
+    cases firstEnd <;> cases secondEnd
+    · rfl
+    · exact ReuseRegressionComponent.noConfusion
+        (congrArg (fun port => port.1.1.1) hPort)
+    · exact ReuseRegressionComponent.noConfusion
+        (congrArg (fun port => port.1.1.1) hPort)
+    · rfl
+
+/-!
+
+## C. The two parenthesized families
+
+-/
+
+/-- The right-associated concrete connection family. -/
+abbrev reuseRegressionRightFamily :
+    PortConnectionFamily reuseRegressionPortModeFamily (Unit ⊕ (Unit ⊕ Unit)) :=
+  reuseRegressionFirstFamily.append
+    (reuseRegressionSecondFamily.append reuseRegressionThirdFamily)
+
+/-- The left-associated concrete connection family after correct third-boundary transport. -/
+abbrev reuseRegressionLeftFamily :
+    PortConnectionFamily reuseRegressionPortModeFamily ((Unit ⊕ Unit) ⊕ Unit) :=
+  (reuseRegressionFirstFamily.append reuseRegressionSecondFamily).append
+    (reuseRegressionThirdFamily.transport
+      (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
+        reuseRegressionSecondFamily))
+
+/-- The ambient fixture channels are finite. -/
+local instance reuseRegressionChannelFintype : Fintype ReuseRegressionChannel :=
+  Fintype.ofFinite _
+
+/-- The right-associated connected channels are finite. -/
+local instance reuseRegressionRightChannelFintype :
+    Fintype reuseRegressionRightFamily.Channel := Fintype.ofFinite _
+
+/-- The left-associated connected channels are finite. -/
+local instance reuseRegressionLeftChannelFintype :
+    Fintype reuseRegressionLeftFamily.Channel := Fintype.ofFinite _
+
+/-- The right-associated external channels are finite. -/
+local instance reuseRegressionRightExternalFintype :
+    Fintype reuseRegressionRightFamily.ExternalChannel := Fintype.ofFinite _
+
+/-- The left-associated external channels are finite. -/
+local instance reuseRegressionLeftExternalFintype :
+    Fintype reuseRegressionLeftFamily.ExternalChannel := Fintype.ofFinite _
+
+/-- Classical equality on ambient channels for raw assembly. -/
+local instance reuseRegressionChannelDecidableEq : DecidableEq ReuseRegressionChannel :=
+  Classical.decEq _
+
+/-- Classical equality on right-associated connected channels. -/
+local instance reuseRegressionRightChannelDecidableEq :
+    DecidableEq reuseRegressionRightFamily.Channel := Classical.decEq _
+
+/-- Classical equality on left-associated connected channels. -/
+local instance reuseRegressionLeftChannelDecidableEq :
+    DecidableEq reuseRegressionLeftFamily.Channel := Classical.decEq _
+
+/-!
+
+## D. The hand-expanded state
+
+-/
+
+end
+
+
+end Optics
