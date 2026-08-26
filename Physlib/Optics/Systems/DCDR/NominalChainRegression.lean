@@ -74,13 +74,19 @@ def zChainRegressionParameters : Parameters :=
 /-- Direct parameter expansion gives the stable forward transmission `-(7/8)I`. -/
 lemma zChainRegression_forward_transfer :
     transfer zChainRegressionParameters = -(7 / 8) * Complex.I := by
-  norm_num [zChainRegressionParameters, transfer, Parameters.responseNumerator,
+  have hDenominator : zChainRegressionParameters.HasNonzeroDenominator := by
+    simpa [zChainRegressionParameters] using
+      zRegression_stable_fixed_hasNonzeroDenominator_I
+  rw [transfer]
+  apply (div_eq_iff hDenominator).2
+  norm_num [zChainRegressionParameters, Parameters.responseNumerator,
     Parameters.denominator, Parameters.loopGain, Parameters.directGain,
     Parameters.feedbackReadoutGain, Parameters.feedbackDrive,
     UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
     Parameters.upperCoefficient, Parameters.lowerCoefficient,
-    Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient,
-    pow_succ, Complex.I_mul_I]
+    Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient]
+  ring_nf
+  norm_num [pow_two, Complex.I_mul_I]
 
 /-- Direct parameter expansion gives the independently stated reverse transmission `-(7/8)I`. -/
 lemma zChainRegression_reverse_transfer :
@@ -548,7 +554,7 @@ lemma zChainRegression_chain_lowerRight :
   unfold TwoPortScatteringTransform.backwardFirstChainBlockFormula
   simp only [Matrix.fromBlocks_apply₂₂]
   rw [zChainRegression_leftReflection_eq_zero, Matrix.mul_zero,
-    zChainRegression_rightReflection_eq_zero, Matrix.zero_mul, sub_zero]
+    Matrix.zero_apply, sub_zero]
   exact zChainRegression_leftToRightTransmission_entry
 
 /-- The production chain agrees with the independently folded N3T chain and its four entries.
