@@ -431,7 +431,7 @@ lemma latticeRegression_mem_componentBehavior :
     latticeRegressionParameters).mem_componentBehavior_iff_forall_component
       latticeRegressionIncident latticeRegressionOutgoing).2
   intro component
-  letI : Fintype
+  let _ : Fintype
       ((rectangularLatticeNetlist
         latticeRegressionParameters).components.portFamily component).Channel := by
     change Fintype
@@ -535,10 +535,7 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
       simp [latticeRegressionConnections, rectangularLatticeNetlist,
         rectangularHorizontalConnections, rectangularHorizontalConnection,
         PortConnectionFamily.append, PortConnection.mateEquiv,
-        PortConnection.channelEmbedding,
-        ScatteringComponentFamily.componentChannelEmbedding,
-        ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
-        latticeRegressionOutgoing, latticeRegressionIncidentValue,
+        latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionHorizontalIncidentValue,
         latticeRegressionHorizontalOutgoingValue] <;> rfl
   · rcases vertical with ⟨⟨edge, column⟩, half⟩
@@ -554,11 +551,8 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
         rectangularVerticalBoundaryConnections, LatticeConnectionFamilies.onBoundary,
         LatticeConnectionFamilies.connectionOnBoundary, rectangularVerticalConnections,
         rectangularVerticalConnection, PortConnectionFamily.append,
-        PortConnection.liftBoundary, PortConnection.liftBoundary_modeEquiv,
-        PortConnection.mateEquiv, PortConnection.channelEmbedding,
-        ScatteringComponentFamily.componentChannelEmbedding,
-        ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
-        latticeRegressionOutgoing, latticeRegressionIncidentValue,
+        PortConnection.liftBoundary, PortConnection.mateEquiv,
+        latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionVerticalIncidentValue,
         latticeRegressionVerticalOutgoingValue] <;> rfl
 
