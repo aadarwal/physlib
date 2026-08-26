@@ -22,6 +22,10 @@ The three frame directions need not be orthogonal, normalized, or independent. C
 formula remains a signed identity for reversed or degenerate frames; it does not silently replace
 the oriented determinant or cofactors by absolute areas.
 
+This is neutral smooth-bulk calculus. It does not state a Maxwell equation, specialize the box to
+`PlanarPillboxFamily`, combine independent half-space fields, represent carrier-supported sheet
+sources, or prove a shrinking-cell limit.
+
 ## ii. Key results
 
 - `integral3_div_affineBox`: the divergence integral over an affine box equals the sum of its three

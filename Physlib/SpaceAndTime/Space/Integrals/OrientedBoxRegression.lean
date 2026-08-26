@@ -27,6 +27,8 @@ the production divergence theorem is invoked.
 - `volumeIntegral_exact`: the pulled-back divergence integral is exactly `8`.
 - `firstFacePair_exact`, `secondFacePair_exact`, and `thirdFacePair_exact`: the three oriented
   face-pair fluxes are `4`, `2`, and `2`.
+- `swappedVolumeIntegral_exact`: exchanging the first two frame directions changes the signed
+  volume integral from `8` to `-8`.
 - `production_and_exact`: the production theorem agrees with the independent exact computations.
 
 ## iii. Table of contents
@@ -119,6 +121,12 @@ def volumeIntegral : ℝ :=
     (∇ ⬝ field) (affineBoxPoint center first second third u v w) *
       inner ℝ (basis.repr first) (basis.repr second ⨯ₑ₃ basis.repr third)
 
+/-- The pulled-back divergence integral after exchanging the first two frame directions. -/
+def swappedVolumeIntegral : ℝ :=
+  ∫ u in (0 : ℝ)..1, ∫ v in (0 : ℝ)..1, ∫ w in (0 : ℝ)..1,
+    (∇ ⬝ field) (affineBoxPoint center second first third u v w) *
+      inner ℝ (basis.repr second) (basis.repr first ⨯ₑ₃ basis.repr third)
+
 /-- The upper-minus-lower flux through the first-coordinate face pair. -/
 def firstFacePair : ℝ :=
   ((∫ v in (0 : ℝ)..1, ∫ w in (0 : ℝ)..1,
@@ -185,10 +193,34 @@ lemma thirdFaceDensity (u v w : ℝ) :
     basis_repr_apply, Matrix.cons_val_zero, Matrix.cons_val_one,
     Matrix.cons_val_two]
 
+/-- Exchanging the first two frame directions negates the signed volume. -/
+lemma swappedOrientedVolume :
+    inner ℝ (basis.repr second) (basis.repr first ⨯ₑ₃ basis.repr third) = -2 := by
+  norm_num [first, second, third, crossProduct, PiLp.inner_apply,
+    Fin.sum_univ_three, RCLike.inner_apply, basis_repr_apply,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two]
+
+/-- Coordinates of the affine parameterization after exchanging the first two directions. -/
+lemma swappedPoint_apply (u v w : ℝ) :
+    affineBoxPoint center second first third u v w =
+      ⟨![2 * v, u + v, w]⟩ := by
+  ext i
+  fin_cases i <;> (
+    simp [affineBoxPoint, center, first, second, third] <;>
+    ring)
+
 /-- Direct integration gives signed volume integral `8`. -/
 lemma volumeIntegral_exact : volumeIntegral = 8 := by
   unfold volumeIntegral
   simp_rw [field_divergence, point_apply, orientedVolume]
+  simp only [Matrix.cons_val_zero]
+  ring_nf
+  norm_num
+
+/-- Direct integration after the coordinate swap gives the opposite signed volume `-8`. -/
+lemma swappedVolumeIntegral_exact : swappedVolumeIntegral = -8 := by
+  unfold swappedVolumeIntegral
+  simp_rw [field_divergence, swappedPoint_apply, swappedOrientedVolume]
   simp only [Matrix.cons_val_zero]
   ring_nf
   norm_num
