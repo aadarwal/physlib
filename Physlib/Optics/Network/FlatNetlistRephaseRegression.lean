@@ -181,8 +181,7 @@ lemma routingRephaseRegression_componentOperator_eq_rephase :
       reuseRegressionComponentOperator, reuseRegressionScattering,
       ModeTransform.rephase, routingRephaseRegressionGauge,
       routingRephaseRegressionI, routingRephaseRegressionNegI,
-      Complex.inv_I, Complex.ext_iff] <;>
-    ring
+      Complex.inv_I, Complex.ext_iff]
 
 /-- The hand-expanded rephased incident state. Its nonzero west-port values are `1`, `2I`,
 `-6I`, and `30I`. -/
