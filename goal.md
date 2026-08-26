@@ -2187,8 +2187,9 @@ larger formulas and proves no independently reusable component law for them.
   normalized-modal-power factor, passive/unitary parameter predicates, and losslessness;
 - [x] its four independently wireable physical-port presentation, pinned nested channel order,
   exact behavior and scattering transport, and direct `ScatteringComponentFamily` consumption;
-- [ ] component-owned physical-port packaging for the remaining beam-splitter, mirror,
-  polarization, and interface primitives consumed by `ScatteringComponentFamily`;
+- [ ] component-owned physical-port packaging consumed by `ScatteringComponentFamily`: the
+  beam-splitter and mirror packages are complete, while polarization and interface primitives
+  remain;
 - [ ] frequency-parameterized propagation and actual time/group-delay statements under N5F, with
   their frequency-domain, causality, and dispersion hypotheses explicit;
 - mirror and termination;
@@ -2414,7 +2415,11 @@ rational N7/N5F netlist, with its absolute ROC, algebraic solve gate, contractio
 and chain pivot kept distinct. On their explicit intersection, one theorem identifies the causal
 transform, rational response, circulation series, fixed N5 response, complete Mason response,
 typed scattering, backward-first chain, and original relational behavior. This completes the ring
-instance of X-01; the DCDR half remains separate, so X-01 as a two-system regression is still open.
+instance of X-01. The DCDR instance now adds its independently gated nominal backward-first chain
+to the same causal-Z, rational, feedback, N5, Mason, scattering, and relational agreement. The
+two-system regression packages those two agreements as a conjunction on their respective common
+domains and proves their fixture values differ; it does not equate the ring and DCDR responses.
+Thus X-01 is complete only in this systemwise sense.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2433,9 +2438,10 @@ not claim the scalar formula for them.
 - transfer amplitude, spectral power, resonance, and rejection-ratio results;
 - at least one difference-equation/Z-transform derivation; and
 - at least one signal-flow/Mason derivation proved equal to network elimination; and
-- for an eligible ring and the DCDR case, a cross-semantics theorem equating relational behavior,
-  compiled elimination, chain response, feedback algebra, Mason gain, and recurrence/Z response on
-  the intersection of their domains.
+- [x] for an eligible ring and the DCDR case, a systemwise cross-semantics theorem equating
+  relational behavior, compiled elimination, chain response, feedback algebra, Mason gain, and
+  recurrence/Z response for each system on its own common domain. The joint theorem is a
+  conjunction and does not assert equality of the two devices' response values.
 
 The cross-semantics theorem keeps three conditions distinct: algebraic feedback requires an
 invertible internal operator; an infinite round-trip series requires contraction or summability;
@@ -2720,18 +2726,18 @@ upstream ownership decision, record the exact decision needed and work on an ind
 
 ## L. Decision gates requiring explicit human confirmation
 
-- [ ] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
+- [x] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
   circular and `S₃` sign, including whether the observer looks along propagation or into the beam.
-- [ ] Confirm whether the first material-medium API should use current raw real field values or wait
+- [x] Confirm whether the first material-medium API should use current raw real field values or wait
   for a stronger dimensional-units refactor.
-- [ ] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
-- [ ] Confirm whether the initial planar-interface PR may state local boundary laws as named
+- [x] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
+- [x] Confirm whether the initial planar-interface PR may state local boundary laws as named
   hypotheses while their Maxwell-integral derivation is developed in a stacked Electromagnetism PR.
 - [ ] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
   coefficients scale full electric-vector amplitudes or tangential components.
 - [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
-- [ ] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
+- [x] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
   corroborating the four-wave arrows and behavior: states are backward-first, scattering
   `(aL, aR; bL, bR)` regroups as `((bL, aL), (aR, bR))`, and the left-to-right scattering
   conversion inverts the right-incident to left-outgoing block. The fork uses only
@@ -2740,14 +2746,16 @@ upstream ownership decision, record the exact decision needed and work on an ind
   power coupling coefficients.
 - [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
   startup term before S4/S5 identities are named.
-- [ ] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
+- [x] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
 - [ ] Confirm whether each stability condition is strict or non-strict and whether it concerns
   poles, zeros, an internal operator, BIBO behavior, or a source-specific named condition.
 - [ ] Replace source decimal examples by human-audited exact data or certified intervals and record
   every source assumption that the Lean statement strengthens, corrects, or rejects.
-- [ ] Confirm the exact HOL source licenses before adapting any source implementation.
+- [x] Confirm the exact HOL source licenses before adapting any source implementation.
 - [ ] Independently verify every bibliography item, URL, page range, and physics claim used in a PR.
-- [ ] Conduct all maintainer/reviewer communication and certify every contributed line.
+- [ ] Conduct all maintainer/reviewer communication and certify every contributed line. Deferred
+  HUMAN-ONLY; residual act: at the trigger, personally certify the exact chosen PR diff and conduct
+  every maintainer/reviewer communication.
 
 ## M. Risk register
 
