@@ -16,7 +16,8 @@ This file certifies that the 18-node PANDA graph is a forward projection of the 
 netlist. The certificate has two independent parts. First, `connectionForwardPorts_eq_connection`
 checks all fourteen boundary identifications against the actual `PortConnectionFamily`. Second,
 `coefficientMatrix_eq_netlistProjection` proves that every coefficient of the graph is the sum of
-the corresponding assembled N7 scattering entries.
+the corresponding assembled N7 scattering entries. The intervening `edgeInput_routedBoundary`
+and `edgeOutput_routedBoundary` results certify each edge endpoint against those physical wires.
 
 The resulting relation `NetlistForwardRelation` is phrased only through that N7-entry matrix. Its
 equivalence with the graph node equation is the matrix-level bridge requested by the construction;
@@ -29,6 +30,9 @@ that the directed 18-node matrix equals an undirected-edge closure.
 ## ii. Key results
 
 - `Panda.connectionForwardPorts_eq_connection`: all fourteen wires match the graph boundaries.
+- `Panda.edgeInput_routedBoundary`: every edge source reaches its local scattering input.
+- `Panda.edgeOutput_routedBoundary`: every local scattering output reaches its edge target.
+- `Panda.edge_routedN7Certificate`: bundled topology-and-gain ownership of every branch.
 - `Panda.coefficientMatrix_eq_netlistProjection`: matrix equality derived from N7 entries.
 - `Panda.isNodeSolution_iff_netlistForwardRelation`: relational graph/netlist certificate.
 - `Panda.isNodeSolution_iff_forwardEquations`: the 18 explicit forward equations.
@@ -130,6 +134,112 @@ lemma connectionForwardPorts_eq_connection (p : Parameters) (connection : Connec
       (connectionForwardPorts p connection).2 =
         ((connections p).connection connection).right := by
   cases connection <;> exact ⟨rfl, rfl⟩
+
+/-- One representative physical channel for each printed graph node. -/
+def nodeN7Channel (p : Parameters) : Node → (netlist p).Channel :=
+  ![componentChannel p .inputCoupler ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    componentChannel p .inputCoupler ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    componentChannel p .inputCoupler ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    componentChannel p .inputCoupler ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    componentChannel p .outputCoupler ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    componentChannel p .outputCoupler ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    componentChannel p .outputCoupler ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    componentChannel p .outputCoupler ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    componentChannel p .rightCoupler ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    componentChannel p .rightCoupler ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    componentChannel p .rightCoupler ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    componentChannel p .rightCoupler ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    componentChannel p .rightHalfTwo ⟨MatchedPropagation.Port.left, ()⟩,
+    componentChannel p .leftCoupler ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    componentChannel p .leftCoupler ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    componentChannel p .leftCoupler ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    componentChannel p .leftCoupler ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    componentChannel p .leftHalfTwo ⟨MatchedPropagation.Port.left, ()⟩]
+
+/-- Two N7 channels represent the same directed graph boundary when they are identical or are the
+two physical endpoints of one declared PANDA connection. -/
+def RoutedBoundary (p : Parameters) (first second : (netlist p).Channel) : Prop :=
+  first = second ∨
+    ∃ connection : Connection,
+      (first = ((netlist p).connections.channelEmbedding
+          ⟨connection, Sum.inl ()⟩) ∧
+        second = ((netlist p).connections.channelEmbedding
+          ⟨connection, Sum.inr ()⟩)) ∨
+      (first = ((netlist p).connections.channelEmbedding
+          ⟨connection, Sum.inr ()⟩) ∧
+        second = ((netlist p).connections.channelEmbedding
+          ⟨connection, Sum.inl ()⟩))
+
+/-- Equality gives a routed-boundary identification. -/
+lemma routedBoundary_refl (p : Parameters) (channel : (netlist p).Channel) :
+    RoutedBoundary p channel channel := Or.inl rfl
+
+/-- The left and right channels of a physical connection form one routed boundary. -/
+lemma routedBoundary_connection_forward (p : Parameters) (connection : Connection) :
+    RoutedBoundary p
+      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inl ()⟩)
+      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inr ()⟩) := by
+  exact Or.inr ⟨connection, Or.inl ⟨rfl, rfl⟩⟩
+
+/-- The routed-boundary identification is available in the reverse endpoint order. -/
+lemma routedBoundary_connection_reverse (p : Parameters) (connection : Connection) :
+    RoutedBoundary p
+      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inr ()⟩)
+      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inl ()⟩) := by
+  exact Or.inr ⟨connection, Or.inr ⟨rfl, rfl⟩⟩
+
+/-- The node assigned to each physical wire is routed to both of that wire's endpoint channels. -/
+lemma connectionNode_routedBoundaries (p : Parameters) (connection : Connection) :
+    RoutedBoundary p (nodeN7Channel p (connectionNode connection))
+        ((netlist p).connections.channelEmbedding ⟨connection, Sum.inl ()⟩) ∧
+      RoutedBoundary p (nodeN7Channel p (connectionNode connection))
+        ((netlist p).connections.channelEmbedding ⟨connection, Sum.inr ()⟩) := by
+  cases connection <;> constructor
+  all_goals first
+    | exact routedBoundary_refl p _
+    | exact routedBoundary_connection_forward p _
+    | exact routedBoundary_connection_reverse p _
+
+/-- Every printed edge source is routed to the incident channel of its owned N7 scattering entry. -/
+lemma edgeInput_routedBoundary (p : Parameters) (edge : Edge) :
+    RoutedBoundary p (nodeN7Channel p (edgeSource edge)) (edgeN7InputChannel p edge) := by
+  fin_cases edge
+  all_goals first
+    | exact routedBoundary_refl p _
+    | exact routedBoundary_connection_forward p .inputToQuarterOne
+    | exact routedBoundary_connection_forward p .rightToQuarterTwo
+    | exact routedBoundary_connection_forward p .outputToQuarterThree
+    | exact routedBoundary_connection_forward p .rightToHalfOne
+    | exact routedBoundary_connection_forward p .leftToHalfOne
+    | exact routedBoundary_connection_forward p .leftToQuarterFour
+
+/-- Every owned N7 scattering output is routed to the target of its printed graph edge. -/
+lemma edgeOutput_routedBoundary (p : Parameters) (edge : Edge) :
+    RoutedBoundary p (nodeN7Channel p (edgeTarget edge)) (edgeN7OutputChannel p edge) := by
+  fin_cases edge
+  all_goals first
+    | exact routedBoundary_refl p _
+    | exact routedBoundary_connection_reverse p .quarterOneToRight
+    | exact routedBoundary_connection_reverse p .rightHalfJoin
+    | exact routedBoundary_connection_reverse p .rightHalfTwoToCoupler
+    | exact routedBoundary_connection_reverse p .quarterTwoToOutput
+    | exact routedBoundary_connection_reverse p .quarterThreeToLeft
+    | exact routedBoundary_connection_reverse p .leftHalfJoin
+    | exact routedBoundary_connection_reverse p .leftHalfTwoToCoupler
+    | exact routedBoundary_connection_reverse p .quarterFourToInput
+
+/-- Each printed branch is one concrete N7 scattering entry between physically routed source and
+target boundaries. -/
+lemma edge_routedN7Certificate (p : Parameters) (edge : Edge) :
+    RoutedBoundary p (nodeN7Channel p (edgeSource edge)) (edgeN7InputChannel p edge) ∧
+      edgeGain p edge =
+        (netlist p).scatteringTransform
+          (Outgoing.mk (edgeN7OutputChannel p edge))
+          (Incident.mk (edgeN7InputChannel p edge)) ∧
+      RoutedBoundary p (nodeN7Channel p (edgeTarget edge))
+        (edgeN7OutputChannel p edge) := by
+  exact ⟨edgeInput_routedBoundary p edge, edgeGain_eq_n7ScatteringEntry p edge,
+    edgeOutput_routedBoundary p edge⟩
 
 /-! ## B. N7-entry coefficient projection -/
 
