@@ -1727,11 +1727,17 @@ PR unless maintainers explicitly ask to retain it.
   on printed p. 37. In particular, verify which source objects store distinguished input/output
   nodes and confirm that the closing-permutation bridge is a Physlib construction rather than a
   source theorem.
-- [ ] Keep S6 partial until the forward-path numerator is proved equal to the routed-loop-family
-  numerator, edge-indexed enumeration retains parallel branches, distinguished terminals are
-  represented, direct definition-level G-01/G-03 regressions are present, and extraction is proved
-  to agree with N5's typed netlist equations. The current cofactor quotient and inverse formula
-  are totalized algebra at zero determinant; solved-response claims require nonvanishing.
+- [x] Complete the generic S6/N5 bridge. The neutral layer now identifies the forward-path and
+  cofactor numerators, retains parallel edge identity, carries distinguished terminals, and has
+  direct G-01/G-03 regressions. `FlatNetlist.feedbackSignalFlowGraph` extracts `C * S`, the graph
+  determinant is nonzero exactly when the relational netlist is well posed, and the Mason-
+  assembled external transform equals the N5 response on that gate. The singular regression pins
+  a zero graph determinant and assigns no response semantics to the totalized inverse there.
+- [ ] Human-check the generic S6/N5 bridge before upstreaming. Confirm the source/sink entry order,
+  the identification of the graph system matrix with `1 - C * S`, and the distinction between the
+  matrix gain graph, which sums parallel edges, and the separate edge-indexed enumeration layer.
+  Do not infer a ring/DCDR G-04 result, a distinguished-terminal external graph, contraction,
+  causality, passivity, reciprocity, or physical realization from the generic equality.
 - [ ] Split the fork's S6 integration batch into focused upstream proposals. At minimum separate
   node equations, node-level combinatorics, determinant/cofactor identities, extraction with edge
   identity, and regressions. Split the 263-line `PathCycle.lean` further into the path-closing-cycle
