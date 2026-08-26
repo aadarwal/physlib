@@ -697,6 +697,130 @@ lemma reuseRegression_mem_both_parenthesizations :
 
 -/
 
+/-- The correctly transported third-east port on the left-associated boundary. -/
+abbrev reuseRegressionLeftThirdEastBoundary :
+    (reuseRegressionFirstFamily.append
+      reuseRegressionSecondFamily).externalPortModeFamily.Port :=
+  (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
+      reuseRegressionSecondFamily).portEquiv reuseRegressionThirdEastBoundary
+
+/-- The correctly transported external drive port on the left-associated boundary. -/
+abbrev reuseRegressionLeftFirstWestBoundary :
+    (reuseRegressionFirstFamily.append
+      reuseRegressionSecondFamily).externalPortModeFamily.Port :=
+  (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
+      reuseRegressionSecondFamily).portEquiv reuseRegressionFirstWestSecondBoundary
+
+/-- The correctly transported fourth-west port on the left-associated boundary. -/
+abbrev reuseRegressionLeftFourthWestBoundary :
+    (reuseRegressionFirstFamily.append
+      reuseRegressionSecondFamily).externalPortModeFamily.Port :=
+  (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
+      reuseRegressionSecondFamily).portEquiv reuseRegressionFourthWestBoundary
+
+/-- The third-east and drive ports are distinct subsystem boundaries. -/
+lemma reuseRegression_leftThirdEast_ne_leftFirstWest :
+    reuseRegressionLeftThirdEastBoundary ≠ reuseRegressionLeftFirstWestBoundary := by
+  intro hPort
+  exact ReuseRegressionComponent.noConfusion
+    (congrArg (fun port => port.1.1) hPort)
+
+/-- The fourth-west endpoint is distinct from the third-east endpoint. -/
+lemma reuseRegression_leftFourthWest_ne_leftThirdEast :
+    reuseRegressionLeftFourthWestBoundary ≠ reuseRegressionLeftThirdEastBoundary := by
+  intro hPort
+  exact ReuseRegressionComponent.noConfusion
+    (congrArg (fun port => port.1.1) hPort)
+
+/-- The fourth-west endpoint is distinct from the external drive endpoint. -/
+lemma reuseRegression_leftFourthWest_ne_leftFirstWest :
+    reuseRegressionLeftFourthWestBoundary ≠ reuseRegressionLeftFirstWestBoundary := by
+  intro hPort
+  exact ReuseRegressionComponent.noConfusion
+    (congrArg (fun port => port.1.1) hPort)
+
+/-- A hostile boundary equivalence that swaps the third-stage source with the external drive port.
+All mode fibers remain the singleton fiber; only the selected subsystem port is wrong. -/
+def reuseRegressionHostileBoundaryEquiv :
+    reuseRegressionSecondFamily.externalPortModeFamily.Equiv
+      (reuseRegressionFirstFamily.append
+        reuseRegressionSecondFamily).externalPortModeFamily where
+  portEquiv :=
+    (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
+      reuseRegressionSecondFamily).portEquiv.trans
+        (Equiv.swap reuseRegressionLeftThirdEastBoundary
+          reuseRegressionLeftFirstWestBoundary)
+  modeEquiv _ := Equiv.refl Unit
+
+/-- The hostile third family and the first two correct stages form a valid but wrongly lifted
+left-associated connection family. -/
+abbrev reuseRegressionHostileFamily :
+    PortConnectionFamily reuseRegressionPortModeFamily ((Unit ⊕ Unit) ⊕ Unit) :=
+  (reuseRegressionFirstFamily.append reuseRegressionSecondFamily).append
+    (reuseRegressionThirdFamily.transport reuseRegressionHostileBoundaryEquiv)
+
+/-- The hostile connected channels are finite. -/
+local instance reuseRegressionHostileChannelFintype :
+    Fintype reuseRegressionHostileFamily.Channel := Fintype.ofFinite _
+
+/-- Classical equality on hostile connected channels. -/
+local instance reuseRegressionHostileChannelDecidableEq :
+    DecidableEq reuseRegressionHostileFamily.Channel := Classical.decEq _
+
+/-- The hostile transport sends the third connection's left endpoint to the drive port. -/
+lemma reuseRegression_hostile_embed_thirdLeft :
+    reuseRegressionHostileFamily.channelEmbedding
+        ⟨Sum.inr (), Sum.inl ()⟩ =
+      (⟨(.first, false), ()⟩ : ReuseRegressionChannel) := by
+  change ⟨reuseRegressionLeftFirstWestBoundary.1, ()⟩ = _
+  rfl
+
+/-- The hostile transport leaves the third connection's fourth-west endpoint fixed. -/
+lemma reuseRegression_hostile_embed_thirdRight :
+    reuseRegressionHostileFamily.channelEmbedding
+        ⟨Sum.inr (), Sum.inr ()⟩ =
+      (⟨(.fourth, false), ()⟩ : ReuseRegressionChannel) := by
+  change
+    ⟨(Equiv.swap reuseRegressionLeftThirdEastBoundary
+        reuseRegressionLeftFirstWestBoundary reuseRegressionLeftFourthWestBoundary).1, ()⟩ = _
+  rw [Equiv.swap_apply_of_ne_of_ne
+    reuseRegression_leftFourthWest_ne_leftThirdEast
+    reuseRegression_leftFourthWest_ne_leftFirstWest]
+  rfl
+
+/-- The hostile third-stage mate returns the fourth-west incident coordinate to the external drive
+port instead of the third component's east port. -/
+lemma reuseRegression_hostile_mate_thirdRight :
+    reuseRegressionHostileFamily.mateEquiv
+        ⟨Sum.inr (), Sum.inr ()⟩ =
+      ⟨Sum.inr (), Sum.inl ()⟩ := by
+  rfl
+
+/-- At fourth-west, hostile incident assembly reads the first component's west-going outgoing
+amplitude. -/
+lemma reuseRegression_hostile_incidentAssembly_fourthWest
+    (external : ModeAmplitude (Incident reuseRegressionHostileFamily.ExternalChannel)) :
+    reuseRegressionHostileFamily.incidentAssembly reuseRegressionOutgoing external
+        (Incident.mk ⟨(.fourth, false), ()⟩) =
+      reuseRegressionOutgoing (Outgoing.mk ⟨(.first, false), ()⟩) := by
+  rw [← reuseRegression_hostile_embed_thirdRight,
+    reuseRegressionHostileFamily.incidentAssembly_apply_connected_channel,
+    reuseRegression_hostile_mate_thirdRight,
+    reuseRegression_hostile_embed_thirdLeft]
+
+/-- No hostile external drive makes the canonical incident state satisfy the hostile raw assembly.
+The rejected coordinate is `30 = 0`. -/
+lemma reuseRegression_hostile_incidentAssembly_ne
+    (external : ModeAmplitude (Incident reuseRegressionHostileFamily.ExternalChannel)) :
+    reuseRegressionIncident ≠
+      reuseRegressionHostileFamily.incidentAssembly reuseRegressionOutgoing external := by
+  intro hAssembly
+  have hFourthWest := congrArg
+    (fun amplitude : ModeAmplitude (Incident ReuseRegressionChannel) =>
+      amplitude (Incident.mk ⟨(.fourth, false), ()⟩)) hAssembly
+  rw [reuseRegression_hostile_incidentAssembly_fourthWest] at hFourthWest
+  norm_num [reuseRegressionIncident, reuseRegressionOutgoing] at hFourthWest
+
 end
 
 
