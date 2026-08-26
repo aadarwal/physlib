@@ -82,6 +82,8 @@ public import Physlib.Electromagnetism.Media.HomogeneousIsotropic
 public import Physlib.Electromagnetism.PointParticle.OneDimension
 public import Physlib.Electromagnetism.PointParticle.ThreeDimension
 public import Physlib.Electromagnetism.ThreeDimension.Basic
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.OneSidedTrace
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.OneSidedTraceRegression
 public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.Planar
 public import Physlib.Electromagnetism.ThreeDimension.Energy
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellBridge
@@ -821,6 +823,7 @@ public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneTrace
 public import Physlib.SpaceAndTime.Space.Origin
 public import Physlib.SpaceAndTime.Space.Slice
 public import Physlib.SpaceAndTime.Space.Translations
