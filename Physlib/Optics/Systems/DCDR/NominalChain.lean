@@ -250,6 +250,429 @@ lemma responseTransform_entry_nominalRight_nominalRight (p : Parameters)
   simpa [nominalRightIncidentAmplitude, Matrix.toLpLin_apply,
     inputChannel_ne_outputChannel p] using hResponse
 
+/-!
+
+## C. Independent and packaged two-port scattering
+
+-/
+
+/-- The independently stated nominal right-to-left scalar transmission. -/
+def nominalRightToLeftTransmission (p : Parameters) : ModeTransform Unit Unit :=
+  fun _ _ => transfer p.reverse
+
+/-- The independently stated nominal left-to-right scalar transmission. -/
+def nominalLeftToRightTransmission (p : Parameters) : ModeTransform Unit Unit :=
+  fun _ _ => transfer p
+
+/-- The independent reflectionless nominal two-port behavior of the DCDR. -/
+def nominalTwoPortBehavior (p : Parameters) : TwoPortScatteringBehavior Unit Unit :=
+  ReflectionlessTwoPort.behavior
+    (nominalRightToLeftTransmission p) (nominalLeftToRightTransmission p)
+
+/-- The independent reflectionless nominal two-port scattering matrix of the DCDR. -/
+def nominalTwoPortScattering (p : Parameters) : ScatteringMatrix (Unit ⊕ Unit) :=
+  ReflectionlessTwoPort.scattering
+    (nominalRightToLeftTransmission p) (nominalLeftToRightTransmission p)
+
+/-- The independent nominal scattering matrix realizes its stated behavior. -/
+lemma nominalTwoPortScattering_realizes_behavior (p : Parameters) :
+    (nominalTwoPortScattering p).toTwoPortScatteringBehavior = nominalTwoPortBehavior p := by
+  exact ReflectionlessTwoPort.scattering_realizes_behavior
+    (nominalRightToLeftTransmission p) (nominalLeftToRightTransmission p)
+
+/-- The original relation reindexed into nominal left/right coordinates. -/
+def nominalExternalBehavior (p : Parameters) : TwoPortScatteringBehavior Unit Unit :=
+  (netlist p).behavior.reindex
+    (nominalTwoPortExternalIncidentEquiv p) (nominalTwoPortExternalOutgoingEquiv p)
+
+/-- The well-posed N5 response packaged in nominal left/right coordinates. -/
+noncomputable def packagedNominalTwoPortScattering (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    TwoPortScatteringTransform Unit Unit :=
+  ((((netlist p).packagedScattering
+      (isWellPosed_of_hasNonzeroDenominator p hDenominator)).reindex
+        (nominalTwoPortExternalChannelEquiv p).symm).toTwoPortScatteringTransform)
+
+/-- Nominal packaging is direct endpoint relabeling of the proof-gated N5 response. -/
+lemma packagedNominalTwoPortScattering_eq_responseTransform_reindex (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedNominalTwoPortScattering p hDenominator =
+      ((netlist p).responseTransform
+        (isWellPosed_of_hasNonzeroDenominator p hDenominator)).reindex
+          (nominalTwoPortExternalIncidentEquiv p)
+          (nominalTwoPortExternalOutgoingEquiv p) := by
+  ext (output | output) (input | input) <;>
+    rcases output with ⟨⟨⟩⟩ <;>
+    rcases input with ⟨⟨⟩⟩ <;> rfl
+
+/-- The packaged nominal N5 scattering has zero left reflection. -/
+@[simp]
+lemma packagedNominalTwoPortScattering_apply_inl_inl (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedNominalTwoPortScattering p hDenominator
+        (Sum.inl (Outgoing.mk ())) (Sum.inl (Incident.mk ())) = 0 := by
+  rw [packagedNominalTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_nominalLeft_nominalLeft p hDenominator
+
+/-- The packaged nominal N5 scattering has the independent right-to-left entry. -/
+@[simp]
+lemma packagedNominalTwoPortScattering_apply_inl_inr (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedNominalTwoPortScattering p hDenominator
+        (Sum.inl (Outgoing.mk ())) (Sum.inr (Incident.mk ())) = transfer p.reverse := by
+  rw [packagedNominalTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_nominalLeft_nominalRight p hDenominator
+
+/-- The packaged nominal N5 scattering has the independent left-to-right entry. -/
+@[simp]
+lemma packagedNominalTwoPortScattering_apply_inr_inl (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedNominalTwoPortScattering p hDenominator
+        (Sum.inr (Outgoing.mk ())) (Sum.inl (Incident.mk ())) = transfer p := by
+  rw [packagedNominalTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_nominalRight_nominalLeft p hDenominator
+
+/-- The packaged nominal N5 scattering has zero right reflection. -/
+@[simp]
+lemma packagedNominalTwoPortScattering_apply_inr_inr (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedNominalTwoPortScattering p hDenominator
+        (Sum.inr (Outgoing.mk ())) (Sum.inr (Incident.mk ())) = 0 := by
+  rw [packagedNominalTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_nominalRight_nominalRight p hDenominator
+
+/-- The packaged nominal graph is exactly the reindexed original netlist behavior. -/
+lemma toBehavior_packagedNominalTwoPortScattering (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    (packagedNominalTwoPortScattering p hDenominator).toBehavior =
+      nominalExternalBehavior p := by
+  rw [packagedNominalTwoPortScattering_eq_responseTransform_reindex,
+    ModeTransform.toBehavior_reindex, nominalExternalBehavior]
+  ext state
+  rcases state with ⟨input, output⟩
+  rw [LinearBehavior.mem_reindex_iff, LinearBehavior.mem_reindex_iff]
+  have hGraph := (netlist p).toBehavior_responseTransform
+    (isWellPosed_of_hasNonzeroDenominator p hDenominator)
+  constructor
+  · intro hMember
+    exact hGraph ▸ hMember
+  · intro hMember
+    exact hGraph.symm ▸ hMember
+
+/-- The packaged N5 transform realizes the independent nominal two-port law. -/
+lemma packagedNominalTwoPortScattering_eq_nominalTwoPortScatteringTransform
+    (p : Parameters) (hDenominator : p.HasNonzeroDenominator) :
+    packagedNominalTwoPortScattering p hDenominator =
+      (nominalTwoPortScattering p).toTwoPortScatteringTransform := by
+  rw [packagedNominalTwoPortScattering_eq_responseTransform_reindex]
+  ext (output | output) (input | input) <;>
+    rcases output with ⟨⟨⟩⟩ <;>
+    rcases input with ⟨⟨⟩⟩
+  · exact responseTransform_entry_nominalLeft_nominalLeft p hDenominator
+  · exact responseTransform_entry_nominalLeft_nominalRight p hDenominator
+  · exact responseTransform_entry_nominalRight_nominalLeft p hDenominator
+  · exact responseTransform_entry_nominalRight_nominalRight p hDenominator
+
+/-- On the solve gate, the reindexed relation equals the independent nominal behavior. -/
+lemma nominalExternalBehavior_eq_nominalTwoPortBehavior (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    nominalExternalBehavior p = nominalTwoPortBehavior p := by
+  calc
+    nominalExternalBehavior p =
+        (packagedNominalTwoPortScattering p hDenominator).toBehavior :=
+      (toBehavior_packagedNominalTwoPortScattering p hDenominator).symm
+    _ = (nominalTwoPortScattering p).toTwoPortScatteringTransform.toBehavior := by
+      rw [packagedNominalTwoPortScattering_eq_nominalTwoPortScatteringTransform]
+    _ = nominalTwoPortBehavior p := nominalTwoPortScattering_realizes_behavior p
+
+/-!
+
+## D. Scalar pivot and backward-first chain
+
+-/
+
+/-- The packaged nominal right-to-left block has the independently stated scalar entry. -/
+lemma packagedNominalTwoPortScattering_rightToLeftTransmission_entry (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    (packagedNominalTwoPortScattering p hDenominator).rightToLeftTransmission
+        (BackwardWave.mk ()) (BackwardWave.mk ()) = transfer p.reverse := by
+  rw [TwoPortScatteringTransform.rightToLeftTransmission_apply]
+  exact packagedNominalTwoPortScattering_apply_inl_inr p hDenominator
+
+/-- The packaged nominal left-to-right block has the independently stated scalar entry. -/
+lemma packagedNominalTwoPortScattering_leftToRightTransmission_entry (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    (packagedNominalTwoPortScattering p hDenominator).leftToRightTransmission
+        (ForwardWave.mk ()) (ForwardWave.mk ()) = transfer p := by
+  rw [TwoPortScatteringTransform.leftToRightTransmission_apply]
+  exact packagedNominalTwoPortScattering_apply_inr_inl p hDenominator
+
+/-- The complete packaged nominal left-reflection block is zero. -/
+lemma packagedNominalTwoPortScattering_leftReflection_eq_zero (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    (packagedNominalTwoPortScattering p hDenominator).leftReflection = 0 := by
+  ext output input
+  rcases output with ⟨⟨⟩⟩
+  rcases input with ⟨⟨⟩⟩
+  rw [TwoPortScatteringTransform.leftReflection_apply]
+  exact packagedNominalTwoPortScattering_apply_inl_inl p hDenominator
+
+/-- The complete packaged nominal right-reflection block is zero. -/
+lemma packagedNominalTwoPortScattering_rightReflection_eq_zero (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    (packagedNominalTwoPortScattering p hDenominator).rightReflection = 0 := by
+  ext output input
+  rcases output with ⟨⟨⟩⟩
+  rcases input with ⟨⟨⟩⟩
+  rw [TwoPortScatteringTransform.rightReflection_apply]
+  exact packagedNominalTwoPortScattering_apply_inr_inr p hDenominator
+
+/-- A constant amplitude on the singleton nominal backward-wave family. -/
+private def nominalBackwardAmplitude (value : ℂ) :
+    ModeAmplitude (BackwardWave Unit) :=
+  WithLp.toLp 2 fun _ => value
+
+/-- The nominal right-to-left block acts by its independently stated scalar transmission. -/
+lemma packagedNominalTwoPortScattering_rightToLeftTransmission_apply (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator)
+    (amplitude : ModeAmplitude (BackwardWave Unit)) :
+    (packagedNominalTwoPortScattering p hDenominator).rightToLeftTransmission.toLinearMap
+        amplitude =
+      WithLp.toLp 2 (fun _ => transfer p.reverse * amplitude (BackwardWave.mk ())) := by
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨⟨⟩⟩
+  simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct]
+  rw [← BackwardWave.channelEquiv.symm.sum_comp, Fintype.sum_unique]
+  simp [packagedNominalTwoPortScattering_rightToLeftTransmission_entry]
+
+/-- The nominal chain pivot is bijective exactly when right-to-left transmission is nonzero. -/
+lemma packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission_iff
+    (p : Parameters) (hDenominator : p.HasNonzeroDenominator) :
+    (packagedNominalTwoPortScattering p hDenominator).HasBijectiveRightToLeftTransmission ↔
+      transfer p.reverse ≠ 0 := by
+  constructor
+  · intro hBijective hZero
+    have hMapped :
+        (packagedNominalTwoPortScattering p hDenominator).rightToLeftTransmission.toLinearMap
+            (nominalBackwardAmplitude 1) =
+          (packagedNominalTwoPortScattering p hDenominator).rightToLeftTransmission.toLinearMap
+            0 := by
+      rw [packagedNominalTwoPortScattering_rightToLeftTransmission_apply,
+        packagedNominalTwoPortScattering_rightToLeftTransmission_apply]
+      apply WithLp.ofLp_injective 2
+      funext index
+      rcases index with ⟨⟨⟩⟩
+      simp [hZero]
+    have hEqual := hBijective.1 hMapped
+    have hCoordinate := congrArg
+      (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
+        amplitude (BackwardWave.mk ())) hEqual
+    norm_num [nominalBackwardAmplitude] at hCoordinate
+  · intro hTransmission
+    constructor
+    · intro first second hEqual
+      apply WithLp.ofLp_injective 2
+      funext index
+      rcases index with ⟨⟨⟩⟩
+      have hCoordinate := congrArg
+        (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
+          amplitude (BackwardWave.mk ())) hEqual
+      rw [packagedNominalTwoPortScattering_rightToLeftTransmission_apply,
+        packagedNominalTwoPortScattering_rightToLeftTransmission_apply] at hCoordinate
+      simpa using mul_left_cancel₀ hTransmission hCoordinate
+    · intro output
+      refine ⟨nominalBackwardAmplitude
+        ((transfer p.reverse)⁻¹ * output (BackwardWave.mk ())), ?_⟩
+      rw [packagedNominalTwoPortScattering_rightToLeftTransmission_apply]
+      apply WithLp.ofLp_injective 2
+      funext index
+      rcases index with ⟨⟨⟩⟩
+      simp [nominalBackwardAmplitude, hTransmission]
+
+/-- A nonzero nominal right-to-left transmission supplies the exact N3T pivot. -/
+lemma packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission
+    (p : Parameters) (hDenominator : p.HasNonzeroDenominator)
+    (hTransmission : transfer p.reverse ≠ 0) :
+    (packagedNominalTwoPortScattering p hDenominator).HasBijectiveRightToLeftTransmission :=
+  (packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission_iff
+    p hDenominator).2 hTransmission
+
+/-- The totalized explicit nominal chain matrix in backward-first order. -/
+def nominalBackwardFirstChainMatrix (p : Parameters) :
+    BackwardFirstChainTransform Unit Unit
+  | Sum.inl _, Sum.inl _ => (transfer p.reverse)⁻¹
+  | Sum.inl _, Sum.inr _ => 0
+  | Sum.inr _, Sum.inl _ => 0
+  | Sum.inr _, Sum.inr _ => transfer p
+
+/-- The behavior-derived nominal chain on the independent solve and pivot gates. -/
+noncomputable def nominalBackwardFirstChainTransform (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) (hTransmission : transfer p.reverse ≠ 0) :
+    BackwardFirstChainTransform Unit Unit :=
+  (packagedNominalTwoPortScattering p hDenominator).toBackwardFirstChainTransform
+    (packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission
+      p hDenominator hTransmission)
+
+/-- The proof-dependent nominal pivot inverse has the reciprocal scalar entry. -/
+lemma packagedNominalTwoPortScattering_rightToLeftTransmissionInverse_entry
+    (p : Parameters) (hDenominator : p.HasNonzeroDenominator)
+    (hTransmission : transfer p.reverse ≠ 0) :
+    let hPivot := packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission
+      p hDenominator hTransmission
+    ((packagedNominalTwoPortScattering p hDenominator).rightToLeftTransmissionInverse hPivot)
+        (BackwardWave.mk ()) (BackwardWave.mk ()) = (transfer p.reverse)⁻¹ := by
+  let scattering := packagedNominalTwoPortScattering p hDenominator
+  let hPivot := packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission
+    p hDenominator hTransmission
+  have hMatrix := scattering.inverse_mul_rightToLeftTransmission hPivot
+  have hEntry := congrArg
+    (fun matrix : ModeTransform (BackwardWave Unit) (BackwardWave Unit) =>
+      matrix (BackwardWave.mk ()) (BackwardWave.mk ())) hMatrix
+  have hProduct :
+      (scattering.rightToLeftTransmissionInverse hPivot)
+          (BackwardWave.mk ()) (BackwardWave.mk ()) * transfer p.reverse = 1 := by
+    simp only [Matrix.mul_apply] at hEntry
+    rw [← BackwardWave.channelEquiv.symm.sum_comp, Fintype.sum_unique] at hEntry
+    simpa [scattering] using hEntry
+  exact (mul_eq_one_iff_eq_inv₀ hTransmission).mp hProduct
+
+/-- The behavior-derived nominal chain is the explicit diagonal matrix. -/
+lemma nominalBackwardFirstChainTransform_eq_matrix (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) (hTransmission : transfer p.reverse ≠ 0) :
+    nominalBackwardFirstChainTransform p hDenominator hTransmission =
+      nominalBackwardFirstChainMatrix p := by
+  rw [nominalBackwardFirstChainTransform,
+    TwoPortScatteringTransform.toBackwardFirstChainTransform_eq_blockFormula]
+  ext (output | output) (input | input) <;>
+    rcases output with ⟨⟨⟩⟩ <;>
+    rcases input with ⟨⟨⟩⟩ <;>
+    simp [TwoPortScatteringTransform.backwardFirstChainBlockFormula,
+      nominalBackwardFirstChainMatrix,
+      packagedNominalTwoPortScattering_leftReflection_eq_zero,
+      packagedNominalTwoPortScattering_rightReflection_eq_zero,
+      packagedNominalTwoPortScattering_rightToLeftTransmissionInverse_entry
+        p hDenominator hTransmission,
+      packagedNominalTwoPortScattering_leftToRightTransmission_entry]
+
+/-- The nominal chain graph is the backward-first regrouping of the reindexed N5 relation. -/
+lemma toBehavior_nominalBackwardFirstChainTransform (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) (hTransmission : transfer p.reverse ≠ 0) :
+    (nominalBackwardFirstChainTransform p hDenominator hTransmission).toBehavior =
+      (nominalExternalBehavior p).toBackwardFirst := by
+  rw [nominalBackwardFirstChainTransform,
+    TwoPortScatteringTransform.toBehavior_toBackwardFirstChainTransform]
+  unfold TwoPortScatteringTransform.toBackwardFirstBehavior
+  rw [toBehavior_packagedNominalTwoPortScattering]
+
+/-- The nominal DCDR chain has the automatically transported leading-block pivot. -/
+lemma nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) (hTransmission : transfer p.reverse ≠ 0) :
+    (nominalBackwardFirstChainTransform p hDenominator hTransmission).HasBijectiveLeadingBlock :=
+  TwoPortScatteringTransform.hasBijectiveLeadingBlock_toBackwardFirstChainTransform
+    (packagedNominalTwoPortScattering p hDenominator)
+    (packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission
+      p hDenominator hTransmission)
+
+/-- Generic N3T conversion of the nominal chain back to scattering recovers the N5 two-port. -/
+lemma nominalBackwardFirstChainTransform_roundTrip (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) (hTransmission : transfer p.reverse ≠ 0) :
+    (nominalBackwardFirstChainTransform p hDenominator hTransmission)
+        |>.toTwoPortScatteringTransform
+          (nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock
+            p hDenominator hTransmission) =
+      packagedNominalTwoPortScattering p hDenominator :=
+  TwoPortScatteringTransform.toTwoPortScatteringTransform_toBackwardFirstChainTransform
+    (packagedNominalTwoPortScattering p hDenominator)
+    (packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission
+      p hDenominator hTransmission)
+    (nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock
+      p hDenominator hTransmission)
+
+/-!
+
+## E. Common-domain Z and chain agreement
+
+-/
+
+/-- The DCDR Z common domain extended by the independent nominal chain pivot.
+
+The pivot is a separate field. It is not derived from ROC membership, either Schur certificate,
+local loop contraction, no cancellation, reduced evaluation, or N5 well-posedness.
+-/
+structure IsZChainCrossSemanticsDomain (p : UnitDelayParameters)
+    (certificate : ResponseReduction p) (z : ℂ) : Prop
+    extends IsZCrossSemanticsDomain p certificate z where
+  /-- The nominal right-to-left scalar transmission is nonzero at `q = z⁻¹`. -/
+  nominalRightToLeftTransmission_ne_zero : transfer (p.at z⁻¹).reverse ≠ 0
+
+/-- The extended domain's base witness supplies the fixed N5 solve gate. -/
+lemma IsZChainCrossSemanticsDomain.hasNonzeroDenominator
+    {p : UnitDelayParameters} {certificate : ResponseReduction p} {z : ℂ}
+    (h : IsZChainCrossSemanticsDomain p certificate z) :
+    (p.at z⁻¹).HasNonzeroDenominator :=
+  h.toIsZCrossSemanticsDomain.hasNonzeroDenominator
+
+/-- On the solve and pivot gates, recurrence response equals the nominal chain response entry. -/
+lemma zTransfer_eq_nominalBackwardFirstChainTransform_entry
+    (p : UnitDelayParameters) (z : ℂ)
+    (hDenominator : (p.at z⁻¹).HasNonzeroDenominator)
+    (hTransmission : transfer (p.at z⁻¹).reverse ≠ 0) :
+    zTransfer p z =
+      nominalBackwardFirstChainTransform (p.at z⁻¹) hDenominator hTransmission
+        (Sum.inr (ForwardWave.mk ())) (Sum.inr (ForwardWave.mk ())) := by
+  rw [zTransfer_eq_transfer,
+    nominalBackwardFirstChainTransform_eq_matrix]
+  rfl
+
+/-- Proof object collecting the complete DCDR X-01 agreement including the nominal chain. -/
+structure ZChainCrossSemanticsAgreement (p : UnitDelayParameters)
+    (certificate : ResponseReduction p) (z : ℂ)
+    (h : IsZChainCrossSemanticsDomain p certificate z) : Prop where
+  /-- All causal-Z, rational, N5, Mason, scattering, and relational fields agree. -/
+  base : ZCrossSemanticsAgreement p certificate z h.toIsZCrossSemanticsDomain
+  /-- The recurrence response equals the bottom-right backward-first chain entry. -/
+  backwardFirstChain :
+    zTransfer p z =
+      nominalBackwardFirstChainTransform (p.at z⁻¹) h.hasNonzeroDenominator
+          h.nominalRightToLeftTransmission_ne_zero
+        (Sum.inr (ForwardWave.mk ())) (Sum.inr (ForwardWave.mk ()))
+  /-- The derived chain graph is the nominal backward-first original relation. -/
+  chainBehavior :
+    (nominalBackwardFirstChainTransform (p.at z⁻¹) h.hasNonzeroDenominator
+        h.nominalRightToLeftTransmission_ne_zero).toBehavior =
+      (nominalExternalBehavior (p.at z⁻¹)).toBackwardFirst
+  /-- Generic N3T conversion recovers the complete nominal packaged scattering law. -/
+  scatteringRoundTrip :
+    let chain := nominalBackwardFirstChainTransform
+      (p.at z⁻¹) h.hasNonzeroDenominator h.nominalRightToLeftTransmission_ne_zero
+    chain.toTwoPortScatteringTransform
+        (nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock
+          (p.at z⁻¹) h.hasNonzeroDenominator
+            h.nominalRightToLeftTransmission_ne_zero) =
+      packagedNominalTwoPortScattering (p.at z⁻¹) h.hasNonzeroDenominator
+
+/-- On the explicit extended domain, every applicable DCDR X-01 view agrees.
+
+The base record supplies causal impulse Z, reduced rational response, reciprocal-Z N5F,
+circulation, fixed N5, complete Mason, packaged scattering, and full-vector relational behavior.
+This extension adds the independently gated nominal backward-first chain and its N3T round trip.
+-/
+lemma zChainCrossSemantics_agree (p : UnitDelayParameters)
+    (certificate : ResponseReduction p) (z : ℂ)
+    (h : IsZChainCrossSemanticsDomain p certificate z) :
+    ZChainCrossSemanticsAgreement p certificate z h where
+  base := zCrossSemantics_agree p certificate z h.toIsZCrossSemanticsDomain
+  backwardFirstChain :=
+    zTransfer_eq_nominalBackwardFirstChainTransform_entry p z
+      h.hasNonzeroDenominator h.nominalRightToLeftTransmission_ne_zero
+  chainBehavior :=
+    toBehavior_nominalBackwardFirstChainTransform (p.at z⁻¹)
+      h.hasNonzeroDenominator h.nominalRightToLeftTransmission_ne_zero
+  scatteringRoundTrip :=
+    nominalBackwardFirstChainTransform_roundTrip (p.at z⁻¹)
+      h.hasNonzeroDenominator h.nominalRightToLeftTransmission_ne_zero
+
 end
 
 end Optics.DCDR
