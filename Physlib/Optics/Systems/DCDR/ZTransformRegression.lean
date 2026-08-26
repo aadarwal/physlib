@@ -20,11 +20,11 @@ circulation series, fixed N5 response, complete Mason response, typed packaged s
 original relational behavior at that same exact value.
 
 The nonreal `z = I` anchor expands `q = z⁻¹ = -I` directly and reaches the raw compiled response
-without `zCrossSemantics_agree`. The separate stable point with loop polynomial `-(1/4)q²`
-exercises the proved lag-two geometric ROC criterion at `z = 1`. The active-amplifier sentinel has
-loop gain `-4`: its algebraic transfer is `-67/20`, while Mathlib's totalized nonsummable geometric
-`tsum` makes the unguarded circulation expression `1/4`. Thus the contraction/Schur gates can
-detect a real divergence.
+without `zCrossSemantics_agree`. The same point belongs to the proved lag-two geometric ROC and
+has a fully assembled common-domain witness. The separate cancelling-loop fixture exercises all
+views at `z = 1`. The active-amplifier sentinel has loop gain `-4`: its algebraic transfer is
+`-67/20`, while Mathlib's totalized nonsummable geometric `tsum` makes the unguarded circulation
+expression `1/4`. Thus the contraction/Schur gates can detect a real divergence.
 
 These are algebraic discrete-time fixtures, not physical resonance claims. No coherent--incoherent
 equivalence, BIBO conclusion, modal or electromagnetic power statement, Maxwell time-domain
@@ -38,6 +38,7 @@ unit-normalized bridge at
 
 - `DCDR.zRegression_crossSemantics`: every applicable DCDR view is pinned at `-1`.
 - `DCDR.zRegression_stable_one_mem_zTransferROC`: nonzero-loop ROC membership is derived.
+- `DCDR.zRegression_stable_I_crossSemanticsDomain`: the nonreal anchor is a common-domain point.
 - `DCDR.zRegression_nonreal_raw_compiled`: the `z = I`, `q = -I` compiled anchor.
 - `DCDR.zRegression_active_circulation_ne_transfer`: the load-bearing contraction sentinel.
 
@@ -245,6 +246,14 @@ lemma zRegression_stable_one_mem_zTransferROC :
     zRegression_stable_zFeedbackLags zRegression_stable_zFeedbackCoefficient_two
   norm_num
 
+/-- The nonreal anchor `z = I` belongs to the actual lag-two geometric ROC. -/
+lemma zRegression_stable_I_mem_zTransferROC :
+    Complex.I ∈ zTransferROC stableUnitDelayParameters := by
+  apply mem_zTransferROC_of_lagTwoGeometric stableUnitDelayParameters
+    (Complex.I / 2) Complex.I zRegression_stable_zFeedbackLags
+      zRegression_stable_zFeedbackCoefficient_two
+  norm_num
+
 /-- The unit cancelled factor is nonzero at the selected reciprocal point. -/
 lemma zRegression_noPoleCancellation :
     zRegressionRationalReduction.NoPoleCancellation 1 := by
@@ -278,6 +287,31 @@ lemma zRegression_crossSemanticsDomain :
   mem_reducedEvaluationDomain := by
     simpa [zRegressionResponseReduction, zRegressionRationalReduction] using
       zRegression_one_mem_reducedEvaluationDomain
+
+/-- The stable nonzero-loop fixture assembles every common-domain gate at `z = I`, hence
+`q = z⁻¹ = -I`. ROC, Schur, cancellation, and fixed-loop conditions remain separate fields. -/
+lemma zRegression_stable_I_crossSemanticsDomain :
+    IsZCrossSemanticsDomain stableUnitDelayParameters stableResponseReduction Complex.I where
+  isAdmissible := stableUnitDelayParameters_isAdmissible
+  recurrenceIsContractive := by
+    rw [UnitDelayParameters.IsZContractive, zRegression_stable_zFeedbackLags]
+    simp [zRegression_stable_zFeedbackCoefficient_two, norm_pow]
+  reducedIsSchurStable := by
+    simpa [stableResponseReduction, stableRationalReduction] using
+      stableReducedResponse_isSchurStable
+  loopIsContractive := by
+    rw [← stableUnitDelayParameters.eval_loopPolynomial,
+      stable_loopPolynomial_expansion, Complex.inv_I]
+    norm_num [Complex.I_mul_I]
+  mem_zTransferROC := zRegression_stable_I_mem_zTransferROC
+  noPoleCancellation := by
+    simp [stableResponseReduction, stableRationalReduction,
+      DelayTransfer.RationalReduction.NoPoleCancellation]
+  mem_reducedEvaluationDomain := by
+    rw [Complex.inv_I]
+    simp [stableResponseReduction, stableRationalReduction, stableReducedResponse,
+      DelayTransfer.ReducedRationalResponse.evaluationDomain, stableDenominator,
+      Complex.I_mul_I]
 
 /-- The fixed `q = 1` presentation has the scalar N5 solve gate supplied by the common domain. -/
 lemma zRegression_fixed_hasNonzeroDenominator :
@@ -543,6 +577,26 @@ lemma zRegression_stable_independent_nonzeroLoop_I :
     zRegression_stable_rawCompiled_I,
     zRegression_stable_eliminationResponse_neg_I,
     zRegression_stable_auditedMasonResponse_neg_I⟩
+
+/-- The assembled `z = I` common-domain agreement is backed by the four independently expanded
+nonzero-loop values. The second conjunct does not use `zCrossSemantics_agree`. -/
+lemma zRegression_stable_I_commonDomain_independent_anchor :
+    let h := zRegression_stable_I_crossSemanticsDomain
+    ZCrossSemanticsAgreement stableUnitDelayParameters stableResponseReduction Complex.I h ∧
+      transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
+          -(7 / 8) * Complex.I ∧
+      rationalZEliminationResponse stableUnitDelayParameters Complex.I
+          h.mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
+      eliminationResponse (stableUnitDelayParameters.at (-Complex.I))
+          (isWellPosed_of_hasNonzeroDenominator
+            (stableUnitDelayParameters.at (-Complex.I)) h.hasNonzeroDenominator) =
+        -(7 / 8) * Complex.I ∧
+      auditedMasonResponse (stableUnitDelayParameters.at (-Complex.I)) =
+        -(7 / 8) * Complex.I := by
+  let h := zRegression_stable_I_crossSemanticsDomain
+  refine ⟨zCrossSemantics_agree stableUnitDelayParameters
+    stableResponseReduction Complex.I h, ?_⟩
+  simpa using zRegression_stable_independent_nonzeroLoop_I
 
 /-!
 
