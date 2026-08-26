@@ -22,9 +22,10 @@ chosen tangent direction. Short-edge and lateral-face terms sample genuine two-s
 off the carrier. Face averages use that tangent and its oriented quarter-turn
 `normalVector cross tangent`; their physical area Jacobian cancels in the normalized average.
 
-The file does not state Stokes, divergence, or Maxwell laws. It also does not prove that the
-averages converge to one-sided traces: that requires uniform thin-cell control stronger than a
-pointwise trace and is therefore an explicit hypothesis in the electromagnetic consumer.
+The file does not state Stokes, divergence, or Maxwell laws. Convergence of its principal and
+carrier-source averages is supplied separately by `PlanarThinCellConvergence`; the full
+half-space trace controls every nearby selected-side sample, while integrability remains an
+explicit hypothesis.
 
 ## ii. Key results
 
