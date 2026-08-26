@@ -431,6 +431,7 @@ lemma latticeRegression_mem_componentBehavior :
     latticeRegressionParameters).mem_componentBehavior_iff_forall_component
       latticeRegressionIncident latticeRegressionOutgoing).2
   intro component
+  change RectangularLatticeComponent 2 2 at component
   change
     (latticeRegressionIncident.restrictEmbedding
         (Incident.relabelEmbedding
