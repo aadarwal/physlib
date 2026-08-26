@@ -1638,6 +1638,19 @@ PR unless maintainers explicitly ask to retain it.
   layer, relational agreement, response agreement, adversarial fixtures, and registration. The
   development history is atomic by concept, but the eventual proposals should preserve the
   per-module review surfaces below 200 lines wherever dependencies permit.
+- [x] Instantiate the all-pass relational/N5/Mason leg of X-01. On
+  `Parameters.HasNonzeroDenominator`, the complete extracted Mason response realizes the existing
+  `FlatNetlist.behavior`; an independently defined reduced two-node circulation model has
+  determinant `1 - t * gamma` and gives the same through transfer. No graph reduction or
+  edge-level extraction from the complete graph is claimed. The exact regression expands its
+  numerator and loop determinant separately from the raw N5 channel solution and includes a
+  swapped-edge-value sentinel. The reduced Mason gain and assembled transfer remain totalized
+  algebraic definitions whose response meaning is only proved on that gate.
+- [ ] Human-check the all-pass Mason instance before upstreaming. Confirm the reduced graph order
+  `y -> x` has gain `gamma`, the return edge has gain `t`, the direct through path is added outside
+  the internal Mason gain, and the reduced determinant is not confused with the complete
+  bidirectional `C * S` determinant. This slice makes no chain, delay, causality, ROC, passivity,
+  reciprocity, or complete X-01 claim.
 - [ ] Add one transport operation for a `PortConnectionFamily` along an equivalence of port
   families. This is the shared missing machinery behind both N5H inner-family replacement by an
   equal boundary relation and literal three-stage append associativity; treat it as one gap, not
