@@ -148,8 +148,21 @@ lemma transport_mateEquiv (equiv : P.Equiv Q) (connection : PortConnection P)
     (connection.transport equiv).mateEquiv
         (connection.transportLocalChannelEquiv equiv channel) =
       connection.transportLocalChannelEquiv equiv (connection.mateEquiv channel) := by
-  rcases channel with mode | mode <;>
-    simp [transport, transportLocalChannelEquiv, PortConnection.mateEquiv]
+  rcases channel with mode | mode
+  · change Sum.inr
+        (equiv.modeEquiv connection.right
+          (connection.modeEquiv
+            ((equiv.modeEquiv connection.left).symm
+              (equiv.modeEquiv connection.left mode)))) =
+      Sum.inr (equiv.modeEquiv connection.right (connection.modeEquiv mode))
+    simp
+  · change Sum.inl
+        (equiv.modeEquiv connection.left
+          (connection.modeEquiv.symm
+            ((equiv.modeEquiv connection.right).symm
+              (equiv.modeEquiv connection.right mode)))) =
+      Sum.inl (equiv.modeEquiv connection.left (connection.modeEquiv.symm mode))
+    simp
 
 end PortConnection
 
@@ -424,17 +437,8 @@ lemma externalOutgoingReadout_transport
   rcases transportedEndpoint with ⟨transportedExternal⟩
   obtain ⟨sourceExternal, rfl⟩ :=
     (family.transportExternalChannelEquiv equiv).surjective transportedExternal
-  change outgoing
-      ((Outgoing.relabelEquiv equiv.channelEquiv).symm
-        (Outgoing.relabelEquiv equiv.channelEquiv (Outgoing.mk sourceExternal.1))) =
-    (family.externalOutgoingReadout.toLinearMap outgoing)
-      ((Outgoing.relabelEquiv
-        (family.transportExternalChannelEquiv equiv)).symm
-          (Outgoing.relabelEquiv
-            (family.transportExternalChannelEquiv equiv)
-              (Outgoing.mk sourceExternal)))
-  rw [Equiv.symm_apply_apply, Equiv.symm_apply_apply,
-    family.externalOutgoingReadout_apply, ModeAmplitude.restrictEmbedding_apply]
+  simp only [ModeAmplitude.restrictEmbedding_apply, ModeAmplitude.reindex_apply,
+    Equiv.symm_apply_apply]
   rfl
 
 /-- Closure membership is invariant after transporting the ambient behavior and both external
@@ -475,7 +479,7 @@ lemma mem_closeBehavior_transport_iff
               (ModeAmplitude.reindex
                 (Incident.relabelEquiv
                   (family.transportExternalChannelEquiv equiv)) input) := by
-                    rw [outgoing, ModeAmplitude.reindex_reindex_symm]
+                    simp only [outgoing, ModeAmplitude.reindex_reindex_symm]
         _ = ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)
               (family.incidentAssembly outgoing input) :=
                 family.incidentAssembly_transport equiv outgoing input
@@ -488,7 +492,7 @@ lemma mem_closeBehavior_transport_iff
               transportedOutgoing := hOutput
         _ = (family.transport equiv).externalOutgoingReadout.toLinearMap
               (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing) := by
-                rw [outgoing, ModeAmplitude.reindex_reindex_symm]
+                simp only [outgoing, ModeAmplitude.reindex_reindex_symm]
         _ = ModeAmplitude.reindex
               (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv))
               (family.externalOutgoingReadout.toLinearMap outgoing) :=
