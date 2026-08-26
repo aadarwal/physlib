@@ -600,54 +600,72 @@ def physicalPortSuite9aHostileIndexedOutput :
         (3 - 8 * Complex.I) / 5
     | ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩ => 3 * Complex.I
 
+/-- The primitive indexed matrix after swapping only the two beam output rows. -/
+def physicalPortSuite9aHostileExplicitIndexedTransform :
+    ModeTransform physicalPortSuite9aHostileFamily.IndexedChannel
+      physicalPortSuite9aHostileFamily.IndexedChannel := fun output input =>
+  match output, input with
+  | ⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩,
+      ⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩ =>
+      -Complex.I * (4 / 5)
+  | ⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩,
+      ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩ => 3 / 5
+  | ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩,
+      ⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩ => 3 / 5
+  | ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩,
+      ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩ =>
+      -Complex.I * (4 / 5)
+  | ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩,
+      ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩ => Complex.I
+  | _, _ => 0
+
+/-- Unfolding the hostile row reindex gives the displayed primitive indexed matrix. -/
+lemma physicalPortSuite9a_hostile_indexedScatteringMatrix_eq_explicit :
+    physicalPortSuite9aHostileFamily.indexedScatteringMatrix.toModeTransform =
+      physicalPortSuite9aHostileExplicitIndexedTransform := by
+  ext output input
+  rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
+  rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
+  cases outputComponent <;> cases inputComponent
+  all_goals
+    cases outputPort <;> cases outputMode <;>
+      cases inputPort <;> cases inputMode
+  all_goals
+    simp [ScatteringComponentFamily.indexedScatteringMatrix,
+      physicalPortSuite9aHostileExplicitIndexedTransform,
+      physicalPortSuite9aHostileFamily, physicalPortSuite9aHostileScattering,
+      physicalPortSuite9aPortFamily, physicalPortSuite9aHostileBeamScattering,
+      physicalPortSuite9aBeamChannelSwap, BeamSplitter.physicalScattering,
+      Mirror.physicalScattering, ScatteringMatrix.toModeTransform_reindex,
+      ModeTransform.reindex_apply, BeamSplitter.scattering, BeamSplitter.mixing,
+      BeamSplitter.crossCoefficient, BeamSplitter.channelEquiv, Mirror.scattering,
+      Mirror.reflection, physicalPortSuite9aBeamParameters,
+      physicalPortSuite9aMirrorParameters, Matrix.blockDiagonal'_apply]
+
 /-- The hostile indexed family acts by the swapped beam law and unchanged mirror law. -/
 lemma physicalPortSuite9a_hostile_indexed_action :
     physicalPortSuite9aHostileFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
         physicalPortSuite9aIndexedInput =
       physicalPortSuite9aHostileIndexedOutput := by
+  rw [physicalPortSuite9a_hostile_indexedScatteringMatrix_eq_explicit]
   apply WithLp.ofLp_injective 2
   funext output
-  rcases output with ⟨component, channel⟩
+  rcases output with ⟨component, ⟨port, mode⟩⟩
   cases component
-  · change ModeTransform.toLinearMap
-        (Matrix.blockDiagonal'
-          (fun selected =>
-            (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform))
-        physicalPortSuite9aIndexedInput ⟨.beamSplitter, channel⟩ = _
-    calc
-      _ = ModeTransform.toLinearMap
-            (physicalPortSuite9aHostileFamily.scattering .beamSplitter).toModeTransform
-            (physicalPortSuite9aIndexedInput.restrictEmbedding
-              (Function.Embedding.sigmaMk .beamSplitter)) channel :=
-        ModeTransform.blockDiagonal'_apply
-          (fun selected =>
-            (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform)
-          physicalPortSuite9aIndexedInput .beamSplitter channel
-      _ = _ := by
-        rw [physicalPortSuite9aIndexedInput_restrict_beam,
-          physicalPortSuite9a_hostile_beam_local_action]
-        rcases channel with ⟨port, mode⟩
-        cases port <;> cases mode <;> rfl
-  · change ModeTransform.toLinearMap
-        (Matrix.blockDiagonal'
-          (fun selected =>
-            (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform))
-        physicalPortSuite9aIndexedInput ⟨.mirror, channel⟩ = _
-    calc
-      _ = (physicalPortSuite9aHostileFamily.scattering .mirror).toModeTransform.toLinearMap
-            (physicalPortSuite9aIndexedInput.restrictEmbedding
-              (Function.Embedding.sigmaMk .mirror)) channel :=
-        ModeTransform.blockDiagonal'_apply
-          (fun selected =>
-            (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform)
-          physicalPortSuite9aIndexedInput .mirror channel
-      _ = _ := by
-        rw [physicalPortSuite9aIndexedInput_restrict_mirror,
-          physicalPortSuite9a_mirror_local_action]
-        rcases channel with ⟨port, mode⟩
-        cases port
-        cases mode
-        rfl
+  · cases port <;> cases mode
+    all_goals
+      simp [physicalPortSuite9aHostileExplicitIndexedTransform,
+        physicalPortSuite9aIndexedInput, physicalPortSuite9aHostileIndexedOutput,
+        ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
+        dotProduct, physicalPortSuite9a_sum_indexed]
+    all_goals ring_nf
+  · cases port
+    cases mode
+    simp [physicalPortSuite9aHostileExplicitIndexedTransform,
+      physicalPortSuite9aIndexedInput, physicalPortSuite9aHostileIndexedOutput,
+      ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
+      dotProduct, physicalPortSuite9a_sum_indexed]
+    ring
 
 /-- The hostile exact output in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aHostileAggregateOutput :
