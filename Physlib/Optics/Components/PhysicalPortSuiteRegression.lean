@@ -298,6 +298,10 @@ lemma physicalPortSuite9a_sum_indexed
     · cases port
       cases mode
       simp
+  have hBeamPorts :
+      physicalPortSuite9aBeamFirstLocal ≠ physicalPortSuite9aBeamSecondLocal := by
+    intro hEqual
+    injection hEqual
   have hFirst :
       physicalPortSuite9aBeamFirstIndexed ∉
         ({physicalPortSuite9aBeamSecondIndexed,
@@ -306,7 +310,7 @@ lemma physicalPortSuite9a_sum_indexed
     simp [physicalPortSuite9aBeamFirstIndexed,
       physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed,
       physicalPortSuite9aBeamFirstLocal, physicalPortSuite9aBeamSecondLocal,
-      physicalPortSuite9aMirrorLocal]
+      physicalPortSuite9aMirrorLocal, hBeamPorts]
   have hSecond :
       physicalPortSuite9aBeamSecondIndexed ∉
         ({physicalPortSuite9aMirrorIndexed} :
