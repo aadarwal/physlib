@@ -26,7 +26,7 @@ packaging, realization, or `ScatteringComponentFamily` assembled-action lemma un
 The hostile family swaps only the two beam-splitter output endpoints. On the same input its beam
 outputs become `(6 - 4I)/5` and `(3 - 8I)/5`, while the mirror remains `3I`. The first coordinate
 therefore proves a genuine output inequality. This sentinel can fail under endpoint-order,
-component-ownership, row/column, or component-index errors; Phase 9b can add fiber and side
+component-ownership, or component-index errors; Phase 9b can add fiber and side
 sentinels without altering it.
 
 ## ii. Key results
