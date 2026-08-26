@@ -431,12 +431,11 @@ lemma latticeRegression_mem_componentBehavior :
     latticeRegressionParameters).mem_componentBehavior_iff_forall_component
       latticeRegressionIncident latticeRegressionOutgoing).2
   intro component
+  change RectangularLatticeComponent 2 2 at component
   let _ : Fintype
-      ((rectangularLatticeNetlist
-        latticeRegressionParameters).components.portFamily component).Channel := by
-    change Fintype
       ((rectangularLatticeComponents
-        latticeRegressionParameters).portFamily component).Channel
+        latticeRegressionParameters).portFamily component).Channel := by
+    change Fintype (rectangularLatticeComponentPortFamily component).Channel
     exact rectangularLatticeLocalChannelFintype latticeRegressionParameters component
   change
     (latticeRegressionIncident.restrictEmbedding
