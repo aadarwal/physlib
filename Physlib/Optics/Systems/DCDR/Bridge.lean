@@ -17,10 +17,6 @@ and netlist-routing equations. It also constructs a complete zero-reverse realiz
 graph solution. Together these directions certify that graph solutions are exactly the forward
 projections of complete N7 realizations with zero reverse excitation.
 
-Every retained graph edge is related to the exact assembled component entry and its routed input
-and output coordinates. The bridge does not identify the forward graph with the complete
-bidirectional `C * S` feedback graph.
-
 ## ii. Key results
 
 - `DCDR.forwardState_isNodeSolution_of_netlistEquations`: complete equations project to the
@@ -35,6 +31,10 @@ bidirectional `C * S` feedback graph.
 
 ## iv. References
 
+Every retained graph edge is related to the exact assembled component entry and its routed input
+and output coordinates. The bridge does not identify the forward graph with the complete
+bidirectional `C * S` feedback graph.
+
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definition 8 and Theorem 3 (p. 173).
 -/
@@ -47,7 +47,11 @@ noncomputable section
 
 namespace DCDR
 
-/-! ## A. Relational extraction from the N7 netlist equations -/
+/-!
+
+## A. Relational extraction from the N7 netlist equations
+
+-/
 
 /-- The first-coupler restriction satisfies its N7 physical behavior. -/
 lemma firstCoupler_physicalBehavior_of_scatteringEquation (p : Parameters)
@@ -1359,4 +1363,3 @@ end DCDR
 end
 
 end Optics
-

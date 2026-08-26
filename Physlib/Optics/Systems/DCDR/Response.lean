@@ -25,11 +25,6 @@ four-factor elimination formula is proved there at lines 466-470. Here `eliminat
 selects one entry of that existing transform; it does not define network semantics by a stored
 formula.
 
-The algebraic `transfer` quotient is totalized by Mathlib. Its netlist-response meaning is asserted
-only under `Parameters.HasNonzeroDenominator`. No contraction, infinite-series convergence,
-causality, delay, region of convergence, pole, zero, stability, passivity, losslessness,
-reciprocity, resonance, bandwidth, or material realization is asserted.
-
 ## ii. Key results
 
 - `DCDR.isWellPosed_iff`: the scalar denominator gate is exactly N5 well-posedness.
@@ -44,6 +39,11 @@ reciprocity, resonance, bandwidth, or material realization is asserted.
 - D. Selected elimination response
 
 ## iv. References
+
+The algebraic `transfer` quotient is totalized by Mathlib. Its netlist-response meaning is asserted
+only under `Parameters.HasNonzeroDenominator`. No contraction, infinite-series convergence,
+causality, delay, region of convergence, pole, zero, stability, passivity, losslessness,
+reciprocity, resonance, bandwidth, or material realization is asserted.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal Processing
 Systems", FMICS 2015, LNCS 9128, Definition 8 and Theorem 3 (p. 173). The printed theorem is the
@@ -64,7 +64,11 @@ local instance responseExternalChannelFintype (p : Parameters) :
     Fintype (netlist p).ExternalChannel :=
   (netlist p).eliminationExternalChannelFintype
 
-/-! ## A. Scalar response data -/
+/-!
+
+## A. Scalar response data
+
+-/
 
 /-- The coherent gain around the DCDR feedback loop. -/
 def Parameters.loopGain (p : Parameters) : ℂ :=
@@ -135,7 +139,11 @@ lemma Parameters.denominator_reverse (p : Parameters) :
           DirectionalCoupler.crossCoefficient p.firstCoupler)
   ring
 
-/-! ## B. Forward and reverse homogeneous equations -/
+/-!
+
+## B. Forward and reverse homogeneous equations
+
+-/
 
 /-- A forward state satisfying the homogeneous equations vanishes on the solve gate. -/
 lemma ForwardEquations.eq_zero {p : Parameters} {state : Node → ℂ}
@@ -298,7 +306,11 @@ lemma reverseEquations_of_netlistEquations (p : Parameters)
     by simpa [reverseState, Parameters.reverse, add_comm] using
       scatteringEquation_firstCoupler_leftFirst p incident outgoing hScattering⟩
 
-/-! ## C. Exact N5 solve gate -/
+/-!
+
+## C. Exact N5 solve gate
+
+-/
 
 /-- A homogeneous complete N7 state vanishes when the scalar denominator is nonzero. -/
 lemma feedbackFixedPoint_eq_zero (p : Parameters) (hDenominator : p.HasNonzeroDenominator)
@@ -440,7 +452,11 @@ lemma isWellPosed_iff (p : Parameters) :
     exact not_isWellPosed_of_denominator_eq_zero p hZero hWellPosed
   · exact isWellPosed_of_hasNonzeroDenominator p
 
-/-! ## D. Selected elimination response -/
+/-!
+
+## D. Selected elimination response
+
+-/
 
 /-- The selected input-to-output entry of the proof-gated N5 response transform. -/
 noncomputable def eliminationResponse (p : Parameters) (hWellPosed : (netlist p).IsWellPosed) :

@@ -29,11 +29,6 @@ solution, then crosses the relational bridge to complete netlist equations.
 swaps the first coupler's two launch ports in an actual `FlatNetlist`; the production lift then
 fails the rewired incident-assembly equation at the upper path.
 
-These are hostile algebraic topology fixtures. The coupler values are not unitary or passive, and
-the tests assert no response, power, stability, pole, zero, resonance, causality, reciprocity, or
-material interpretation. Power would mean normalized modal power, not electromagnetic power
-before the separately gated Poynting-normalization bridge.
-
 ## ii. Key results
 
 - `topologyRegression_connectionEndpoints`: all six netlist wires in endpoint order.
@@ -54,6 +49,11 @@ before the separately gated Poynting-normalization bridge.
 
 ## iv. References
 
+These are hostile algebraic topology fixtures. The coupler values are not unitary or passive, and
+the tests assert no response, power, stability, pole, zero, resonance, causality, reciprocity, or
+material interpretation. Power would mean normalized modal power, not electromagnetic power
+before the separately gated Poynting-normalization bridge.
+
 The branch order is FMICS 2015, Definition 8 (p. 173). This regression checks Physlib's audited
 transcription and makes no additional source claim.
 -/
@@ -66,7 +66,11 @@ noncomputable section
 
 namespace DCDR
 
-/-! ## A. Asymmetric parameters and physical wiring -/
+/-!
+
+## A. Asymmetric parameters and physical wiring
+
+-/
 
 /-- Distinct algebraic gains used to expose every directed role in the topology. -/
 def topologyRegressionParameters : Parameters where
@@ -144,7 +148,11 @@ lemma topologyRegression_edgeSources :
 lemma topologyRegression_edgeTargets :
     edgeTarget = ![2, 5, 7, 3, 4, 7, 6, 1, 2, 3, 6] := rfl
 
-/-! ## B. Direct edge-level matrix anchors -/
+/-!
+
+## B. Direct edge-level matrix anchors
+
+-/
 
 /-- Direct edge enumeration gives the first coupler's upper through entry. -/
 lemma topologyRegression_firstUpper :
@@ -211,7 +219,11 @@ lemma topologyRegression_output_orientation :
   have hImaginary := congrArg Complex.im hEqual
   norm_num at hImaginary
 
-/-! ## C. Numeric graph-to-netlist projection -/
+/-!
+
+## C. Numeric graph-to-netlist projection
+
+-/
 
 /-- A numeric fixture with zero feedback gain, retaining unequal coupler and arm coefficients. -/
 def topologyProjectionParameters : Parameters where
@@ -310,7 +322,11 @@ lemma topologyProjection_exists_netlistRealization :
     topologyProjectionParameters 1 topologyProjectionState).mp
       topologyProjection_isNodeSolution
 
-/-! ## D. Rewired-netlist negative control -/
+/-!
+
+## D. Rewired-netlist negative control
+
+-/
 
 /-- The DCDR wiring with the first coupler's upper and lower launch ports deliberately swapped. -/
 def topologySwappedConnections (p : Parameters) :

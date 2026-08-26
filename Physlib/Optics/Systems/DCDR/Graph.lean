@@ -20,9 +20,6 @@ The scalar coefficient matrix is the parallel-edge sum from
 `Physlib/Mathematics/SignalFlowGraph/Extraction.lean:175-183`, named through
 `ofCoefficientMatrix` from the same file's lines 95-97.
 
-The complete N7 netlist is bidirectional, while this graph records only the forward boundary
-coordinates. No claim identifies this matrix with the complete `C * S` feedback graph.
-
 ## ii. Key results
 
 - `DCDR.signalMultigraph`: the edge-indexed eight-node, eleven-branch forward graph.
@@ -36,6 +33,9 @@ coordinates. No claim identifies this matrix with the complete `C * S` feedback 
 
 ## iv. References
 
+The complete N7 netlist is bidirectional, while this graph records only the forward boundary
+coordinates. No claim identifies this matrix with the complete `C * S` feedback graph.
+
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definition 8 and Theorem 3 (p. 173).
 -/
@@ -48,7 +48,11 @@ noncomputable section
 
 namespace DCDR
 
-/-! ## A. The edge-indexed eight-node signal-flow graph -/
+/-!
+
+## A. The edge-indexed eight-node signal-flow graph
+
+-/
 
 /-- The eight forward DCDR boundary signals, indexed as source nodes one through eight. -/
 abbrev Node := Fin 8
@@ -344,4 +348,3 @@ end DCDR
 end
 
 end Optics
-

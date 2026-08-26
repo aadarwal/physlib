@@ -30,7 +30,7 @@ Another exact source fixture satisfies the strict version of printed Theorem 4's
 the reciprocal pole of Theorem 3's differently indexed denominator has norm two. It makes the
 withholding of a forced strict Theorem 4 bridge executable.
 
-## ii. Key declarations
+## ii. Key results
 
 - `unstableReducedResponse_zPoles_eq_pair`: exact two-element reciprocal pole set.
 - `unstableResponseReduction_ncard_actualPoles_eq_two`: tight DCDR pole count.
@@ -42,9 +42,9 @@ withholding of a forced strict Theorem 4 bridge executable.
 
 - A. Tight two-pole fixture
 - B. Degree-drop fixture
-- C. Source-dictionary divergence fixture
+- C. Source-dictionary divergence and printed-form mismatch fixtures
 
-## iv. Non-claims
+## iv. References
 
 These exact algebraic fixtures do not claim physical resonance, coherent--incoherent equivalence,
 BIBO stability, normalized-modal or electromagnetic power, causality or time-domain behavior, or

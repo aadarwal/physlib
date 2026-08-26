@@ -19,12 +19,6 @@ FMICS'15 p. 172 states that its coherent treatment was not printed. Coherent N7
 `t`/`-I * k` is the source's own unprinted coherent branch; the printed incoherent
 `1 - k`/`k` model is a different case, compared only if reference [3] surfaces.
 
-The complete N7 netlist is bidirectional, while the source graph records only its forward
-boundary coordinates. No claim identifies the eight-node matrix with the complete `C * S`
-feedback graph. This is a fixed-carrier, single-mode topology; no passivity, losslessness,
-reciprocity, causality, time-domain behavior, stability, pole, zero, resonance, bandwidth, or
-material realization is asserted.
-
 ## ii. Key results
 
 - `DCDR.netlist`: the explicit two-coupler, three-path N7 flat netlist.
@@ -35,12 +29,26 @@ material realization is asserted.
 
 ## iii. Table of contents
 
-- `DCDR.Netlist`: components, wiring, external channels, and forward coordinates
-- `DCDR.Graph`: multigraph, coefficient matrix, graph, and edge provenance
-- `DCDR.Bridge`: lifts and the relational extraction equivalence
+- A. Re-exported topology modules
 
 ## iv. References
 
+The complete N7 netlist is bidirectional, while the source graph records only its forward
+boundary coordinates. No claim identifies the eight-node matrix with the complete `C * S`
+feedback graph. This is a fixed-carrier, single-mode topology; no passivity, losslessness,
+reciprocity, causality, time-domain behavior, stability, pole, zero, resonance, bandwidth, or
+material realization is asserted.
+
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definition 8 and Theorem 3 (p. 173).
+-/
+
+/-!
+
+## A. Re-exported topology modules
+
+- `DCDR.Netlist`: components, wiring, external channels, and forward coordinates.
+- `DCDR.Graph`: multigraph, coefficient matrix, graph, and edge provenance.
+- `DCDR.Bridge`: lifts and the relational extraction equivalence.
+
 -/

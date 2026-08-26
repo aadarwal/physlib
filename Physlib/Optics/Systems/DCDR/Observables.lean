@@ -35,7 +35,7 @@ Coherent N7 `t`/`-I * k` is the FMICS'15 source's own unprinted coherent branch.
 incoherent `1 - k`/`k` numerator below is a different case. No theorem identifies it with the
 coherent response certificate.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `ResponseReduction.allZerosInsideUnitDisk`: the coherent reduced-response observable.
 - `PrintedIncoherentTheoremFiveConditions`: all three hypotheses printed in FMICS'15 Theorem 5.
@@ -49,15 +49,15 @@ coherent response certificate.
 - C. Audited and strict Theorem 5 conditions
 - D. Strict zero-location result
 
-## iv. References and non-claims
-
-U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
-Processing Systems", FMICS 2015, LNCS 9128, Definitions 6-8 and Theorem 5.
+## iv. References
 
 This file proves no physical resonance, frequency-response, passivity, or BIBO theorem. It
 introduces neither normalized-modal power nor electromagnetic power; no E3b power bridge is used.
 It gives no causality or time-domain interpretation. Formal `q` and reciprocal `z` are algebraic
 coordinates. The printed incoherent result is not a parity bridge to the coherent N7 netlist.
+
+U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
+Processing Systems", FMICS 2015, LNCS 9128, Definitions 6-8 and Theorem 5.
 -/
 
 @[expose] public section

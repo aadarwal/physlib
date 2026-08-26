@@ -30,11 +30,6 @@ that result with the generic instantiation relates both Mason presentations to N
 The regression module expands the eight equations and the eleven-branch path/loop enumeration
 independently, without using either agreement theorem.
 
-All Mason quotients are totalized algebraic definitions. Their response meaning is asserted only
-under `Parameters.HasNonzeroDenominator`. No contraction, infinite series, causality, delay,
-region of convergence, pole, zero, stability, passivity, reciprocity, resonance, bandwidth, or
-material realization is asserted.
-
 ## ii. Key results
 
 - `DCDR.auditedSignalFlowGraph_graphDet_ne_zero_iff`: the audited graph has the N5 solve gate.
@@ -50,6 +45,11 @@ material realization is asserted.
 
 ## iv. References
 
+All Mason quotients are totalized algebraic definitions. Their response meaning is asserted only
+under `Parameters.HasNonzeroDenominator`. No contraction, infinite series, causality, delay,
+region of convergence, pole, zero, stability, passivity, reciprocity, resonance, bandwidth, or
+material realization is asserted.
+
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal Processing
 Systems", FMICS 2015, LNCS 9128, Definitions 1-4 and 8 and Theorem 3 (pp. 167-173).
 -/
@@ -62,7 +62,11 @@ noncomputable section
 
 namespace DCDR
 
-/-! ## A. The two Mason response presentations -/
+/-!
+
+## A. The two Mason response presentations
+
+-/
 
 /-- The edge-level Mason quotient of the audited eight-node, eleven-branch graph. -/
 noncomputable def auditedMasonResponse (p : Parameters) : ℂ :=
@@ -74,7 +78,11 @@ noncomputable def masonResponse (p : Parameters) : ℂ :=
   (netlist p).masonResponseTransform
     (Outgoing.mk (outputChannel p)) (Incident.mk (inputChannel p))
 
-/-! ## B. The audited graph gate and response -/
+/-!
+
+## B. The audited graph gate and response
+
+-/
 
 /-- The unit source injection used by the terminated audited graph is `signalInput 1`. -/
 lemma signalInput_one_eq_single :
@@ -160,7 +168,11 @@ lemma auditedMasonResponse_eq_transfer (p : Parameters)
           Physlib.SignalFlowGraph.ofCoefficientMatrix, signalInput_one_eq_single] using hState
     _ = transfer p := by simpa using hOutput
 
-/-! ## C. Generic N5/Mason instantiation -/
+/-!
+
+## C. Generic N5/Mason instantiation
+
+-/
 
 /-- The complete extracted feedback graph has exactly the N5 well-posedness gate. -/
 lemma feedbackSignalFlowGraph_graphDet_ne_zero_iff (p : Parameters) :
