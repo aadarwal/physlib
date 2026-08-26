@@ -277,6 +277,204 @@ end PortConnectionFamily
 
 -/
 
+namespace PortConnectionFamily
+
+variable {P : PortModeFamily.{u, v}} {Q : PortModeFamily.{w, x}} {index : Type y}
+variable (equiv : P.Equiv Q) (family : PortConnectionFamily P index)
+variable [Fintype P.Channel] [Fintype Q.Channel]
+variable [Fintype family.Channel] [Fintype (family.transport equiv).Channel]
+variable [Fintype family.ExternalChannel]
+variable [Fintype (family.transport equiv).ExternalChannel]
+
+/-- Classical equality on the source ambient channels. -/
+local instance sourceChannelDecidableEq : DecidableEq P.Channel := Classical.decEq _
+
+/-- Classical equality on the transported ambient channels. -/
+local instance transportedChannelDecidableEq : DecidableEq Q.Channel := Classical.decEq _
+
+/-- Classical equality on the source connected channels. -/
+local instance sourceConnectedChannelDecidableEq : DecidableEq family.Channel :=
+  Classical.decEq _
+
+/-- Classical equality on the transported connected channels. -/
+local instance transportedConnectedChannelDecidableEq :
+    DecidableEq (family.transport equiv).Channel := Classical.decEq _
+
+/-- Incident assembly commutes with simultaneous transport of ambient outgoing labels and
+external incident labels. -/
+lemma incidentAssembly_transport
+    (outgoing : ModeAmplitude (Outgoing P.Channel))
+    (external : ModeAmplitude (Incident family.ExternalChannel)) :
+    (family.transport equiv).incidentAssembly
+        (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing)
+        (ModeAmplitude.reindex
+          (Incident.relabelEquiv (family.transportExternalChannelEquiv equiv)) external) =
+      ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)
+        (family.incidentAssembly outgoing external) := by
+  classical
+  apply WithLp.ofLp_injective 2
+  funext transportedIncident
+  rcases transportedIncident with ⟨transportedChannel⟩
+  obtain ⟨channel, rfl⟩ := equiv.channelEquiv.surjective transportedChannel
+  by_cases hConnected : channel ∈ Set.range family.channelEmbedding
+  · rcases hConnected with ⟨connected, rfl⟩
+    calc
+      (family.transport equiv).incidentAssembly
+            (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing)
+            (ModeAmplitude.reindex
+              (Incident.relabelEquiv
+                (family.transportExternalChannelEquiv equiv)) external)
+            (Incident.mk (equiv.channelEquiv (family.channelEmbedding connected))) =
+          (family.transport equiv).incidentAssembly
+            (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing)
+            (ModeAmplitude.reindex
+              (Incident.relabelEquiv
+                (family.transportExternalChannelEquiv equiv)) external)
+            (Incident.mk
+              ((family.transport equiv).channelEmbedding
+                (family.transportChannelEquiv equiv connected))) := by
+                  rw [family.transport_channelEmbedding]
+      _ = ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing
+            (Outgoing.mk
+              ((family.transport equiv).channelEmbedding
+                ((family.transport equiv).mateEquiv
+                  (family.transportChannelEquiv equiv connected)))) := by
+            rw [(family.transport equiv).incidentAssembly_apply_connected_channel]
+      _ = outgoing
+            (Outgoing.mk (family.channelEmbedding (family.mateEquiv connected))) := by
+            rw [family.transport_mateEquiv, family.transport_channelEmbedding,
+              ModeAmplitude.reindex_apply]
+            exact congrArg outgoing
+              ((Outgoing.relabelEquiv equiv.channelEquiv).symm_apply_apply
+                (Outgoing.mk (family.channelEmbedding (family.mateEquiv connected))))
+      _ = family.incidentAssembly outgoing external
+            (Incident.mk (family.channelEmbedding connected)) := by
+            rw [family.incidentAssembly_apply_connected_channel]
+      _ = ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)
+            (family.incidentAssembly outgoing external)
+            (Incident.mk (equiv.channelEquiv (family.channelEmbedding connected))) := by
+            rw [ModeAmplitude.reindex_apply]
+            exact congrArg (family.incidentAssembly outgoing external)
+              ((Incident.relabelEquiv equiv.channelEquiv).symm_apply_apply
+                (Incident.mk (family.channelEmbedding connected))).symm
+  · let sourceExternal : family.ExternalChannel := ⟨channel, hConnected⟩
+    let transportedExternal : (family.transport equiv).ExternalChannel :=
+      family.transportExternalChannelEquiv equiv sourceExternal
+    change (family.transport equiv).incidentAssembly
+          (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing)
+          (ModeAmplitude.reindex
+            (Incident.relabelEquiv
+              (family.transportExternalChannelEquiv equiv)) external)
+          (Incident.mk transportedExternal.1) = _
+    calc
+      (family.transport equiv).incidentAssembly
+            (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing)
+            (ModeAmplitude.reindex
+              (Incident.relabelEquiv
+                (family.transportExternalChannelEquiv equiv)) external)
+            (Incident.mk transportedExternal.1) =
+          ModeAmplitude.reindex
+            (Incident.relabelEquiv (family.transportExternalChannelEquiv equiv)) external
+            (Incident.mk transportedExternal) := by
+              rw [(family.transport equiv).incidentAssembly_apply_external]
+      _ = external (Incident.mk sourceExternal) := by
+            rw [ModeAmplitude.reindex_apply]
+            exact congrArg external
+              ((Incident.relabelEquiv
+                (family.transportExternalChannelEquiv equiv)).symm_apply_apply
+                  (Incident.mk sourceExternal))
+      _ = family.incidentAssembly outgoing external
+            (Incident.mk sourceExternal.1) := by
+              rw [family.incidentAssembly_apply_external]
+      _ = ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)
+            (family.incidentAssembly outgoing external)
+            (Incident.mk (equiv.channelEquiv channel)) := by
+              rw [ModeAmplitude.reindex_apply]
+              exact congrArg (family.incidentAssembly outgoing external)
+                ((Incident.relabelEquiv equiv.channelEquiv).symm_apply_apply
+                  (Incident.mk channel)).symm
+
+/-- External readout commutes with simultaneous transport of ambient and boundary labels. -/
+lemma externalOutgoingReadout_transport
+    (outgoing : ModeAmplitude (Outgoing P.Channel)) :
+    (family.transport equiv).externalOutgoingReadout.toLinearMap
+        (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing) =
+      ModeAmplitude.reindex
+        (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv))
+        (family.externalOutgoingReadout.toLinearMap outgoing) := by
+  classical
+  rw [(family.transport equiv).externalOutgoingReadout_apply,
+    family.externalOutgoingReadout_apply]
+  apply WithLp.ofLp_injective 2
+  funext transportedEndpoint
+  rcases transportedEndpoint with ⟨transportedExternal⟩
+  obtain ⟨sourceExternal, rfl⟩ :=
+    (family.transportExternalChannelEquiv equiv).surjective transportedExternal
+  rw [ModeAmplitude.restrictEmbedding_apply, ModeAmplitude.restrictEmbedding_apply,
+    ModeAmplitude.reindex_apply, ModeAmplitude.reindex_apply]
+  exact congrArg outgoing
+    ((Outgoing.relabelEquiv equiv.channelEquiv).symm_apply_apply
+      (Outgoing.mk sourceExternal.1))
+
+/-- Closure membership is invariant after transporting the ambient behavior and both external
+amplitudes. -/
+lemma mem_closeBehavior_transport_iff
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (input : ModeAmplitude (Incident family.ExternalChannel))
+    (output : ModeAmplitude (Outgoing family.ExternalChannel)) :
+    (ModeAmplitude.reindex
+          (Incident.relabelEquiv (family.transportExternalChannelEquiv equiv)) input,
+        ModeAmplitude.reindex
+          (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv)) output) ∈
+        (family.transport equiv).closeBehavior
+          (behavior.reindex (Incident.relabelEquiv equiv.channelEquiv)
+            (Outgoing.relabelEquiv equiv.channelEquiv)) ↔
+      (input, output) ∈ family.closeBehavior behavior := by
+  classical
+  rw [(family.transport equiv).mem_closeBehavior_iff, family.mem_closeBehavior_iff]
+  constructor
+  · rintro ⟨transportedIncident, transportedOutgoing, hBehavior, hIncident, hOutput⟩
+    let incident := ModeAmplitude.reindex
+      (Incident.relabelEquiv equiv.channelEquiv).symm transportedIncident
+    let outgoing := ModeAmplitude.reindex
+      (Outgoing.relabelEquiv equiv.channelEquiv).symm transportedOutgoing
+    refine ⟨incident, outgoing, ?_, ?_, ?_⟩
+    · simpa only [incident, outgoing, LinearBehavior.mem_reindex_iff] using hBehavior
+    · apply (ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)).injective
+      rw [ModeAmplitude.reindex_reindex_symm, family.incidentAssembly_transport]
+      simpa only [outgoing, ModeAmplitude.reindex_reindex_symm] using hIncident
+    · apply (ModeAmplitude.reindex
+        (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv))).injective
+      rw [ModeAmplitude.reindex_reindex_symm, ← family.externalOutgoingReadout_transport]
+      simpa only [outgoing, ModeAmplitude.reindex_reindex_symm] using hOutput
+  · rintro ⟨incident, outgoing, hBehavior, hIncident, hOutput⟩
+    refine ⟨ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv) incident,
+      ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing, ?_, ?_, ?_⟩
+    · simpa only [LinearBehavior.mem_reindex_iff,
+        ModeAmplitude.reindex_symm_reindex] using hBehavior
+    · rw [family.incidentAssembly_transport, ← hIncident]
+    · rw [family.externalOutgoingReadout_transport, ← hOutput]
+
+/-- Singular-safe closure is covariant under a dependent ambient port-family equivalence. -/
+lemma closeBehavior_transport
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel)) :
+    (family.transport equiv).closeBehavior
+        (behavior.reindex (Incident.relabelEquiv equiv.channelEquiv)
+          (Outgoing.relabelEquiv equiv.channelEquiv)) =
+      (family.closeBehavior behavior).reindex
+        (Incident.relabelEquiv (family.transportExternalChannelEquiv equiv))
+        (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv)) := by
+  ext ⟨input, output⟩
+  rw [LinearBehavior.mem_reindex_iff]
+  simpa only [ModeAmplitude.reindex_reindex_symm] using
+    family.mem_closeBehavior_transport_iff equiv behavior
+      (ModeAmplitude.reindex
+        (Incident.relabelEquiv (family.transportExternalChannelEquiv equiv)).symm input)
+      (ModeAmplitude.reindex
+        (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv)).symm output)
+
+end PortConnectionFamily
+
 end
 
 
