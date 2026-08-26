@@ -62,6 +62,11 @@ namespace Optics.DCDR
 
 noncomputable section
 
+/-- The nominal-chain layer uses the same external-channel instance as N5 elimination. -/
+local instance nominalChainExternalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  (netlist p).eliminationExternalChannelFintype
+
 /-!
 
 ## A. Nominal external reference-plane coordinates
@@ -444,7 +449,7 @@ lemma packagedNominalTwoPortScattering_rightToLeftTransmission_apply (p : Parame
   rcases output with ⟨⟨⟩⟩
   simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct]
   rw [← BackwardWave.channelEquiv.symm.sum_comp, Fintype.sum_unique]
-  simp [packagedNominalTwoPortScattering_rightToLeftTransmission_entry]
+  simp
 
 /-- The nominal chain pivot is bijective exactly when right-to-left transmission is nonzero. -/
 lemma packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission_iff
@@ -552,8 +557,7 @@ lemma nominalBackwardFirstChainTransform_eq_matrix (p : Parameters)
       packagedNominalTwoPortScattering_leftReflection_eq_zero,
       packagedNominalTwoPortScattering_rightReflection_eq_zero,
       packagedNominalTwoPortScattering_rightToLeftTransmissionInverse_entry
-        p hDenominator hTransmission,
-      packagedNominalTwoPortScattering_leftToRightTransmission_entry]
+        p hDenominator hTransmission]
 
 /-- The nominal chain graph is the backward-first regrouping of the reindexed N5 relation. -/
 lemma toBehavior_nominalBackwardFirstChainTransform (p : Parameters)
@@ -577,10 +581,9 @@ lemma nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock (p : Parameter
 /-- Generic N3T conversion of the nominal chain back to scattering recovers the N5 two-port. -/
 lemma nominalBackwardFirstChainTransform_roundTrip (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) (hTransmission : transfer p.reverse ≠ 0) :
-    (nominalBackwardFirstChainTransform p hDenominator hTransmission)
-        |>.toTwoPortScatteringTransform
-          (nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock
-            p hDenominator hTransmission) =
+    (nominalBackwardFirstChainTransform p hDenominator hTransmission).toTwoPortScatteringTransform
+        (nominalBackwardFirstChainTransform_hasBijectiveLeadingBlock
+          p hDenominator hTransmission) =
       packagedNominalTwoPortScattering p hDenominator :=
   TwoPortScatteringTransform.toTwoPortScatteringTransform_toBackwardFirstChainTransform
     (packagedNominalTwoPortScattering p hDenominator)

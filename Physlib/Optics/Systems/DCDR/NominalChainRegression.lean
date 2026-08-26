@@ -56,6 +56,11 @@ noncomputable section
 
 open Physlib.ZTransform
 
+/-- The chain regression uses the same external-channel instance as N5 elimination. -/
+local instance zChainRegressionExternalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  (netlist p).eliminationExternalChannelFintype
+
 /-!
 
 ## A. Exact scalar data and pivot
