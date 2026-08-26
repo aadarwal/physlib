@@ -73,6 +73,10 @@ def dynOutgoingValue :
 abbrev DynChannel :=
   (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Channel
 
+noncomputable instance dynLatticeSiteChannelFintype :
+    Fintype latticeSitePortFamily.Channel :=
+  Fintype.ofEquiv LatticeSitePort latticeSiteChannelEquiv
+
 def dynIncident : ModeAmplitude (Incident DynChannel) :=
   WithLp.toLp 2 fun endpoint =>
     match endpoint.channel with
@@ -165,11 +169,13 @@ lemma dynInputPort_not_horizontal :
   cases half <;> cases endpoint <;>
     simp only [rectangularHorizontalConnection, PortConnection.endpointPort] at hPort
   · have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynInputPort] at hLabel
+    simp [dynSitePortLabel, dynInputPort, rectangularRingComponent] at hLabel
   · have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynInputPort, rectangularHorizontalCouplerComponent] at hLabel
+    simp [dynSitePortLabel, dynInputPort, rectangularRingComponent,
+      rectangularHorizontalCouplerComponent] at hLabel
   · have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynInputPort, rectangularHorizontalCouplerComponent] at hLabel
+    simp [dynSitePortLabel, dynInputPort, rectangularRingComponent,
+      rectangularHorizontalCouplerComponent] at hLabel
   · have hSite := congrArg dynSiteIndex hPort
     have hColumn : column.succ = (0 : Fin 2) := by
       exact congrArg Prod.snd (Option.some.inj hSite)
@@ -191,11 +197,13 @@ lemma dynOutputPort_not_horizontal :
     have hValue := congrArg Fin.val hColumn
     omega
   · have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynOutputPort, rectangularHorizontalCouplerComponent] at hLabel
+    simp [dynSitePortLabel, dynOutputPort, rectangularRingComponent,
+      rectangularHorizontalCouplerComponent] at hLabel
   · have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynOutputPort, rectangularHorizontalCouplerComponent] at hLabel
+    simp [dynSitePortLabel, dynOutputPort, rectangularRingComponent,
+      rectangularHorizontalCouplerComponent] at hLabel
   · have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynOutputPort] at hLabel
+    simp [dynSitePortLabel, dynOutputPort, rectangularRingComponent] at hLabel
 
 lemma dynInputPort_not_vertical :
     dynInputPort ∉
@@ -207,7 +215,8 @@ lemma dynInputPort_not_vertical :
     simp only [rectangularVerticalConnection, PortConnection.endpointPort] at hPort
   all_goals
     have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynInputPort, rectangularVerticalCouplerComponent] at hLabel
+    simp [dynSitePortLabel, dynInputPort, rectangularRingComponent,
+      rectangularVerticalCouplerComponent] at hLabel
 
 lemma dynOutputPort_not_vertical :
     dynOutputPort ∉
@@ -219,7 +228,8 @@ lemma dynOutputPort_not_vertical :
     simp only [rectangularVerticalConnection, PortConnection.endpointPort] at hPort
   all_goals
     have hLabel := congrArg dynSitePortLabel hPort
-    simp [dynSitePortLabel, dynOutputPort, rectangularVerticalCouplerComponent] at hLabel
+    simp [dynSitePortLabel, dynOutputPort, rectangularRingComponent,
+      rectangularVerticalCouplerComponent] at hLabel
 
 lemma dynPort_not_flat
     (port : (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Port)
@@ -358,8 +368,7 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
     fin_cases row <;> cases half <;>
       rcases localChannel with mode | mode <;> cases mode <;>
       simp [dynConnections, rectangularLatticeNetlist, rectangularHorizontalConnections,
-        PortConnectionFamily.append, PortConnection.mateEquiv,
-        PortConnection.channelEmbedding, ScatteringComponentFamily.componentChannelEmbedding,
+        PortConnectionFamily.append, ScatteringComponentFamily.componentChannelEmbedding,
         ScatteringComponentFamily.channelEquiv, dynIncident, dynOutgoing, dynIncidentValue,
         dynOutgoingValue, dynHorizontalIncidentValue, dynHorizontalOutgoingValue]
   · rcases vertical with ⟨⟨edge, column⟩, half⟩
@@ -375,8 +384,8 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
         rectangularVerticalBoundaryConnections, LatticeConnectionFamilies.onBoundary,
         LatticeConnectionFamilies.connectionOnBoundary, rectangularVerticalConnections,
         rectangularVerticalConnection, PortConnectionFamily.append,
-        PortConnection.liftBoundary, PortConnection.mateEquiv,
-        PortConnection.channelEmbedding, ScatteringComponentFamily.componentChannelEmbedding,
+        PortConnection.liftBoundary, PortConnection.liftBoundary_modeEquiv,
+        ScatteringComponentFamily.componentChannelEmbedding,
         ScatteringComponentFamily.channelEquiv, dynIncident, dynOutgoing, dynIncidentValue,
         dynOutgoingValue, dynVerticalIncidentValue, dynVerticalOutgoingValue]
 
@@ -568,8 +577,11 @@ lemma dynMiswired_endpointDisjoint :
       dynMiswiredVerticalConnections, dynMiswiredVerticalConnection,
       PortConnection.endpointPort] at hPort
   all_goals
-    simp_all [rectangularRingComponent, rectangularHorizontalCouplerComponent,
-      rectangularVerticalCouplerComponent]
+    have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel] at hLabel
+  all_goals
+    have hComponent := congrArg Sigma.fst hPort
+    cases hComponent
 
 def dynMiswiredVerticalBoundaryConnections :=
   LatticeConnectionFamilies.onBoundary
