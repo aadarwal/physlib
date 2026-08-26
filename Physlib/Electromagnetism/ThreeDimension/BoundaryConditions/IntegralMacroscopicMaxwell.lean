@@ -94,18 +94,18 @@ structure PlanarMaxwellThinCellFluxRates {plane : OrientedAffineHyperplane 3}
   /-- The magnetic rate is the derivative of the actual normalized magnetic flux. -/
   magneticFlux_hasDerivAt : ∀ t x tangent scale,
     HasDerivAt
-      (fun s ↦ (cells.loop x tangent).spanningSurfaceAverage
-        fields.magneticInductionFamily s x scale)
-      (magneticFluxRate t x tangent scale) t
+      (fun s : ℝ ↦ (cells.loop x tangent).spanningSurfaceAverage
+        fields.magneticInductionFamily (Time.toRealCLE.symm s) x scale)
+      (magneticFluxRate t x tangent scale) (Time.toRealCLE t)
   /-- Time derivative of the electric-displacement flux through a thin loop. -/
   electricFluxRate : Time → (x : plane.carrier) →
     plane.tangentSubmodule → ℕ → ℝ
   /-- The electric rate is the derivative of the actual normalized electric flux. -/
   electricFlux_hasDerivAt : ∀ t x tangent scale,
     HasDerivAt
-      (fun s ↦ (cells.loop x tangent).spanningSurfaceAverage
-        fields.electricDisplacementFamily s x scale)
-      (electricFluxRate t x tangent scale) t
+      (fun s : ℝ ↦ (cells.loop x tangent).spanningSurfaceAverage
+        fields.electricDisplacementFamily (Time.toRealCLE.symm s) x scale)
+      (electricFluxRate t x tangent scale) (Time.toRealCLE t)
 
 /-! ## C. Integrability of the displayed terms -/
 

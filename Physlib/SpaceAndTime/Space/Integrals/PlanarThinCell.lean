@@ -145,10 +145,13 @@ lemma signedNormalCoordinate_normalOffsetPoint {d : ℕ}
     (plane : OrientedAffineHyperplane d) (x : plane.carrier)
     (offset : plane.tangentSubmodule) (height : ℝ) :
     plane.signedNormalCoordinate (plane.normalOffsetPoint x offset height) = height := by
+  have hOffset : inner ℝ plane.normalVector
+      (offset : EuclideanSpace ℝ (Fin d)) = 0 := by
+    change plane.IsTangent (offset : EuclideanSpace ℝ (Fin d))
+    exact (plane.mem_tangentSubmodule offset).mp offset.property
   rw [normalOffsetPoint, plane.signedNormalCoordinate_vadd,
     (plane.mem_carrier (x : Space d)).mp x.property, add_zero,
-    normalComponent, inner_add_right, inner_smul_right,
-    (plane.mem_tangentSubmodule offset).mp offset.property,
+    normalComponent, inner_add_right, inner_smul_right, hOffset,
     zero_add, plane.inner_normalVector_self, mul_one]
 
 /-- Sample a negative-side field at a signed negative normal height.
@@ -162,9 +165,7 @@ def negativeSideSample {d : ℕ} {P V : Type*} [Zero V]
     (height : ℝ) : V :=
   if hHeight : height < 0 then
     field parameter ⟨plane.normalOffsetPoint x offset height, by
-      change 0 < -plane.signedNormalCoordinate (plane.normalOffsetPoint x offset height)
-      rw [plane.signedNormalCoordinate_normalOffsetPoint]
-      linarith⟩
+      simpa [OrientedAffineHyperplane.openHalfSpace] using hHeight⟩
   else 0
 
 /-- Sample a positive-side field at a signed positive normal height.
@@ -178,8 +179,7 @@ def positiveSideSample {d : ℕ} {P V : Type*} [Zero V]
     (height : ℝ) : V :=
   if hHeight : 0 < height then
     field parameter ⟨plane.normalOffsetPoint x offset height, by
-      change 0 < plane.signedNormalCoordinate (plane.normalOffsetPoint x offset height)
-      simpa using hHeight⟩
+      simpa [OrientedAffineHyperplane.openHalfSpace] using hHeight⟩
   else 0
 
 /-- A carrier point displaced by a bundled tangent vector remains in the carrier. -/
@@ -236,9 +236,12 @@ lemma tangent_cross_quarterTurnTangent_of_norm_eq_one
   change (tangent : EuclideanSpace ℝ (Fin 3)) ⨯ₑ₃
       (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))) =
     plane.normalVector
+  have hTangent : inner ℝ plane.normalVector
+      (tangent : EuclideanSpace ℝ (Fin 3)) = 0 := by
+    change plane.IsTangent (tangent : EuclideanSpace ℝ (Fin 3))
+    exact (plane.mem_tangentSubmodule tangent).mp tangent.property
   rw [Space.cross_cross_eq_smul_sub_smul', real_inner_self_eq_norm_sq, hNorm,
-    one_pow, one_smul,
-    (plane.mem_tangentSubmodule tangent).mp tangent.property, zero_smul, sub_zero]
+    one_pow, one_smul, hTangent, zero_smul, sub_zero]
 
 end OrientedAffineHyperplane
 
