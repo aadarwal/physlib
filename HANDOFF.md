@@ -1,26 +1,53 @@
-# S7C slice 5: DATE row and Physlib-original rectangular lattice
+# S7C slice 5b: dynamic S-08 lattice regression
 
 ## Cutoff and synchronization
 
-This cutoff implements the lattice slice requested by goal.md section S7C and regression row S-08.
+This cutoff completes the lattice slice requested by goal.md section S7C and regression row S-08.
 The exact required sync target was
 `fe56bbc20c930747bee5b23905187d734f09f5e5`. It was merged in
 `cba99dc188576ab799682fab551c3dd0a4fe4003` before implementation. The later target
 `5fc99609` was announced with an explicit instruction not to force a mid-slice resync.
 
 The exact gated source head is
-`13827bb6092099f0a54152c4bcde7aafbae2a32c`. Its three slice commits are:
+`9d737a7ebd8e74c03a1b3b386812f5a45a8b47a5`. The EE recut begins with
+`348f95958156a998cb15cf2514ad58f0182b008c`, which extracts the neutral reindex API and shortens
+the production proof. Commits `6fa7cee6` through `13faa391` replace the isolated regression with
+the dynamic raw fixture, and `9d737a7e` applies the final committed-state style correction.
 
-- `e95c525fc7b5da803067dfc3f3c2203596e5f8ca`, module-doc normalization;
-- `0075a77ea12a3128c12cde40d79c704ed7788e62`, lattice implementation; and
-- `13827bb6092099f0a54152c4bcde7aafbae2a32c`, section-heading doc formatting.
+The implementation consists of:
 
-The implementation adds two unregistered modules:
+- `Physlib/Optics/Network/LinearBehaviorReindex.lean` (66 lines), the authorized additive
+  out-of-home neutral API module;
+- `Physlib/Optics/Systems/Cascade/Lattice.lean` (1269 lines); and
+- `Physlib/Optics/Systems/Cascade/LatticeRegression.lean` (972 lines).
 
-- `Physlib/Optics/Systems/Cascade/Lattice.lean` (1391 lines); and
-- `Physlib/Optics/Systems/Cascade/LatticeRegression.lean` (699 lines).
+All are below the 1500-line cap. `Physlib.lean` is intentionally unchanged in this cutoff.
 
-Both are below the 1500-line cap. `Physlib.lean` is intentionally unchanged in this cutoff.
+## EE blocker disposition
+
+The production construction had already passed EE. Slice 5b changes its implementation only by
+extracting a generic inverse-reindex lemma, shortening the column-first proof, and clarifying that
+`^ count` means matrix exponentiation. The substantive recut is the regression.
+
+The new `2 × 2` fixture has distinct nonzero through and cross amplitudes. Its unit external drive
+follows this directed route:
+
+```text
+ring(0,0).west -> ring(0,0).east -> H(row 0).right
+  -> ring(0,1).west -> ring(0,1).south -> V(column 1).right
+  -> ring(1,1).north -> ring(1,1).east
+```
+
+The horizontal and vertical wire amplitudes are respectively `-6 * I` and `-126`, and the final
+external response is `-630`. The same concrete ambient state is established directly in the
+canonical flat equations and independently through horizontal-inner then vertical-outer closure.
+Neither proof invokes either production flattening equality.
+
+The negative family swaps the successor-ring column on every vertical right endpoint. It therefore
+mates `ring(1,1).north` with `V(column 0).right`, whose outgoing value is zero, instead of the
+canonical `V(column 1).right`, whose outgoing value is `-126`. The hostile raw incident-assembly
+equation is rejected by the concrete contradiction `-126 = 0`. This exercises the S-08 wiring and
+hierarchy-index failure mode rather than merely comparing component scattering tables.
 
 ## Source scope and classification
 
@@ -34,8 +61,8 @@ The controlling goal text is:
 
 The corpus note at goal.md:153-155 says the lattice theorem is a Physlib extension and that
 DATE'14 proves only the uncoupled row sublattice. DATE14.txt:204-207 says that Figure 3 decomposes
-a two-dimensional lattice into an uncoupled row sublattice and a coupled column sublattice.
-Its Figure 3 caption at lines 236-238 describes:
+a two-dimensional lattice into an uncoupled row sublattice and a coupled column sublattice. Its
+Figure 3 caption at lines 236-238 describes:
 
 - a row sublattice consisting of a cascade of uncoupled MRRs periodically coupled to two side
   waveguides; and
@@ -50,120 +77,119 @@ Accordingly:
 
 - Section A of `Lattice.lean` is the only DATE'14-parity content in this slice.
 - Sections B-E and all of S-08 are Physlib-original.
-- Every result introduced by the slice is a `lemma`; DATE'14 prints no lattice theorem.
+- Every result introduced by this slice is a `lemma`; DATE'14 prints no lattice theorem.
 
 ## A. Source-backed uncoupled row
 
-`DateUncoupledRowSublattice` at `Lattice.lean:86` stores exactly a list of existing
-`DateCascadeStage` values. Its behavior and composition at lines 93 and 98 are definitions by
+`DateUncoupledRowSublattice` at `Lattice.lean:88` stores exactly a list of existing
+`DateCascadeStage` values. Its behavior and composition at lines 95 and 100 are definitions by
 the existing heterogeneous cascade objects. It adds no ring, bus, or coupling physics.
 
 The wrapper transfers the already discharged DATE results:
 
-- `behavior_eq_composition_toBehavior` at `Lattice.lean:111` instantiates
-  `dateCascadeBehavior_eq_composition_toBehavior` from
-  `Heterogeneous.lean:227-241`;
-- `identical_composition_eq_pow` at `Lattice.lean:120` instantiates the identical-stage power
-  result from `Identical.lean:99-103`;
-- `identical_composition_eq_sylvesterClosedForm` at `Lattice.lean:129` instantiates the exact
-  Sylvester-domain result from `Identical.lean:336-343`;
-- `TerminationHypotheses` at `Lattice.lean:137` is the existing corrected termination domain
-  from `Termination.lean:321-330`;
-- `reflectivity_eq_neg_entry12_div_entry11` at `Lattice.lean:155` reuses the relational
-  reflection result from `Termination.lean:417-431`; and
-- `transmissivity_eq_one_div_entry11` at `Lattice.lean:166` reuses the relational transmission
-  result from `Termination.lean:433-447`.
+- `behavior_eq_composition_toBehavior` at `Lattice.lean:113` instantiates
+  `dateCascadeBehavior_eq_composition_toBehavior` at `Heterogeneous.lean:227`;
+- `identical_composition_eq_pow` at `Lattice.lean:123` instantiates the matrix-exponentiation
+  result at `Identical.lean:99`;
+- `identical_composition_eq_sylvesterClosedForm` at `Lattice.lean:132` instantiates the exact
+  Sylvester-domain result at `Identical.lean:337`;
+- `TerminationHypotheses` at `Lattice.lean:140` is the corrected termination domain whose source
+  structure is at `Termination.lean:326`;
+- `reflectivity_eq_neg_entry12_div_entry11` at `Lattice.lean:158` reuses the relational
+  reflection result at `Termination.lean:422`; and
+- `transmissivity_eq_one_div_entry11` at `Lattice.lean:169` reuses the relational transmission
+  result at `Termination.lean:438`.
 
-Thus IP-15 through IP-18 transfer to the row without a new derivation or expanded parity claim.
-The nonzero `M11` pivot remains part of the termination hypotheses.
+Thus IP-15--17 and only the already-discharged DATE'14 Thm. 5 half of IP-18 transfer to the row.
+This slice makes no new printed-Thm.-6 or broader IP-18 claim. The nonzero `M11` pivot remains in
+the termination hypotheses.
 
-## B. Physlib-original coupled column
+## B. Neutral reindex API and Physlib-original coupled column
 
-`RectangularLatticeParameters` at `Lattice.lean:232` separates four-port ring-site scattering
-laws from the horizontal and vertical neighbouring-coupler parameters. The construction then
-provides explicit component and connection families:
+The authorized out-of-home module `LinearBehaviorReindex.lean` adds only
+`LinearBehavior.reindex_symm_reindex` at line 51. It states that finite behavior relabelling
+followed by the inverse relabelling recovers the original relation. No existing neutral declaration
+was changed, and the neutral module imports no Cascade or regression module.
 
-- `rectangularLatticeComponents` at line 285;
-- `rectangularHorizontalConnection` at line 385;
-- `rectangularVerticalConnection` at line 406;
-- `rectangularHorizontalConnections` at line 427; and
-- `rectangularVerticalConnections` at line 442.
+`RectangularLatticeParameters` at `Lattice.lean:235` separates four-port ring-site scattering laws
+from horizontal and vertical neighbouring-coupler parameters. The explicit component and connection
+families begin at:
 
-`rectangularCoupledColumnNetlist` at `Lattice.lean:635` is an explicit `FlatNetlist` for a
-selected column. It contains one supplied four-port ring law per row and a separate directional
-coupler between each pair of vertical neighbours. Its relational chain composition is
-`rectangularCoupledColumnComposition` at line 658.
+- `rectangularLatticeComponents`, line 288;
+- `rectangularHorizontalConnection`, line 388;
+- `rectangularVerticalConnection`, line 409;
+- `rectangularHorizontalConnections`, line 430; and
+- `rectangularVerticalConnections`, line 445.
 
-`rectangularCoupledColumn_behavior_eq_composition` at line 671 identifies the netlist behavior
-with that singular-safe relational connection closure. This is a generic netlist instantiation,
-not a DATE'14 statement and not a closed-form response.
+`rectangularCoupledColumnNetlist` at `Lattice.lean:638` is an explicit `FlatNetlist` for one
+selected column. It contains a supplied four-port ring law per row and a separate directional
+coupler between each pair of vertical neighbours. Its singular-safe relational composition is
+`rectangularCoupledColumnComposition` at line 661, and
+`rectangularCoupledColumn_behavior_eq_composition` at line 674 identifies the netlist behavior
+with that closure. DATE'14 supplies no statement or closed form for this object.
 
 ## C. Full M by N lattice and S-08
 
 The full lattice is one explicit `FlatNetlist`, not a behavior defined through either hierarchy.
-`rectangularLatticeNetlist` at `Lattice.lean:868` directly specifies:
-
-- all ring and coupler components;
-- the sum of horizontal and vertical connection labels; and
-- the appended physical connection family.
+`rectangularLatticeNetlist` at `Lattice.lean:871` directly specifies all components, the sum of
+horizontal and vertical connection labels, and their appended physical connection family.
 
 The canonical ordering is row-first: horizontal links are closed before vertical links. This
-choice matches the direct connection-label order in the flat object. The alternate column-first
+matches the direct connection-label order in the flat object. The alternate column-first
 presentation follows only after a proved wiring reindex; the two label types are not silently
 identified.
 
 The hierarchy and response API is:
 
-- `rectangularLatticeRowHierarchy` at line 724;
-- `rectangularLatticeColumnHierarchy` at line 738;
-- `rectangularRowColumnWiringEquiv` at line 1098;
-- `rectangularRowDecompositionBehavior` at line 1111;
-- `rectangularLatticeBehavior_eq_rowDecomposition` at line 1129;
-- `rectangularColumnDecompositionBehavior` at line 1146;
-- `rectangularColumnFlattenBehavior_eq_columnDecomposition` at line 1163;
-- `rectangularLatticeBehaviorInColumnCoordinates` at line 1233;
-- `rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex` at line 1251;
-- `rectangularColumnDecompositionInLatticeCoordinates` at line 1266; and
-- `rectangularLatticeBehavior_eq_columnDecomposition` at line 1284.
+- `rectangularLatticeRowHierarchy`, line 727;
+- `rectangularLatticeColumnHierarchy`, line 741;
+- `rectangularRowColumnWiringEquiv`, line 1101;
+- `rectangularRowDecompositionBehavior`, line 1114;
+- `rectangularLatticeBehavior_eq_rowDecomposition`, line 1132;
+- `rectangularColumnDecompositionBehavior`, line 1149;
+- `rectangularColumnFlattenBehavior_eq_columnDecomposition`, line 1166;
+- `rectangularLatticeBehaviorInColumnCoordinates`, line 1182;
+- `rectangularColumnFlattenBehavior_eq_latticeBehavior_reindex`, line 1200;
+- `rectangularColumnDecompositionInLatticeCoordinates`, line 1215; and
+- `rectangularLatticeBehavior_eq_columnDecomposition`, line 1233.
 
 These lemmas establish S-08 on the common relational domain without assuming well-posedness.
 The row-first flatten is literally the canonical flat lattice. The column-first flatten agrees
-after the explicit external-channel equivalence induced by connection-order reindexing.
+after the explicit external-channel equivalence induced by connection-order reindexing. The final
+column proof is now lines 1233-1263 and uses the neutral inverse-reindex lemma.
 
-## Regression and failure controls
+## Dynamic regression and wiring failure control
 
-`LatticeRegression.lean` uses a `2 × 2` fixture with distinct site coefficients
-`2 * row + column + 1`, hence the site array `[[1, 2], [3, 4]]`. Couplers also have distinct
-numbered parameters. The positive facts are expanded from the component, matrix, incident
-assembly, connection, and output-readout primitives; they do not invoke either production S-08
-behavior lemma.
+The positive anchor is expanded from Mathlib and Physlib primitives rather than either production
+S-08 equality:
 
-The main positive anchors are:
-
-- `latticeRegression_rawBehavior` at line 571, a direct witness in the canonical flat-netlist
+- `latticeRegression_mem_componentBehavior` at `LatticeRegression.lean:450` expands every
+  component scattering equation for the concrete state;
+- `latticeRegression_connectedEquation` at line 574 expands every canonical mate equation;
+- `latticeRegression_incidentAssembly` at line 627 and
+  `latticeRegression_outputReadout` at line 645 assemble the raw flat witness;
+- `latticeRegression_mem_flatBehavior` at line 659 places that witness in the canonical flat
   relation;
-- `latticeRegression_outputEast` at line 584, whose selected response is `2`;
-- `latticeRegression_rowFlatten_site01West_entry` at line 589, a direct entry calculation;
-- `latticeRegression_columnFlatten_site01West_entry` at line 609, the independently selected
-  column-first entry calculation;
-- `latticeRegression_flatten_scattering_eq` at line 630, the directly reduced component-law
-  equality; and
-- `latticeRegression_selectedVerticalWire` and
-  `latticeRegression_selectedColumnFirstVerticalWire` at lines 637 and 644, direct wiring
-  anchors in the two label orders.
+- `latticeRegression_mem_innerClosure`, `latticeRegression_mem_innerBoundary`, and
+  `latticeRegression_mem_outerClosure` at lines 689, 717, and 744 independently construct the
+  horizontal-inner and vertical-outer stages;
+- `latticeRegression_mem_rowDecomposition` at line 766 places the same pair in the staged
+  row-first behavior;
+- `latticeRegression_horizontalWire_nonzero` and
+  `latticeRegression_verticalWire_nonzero` at lines 779 and 792 prove nonzero traversal of both
+  connection families;
+- `latticeRegression_crossParameters` at line 805 pins distinct nonzero coupler values;
+- `latticeRegression_inputValue` and `latticeRegression_outputValue` at lines 822 and 827 pin
+  the unit drive and `-630` response; and
+- `latticeRegression_flat_and_rowDecomposition` at line 835 joins the independently proved
+  memberships without a production flattening theorem.
 
-The negative fixture deliberately swaps each site's row and column indices:
-
-- `latticeRegressionTransposedSites` at line 653;
-- `latticeRegressionMisindexedColumnHierarchy` at line 660;
-- `latticeRegression_misindexed_site01West_entry` at line 664, which computes `3` where the
-  correct flattened lattice computes `2`; and
-- `latticeRegression_misindexedFlatten_scattering_ne` at line 683, which proves the assembled
-  flattened component laws unequal.
-
-The negative proof is the required hierarchy/cascade-index sentinel: an index transposition
-cannot be hidden by the correct decomposition API. It proves a concrete `2 != 3` matrix-entry
-contradiction rather than testing a Boolean or reusing the production agreement lemma.
+The hostile wiring is an actual `PortConnectionFamily`, beginning with
+`latticeRegressionMiswiredVerticalConnection` at `LatticeRegression.lean:849`.
+`latticeRegressionMiswired_incidentAssembly_ring11North` at line 944 calculates the wrong mate,
+and `latticeRegressionMiswired_incidentAssembly_rejected` at line 957 proves that no hostile
+external input makes the canonical incident state satisfy that raw assembly. This is the requested
+mis-lift/mis-mate negative pair, not a relabelled version of the old `2 != 3` fixture.
 
 ## Module-doc normalization (doc-only)
 
@@ -196,12 +222,8 @@ modules received comment-only normalization, with no declarations or proofs chan
 - `Termination.lean`; and
 - `TerminationRegression.lean`.
 
-The standalone lettered headings in the new `LatticeRegression.lean` were also formatted as
-module-doc comments. The heading-only commits preserve all existing declaration line numbers.
-
-The prior PANDA HANDOFF citation is corrected here: `responseRegression_graphDet` is at
-`PandaResponseRegression.lean:1201`, while
-`responseRegression_graphDet_ne_zero` is at `PandaResponseRegression.lean:1207`.
+The prior PANDA citation is also corrected here: `responseRegression_graphDet` is at
+`PandaResponseRegression.lean:1201`, while `responseRegression_graphDet_ne_zero` is at line 1207.
 
 ## Non-claims
 
@@ -215,54 +237,67 @@ The prior PANDA HANDOFF citation is corrected here: `responseRegression_graphDet
 - No passivity, losslessness, reciprocity, impedance matching, stability, causality,
   convergence, resonance, bandwidth, dispersion, pole/zero, bending-loss, insertion-loss,
   material, fabrication, or measurement-validation claim is made.
-- No electromagnetic-power claim is made. Power remains normalized modal power until the
-  hypotheses in `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93` are supplied.
+- No electromagnetic-power claim is made. The `^ count` notation is matrix exponentiation;
+  modal power remains non-electromagnetic until the hypotheses in
+  `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93` are supplied.
 - Human verification of the source classification and intended physical model remains required
   by `AI-POLICY.md`.
 
 ## Reviewer map
 
-1. Read `Lattice.lean:70-175` for the source-backed row aliases and transferred IP-15--18 API.
-2. Read `Lattice.lean:620-676` for the explicit coupled-column netlist and relational behavior.
-3. Read `Lattice.lean:724-875` for both hierarchies and the independent full flat netlist.
-4. Read `Lattice.lean:1080-1301` for wiring reindexing and the two S-08 behavior equalities.
-5. Read `LatticeRegression.lean:438-645` for the raw positive behavior and primitive anchors.
-6. Read `LatticeRegression.lean:653-695` for the transposed-index negative control.
-7. Review the two doc-only commits separately; their changes are confined to comments.
+1. Read `LatticeRegression.lean:450-667` for the primitive component, mate, assembly, and flat
+   behavior proof.
+2. Read `LatticeRegression.lean:670-840` for the independently staged closure and nonzero
+   horizontal/vertical traversal anchors.
+3. Read `LatticeRegression.lean:843-967` for the hostile vertical endpoint and raw-equation
+   rejection.
+4. Read `LinearBehaviorReindex.lean:44-60` and `Lattice.lean:1233-1263` for the authorized neutral
+   extraction and shortened production proof.
+5. Read `Lattice.lean:79-174` for the source-backed row classification and narrowed IP-18 claim.
+6. Read `Lattice.lean:614-678,722-877,1082-1263` for the explicit column, flat lattice, wiring
+   reindex, and two Physlib-original decompositions.
+7. Review the module-doc normalization commits separately; they change comments only.
 
 ## Exact validation record
 
 The exact implementation source head
-`13827bb6092099f0a54152c4bcde7aafbae2a32c` passed one chained
-`lake-lock env bash` gate. The gate temporarily registered only the two lattice modules and the
-nine unregistered PANDA dependencies, then ran:
+`9d737a7ebd8e74c03a1b3b386812f5a45a8b47a5` was tested with a temporary registration of the
+neutral reindex module, both lattice modules, and the nine unregistered PANDA dependencies. One
+chained `lake-lock env bash` hold ran:
 
 ```text
 lake exe cache get
-lake --wfail build <the eleven unregistered Cascade modules>
+lake --wfail build Physlib
 lake exe runPhyslibLinters
 lake exe lint_all
 ./scripts/lint-style.sh
-git diff --check
-the banned-token, declaration-kind, codepoint, line-cap, module-doc, and import audits
+lake exe module_doc_lint
 ```
+
+The frozen sync's repository-wide module-doc backlog makes the last command nonzero after all
+in-scope files have been checked. The filename-filtered module-doc confirmation, `git diff --check`,
+and the static audits were therefore run immediately afterward.
 
 Results:
 
 - cache: no downloads; 8690 files were already decompressed;
-- targeted warning-as-error build: passed, 2783 jobs;
+- warning-as-error `Physlib` build: passed, 4953 jobs;
 - `runPhyslibLinters`: Physlib and QuantumInfo passed;
-- `lint_all`: full build and declaration linters passed;
+- `lint_all`: full build, illegal-import check, duplicate-tag check, sorry/pseudo check, and
+  declaration linters passed; its listed missing registrations and transitive-import diagnostics
+  are pre-existing and outside the lane on the frozen sync;
 - standalone committed-state `lint-style.sh`: passed;
+- repository-wide `module_doc_lint` reaches only legacy out-of-lane documentation failures on
+  this frozen sync; a registration-active filename-filtered rerun reported no Cascade or
+  `LinearBehaviorReindex.lean` error, and all 20 in-scope modules have the exact four headings and
+  matching tables of contents;
 - `git diff --check`: passed;
-- the Cascade module-doc audit passed for all 19 lane modules;
-- repository-wide module-doc diagnostics were confined to older out-of-lane files on this sync;
-- the redundant-import audit named no Cascade module;
-- no changed Lean file contains `sorry`, `axiom`, `native_decide`, `maxHeartbeats`, or
-  `Lean.ofReduceBool`;
-- the new lattice modules contain zero `theorem` declarations;
-- every changed Lean line is at most 100 Unicode codepoints; and
-- every new module is below 1500 lines.
+- no in-scope Lean file exceeds 100 Unicode codepoints per line;
+- all twelve unregistered modules are below 1500 lines;
+- no changed lattice or neutral Lean file contains `sorry`, `axiom`, `native_decide`,
+  `maxHeartbeats`, or `Lean.ofReduceBool`;
+- the two lattice modules contain zero `theorem` declarations; and
+- production modules do not import regression modules.
 
 The temporary registry was restored byte-identically. `Physlib.lean` had SHA-256
 `88d1329fba21fc443261608300b3c922c4612d3cb4454a7f82e57e760aeaadb7` before and after the gate.
