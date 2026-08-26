@@ -138,6 +138,18 @@ lemma passiveCaseUnitDelayParameters_data :
     DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
     DCDRSourceBridge.passiveCaseSourceParameters]
 
+/-- Primitive substitution separates the two printed Theorem 3 loop terms. -/
+lemma passiveCase_printedLoopTerms :
+    DCDRSourceBridge.passiveCaseSourceParameters.k1 *
+          DCDRSourceBridge.passiveCaseSourceParameters.k2 *
+          DCDRSourceBridge.passiveCaseSourceParameters.G1 *
+          DCDRSourceBridge.passiveCaseSourceParameters.G3 = 81 / 100 ∧
+      (1 - DCDRSourceBridge.passiveCaseSourceParameters.k1) *
+          (1 - DCDRSourceBridge.passiveCaseSourceParameters.k2) *
+          DCDRSourceBridge.passiveCaseSourceParameters.G2 *
+          DCDRSourceBridge.passiveCaseSourceParameters.G3 = 1 / 100 := by
+  norm_num [DCDRSourceBridge.passiveCaseSourceParameters]
+
 /-- Primitive expansion gives the printed Theorem 3 loop coefficient `41/50`. -/
 lemma passiveCase_printedLoopCoefficient :
     DCDRSourceBridge.passiveCaseSourceParameters.printedLoopCoefficient = 41 / 50 := by
