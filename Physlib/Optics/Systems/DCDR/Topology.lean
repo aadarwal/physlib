@@ -8,7 +8,7 @@ module
 public import Physlib.Mathematics.SignalFlowGraph.Terminated
 public import Physlib.Optics.Components.DirectionalCouplerPhysical
 public import Physlib.Optics.Components.MatchedPropagationPhysical
-public import Physlib.Optics.Network.FlatNetlistElimination
+public import Physlib.Optics.Network.FlatNetlist
 
 /-!
 # Double-coupler double-ring topology
@@ -27,8 +27,9 @@ branches as an edge-indexed `TerminatedMultigraph`, whose terminal and transfer 
 `Physlib/Mathematics/SignalFlowGraph/Terminated.lean:227-241`. It obtains the scalar gain matrix by
 the parallel-edge sum in `Physlib/Mathematics/SignalFlowGraph/Extraction.lean:175-183`, then passes
 that matrix through `ofCoefficientMatrix`, defined at the same file's lines 95-97. The forward
-eight-node equations are proved from the raw N7 component-scattering and netlist-routing
-equations. They are not a hand-drawn replacement for the netlist.
+eight-node equation is equivalent to the existence of a complete N7 component-scattering and
+netlist-routing state with zero reverse excitation. Every retained edge is separately identified
+with its exact assembled component entry and its routed input and output coordinates.
 
 The complete N7 netlist is bidirectional, while the source graph records the forward boundary
 coordinates only. No claim identifies the eight-node matrix with the complete `C * S` feedback
@@ -49,15 +50,16 @@ stability, pole, zero, resonance, bandwidth, or material realization is asserted
 - `DCDR.netlist`: the explicit two-coupler, three-path N7 flat netlist.
 - `DCDR.signalMultigraph`: the edge-indexed eight-node, eleven-branch forward graph.
 - `DCDR.signalFlowGraph`: its gain matrix, named through `ofCoefficientMatrix`.
-- `DCDR.forwardState_isNodeSolution_of_netlistEquations`: the graph equations derived from the
-  complete netlist equations.
+- `DCDR.edgeGain_eq_n7ScatteringEntry`: every retained gain is an assembled N7 entry.
+- `DCDR.isNodeSolution_iff_exists_netlistRealization`: graph solutions are exactly the projected
+  complete zero-reverse N7 realizations.
 
 ## iii. Table of contents
 
 - A. N7 parameters and explicit flat netlist
 - B. External channels and forward coordinates
 - C. The edge-indexed eight-node signal-flow graph
-- D. Derivation from the N7 netlist equations
+- D. Relational extraction from the N7 netlist equations
 
 ## iv. References
 
@@ -301,11 +303,6 @@ noncomputable instance connectedChannelFintype (p : Parameters) :
 noncomputable instance connectedChannelDecidableEq (p : Parameters) :
     DecidableEq (netlist p).ConnectedChannel := Classical.decEq _
 
-/-- External DCDR channels are finite. -/
-noncomputable instance externalChannelFintype (p : Parameters) :
-    Fintype (netlist p).ExternalChannel :=
-  (netlist p).eliminationExternalChannelFintype
-
 /-! ## B. External channels and forward coordinates -/
 
 /-- The aggregate channel owned by a selected first-coupler port. -/
@@ -366,6 +363,57 @@ lemma inputChannel_ne_outputChannel (p : Parameters) :
   have hValue := congrArg Subtype.val hChannel
   cases hValue
 
+/-- Every external DCDR channel is one of the declared input and output channels. -/
+lemma externalChannel_eq_input_or_output (p : Parameters)
+    (channel : (netlist p).ExternalChannel) :
+    channel = inputChannel p ∨ channel = outputChannel p := by
+  rcases channel with ⟨⟨⟨component, port⟩, mode⟩, hExternal⟩
+  cases component <;> cases port <;> cases mode
+  · exact Or.inl rfl
+  · exact absurd ⟨⟨Connection.feedbackToFirst, Sum.inr ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.firstToUpper, Sum.inl ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.firstToLower, Sum.inl ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.upperToSecond, Sum.inr ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.lowerToSecond, Sum.inr ()⟩, rfl⟩ hExternal
+  · exact Or.inr rfl
+  · exact absurd ⟨⟨Connection.secondToFeedback, Sum.inl ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.firstToUpper, Sum.inr ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.upperToSecond, Sum.inl ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.firstToLower, Sum.inr ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.lowerToSecond, Sum.inl ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.secondToFeedback, Sum.inr ()⟩, rfl⟩ hExternal
+  · exact absurd ⟨⟨Connection.feedbackToFirst, Sum.inl ()⟩, rfl⟩ hExternal
+
+/-- The two channel labels select the external input and output, respectively. -/
+def externalChannelOfFin (p : Parameters) : Fin 2 → (netlist p).ExternalChannel :=
+  ![inputChannel p, outputChannel p]
+
+/-- The declared input and output exhaust the external channel family. -/
+noncomputable def externalChannelEquiv (p : Parameters) :
+    Fin 2 ≃ (netlist p).ExternalChannel :=
+  Equiv.ofBijective (externalChannelOfFin p) ⟨by
+    intro first second hChannel
+    fin_cases first <;> fin_cases second
+    · rfl
+    · exact absurd hChannel (inputChannel_ne_outputChannel p)
+    · exact absurd hChannel (Ne.symm (inputChannel_ne_outputChannel p))
+    · rfl, by
+    intro channel
+    rcases externalChannel_eq_input_or_output p channel with rfl | rfl
+    · exact ⟨0, rfl⟩
+    · exact ⟨1, rfl⟩⟩
+
+/-- External DCDR channels are finite through their explicit two-channel classification. -/
+noncomputable instance externalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  Fintype.ofEquiv (Fin 2) (externalChannelEquiv p)
+
+/-- The DCDR has exactly two external channels. -/
+lemma externalChannel_card (p : Parameters) :
+    Fintype.card (netlist p).ExternalChannel = 2 := by
+  rw [← Fintype.card_congr (externalChannelEquiv p)]
+  decide
+
 /-- A coherent scalar amplitude injected only at the source-side input. -/
 def inputAmplitude (p : Parameters) (amplitude : ℂ) :
     ModeAmplitude (netlist p).ExternalIncident :=
@@ -389,6 +437,9 @@ lemma inputAmplitude_apply_output (p : Parameters) (amplitude : ℂ) :
 /-- The eight forward DCDR boundary signals, indexed as source nodes one through eight. -/
 abbrev Node := Fin 8
 
+/-- The forward graph has exactly eight named boundary coordinates. -/
+lemma node_card : Fintype.card Node = 8 := by decide
+
 /-- The eleven source branches, indexed in the order of FMICS'15 Definition 8. -/
 abbrev Edge := Fin 11
 
@@ -411,6 +462,201 @@ def edgeGain (p : Parameters) : Edge → ℂ :=
     DirectionalCoupler.crossCoefficient p.firstCoupler,
     p.firstCoupler.throughAmplitude,
     p.secondCoupler.throughAmplitude]
+
+/-- The physical N7 incident channel supplying each retained graph edge. -/
+def edgeN7InputChannel (p : Parameters) : Edge → (netlist p).Channel :=
+  ![(netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.upperPath
+      ⟨MatchedPropagation.Port.left, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.lowerPath
+      ⟨MatchedPropagation.Port.left, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.feedbackPath
+      ⟨MatchedPropagation.Port.left, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩]
+
+/-- The physical N7 outgoing channel receiving each retained graph edge. -/
+def edgeN7OutputChannel (p : Parameters) : Edge → (netlist p).Channel :=
+  ![(netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.upperPath
+      ⟨MatchedPropagation.Port.right, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.lowerPath
+      ⟨MatchedPropagation.Port.right, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.feedbackPath
+      ⟨MatchedPropagation.Port.right, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
+    (netlist p).components.componentChannelEmbedding Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩]
+
+/-- The four forward entries of an owned N7 directional-coupler scattering matrix. -/
+private lemma directionalCoupler_forwardScatteringEntries
+    (q : DirectionalCoupler.Parameters) :
+    (DirectionalCoupler.physicalScattering q Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+          ⟨DirectionalCoupler.Port.leftFirst, ()⟩ = q.throughAmplitude ∧
+      (DirectionalCoupler.physicalScattering q Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+          ⟨DirectionalCoupler.Port.leftFirst, ()⟩ =
+        DirectionalCoupler.crossCoefficient q ∧
+      (DirectionalCoupler.physicalScattering q Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+          ⟨DirectionalCoupler.Port.leftSecond, ()⟩ =
+        DirectionalCoupler.crossCoefficient q ∧
+      (DirectionalCoupler.physicalScattering q Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+          ⟨DirectionalCoupler.Port.leftSecond, ()⟩ = q.throughAmplitude := by
+  simp [DirectionalCoupler.physicalScattering,
+    ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
+    DirectionalCoupler.scattering, ReflectionlessTwoPort.scattering,
+    DirectionalCoupler.mixing, DirectionalCoupler.portFamily,
+    DirectionalCoupler.channelEquiv]
+
+/-- The forward entry of an owned N7 matched-propagation scattering matrix. -/
+private lemma matchedPropagation_forwardScatteringEntry
+    (q : MatchedPropagation.Parameters) :
+    (MatchedPropagation.physicalScattering q Unit).toModeTransform
+        ⟨MatchedPropagation.Port.right, ()⟩
+        ⟨MatchedPropagation.Port.left, ()⟩ =
+      MatchedPropagation.transmissionCoefficient q := by
+  simp [MatchedPropagation.physicalScattering,
+    ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
+    MatchedPropagation.scattering, ReflectionlessTwoPort.scattering,
+    MatchedPropagation.transmission, MatchedPropagation.portFamily,
+    MatchedPropagation.channelEquiv]
+
+/-- Every retained edge gain is the corresponding entry of the assembled N7 component law. -/
+lemma edgeGain_eq_n7ScatteringEntry (p : Parameters) (edge : Edge) :
+    edgeGain p edge =
+      (netlist p).scatteringTransform
+        (Outgoing.mk (edgeN7OutputChannel p edge))
+        (Incident.mk (edgeN7InputChannel p edge)) := by
+  -- The dependent local-channel types require one short check for each audited edge label.
+  fin_cases edge
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.firstCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+          ⟨DirectionalCoupler.Port.leftFirst, ()⟩ = p.firstCoupler.throughAmplitude
+        exact (directionalCoupler_forwardScatteringEntries p.firstCoupler).1)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.upperPath
+      ⟨MatchedPropagation.Port.right, ()⟩ ⟨MatchedPropagation.Port.left, ()⟩).trans (by
+        change (MatchedPropagation.physicalScattering p.upperPath Unit).toModeTransform
+          ⟨MatchedPropagation.Port.right, ()⟩ ⟨MatchedPropagation.Port.left, ()⟩ =
+            MatchedPropagation.transmissionCoefficient p.upperPath
+        exact matchedPropagation_forwardScatteringEntry p.upperPath)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.secondCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+          ⟨DirectionalCoupler.Port.leftFirst, ()⟩ = p.secondCoupler.throughAmplitude
+        exact (directionalCoupler_forwardScatteringEntries p.secondCoupler).1)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.firstCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+          ⟨DirectionalCoupler.Port.leftFirst, ()⟩ =
+            DirectionalCoupler.crossCoefficient p.firstCoupler
+        exact (directionalCoupler_forwardScatteringEntries p.firstCoupler).2.1)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.lowerPath
+      ⟨MatchedPropagation.Port.right, ()⟩ ⟨MatchedPropagation.Port.left, ()⟩).trans (by
+        change (MatchedPropagation.physicalScattering p.lowerPath Unit).toModeTransform
+          ⟨MatchedPropagation.Port.right, ()⟩ ⟨MatchedPropagation.Port.left, ()⟩ =
+            MatchedPropagation.transmissionCoefficient p.lowerPath
+        exact matchedPropagation_forwardScatteringEntry p.lowerPath)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.secondCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+          ⟨DirectionalCoupler.Port.leftSecond, ()⟩ =
+            DirectionalCoupler.crossCoefficient p.secondCoupler
+        exact (directionalCoupler_forwardScatteringEntries p.secondCoupler).2.2.1)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+      ⟨DirectionalCoupler.Port.leftFirst, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.secondCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+          ⟨DirectionalCoupler.Port.leftFirst, ()⟩ =
+            DirectionalCoupler.crossCoefficient p.secondCoupler
+        exact (directionalCoupler_forwardScatteringEntries p.secondCoupler).2.1)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.feedbackPath
+      ⟨MatchedPropagation.Port.right, ()⟩ ⟨MatchedPropagation.Port.left, ()⟩).trans (by
+        change (MatchedPropagation.physicalScattering p.feedbackPath Unit).toModeTransform
+          ⟨MatchedPropagation.Port.right, ()⟩ ⟨MatchedPropagation.Port.left, ()⟩ =
+            MatchedPropagation.transmissionCoefficient p.feedbackPath
+        exact matchedPropagation_forwardScatteringEntry p.feedbackPath)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.firstCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightFirst, ()⟩
+          ⟨DirectionalCoupler.Port.leftSecond, ()⟩ =
+            DirectionalCoupler.crossCoefficient p.firstCoupler
+        exact (directionalCoupler_forwardScatteringEntries p.firstCoupler).2.2.1)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.firstCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.firstCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+          ⟨DirectionalCoupler.Port.leftSecond, ()⟩ = p.firstCoupler.throughAmplitude
+        exact (directionalCoupler_forwardScatteringEntries p.firstCoupler).2.2.2)
+  · simp [edgeGain, edgeN7InputChannel, edgeN7OutputChannel]
+    symm
+    exact ((netlist p).scatteringTransform_entry_same Component.secondCoupler
+      ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+      ⟨DirectionalCoupler.Port.leftSecond, ()⟩).trans (by
+        change (DirectionalCoupler.physicalScattering p.secondCoupler Unit).toModeTransform
+          ⟨DirectionalCoupler.Port.rightSecond, ()⟩
+          ⟨DirectionalCoupler.Port.leftSecond, ()⟩ = p.secondCoupler.throughAmplitude
+        exact (directionalCoupler_forwardScatteringEntries p.secondCoupler).2.2.2)
 
 /-- The edge-indexed eight-node, eleven-branch forward DCDR graph. -/
 def signalMultigraph (p : Parameters) :
@@ -476,7 +722,7 @@ lemma coefficientMatrix_eq_displayed (p : Parameters) :
     simp [signalMultigraph, edgeSource, edgeTarget, edgeGain,
       displayedCoefficientMatrix, Fin.sum_univ_succ]
 
-/-! ## D. Derivation from the N7 netlist equations -/
+/-! ## D. Relational extraction from the N7 netlist equations -/
 
 /-- The first-coupler restriction satisfies its N7 physical behavior. -/
 lemma firstCoupler_physicalBehavior_of_scatteringEquation (p : Parameters)
@@ -627,6 +873,204 @@ lemma feedbackPath_physicalBehavior_of_scatteringEquation (p : Parameters)
             (MatchedPropagation.physicalScattering p.feedbackPath Unit)) at hLocal
   rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior] at hLocal
   exact hLocal
+
+/-- The first coupler gives its reverse first-arm coordinate law. -/
+lemma scatteringEquation_firstCoupler_leftFirst (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (p.firstCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        DirectionalCoupler.crossCoefficient p.firstCoupler *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) := by
+  have hPhysical :=
+    firstCoupler_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (DirectionalCoupler.mem_physicalBehavior_iff p.firstCoupler _ _).mp hPhysical
+  rw [DirectionalCoupler.mem_behavior_iff,
+    DirectionalCoupler.mixing_toLinearMap_apply,
+    DirectionalCoupler.mixing_toLinearMap_apply] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk (Sum.inl ())))) hRaw
+  change
+    outgoing (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (p.firstCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        DirectionalCoupler.crossCoefficient p.firstCoupler *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) at hCoordinate
+  exact hCoordinate
+
+/-- The first coupler gives its reverse second-arm coordinate law. -/
+lemma scatteringEquation_firstCoupler_leftSecond (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      DirectionalCoupler.crossCoefficient p.firstCoupler *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        (p.firstCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) := by
+  have hPhysical :=
+    firstCoupler_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (DirectionalCoupler.mem_physicalBehavior_iff p.firstCoupler _ _).mp hPhysical
+  rw [DirectionalCoupler.mem_behavior_iff,
+    DirectionalCoupler.mixing_toLinearMap_apply,
+    DirectionalCoupler.mixing_toLinearMap_apply] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk (Sum.inr ())))) hRaw
+  change
+    outgoing (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      DirectionalCoupler.crossCoefficient p.firstCoupler *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        (p.firstCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) at hCoordinate
+  exact hCoordinate
+
+/-- The second coupler gives its reverse first-arm coordinate law. -/
+lemma scatteringEquation_secondCoupler_leftFirst (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (p.secondCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        DirectionalCoupler.crossCoefficient p.secondCoupler *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) := by
+  have hPhysical :=
+    secondCoupler_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (DirectionalCoupler.mem_physicalBehavior_iff p.secondCoupler _ _).mp hPhysical
+  rw [DirectionalCoupler.mem_behavior_iff,
+    DirectionalCoupler.mixing_toLinearMap_apply,
+    DirectionalCoupler.mixing_toLinearMap_apply] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk (Sum.inl ())))) hRaw
+  change
+    outgoing (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (p.secondCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        DirectionalCoupler.crossCoefficient p.secondCoupler *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) at hCoordinate
+  exact hCoordinate
+
+/-- The second coupler gives its reverse second-arm coordinate law. -/
+lemma scatteringEquation_secondCoupler_leftSecond (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      DirectionalCoupler.crossCoefficient p.secondCoupler *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        (p.secondCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) := by
+  have hPhysical :=
+    secondCoupler_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (DirectionalCoupler.mem_physicalBehavior_iff p.secondCoupler _ _).mp hPhysical
+  rw [DirectionalCoupler.mem_behavior_iff,
+    DirectionalCoupler.mixing_toLinearMap_apply,
+    DirectionalCoupler.mixing_toLinearMap_apply] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk (Sum.inr ())))) hRaw
+  change
+    outgoing (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      DirectionalCoupler.crossCoefficient p.secondCoupler *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) +
+        (p.secondCoupler.throughAmplitude : ℂ) *
+          incident (Incident.mk
+            (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) at hCoordinate
+  exact hCoordinate
+
+/-- The upper N7 path gives its reverse propagation coordinate law. -/
+lemma scatteringEquation_upperPath_left (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk (upperPathChannel p MatchedPropagation.Port.left)) =
+      p.upperCoefficient *
+        incident (Incident.mk (upperPathChannel p MatchedPropagation.Port.right)) := by
+  have hPhysical :=
+    upperPath_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (MatchedPropagation.mem_physicalBehavior_iff p.upperPath _ _).mp hPhysical
+  rw [MatchedPropagation.mem_behavior_iff] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk ()))) hRaw
+  change
+    outgoing (Outgoing.mk (upperPathChannel p MatchedPropagation.Port.left)) =
+      p.upperCoefficient *
+        incident (Incident.mk
+          (upperPathChannel p MatchedPropagation.Port.right)) at hCoordinate
+  exact hCoordinate
+
+/-- The lower N7 path gives its reverse propagation coordinate law. -/
+lemma scatteringEquation_lowerPath_left (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk (lowerPathChannel p MatchedPropagation.Port.left)) =
+      p.lowerCoefficient *
+        incident (Incident.mk (lowerPathChannel p MatchedPropagation.Port.right)) := by
+  have hPhysical :=
+    lowerPath_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (MatchedPropagation.mem_physicalBehavior_iff p.lowerPath _ _).mp hPhysical
+  rw [MatchedPropagation.mem_behavior_iff] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk ()))) hRaw
+  change
+    outgoing (Outgoing.mk (lowerPathChannel p MatchedPropagation.Port.left)) =
+      p.lowerCoefficient *
+        incident (Incident.mk
+          (lowerPathChannel p MatchedPropagation.Port.right)) at hCoordinate
+  exact hCoordinate
+
+/-- The feedback N7 path gives its reverse propagation coordinate law. -/
+lemma scatteringEquation_feedbackPath_left (p : Parameters)
+    (incident : ModeAmplitude (netlist p).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (hScattering : outgoing = (netlist p).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk (feedbackPathChannel p MatchedPropagation.Port.left)) =
+      p.feedbackCoefficient *
+        incident (Incident.mk (feedbackPathChannel p MatchedPropagation.Port.right)) := by
+  have hPhysical :=
+    feedbackPath_physicalBehavior_of_scatteringEquation p incident outgoing hScattering
+  have hRaw :=
+    (MatchedPropagation.mem_physicalBehavior_iff p.feedbackPath _ _).mp hPhysical
+  rw [MatchedPropagation.mem_behavior_iff] at hRaw
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk ()))) hRaw
+  change
+    outgoing (Outgoing.mk (feedbackPathChannel p MatchedPropagation.Port.left)) =
+      p.feedbackCoefficient *
+        incident (Incident.mk
+          (feedbackPathChannel p MatchedPropagation.Port.right)) at hCoordinate
+  exact hCoordinate
 
 /-- The first coupler gives the forward upper-arm coordinate law. -/
 lemma scatteringEquation_firstCoupler_rightFirst (p : Parameters)
@@ -837,6 +1281,107 @@ lemma incidentAssembly_apply_input (p : Parameters)
   exact (netlist p).connections.incidentAssembly_apply_external
     outgoing external (inputChannel p)
 
+/-- Incident assembly exposes the source-side output coordinate as a second external input. -/
+lemma incidentAssembly_apply_output (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk
+          (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) =
+      external (Incident.mk (outputChannel p)) := by
+  exact (netlist p).connections.incidentAssembly_apply_external
+    outgoing external (outputChannel p)
+
+/-- Reverse incident assembly sends the upper path's left output to the first coupler. -/
+lemma incidentAssembly_apply_firstCoupler_rightFirst (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk
+          (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) =
+      outgoing (Outgoing.mk (upperPathChannel p MatchedPropagation.Port.left)) := by
+  change
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk ((netlist p).connections.channelEmbedding
+          ⟨Connection.firstToUpper, Sum.inl ()⟩)) = _
+  rw [(netlist p).connections.incidentAssembly_apply_connected_channel]
+  rfl
+
+/-- Reverse incident assembly sends the lower path's left output to the first coupler. -/
+lemma incidentAssembly_apply_firstCoupler_rightSecond (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk
+          (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) =
+      outgoing (Outgoing.mk (lowerPathChannel p MatchedPropagation.Port.left)) := by
+  change
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk ((netlist p).connections.channelEmbedding
+          ⟨Connection.firstToLower, Sum.inl ()⟩)) = _
+  rw [(netlist p).connections.incidentAssembly_apply_connected_channel]
+  rfl
+
+/-- Reverse incident assembly sends the feedback path's left output to the second coupler. -/
+lemma incidentAssembly_apply_secondCoupler_rightSecond (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk
+          (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) =
+      outgoing (Outgoing.mk (feedbackPathChannel p MatchedPropagation.Port.left)) := by
+  change
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk ((netlist p).connections.channelEmbedding
+          ⟨Connection.secondToFeedback, Sum.inl ()⟩)) = _
+  rw [(netlist p).connections.incidentAssembly_apply_connected_channel]
+  rfl
+
+/-- Reverse incident assembly sends the second coupler's upper-left output into the upper path. -/
+lemma incidentAssembly_apply_upperPath_right (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk (upperPathChannel p MatchedPropagation.Port.right)) =
+      outgoing (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftFirst)) := by
+  change
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk ((netlist p).connections.channelEmbedding
+          ⟨Connection.upperToSecond, Sum.inl ()⟩)) = _
+  rw [(netlist p).connections.incidentAssembly_apply_connected_channel]
+  rfl
+
+/-- Reverse incident assembly sends the second coupler's lower-left output into the lower path. -/
+lemma incidentAssembly_apply_lowerPath_right (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk (lowerPathChannel p MatchedPropagation.Port.right)) =
+      outgoing (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftSecond)) := by
+  change
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk ((netlist p).connections.channelEmbedding
+          ⟨Connection.lowerToSecond, Sum.inl ()⟩)) = _
+  rw [(netlist p).connections.incidentAssembly_apply_connected_channel]
+  rfl
+
+/-- Reverse incident assembly sends the first coupler's feedback-left output into its path. -/
+lemma incidentAssembly_apply_feedbackPath_right (p : Parameters)
+    (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
+    (external : ModeAmplitude (netlist p).ExternalIncident) :
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk (feedbackPathChannel p MatchedPropagation.Port.right)) =
+      outgoing (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftSecond)) := by
+  change
+    (netlist p).connections.incidentAssembly outgoing external
+        (Incident.mk ((netlist p).connections.channelEmbedding
+          ⟨Connection.feedbackToFirst, Sum.inl ()⟩)) = _
+  rw [(netlist p).connections.incidentAssembly_apply_connected_channel]
+  rfl
+
 /-- The upper path receives the first coupler's upper output. -/
 lemma incidentAssembly_apply_upperPath_left (p : Parameters)
     (outgoing : ModeAmplitude (netlist p).OutgoingIndex)
@@ -957,6 +1502,70 @@ def forwardState (p : Parameters)
 def signalInput (amplitude : ℂ) : Node → ℂ :=
   ![amplitude, 0, 0, 0, 0, 0, 0, 0]
 
+/-- The complete incident N7 state obtained by lifting eight forward graph coordinates.
+
+The seven reverse-going incident coordinates are set to zero. The forward coordinates at
+component boundaries are copied from the graph nodes related by the six physical wires.
+-/
+def liftedIncident (p : Parameters) (state : Node → ℂ) :
+    ModeAmplitude (netlist p).IncidentIndex :=
+  WithLp.toLp 2 fun endpoint =>
+    match endpoint.channel.1.1, endpoint.channel.1.2 with
+    | .firstCoupler, .leftFirst => state 0
+    | .firstCoupler, .leftSecond => state 1
+    | .firstCoupler, .rightFirst => 0
+    | .firstCoupler, .rightSecond => 0
+    | .secondCoupler, .leftFirst => state 5
+    | .secondCoupler, .leftSecond => state 4
+    | .secondCoupler, .rightFirst => 0
+    | .secondCoupler, .rightSecond => 0
+    | .upperPath, .left => state 2
+    | .upperPath, .right => 0
+    | .lowerPath, .left => state 3
+    | .lowerPath, .right => 0
+    | .feedbackPath, .left => state 6
+    | .feedbackPath, .right => 0
+
+/-- The complete outgoing N7 state obtained by lifting eight forward graph coordinates.
+
+The seven reverse-going outgoing coordinates are zero. Each retained forward output is copied
+to the physical component endpoint represented by its graph node.
+-/
+def liftedOutgoing (p : Parameters) (state : Node → ℂ) :
+    ModeAmplitude (netlist p).OutgoingIndex :=
+  WithLp.toLp 2 fun endpoint =>
+    match endpoint.channel.1.1, endpoint.channel.1.2 with
+    | .firstCoupler, .leftFirst => 0
+    | .firstCoupler, .leftSecond => 0
+    | .firstCoupler, .rightFirst => state 2
+    | .firstCoupler, .rightSecond => state 3
+    | .secondCoupler, .leftFirst => 0
+    | .secondCoupler, .leftSecond => 0
+    | .secondCoupler, .rightFirst => state 7
+    | .secondCoupler, .rightSecond => state 6
+    | .upperPath, .left => 0
+    | .upperPath, .right => state 5
+    | .lowerPath, .left => 0
+    | .lowerPath, .right => state 4
+    | .feedbackPath, .left => 0
+    | .feedbackPath, .right => state 1
+
+/-- Every retained edge starts at the graph coordinate routed into its physical N7 input. -/
+lemma liftedIncident_apply_edgeN7Input (p : Parameters) (state : Node → ℂ)
+    (edge : Edge) :
+    liftedIncident p state (Incident.mk (edgeN7InputChannel p edge)) =
+      state (edgeSource edge) := by
+  fin_cases edge <;>
+    rfl
+
+/-- Every retained edge ends at the graph coordinate routed from its physical N7 output. -/
+lemma liftedOutgoing_apply_edgeN7Output (p : Parameters) (state : Node → ℂ)
+    (edge : Edge) :
+    liftedOutgoing p state (Outgoing.mk (edgeN7OutputChannel p edge)) =
+      state (edgeTarget edge) := by
+  fin_cases edge <;>
+    rfl
+
 /-- The eight scalar forward equations in the published node order. -/
 structure ForwardEquations (p : Parameters) (input : ℂ) (state : Node → ℂ) : Prop where
   /-- Node one is the externally supplied input. -/
@@ -983,6 +1592,220 @@ structure ForwardEquations (p : Parameters) (input : ℂ) (state : Node → ℂ)
   nodeEight : state 7 =
     DirectionalCoupler.crossCoefficient p.secondCoupler * state 4 +
       (p.secondCoupler.throughAmplitude : ℂ) * state 5
+
+/-- A forward graph solution's lifted N7 amplitudes satisfy every component scattering law. -/
+lemma liftedOutgoing_eq_scatteringTransform (p : Parameters) (input : ℂ)
+    (state : Node → ℂ) (hForward : ForwardEquations p input state) :
+    liftedOutgoing p state =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state) := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  -- These are the fourteen owned physical channels: seven reverse and seven forward outputs.
+  cases component <;> cases port <;> cases mode
+  · change liftedOutgoing p state (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (firstCouplerChannel p DirectionalCoupler.Port.leftFirst))
+    rw [scatteringEquation_firstCoupler_leftFirst p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, firstCouplerChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (firstCouplerChannel p DirectionalCoupler.Port.leftSecond))
+    rw [scatteringEquation_firstCoupler_leftSecond p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, firstCouplerChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (firstCouplerChannel p DirectionalCoupler.Port.rightFirst))
+    rw [scatteringEquation_firstCoupler_rightFirst p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, firstCouplerChannel] using hForward.nodeThree
+  · change liftedOutgoing p state (Outgoing.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (firstCouplerChannel p DirectionalCoupler.Port.rightSecond))
+    rw [scatteringEquation_firstCoupler_rightSecond p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, firstCouplerChannel] using hForward.nodeFour
+  · change liftedOutgoing p state (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (secondCouplerChannel p DirectionalCoupler.Port.leftFirst))
+    rw [scatteringEquation_secondCoupler_leftFirst p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, secondCouplerChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (secondCouplerChannel p DirectionalCoupler.Port.leftSecond))
+    rw [scatteringEquation_secondCoupler_leftSecond p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, secondCouplerChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (secondCouplerChannel p DirectionalCoupler.Port.rightFirst))
+    rw [scatteringEquation_secondCoupler_rightFirst p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, secondCouplerChannel, add_comm] using
+      hForward.nodeEight
+  · change liftedOutgoing p state (Outgoing.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (secondCouplerChannel p DirectionalCoupler.Port.rightSecond))
+    rw [scatteringEquation_secondCoupler_rightSecond p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, secondCouplerChannel, add_comm] using
+      hForward.nodeSeven
+  · change liftedOutgoing p state (Outgoing.mk
+        (upperPathChannel p MatchedPropagation.Port.left)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (upperPathChannel p MatchedPropagation.Port.left))
+    rw [scatteringEquation_upperPath_left p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, upperPathChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (upperPathChannel p MatchedPropagation.Port.right)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (upperPathChannel p MatchedPropagation.Port.right))
+    rw [scatteringEquation_upperPath_right p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, upperPathChannel] using hForward.nodeSix
+  · change liftedOutgoing p state (Outgoing.mk
+        (lowerPathChannel p MatchedPropagation.Port.left)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (lowerPathChannel p MatchedPropagation.Port.left))
+    rw [scatteringEquation_lowerPath_left p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, lowerPathChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (lowerPathChannel p MatchedPropagation.Port.right)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (lowerPathChannel p MatchedPropagation.Port.right))
+    rw [scatteringEquation_lowerPath_right p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, lowerPathChannel] using hForward.nodeFive
+  · change liftedOutgoing p state (Outgoing.mk
+        (feedbackPathChannel p MatchedPropagation.Port.left)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (feedbackPathChannel p MatchedPropagation.Port.left))
+    rw [scatteringEquation_feedbackPath_left p (liftedIncident p state) _ rfl]
+    simp [liftedIncident, liftedOutgoing, feedbackPathChannel]
+  · change liftedOutgoing p state (Outgoing.mk
+        (feedbackPathChannel p MatchedPropagation.Port.right)) =
+      (netlist p).scatteringTransform.toLinearMap (liftedIncident p state)
+        (Outgoing.mk (feedbackPathChannel p MatchedPropagation.Port.right))
+    rw [scatteringEquation_feedbackPath_right p (liftedIncident p state) _ rfl]
+    simpa [liftedIncident, liftedOutgoing, feedbackPathChannel] using hForward.nodeTwo
+
+/-- A forward graph solution's lifted N7 amplitudes satisfy all six wires and both externals. -/
+lemma liftedIncident_eq_incidentAssembly (p : Parameters) (input : ℂ)
+    (state : Node → ℂ) (hForward : ForwardEquations p input state) :
+    liftedIncident p state =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input) := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  -- Exhausting all physical ports checks both ends of every wire and both external coordinates.
+  cases component <;> cases port <;> cases mode
+  · change liftedIncident p state (Incident.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (firstCouplerChannel p DirectionalCoupler.Port.leftFirst))
+    rw [incidentAssembly_apply_input]
+    simpa [liftedIncident, firstCouplerChannel] using hForward.nodeOne
+  · change liftedIncident p state (Incident.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (firstCouplerChannel p DirectionalCoupler.Port.leftSecond))
+    rw [incidentAssembly_apply_firstCoupler_leftSecond]
+    simp [liftedIncident, liftedOutgoing, firstCouplerChannel, feedbackPathChannel]
+  · change liftedIncident p state (Incident.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.rightFirst)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (firstCouplerChannel p DirectionalCoupler.Port.rightFirst))
+    rw [incidentAssembly_apply_firstCoupler_rightFirst]
+    simp [liftedIncident, liftedOutgoing, firstCouplerChannel, upperPathChannel]
+  · change liftedIncident p state (Incident.mk
+        (firstCouplerChannel p DirectionalCoupler.Port.rightSecond)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (firstCouplerChannel p DirectionalCoupler.Port.rightSecond))
+    rw [incidentAssembly_apply_firstCoupler_rightSecond]
+    simp [liftedIncident, liftedOutgoing, firstCouplerChannel, lowerPathChannel]
+  · change liftedIncident p state (Incident.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftFirst)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (secondCouplerChannel p DirectionalCoupler.Port.leftFirst))
+    rw [incidentAssembly_apply_secondCoupler_leftFirst]
+    simp [liftedIncident, liftedOutgoing, secondCouplerChannel, upperPathChannel]
+  · change liftedIncident p state (Incident.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.leftSecond)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (secondCouplerChannel p DirectionalCoupler.Port.leftSecond))
+    rw [incidentAssembly_apply_secondCoupler_leftSecond]
+    simp [liftedIncident, liftedOutgoing, secondCouplerChannel, lowerPathChannel]
+  · change liftedIncident p state (Incident.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.rightFirst)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (secondCouplerChannel p DirectionalCoupler.Port.rightFirst))
+    rw [incidentAssembly_apply_output]
+    simp [liftedIncident, secondCouplerChannel]
+  · change liftedIncident p state (Incident.mk
+        (secondCouplerChannel p DirectionalCoupler.Port.rightSecond)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (secondCouplerChannel p DirectionalCoupler.Port.rightSecond))
+    rw [incidentAssembly_apply_secondCoupler_rightSecond]
+    simp [liftedIncident, liftedOutgoing, secondCouplerChannel, feedbackPathChannel]
+  · change liftedIncident p state (Incident.mk
+        (upperPathChannel p MatchedPropagation.Port.left)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (upperPathChannel p MatchedPropagation.Port.left))
+    rw [incidentAssembly_apply_upperPath_left]
+    simp [liftedIncident, liftedOutgoing, upperPathChannel, firstCouplerChannel]
+  · change liftedIncident p state (Incident.mk
+        (upperPathChannel p MatchedPropagation.Port.right)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (upperPathChannel p MatchedPropagation.Port.right))
+    rw [incidentAssembly_apply_upperPath_right]
+    simp [liftedIncident, liftedOutgoing, upperPathChannel, secondCouplerChannel]
+  · change liftedIncident p state (Incident.mk
+        (lowerPathChannel p MatchedPropagation.Port.left)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (lowerPathChannel p MatchedPropagation.Port.left))
+    rw [incidentAssembly_apply_lowerPath_left]
+    simp [liftedIncident, liftedOutgoing, lowerPathChannel, firstCouplerChannel]
+  · change liftedIncident p state (Incident.mk
+        (lowerPathChannel p MatchedPropagation.Port.right)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (lowerPathChannel p MatchedPropagation.Port.right))
+    rw [incidentAssembly_apply_lowerPath_right]
+    simp [liftedIncident, liftedOutgoing, lowerPathChannel, secondCouplerChannel]
+  · change liftedIncident p state (Incident.mk
+        (feedbackPathChannel p MatchedPropagation.Port.left)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (feedbackPathChannel p MatchedPropagation.Port.left))
+    rw [incidentAssembly_apply_feedbackPath_left]
+    simp [liftedIncident, liftedOutgoing, feedbackPathChannel, secondCouplerChannel]
+  · change liftedIncident p state (Incident.mk
+        (feedbackPathChannel p MatchedPropagation.Port.right)) =
+      (netlist p).connections.incidentAssembly
+        (liftedOutgoing p state) (inputAmplitude p input)
+        (Incident.mk (feedbackPathChannel p MatchedPropagation.Port.right))
+    rw [incidentAssembly_apply_feedbackPath_right]
+    simp [liftedIncident, liftedOutgoing, feedbackPathChannel, firstCouplerChannel]
+
+/-- Projecting the lifted complete N7 state recovers the original eight graph coordinates. -/
+lemma forwardState_lifted (p : Parameters) (state : Node → ℂ) :
+    forwardState p (liftedIncident p state) (liftedOutgoing p state) = state := by
+  funext node
+  fin_cases node <;>
+    rfl
 
 /-- The displayed eight equations are exactly the node equation of the extracted graph. -/
 lemma isNodeSolution_iff_forwardEquations (p : Parameters) (input : ℂ)
@@ -1175,6 +1998,35 @@ lemma forwardState_isNodeSolution_of_netlistEquations (p : Parameters)
   rw [isNodeSolution_iff_forwardEquations]
   exact forwardEquations_of_netlistEquations p external incident outgoing
     hScattering hAssembly
+
+/-- The extracted graph equation is equivalent to a complete zero-reverse N7 realization.
+
+The forward implication constructs all fourteen incident and fourteen outgoing component
+coordinates, proves the raw assembled scattering and routing equations, and projects back to the
+given eight-node state. The reverse implication is the previously established netlist projection.
+-/
+lemma isNodeSolution_iff_exists_netlistRealization (p : Parameters) (input : ℂ)
+    (state : Node → ℂ) :
+    Physlib.SignalFlowGraph.IsNodeSolution
+        (signalFlowGraph p) (signalInput input) state ↔
+      ∃ incident : ModeAmplitude (netlist p).IncidentIndex,
+        ∃ outgoing : ModeAmplitude (netlist p).OutgoingIndex,
+          outgoing = (netlist p).scatteringTransform.toLinearMap incident ∧
+            incident = (netlist p).connections.incidentAssembly
+              outgoing (inputAmplitude p input) ∧
+            forwardState p incident outgoing = state := by
+  constructor
+  · intro hState
+    have hForward :=
+      (isNodeSolution_iff_forwardEquations p input state).mp hState
+    exact ⟨liftedIncident p state, liftedOutgoing p state,
+      liftedOutgoing_eq_scatteringTransform p input state hForward,
+      liftedIncident_eq_incidentAssembly p input state hForward,
+      forwardState_lifted p state⟩
+  · rintro ⟨incident, outgoing, hScattering, hAssembly, hProjection⟩
+    rw [← hProjection]
+    simpa using forwardState_isNodeSolution_of_netlistEquations p
+      (inputAmplitude p input) incident outgoing hScattering hAssembly
 
 end DCDR
 

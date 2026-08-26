@@ -4,8 +4,8 @@
 
 - Branch: `optics/s7d-dcdr`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s7d-dcdr`
-- This slice adds the explicit N7 DCDR netlist, the edge-indexed eight-node graph, the derivation of
-  its forward equations from raw component and routing equations, and hostile topology regressions.
+- This slice adds the explicit N7 DCDR netlist, the edge-indexed eight-node graph, a relational iff
+  between its node equation and complete zero-reverse N7 states, and hostile topology regressions.
 - The final synchronized development head and post-sync gate source head are recorded in the gate
   section below.
 - `Physlib.lean` is not committed by this lane. The two modules were registered temporarily for
@@ -93,14 +93,22 @@ The public instance declarations are:
 - `inputChannel`
 - `outputChannel`
 - `inputChannel_ne_outputChannel`
+- `externalChannel_eq_input_or_output`
+- `externalChannelOfFin`
+- `externalChannelEquiv`
+- `externalChannel_card`
 - `inputAmplitude`
 - `inputAmplitude_apply_input`
 - `inputAmplitude_apply_output`
 - `Node`
+- `node_card`
 - `Edge`
 - `edgeSource`
 - `edgeTarget`
 - `edgeGain`
+- `edgeN7InputChannel`
+- `edgeN7OutputChannel`
+- `edgeGain_eq_n7ScatteringEntry`
 - `signalMultigraph`
 - `coefficientMatrix`
 - `signalFlowGraph`
@@ -125,7 +133,21 @@ The public instance declarations are:
 - `scatteringEquation_upperPath_right`
 - `scatteringEquation_lowerPath_right`
 - `scatteringEquation_feedbackPath_right`
+- `scatteringEquation_firstCoupler_leftFirst`
+- `scatteringEquation_firstCoupler_leftSecond`
+- `scatteringEquation_secondCoupler_leftFirst`
+- `scatteringEquation_secondCoupler_leftSecond`
+- `scatteringEquation_upperPath_left`
+- `scatteringEquation_lowerPath_left`
+- `scatteringEquation_feedbackPath_left`
 - `incidentAssembly_apply_input`
+- `incidentAssembly_apply_output`
+- `incidentAssembly_apply_firstCoupler_rightFirst`
+- `incidentAssembly_apply_firstCoupler_rightSecond`
+- `incidentAssembly_apply_secondCoupler_rightSecond`
+- `incidentAssembly_apply_upperPath_right`
+- `incidentAssembly_apply_lowerPath_right`
+- `incidentAssembly_apply_feedbackPath_right`
 - `incidentAssembly_apply_upperPath_left`
 - `incidentAssembly_apply_secondCoupler_leftFirst`
 - `incidentAssembly_apply_lowerPath_left`
@@ -134,13 +156,21 @@ The public instance declarations are:
 - `incidentAssembly_apply_firstCoupler_leftSecond`
 - `forwardState`
 - `signalInput`
+- `liftedIncident`
+- `liftedOutgoing`
+- `liftedIncident_apply_edgeN7Input`
+- `liftedOutgoing_apply_edgeN7Output`
 - `ForwardEquations`
+- `liftedOutgoing_eq_scatteringTransform`
+- `liftedIncident_eq_incidentAssembly`
+- `forwardState_lifted`
 - `isNodeSolution_iff_forwardEquations`
 - `upperCoordinate_of_netlistEquations`
 - `lowerCoordinate_of_netlistEquations`
 - `feedbackCoordinate_of_netlistEquations`
 - `forwardEquations_of_netlistEquations`
 - `forwardState_isNodeSolution_of_netlistEquations`
+- `isNodeSolution_iff_exists_netlistRealization`
 
 ## Regression declaration inventory
 
@@ -156,11 +186,35 @@ All declarations below are in namespace `Optics.DCDR`.
 - `topologyRegression_output_fromLower`
 - `topologyRegression_output_fromUpper`
 - `topologyRegression_output_orientation`
+- `topologyProjectionParameters`
+- `topologyProjectionState`
+- `topologyProjectionState_coordinates`
+- `topologyProjection_edgeGains`
+- `topologyProjection_n7Entries`
+- `topologyProjection_forwardEquations`
+- `topologyProjection_isNodeSolution`
+- `topologyProjection_exists_netlistRealization`
+- `topologySwappedConnections`
+- `topologySwappedNetlist`
+- `topologySwappedInputAmplitude`
+- `topologySwapped_incidentAssembly_apply_upperPath_left`
+- `topologyProjection_swappedNetlist_rejects_productionLift`
 
 The fixture uses unequal through amplitudes `2` and `5`, cross amplitudes `3` and `7`, and path
 coefficients `11`, `13`, and `17`. Its matrix anchors enumerate `Multigraph.toMatrix` directly and
 do not use `coefficientMatrix_eq_displayed`. The endpoint anchor separately expands all twelve
 ends of the six physical wires. The values are deliberately outside any passive or unitary gate.
+
+The projection fixture changes the feedback coefficient to zero, hand-computes all eleven
+assembled N7 entries and the state `[1, 0, 2, -3I, -39I, 22, -349I, -163]`, and obtains complete
+netlist witnesses only through `isNodeSolution_iff_exists_netlistRealization`. The negative control
+builds an actual second `FlatNetlist` with the first coupler's launch ports swapped; the production
+lift then fails its upper-path assembly coordinate (`2 ≠ -3I`).
+
+The rewired fixture additionally exposes the finite/decidable instances
+`topologySwappedConnectionLocalChannelFintype`, `topologySwappedChannelFintype`,
+`topologySwappedChannelDecidableEq`, `topologySwappedConnectedChannelFintype`, and
+`topologySwappedConnectedChannelDecidableEq`.
 
 ## Exact validation bindings
 
@@ -180,6 +234,14 @@ The validation lane should bind at least these public names:
 - `Optics.DCDR.coefficientMatrix_eq_displayed`
 - `Optics.DCDR.isNodeSolution_iff_forwardEquations`
 - `Optics.DCDR.forwardState_isNodeSolution_of_netlistEquations`
+- `Optics.DCDR.externalChannel_eq_input_or_output`
+- `Optics.DCDR.externalChannelEquiv`
+- `Optics.DCDR.externalChannel_card`
+- `Optics.DCDR.node_card`
+- `Optics.DCDR.edgeGain_eq_n7ScatteringEntry`
+- `Optics.DCDR.liftedIncident_apply_edgeN7Input`
+- `Optics.DCDR.liftedOutgoing_apply_edgeN7Output`
+- `Optics.DCDR.isNodeSolution_iff_exists_netlistRealization`
 - `Optics.DCDR.topologyRegression_connectionEndpoints`
 - `Optics.DCDR.topologyRegression_edgeSources`
 - `Optics.DCDR.topologyRegression_edgeTargets`
@@ -188,6 +250,9 @@ The validation lane should bind at least these public names:
 - `Optics.DCDR.topologyRegression_output_fromLower`
 - `Optics.DCDR.topologyRegression_output_fromUpper`
 - `Optics.DCDR.topologyRegression_output_orientation`
+- `Optics.DCDR.topologyProjection_n7Entries`
+- `Optics.DCDR.topologyProjection_exists_netlistRealization`
+- `Optics.DCDR.topologyProjection_swappedNetlist_rejects_productionLift`
 
 ## Cross-module conventions and reused results
 
@@ -228,9 +293,11 @@ The validation lane should bind at least these public names:
   which also contains reverse-direction and propagation-component boundary coordinates.
 - `Parameters`, the netlist, and all graph objects are total. No determinant, inverse, response,
   or well-posedness claim is made in this slice.
-- `forwardState_isNodeSolution_of_netlistEquations` is conditional on the raw component scattering
-  equation and incident-assembly equation. It does not infer network behavior membership or
-  functional solvability by itself.
+- `isNodeSolution_iff_exists_netlistRealization` is a gate-free relational equivalence. Its
+  forward direction constructs a complete state with zero reverse excitation; it neither asserts
+  uniqueness nor inverts the feedback operator.
+- `forwardState_isNodeSolution_of_netlistEquations` remains the unrestricted projection from any
+  complete raw scattering/assembly state, including states not produced by the zero-reverse lift.
 
 ## Non-claims
 
