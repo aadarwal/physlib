@@ -720,5 +720,4 @@ end ResponseReduction
 
 end
 
-
 end Optics.DCDR

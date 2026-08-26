@@ -493,5 +493,4 @@ lemma unstableResponseReduction_two_mul_I_mem_actualPoles :
 
 end
 
-
 end Optics.DCDR
