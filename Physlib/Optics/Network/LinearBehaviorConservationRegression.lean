@@ -56,10 +56,8 @@ electromagnetic power or energy statements, and no time-reversal, scattering, ph
 reciprocity, reference-plane, propagation, or physical losslessness interpretation is asserted.
 
 This is fail-capable evidence for ledger row N-09, whose failure mode is a false square-port
-identification. The positive and hostile anchors do not invoke
-`ModeTransform.toBehavior_isPassive_iff`,
-`ModeTransform.toBehavior_isPowerPreserving_iff`, any relabel/rephase covariance lemma, or any
-FlatNetlist conservation lift.
+identification. The positive and hostile anchors invoke no transform/behavior classification iff,
+relabel/rephase covariance result, or FlatNetlist conservation lift.
 -/
 
 @[expose] public section
