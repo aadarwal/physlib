@@ -28,10 +28,16 @@ and rejection by the connection equations.
 
 - `routingRephaseRegression_mem_both_parenthesizations`: independently expanded raw solutions for
   both three-stage parenthesizations agree and expose `-210I`.
+- `routingRephaseRegression_componentOperator_eq_rephase`,
+  `routingRephaseRegression_incident_eq_rephase`, and
+  `routingRephaseRegression_outgoing_eq_rephase`: the hand-expanded positive data are exactly the
+  declared primitive rephasings.
 - `routingRephaseRegression_cross_amplitudes_nonzero`: all three phase-sensitive wire amplitudes
   are nonzero.
 - `routingRephaseRegression_hostile_incidentAssembly_ne`: the one-end hostile phase change is
   rejected by the raw right-associated connection equations.
+- `routingRephaseRegression_hostile_idealRouting_mate_entry`: the hostile rephased mate entry is
+  exactly `-I`, not one.
 
 ## iii. Table of contents
 
@@ -159,6 +165,25 @@ def routingRephaseRegressionComponentBehavior :
     LinearBehavior (Incident ReuseRegressionChannel) (Outgoing ReuseRegressionChannel) :=
   routingRephaseRegressionComponentOperator.toBehavior
 
+/-- The hand-expanded component operator is exactly the primitive entrywise rephasing of the
+unphased fixture operator. This finite expansion uses no routing or netlist covariance result. -/
+lemma routingRephaseRegression_componentOperator_eq_rephase :
+    routingRephaseRegressionComponentOperator =
+      reuseRegressionComponentOperator.rephase
+        routingRephaseRegressionGauge.incident
+        routingRephaseRegressionGauge.outgoing := by
+  funext output input
+  rcases output with ⟨⟨⟨outputComponent, outputPort⟩, outputMode⟩⟩
+  rcases input with ⟨⟨⟨inputComponent, inputPort⟩, inputMode⟩⟩
+  cases outputComponent <;> cases outputPort <;> cases outputMode <;>
+    cases inputComponent <;> cases inputPort <;> cases inputMode <;>
+    norm_num [routingRephaseRegressionComponentOperator,
+      reuseRegressionComponentOperator, reuseRegressionScattering,
+      ModeTransform.rephase, routingRephaseRegressionGauge,
+      routingRephaseRegressionI, routingRephaseRegressionNegI,
+      Complex.inv_I, Complex.ext_iff] <;>
+    ring
+
 /-- The hand-expanded rephased incident state. Its nonzero west-port values are `1`, `2I`,
 `-6I`, and `30I`. -/
 def routingRephaseRegressionIncident :
@@ -182,6 +207,34 @@ def routingRephaseRegressionOutgoing :
     | .third, true => 30 * Complex.I
     | .fourth, true => -210 * Complex.I
     | _, _ => 0
+
+/-- The positive incident state is exactly the coordinatewise primitive rephasing of the unphased
+state. The proof inspects every component, port, and mode directly. -/
+lemma routingRephaseRegression_incident_eq_rephase :
+    routingRephaseRegressionIncident =
+      ModeAmplitude.rephase routingRephaseRegressionGauge.incident
+        reuseRegressionIncident := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  cases component <;> cases port <;> cases mode <;>
+    norm_num [routingRephaseRegressionIncident, reuseRegressionIncident,
+      routingRephaseRegressionGauge, routingRephaseRegressionI,
+      routingRephaseRegressionNegI, Complex.ext_iff]
+
+/-- The positive outgoing state is exactly the coordinatewise primitive rephasing of the unphased
+state, independently of every connection-family covariance result. -/
+lemma routingRephaseRegression_outgoing_eq_rephase :
+    routingRephaseRegressionOutgoing =
+      ModeAmplitude.rephase routingRephaseRegressionGauge.outgoing
+        reuseRegressionOutgoing := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  cases component <;> cases port <;> cases mode <;>
+    norm_num [routingRephaseRegressionOutgoing, reuseRegressionOutgoing,
+      routingRephaseRegressionGauge, routingRephaseRegressionI,
+      routingRephaseRegressionNegI, Complex.ext_iff]
 
 /-- Restrict the hand-expanded incident state to an arbitrary connection family's external
 input labels. -/
