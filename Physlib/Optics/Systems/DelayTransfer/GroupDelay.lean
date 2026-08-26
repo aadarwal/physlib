@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.Calculus.Deriv.Basic
 public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponse
 
 /-!
