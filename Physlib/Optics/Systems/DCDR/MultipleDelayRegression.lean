@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Systems.DCDR.MultipleDelay
+public import Physlib.Optics.Systems.DCDR.MultipleDelaySource
 
 /-!
 # Exact multiple-delay regressions for the double-coupler double-ring
