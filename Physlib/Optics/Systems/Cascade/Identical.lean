@@ -334,7 +334,7 @@ theorem dateChain_pow_eq_sylvesterClosedForm
   congr 2 <;> congr 1 <;> omega
 
 /-- DATE's identical cascade has the Sylvester sine form on the exact source domain. -/
-theorem dateIdenticalCascadeComposition_eq_sylvesterClosedForm
+lemma dateIdenticalCascadeComposition_eq_sylvesterClosedForm
     (stage : DateCascadeStage) (count : ℕ)
     (h : DateSylvesterHypotheses stage.compositionMatrix) :
     dateIdenticalCascadeComposition stage count =
