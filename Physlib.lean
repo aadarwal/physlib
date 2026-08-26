@@ -475,6 +475,8 @@ public import Physlib.Optics.Systems.DCDR.Bridge
 public import Physlib.Optics.Systems.DCDR.Graph
 public import Physlib.Optics.Systems.DCDR.Mason
 public import Physlib.Optics.Systems.DCDR.Netlist
+public import Physlib.Optics.Systems.DCDR.Poles
+public import Physlib.Optics.Systems.DCDR.PolesRegression
 public import Physlib.Optics.Systems.DCDR.Response
 public import Physlib.Optics.Systems.DCDR.ResponseRegression
 public import Physlib.Optics.Systems.DCDR.Topology
