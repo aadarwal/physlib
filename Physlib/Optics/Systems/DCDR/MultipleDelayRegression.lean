@@ -504,7 +504,7 @@ lemma unitDelayBridge_embedded_polynomial_evaluations :
       unitDelayBridgeQ, DirectionalCoupler.crossCoefficient]
 
 /-- Direct nonvanishing and validity place the bridge point in the old response domain. -/
-def unitDelayBridgeOldDomainProof :
+lemma unitDelayBridgeOldDomainProof :
     (fun _ : Fin 1 => unitDelayBridgeQ) ∈
       (rationalNetlist unitDelayBridgeParameters).responseDomain :=
   rationalNetlist_mem_responseDomain unitDelayBridgeParameters unitDelayBridgeQ
@@ -513,7 +513,7 @@ def unitDelayBridgeOldDomainProof :
       norm_num)
 
 /-- Direct nonvanishing and positive exponents place the point in the embedded response domain. -/
-def unitDelayBridgeEmbeddedDomainProof :
+lemma unitDelayBridgeEmbeddedDomainProof :
     (fun _ : Fin 1 => unitDelayBridgeQ) ∈
       (multipleDelayRationalNetlist
         unitDelayBridgeParameters.toMultipleDelayParameters).responseDomain :=
@@ -528,9 +528,8 @@ lemma unitDelayBridge_old_response_eq_one :
     rationalEliminationResponse unitDelayBridgeParameters unitDelayBridgeQ
       unitDelayBridgeOldDomainProof = 1 := by
   rw [rationalEliminationResponse_eq_responseModel]
-  change
-    unitDelayBridgeParameters.responseNumeratorPolynomial.eval unitDelayBridgeQ /
-        unitDelayBridgeParameters.denominatorPolynomial.eval unitDelayBridgeQ = 1
+  rw [DelayTransfer.RationalModel.eval_eq]
+  simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
   rw [unitDelayBridge_old_polynomial_evaluations.1,
     unitDelayBridge_old_polynomial_evaluations.2]
   norm_num
@@ -541,11 +540,9 @@ lemma unitDelayBridge_embedded_response_eq_one :
         unitDelayBridgeParameters.toMultipleDelayParameters unitDelayBridgeQ
         unitDelayBridgeEmbeddedDomainProof = 1 := by
   rw [multipleDelayRationalEliminationResponse_eq_responseModel]
-  change
-    unitDelayBridgeParameters.toMultipleDelayParameters.responseNumeratorPolynomial.eval
-          unitDelayBridgeQ /
-        unitDelayBridgeParameters.toMultipleDelayParameters.denominatorPolynomial.eval
-          unitDelayBridgeQ = 1
+  rw [DelayTransfer.RationalModel.eval_eq]
+  simp only [MultipleDelayParameters.responseModel,
+    MvPolynomial.eval_toMvPolynomial]
   rw [unitDelayBridge_embedded_polynomial_evaluations.1,
     unitDelayBridge_embedded_polynomial_evaluations.2]
   norm_num
@@ -580,11 +577,14 @@ lemma unitDelayValidityCounterexample_predicates :
 /-- The old family has no physical response-domain point when its negative gain gate fails. -/
 lemma unitDelayValidityCounterexample_old_responseDomain_eq_empty :
     (rationalNetlist unitDelayValidityCounterexample).responseDomain = ∅ := by
-  refine eq_empty_iff_forall_notMem.mpr ?_
-  intro value hValue
-  have hAdmissible : unitDelayValidityCounterexample.IsAdmissible :=
-    (hValue.2 Component.upperPath).1
-  exact unitDelayValidityCounterexample_predicates.1 hAdmissible
+  ext value
+  constructor
+  · intro hValue
+    exfalso
+    have hAdmissible : unitDelayValidityCounterexample.IsAdmissible :=
+      (hValue.2 Component.upperPath).1
+    exact unitDelayValidityCounterexample_predicates.1 hAdmissible
+  · simp
 
 /-- Primitive expansion gives embedded denominator value one at formal `q = 0`. -/
 lemma unitDelayValidityCounterexample_embedded_denominator_at_zero :
