@@ -301,9 +301,12 @@ lemma rephasedBehavior_eq (gauge : ChannelEndGauge netlist.Channel)
   classical
   rw [rephasedBehavior, rephasedComponentBehavior,
     netlist.connections.closeBehavior_rephase
-      netlist.componentBehavior gauge hMatched,
-    ← netlist.behavior_eq_closeBehavior]
-  rfl
+      netlist.componentBehavior gauge hMatched]
+  have hExternalFintype :
+      rephaseExternalChannelFintype netlist.connections =
+        eliminationExternalChannelFintype netlist :=
+    Subsingleton.elim _ _
+  rw [hExternalFintype, ← netlist.behavior_eq_closeBehavior]
 
 /-!
 ## D. Well-posed response covariance
