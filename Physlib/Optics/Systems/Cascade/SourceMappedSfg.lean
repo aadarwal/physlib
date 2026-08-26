@@ -40,9 +40,10 @@ SFG-TR'14 Def. 35 gives an eight-node add-drop signal-flow graph and Thm. 7 give
 
 The list below is bookkeeping for a cascade development, not a scalar cascade law. No PANDA,
 NSV'16, DATE lattice, quadruple-ring, coupled-lattice, full `M x N` lattice, dispersion, bending
-loss, bandwidth, causality, resonance, or measurement-validation claim is made. Power, if later
-introduced, means normalized modal power; its electromagnetic interpretation requires the
-finite common-frequency Maxwell and aperture-flux hypotheses at
+loss, bandwidth, causality, resonance, passivity, losslessness, reciprocity, or
+measurement-validation claim is made. Power, if later introduced, means normalized modal power;
+its electromagnetic interpretation requires the finite common-frequency Maxwell and
+aperture-flux hypotheses at
 `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:60-90`.
 -/
 
