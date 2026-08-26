@@ -143,7 +143,7 @@ lemma scattering_realizes_behavior [Fintype ι] [DecidableEq ι] (p : Parameters
   ext ⟨incident, outgoing⟩
   rw [ModeTransform.mem_toBehavior_iff_toLinearMap, mem_behavior_iff,
     ScatteringMatrix.toLinearMap_toOrientedModeTransform, outputMap_apply]
-  rfl
+  rw [scattering_toLinearMap_apply]
 
 /-- A unit-phase reflection coefficient makes the one-port scattering matrix lossless. -/
 lemma scattering_isLossless [Fintype ι] [DecidableEq ι] (p : Parameters)
