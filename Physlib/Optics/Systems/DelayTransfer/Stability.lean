@@ -6,7 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Mathematics.ZTransform.Convolution
-public import Physlib.Mathematics.ZTransform.StabilityRegression
+public import Physlib.Mathematics.ZTransform.OnePole
 public import Physlib.Optics.Systems.DelayTransfer.Poles
 
 /-!
@@ -17,8 +17,9 @@ public import Physlib.Optics.Systems.DelayTransfer.Poles
 The numerator and denominator roots of an abstract `ReducedRationalResponse` are finite because
 both complex polynomials are nonzero. Their distinct-root counts are bounded by the corresponding
 polynomial degrees. Under `q = z⁻¹`, `zPoles` removes the formal root `q = 0` and inverts the
-remaining denominator roots; its cardinality has the same degree bound. `IsSchurStable` says
-literally that every such reciprocal-coordinate denominator root lies inside the unit disk.
+remaining denominator roots; `q = 0` has no finite reciprocal coordinate and formally represents
+`z = ∞`. Its cardinality has the same degree bound. `IsSchurStable` says literally that every
+such reciprocal-coordinate denominator root lies inside the unit disk.
 
 The BIBO equivalence is deliberately restricted to the named nonzero proper causal one-pole
 class `1 / (1 - a*q)`, whose impulse response is `geometricSeq a`. Its denominator bridge proves
@@ -55,7 +56,7 @@ theorem. Necessity is proved for this class with explicit bounded inputs.
 `Physlib.ZTransform.IsSchurStable` are defined or proved in
 `Physlib/Mathematics/ZTransform/Stability.lean:202-236`; they are reused, not redefined. The exact
 one-pole candidate set, Schur characterization, and unit-circle ROC theorem are reused from
-`Physlib/Mathematics/ZTransform/StabilityRegression.lean:91-132`.
+the neutral production module `Physlib/Mathematics/ZTransform/OnePole.lean:72-108`.
 
 FMICS'15 Definition 7 calls the condition that every nonzero numerator root lies inside the unit
 disk a “resonance condition”, according to the audited statement in `goal.md:2273-2278`. Here
@@ -139,7 +140,10 @@ lemma card_poleFinset_le_natDegree (response : ReducedRationalResponse) :
 
 -/
 
-/-- Nonzero numerator roots in the `z` coordinate selected by `q = z⁻¹`. -/
+/-- Nonzero numerator roots in the `z` coordinate selected by `q = z⁻¹`.
+
+The omitted formal root `q = 0` has no finite reciprocal `z`; it formally represents `z = ∞`.
+-/
 def zZeros (response : ReducedRationalResponse) : Set ℂ :=
   {z | z ≠ 0 ∧ z⁻¹ ∈ response.zeros}
 
@@ -180,7 +184,10 @@ lemma card_zZeroFinset_le_natDegree (response : ReducedRationalResponse) :
     _ ≤ response.zeroFinset.card := Finset.card_filter_le _ _
     _ ≤ response.numerator.natDegree := response.card_zeroFinset_le_natDegree
 
-/-- Nonzero denominator roots in the `z` coordinate selected by `q = z⁻¹`. -/
+/-- Nonzero denominator roots in the `z` coordinate selected by `q = z⁻¹`.
+
+The omitted formal root `q = 0` has no finite reciprocal `z`; it formally represents `z = ∞`.
+-/
 def zPoles (response : ReducedRationalResponse) : Set ℂ :=
   {z | z ≠ 0 ∧ z⁻¹ ∈ response.poles}
 
@@ -334,26 +341,28 @@ lemma transform_impulseResponse_eq_response_eval (system : ProperCausalOnePole)
 /-- The one-pole reduced denominator is the existing lag-one recurrence denominator. -/
 lemma response_denominator_eq_recurrenceDenominator (system : ProperCausalOnePole) :
     system.response.denominator =
-      recurrenceDenominator {1} (onePoleFeedback system.coefficient) := by
+      recurrenceDenominator {1} (onePoleFeedbackCoefficients system.coefficient) := by
   simp [response, ReducedRationalResponse.onePoleReducedResponse,
-    recurrenceDenominator, onePoleFeedback_one]
+    recurrenceDenominator, onePoleFeedbackCoefficients_one]
 
 /-- The stated class's reciprocal-coordinate denominator roots are the Z-transform candidate
 poles. -/
 lemma response_zPoles_eq_candidatePoles (system : ProperCausalOnePole) :
     system.response.zPoles =
-      Physlib.ZTransform.candidatePoles {1} (onePoleFeedback system.coefficient) :=
+      Physlib.ZTransform.candidatePoles
+        {1} (onePoleFeedbackCoefficients system.coefficient) :=
   system.response.zPoles_eq_candidatePoles_of_denominator_eq_recurrence
-    {1} (onePoleFeedback system.coefficient)
+    {1} (onePoleFeedbackCoefficients system.coefficient)
     system.response_denominator_eq_recurrenceDenominator
 
 /-- The stated class's reduced-response Schur predicate is exactly the existing Z-transform
 Schur predicate. -/
 lemma response_isSchurStable_iff_zTransform (system : ProperCausalOnePole) :
     system.response.IsSchurStable ↔
-      Physlib.ZTransform.IsSchurStable {1} (onePoleFeedback system.coefficient) :=
+      Physlib.ZTransform.IsSchurStable
+        {1} (onePoleFeedbackCoefficients system.coefficient) :=
   system.response.isSchurStable_iff_zTransform_of_denominator_eq_recurrence
-    {1} (onePoleFeedback system.coefficient)
+    {1} (onePoleFeedbackCoefficients system.coefficient)
     system.response_denominator_eq_recurrenceDenominator
 
 end ProperCausalOnePole
@@ -441,20 +450,21 @@ lemma isBIBOStable_geometricSeq_iff {a : ℂ} (ha : a ≠ 0) :
     IsBIBOStable (geometricSeq a) ↔ ‖a‖ < 1 :=
   ⟨norm_lt_one_of_isBIBOStable_geometricSeq,
     fun h => isBIBOStable_of_sphere_subset_ROC _
-      (sphere_subset_ROC_geometricSeq ha h)⟩
+      (sphere_subset_ROC_geometricSeq_of_norm_lt_one ha h)⟩
 
 /-- For the nonzero proper causal one-pole class, BIBO and Schur stability are equivalent. -/
 lemma isBIBOStable_geometricSeq_iff_isSchurStable_onePole {a : ℂ} (ha : a ≠ 0) :
     IsBIBOStable (geometricSeq a) ↔
-      Physlib.ZTransform.IsSchurStable {1} (Physlib.ZTransform.onePoleFeedback a) := by
+      Physlib.ZTransform.IsSchurStable
+        {1} (Physlib.ZTransform.onePoleFeedbackCoefficients a) := by
   rw [isBIBOStable_geometricSeq_iff ha,
-    Physlib.ZTransform.isSchurStable_onePole_iff ha]
+    Physlib.ZTransform.isSchurStable_onePoleFeedbackCoefficients_iff ha]
 
 /-- For the nonzero proper causal one-pole class, absolute summability and BIBO stability are
 equivalent. -/
 lemma isAbsSummable_geometricSeq_iff_isBIBOStable {a : ℂ} (ha : a ≠ 0) :
     IsAbsSummable (geometricSeq a) ↔ IsBIBOStable (geometricSeq a) := by
-  rw [Physlib.ZTransform.isAbsSummable_geometricSeq ha,
+  rw [Physlib.ZTransform.isAbsSummable_geometricSeq_iff_norm_lt_one ha,
     isBIBOStable_geometricSeq_iff ha]
 
 namespace ProperCausalOnePole
@@ -468,9 +478,11 @@ lemma isBIBOStable_of_isSchurStable (system : ProperCausalOnePole)
     (hSchur : system.response.IsSchurStable) :
     IsBIBOStable system.impulseResponse := by
   have hZTransform := system.response_isSchurStable_iff_zTransform.mp hSchur
-  have hNorm := (isSchurStable_onePole_iff system.coefficient_ne_zero).mp hZTransform
+  have hNorm :=
+    (isSchurStable_onePoleFeedbackCoefficients_iff
+      system.coefficient_ne_zero).mp hZTransform
   exact isBIBOStable_of_sphere_subset_ROC system.impulseResponse
-    (sphere_subset_ROC_geometricSeq system.coefficient_ne_zero hNorm)
+    (sphere_subset_ROC_geometricSeq_of_norm_lt_one system.coefficient_ne_zero hNorm)
 
 /-- BIBO stability implies Schur stability for the stated proper causal one-pole class. -/
 lemma isSchurStable_of_isBIBOStable (system : ProperCausalOnePole)
@@ -478,7 +490,8 @@ lemma isSchurStable_of_isBIBOStable (system : ProperCausalOnePole)
     system.response.IsSchurStable := by
   have hNorm := norm_lt_one_of_isBIBOStable_geometricSeq hBIBO
   apply system.response_isSchurStable_iff_zTransform.mpr
-  exact (isSchurStable_onePole_iff system.coefficient_ne_zero).mpr hNorm
+  exact (isSchurStable_onePoleFeedbackCoefficients_iff
+    system.coefficient_ne_zero).mpr hNorm
 
 /-- BIBO and Schur stability are equivalent for the stated proper causal one-pole class. -/
 lemma isBIBOStable_iff_isSchurStable (system : ProperCausalOnePole) :

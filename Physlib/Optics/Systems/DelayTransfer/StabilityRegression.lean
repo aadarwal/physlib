@@ -38,12 +38,15 @@ are abstract quotient checks: no N5F response-entry certificate is inferred.
 
 ## iv. References and non-claims
 
-The one-pole Z-transform candidate and Schur characterizations are in
-`Physlib/Mathematics/ZTransform/StabilityRegression.lean:89-106`. The generic candidate-pole
-definition and BIBO sufficiency result are in
-`Physlib/Mathematics/ZTransform/Stability.lean:202-236`. Regression row S-07 requests an audited
-unstable parameter case at `goal.md:2556`; the DCDR instance remains the responsibility of the
-S7D lane.
+The production one-pole candidate characterization and unit-circle ROC bridge are in
+`Physlib/Mathematics/ZTransform/OnePole.lean:72-108`. The generic candidate-pole definition and
+BIBO sufficiency result are in `Physlib/Mathematics/ZTransform/Stability.lean:202-236`.
+Regression row S-07 requests an audited unstable parameter case at `goal.md:2556`; the DCDR
+instance remains the responsibility of the S7D lane.
+
+The BIBO anchors below do not call this delay-transfer module's Schur/BIBO equivalence. The
+stable anchor uses the production unit-circle ROC route directly; the unstable anchor supplies
+the bounded unit impulse and exhibits unbounded powers of two in the output.
 
 No physical resonance, network transfer-pole, DCDR topology, or general proper-rational BIBO
 equivalence is asserted.
@@ -90,7 +93,7 @@ lemma stableOnePole_formalPoles : stableOnePole.response.poles = {(2 : ℂ)} := 
 /-- The stable fixture's reciprocal-coordinate denominator root is exactly `{1/2}`. -/
 lemma stableOnePole_zPoles : stableOnePole.response.zPoles = {(1 / 2 : ℂ)} := by
   rw [stableOnePole.response_zPoles_eq_candidatePoles,
-    candidatePoles_onePole stableOnePole.coefficient_ne_zero]
+    candidatePoles_onePoleFeedbackCoefficients stableOnePole.coefficient_ne_zero]
   rfl
 
 /-- The stable fixture has numerator degree zero. -/
@@ -136,13 +139,17 @@ lemma stableOnePole_transform_one :
 
 /-- The stable fixture satisfies the reduced-quotient Schur predicate. -/
 lemma stableOnePole_isSchurStable : stableOnePole.response.IsSchurStable := by
-  rw [stableOnePole.response_isSchurStable_iff_zTransform,
-    isSchurStable_onePole_iff stableOnePole.coefficient_ne_zero]
-  norm_num [stableOnePole]
+  rw [ReducedRationalResponse.IsSchurStable]
+  intro z hz
+  rw [stableOnePole_zPoles] at hz
+  rw [Set.mem_singleton_iff.mp hz]
+  norm_num
 
 /-- The stable fixture's causal impulse response is BIBO stable. -/
-lemma stableOnePole_isBIBOStable : IsBIBOStable stableOnePole.impulseResponse :=
-  stableOnePole.isBIBOStable_of_isSchurStable stableOnePole_isSchurStable
+lemma stableOnePole_isBIBOStable : IsBIBOStable stableOnePole.impulseResponse := by
+  apply isBIBOStable_of_sphere_subset_ROC
+  change Metric.sphere (0 : ℂ) 1 ⊆ ROC (geometricSeq (1 / 2))
+  exact sphere_subset_ROC_geometricSeq_of_norm_lt_one (by norm_num) (by norm_num)
 
 /-- The audited unstable one-pole fixture with coefficient `2`. -/
 def unstableOnePole : ProperCausalOnePole where
@@ -152,20 +159,26 @@ def unstableOnePole : ProperCausalOnePole where
 /-- The unstable fixture's reciprocal-coordinate denominator root is exactly `{2}`. -/
 lemma unstableOnePole_zPoles : unstableOnePole.response.zPoles = {(2 : ℂ)} := by
   rw [unstableOnePole.response_zPoles_eq_candidatePoles,
-    candidatePoles_onePole unstableOnePole.coefficient_ne_zero]
+    candidatePoles_onePoleFeedbackCoefficients unstableOnePole.coefficient_ne_zero]
   rfl
 
 /-- The audited coefficient-`2` fixture is not Schur stable. -/
 lemma unstableOnePole_not_isSchurStable : ¬ unstableOnePole.response.IsSchurStable := by
-  rw [unstableOnePole.response_isSchurStable_iff_zTransform,
-    isSchurStable_onePole_iff unstableOnePole.coefficient_ne_zero]
-  norm_num [unstableOnePole]
+  intro hSchur
+  rw [ReducedRationalResponse.IsSchurStable] at hSchur
+  have hAtTwo := hSchur 2 (by rw [unstableOnePole_zPoles]; rfl)
+  norm_num at hAtTwo
 
 /-- The audited coefficient-`2` impulse response is not BIBO stable. -/
 lemma unstableOnePole_not_isBIBOStable :
     ¬ IsBIBOStable unstableOnePole.impulseResponse := by
-  rw [unstableOnePole.isBIBOStable_iff_isSchurStable]
-  exact unstableOnePole_not_isSchurStable
+  intro hStable
+  obtain ⟨bound, hBound⟩ := hStable unitImpulse isBoundedSeq_unitImpulse
+  obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt bound (by norm_num : 1 < ‖(2 : ℂ)‖)
+  have hAtN := hBound (n : ℤ)
+  change ‖convolution (geometricSeq 2) unitImpulse (n : ℤ)‖ ≤ bound at hAtN
+  rw [convolution_unitImpulse_right, geometricSeq_natCast, norm_pow] at hAtN
+  exact (not_le_of_gt hn) hAtN
 
 end
 

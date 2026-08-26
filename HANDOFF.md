@@ -1,16 +1,18 @@
-# S4 delay-transfer slice 3 handoff
+# S4 delay-transfer slice 3b handoff
 
 ## Branch and synchronization
 
 - Branch: `optics/s4-delay-transfer`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s4-delay-transfer`
 - Synced by merge onto `optics/development` at `33ee2ab7` before cutoff.
-- This slice changes only the four new Lean files below plus this handoff note.
+- Slice 3b adds one neutral production Z-transform module, revises the four slice-3 modules,
+  and refreshes this handoff note.
 
 ## Files and registrations requested
 
 Register these modules in sorted order in `Physlib.lean`:
 
+- `Physlib.Mathematics.ZTransform.OnePole`
 - `Physlib.Optics.Systems.DelayTransfer.FrequencyResponse`
 - `Physlib.Optics.Systems.DelayTransfer.FrequencyResponseRegression`
 - `Physlib.Optics.Systems.DelayTransfer.Stability`
@@ -18,6 +20,7 @@ Register these modules in sorted order in `Physlib.lean`:
 
 Files:
 
+- `Physlib/Mathematics/ZTransform/OnePole.lean`
 - `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean`
 - `Physlib/Optics/Systems/DelayTransfer/FrequencyResponseRegression.lean`
 - `Physlib/Optics/Systems/DelayTransfer/Stability.lean`
@@ -36,6 +39,18 @@ It also supplies a generic stable/unstable one-pole strictness fixture relevant 
 S-07 at `goal.md:2556`. The DCDR topology-specific instance remains assigned to S7D.
 
 ## Production declarations
+
+### `OnePole.lean`
+
+In namespace `Physlib.ZTransform`:
+
+- `onePoleFeedbackCoefficients`
+- `onePoleFeedbackCoefficients_one`
+- `delaySymbol_onePoleFeedbackCoefficients`
+- `candidatePoles_onePoleFeedbackCoefficients`
+- `isSchurStable_onePoleFeedbackCoefficients_iff`
+- `isAbsSummable_geometricSeq_iff_norm_lt_one`
+- `sphere_subset_ROC_geometricSeq_of_norm_lt_one`
 
 ### `Stability.lean`
 
@@ -141,6 +156,7 @@ In namespace `Optics.DelayTransfer.RationalNetlist`:
 - `frequencyDelayEvaluation_quadrature`
 - `unitCirclePoint_quadrature`
 - `allPassRationalNetlistFrequencyQuadratureDomain`
+- `allPassRationalNetlist_quadrature_compiled_entry_via_equations`
 - `allPassRationalNetlist_frequency_quadrature_response_entry`
 - `allPassRationalNetlist_frequency_eq_reciprocalZ_quadrature_entry`
 
@@ -156,12 +172,16 @@ The validation lane should bind at least these public names:
 - `Optics.DelayTransfer.ProperCausalOnePole.transform_impulseResponse_eq_response_eval`
 - `Optics.DelayTransfer.ProperCausalOnePole.response_isSchurStable_iff_zTransform`
 - `Optics.DelayTransfer.ProperCausalOnePole.isBIBOStable_iff_isSchurStable`
+- `Physlib.ZTransform.candidatePoles_onePoleFeedbackCoefficients`
+- `Physlib.ZTransform.isSchurStable_onePoleFeedbackCoefficients_iff`
+- `Physlib.ZTransform.sphere_subset_ROC_geometricSeq_of_norm_lt_one`
 - `Optics.DelayTransfer.RationalNetlist.mem_frequencyResponseDomain_iff`
 - `Optics.DelayTransfer.RationalNetlist.frequencyResponse_eq_formalDelay`
 - `Optics.DelayTransfer.RationalNetlist.frequencyResponse_eq_reciprocalZ`
 - `Optics.DelayTransfer.frequencyDelayEvaluation_quadrature`
 - `Optics.DelayTransfer.unitCirclePoint_quadrature`
 - `Optics.DelayTransfer.allPassRationalNetlist_frequency_quadrature_response_entry`
+- `Optics.DelayTransfer.allPassRationalNetlist_quadrature_compiled_entry_via_equations`
 - `Optics.DelayTransfer.unstableOnePole_not_isBIBOStable`
 
 ## Cross-module conventions and reused results
@@ -188,18 +208,19 @@ The validation lane should bind at least these public names:
   `Physlib/Mathematics/ZTransform/Stability.lean:211-215`; no general converse is added.
 - The causal geometric impulse response and its transform on `‖a‖ < ‖z‖` are reused from
   `Physlib/Mathematics/ZTransform/Convergence.lean:237-268`.
-- The lag-one recurrence coefficient family is `onePoleFeedback` from
-  `Physlib/Mathematics/ZTransform/DifferenceEquationRegression.lean:88-98`.
-- The exact one-pole candidate set, Schur characterization, absolute-summability result, and
-  unit-circle ROC theorem are reused from
-  `Physlib/Mathematics/ZTransform/StabilityRegression.lean:82-130`. This is why production
-  `Stability.lean` imports that existing S5 specialization instead of rederiving it.
+- The lag-one recurrence coefficient family, exact candidate-pole singleton, Schur
+  characterization, absolute-summability criterion, and unit-circle ROC bridge now live in the
+  neutral production module `Physlib/Mathematics/ZTransform/OnePole.lean:58-108`. Production
+  delay-transfer code imports no Z-transform regression fixture.
 - The necessity proof probes BIBO stability with the unit impulse and uses the independently
   proved right-identity formula from
   `Physlib/Mathematics/ZTransform/Convolution.lean:189-199`.
-- The non-real all-pass frequency fixture reuses the already hand-solved compiled N5F anchor and
-  mapped Laplace/reciprocal-Z anchors from
-  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:1110-1237`.
+- The non-real all-pass frequency fixture invokes the channel-equation solver
+  `allPassRationalNetlist_responseThrough` from
+  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:845-912` directly. It then uses
+  the production Laplace and reciprocal-Z response transports from
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:384-495`; it does not cite any prior
+  formal-delay, Laplace, or reciprocal-Z response-value anchor.
 - The audited source wording for all nonzero numerator roots inside the unit disk is quoted in
   `goal.md:2273-2278`. The API deliberately uses `AllZerosInsideUnitDisk`, not “resonance”.
 
@@ -212,6 +233,8 @@ The validation lane should bind at least these public names:
   equivalence is only for the named nonzero one-pole class `1 / (1 - a*q)`.
 - No rational dependence on physical frequency is claimed, and no dispersion model is supplied.
 - The choice `s = I*ω` is not presented as a bridge to the phasor layer's time convention.
+- Imaginary-axis substitution alone is not claimed to imply time-domain causality.
+- The removed formal root `q = 0` has no finite reciprocal `z` and formally represents `z = ∞`.
 - No passivity, physical resonance, DCDR topology, group-delay, or dispersion theorem is claimed.
 - The local logarithmic-derivative extension remains slice 4 work.
 

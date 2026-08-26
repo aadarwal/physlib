@@ -53,9 +53,10 @@ are independent as documented in
 `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:16-24`. This module does not claim a
 response outside that domain. It does not claim rational dependence on physical frequency, nor
 does it supply a dispersion model, positivity or dimensional interpretation of the real delay
-data, or a bridge to the phasor layer's time convention. No passivity, resonance, group-delay, or
-dispersion result is asserted. In particular, the requested Physlib extension concerning local
-logarithmic derivatives is deferred to the later group-delay slice.
+data, or a bridge to the phasor layer's time convention. Imaginary-axis substitution alone
+implies no time-domain causality. No passivity, resonance, group-delay, or dispersion result is
+asserted. In particular, the requested Physlib extension concerning local logarithmic
+derivatives is deferred to the later group-delay slice.
 
 This module implements the requested “frequency response under the chosen
 `q = exp (-s * τ) = z⁻¹` convention” from `goal.md:2268`.

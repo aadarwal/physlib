@@ -16,16 +16,18 @@ public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponse
 The compiled all-pass rational netlist is evaluated at unit delay and angular frequency `π/2`.
 The frequency-delay map is hand-expanded to `q = -I`, while the reciprocal-Z unit-circle point is
 hand-expanded to `z = I`. The proof-gated response entry is then shown to be the non-real value
-`75/109 + (32/109) I` already obtained by solving the compiled all-pass channel equations.
+`75/109 + (32/109) I` by directly invoking the compiled all-pass channel-equation solve.
 
 These anchors can fail if the exponential sign, imaginary-axis embedding, reciprocal convention,
-frequency response domain, or channel reindexing is changed.
+frequency response domain, channel reindexing, rational compilation, or loop equations are
+changed.
 
 ## ii. Key results
 
 - `frequencyDelayEvaluation_quadrature`: the exact negative-exponential delay value.
 - `unitCirclePoint_quadrature`: the exact reciprocal-Z point.
 - `allPassRationalNetlistFrequencyQuadratureDomain`: the proof-gated frequency witness.
+- `allPassRationalNetlist_quadrature_compiled_entry_via_equations`: the direct equation solve.
 - `allPassRationalNetlist_frequency_quadrature_response_entry`: the compiled response anchor.
 - `allPassRationalNetlist_frequency_eq_reciprocalZ_quadrature_entry`: selected entries agree.
 
@@ -36,10 +38,11 @@ frequency response domain, or channel reindexing is changed.
 
 ## iv. References and non-claims
 
-The rational all-pass fixture and its hand-solved formal, Laplace, and reciprocal-Z response
-anchors are in `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:150-298` and
-`1110-1237`. The physical all-pass channel equation is proved independently in
-`Physlib/Optics/Systems/Microring/AllPass.lean:1174-1239`.
+The rational all-pass fixture and its direct compiled channel-equation solve are in
+`Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:150-298` and `845-912`. The
+physical all-pass channel equation is proved independently in
+`Physlib/Optics/Systems/Microring/AllPass.lean:1174-1239`. This regression does not use the prior
+formal-delay, Laplace, or reciprocal-Z response-value anchors.
 
 The fixture checks one declared constant delay. It proves no rational dependence on physical
 frequency, dispersion model, group-delay theorem, passivity result, or response outside the N5F
@@ -61,6 +64,18 @@ local instance frequencyRegressionChannelFintype (p : AllPass.Parameters) :
 local instance frequencyRegressionConnectedChannelFintype (p : AllPass.Parameters) :
     Fintype (allPassRationalNetlist p).ConnectedChannel :=
   AllPass.connectedChannelFintype p
+
+/-- Formal-delay compilation retains finite aggregate all-pass channels. -/
+local instance frequencyRegressionCompileChannelFintype (p : AllPass.Parameters)
+    (value : DelayTuple 1) :
+    Fintype ((allPassRationalNetlist p).compile value).Channel :=
+  inferInstanceAs (Fintype (allPassRationalNetlist p).Channel)
+
+/-- Formal-delay compilation retains finite connected all-pass channels. -/
+local instance frequencyRegressionCompileConnectedChannelFintype
+    (p : AllPass.Parameters) (value : DelayTuple 1) :
+    Fintype ((allPassRationalNetlist p).compile value).ConnectedChannel :=
+  inferInstanceAs (Fintype (allPassRationalNetlist p).ConnectedChannel)
 
 /-- Laplace reparameterization retains finite aggregate all-pass channels. -/
 local instance frequencyRegressionLaplaceChannelFintype (p : AllPass.Parameters)
@@ -132,6 +147,30 @@ lemma allPassRationalNetlistFrequencyQuadratureDomain :
     frequencyDelayEvaluation_quadrature]
   exact allPassRationalQuadratureDomain
 
+/-- Direct expansion of the compiled channel equations gives the quadrature response entry.
+
+This proof does not use a formal-delay, Laplace, reciprocal-Z, or frequency response anchor.
+-/
+lemma allPassRationalNetlist_quadrature_compiled_entry_via_equations :
+    (((allPassRationalNetlist
+      allPassRationalQuadratureParameters).compile
+        (fun _ : Fin 1 ↦ -Complex.I)).responseTransform
+          allPassRationalQuadratureDomain.1)
+        (Outgoing.mk (allPassRationalFormalThroughChannel
+          allPassRationalQuadratureParameters))
+        (Incident.mk (allPassRationalFormalInputChannel
+          allPassRationalQuadratureParameters)) =
+      75 / 109 + (32 / 109) * Complex.I := by
+  have hResponse := allPassRationalNetlist_responseThrough
+    allPassRationalQuadratureParameters (-Complex.I)
+    allPassRational_quadrature_loopCoefficient allPassRationalQuadratureDomain
+    allPassRational_quadrature_hasNonzeroDenominator 1
+  rw [allPassRational_quadrature_throughTransfer] at hResponse
+  simp [allPassRationalInputAmplitude, ModeTransform.toLinearMap,
+    Matrix.toLpLin_apply] at hResponse
+  convert hResponse using 1
+  all_goals rfl
+
 /-- The compiled all-pass frequency response has the exact non-real quadrature entry. -/
 lemma allPassRationalNetlist_frequency_quadrature_response_entry :
     (allPassRationalNetlist
@@ -158,7 +197,18 @@ lemma allPassRationalNetlist_frequency_quadrature_response_entry :
   have hDomainProof : allPassRationalNetlistFrequencyQuadratureDomain =
       allPassRationalNetlistLaplaceQuadratureDomain := Subsingleton.elim _ _
   rw [hDomainProof]
-  exact allPassRationalNetlist_laplace_quadrature_response_entry
+  have hMapped :=
+    (allPassRationalNetlist
+      allPassRationalQuadratureParameters).response_laplace_reindex_of_evaluation_eq
+        (fun _ : Fin 1 => 1) allPassRationalNetlistLaplaceQuadratureDomain
+        laplaceEvaluation_quadrature allPassRationalQuadratureDomain
+  have hEntry := congrArg
+    (fun response => response
+      (Outgoing.mk (allPassRationalFormalThroughChannel
+        allPassRationalQuadratureParameters))
+      (Incident.mk (allPassRationalFormalInputChannel
+        allPassRationalQuadratureParameters))) hMapped
+  exact hEntry.trans allPassRationalNetlist_quadrature_compiled_entry_via_equations
 
 /-- At quadrature, the selected proof-gated frequency entry equals the reciprocal-Z entry at
 `z = I`. -/
@@ -181,8 +231,20 @@ lemma allPassRationalNetlist_frequency_eq_reciprocalZ_quadrature_entry :
           allPassRationalQuadratureParameters))
         (Incident.mk (allPassRationalFormalInputChannel
           allPassRationalQuadratureParameters)) := by
-  rw [allPassRationalNetlist_frequency_quadrature_response_entry,
-    allPassRationalNetlist_reciprocalZ_quadrature_response_entry]
+  rw [allPassRationalNetlist_frequency_quadrature_response_entry]
+  symm
+  have hMapped :=
+    (allPassRationalNetlist
+      allPassRationalQuadratureParameters).response_reciprocalZ_reindex_of_evaluation_eq
+        allPassRationalNetlistReciprocalZQuadratureDomain
+        zInverseEvaluation_quadrature allPassRationalQuadratureDomain
+  have hEntry := congrArg
+    (fun response => response
+      (Outgoing.mk (allPassRationalFormalThroughChannel
+        allPassRationalQuadratureParameters))
+      (Incident.mk (allPassRationalFormalInputChannel
+        allPassRationalQuadratureParameters))) hMapped
+  exact hEntry.trans allPassRationalNetlist_quadrature_compiled_entry_via_equations
 
 end
 
