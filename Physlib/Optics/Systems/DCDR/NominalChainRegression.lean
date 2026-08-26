@@ -80,20 +80,13 @@ lemma zChainRegression_forward_transfer :
     UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
     Parameters.upperCoefficient, Parameters.lowerCoefficient,
     Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient,
-    Complex.I_mul_I]
-  ring
+    pow_succ, Complex.I_mul_I]
 
 /-- Direct parameter expansion gives the independently stated reverse transmission `-(7/8)I`. -/
 lemma zChainRegression_reverse_transfer :
     transfer zChainRegressionParameters.reverse = -(7 / 8) * Complex.I := by
-  norm_num [zChainRegressionParameters, transfer, Parameters.responseNumerator,
-    Parameters.denominator, Parameters.loopGain, Parameters.directGain,
-    Parameters.feedbackReadoutGain, Parameters.feedbackDrive, Parameters.reverse,
-    UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
-    Parameters.upperCoefficient, Parameters.lowerCoefficient,
-    Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient,
-    Complex.I_mul_I]
-  ring
+  change transfer zChainRegressionParameters = -(7 / 8) * Complex.I
+  exact zChainRegression_forward_transfer
 
 /-- The stable fixed-carrier N5 denominator gate, restated at the chain fixture. -/
 lemma zChainRegression_hasNonzeroDenominator :
@@ -172,6 +165,30 @@ lemma zChainRegression_forwardEquations_output {input : ℂ} {state : Node → �
                 zChainRegressionParameters.denominator⁻¹ * input := by ring
     _ = -(7 / 8) * Complex.I * input := by rw [zChainRegression_forward_transfer]
 
+/-- The left external readout is unfolded directly to the first N7 outgoing coordinate. -/
+lemma zChainRegression_outputReadout_left
+    (outgoing : ModeAmplitude (netlist zChainRegressionParameters).OutgoingIndex) :
+    (netlist zChainRegressionParameters).outputReadout.toLinearMap outgoing
+        (Outgoing.mk (inputChannel zChainRegressionParameters)) =
+      outgoing (Outgoing.mk (firstCouplerChannel zChainRegressionParameters
+        DirectionalCoupler.Port.leftFirst)) := by
+  rw [FlatNetlist.outputReadout,
+    (netlist zChainRegressionParameters).connections.externalOutgoingReadout_apply,
+    ModeAmplitude.restrictEmbedding_apply]
+  rfl
+
+/-- The right external readout is unfolded directly to the second N7 outgoing coordinate. -/
+lemma zChainRegression_outputReadout_right
+    (outgoing : ModeAmplitude (netlist zChainRegressionParameters).OutgoingIndex) :
+    (netlist zChainRegressionParameters).outputReadout.toLinearMap outgoing
+        (Outgoing.mk (outputChannel zChainRegressionParameters)) =
+      outgoing (Outgoing.mk (secondCouplerChannel zChainRegressionParameters
+        DirectionalCoupler.Port.rightFirst)) := by
+  rw [FlatNetlist.outputReadout,
+    (netlist zChainRegressionParameters).connections.externalOutgoingReadout_apply,
+    ModeAmplitude.restrictEmbedding_apply]
+  rfl
+
 /-- Raw forward and reverse N7 equations pin both response coordinates at the fixture. -/
 lemma zChainRegression_response_coordinates
     (external : ModeAmplitude (netlist zChainRegressionParameters).ExternalIncident) :
@@ -194,8 +211,8 @@ lemma zChainRegression_response_coordinates
   rcases ((netlist zChainRegressionParameters).mem_behavior_iff_equations
       external response).mp hMember with
     ⟨incident, outgoing, hScattering, hAssembly, hOutput⟩
-  have hAssembly' : incident = (netlist zChainRegressionParameters).connections
-      |>.incidentAssembly outgoing external := by
+  have hAssembly' : incident =
+      (netlist zChainRegressionParameters).connections.incidentAssembly outgoing external := by
     simpa only [PortConnectionFamily.incidentAssembly] using hAssembly
   have hForward := forwardEquations_of_netlistEquations zChainRegressionParameters
     external incident outgoing hScattering hAssembly'
@@ -208,9 +225,8 @@ lemma zChainRegression_response_coordinates
     (fun state => state (Outgoing.mk (inputChannel zChainRegressionParameters))) hOutput
   have hReadoutRight := congrArg
     (fun state => state (Outgoing.mk (outputChannel zChainRegressionParameters))) hOutput
-  rw [FlatNetlist.outputReadout,
-    (netlist zChainRegressionParameters).connections.externalOutgoingReadout_apply,
-    ModeAmplitude.restrictEmbedding_apply] at hReadoutLeft hReadoutRight
+  rw [zChainRegression_outputReadout_left] at hReadoutLeft
+  rw [zChainRegression_outputReadout_right] at hReadoutRight
   change response (Outgoing.mk (inputChannel zChainRegressionParameters)) = _ ∧
     response (Outgoing.mk (outputChannel zChainRegressionParameters)) = _
   constructor
@@ -342,6 +358,14 @@ lemma zChainRegression_reverse_transfer_ne_zero :
   have hImaginary := congrArg Complex.im hZero
   norm_num at hImaginary
 
+/-- The independently computed pivot scalar and its displayed inverse multiply to one. -/
+lemma zChainRegression_pivotProduct :
+    (-(7 / 8) * Complex.I) * ((8 / 7) * Complex.I) = (1 : ℂ) := by
+  calc
+    (-(7 / 8) * Complex.I) * ((8 / 7) * Complex.I) =
+        (-(7 / 8) * (8 / 7)) * (Complex.I * Complex.I) := by ring
+    _ = 1 := by rw [Complex.I_mul_I]; norm_num
+
 /-- A constant amplitude on the singleton regression backward-wave family. -/
 def zChainRegressionBackwardAmplitude (value : ℂ) :
     ModeAmplitude (BackwardWave Unit) :=
@@ -403,7 +427,11 @@ lemma zChainRegression_rightToLeftTransmission_action
   rcases output with ⟨⟨⟩⟩
   simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct]
   rw [← BackwardWave.channelEquiv.symm.sum_comp, Fintype.sum_unique]
-  simp [zChainRegression_rightToLeftTransmission_entry]
+  change (packagedNominalTwoPortScattering zChainRegressionParameters
+      zChainRegression_hasNonzeroDenominator).rightToLeftTransmission
+        (BackwardWave.mk ()) (BackwardWave.mk ()) * amplitude (BackwardWave.mk ()) =
+    (-(7 / 8) * Complex.I) * amplitude (BackwardWave.mk ())
+  rw [zChainRegression_rightToLeftTransmission_entry]
 
 /-- The exact right-to-left pivot is bijective without using the production pivot iff. -/
 lemma zChainRegression_hasBijectiveRightToLeftTransmission :
@@ -433,10 +461,12 @@ lemma zChainRegression_hasBijectiveRightToLeftTransmission :
     funext index
     rcases index with ⟨⟨⟩⟩
     simp only [zChainRegressionBackwardAmplitude]
-    have hProduct : (-(7 / 8) * Complex.I) * ((8 / 7) * Complex.I) = (1 : ℂ) := by
-      norm_num [Complex.I_mul_I]
-      ring
-    rw [mul_assoc, hProduct, one_mul]
+    calc
+      (-(7 / 8) * Complex.I) *
+          ((8 / 7) * Complex.I * output (BackwardWave.mk ())) =
+        ((-(7 / 8) * Complex.I) * ((8 / 7) * Complex.I)) *
+          output (BackwardWave.mk ()) := by ring
+      _ = output (BackwardWave.mk ()) := by rw [zChainRegression_pivotProduct, one_mul]
 
 /-!
 
@@ -471,14 +501,10 @@ lemma zChainRegression_pivotInverse_entry :
     rw [← BackwardWave.channelEquiv.symm.sum_comp, Fintype.sum_unique] at hEntry
     rw [zChainRegression_rightToLeftTransmission_entry] at hEntry
     simpa [scattering] using hEntry
-  have hScalarProduct :
-      (-(7 / 8) * Complex.I) * ((8 / 7) * Complex.I) = (1 : ℂ) := by
-    norm_num [Complex.I_mul_I]
-    ring
   calc
     _ = _ * 1 := by rw [mul_one]
     _ = _ * ((-(7 / 8) * Complex.I) * ((8 / 7) * Complex.I)) := by
-      rw [hScalarProduct]
+      rw [zChainRegression_pivotProduct]
     _ = (_ * (-(7 / 8) * Complex.I)) * ((8 / 7) * Complex.I) := by ring
     _ = (8 / 7) * Complex.I := by rw [hInverseProduct, one_mul]
 
@@ -498,8 +524,9 @@ lemma zChainRegression_chain_upperRight :
         (Sum.inl (BackwardWave.mk ())) (Sum.inr (ForwardWave.mk ())) = 0 := by
   rw [zChainRegressionChain,
     TwoPortScatteringTransform.toBackwardFirstChainTransform_eq_blockFormula]
-  simp [TwoPortScatteringTransform.backwardFirstChainBlockFormula,
-    zChainRegression_leftReflection_eq_zero]
+  unfold TwoPortScatteringTransform.backwardFirstChainBlockFormula
+  simp only [Matrix.fromBlocks_apply₁₂, Matrix.neg_apply]
+  rw [zChainRegression_leftReflection_eq_zero, Matrix.mul_zero, Matrix.zero_apply, neg_zero]
 
 /-- The lower-left backward-first chain entry is zero. -/
 lemma zChainRegression_chain_lowerLeft :
@@ -507,8 +534,9 @@ lemma zChainRegression_chain_lowerLeft :
         (Sum.inr (ForwardWave.mk ())) (Sum.inl (BackwardWave.mk ())) = 0 := by
   rw [zChainRegressionChain,
     TwoPortScatteringTransform.toBackwardFirstChainTransform_eq_blockFormula]
-  simp [TwoPortScatteringTransform.backwardFirstChainBlockFormula,
-    zChainRegression_rightReflection_eq_zero]
+  unfold TwoPortScatteringTransform.backwardFirstChainBlockFormula
+  simp only [Matrix.fromBlocks_apply₂₁]
+  rw [zChainRegression_rightReflection_eq_zero, Matrix.zero_mul, Matrix.zero_apply]
 
 /-- The bottom-right backward-first chain entry is the forward response `-(7/8)I`. -/
 lemma zChainRegression_chain_lowerRight :
@@ -517,10 +545,11 @@ lemma zChainRegression_chain_lowerRight :
       -(7 / 8) * Complex.I := by
   rw [zChainRegressionChain,
     TwoPortScatteringTransform.toBackwardFirstChainTransform_eq_blockFormula]
-  simp [TwoPortScatteringTransform.backwardFirstChainBlockFormula,
-    zChainRegression_leftReflection_eq_zero,
-    zChainRegression_rightReflection_eq_zero,
-    zChainRegression_leftToRightTransmission_entry]
+  unfold TwoPortScatteringTransform.backwardFirstChainBlockFormula
+  simp only [Matrix.fromBlocks_apply₂₂]
+  rw [zChainRegression_leftReflection_eq_zero, Matrix.mul_zero,
+    zChainRegression_rightReflection_eq_zero, Matrix.zero_mul, sub_zero]
+  exact zChainRegression_leftToRightTransmission_entry
 
 /-- The production chain agrees with the independently folded N3T chain and its four entries.
 
