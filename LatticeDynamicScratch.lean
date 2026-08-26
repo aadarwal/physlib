@@ -166,7 +166,8 @@ lemma dyn_mem_componentBehavior :
       ((rectangularLatticeComponents dynParameters).scattering component).toModeTransform
           ⟨port, mode⟩ input * dynIncidentValue component input
   rcases component with ⟨row, column⟩ | (horizontal | vertical)
-  · fin_cases row <;> fin_cases column <;> cases port <;> cases mode <;>
+  · rw [Fintype.sum_equiv latticeSiteChannelEquiv _ _ (by intro input; rfl)]
+    fin_cases row <;> fin_cases column <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, dynParameters,
         rectangularLatticeComponentScattering, latticeSitePhysicalScattering,
         ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
@@ -220,11 +221,13 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
       apply Fin.ext
       omega
     subst column
+    change dynIncidentValue _ _ = dynOutgoingValue _ _
     fin_cases row <;> cases half <;>
       rcases localChannel with mode | mode <;> cases mode <;>
       simp [dynConnections, rectangularLatticeNetlist, rectangularHorizontalConnections,
-        rectangularHorizontalConnection, PortConnection.mateEquiv,
-        PortConnection.channelEmbedding, dynIncident, dynOutgoing, dynIncidentValue,
+        PortConnectionFamily.append, PortConnection.mateEquiv,
+        PortConnection.channelEmbedding, ScatteringComponentFamily.componentChannelEmbedding,
+        ScatteringComponentFamily.channelEquiv, dynIncident, dynOutgoing, dynIncidentValue,
         dynOutgoingValue, dynHorizontalIncidentValue, dynHorizontalOutgoingValue]
   · rcases vertical with ⟨⟨edge, column⟩, half⟩
     rcases edge with ⟨row, hRow⟩
@@ -232,13 +235,16 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
       apply Fin.ext
       omega
     subst row
+    change dynIncidentValue _ _ = dynOutgoingValue _ _
     fin_cases column <;> cases half <;>
       rcases localChannel with mode | mode <;> cases mode <;>
       simp [dynConnections, rectangularLatticeNetlist,
         rectangularVerticalBoundaryConnections, LatticeConnectionFamilies.onBoundary,
         LatticeConnectionFamilies.connectionOnBoundary, rectangularVerticalConnections,
-        rectangularVerticalConnection, PortConnection.mateEquiv,
-        PortConnection.channelEmbedding, dynIncident, dynOutgoing, dynIncidentValue,
+        rectangularVerticalConnection, PortConnectionFamily.append,
+        PortConnection.liftBoundary, PortConnection.mateEquiv,
+        PortConnection.channelEmbedding, ScatteringComponentFamily.componentChannelEmbedding,
+        ScatteringComponentFamily.channelEquiv, dynIncident, dynOutgoing, dynIncidentValue,
         dynOutgoingValue, dynVerticalIncidentValue, dynVerticalOutgoingValue]
 
 lemma dyn_incidentAssembly :
@@ -346,8 +352,8 @@ lemma dyn_horizontalWire_nonzero :
       dynOutgoing (Outgoing.mk (dynHorizontalCouplerChannel 0 .right)) ≠ 0 := by
   constructor
   · rfl
-  · norm_num [dynOutgoing, dynHorizontalCouplerChannel, dynTwoPortChannel,
-      dynOutgoingValue, dynHorizontalOutgoingValue]
+  · change (-6 * Complex.I : ℂ) ≠ 0
+    norm_num
 
 lemma dyn_verticalWire_nonzero :
     dynIncident (Incident.mk (dynRingChannel 1 1 .north)) =
@@ -355,8 +361,8 @@ lemma dyn_verticalWire_nonzero :
       dynOutgoing (Outgoing.mk (dynVerticalCouplerChannel 1 .right)) ≠ 0 := by
   constructor
   · rfl
-  · norm_num [dynOutgoing, dynVerticalCouplerChannel, dynTwoPortChannel,
-      dynOutgoingValue, dynVerticalOutgoingValue]
+  · change (-126 : ℂ) ≠ 0
+    norm_num
 
 lemma dyn_crossParameters :
     (dynParameters.horizontalCoupler 0 dynForwardIndex).crossAmplitude = 3 ∧
@@ -420,7 +426,9 @@ lemma dynMiswired_endpointDisjoint :
     simp only [rectangularHorizontalConnections, rectangularHorizontalConnection,
       dynMiswiredVerticalConnections, dynMiswiredVerticalConnection,
       PortConnection.endpointPort] at hPort
-  all_goals cases hPort
+  all_goals
+    simp_all [rectangularRingComponent, rectangularHorizontalCouplerComponent,
+      rectangularVerticalCouplerComponent]
 
 def dynMiswiredVerticalBoundaryConnections :=
   LatticeConnectionFamilies.onBoundary
@@ -471,11 +479,8 @@ lemma dynMiswired_incidentAssembly_rejected
   have hCoordinate := congrArg
     (fun amplitude => amplitude (Incident.mk (dynRingChannel 1 1 .north))) hAssembly
   rw [dynMiswired_incidentAssembly_ring11North] at hCoordinate
-  have hImpossible : (-126 : ℂ) = 0 := by
-    simpa [dynIncident, dynOutgoing, dynRingChannel, dynVerticalCouplerChannel,
-      dynTwoPortChannel, dynIncidentValue, dynOutgoingValue,
-      dynVerticalOutgoingValue] using hCoordinate
-  norm_num at hImpossible
+  change (-126 : ℂ) = 0 at hCoordinate
+  norm_num at hCoordinate
 
 end
 
