@@ -191,6 +191,43 @@ lemma innerBoundaryBehavior_eq_of_boundaryRelation
     apply Outgoing.ext
     rfl
 
+variable (outer : PortConnectionFamily inner.externalPortModeFamily middleIndex)
+variable [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel]
+variable [Fintype outer.ExternalChannel]
+variable [Fintype (outer.transport boundary).ExternalChannel]
+variable [Fintype (inner.append outer).ExternalChannel]
+variable [Fintype (replacement.append (outer.transport boundary)).ExternalChannel]
+
+/-- An inner connection family may be replaced behind an outer stage when its closed relation is
+the same after the supplied boundary transport. -/
+lemma replaceInnerFamily
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (hBoundary : replacement.closeBehavior behavior =
+      (inner.closeBehavior behavior).reindex
+        (Incident.relabelEquiv (inner.boundaryExternalChannelEquiv replacement boundary))
+        (Outgoing.relabelEquiv
+          (inner.boundaryExternalChannelEquiv replacement boundary))) :
+    (replacement.append (outer.transport boundary)).closeBehavior behavior =
+      ((inner.append outer).closeBehavior behavior).reindex
+        (Incident.relabelEquiv
+          (inner.replacementExternalChannelEquiv replacement boundary outer))
+        (Outgoing.relabelEquiv
+          (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
+  rw [replacement.closeBehavior_append (outer.transport boundary),
+    inner.closeBehavior_append outer,
+    inner.innerBoundaryBehavior_eq_of_boundaryRelation replacement boundary behavior hBoundary,
+    outer.closeBehavior_transport boundary]
+  rw [LinearBehavior.reindex_trans, LinearBehavior.reindex_trans]
+  congr 1
+  · apply Equiv.ext
+    rintro ⟨channel⟩
+    apply Incident.ext
+    rfl
+  · apply Equiv.ext
+    rintro ⟨channel⟩
+    apply Outgoing.ext
+    rfl
+
 end PortConnectionFamily
 
 end
