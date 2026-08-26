@@ -8,7 +8,6 @@ module
 public import Physlib.SpaceAndTime.Space.Integrals.ThinCellLimit
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneTrace
-public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 
 /-!
 # Planar thin-loop and pillbox averages

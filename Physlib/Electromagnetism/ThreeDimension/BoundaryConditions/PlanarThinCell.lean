@@ -7,7 +7,6 @@ module
 
 public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.IntegralMacroscopicMaxwell
 public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCellConvergence
-public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
 
 /-!
 # Boundary laws from planar integral Maxwell thin cells

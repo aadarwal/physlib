@@ -82,9 +82,13 @@ public import Physlib.Electromagnetism.Media.HomogeneousIsotropic
 public import Physlib.Electromagnetism.PointParticle.OneDimension
 public import Physlib.Electromagnetism.PointParticle.ThreeDimension
 public import Physlib.Electromagnetism.ThreeDimension.Basic
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.IntegralMacroscopicMaxwell
 public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.OneSidedTrace
 public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.OneSidedTraceRegression
 public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.Planar
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.PlanarThinCell
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.PlanarThinCellRateRegression
+public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.PlanarThinCellRegression
 public import Physlib.Electromagnetism.ThreeDimension.Energy
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellBridge
 public import Physlib.Electromagnetism.ThreeDimension.MacroscopicMaxwellEquations
@@ -322,6 +326,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFlux
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFluxRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterference
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterferenceRegression
+public import Physlib.Optics.Interfaces.PlanarDielectric.IntegralBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.MagneticFixedFrequency
@@ -460,6 +465,8 @@ public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
 public import Physlib.Optics.Systems.Cascade.Heterogeneous
 public import Physlib.Optics.Systems.Cascade.HeterogeneousRegression
+public import Physlib.Optics.Systems.Cascade.Identical
+public import Physlib.Optics.Systems.Cascade.IdenticalRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
@@ -820,7 +827,10 @@ public import Physlib.SpaceAndTime.Space.EuclideanGroup.AffineGroup
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCell
+public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCellConvergence
 public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
+public import Physlib.SpaceAndTime.Space.Integrals.ThinCellLimit
 public import Physlib.SpaceAndTime.Space.IsDistBounded
 public import Physlib.SpaceAndTime.Space.LengthUnit
 public import Physlib.SpaceAndTime.Space.Module
