@@ -91,11 +91,10 @@ lemma fderiv_inner_planarRectanglePoint_first
         (fderiv ℝ field (planarRectanglePoint center first second p.1 p.2) first)
         direction := by
   have hPoint : DifferentiableAt ℝ
-      (fun q : ℝ × ℝ ↦ planarRectanglePoint center first second q.1 q.2) p :=
-    by
-      change DifferentiableAt ℝ
-        (fun q : ℝ × ℝ ↦ center + q.1 • first + q.2 • second) p
-      fun_prop
+      (fun q : ℝ × ℝ ↦ planarRectanglePoint center first second q.1 q.2) p := by
+    change DifferentiableAt ℝ
+      (fun q : ℝ × ℝ ↦ center + q.1 • first + q.2 • second) p
+    fun_prop
   have hPullback : DifferentiableAt ℝ
       (fun q : ℝ × ℝ ↦ field (planarRectanglePoint center first second q.1 q.2)) p :=
     hf.comp p hPoint
@@ -129,11 +128,10 @@ lemma fderiv_inner_planarRectanglePoint_second
         (fderiv ℝ field (planarRectanglePoint center first second p.1 p.2) second)
         direction := by
   have hPoint : DifferentiableAt ℝ
-      (fun q : ℝ × ℝ ↦ planarRectanglePoint center first second q.1 q.2) p :=
-    by
-      change DifferentiableAt ℝ
-        (fun q : ℝ × ℝ ↦ center + q.1 • first + q.2 • second) p
-      fun_prop
+      (fun q : ℝ × ℝ ↦ planarRectanglePoint center first second q.1 q.2) p := by
+    change DifferentiableAt ℝ
+      (fun q : ℝ × ℝ ↦ center + q.1 • first + q.2 • second) p
+    fun_prop
   have hPullback : DifferentiableAt ℝ
       (fun q : ℝ × ℝ ↦ field (planarRectanglePoint center first second q.1 q.2)) p :=
     hf.comp p hPoint

@@ -21,7 +21,9 @@ one smooth ambient field. A discontinuous interface field must instead be treate
 half-rectangles, with the carrier traces retained as boundary terms.
 
 No Maxwell equation, surface-current law, one-sided extension theorem, or thin-cell limit is
-claimed here.
+claimed here. In particular, this file does not provide the three-dimensional pillbox divergence
+identity or the bridge from differential or weak Maxwell equations to the literal thin-cell
+integral-Maxwell predicate.
 
 ## ii. Key results
 
