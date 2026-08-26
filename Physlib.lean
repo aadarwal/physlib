@@ -249,6 +249,8 @@ public import Physlib.Meta.TODO.Basic
 public import Physlib.Meta.TODO.Global
 public import Physlib.Meta.TransverseTactics
 public import Physlib.Optics.Basic
+public import Physlib.Optics.Components.BeamSplitter
+public import Physlib.Optics.Components.BeamSplitterPhysical
 public import Physlib.Optics.Components.DirectionalCoupler
 public import Physlib.Optics.Components.DirectionalCouplerPhysical
 public import Physlib.Optics.Components.DirectionalCouplerPhysicalFamilyRegression
@@ -267,6 +269,9 @@ public import Physlib.Optics.Components.MatchedPropagationPhysicalRegression
 public import Physlib.Optics.Components.MatchedPropagationPower
 public import Physlib.Optics.Components.MatchedPropagationPowerRegression
 public import Physlib.Optics.Components.MatchedPropagationRegression
+public import Physlib.Optics.Components.Mirror
+public import Physlib.Optics.Components.MirrorPhysical
+public import Physlib.Optics.Components.PhysicalPortSuiteRegression
 public import Physlib.Optics.Components.Polarizer
 public import Physlib.Optics.Components.Polarizer.Basic
 public import Physlib.Optics.Components.Polarizer.Coherency
@@ -514,6 +519,8 @@ public import Physlib.Optics.Systems.DCDR.MultipleDelayPolynomial
 public import Physlib.Optics.Systems.DCDR.MultipleDelayRegression
 public import Physlib.Optics.Systems.DCDR.MultipleDelaySource
 public import Physlib.Optics.Systems.DCDR.Netlist
+public import Physlib.Optics.Systems.DCDR.NominalChain
+public import Physlib.Optics.Systems.DCDR.NominalChainRegression
 public import Physlib.Optics.Systems.DCDR.Observables
 public import Physlib.Optics.Systems.DCDR.ObservablesRegression
 public import Physlib.Optics.Systems.DCDR.PassiveCaseRegression
@@ -549,6 +556,7 @@ public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
 public import Physlib.Optics.Systems.Microring.AllPassChain
 public import Physlib.Optics.Systems.Microring.AllPassChainRegression
+public import Physlib.Optics.Systems.Microring.AllPassDCDRX01Regression
 public import Physlib.Optics.Systems.Microring.AllPassDelayTransfer
 public import Physlib.Optics.Systems.Microring.AllPassMason
 public import Physlib.Optics.Systems.Microring.AllPassMasonRegression
@@ -923,6 +931,8 @@ public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistribution
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistributionRegression
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneTrace
 public import Physlib.SpaceAndTime.Space.Origin
 public import Physlib.SpaceAndTime.Space.Slice

@@ -25,6 +25,10 @@ to reference the underlying Schwartz maps.
 
 - `distOfFunction f hf` : The distribution on space constructed from the function
   `f : Space d → F` satisfying the `IsDistBounded f` condition.
+- `distOfFunctionOn s hs f hf` : The distribution obtained by integrating a
+  distribution-bounded function only over a measurable set.
+- `distOfFunctionOn_congr` : restricted distributions agree when their ambient functions agree
+  on the restriction set.
 
 ## iii. Table of contents
 
@@ -79,6 +83,35 @@ def distOfFunction {d : ℕ} (f : Space d → F) (hf : IsDistBounded f) :
 lemma distOfFunction_apply {d : ℕ} (f : Space d → F)
     (hf : IsDistBounded f) (η : 𝓢(Space d, ℝ)) :
     distOfFunction f hf η = ∫ x, η x • f x := rfl
+
+/-- The distribution obtained by integrating a distribution-bounded function over a measurable
+set. Values of the supplied ambient function outside the set do not contribute. -/
+def distOfFunctionOn {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
+    (f : Space d → F) (hf : IsDistBounded f) : (Space d) →d[ℝ] F :=
+  distOfFunction (s.indicator f) (hf.indicator hs)
+
+/-- Evaluation of a function distribution restricted to a measurable set. -/
+lemma distOfFunctionOn_apply {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
+    (f : Space d → F) (hf : IsDistBounded f) (η : 𝓢(Space d, ℝ)) :
+    distOfFunctionOn s hs f hf η = ∫ x in s, η x • f x := by
+  rw [distOfFunctionOn, distOfFunction_apply, ← MeasureTheory.integral_indicator hs]
+  congr 1
+  funext x
+  by_cases hx : x ∈ s
+  · simp [Set.indicator_of_mem hx]
+  · simp [Set.indicator_of_notMem hx]
+
+/-- Restricted function distributions depend only on the supplied function's values inside the
+restriction set. -/
+lemma distOfFunctionOn_congr {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
+    (f g : Space d → F) (hf : IsDistBounded f) (hg : IsDistBounded g)
+    (hfg : Set.EqOn f g s) :
+    distOfFunctionOn s hs f hf = distOfFunctionOn s hs g hg := by
+  ext η
+  rw [distOfFunctionOn_apply, distOfFunctionOn_apply]
+  apply integral_congr_ae
+  filter_upwards [ae_restrict_mem hs] with x hx
+  rw [hfg hx]
 
 /-!
 

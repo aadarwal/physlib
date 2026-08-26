@@ -95,7 +95,7 @@ lemma reflection_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters
 This definition states coefficient-times-corresponding-mode directly. It does not use the matrix
 `reflection` or the scattering realization.
 -/
-def outputMap [Fintype ι] [DecidableEq ι] (p : Parameters) :
+def outputMap [Fintype ι] (p : Parameters) :
     ModeAmplitude (Incident ι) →ₗ[ℂ] ModeAmplitude (Outgoing ι) :=
   (ModeAmplitude.reindex
       (Outgoing.channelEquiv.symm : ι ≃ Outgoing ι)).toLinearEquiv.toLinearMap.comp
@@ -105,7 +105,7 @@ def outputMap [Fintype ι] [DecidableEq ι] (p : Parameters) :
         (Incident.channelEquiv : Incident ι ≃ ι)).toLinearEquiv.toLinearMap)
 
 /-- The independent output law removes endpoint wrappers, reflects, and restores them. -/
-lemma outputMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
+lemma outputMap_apply [Fintype ι] (p : Parameters)
     (incident : ModeAmplitude (Incident ι)) :
     outputMap p incident =
       ModeAmplitude.reindex Outgoing.channelEquiv.symm
@@ -114,13 +114,13 @@ lemma outputMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
   rfl
 
 /-- The independent one-port mirror behavior. -/
-def behavior [Fintype ι] [DecidableEq ι] (p : Parameters) :
+def behavior [Fintype ι] (p : Parameters) :
     LinearBehavior (Incident ι) (Outgoing ι) :=
   LinearBehavior.ofLinearMap (outputMap p)
 
 /-- Behavior membership is exactly the independently declared reflection equation. -/
 @[simp]
-lemma mem_behavior_iff [Fintype ι] [DecidableEq ι] (p : Parameters)
+lemma mem_behavior_iff [Fintype ι] (p : Parameters)
     (incident : ModeAmplitude (Incident ι))
     (outgoing : ModeAmplitude (Outgoing ι)) :
     (incident, outgoing) ∈ behavior p ↔

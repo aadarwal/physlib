@@ -153,14 +153,14 @@ lemma outgoingChannelEquiv_apply_second (value : ι) :
 -/
 
 /-- The independently specified beam-splitter law in component-owned endpoint labels. -/
-def physicalBehavior [Fintype ι] [DecidableEq ι] (p : Parameters) :
+def physicalBehavior [Fintype ι] (p : Parameters) :
     LinearBehavior (Incident ((portFamily ι).Channel))
       (Outgoing ((portFamily ι).Channel)) :=
   (behavior p).reindex (incidentChannelEquiv ι) (outgoingChannelEquiv ι)
 
 /-- Physical behavior membership is membership in the pinned algebraic coordinates. -/
 @[simp]
-lemma mem_physicalBehavior_iff [Fintype ι] [DecidableEq ι] (p : Parameters)
+lemma mem_physicalBehavior_iff [Fintype ι] (p : Parameters)
     (incident : ModeAmplitude (Incident ((portFamily ι).Channel)))
     (outgoing : ModeAmplitude (Outgoing ((portFamily ι).Channel))) :
     (incident, outgoing) ∈ physicalBehavior p ↔
