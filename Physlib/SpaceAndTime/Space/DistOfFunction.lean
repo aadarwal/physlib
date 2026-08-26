@@ -25,6 +25,8 @@ to reference the underlying Schwartz maps.
 
 - `distOfFunction f hf` : The distribution on space constructed from the function
   `f : Space d → F` satisfying the `IsDistBounded f` condition.
+- `distOfFunctionOn s hs f hf` : The distribution obtained by integrating a
+  distribution-bounded function only over a measurable set.
 
 ## iii. Table of contents
 
@@ -79,6 +81,23 @@ def distOfFunction {d : ℕ} (f : Space d → F) (hf : IsDistBounded f) :
 lemma distOfFunction_apply {d : ℕ} (f : Space d → F)
     (hf : IsDistBounded f) (η : 𝓢(Space d, ℝ)) :
     distOfFunction f hf η = ∫ x, η x • f x := rfl
+
+/-- The distribution obtained by integrating a distribution-bounded function over a measurable
+set. -/
+def distOfFunctionOn {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
+    (f : Space d → F) (hf : IsDistBounded f) : (Space d) →d[ℝ] F :=
+  distOfFunction (s.indicator f) (hf.indicator hs)
+
+/-- Evaluation of a function distribution restricted to a measurable set. -/
+lemma distOfFunctionOn_apply {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
+    (f : Space d → F) (hf : IsDistBounded f) (η : 𝓢(Space d, ℝ)) :
+    distOfFunctionOn s hs f hf η = ∫ x in s, η x • f x := by
+  rw [distOfFunctionOn, distOfFunction_apply, ← MeasureTheory.integral_indicator hs]
+  congr 1
+  funext x
+  by_cases hx : x ∈ s
+  · simp [Set.indicator_of_mem hx]
+  · simp [Set.indicator_of_notMem hx]
 
 /-!
 
