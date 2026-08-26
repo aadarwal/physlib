@@ -52,12 +52,16 @@ Files:
 - `RationalNetlist.solveDomain`, `RationalNetlist.responseDomain`
 - `RationalNetlist.mem_compileBehavior_iff_unguardedResponse`
 - `RationalNetlist.mem_compileBehavior_iff_response`
-- `RationalNetlist.laplace`, `RationalNetlist.solveDomain_laplace`
+- `RationalNetlist.laplace`, `RationalNetlist.laplaceExternalChannelEquiv`
+- `RationalNetlist.solveDomain_laplace`
 - `RationalNetlist.responseDomain_laplace`, `RationalNetlist.unguardedResponse_laplace`
 - `RationalNetlist.mem_compileBehavior_laplace_iff_unguardedResponse`
-- `RationalNetlist.response_laplace`
-- `RationalNetlist.reciprocalZ`, `RationalNetlist.solveDomain_reciprocalZ`
-- `RationalNetlist.response_reciprocalZ`
+- `RationalNetlist.response_laplace`, `RationalNetlist.response_laplace_reindex`
+- `RationalNetlist.response_laplace_reindex_of_evaluation_eq`
+- `RationalNetlist.reciprocalZ`, `RationalNetlist.reciprocalZExternalChannelEquiv`
+- `RationalNetlist.solveDomain_reciprocalZ`, `RationalNetlist.responseDomain_reciprocalZ`
+- `RationalNetlist.response_reciprocalZ`, `RationalNetlist.response_reciprocalZ_reindex`
+- `RationalNetlist.response_reciprocalZ_reindex_of_evaluation_eq`
 
 `Optics.DelayTransfer.EvaluationRegression`:
 
@@ -69,6 +73,7 @@ Files:
 - `allPassPropagationEntryModel`, `allPassPropagationEntryModel_eval`
 - `allPassEvaluatedPropagationScattering`, `allPassEvaluatedPropagationScattering_eq`
 - `allPassRationalComponents`, `allPassRationalNetlist`
+- `allPassRationalFormalInputChannel`, `allPassRationalFormalThroughChannel`
 - `allPassRationalComponents_scattering_coupler`
 - `allPassRationalComponents_scattering_propagation`
 - `allPassRationalComponents_scattering_eq`
@@ -116,6 +121,10 @@ Files:
 - `allPassRational_quadrature_throughTransfer`, `allPassRationalQuadratureDomain`
 - `allPassRationalNetlist_quadrature_response_entry`
 - `laplaceEvaluation_quadrature`, `zInverseEvaluation_quadrature`
+- `allPassRationalNetlistLaplaceQuadratureDomain`
+- `allPassRationalNetlist_laplace_quadrature_response_entry`
+- `allPassRationalNetlistReciprocalZQuadratureDomain`
+- `allPassRationalNetlist_reciprocalZ_quadrature_response_entry`
 
 ### Goal rows and contract clauses
 
@@ -128,12 +137,16 @@ Files:
 - S-02 cross-regression: an actual `RationalNetlist` with constant N7 coupler entries, formal
   propagation entries, and the exact S2 wiring compiles to the S2 network. Its response is solved
   from the compiled channel equations at both named S2 points.
-- Convention regression: the compiled network has response `75/109 + (32/109) I` at `q = -I`;
-  both `q = exp (-s*τ)` at `s = I*pi/2`, `τ = 1` and `q = z⁻¹` at `z = I` produce that point.
+- Convention regression: the compiled network has response `75/109 + (32/109) I` at `q = -I`.
+  The proof-gated `.laplace` response at `s = I*pi/2`, `τ = 1` and proof-gated
+  `.reciprocalZ` response at `z = I` both transport through the actual reparameterized netlists
+  to that compiled anchor.
 
 ### Exact public validation anchors
 
 - `Optics.DelayTransfer.RationalModel.eval_eq_of_toRational_eq`
+- `Optics.DelayTransfer.RationalNetlist.response_laplace_reindex_of_evaluation_eq`
+- `Optics.DelayTransfer.RationalNetlist.response_reciprocalZ_reindex_of_evaluation_eq`
 - `Optics.DelayTransfer.allPassRationalNetlist`
 - `Optics.DelayTransfer.allPassRationalNetlist_compile_eq`
 - `Optics.DelayTransfer.allPassRationalNetlist_response_entry`
@@ -142,6 +155,8 @@ Files:
 - `Optics.DelayTransfer.allPassRationalNetlist_quadrature_response_entry`
 - `Optics.DelayTransfer.laplaceEvaluation_quadrature`
 - `Optics.DelayTransfer.zInverseEvaluation_quadrature`
+- `Optics.DelayTransfer.allPassRationalNetlist_laplace_quadrature_response_entry`
+- `Optics.DelayTransfer.allPassRationalNetlist_reciprocalZ_quadrature_response_entry`
 
 ### Quoted cross-module conventions
 
@@ -153,6 +168,12 @@ Files:
   commutation on `solveDomain`; the Slice 1 bridge invokes that lemma directly.
 - `Physlib/Optics/Network/ParameterizedResponse.lean:640-654` defines reparameterized solve and
   response domains as preimages and makes proof-gated response commutation definitional.
+- `Physlib/Optics/Network/ParameterizedResponse.lean:525-527` proves that a response is
+  independent of the supplied proof of membership in its fixed response domain.
+- `Physlib/Optics/Network/Port.lean:144-151,236-243` lifts unchanged external-channel labels to
+  incident and outgoing coordinate equivalences.
+- `Physlib/Optics/Mode/Reindex.lean:85-94` defines response-matrix reindexing and its entry law;
+  the mapped anchors use it to expose the unchanged external coordinates explicitly.
 - `Physlib/Optics/Systems/Microring/AllPass.lean:114-146` defines the loop coefficient, loop gain,
   denominator, and exact nonzero-denominator solve gate used by the regression bridge.
 - `Physlib/Optics/Systems/Microring/AllPass.lean:164-188` defines the totalized transfer and proves
@@ -182,6 +203,7 @@ Files:
   feedback operator invertible, and a removable retained denominator can exclude an otherwise
   well-posed evaluated network.
 - `solveDomain` and `responseDomain` remain distinct.
+- No degree or finiteness bound for an eliminated response is proved in Slice 1.
 - No candidate-pole/actual-pole identification, stability, causality, physical resonance,
   group-delay, dispersion, or global-phase result is claimed in Slice 1.
 
@@ -204,7 +226,7 @@ for finite-delay linear networks” is explicitly withheld.
 - `Physlib.lean` was restored byte-identically to SHA-256
   `ad2036c829a114b2a4e18d1035ecb1a30452724b474bd8c6fe038df8fbf5d5cd`.
 
-## Slice 2: candidate singularities and reduced poles
+## Slice 2: candidate singularities and abstract polynomial cancellation
 
 Files:
 
@@ -224,33 +246,44 @@ Files:
 - `ReducedRationalResponse.zeros`, `ReducedRationalResponse.poles`
 - `ReducedRationalResponse.numerator_ne_zero_of_mem_poles`
 - `RationalReduction`
-- `RationalReduction.candidatePoles`, `RationalReduction.actualPoles`
+- `RationalReduction.rawDenominatorRoots`, `RationalReduction.reducedPoles`
 - `RationalReduction.NoPoleCancellation`, `RationalReduction.rawDenominator_ne_zero`
-- `RationalReduction.actualPoles_subset_candidatePoles`
-- `RationalReduction.candidatePoles_subset_actualPoles`
-- `RationalReduction.candidatePoles_eq_actualPoles`
-- `RationalReduction.actualPoles_subset_candidateSingularities`
-- `RationalReduction.candidateSingularities_subset_actualPoles`
+- `RationalReduction.reducedPoles_subset_rawDenominatorRoots`
+- `RationalReduction.rawDenominatorRoots_subset_reducedPoles`
+- `RationalReduction.rawDenominatorRoots_eq_reducedPoles`
 - `recurrenceDenominator`, `eval_recurrenceDenominator`
 - `reciprocalCandidatePoles`, `recurrenceCandidatePoles_eq`
 
 `Optics.DelayTransfer.PolesRegression`:
 
 - `cancellationRegressionReduced`, `cancellationRegression`
-- `cancellationRegression_candidate_not_actual`
+- `cancellationRegression_raw_root_not_reduced`
 - `cancellationRegression_not_noPoleCancellation`
-- `cancellationRegression_not_candidatePoles_subset_actualPoles`
+- `cancellationRegression_not_rawRoots_subset_reducedPoles`
 
 ### Goal rows and contract clauses
 
-- S4/S4P: internal determinant roots are candidate singularities; reduced denominator roots are
-  actual transfer poles after explicit cancellation.
-- S4P: actual poles are unconditionally candidates, while the converse requires the explicit
-  `NoPoleCancellation` hypothesis.
-- S4P negative control: the fully cancelled `(q - 1) / (q - 1)` fixture invalidates an ungated
-  candidate-to-actual converse.
+- “singular internal operators as candidate poles”: `InternalDeterminantPolynomial` certifies an
+  actual N5F feedback-operator determinant, whose roots are candidate singularities only.
+- “reduced rational responses and their evaluation domains; zeros and transfer-function poles
+  after cancellation, distinct from candidate singularities”: only the abstract polynomial
+  reduction schema is supplied here. Its numerator is not certified to a network response, so
+  the transfer-function-pole part remains withheld with symbolic response elimination.
+- Abstract-schema negative control: the fully cancelled `(q - 1) / (q - 1)` fixture has a raw
+  denominator root that is absent after reduction. The pointwise `NoPoleCancellation q` gate is
+  exactly what preserves a raw root at that `q`.
 - T-02 support: `recurrenceCandidatePoles_eq` identifies the existing finite-recurrence
   candidate set with reciprocal roots of the one-delay polynomial denominator.
+
+### Exact public validation anchors
+
+- `Optics.DelayTransfer.InternalDeterminantPolynomial.candidateSingularities`
+- `Optics.DelayTransfer.RationalReduction.reducedPoles_subset_rawDenominatorRoots`
+- `Optics.DelayTransfer.RationalReduction.rawDenominatorRoots_subset_reducedPoles`
+- `Optics.DelayTransfer.cancellationRegression_raw_root_not_reduced`
+- `Optics.DelayTransfer.cancellationRegression_not_noPoleCancellation`
+- `Optics.DelayTransfer.cancellationRegression_not_rawRoots_subset_reducedPoles`
+- `Optics.DelayTransfer.recurrenceCandidatePoles_eq`
 
 ### Quoted cross-module conventions
 
@@ -263,12 +296,17 @@ Files:
 ### Non-claims
 
 - A candidate internal singularity is not automatically an actual transfer pole.
-- No reachability or observability theorem is inferred; `NoPoleCancellation` is an explicit
-  sufficient algebraic hypothesis.
+- No theorem relates `ReducedRationalResponse` or `RationalReduction` to a selected N5F response
+  entry. Their numerator, quotient, and reduced denominator roots are abstract polynomial data.
+- A response-indexed quotient certificate and a genuine singular-but-cancelled netlist fixture
+  remain future work after symbolic external-response elimination.
+- No reachability or observability theorem is inferred. `NoPoleCancellation q` is only the
+  pointwise sufficient criterion for the abstract raw denominator root at `q` to survive.
 - No candidate or numerator root is called a physical resonance.
+- No degree or finiteness bound is proved in Slice 2.
 - No rational-in-frequency, stability, BIBO, causality, passivity, frequency-response,
   group-delay, or dispersion claim is made in Slice 2.
 
 ### Gates
 
-Pending the post-sync chained Slice 2 gate; the registry will be restored byte-for-byte afterward.
+Pending the post-sync chained Slice 1c gate; the registry will be restored byte-for-byte afterward.

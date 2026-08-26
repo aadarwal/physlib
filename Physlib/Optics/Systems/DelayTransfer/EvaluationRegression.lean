@@ -25,6 +25,12 @@ The non-real point `q = -I` gives `75 / 109 + (32 / 109) I`; separate equalities
 formal value from both `laplaceEvaluation` at `s = I*pi/2`, `τ = 1`, and
 `zInverseEvaluation` at `z = I`.
 
+Proof-gated anchors then carry both substitutions through the actual reparameterized netlists.
+The `.laplace` response at unit delay and `s = I*pi/2`, and the `.reciprocalZ` response at
+`z = I`, both equal the compiled non-real response. The anchors use the equality-aware reindexed
+corollaries whose proofs invoke `response_laplace` and `response_reciprocalZ`, so a broken
+reparameterization layer makes the fixture fail.
+
 `allPassRationalNetlist` independently lifts the constant N7 coupler entries and the formal
 propagation entries `a*q`, then reuses the exact S2 connection family. Its compile equality is
 proved entry by entry. The proof-gated response anchor therefore exercises rational evaluation,
@@ -46,6 +52,8 @@ theorem.
 - `allPassRationalNetlist_antiresonance_response_entry`: compiled half-turn response `11/13`.
 - `allPassRationalNetlist_quadrature_response_entry`: compiled non-real response.
 - `laplaceEvaluation_quadrature`, `zInverseEvaluation_quadrature`: both conventions give `-I`.
+- `allPassRationalNetlist_laplace_quadrature_response_entry`: mapped Laplace response anchor.
+- `allPassRationalNetlist_reciprocalZ_quadrature_response_entry`: mapped reciprocal-Z anchor.
 
 ## iii. Table of contents
 
@@ -214,6 +222,22 @@ def allPassRationalNetlist (p : AllPass.Parameters) : RationalNetlist 1 where
   Connection := AllPass.Connection
   connections := AllPass.connections p
 
+/-- The left-bus input channel in the retained formal-delay presentation. -/
+def allPassRationalFormalInputChannel (p : AllPass.Parameters) :
+    (allPassRationalNetlist p).ExternalChannel :=
+  ⟨⟨⟨AllPass.Component.coupler, DirectionalCoupler.Port.leftFirst⟩, ()⟩, by
+    rintro ⟨⟨connection, channel⟩, hChannel⟩
+    cases connection <;> rcases channel with mode | mode <;> cases mode
+    all_goals cases hChannel⟩
+
+/-- The right-bus through channel in the retained formal-delay presentation. -/
+def allPassRationalFormalThroughChannel (p : AllPass.Parameters) :
+    (allPassRationalNetlist p).ExternalChannel :=
+  ⟨⟨⟨AllPass.Component.coupler, DirectionalCoupler.Port.rightFirst⟩, ()⟩, by
+    rintro ⟨⟨connection, channel⟩, hChannel⟩
+    cases connection <;> rcases channel with mode | mode <;> cases mode
+    all_goals cases hChannel⟩
+
 /-- The rational all-pass fixture retains the finite aggregate S2 channels. -/
 local instance allPassRationalChannelFintype (p : AllPass.Parameters) :
     Fintype (allPassRationalNetlist p).Channel :=
@@ -223,6 +247,28 @@ local instance allPassRationalChannelFintype (p : AllPass.Parameters) :
 local instance allPassRationalConnectedChannelFintype (p : AllPass.Parameters) :
     Fintype (allPassRationalNetlist p).ConnectedChannel :=
   AllPass.connectedChannelFintype p
+
+/-- Laplace reparameterization retains the finite aggregate all-pass channels. -/
+local instance allPassRationalLaplaceChannelFintype (p : AllPass.Parameters)
+    (delays : Fin 1 → ℝ) :
+    Fintype ((allPassRationalNetlist p).laplace delays).Channel :=
+  inferInstanceAs (Fintype (allPassRationalNetlist p).Channel)
+
+/-- Laplace reparameterization retains the finite connected all-pass channels. -/
+local instance allPassRationalLaplaceConnectedChannelFintype (p : AllPass.Parameters)
+    (delays : Fin 1 → ℝ) :
+    Fintype ((allPassRationalNetlist p).laplace delays).ConnectedChannel :=
+  inferInstanceAs (Fintype (allPassRationalNetlist p).ConnectedChannel)
+
+/-- Reciprocal-Z reparameterization retains the finite aggregate all-pass channels. -/
+local instance allPassRationalReciprocalZChannelFintype (p : AllPass.Parameters) :
+    Fintype (allPassRationalNetlist p).reciprocalZ.Channel :=
+  inferInstanceAs (Fintype (allPassRationalNetlist p).Channel)
+
+/-- Reciprocal-Z reparameterization retains the finite connected all-pass channels. -/
+local instance allPassRationalReciprocalZConnectedChannelFintype (p : AllPass.Parameters) :
+    Fintype (allPassRationalNetlist p).reciprocalZ.ConnectedChannel :=
+  inferInstanceAs (Fintype (allPassRationalNetlist p).ConnectedChannel)
 
 /-- Pointwise compilation retains the finite aggregate all-pass channels. -/
 local instance allPassRationalCompileChannelFintype (p : AllPass.Parameters)
@@ -1077,10 +1123,10 @@ lemma allPassRationalNetlist_quadrature_response_entry :
     (allPassRationalNetlist
       allPassRationalQuadratureParameters).toParameterizedNetlist.response
         allPassRationalQuadratureDomain
-        (Outgoing.mk (allPassRationalThroughChannel
-          allPassRationalQuadratureParameters (-Complex.I)))
-        (Incident.mk (allPassRationalInputChannel
-          allPassRationalQuadratureParameters (-Complex.I))) =
+        (Outgoing.mk (allPassRationalFormalThroughChannel
+          allPassRationalQuadratureParameters))
+        (Incident.mk (allPassRationalFormalInputChannel
+          allPassRationalQuadratureParameters)) =
       75 / 109 + (32 / 109) * Complex.I := by
   have hResponse := allPassRationalNetlist_response_entry
     allPassRationalQuadratureParameters (-Complex.I)
@@ -1088,7 +1134,8 @@ lemma allPassRationalNetlist_quadrature_response_entry :
     allPassRational_quadrature_isValid
     allPassRational_quadrature_hasNonzeroDenominator
   rw [allPassRational_quadrature_throughTransfer] at hResponse
-  simpa [allPassRationalQuadratureDomain] using hResponse
+  convert hResponse using 1
+  all_goals rfl
 
 /-- With unit delay and `s = I*pi/2`, the Laplace convention evaluates to `q = -I`. -/
 lemma laplaceEvaluation_quadrature :
@@ -1109,6 +1156,85 @@ lemma zInverseEvaluation_quadrature :
     zInverseEvaluation Complex.I = (fun _ => -Complex.I) := by
   funext i
   rw [zInverseEvaluation_apply, Complex.inv_I]
+
+/-- The unit-delay quadrature Laplace point belongs to the mapped proof-gated response domain. -/
+lemma allPassRationalNetlistLaplaceQuadratureDomain :
+    Complex.I * (Real.pi / 2 : ℝ) ∈
+      ((allPassRationalNetlist allPassRationalQuadratureParameters).laplace
+        (fun _ : Fin 1 => 1)).responseDomain := by
+  change laplaceEvaluation (fun _ : Fin 1 => 1)
+    (Complex.I * (Real.pi / 2 : ℝ)) ∈
+      (allPassRationalNetlist
+        allPassRationalQuadratureParameters).toParameterizedNetlist.responseDomain
+  rw [laplaceEvaluation_quadrature]
+  exact allPassRationalQuadratureDomain
+
+/-- The proof-gated Laplace-reparameterized fixture carries the compiled non-real response. -/
+lemma allPassRationalNetlist_laplace_quadrature_response_entry :
+    (((allPassRationalNetlist allPassRationalQuadratureParameters).laplace
+      (fun _ : Fin 1 => 1)).response
+        allPassRationalNetlistLaplaceQuadratureDomain).reindex
+          (Incident.relabelEquiv ((allPassRationalNetlist
+            allPassRationalQuadratureParameters).laplaceExternalChannelEquiv
+              (fun _ : Fin 1 => 1)))
+          (Outgoing.relabelEquiv ((allPassRationalNetlist
+            allPassRationalQuadratureParameters).laplaceExternalChannelEquiv
+              (fun _ : Fin 1 => 1)))
+        (Outgoing.mk (allPassRationalFormalThroughChannel
+          allPassRationalQuadratureParameters))
+        (Incident.mk (allPassRationalFormalInputChannel
+          allPassRationalQuadratureParameters)) =
+      75 / 109 + (32 / 109) * Complex.I := by
+  have hResponse :=
+    (allPassRationalNetlist
+      allPassRationalQuadratureParameters).response_laplace_reindex_of_evaluation_eq
+        (fun _ : Fin 1 => 1) allPassRationalNetlistLaplaceQuadratureDomain
+        laplaceEvaluation_quadrature allPassRationalQuadratureDomain
+  have hEntry := congrArg
+    (fun response => response
+      (Outgoing.mk (allPassRationalFormalThroughChannel
+        allPassRationalQuadratureParameters))
+      (Incident.mk (allPassRationalFormalInputChannel
+        allPassRationalQuadratureParameters))) hResponse
+  exact hEntry.trans allPassRationalNetlist_quadrature_response_entry
+
+/-- The point `z = I` belongs to the reciprocal-Z proof-gated response domain. -/
+lemma allPassRationalNetlistReciprocalZQuadratureDomain :
+    Complex.I ∈
+      (allPassRationalNetlist
+        allPassRationalQuadratureParameters).reciprocalZ.responseDomain := by
+  change zInverseEvaluation Complex.I ∈
+    (allPassRationalNetlist
+      allPassRationalQuadratureParameters).toParameterizedNetlist.responseDomain
+  rw [zInverseEvaluation_quadrature]
+  exact allPassRationalQuadratureDomain
+
+/-- The proof-gated reciprocal-Z fixture carries the compiled non-real response at `z = I`. -/
+lemma allPassRationalNetlist_reciprocalZ_quadrature_response_entry :
+    ((allPassRationalNetlist
+      allPassRationalQuadratureParameters).reciprocalZ.response
+        allPassRationalNetlistReciprocalZQuadratureDomain).reindex
+          (Incident.relabelEquiv ((allPassRationalNetlist
+            allPassRationalQuadratureParameters).reciprocalZExternalChannelEquiv))
+          (Outgoing.relabelEquiv ((allPassRationalNetlist
+            allPassRationalQuadratureParameters).reciprocalZExternalChannelEquiv))
+        (Outgoing.mk (allPassRationalFormalThroughChannel
+          allPassRationalQuadratureParameters))
+        (Incident.mk (allPassRationalFormalInputChannel
+          allPassRationalQuadratureParameters)) =
+      75 / 109 + (32 / 109) * Complex.I := by
+  have hResponse :=
+    (allPassRationalNetlist
+      allPassRationalQuadratureParameters).response_reciprocalZ_reindex_of_evaluation_eq
+        allPassRationalNetlistReciprocalZQuadratureDomain
+        zInverseEvaluation_quadrature allPassRationalQuadratureDomain
+  have hEntry := congrArg
+    (fun response => response
+      (Outgoing.mk (allPassRationalFormalThroughChannel
+        allPassRationalQuadratureParameters))
+      (Incident.mk (allPassRationalFormalInputChannel
+        allPassRationalQuadratureParameters))) hResponse
+  exact hEntry.trans allPassRationalNetlist_quadrature_response_entry
 
 end
 

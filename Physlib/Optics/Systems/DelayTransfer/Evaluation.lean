@@ -43,7 +43,10 @@ response evaluated at `q_i = exp (-s * τ_i)` or `q = z⁻¹`.
 - `RationalNetlist.mem_compileBehavior_iff_unguardedResponse`: N-10 on formal delay tuples.
 - `RationalNetlist.laplace`: substitution by `q_i = exp (-s * τ_i)`.
 - `RationalNetlist.response_laplace`: proof-gated response commutes with that substitution.
+- `RationalNetlist.response_laplace_reindex_of_evaluation_eq`: named-value response transport.
 - `RationalNetlist.reciprocalZ`: substitution by `q = z⁻¹`.
+- `RationalNetlist.response_reciprocalZ`: proof-gated response commutes with that substitution.
+- `RationalNetlist.response_reciprocalZ_reindex_of_evaluation_eq`: reciprocal-Z transport.
 
 ## iii. Table of contents
 
@@ -65,6 +68,7 @@ frequency, does not identify candidate singularities with transfer-function pole
 causality, stability, resonance, group-delay, or dispersion claim. No elimination argument is
 reproved here. In particular, symbolic rational elimination of the external response is future
 work; this module only evaluates retained component presentations pointwise into N5F.
+No degree or finiteness bound for an eliminated response is proved here.
 -/
 
 @[expose] public section
@@ -265,6 +269,12 @@ lemma mem_compileBehavior_iff_response {value : DelayTuple n}
 def laplace (delays : Fin n → ℝ) : ParameterizedNetlist ℂ :=
   netlist.toParameterizedNetlist.reparameterize (laplaceEvaluation delays)
 
+/-- Laplace reparameterization leaves the external channel labels unchanged. -/
+def laplaceExternalChannelEquiv (delays : Fin n → ℝ) :
+    (netlist.laplace delays).ExternalChannel ≃ netlist.ExternalChannel := by
+  change netlist.ExternalChannel ≃ netlist.ExternalChannel
+  exact Equiv.refl _
+
 /-- Laplace reparameterization retains finite aggregate channels. -/
 local instance laplaceChannelFintype (delays : Fin n → ℝ) :
     Fintype (netlist.laplace delays).Channel :=
@@ -345,17 +355,55 @@ lemma mem_compileBehavior_laplace_iff_unguardedResponse
 /-- The proof-gated Laplace response is formal-delay response evaluated at the exponential
 substitution. -/
 lemma response_laplace (delays : Fin n → ℝ) {s : ℂ}
-    (hLaplace : s ∈ (netlist.laplace delays).responseDomain)
-    (hDelay : laplaceEvaluation delays s ∈ netlist.responseDomain) :
+    (hLaplace : s ∈ (netlist.laplace delays).responseDomain) :
     (netlist.laplace delays).response hLaplace =
-      netlist.toParameterizedNetlist.response hDelay :=
+      netlist.toParameterizedNetlist.response
+        (value := laplaceEvaluation delays s) (by
+          rw [netlist.responseDomain_laplace delays] at hLaplace
+          exact hLaplace) :=
   netlist.toParameterizedNetlist.response_reparameterize
-    (laplaceEvaluation delays) hLaplace hDelay
+    (value' := s) (laplaceEvaluation delays) hLaplace _
+
+/-- Laplace response commutes with substitution after the unchanged external labels are made
+explicit. -/
+lemma response_laplace_reindex (delays : Fin n → ℝ) {s : ℂ}
+    (hLaplace : s ∈ (netlist.laplace delays).responseDomain) :
+    ((netlist.laplace delays).response hLaplace).reindex
+        (Incident.relabelEquiv (netlist.laplaceExternalChannelEquiv delays))
+        (Outgoing.relabelEquiv (netlist.laplaceExternalChannelEquiv delays)) =
+      netlist.toParameterizedNetlist.response
+        (value := laplaceEvaluation delays s) (by
+          rw [netlist.responseDomain_laplace delays] at hLaplace
+          exact hLaplace) := by
+  have hResponse := netlist.response_laplace delays hLaplace
+  ext ⟨output⟩ ⟨input⟩
+  exact congrFun (congrFun hResponse ⟨output⟩) ⟨input⟩
+
+/-- A named formal-delay value may replace the exponential substitution in the reindexed
+Laplace response when an equality and its domain proof are supplied. -/
+lemma response_laplace_reindex_of_evaluation_eq (delays : Fin n → ℝ) {s : ℂ}
+    (hLaplace : s ∈ (netlist.laplace delays).responseDomain)
+    {value : DelayTuple n} (hEvaluation : laplaceEvaluation delays s = value)
+    (hValue : value ∈ netlist.responseDomain) :
+    ((netlist.laplace delays).response hLaplace).reindex
+        (Incident.relabelEquiv (netlist.laplaceExternalChannelEquiv delays))
+        (Outgoing.relabelEquiv (netlist.laplaceExternalChannelEquiv delays)) =
+      netlist.toParameterizedNetlist.response hValue := by
+  subst value
+  exact (netlist.response_laplace_reindex delays hLaplace).trans
+    (netlist.toParameterizedNetlist.response_congr _ hValue)
 
 /-- The one-delay N5F family obtained by substituting `q = z⁻¹`. -/
 def reciprocalZ (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) :
     ParameterizedNetlist ℂ :=
   oneDelayNetlist.toParameterizedNetlist.reparameterize zInverseEvaluation
+
+/-- Reciprocal-Z reparameterization leaves the external channel labels unchanged. -/
+def reciprocalZExternalChannelEquiv
+    (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) :
+    oneDelayNetlist.reciprocalZ.ExternalChannel ≃ oneDelayNetlist.ExternalChannel := by
+  change oneDelayNetlist.ExternalChannel ≃ oneDelayNetlist.ExternalChannel
+  exact Equiv.refl _
 
 /-- Reciprocal-z reparameterization retains finite aggregate channels. -/
 local instance reciprocalZChannelFintype
@@ -396,14 +444,55 @@ lemma solveDomain_reciprocalZ (netlist : RationalNetlist.{u, v, w, x} 1)
     netlist.reciprocalZ.solveDomain = zInverseEvaluation ⁻¹' netlist.solveDomain :=
   netlist.toParameterizedNetlist.solveDomain_reparameterize zInverseEvaluation
 
+/-- The reciprocal-z response domain is the exact preimage of the formal-delay response domain. -/
+lemma responseDomain_reciprocalZ (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] :
+    netlist.reciprocalZ.responseDomain = zInverseEvaluation ⁻¹' netlist.responseDomain :=
+  netlist.toParameterizedNetlist.responseDomain_reparameterize zInverseEvaluation
+
 /-- Proof-gated response commutes with the selected `q = z⁻¹` substitution. -/
 lemma response_reciprocalZ (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
-    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain)
-    (hDelay : zInverseEvaluation z ∈ netlist.responseDomain) :
+    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain) :
     netlist.reciprocalZ.response hZ =
-      netlist.toParameterizedNetlist.response hDelay :=
-  netlist.toParameterizedNetlist.response_reparameterize zInverseEvaluation hZ hDelay
+      netlist.toParameterizedNetlist.response
+        (value := zInverseEvaluation z) (by
+          rw [netlist.responseDomain_reciprocalZ] at hZ
+          exact hZ) :=
+  netlist.toParameterizedNetlist.response_reparameterize
+    (value' := z) zInverseEvaluation hZ _
+
+/-- Reciprocal-Z response commutes with substitution after the unchanged external labels are
+made explicit. -/
+lemma response_reciprocalZ_reindex (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
+    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain) :
+    (netlist.reciprocalZ.response hZ).reindex
+        (Incident.relabelEquiv netlist.reciprocalZExternalChannelEquiv)
+        (Outgoing.relabelEquiv netlist.reciprocalZExternalChannelEquiv) =
+      netlist.toParameterizedNetlist.response
+        (value := zInverseEvaluation z) (by
+          rw [netlist.responseDomain_reciprocalZ] at hZ
+          exact hZ) := by
+  have hResponse := netlist.response_reciprocalZ hZ
+  ext ⟨output⟩ ⟨input⟩
+  exact congrFun (congrFun hResponse ⟨output⟩) ⟨input⟩
+
+/-- A named formal-delay value may replace `z⁻¹` in the reindexed reciprocal-Z response
+when an equality and its domain proof are supplied. -/
+lemma response_reciprocalZ_reindex_of_evaluation_eq
+    (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
+    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain)
+    {value : DelayTuple 1} (hEvaluation : zInverseEvaluation z = value)
+    (hValue : value ∈ netlist.responseDomain) :
+    (netlist.reciprocalZ.response hZ).reindex
+        (Incident.relabelEquiv netlist.reciprocalZExternalChannelEquiv)
+        (Outgoing.relabelEquiv netlist.reciprocalZExternalChannelEquiv) =
+      netlist.toParameterizedNetlist.response hValue := by
+  subst value
+  exact (netlist.response_reciprocalZ_reindex hZ).trans
+    (netlist.toParameterizedNetlist.response_congr _ hValue)
 
 end Finite
 

@@ -9,21 +9,20 @@ public import Physlib.Mathematics.ZTransform.Stability
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 
 /-!
-# Candidate singularities and poles after cancellation
+# Candidate singularities and abstract polynomial cancellation
 
 ## i. Overview
 
-This file keeps three objects distinct. An `InternalDeterminantPolynomial` certifies that a
-one-delay polynomial evaluates to the determinant of N5F's internal feedback operator. Its roots
-are `candidateSingularities`: points where the internal network equations are singular, whether
-or not the selected input and output can see that singular mode.
+This file keeps two independent schemas distinct. An `InternalDeterminantPolynomial` certifies
+that a one-delay polynomial evaluates to the determinant of N5F's internal feedback operator. Its
+roots are `candidateSingularities`: points where the internal network equations are singular,
+whether or not a selected input and output can see that singular mode.
 
-A `ReducedRationalResponse` has coprime, nonzero numerator and denominator polynomials. Its
-denominator roots are transfer-function poles after cancellation. `RationalReduction` records an
-unreduced numerator and denominator together with the common factor removed from both. Therefore
-every pole after cancellation is an unreduced candidate pole, unconditionally. The converse is
-proved only under `NoPoleCancellation`, which says that the removed factor has no root at the
-point in question. A regression module exhibits a cancelled internal candidate.
+Separately, `ReducedRationalResponse` is an abstract coprime polynomial quotient, and
+`RationalReduction` records a purely polynomial common-factor cancellation. The numerator is not
+certified to be a selected N5F response numerator. The subset and equality lemmas therefore state
+only relationships between the raw denominator roots and reduced denominator roots of this
+abstract schema.
 
 Finally, `recurrenceDenominator` makes the existing
 `Physlib.ZTransform.candidatePoles` definition from
@@ -34,29 +33,32 @@ required reciprocal-coordinate convention `q = z⁻¹`.
 
 - `InternalDeterminantPolynomial`: a certified polynomial internal determinant.
 - `InternalDeterminantPolynomial.candidateSingularities`: its root set in formal `q`.
-- `ReducedRationalResponse`: a coprime numerator/denominator response.
+- `ReducedRationalResponse`: an abstract coprime polynomial quotient.
 - `RationalReduction`: explicit common-factor cancellation data.
-- `RationalReduction.actualPoles_subset_candidatePoles`: the unconditional direction.
-- `RationalReduction.candidatePoles_subset_actualPoles`: the no-cancellation converse.
+- `RationalReduction.reducedPoles_subset_rawDenominatorRoots`: the unconditional direction.
+- `RationalReduction.NoPoleCancellation`: the pointwise cancellation criterion.
+- `RationalReduction.rawDenominatorRoots_subset_reducedPoles`: the gated converse.
 - `recurrenceCandidatePoles_eq`: bridge to `Physlib.ZTransform.candidatePoles`.
 
 ## iii. Table of contents
 
 - A. Polynomial internal determinants
-- B. Reduced responses and explicit cancellation
-- C. Candidate-to-actual pole criteria
+- B. Abstract reduced quotients and explicit cancellation
+- C. Abstract denominator-root criteria
 - D. Bridge to finite difference equations
 
 ## iv. References and non-claims
 
-The candidate/actual distinction is required by `goal.md` section H.4 S4 and S4P. A candidate
-internal singularity is not called an actual pole without the cancellation criterion. Hidden
-unreachable or unobservable singular modes are not ruled out automatically. No root is called a
-physical resonance, and the source term “resonance condition” for all numerator zeros inside the
-unit disk is deliberately not adopted.
+No theorem here relates a `ReducedRationalResponse` quotient to a selected network response entry.
+Consequently, no reduced denominator root is identified as an actual pole of an N5F network.
+That bridge requires the withheld symbolic response elimination, a response-indexed quotient
+certificate, and a genuine singular-but-cancelled netlist fixture; those remain future work.
 
-The response is rational in formal `q`, not necessarily in physical frequency. No stability,
-BIBO, causality, passivity, or frequency-response claim is made in this module.
+Hidden unreachable or unobservable singular modes are not ruled out. No root is called a physical
+resonance, and the source term “resonance condition” for all numerator zeros inside the unit disk
+is deliberately not adopted. The quotient is rational only in formal `q`, not necessarily in
+physical frequency. No degree or finiteness bound, stability, BIBO, causality, passivity, or
+frequency-response claim is made in this module.
 -/
 
 @[expose] public section
@@ -113,11 +115,11 @@ end InternalDeterminantPolynomial
 
 /-!
 
-## B. Reduced responses and explicit cancellation
+## B. Abstract reduced quotients and explicit cancellation
 
 -/
 
-/-- A nonzero coprime numerator and denominator representing a reduced one-delay response. -/
+/-- A nonzero coprime numerator and denominator representing an abstract reduced quotient. -/
 structure ReducedRationalResponse where
   /-- The numerator after cancellation. -/
   numerator : Polynomial ℂ
@@ -132,26 +134,26 @@ structure ReducedRationalResponse where
 
 namespace ReducedRationalResponse
 
-/-- The domain on which the reduced denominator evaluates nontrivially. -/
+/-- The domain on which the abstract reduced denominator evaluates nontrivially. -/
 def evaluationDomain (response : ReducedRationalResponse) : Set ℂ :=
   {q | response.denominator.eval q ≠ 0}
 
 /-- Totalized value of a reduced response.
 
-It has transfer-function meaning only on `evaluationDomain`.
+It has quotient-evaluation meaning only on `evaluationDomain`. No network response is certified.
 -/
 def eval (response : ReducedRationalResponse) (q : ℂ) : ℂ :=
   response.numerator.eval q / response.denominator.eval q
 
-/-- The zeros of a reduced transfer response. -/
+/-- Numerator roots of the abstract reduced quotient. -/
 def zeros (response : ReducedRationalResponse) : Set ℂ :=
   {q | response.numerator.eval q = 0}
 
-/-- The poles of a reduced transfer response, after common-factor cancellation. -/
+/-- Denominator roots of the abstract reduced quotient, after common-factor cancellation. -/
 def poles (response : ReducedRationalResponse) : Set ℂ :=
   {q | response.denominator.eval q = 0}
 
-/-- At a reduced denominator root, the coprime numerator is nonzero. -/
+/-- At an abstract reduced denominator root, the coprime numerator is nonzero. -/
 lemma numerator_ne_zero_of_mem_poles (response : ReducedRationalResponse)
     {q : ℂ} (hq : q ∈ response.poles) : response.numerator.eval q ≠ 0 := by
   have hEither := Polynomial.aeval_ne_zero_of_isCoprime response.isCoprime q
@@ -162,7 +164,7 @@ lemma numerator_ne_zero_of_mem_poles (response : ReducedRationalResponse)
 
 end ReducedRationalResponse
 
-/-- An explicit reduction of an unreduced rational response by one common factor. -/
+/-- An explicit reduction of an abstract polynomial quotient by one common factor. -/
 structure RationalReduction where
   /-- The numerator before cancellation. -/
   rawNumerator : Polynomial ℂ
@@ -170,7 +172,7 @@ structure RationalReduction where
   rawDenominator : Polynomial ℂ
   /-- The common factor removed from numerator and denominator. -/
   cancelledFactor : Polynomial ℂ
-  /-- The coprime response remaining after cancellation. -/
+  /-- The coprime quotient remaining after cancellation. -/
   reduced : ReducedRationalResponse
   /-- The cancelled factor is a nonzero formal polynomial. -/
   cancelledFactor_ne_zero : cancelledFactor ≠ 0
@@ -181,16 +183,16 @@ structure RationalReduction where
 
 namespace RationalReduction
 
-/-- Roots of the unreduced denominator, before input/output cancellation is removed. -/
-def candidatePoles (reduction : RationalReduction) : Set ℂ :=
+/-- Roots of the raw denominator before the abstract common factor is removed. -/
+def rawDenominatorRoots (reduction : RationalReduction) : Set ℂ :=
   {q | reduction.rawDenominator.eval q = 0}
 
-/-- Poles of the reduced transfer response, after cancellation. -/
-def actualPoles (reduction : RationalReduction) : Set ℂ := reduction.reduced.poles
+/-- Denominator roots of the abstract reduced quotient. -/
+def reducedPoles (reduction : RationalReduction) : Set ℂ := reduction.reduced.poles
 
-/-- No pole cancellation means that the removed common factor has no root. -/
-def NoPoleCancellation (reduction : RationalReduction) : Prop :=
-  ∀ q : ℂ, reduction.cancelledFactor.eval q ≠ 0
+/-- No cancellation at `q` means that the removed common factor does not vanish at `q`. -/
+def NoPoleCancellation (reduction : RationalReduction) (q : ℂ) : Prop :=
+  reduction.cancelledFactor.eval q ≠ 0
 
 /-- The unreduced denominator is a nonzero formal polynomial. -/
 lemma rawDenominator_ne_zero (reduction : RationalReduction) :
@@ -200,64 +202,38 @@ lemma rawDenominator_ne_zero (reduction : RationalReduction) :
 
 /-!
 
-## C. Candidate-to-actual pole criteria
+## C. Abstract denominator-root criteria
 
 -/
 
-/-- Every transfer-function pole after cancellation is an unreduced candidate pole. -/
-lemma actualPoles_subset_candidatePoles (reduction : RationalReduction) :
-    reduction.actualPoles ⊆ reduction.candidatePoles := by
+/-- Every reduced denominator root is a raw denominator root. -/
+lemma reducedPoles_subset_rawDenominatorRoots (reduction : RationalReduction) :
+    reduction.reducedPoles ⊆ reduction.rawDenominatorRoots := by
   intro q hq
   change reduction.reduced.denominator.eval q = 0 at hq
   change reduction.rawDenominator.eval q = 0
   rw [reduction.rawDenominator_eq, eval_mul, hq, mul_zero]
 
-/-- Under the explicit no-cancellation criterion, every candidate pole is an actual pole. -/
-lemma candidatePoles_subset_actualPoles (reduction : RationalReduction)
-    (hNoCancellation : reduction.NoPoleCancellation) :
-    reduction.candidatePoles ⊆ reduction.actualPoles := by
+/-- Under the explicit no-cancellation criterion, every raw root remains a reduced root. -/
+lemma rawDenominatorRoots_subset_reducedPoles (reduction : RationalReduction)
+    (hNoCancellation : ∀ q ∈ reduction.rawDenominatorRoots,
+      reduction.NoPoleCancellation q) :
+    reduction.rawDenominatorRoots ⊆ reduction.reducedPoles := by
   intro q hq
+  have hFactor := hNoCancellation q hq
   change reduction.rawDenominator.eval q = 0 at hq
   change reduction.reduced.denominator.eval q = 0
   rw [reduction.rawDenominator_eq, eval_mul] at hq
-  exact (mul_eq_zero.mp hq).resolve_left (hNoCancellation q)
+  exact (mul_eq_zero.mp hq).resolve_left hFactor
 
-/-- With no cancellation, candidate and actual pole sets coincide. -/
-lemma candidatePoles_eq_actualPoles (reduction : RationalReduction)
-    (hNoCancellation : reduction.NoPoleCancellation) :
-    reduction.candidatePoles = reduction.actualPoles :=
+/-- With no cancellation, the raw and reduced denominator-root sets coincide. -/
+lemma rawDenominatorRoots_eq_reducedPoles (reduction : RationalReduction)
+    (hNoCancellation : ∀ q ∈ reduction.rawDenominatorRoots,
+      reduction.NoPoleCancellation q) :
+    reduction.rawDenominatorRoots = reduction.reducedPoles :=
   Set.Subset.antisymm
-    (reduction.candidatePoles_subset_actualPoles hNoCancellation)
-    reduction.actualPoles_subset_candidatePoles
-
-/-- If the unreduced denominator is the certified internal determinant polynomial, every actual
-transfer pole is an internal candidate singularity. -/
-lemma actualPoles_subset_candidateSingularities
-    {netlist : RationalNetlist.{u, v, w, x} 1}
-    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
-    (determinant : InternalDeterminantPolynomial netlist)
-    (reduction : RationalReduction)
-    (hDenominator : reduction.rawDenominator = determinant.polynomial) :
-    reduction.actualPoles ⊆ determinant.candidateSingularities := by
-  intro q hq
-  have hCandidate := reduction.actualPoles_subset_candidatePoles hq
-  simpa [candidatePoles, InternalDeterminantPolynomial.candidateSingularities,
-    hDenominator] using hCandidate
-
-/-- If the internal determinant is the unreduced denominator and no factor was cancelled, every
-internal candidate singularity is an actual transfer pole. -/
-lemma candidateSingularities_subset_actualPoles
-    {netlist : RationalNetlist.{u, v, w, x} 1}
-    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
-    (determinant : InternalDeterminantPolynomial netlist)
-    (reduction : RationalReduction)
-    (hDenominator : reduction.rawDenominator = determinant.polynomial)
-    (hNoCancellation : reduction.NoPoleCancellation) :
-    determinant.candidateSingularities ⊆ reduction.actualPoles := by
-  intro q hq
-  apply reduction.candidatePoles_subset_actualPoles hNoCancellation
-  simpa [candidatePoles, InternalDeterminantPolynomial.candidateSingularities,
-    hDenominator] using hq
+    (reduction.rawDenominatorRoots_subset_reducedPoles hNoCancellation)
+    reduction.reducedPoles_subset_rawDenominatorRoots
 
 end RationalReduction
 
