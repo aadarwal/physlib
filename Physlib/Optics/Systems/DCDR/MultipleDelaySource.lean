@@ -262,7 +262,8 @@ lemma MultipleDelaySourceParameters.finite_zPoles_and_ncard_le_delayShape
   rw [hDenominator]
   exact p.printedDenominatorPolynomial_natDegree_le
 
-/-- The unit-delay source embedding recovers the existing printed numerator polynomial. -/
+/-- The unit-delay embedding recovers the printed numerator at
+`Physlib/Optics/Systems/DCDR/SourceBridge.lean:310-327`. -/
 lemma SourceParameters.toMultipleDelaySourceParameters_printedNumeratorPolynomial
     (p : SourceParameters) :
     p.toMultipleDelaySourceParameters.printedNumeratorPolynomial =
@@ -277,7 +278,8 @@ lemma SourceParameters.toMultipleDelaySourceParameters_printedNumeratorPolynomia
     SourceParameters.printedCubicCoefficient]
   ring
 
-/-- The unit-delay source embedding recovers the existing printed denominator polynomial. -/
+/-- The unit-delay embedding recovers the printed denominator at
+`Physlib/Optics/Systems/DCDR/SourceBridge.lean:318-332`. -/
 lemma SourceParameters.toMultipleDelaySourceParameters_printedDenominatorPolynomial
     (p : SourceParameters) :
     p.toMultipleDelaySourceParameters.printedDenominatorPolynomial =

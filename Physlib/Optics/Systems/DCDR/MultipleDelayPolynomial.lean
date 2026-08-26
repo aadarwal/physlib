@@ -221,7 +221,8 @@ lemma MultipleDelayParameters.responseNumeratorPolynomial_natDegree_le
 /-- An S4 common-factor reduction
 (`Physlib/Optics/Systems/DelayTransfer/Poles.lean:168-183`) for this response. -/
 structure MultipleDelayResponseReduction (p : MultipleDelayParameters) where
-  /-- The explicit S4 common-factor reduction. -/
+  /-- The S4 common-factor reduction at
+  `Physlib/Optics/Systems/DelayTransfer/Poles.lean:168-183`. -/
   reduction : DelayTransfer.RationalReduction
   /-- The raw numerator is the selected coherent response numerator. -/
   rawNumerator_eq : reduction.rawNumerator = p.responseNumeratorPolynomial

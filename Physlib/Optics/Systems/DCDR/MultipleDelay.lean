@@ -22,8 +22,8 @@ The unit-delay parameters and fixed-carrier path realization being extended are 
 `Physlib/Optics/Systems/DCDR/Poles.lean:274-324`.
 
 The one-delay family is the literal specialization `(m1, m2, m3) = (1, 1, 1)`. Pointwise
-compilation evaluates each retained polynomial path and recovers the existing coherent N7 flat
-netlist. Polynomial degree and reduction results live in `DCDR/MultipleDelayPolynomial.lean`;
+compilation evaluates each retained polynomial path and produces the coherent N7 flat netlist.
+Polynomial degree and reduction results live in `DCDR/MultipleDelayPolynomial.lean`;
 the separate printed-source dictionary lives in `DCDR/MultipleDelaySource.lean`.
 
 ## ii. Key results
@@ -351,28 +351,32 @@ lemma UnitDelayParameters.toMultipleDelayParameters_isAdmissible
   simp [MultipleDelayParameters.IsAdmissible,
     UnitDelayParameters.toMultipleDelayParameters]
 
-/-- The embedded upper polynomial is the existing unit-delay upper polynomial. -/
+/-- The embedded upper polynomial is the unit-delay polynomial at
+`Physlib/Optics/Systems/DCDR/Poles.lean:143-145`. -/
 lemma UnitDelayParameters.toMultipleDelayParameters_upperPolynomial
     (p : UnitDelayParameters) :
     p.toMultipleDelayParameters.upperPolynomial = p.upperPolynomial := by
   simp [UnitDelayParameters.toMultipleDelayParameters,
     MultipleDelayParameters.upperPolynomial, UnitDelayParameters.upperPolynomial]
 
-/-- The embedded lower polynomial is the existing unit-delay lower polynomial. -/
+/-- The embedded lower polynomial is the unit-delay polynomial at
+`Physlib/Optics/Systems/DCDR/Poles.lean:147-149`. -/
 lemma UnitDelayParameters.toMultipleDelayParameters_lowerPolynomial
     (p : UnitDelayParameters) :
     p.toMultipleDelayParameters.lowerPolynomial = p.lowerPolynomial := by
   simp [UnitDelayParameters.toMultipleDelayParameters,
     MultipleDelayParameters.lowerPolynomial, UnitDelayParameters.lowerPolynomial]
 
-/-- The embedded feedback polynomial is the existing unit-delay feedback polynomial. -/
+/-- The embedded feedback polynomial is the unit-delay polynomial at
+`Physlib/Optics/Systems/DCDR/Poles.lean:151-153`. -/
 lemma UnitDelayParameters.toMultipleDelayParameters_feedbackPolynomial
     (p : UnitDelayParameters) :
     p.toMultipleDelayParameters.feedbackPolynomial = p.feedbackPolynomial := by
   simp [UnitDelayParameters.toMultipleDelayParameters,
     MultipleDelayParameters.feedbackPolynomial, UnitDelayParameters.feedbackPolynomial]
 
-/-- The embedded coherent denominator is exactly the existing unit-delay denominator. -/
+/-- The embedded denominator is exactly the unit-delay denominator at
+`Physlib/Optics/Systems/DCDR/Poles.lean:155-165`. -/
 lemma UnitDelayParameters.toMultipleDelayParameters_denominatorPolynomial
     (p : UnitDelayParameters) :
     p.toMultipleDelayParameters.denominatorPolynomial = p.denominatorPolynomial := by
@@ -388,7 +392,8 @@ lemma UnitDelayParameters.toMultipleDelayParameters_denominatorPolynomial
     UnitDelayParameters.feedbackPolynomial,
     UnitDelayParameters.toMultipleDelayParameters]
 
-/-- The embedded coherent numerator is exactly the existing unit-delay numerator. -/
+/-- The embedded numerator is exactly the unit-delay numerator at
+`Physlib/Optics/Systems/DCDR/Poles.lean:167-194`. -/
 lemma UnitDelayParameters.toMultipleDelayParameters_responseNumeratorPolynomial
     (p : UnitDelayParameters) :
     p.toMultipleDelayParameters.responseNumeratorPolynomial =
@@ -441,7 +446,8 @@ lemma multipleDelayRationalPathEntryModel_eval (gain : ℂ) (delay : ℕ) (q : �
   cases outputPort <;> cases inputPort <;> cases outputMode <;> cases inputMode <;>
     simp [multipleDelayRationalPathEntryModel]
 
-/-- The evaluated rational path entries in the existing N7 channel labels. -/
+/-- Evaluated path entries in the N7 channel labels at
+`Physlib/Optics/Systems/DCDR/Netlist.lean:293-316`. -/
 def multipleDelayEvaluatedPathScattering (gain : ℂ) (delay : ℕ) (q : ℂ) :
     ScatteringMatrix ((MatchedPropagation.portFamily Unit).Channel) where
   toModeTransform output input :=
