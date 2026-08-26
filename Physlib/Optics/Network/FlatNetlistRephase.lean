@@ -341,12 +341,8 @@ lemma rephasedResponseTransform_eq
   unfold rephasedResponseTransform
   apply LinearBehavior.toModeTransform_unique
   rw [ModeTransform.toBehavior_rephase,
+    netlist.toBehavior_responseTransform hWellPosed,
     netlist.rephasedBehavior_eq gauge hMatched]
-  ext ⟨input, output⟩
-  simp only [LinearBehavior.mem_rephase_iff]
-  exact (ModeTransform.mem_toBehavior_iff_toLinearMap
-    (netlist.responseTransform hWellPosed) _ _).trans
-      (netlist.mem_behavior_iff_eq_responseTransform hWellPosed _ _).symm
 
 end FlatNetlist
 
@@ -452,10 +448,11 @@ lemma closeBehavior_append_rephase_eq_staged
         ((inner.append outer).externalGauge gauge).incident
         ((inner.append outer).externalGauge gauge).outgoing := by
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
-  ext ⟨input, output⟩
-  simp only [LinearBehavior.mem_rephase_iff]
-  rw [inner.closeBehavior_append outer behavior]
-  exact Iff.rfl
+  exact congrArg
+    (fun relation => relation.rephase
+      ((inner.append outer).externalGauge gauge).incident
+      ((inner.append outer).externalGauge gauge).outgoing)
+    (inner.closeBehavior_append outer behavior)
 
 end Finite
 
