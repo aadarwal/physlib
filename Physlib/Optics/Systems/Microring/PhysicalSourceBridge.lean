@@ -96,29 +96,34 @@ open Microring
 
 /-! ## A. Existing DATE parameters mapped to physical data -/
 
-/-- The DATE amplitudes at `SourceBridgeDate.lean:64-118` interpreted as physical N7 fields. -/
+/-- The DATE amplitudes at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:64-118` as physical N7 fields. -/
 def DateParameters.toPhysicalCoupling (p : DateParameters) : CouplingParameters where
   throughAmplitude := p.reflectivity
   crossAmplitude := p.transmissivity
 
-/-- The DATE data at `SourceBridgeDate.lean:64-89` interpreted as physical propagation data. -/
+/-- The DATE data at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:64-89` as physical propagation data. -/
 def DateParameters.toPhysicalPropagation (p : DateParameters) : PhysicalParameters where
   pathLength := p.couplingLength
   powerAttenuationCoefficient := p.powerAttenuation
   effectiveIndex := p.effectiveIndex
   wavelength := p.wavelength
 
-/-- The DATE dictionary at `SourceBridgeDate.lean:410-428` as a symmetric physical two-bus ring. -/
+/-- The DATE dictionary at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:410-428` as a physical two-bus ring. -/
 def DateParameters.toPhysicalAddDrop (p : DateParameters) : AddDropPhysicalParameters where
   inputCoupling := p.toPhysicalCoupling
   dropCoupling := p.toPhysicalCoupling
   propagation := p.toPhysicalPropagation
 
-/-- The physical DATE map retains the attenuation definition at `SourceBridgeDate.lean:82-89`. -/
+/-- The physical DATE map retains the attenuation definition at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:82-89`. -/
 lemma DateParameters.toPhysicalPropagation_fieldAttenuation (p : DateParameters) :
     p.toPhysicalPropagation.fieldAttenuation = p.fieldAttenuation := rfl
 
-/-- The physical phase lift is DATE's formula at `SourceBridgeDate.lean:79-80`. -/
+/-- The physical phase lift is DATE's formula at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:79-80`. -/
 lemma DateParameters.toPhysicalPropagation_roundTripPhaseLift (p : DateParameters) :
     p.toPhysicalPropagation.roundTripPhaseLift = p.roundTripPhase := by
   rw [Microring.PhysicalParameters.roundTripPhaseLift,
@@ -126,7 +131,8 @@ lemma DateParameters.toPhysicalPropagation_roundTripPhaseLift (p : DateParameter
     DateParameters.toPhysicalPropagation, DateParameters.roundTripPhase]
   ring
 
-/-- Mapping DATE physically gives the audited dictionary at `SourceBridgeDate.lean:410-428`. -/
+/-- Mapping DATE physically gives the audited dictionary at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:410-428`. -/
 lemma DateParameters.toPhysicalAddDrop_toParameters (p : DateParameters) :
     p.toPhysicalAddDrop.toParameters = p.toAddDrop := by
   unfold DateParameters.toPhysicalAddDrop AddDropPhysicalParameters.toParameters
@@ -163,8 +169,8 @@ lemma DateParameters.toPhysicalCoupling_hasBijectiveRightToLeftTransmission
   rw [p.toPhysicalCoupling_toTwoPortScattering]
   exact p.couplerScattering_hasBijectiveRightToLeftTransmission hTransmissivity
 
-/-- DATE Thm. 1 is the physical N7 chain conversion up to the algebraic sign gauge defined at
-`SourceBridgeDate.lean:295-307`. -/
+/-- DATE Thm. 1 is the physical N7 chain conversion up to the algebraic sign gauge at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:295-307`. -/
 lemma dateTwoPortChainMatrix_eq_gauged_physicalCouplerChain (p : DateParameters)
     (hUnitary : p.IsUnitary) (hTransmissivity : p.transmissivity ≠ 0) :
     dateTwoPortChainMatrix p =
@@ -199,7 +205,7 @@ lemma dateTwoPortChainMatrix_eq_gauged_physicalCouplerChain (p : DateParameters)
 /-- The DATE-ordered, gauge-adapted two-sided scattering view of the physical N5 ring response.
 
 Rows are source `(c,b)` and columns are source `(a,d)`, with the gauges defined at
-`SourceBridgeDate.lean:457-466`.
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:457-466`.
 -/
 def datePhysicalN5FourPortScattering (p : DateParameters)
     (hDenominator : p.toPhysicalAddDrop.toParameters.HasNonzeroDenominator) :
@@ -337,8 +343,9 @@ lemma datePhysicalFourPortChainTransform_eq (p : DateParameters)
     _ = dateFourPortBackwardFirstChainMatrix p :=
       dateSourceFourPortChainTransform_eq p hForward
 
-/-- DATE Thm. 2's source-order matrix at `SourceBridgeDate.lean:588-619` is the reindexed physical
-N5 chain response. -/
+/-- DATE Thm. 2's source-order matrix at
+`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:588-619` is the reindexed physical N5
+chain response. -/
 lemma dateFourPortChainMatrix_eq_reindexed_physicalResponse (p : DateParameters)
     (hUnitary : p.IsUnitary) (hDenominator : p.HasNonzeroDenominator)
     (hForward : dateForwardTransfer p ≠ 0) :

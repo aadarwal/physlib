@@ -7,7 +7,7 @@ module
 
 public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPassRegression
-public import Physlib.Optics.Systems.Microring.PhysicalRealization
+public import Physlib.Optics.Systems.Microring.PhysicalSourceBridge
 
 /-!
 # Symbolic regressions for physical microring realization
@@ -24,6 +24,9 @@ lifts `0` and `pi` exactly.
 The relation anchors substitute internal fields by hand. The response anchors reuse the S2
 regressions that eliminate the concrete netlist channel equations directly; they do not rewrite
 with `allPass_physicalResponse_eq_transfer` or `addDrop_physicalResponse_eq_transfers`.
+The source-composition anchors independently expand DATE, SysCon, and SFG fields at the same
+physical point before comparing them with that response; they do not use the physical source
+bridge lemmas under test.
 
 The zero-phase add-drop fixture uses the S2 symmetric half-arc reference plane and N7 `-I * k`
 gauge. Its drop value `-32 / 91` is gauge- and reference-plane-dependent. No named phase point is
@@ -43,6 +46,9 @@ flux-orthogonal, unit-normalized bridge at
 - `physicalRegression_addDrop_fieldRelation`: direct two-bus internal-field solution.
 - `physicalRegression_allPass_response`: independently eliminated N5 response `1 / 7`.
 - `physicalRegression_addDrop_responses`: independently eliminated N5 responses.
+- `physicalRegression_date_backwardTransfer_eq_response`: DATE and physical N5 agreement.
+- `physicalRegression_sysCon_dropTransfer_eq_response`: SysCon and physical N5 agreement.
+- `physicalRegression_sfg_dropTransfer_eq_response`: SFG-TR and physical N5 agreement.
 
 ## iii. Table of contents
 
@@ -51,6 +57,7 @@ flux-orthogonal, unit-normalized bridge at
 - C. Maps to the named S2 parameters
 - D. Direct internal-field anchors
 - E. Independent N5 response anchors
+- F. Independently expanded source-composition anchors
 
 ## iv. References
 
@@ -381,6 +388,175 @@ lemma physicalRegression_addDrop_responses :
       AddDrop.addDropRegression_resonance_isWellPosed
       AddDrop.dropChannel).trans
         AddDrop.addDropRegression_resonance_responseTransform_entry_drop
+
+/-! ## F. Independently expanded source-composition anchors -/
+
+open MicroringSourceBridge
+open scoped ComplexOrder
+
+/-- DATE data whose physical interpretation is the exact zero-phase add-drop fixture. -/
+def physicalRegressionDateParameters : DateParameters where
+  reflectivity := 3 / 5
+  transmissivity := 4 / 5
+  couplingLength := 1
+  powerAttenuation := 4 * Real.log 2
+  wavelength := 1
+  effectiveIndex := 0
+
+/-- Direct record expansion identifies the DATE and physical parameter points. -/
+lemma physicalRegression_date_toPhysicalAddDrop :
+    physicalRegressionDateParameters.toPhysicalAddDrop = physicalRegressionAddDrop := rfl
+
+/-- Direct evaluation of `SourceBridgeDate.lean:86-87` gives DATE's field factor `1 / 4`. -/
+lemma physicalRegression_date_fieldAttenuation :
+    physicalRegressionDateParameters.fieldAttenuation = 1 / 4 := by
+  rw [DateParameters.fieldAttenuation]
+  change Real.exp (-(4 * Real.log 2) * 1 / 2) = 1 / 4
+  rw [show -(4 * Real.log 2) * 1 / 2 = -(Real.log 2 + Real.log 2) by ring,
+    Real.exp_neg, Real.exp_add, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
+  norm_num
+
+/-- Direct phase expansion gives DATE's full- and half-round-trip factors as one. -/
+lemma physicalRegression_date_phaseFactors :
+    physicalRegressionDateParameters.phaseFactor = 1 ∧
+      physicalRegressionDateParameters.halfPhaseFactor = 1 := by
+  constructor <;>
+    norm_num [DateParameters.phaseFactor, DateParameters.halfPhaseFactor,
+      DateParameters.roundTripPhase, physicalRegressionDateParameters,
+      MatchedPropagation.carrierPhaseFactor]
+
+/-- Direct expansion gives DATE's zero-phase denominator `91 / 100`. -/
+lemma physicalRegression_date_denominator :
+    physicalRegressionDateParameters.denominator = 91 / 100 := by
+  rw [DateParameters.denominator, physicalRegression_date_fieldAttenuation,
+    physicalRegression_date_phaseFactors.1]
+  norm_num [physicalRegressionDateParameters]
+
+/-- Direct expansion of `SourceBridgeDate.lean:486-488` gives DATE's drop field `-32 / 91`. -/
+lemma physicalRegression_date_backwardTransfer :
+    dateBackwardTransfer physicalRegressionDateParameters = -32 / 91 := by
+  rw [dateBackwardTransfer, physicalRegression_date_fieldAttenuation,
+    physicalRegression_date_phaseFactors.2, physicalRegression_date_denominator]
+  have hSqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
+    apply (Real.sqrt_eq_iff_eq_sq (by norm_num) (by norm_num)).2
+    norm_num
+  norm_num [physicalRegressionDateParameters, hSqrt]
+
+/-- Independent DATE and netlist expansions agree at the physical zero-phase point. -/
+lemma physicalRegression_date_backwardTransfer_eq_response :
+    dateBackwardTransfer physicalRegressionDateParameters =
+      (addDropTopology physicalRegressionAddDrop).responseTransform
+        physicalRegression_addDrop_isWellPosed
+        (Outgoing.mk (addDropDropChannel physicalRegressionAddDrop))
+        (Incident.mk (addDropInputChannel physicalRegressionAddDrop)) := by
+  rw [physicalRegression_date_backwardTransfer,
+    physicalRegression_addDrop_responses.2]
+
+/-- Exact SysCon data selected by the physical zero-phase add-drop fixture. -/
+def physicalRegressionSysConParameters : SysConParameters where
+  phase := 0
+  fieldAttenuation := 1 / 4
+  inputCrossAmplitude := 4 / 5
+  dropCrossAmplitude := 4 / 5
+  inputThroughAmplitude := 3 / 5
+  dropThroughAmplitude := 3 / 5
+
+/-- Direct expansion identifies the physical and SysCon parameter dictionaries. -/
+lemma physicalRegression_toSysConParameters :
+    addDropPhysicalToSysConParameters physicalRegressionAddDrop =
+      physicalRegressionSysConParameters := by
+  change
+    ({ phase := physicalRegressionQuarterAttenuation.roundTripPhaseLift
+       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation
+       inputCrossAmplitude := 4 / 5
+       dropCrossAmplitude := 4 / 5
+       inputThroughAmplitude := 3 / 5
+       dropThroughAmplitude := 3 / 5 } : SysConParameters) =
+      physicalRegressionSysConParameters
+  rw [physicalRegression_quarterAttenuation]
+  norm_num [physicalRegressionQuarterAttenuation,
+    PhysicalParameters.roundTripPhaseLift, PhysicalParameters.propagationConstant,
+    physicalRegressionSysConParameters]
+
+/-- Direct expansion gives SysCon's zero-phase loop gain and denominator. -/
+lemma physicalRegression_sysCon_loopGain_denominator :
+    physicalRegressionSysConParameters.loopGain = 9 / 100 ∧
+      physicalRegressionSysConParameters.denominator = 91 / 100 := by
+  constructor
+  · norm_num [SysConParameters.loopGain, physicalRegressionSysConParameters,
+      MatchedPropagation.carrierPhaseFactor]
+  · rw [SysConParameters.denominator]
+    norm_num [SysConParameters.loopGain, physicalRegressionSysConParameters,
+      MatchedPropagation.carrierPhaseFactor]
+
+/-- Direct expansion of `SourceBridgeSysCon.lean:160-165` gives SysCon's drop field `-32 / 91`. -/
+lemma physicalRegression_sysCon_dropTransfer :
+    sysConDropTransfer physicalRegressionSysConParameters = -32 / 91 := by
+  have hSqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
+    apply (Real.sqrt_eq_iff_eq_sq (by norm_num) (by norm_num)).2
+    norm_num
+  rw [sysConDropTransfer, physicalRegression_sysCon_loopGain_denominator.2]
+  norm_num [physicalRegressionSysConParameters,
+    MatchedPropagation.carrierPhaseFactor, hSqrt]
+
+/-- Independent SysCon and netlist expansions agree at the physical zero-phase point. -/
+lemma physicalRegression_sysCon_dropTransfer_eq_response :
+    sysConDropTransfer
+        (addDropPhysicalToSysConParameters physicalRegressionAddDrop) =
+      (addDropTopology physicalRegressionAddDrop).responseTransform
+        physicalRegression_addDrop_isWellPosed
+        (Outgoing.mk (addDropDropChannel physicalRegressionAddDrop))
+        (Incident.mk (addDropInputChannel physicalRegressionAddDrop)) := by
+  rw [physicalRegression_toSysConParameters,
+    physicalRegression_sysCon_dropTransfer,
+    physicalRegression_addDrop_responses.2]
+
+/-- Exact SFG-TR coefficients selected by the physical zero-phase add-drop fixture. -/
+def physicalRegressionSfgParameters : SfgParameters where
+  roundTripCoefficient := 1 / 4
+  inputCrossAmplitude := 4 / 5
+  dropCrossAmplitude := 4 / 5
+  inputThroughAmplitude := 3 / 5
+  dropThroughAmplitude := 3 / 5
+
+/-- Direct expansion identifies the physical and SFG-TR parameter dictionaries. -/
+lemma physicalRegression_toSfgParameters :
+    SfgParameters.ofAddDrop physicalRegressionAddDrop.toParameters =
+      physicalRegressionSfgParameters := by
+  rw [physicalRegression_addDrop_toParameters]
+  unfold SfgParameters.ofAddDrop
+  rw [AddDrop.addDropRegression_resonance_roundTripCoefficient]
+  norm_num [AddDrop.addDropRegressionResonanceParameters,
+    physicalRegressionSfgParameters]
+
+/-- Direct expansion of `SourceBridgeSfg.lean:87-92` gives SFG-TR's drop field `-32 / 91`. -/
+lemma physicalRegression_sfg_dropTransfer :
+    sfgAddDropTransfer physicalRegressionSfgParameters = -32 / 91 := by
+  have hRealSqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
+    apply (Real.sqrt_eq_iff_eq_sq (by norm_num) (by norm_num)).2
+    norm_num
+  have hSqrt : Complex.sqrt (1 / 4) = 1 / 2 := by
+    have hNonneg : (0 : ℂ) ≤ 1 / 4 := by
+      norm_num [Complex.nonneg_iff]
+    calc
+      Complex.sqrt (1 / 4) = (Real.sqrt (1 / 4 : ℝ) : ℂ) := by
+        rw [Complex.sqrt_of_nonneg hNonneg]
+        norm_num
+      _ = 1 / 2 := by rw [hRealSqrt]; norm_num
+  rw [sfgAddDropTransfer]
+  norm_num [physicalRegressionSfgParameters, hSqrt]
+
+/-- Independent SFG-TR and netlist expansions agree at the physical zero-phase point. -/
+lemma physicalRegression_sfg_dropTransfer_eq_response :
+    sfgAddDropTransfer
+        (SfgParameters.ofAddDrop physicalRegressionAddDrop.toParameters) =
+      (addDropTopology physicalRegressionAddDrop).responseTransform
+        physicalRegression_addDrop_isWellPosed
+        (Outgoing.mk (addDropDropChannel physicalRegressionAddDrop))
+        (Incident.mk (addDropInputChannel physicalRegressionAddDrop)) := by
+  rw [physicalRegression_toSfgParameters,
+    physicalRegression_sfg_dropTransfer,
+    physicalRegression_addDrop_responses.2]
 
 end Microring
 
