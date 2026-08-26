@@ -41,6 +41,9 @@ negates its normal component, and preserves the angle when the reference side is
 ## ii. Key results
 
 - `OrientedAffineHyperplane.signedNormalCoordinate_vadd`: signed-coordinate translation.
+- `OrientedAffineHyperplane.isOpen_openHalfSpace`: either strict geometric side is open.
+- `OrientedAffineHyperplane.measurableSet_openHalfSpace`: either strict geometric side is
+  measurable.
 - `OrientedAffineHyperplane.normalComponent_tangentialProjection`: the tangential projection is
   tangent.
 - `OrientedAffineHyperplane.tangentialProjection_add_normal`: exact vector decomposition.
@@ -196,6 +199,13 @@ It is zero on the carrier, positive on the positive side, and negative on the ne
 def signedNormalCoordinate (plane : OrientedAffineHyperplane d) (x : Space d) : ℝ :=
   inner ℝ plane.normalVector (x -ᵥ plane.point)
 
+/-- The signed normal coordinate varies continuously with the ambient point. -/
+@[fun_prop]
+lemma continuous_signedNormalCoordinate (plane : OrientedAffineHyperplane d) :
+    Continuous plane.signedNormalCoordinate := by
+  unfold signedNormalCoordinate
+  fun_prop
+
 /-- The scalar normal component of a displacement vector. -/
 def normalComponent (plane : OrientedAffineHyperplane d)
     (v : EuclideanSpace ℝ (Fin d)) : ℝ :=
@@ -293,6 +303,18 @@ def openHalfSpace (plane : OrientedAffineHyperplane d) (side : Side) : Set (Spac
 The carrier belongs to both closed half-spaces. -/
 def closedHalfSpace (plane : OrientedAffineHyperplane d) (side : Side) : Set (Space d) :=
   {x | 0 ≤ side.sign * plane.signedNormalCoordinate x}
+
+/-- Either strict side of an oriented affine hyperplane is an open set. -/
+lemma isOpen_openHalfSpace (plane : OrientedAffineHyperplane d) (side : Side) :
+    IsOpen (plane.openHalfSpace side) := by
+  rw [openHalfSpace]
+  exact isOpen_lt continuous_const
+    (continuous_const.mul plane.continuous_signedNormalCoordinate)
+
+/-- Either strict side of an oriented affine hyperplane is measurable. -/
+lemma measurableSet_openHalfSpace (plane : OrientedAffineHyperplane d) (side : Side) :
+    MeasurableSet (plane.openHalfSpace side) :=
+  (plane.isOpen_openHalfSpace side).measurableSet
 
 @[simp]
 lemma mem_carrier (plane : OrientedAffineHyperplane d) (x : Space d) :
