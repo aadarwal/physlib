@@ -422,6 +422,7 @@ lemma incidentAssembly_transport
                   (Incident.mk channel)).symm
 
 /-- External readout commutes with simultaneous transport of ambient and boundary labels. -/
+omit [Fintype family.Channel] [Fintype (family.transport equiv).Channel] in
 lemma externalOutgoingReadout_transport
     (outgoing : ModeAmplitude (Outgoing P.Channel)) :
     (family.transport equiv).externalOutgoingReadout.toLinearMap
@@ -437,8 +438,7 @@ lemma externalOutgoingReadout_transport
   rcases transportedEndpoint with ⟨transportedExternal⟩
   obtain ⟨sourceExternal, rfl⟩ :=
     (family.transportExternalChannelEquiv equiv).surjective transportedExternal
-  simp only [ModeAmplitude.restrictEmbedding_apply, ModeAmplitude.reindex_apply,
-    Equiv.symm_apply_apply]
+  simp only [ModeAmplitude.restrictEmbedding_apply, ModeAmplitude.reindex_apply]
   rfl
 
 /-- Closure membership is invariant after transporting the ambient behavior and both external
