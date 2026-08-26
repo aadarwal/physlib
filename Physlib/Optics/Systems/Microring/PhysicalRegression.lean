@@ -14,12 +14,14 @@ public import Physlib.Optics.Systems.Microring.PhysicalSourceBridge
 
 ## i. Overview
 
-These fixtures pin the conversion from physical path data to the S2 field parameters, the
-distinction between amplitude and power quantities, and the independent travelling-field
-relations. The canonical `3-4-5` couplers are combined with exact logarithmic attenuation data so
-that the derived field factors are `1 / 2` and `1 / 4`. Separate rational optical-depth fixtures
-use `alpha * L = 0` and normalized optical paths `n_eff * L / lambda = 0, 1 / 2`, giving real phase
-lifts `0` and `pi` exactly.
+These fixtures pin the conversion from physical path data to the S2 field parameters and the
+independent travelling-field relations. Positive anchors square the canonical `3-4-5` amplitudes
+and the half field attenuation. Negative controls reject squared powers in the amplitude role,
+raw amplitudes in the power role, and a swapped field/power attenuation pair through the typed
+conversion API. Exact logarithmic attenuation data gives field factors `1 / 2` and `1 / 4`.
+Separate rational optical-depth fixtures use `alpha * L = 0` and normalized optical paths
+`n_eff * L / lambda = 0, 1 / 4, 1 / 2`, giving phase lifts `0`, `pi / 2`, and `pi`. The quarter-turn
+fixture directly pins the negative-exponential carrier factor to `-I`.
 
 The relation anchors substitute internal fields by hand. The response anchors reuse the S2
 regressions that eliminate the concrete netlist channel equations directly; they do not rewrite
@@ -40,6 +42,10 @@ flux-orthogonal, unit-normalized bridge at
 
 - `physicalRegression_halfAttenuation`: exact field factor `1 / 2`.
 - `physicalRegression_quarterAttenuation`: exact field factor `1 / 4`.
+- `physicalRegression_powerFractions_not_amplitudeCoupling`: amplitude-role negative control.
+- `physicalRegression_amplitudes_not_powerCoupling`: power-role negative control.
+- `physicalRegression_attenuation_roleSwap_rejected`: attenuation-role negative control.
+- `physicalRegression_quarterTurn_carrierPhaseFactor`: the carrier sign at phase `pi / 2`.
 - `physicalRegression_allPass_toParameters`: the named S2 one-bus parameter point.
 - `physicalRegression_addDrop_toParameters`: the named S2 two-bus parameter point.
 - `physicalRegression_allPass_fieldRelation`: direct one-bus internal-field solution.
@@ -91,6 +97,20 @@ lemma physicalRegression_coupling_powers :
       physicalRegressionCoupling.crossAmplitude ^ 2 = 16 / 25 := by
   norm_num [physicalRegressionCoupling]
 
+/-- Squared power fractions do not satisfy the amplitude normalization. -/
+lemma physicalRegression_powerFractions_not_amplitudeCoupling :
+    ¬ IsAmplitudeCoupling
+      ({ throughAmplitude := 9 / 25
+         crossAmplitude := 16 / 25 } : CouplingParameters) := by
+  norm_num [IsAmplitudeCoupling]
+
+/-- Raw `3-4-5` amplitudes do not satisfy the power-fraction normalization. -/
+lemma physicalRegression_amplitudes_not_powerCoupling :
+    ¬ IsPowerCoupling
+      ({ throughPower := 3 / 5
+         crossPower := 4 / 5 } : PowerCouplingParameters) := by
+  norm_num [IsPowerCoupling]
+
 /-- Unit path length with power coefficient `2 * log 2` and zero phase lift. -/
 def physicalRegressionHalfAttenuation : PhysicalParameters where
   pathLength := 1
@@ -100,7 +120,7 @@ def physicalRegressionHalfAttenuation : PhysicalParameters where
 
 /-- Direct exponential evaluation gives the field factor `1 / 2`. -/
 lemma physicalRegression_halfAttenuation :
-    physicalRegressionHalfAttenuation.fieldAttenuation = 1 / 2 := by
+    physicalRegressionHalfAttenuation.fieldAttenuation.value = 1 / 2 := by
   rw [PhysicalParameters.fieldAttenuation]
   change Real.exp (-(2 * Real.log 2) * 1 / 2) = 1 / 2
   rw [show -(2 * Real.log 2) * 1 / 2 = -Real.log 2 by ring,
@@ -109,7 +129,7 @@ lemma physicalRegression_halfAttenuation :
 
 /-- Direct exponential evaluation gives the corresponding power factor `1 / 4`. -/
 lemma physicalRegression_halfPowerAttenuation :
-    physicalRegressionHalfAttenuation.powerAttenuation = 1 / 4 := by
+    physicalRegressionHalfAttenuation.powerAttenuation.value = 1 / 4 := by
   rw [PhysicalParameters.powerAttenuation]
   change Real.exp (-(2 * Real.log 2) * 1) = 1 / 4
   rw [show -(2 * Real.log 2) * 1 = -(Real.log 2 + Real.log 2) by ring,
@@ -118,10 +138,18 @@ lemma physicalRegression_halfPowerAttenuation :
 
 /-- At this point the explicit field square equals the power attenuation. -/
 lemma physicalRegression_halfAttenuation_sq :
-    physicalRegressionHalfAttenuation.fieldAttenuation ^ 2 =
-      physicalRegressionHalfAttenuation.powerAttenuation := by
+    physicalRegressionHalfAttenuation.fieldAttenuation.value ^ 2 =
+      physicalRegressionHalfAttenuation.powerAttenuation.value := by
   rw [physicalRegression_halfAttenuation, physicalRegression_halfPowerAttenuation]
   norm_num
+
+/-- A power value used as a field value fails the field-to-power consistency equation. -/
+lemma physicalRegression_attenuation_roleSwap_rejected :
+    fieldToPowerAttenuation ({ value := 1 / 4 } : FieldAttenuation) ≠
+      ({ value := 1 / 2 } : PowerAttenuation) := by
+  intro hSwap
+  have hValue := congrArg PowerAttenuation.value hSwap
+  norm_num [fieldToPowerAttenuation] at hValue
 
 /-- Unit path length with power coefficient `4 * log 2` and zero phase lift. -/
 def physicalRegressionQuarterAttenuation : PhysicalParameters where
@@ -132,7 +160,7 @@ def physicalRegressionQuarterAttenuation : PhysicalParameters where
 
 /-- Direct exponential evaluation gives the field factor `1 / 4`. -/
 lemma physicalRegression_quarterAttenuation :
-    physicalRegressionQuarterAttenuation.fieldAttenuation = 1 / 4 := by
+    physicalRegressionQuarterAttenuation.fieldAttenuation.value = 1 / 4 := by
   rw [PhysicalParameters.fieldAttenuation]
   change Real.exp (-(4 * Real.log 2) * 1 / 2) = 1 / 4
   rw [show -(4 * Real.log 2) * 1 / 2 = -(Real.log 2 + Real.log 2) by ring,
@@ -194,6 +222,42 @@ lemma physicalRegression_halfTurn_lift :
     PhysicalParameters.propagationConstant, physicalRegressionRationalHalfTurn]
   ring
 
+/-- A rational zero-optical-depth point with normalized optical path `1 / 4`. -/
+def physicalRegressionRationalQuarterTurn : PhysicalParameters where
+  pathLength := 1
+  powerAttenuationCoefficient := 0
+  effectiveIndex := 1 / 4
+  wavelength := 1
+
+/-- The quarter-turn fixture has rational optical depth `alpha * L = 0`. -/
+lemma physicalRegression_quarterTurn_opticalDepth :
+    physicalRegressionRationalQuarterTurn.powerAttenuationCoefficient *
+      physicalRegressionRationalQuarterTurn.pathLength = 0 := by
+  norm_num [physicalRegressionRationalQuarterTurn]
+
+/-- Its normalized optical path is exactly `1 / 4`. -/
+lemma physicalRegression_quarterTurn_normalizedOpticalPath :
+    physicalRegressionRationalQuarterTurn.effectiveIndex *
+        physicalRegressionRationalQuarterTurn.pathLength /
+      physicalRegressionRationalQuarterTurn.wavelength = 1 / 4 := by
+  norm_num [physicalRegressionRationalQuarterTurn]
+
+/-- Direct evaluation gives the real round-trip phase lift `pi / 2`. -/
+lemma physicalRegression_quarterTurn_lift :
+    physicalRegressionRationalQuarterTurn.roundTripPhaseLift = Real.pi / 2 := by
+  norm_num [PhysicalParameters.roundTripPhaseLift,
+    PhysicalParameters.propagationConstant, physicalRegressionRationalQuarterTurn]
+  ring
+
+/-- At phase `pi / 2`, the negative-exponential carrier convention gives `-I`. -/
+lemma physicalRegression_quarterTurn_carrierPhaseFactor :
+    MatchedPropagation.carrierPhaseFactor
+      physicalRegressionRationalQuarterTurn.roundTripPhase = -Complex.I := by
+  simp [PhysicalParameters.roundTripPhase, PhysicalParameters.roundTripPhaseLift,
+    PhysicalParameters.propagationConstant, physicalRegressionRationalQuarterTurn,
+    MatchedPropagation.carrierPhaseFactor, Real.Angle.toCircle_coe, Circle.coe_exp]
+  apply Complex.ext <;> norm_num
+
 /-! ## C. Maps to the named S2 parameters -/
 
 /-- The physical point whose derived parameters are the named S2 all-pass resonance point. -/
@@ -207,7 +271,7 @@ lemma physicalRegression_allPass_toParameters :
   change
     ({ throughAmplitude := 3 / 5
        crossAmplitude := 4 / 5
-       fieldAttenuation := physicalRegressionHalfAttenuation.fieldAttenuation
+       fieldAttenuation := physicalRegressionHalfAttenuation.fieldAttenuation.value
        roundTripPhase := physicalRegressionHalfAttenuation.roundTripPhase } :
       AllPass.Parameters) = AllPass.allPassRegressionResonanceParameters
   rw [physicalRegression_halfAttenuation]
@@ -229,7 +293,7 @@ lemma physicalRegression_addDrop_toParameters :
        inputCrossAmplitude := 4 / 5
        dropThroughAmplitude := 3 / 5
        dropCrossAmplitude := 4 / 5
-       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation
+       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation.value
        roundTripPhase := physicalRegressionQuarterAttenuation.roundTripPhaseLift } :
       AddDrop.Parameters) = AddDrop.addDropRegressionResonanceParameters
   rw [physicalRegression_quarterAttenuation]
@@ -253,7 +317,7 @@ lemma physicalRegression_addDropHalfTurn_toParameters :
        inputCrossAmplitude := 4 / 5
        dropThroughAmplitude := 3 / 5
        dropCrossAmplitude := 4 / 5
-       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation
+       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation.value
        roundTripPhase :=
          ({ physicalRegressionQuarterAttenuation with effectiveIndex := 1 / 2 } :
            PhysicalParameters).roundTripPhaseLift } : AddDrop.Parameters) =
@@ -467,7 +531,7 @@ lemma physicalRegression_toSysConParameters :
       physicalRegressionSysConParameters := by
   change
     ({ phase := physicalRegressionQuarterAttenuation.roundTripPhaseLift
-       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation
+       fieldAttenuation := physicalRegressionQuarterAttenuation.fieldAttenuation.value
        inputCrossAmplitude := 4 / 5
        dropCrossAmplitude := 4 / 5
        inputThroughAmplitude := 3 / 5

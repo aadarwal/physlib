@@ -120,7 +120,7 @@ def DateParameters.toPhysicalAddDrop (p : DateParameters) : AddDropPhysicalParam
 /-- The physical DATE map retains the attenuation definition at
 `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:82-89`. -/
 lemma DateParameters.toPhysicalPropagation_fieldAttenuation (p : DateParameters) :
-    p.toPhysicalPropagation.fieldAttenuation = p.fieldAttenuation := rfl
+    p.toPhysicalPropagation.fieldAttenuation.value = p.fieldAttenuation := rfl
 
 /-- The physical phase lift is DATE's formula at
 `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:79-80`. -/
@@ -371,7 +371,7 @@ classification of `x_r`.
 def addDropPhysicalToSysConParameters (p : AddDropPhysicalParameters) :
     SysConParameters where
   phase := p.propagation.roundTripPhaseLift
-  fieldAttenuation := p.propagation.fieldAttenuation
+  fieldAttenuation := p.propagation.fieldAttenuation.value
   inputCrossAmplitude := p.inputCoupling.crossAmplitude
   dropCrossAmplitude := p.dropCoupling.crossAmplitude
   inputThroughAmplitude := p.inputCoupling.throughAmplitude
