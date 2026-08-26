@@ -425,6 +425,131 @@ lemma reuseRegression_cross_amplitudes_nonzero :
 
 -/
 
+/-- The first west channel is structurally external in the right parenthesization. -/
+lemma reuseRegression_right_firstWest_external :
+    (⟨(.first, false), ()⟩ : ReuseRegressionChannel) ∉
+      Set.range reuseRegressionRightFamily.channelEmbedding := by
+  rintro ⟨⟨connectionIndex, localChannel⟩, hChannel⟩
+  rcases connectionIndex with firstIndex | laterIndex
+  · cases firstIndex
+    rcases localChannel with mode | mode <;> cases mode
+    · exact Bool.noConfusion (congrArg (fun channel => channel.1.2) hChannel)
+    · exact ReuseRegressionComponent.noConfusion
+        (congrArg (fun channel => channel.1.1) hChannel)
+  · rcases laterIndex with secondIndex | thirdIndex
+    · cases secondIndex
+      rcases localChannel with mode | mode <;> cases mode <;>
+        exact ReuseRegressionComponent.noConfusion
+          (congrArg (fun channel => channel.1.1) hChannel)
+    · cases thirdIndex
+      rcases localChannel with mode | mode <;> cases mode <;>
+        exact ReuseRegressionComponent.noConfusion
+          (congrArg (fun channel => channel.1.1) hChannel)
+
+/-- The fourth east channel is structurally external in the right parenthesization. -/
+lemma reuseRegression_right_fourthEast_external :
+    (⟨(.fourth, true), ()⟩ : ReuseRegressionChannel) ∉
+      Set.range reuseRegressionRightFamily.channelEmbedding := by
+  rintro ⟨⟨connectionIndex, localChannel⟩, hChannel⟩
+  rcases connectionIndex with firstIndex | laterIndex
+  · cases firstIndex
+    rcases localChannel with mode | mode <;> cases mode <;>
+      exact ReuseRegressionComponent.noConfusion
+        (congrArg (fun channel => channel.1.1) hChannel)
+  · rcases laterIndex with secondIndex | thirdIndex
+    · cases secondIndex
+      rcases localChannel with mode | mode <;> cases mode <;>
+        exact ReuseRegressionComponent.noConfusion
+          (congrArg (fun channel => channel.1.1) hChannel)
+    · cases thirdIndex
+      rcases localChannel with mode | mode <;> cases mode
+      · exact ReuseRegressionComponent.noConfusion
+          (congrArg (fun channel => channel.1.1) hChannel)
+      · exact Bool.noConfusion (congrArg (fun channel => channel.1.2) hChannel)
+
+/-- The right-associated incident assembly satisfies all six connected mate equations and both
+external injection equations. -/
+lemma reuseRegression_right_incidentAssembly :
+    reuseRegressionIncident =
+      reuseRegressionRightFamily.incidentAssembly reuseRegressionOutgoing
+        (reuseRegressionExternalInput reuseRegressionRightFamily) := by
+  classical
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  cases component <;> cases port <;> cases mode
+  · let external : reuseRegressionRightFamily.ExternalChannel :=
+      ⟨⟨(.first, false), ()⟩, reuseRegression_right_firstWest_external⟩
+    change reuseRegressionIncident (Incident.mk external.1) = _
+    rw [reuseRegressionRightFamily.incidentAssembly_apply_external]
+    rfl
+  · rw [show (⟨(.first, true), ()⟩ : ReuseRegressionChannel) =
+        reuseRegressionRightFamily.channelEmbedding
+          ⟨Sum.inl (), Sum.inl ()⟩ from rfl,
+      reuseRegressionRightFamily.incidentAssembly_apply_connected_channel]
+    rfl
+  · rw [show (⟨(.second, false), ()⟩ : ReuseRegressionChannel) =
+        reuseRegressionRightFamily.channelEmbedding
+          ⟨Sum.inl (), Sum.inr ()⟩ from rfl,
+      reuseRegressionRightFamily.incidentAssembly_apply_connected_channel]
+    rfl
+  · rw [show (⟨(.second, true), ()⟩ : ReuseRegressionChannel) =
+        reuseRegressionRightFamily.channelEmbedding
+          ⟨Sum.inr (Sum.inl ()), Sum.inl ()⟩ from rfl,
+      reuseRegressionRightFamily.incidentAssembly_apply_connected_channel]
+    rfl
+  · rw [show (⟨(.third, false), ()⟩ : ReuseRegressionChannel) =
+        reuseRegressionRightFamily.channelEmbedding
+          ⟨Sum.inr (Sum.inl ()), Sum.inr ()⟩ from rfl,
+      reuseRegressionRightFamily.incidentAssembly_apply_connected_channel]
+    rfl
+  · rw [show (⟨(.third, true), ()⟩ : ReuseRegressionChannel) =
+        reuseRegressionRightFamily.channelEmbedding
+          ⟨Sum.inr (Sum.inr ()), Sum.inl ()⟩ from rfl,
+      reuseRegressionRightFamily.incidentAssembly_apply_connected_channel]
+    rfl
+  · rw [show (⟨(.fourth, false), ()⟩ : ReuseRegressionChannel) =
+        reuseRegressionRightFamily.channelEmbedding
+          ⟨Sum.inr (Sum.inr ()), Sum.inr ()⟩ from rfl,
+      reuseRegressionRightFamily.incidentAssembly_apply_connected_channel]
+    rfl
+  · let external : reuseRegressionRightFamily.ExternalChannel :=
+      ⟨⟨(.fourth, true), ()⟩, reuseRegression_right_fourthEast_external⟩
+    change reuseRegressionIncident (Incident.mk external.1) = _
+    rw [reuseRegressionRightFamily.incidentAssembly_apply_external]
+    rfl
+
+/-- Right-associated external readout is the direct restriction of the hand-expanded outgoing
+state. -/
+lemma reuseRegression_right_outputReadout :
+    reuseRegressionExternalOutput reuseRegressionRightFamily =
+      reuseRegressionRightFamily.externalOutgoingReadout.toLinearMap
+        reuseRegressionOutgoing := by
+  classical
+  rw [PortConnectionFamily.externalOutgoingReadout_apply]
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rw [ModeAmplitude.restrictEmbedding_apply]
+  rfl
+
+/-- The right-associated family admits the hand-expanded raw solution. -/
+lemma reuseRegression_mem_right :
+    (reuseRegressionExternalInput reuseRegressionRightFamily,
+        reuseRegressionExternalOutput reuseRegressionRightFamily) ∈
+      reuseRegressionRightFamily.closeBehavior reuseRegressionComponentBehavior := by
+  classical
+  rw [PortConnectionFamily.mem_closeBehavior_iff]
+  exact ⟨reuseRegressionIncident, reuseRegressionOutgoing,
+    reuseRegression_mem_componentBehavior,
+    reuseRegression_right_incidentAssembly,
+    reuseRegression_right_outputReadout⟩
+
+/-!
+
+## F. Raw equations for the left parenthesization
+
+-/
+
 end
 
 
