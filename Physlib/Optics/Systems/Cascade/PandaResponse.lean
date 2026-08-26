@@ -38,6 +38,8 @@ certified in `PandaBridge`; they do not identify that directed matrix with an un
 - `Panda.closedState_forwardEquations`: an explicit solution of all eighteen graph equations.
 - `Panda.nsv16_throughTransfer`: comparison with printed NSV'16 Theorem 5.
 - `Panda.nsv16_dropTransfer`: comparison with printed NSV'16 Theorem 6.
+- `Panda.auditedThroughMasonResponse_eq_source`: edge-level Mason form of Theorem 5.
+- `Panda.auditedDropMasonResponse_eq_source`: edge-level Mason form of Theorem 6.
 
 ## iii. Table of contents
 
@@ -51,10 +53,13 @@ certified in `PandaBridge`; they do not identify that directed matrix with an un
 S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
 Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-44.
 
-The final paragraph on p. 44 says the authors found missing parts in reference [10] and a sign
+The audit recorded in `HOL-CORPUS.md` section 6.2 and parity rows IP-13/IP-14 is carried literally:
+the final paragraph on p. 44 says the authors found missing parts in reference [10] and a sign
 mismatch in reference [1]. It does not identify an error in their own Theorem 5 or 6; Physlib
-therefore reproduces those two printed expressions without a forced correction. The only bridge
-qualification is the explicit directed/projection and principal-root dictionary above.
+therefore reproduces those two printed expressions without a forced correction. IP-13/IP-14's
+four complex square-sum hypotheses are exactly `HasSourceCouplerNormalization`; no real-valued or
+passivity premise is silently substituted. The only bridge qualification is the explicit
+directed/projection and principal-root dictionary above.
 
 The totalized quotients below have response meaning only under `HasNonzeroSourceDenominator`.
 No passivity, losslessness, reciprocity, causality, convergence, stability, resonance, bandwidth,
@@ -204,6 +209,16 @@ def sourceThroughTransfer (s : SourceParameters) : ℂ :=
 def sourceDropTransfer (s : SourceParameters) : ℂ :=
   sourceDropNumerator s / sourceDenominator s
 
+/-- The edge-indexed Mason quotient of the oriented through-port projection. -/
+noncomputable def auditedThroughMasonResponse (p : Parameters) : ℂ :=
+  Physlib.SignalFlowGraph.edgeMasonNumerator (signalMultigraph p) 0 2 /
+    Physlib.SignalFlowGraph.edgeGraphDet (signalMultigraph p)
+
+/-- The edge-indexed Mason quotient of the oriented drop-port projection. -/
+noncomputable def auditedDropMasonResponse (p : Parameters) : ℂ :=
+  Physlib.SignalFlowGraph.edgeMasonNumerator (signalMultigraph p) 0 7 /
+    Physlib.SignalFlowGraph.edgeGraphDet (signalMultigraph p)
+
 /-- The expanded source denominator is its sparse three-ring factorization. -/
 lemma sourceDenominator_eq_factorized (s : SourceParameters) :
     sourceDenominator s =
@@ -301,7 +316,7 @@ lemma closedState_forwardEquations (p : Parameters) (s : SourceParameters) (inpu
   all_goals
     simp only [DirectionalCoupler.crossCoefficient, sourceCrossCoefficient] at *
   all_goals
-    rw [← hc1, ← hs1, ← hc2, ← hs2, ← hcr, ← hsr, ← hcl, ← hsl]
+    simp only [← hc1, ← hs1, ← hc2, ← hs2, ← hcr, ← hsr, ← hcl, ← hsl]
   all_goals
     try rw [← hRoot.mainFirstHalf]
   all_goals
@@ -318,48 +333,110 @@ lemma closedState_forwardEquations (p : Parameters) (s : SourceParameters) (inpu
   all_goals
     field_simp [hDenominator]
   all_goals
-    rw [sourceDenominator_eq_factorized, sourceThroughNumerator_eq_factorized]
+    simp only [sourceDenominator_eq_factorized, sourceThroughNumerator_eq_factorized]
   all_goals
     ring_nf at hx1 hx2 hxr hxl ⊢
   all_goals
     simp only [Complex.I_mul_I] at hx1 hx2 hxr hxl ⊢
   all_goals
-    linear_combination hx1
-      + hx2
-      + hxr
-      + hxl
+    polyrith only [hx1, hx2, hxr, hxl]
 
 /-! ## D. NSV'16 comparisons -/
 
-/-- NSV'16 Theorem 5: the node-three response is the printed through-port quotient. -/
+/-- Unit source injection is the singleton vector at printed node one. -/
+lemma signalInput_one_eq_single : signalInput 1 = Pi.single (0 : Node) 1 := by
+  funext node
+  fin_cases node <;> simp [signalInput, Pi.single]
+
+/-- NSV'16 Theorem 5: the solved node-three response is the printed through-port quotient.
+
+Besides the source's four normalization hypotheses, the statement exposes the cross-model
+dictionary, principal-root selection, nonzero printed denominator, and invertible oriented graph
+as response-semantics gates.
+-/
 theorem nsv16_throughTransfer (p : Parameters) (s : SourceParameters)
     (hDictionary : HasSourceCouplerDictionary p s)
     (hRoot : HasPrincipalRootSelection p s)
     (hNormalization : HasSourceCouplerNormalization s)
-    (hDenominator : HasNonzeroSourceDenominator s) :
-    Physlib.SignalFlowGraph.IsNodeSolution (signalFlowGraph p) (signalInput 1)
-        (closedState p s 1) ∧
-      closedState p s 1 2 = sourceThroughTransfer s := by
-  constructor
-  · exact (isNodeSolution_iff_forwardEquations p 1 (closedState p s 1)).mpr
+    (hDenominator : HasNonzeroSourceDenominator s)
+    (hGraph : Physlib.SignalFlowGraph.graphDet (coefficientMatrix p) ≠ 0) :
+    (throughTerminatedMultigraph p).transfer = sourceThroughTransfer s := by
+  have hState : Physlib.SignalFlowGraph.IsNodeSolution (coefficientMatrix p)
+      (Pi.single (0 : Node) 1) (closedState p s 1) := by
+    have hForward := (isNodeSolution_iff_forwardEquations p 1 (closedState p s 1)).mpr
       (closedState_forwardEquations p s 1 hDictionary hRoot hNormalization hDenominator)
-  · simp [closedState, sourceThroughTransfer]
+    simpa only [signalFlowGraph_eq_coefficientMatrix, signalInput_one_eq_single] using hForward
+  have hUnit : IsUnit
+      (Physlib.SignalFlowGraph.systemMatrix (coefficientMatrix p)).det := by
+    rw [← Physlib.SignalFlowGraph.graphDet_eq_det]
+    exact isUnit_iff_ne_zero.mpr hGraph
+  calc
+    (throughTerminatedMultigraph p).transfer = closedState p s 1 2 := by
+      exact Physlib.SignalFlowGraph.TerminatedMultigraph.transfer_eq_of_isNodeSolution
+        (throughTerminatedMultigraph p) hUnit hState
+    _ = sourceThroughTransfer s := by simp [closedState, sourceThroughTransfer]
 
-/-- NSV'16 Theorem 6: the node-eight response is the printed drop-port quotient. -/
+/-- NSV'16 Theorem 6: the solved node-eight response is the printed drop-port quotient.
+
+The additional hypotheses have exactly the same dictionary and response-semantics roles as in
+`nsv16_throughTransfer`.
+-/
 theorem nsv16_dropTransfer (p : Parameters) (s : SourceParameters)
     (hDictionary : HasSourceCouplerDictionary p s)
     (hRoot : HasPrincipalRootSelection p s)
     (hNormalization : HasSourceCouplerNormalization s)
-    (hDenominator : HasNonzeroSourceDenominator s) :
-    Physlib.SignalFlowGraph.IsNodeSolution (signalFlowGraph p) (signalInput 1)
-        (closedState p s 1) ∧
-      closedState p s 1 7 = sourceDropTransfer s := by
-  constructor
-  · exact (isNodeSolution_iff_forwardEquations p 1 (closedState p s 1)).mpr
+    (hDenominator : HasNonzeroSourceDenominator s)
+    (hGraph : Physlib.SignalFlowGraph.graphDet (coefficientMatrix p) ≠ 0) :
+    (dropTerminatedMultigraph p).transfer = sourceDropTransfer s := by
+  have hState : Physlib.SignalFlowGraph.IsNodeSolution (coefficientMatrix p)
+      (Pi.single (0 : Node) 1) (closedState p s 1) := by
+    have hForward := (isNodeSolution_iff_forwardEquations p 1 (closedState p s 1)).mpr
       (closedState_forwardEquations p s 1 hDictionary hRoot hNormalization hDenominator)
-  · rw [sourceDropTransfer, sourceDropNumerator_eq_factorized]
-    simp [closedState, sourceCrossCoefficient]
-    ring
+    simpa only [signalFlowGraph_eq_coefficientMatrix, signalInput_one_eq_single] using hForward
+  have hUnit : IsUnit
+      (Physlib.SignalFlowGraph.systemMatrix (coefficientMatrix p)).det := by
+    rw [← Physlib.SignalFlowGraph.graphDet_eq_det]
+    exact isUnit_iff_ne_zero.mpr hGraph
+  calc
+    (dropTerminatedMultigraph p).transfer = closedState p s 1 7 := by
+      exact Physlib.SignalFlowGraph.TerminatedMultigraph.transfer_eq_of_isNodeSolution
+        (dropTerminatedMultigraph p) hUnit hState
+    _ = sourceDropTransfer s := by
+      rw [sourceDropTransfer, sourceDropNumerator_eq_factorized]
+      simp [closedState, sourceCrossCoefficient]
+      ring
+
+/-- The edge-level Mason quotient of the directed projection is the printed through expression on
+the exact response domain. -/
+theorem auditedThroughMasonResponse_eq_source (p : Parameters) (s : SourceParameters)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s)
+    (hGraph : Physlib.SignalFlowGraph.graphDet (coefficientMatrix p) ≠ 0) :
+    auditedThroughMasonResponse p = sourceThroughTransfer s := by
+  calc
+    auditedThroughMasonResponse p = (throughTerminatedMultigraph p).transfer := by
+      exact (Physlib.SignalFlowGraph.TerminatedMultigraph.transfer_eq_edgeMason
+        (throughTerminatedMultigraph p) hGraph).symm
+    _ = sourceThroughTransfer s :=
+      nsv16_throughTransfer p s hDictionary hRoot hNormalization hDenominator hGraph
+
+/-- The edge-level Mason quotient of the directed projection is the printed drop expression on the
+exact response domain. -/
+theorem auditedDropMasonResponse_eq_source (p : Parameters) (s : SourceParameters)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s)
+    (hGraph : Physlib.SignalFlowGraph.graphDet (coefficientMatrix p) ≠ 0) :
+    auditedDropMasonResponse p = sourceDropTransfer s := by
+  calc
+    auditedDropMasonResponse p = (dropTerminatedMultigraph p).transfer := by
+      exact (Physlib.SignalFlowGraph.TerminatedMultigraph.transfer_eq_edgeMason
+        (dropTerminatedMultigraph p) hGraph).symm
+    _ = sourceDropTransfer s :=
+      nsv16_dropTransfer p s hDictionary hRoot hNormalization hDenominator hGraph
 
 end Panda
 

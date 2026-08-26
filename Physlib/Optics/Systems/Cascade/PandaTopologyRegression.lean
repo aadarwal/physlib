@@ -65,29 +65,12 @@ open Physlib.SignalFlowGraph
 
 /-- Adjacency in the retained 24-edge topology, independent of all gains. -/
 def TopologyAdjacent (first second : Node) : Prop :=
-  ((signalMultigraph arbitraryParameters).edgesBetween first second).Nonempty
-where
-  /-- A dummy parameter value; `edgesBetween` uses only `edgeSource` and `edgeTarget`. -/
-  arbitraryParameters : Parameters :=
-    { inputCoupler := ⟨0, 0⟩
-      outputCoupler := ⟨0, 0⟩
-      rightCoupler := ⟨0, 0⟩
-      leftCoupler := ⟨0, 0⟩
-      mainQuarterOne := ⟨0, 0⟩
-      mainQuarterTwo := ⟨0, 0⟩
-      mainQuarterThree := ⟨0, 0⟩
-      mainQuarterFour := ⟨0, 0⟩
-      rightHalfOne := ⟨0, 0⟩
-      rightHalfTwo := ⟨0, 0⟩
-      leftHalfOne := ⟨0, 0⟩
-      leftHalfTwo := ⟨0, 0⟩ }
+  ∃ edge : Edge, edgeSource edge = first ∧ edgeTarget edge = second
 
 /-- Retained adjacency is equivalently the existence of an indexed source/target branch. -/
 lemma topologyAdjacent_iff (first second : Node) :
     TopologyAdjacent first second ↔
-      ∃ edge : Edge, edgeSource edge = first ∧ edgeTarget edge = second := by
-  simp [TopologyAdjacent, signalMultigraph,
-    Physlib.SignalFlowGraph.Multigraph.edgesBetween]
+      ∃ edge : Edge, edgeSource edge = first ∧ edgeTarget edge = second := Iff.rfl
 
 /-! ## B. Through and drop paths -/
 
@@ -137,11 +120,8 @@ lemma topologyThroughPaths_sound (path : List Node) (hPath : path ∈ topologyTh
     path.Nodup ∧ path.head? = some 0 ∧ path.getLast? = some 2 ∧
       path.IsChain TopologyAdjacent := by
   simp only [topologyThroughPaths, Finset.mem_insert, Finset.mem_singleton] at hPath
-  rcases hPath with rfl | rfl | rfl | rfl | rfl <;>
-    simp [topologyThroughDirect, topologyThroughMainDirect,
-      topologyThroughRightCirculation, topologyThroughLeftCirculation,
-      topologyThroughBothCirculations, TopologyAdjacent, signalMultigraph,
-      Physlib.SignalFlowGraph.Multigraph.edgesBetween, edgeSource, edgeTarget]
+  rcases hPath with rfl | rfl | rfl | rfl | rfl
+  all_goals native_decide
 
 /-- Every listed drop path is repetition-free, has the declared terminals, and follows retained
 adjacency. -/
@@ -149,10 +129,8 @@ lemma topologyDropPaths_sound (path : List Node) (hPath : path ∈ topologyDropP
     path.Nodup ∧ path.head? = some 0 ∧ path.getLast? = some 7 ∧
       path.IsChain TopologyAdjacent := by
   simp only [topologyDropPaths, Finset.mem_insert, Finset.mem_singleton] at hPath
-  rcases hPath with rfl | rfl <;>
-    simp [topologyDropDirect, topologyDropRightCirculation, TopologyAdjacent,
-      signalMultigraph, Physlib.SignalFlowGraph.Multigraph.edgesBetween,
-      edgeSource, edgeTarget]
+  rcases hPath with rfl | rfl
+  all_goals native_decide
 
 /-! ## C. Canonically based simple loops -/
 
@@ -188,11 +166,8 @@ lemma topologyCanonicalLoops_sound (loop : List Node) (hLoop : loop ∈ topology
     loop ≠ [] ∧ loop.head? = loop.getLast? ∧ loop.dropLast.Nodup ∧
       loop.IsChain TopologyAdjacent := by
   simp only [topologyCanonicalLoops, Finset.mem_insert, Finset.mem_singleton] at hLoop
-  rcases hLoop with rfl | rfl | rfl | rfl | rfl | rfl <;>
-    simp [topologyRightLoop, topologyLeftLoop, topologyMainDirectLoop,
-      topologyMainRightLoop, topologyMainLeftLoop, topologyMainBothLoop,
-      TopologyAdjacent, signalMultigraph,
-      Physlib.SignalFlowGraph.Multigraph.edgesBetween, edgeSource, edgeTarget]
+  rcases hLoop with rfl | rfl | rfl | rfl | rfl | rfl
+  all_goals native_decide
 
 /-! ## D. Edge-refinement teeth -/
 
@@ -244,6 +219,124 @@ lemma topology_leftLoop_gain (p : Parameters) :
       (p.leftCoupler.throughAmplitude : ℂ) * p.leftRoundTripCoefficient := by
   simp [edgeListGain, signalMultigraph, edgeGain, Parameters.leftRoundTripCoefficient]
   ring
+
+/-- The five through-path edge products retain every coupler and propagation choice. -/
+lemma topology_throughPath_gains (p : Parameters) :
+    edgeListGain (signalMultigraph p) [0] =
+        (p.inputCoupler.throughAmplitude : ℂ) ∧
+      edgeListGain (signalMultigraph p) [1, 4, 5, 11, 12, 16, 17, 23, 3] =
+        DirectionalCoupler.crossCoefficient p.inputCoupler *
+          p.mainQuarterOneCoefficient * p.rightCoupler.throughAmplitude *
+          p.mainQuarterTwoCoefficient * p.outputCoupler.throughAmplitude *
+          p.mainQuarterThreeCoefficient * p.leftCoupler.throughAmplitude *
+          p.mainQuarterFourCoefficient *
+          DirectionalCoupler.crossCoefficient p.inputCoupler ∧
+      edgeListGain (signalMultigraph p)
+          [1, 4, 6, 7, 8, 9, 11, 12, 16, 17, 23, 3] =
+        DirectionalCoupler.crossCoefficient p.inputCoupler *
+          p.mainQuarterOneCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.rightHalfOneCoefficient * p.rightHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.mainQuarterTwoCoefficient * p.outputCoupler.throughAmplitude *
+          p.mainQuarterThreeCoefficient * p.leftCoupler.throughAmplitude *
+          p.mainQuarterFourCoefficient *
+          DirectionalCoupler.crossCoefficient p.inputCoupler ∧
+      edgeListGain (signalMultigraph p)
+          [1, 4, 5, 11, 12, 16, 18, 19, 20, 22, 23, 3] =
+        DirectionalCoupler.crossCoefficient p.inputCoupler *
+          p.mainQuarterOneCoefficient * p.rightCoupler.throughAmplitude *
+          p.mainQuarterTwoCoefficient * p.outputCoupler.throughAmplitude *
+          p.mainQuarterThreeCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.mainQuarterFourCoefficient *
+          DirectionalCoupler.crossCoefficient p.inputCoupler ∧
+      edgeListGain (signalMultigraph p)
+          [1, 4, 6, 7, 8, 9, 11, 12, 16, 18, 19, 20, 22, 23, 3] =
+        DirectionalCoupler.crossCoefficient p.inputCoupler *
+          p.mainQuarterOneCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.rightHalfOneCoefficient * p.rightHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.mainQuarterTwoCoefficient * p.outputCoupler.throughAmplitude *
+          p.mainQuarterThreeCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.mainQuarterFourCoefficient *
+          DirectionalCoupler.crossCoefficient p.inputCoupler := by
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
+    simp [edgeListGain, signalMultigraph, edgeGain] <;> ring
+
+/-- The two drop-path edge products distinguish direct and right-ring-circulating routes. -/
+lemma topology_dropPath_gains (p : Parameters) :
+    edgeListGain (signalMultigraph p) [1, 4, 5, 11, 13] =
+        DirectionalCoupler.crossCoefficient p.inputCoupler *
+          p.mainQuarterOneCoefficient * p.rightCoupler.throughAmplitude *
+          p.mainQuarterTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.outputCoupler ∧
+      edgeListGain (signalMultigraph p) [1, 4, 6, 7, 8, 9, 11, 13] =
+        DirectionalCoupler.crossCoefficient p.inputCoupler *
+          p.mainQuarterOneCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.rightHalfOneCoefficient * p.rightHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.mainQuarterTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.outputCoupler := by
+  constructor <;> simp [edgeListGain, signalMultigraph, edgeGain] <;> ring
+
+/-- The four main-loop edge products independently retain both side-ring route choices. -/
+lemma topology_mainLoop_gains (p : Parameters) :
+    edgeListGain (signalMultigraph p) [2, 4, 5, 11, 12, 16, 17, 23] =
+        (p.inputCoupler.throughAmplitude : ℂ) * p.mainQuarterOneCoefficient *
+          p.rightCoupler.throughAmplitude * p.mainQuarterTwoCoefficient *
+          p.outputCoupler.throughAmplitude * p.mainQuarterThreeCoefficient *
+          p.leftCoupler.throughAmplitude * p.mainQuarterFourCoefficient ∧
+      edgeListGain (signalMultigraph p) [2, 4, 6, 7, 8, 9, 11, 12, 16, 17, 23] =
+        (p.inputCoupler.throughAmplitude : ℂ) * p.mainQuarterOneCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.rightHalfOneCoefficient * p.rightHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.mainQuarterTwoCoefficient * p.outputCoupler.throughAmplitude *
+          p.mainQuarterThreeCoefficient * p.leftCoupler.throughAmplitude *
+          p.mainQuarterFourCoefficient ∧
+      edgeListGain (signalMultigraph p)
+          [2, 4, 5, 11, 12, 16, 18, 19, 20, 22, 23] =
+        (p.inputCoupler.throughAmplitude : ℂ) * p.mainQuarterOneCoefficient *
+          p.rightCoupler.throughAmplitude * p.mainQuarterTwoCoefficient *
+          p.outputCoupler.throughAmplitude * p.mainQuarterThreeCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.mainQuarterFourCoefficient ∧
+      edgeListGain (signalMultigraph p)
+          [2, 4, 6, 7, 8, 9, 11, 12, 16, 18, 19, 20, 22, 23] =
+        (p.inputCoupler.throughAmplitude : ℂ) * p.mainQuarterOneCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.rightHalfOneCoefficient * p.rightHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.rightCoupler *
+          p.mainQuarterTwoCoefficient * p.outputCoupler.throughAmplitude *
+          p.mainQuarterThreeCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient *
+          DirectionalCoupler.crossCoefficient p.leftCoupler *
+          p.mainQuarterFourCoefficient := by
+  refine ⟨?_, ?_, ?_, ?_⟩ <;>
+    simp [edgeListGain, signalMultigraph, edgeGain] <;> ring
+
+/-- The loop intersection audit records both non-touching and touching cases used by Mason
+cofactors. -/
+lemma topology_loop_touch_audit :
+    Disjoint topologyRightLoop.dropLast.toFinset topologyLeftLoop.dropLast.toFinset ∧
+      Disjoint topologyRightLoop.dropLast.toFinset topologyMainDirectLoop.dropLast.toFinset ∧
+      Disjoint topologyLeftLoop.dropLast.toFinset topologyMainDirectLoop.dropLast.toFinset ∧
+      Disjoint topologyRightLoop.dropLast.toFinset topologyMainLeftLoop.dropLast.toFinset ∧
+      Disjoint topologyLeftLoop.dropLast.toFinset topologyMainRightLoop.dropLast.toFinset ∧
+      ¬Disjoint topologyRightLoop.dropLast.toFinset topologyMainRightLoop.dropLast.toFinset ∧
+      ¬Disjoint topologyLeftLoop.dropLast.toFinset topologyMainLeftLoop.dropLast.toFinset := by
+  decide
 
 /-! ## E. Asymmetric mis-wiring sentinel -/
 
