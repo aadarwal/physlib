@@ -923,6 +923,8 @@ public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistribution
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistributionRegression
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneTrace
 public import Physlib.SpaceAndTime.Space.Origin
 public import Physlib.SpaceAndTime.Space.Slice
