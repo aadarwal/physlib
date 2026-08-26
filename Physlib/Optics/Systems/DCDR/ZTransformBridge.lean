@@ -208,32 +208,16 @@ lemma zTransfer_eq_packagedScattering_entry (p : UnitDelayParameters) (z : ℂ)
 
 -/
 
-/-- The selected scalar value occurs in the original singular-safe external relation. -/
-def HasSelectedRelationalResponse (p : Parameters) (value : ℂ) : Prop :=
-  ∃ output : ModeAmplitude (netlist p).ExternalOutgoing,
-    (inputAmplitude p 1, output) ∈ (netlist p).behavior ∧
-      output (Outgoing.mk (outputChannel p)) = value
-
-/-- The selected response-transform entry has a witness in the original relation. -/
-lemma eliminationResponse_hasSelectedRelationalResponse (p : Parameters)
-    (hWellPosed : (netlist p).IsWellPosed) :
-    HasSelectedRelationalResponse p (eliminationResponse p hWellPosed) := by
-  let output := ((netlist p).responseTransform hWellPosed).toLinearMap
-    (inputAmplitude p 1)
-  refine ⟨output, ?_, ?_⟩
-  · rw [← (netlist p).toBehavior_responseTransform hWellPosed,
-      ModeTransform.mem_toBehavior_iff_toLinearMap]
-  · simpa [output] using responseTransform_apply_inputAmplitude p hWellPosed 1
-
-/-- On the solve gate, the recurrence value occurs in the original fixed-carrier relation. -/
-lemma zTransfer_hasSelectedRelationalResponse (p : UnitDelayParameters) (z : ℂ)
-    (hDenominator : (p.at z⁻¹).HasNonzeroDenominator) :
-    HasSelectedRelationalResponse (p.at z⁻¹) (zTransfer p z) := by
-  let hWellPosed := isWellPosed_of_hasNonzeroDenominator (p.at z⁻¹) hDenominator
-  rcases eliminationResponse_hasSelectedRelationalResponse (p.at z⁻¹) hWellPosed with
-    ⟨output, hBehavior, hValue⟩
-  refine ⟨output, hBehavior, hValue.trans ?_⟩
-  exact (zTransfer_eq_eliminationResponse p z hDenominator).symm
+/-- Original relational behavior is exactly full-vector action by the complete Mason response. -/
+lemma mem_behavior_iff_eq_masonResponseTransform (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator)
+    (input : ModeAmplitude (netlist p).ExternalIncident)
+    (output : ModeAmplitude (netlist p).ExternalOutgoing) :
+    (input, output) ∈ (netlist p).behavior ↔
+      output = (netlist p).masonResponseTransform.toLinearMap input := by
+  rw [(netlist p).mem_behavior_iff_eq_responseTransform
+      (isWellPosed_of_hasNonzeroDenominator p hDenominator),
+    (netlist p).responseTransform_eq_masonResponseTransform]
 
 /-!
 
@@ -327,9 +311,12 @@ structure ZCrossSemanticsAgreement (p : UnitDelayParameters)
         (isWellPosed_of_hasNonzeroDenominator
           (p.at z⁻¹) h.hasNonzeroDenominator)).toModeTransform
             (outputChannel (p.at z⁻¹)) (inputChannel (p.at z⁻¹))
-  /-- The common scalar occurs in the original singular-safe relational behavior. -/
+  /-- The complete Mason action belongs to the original two-channel relational behavior. -/
   relationalBehavior :
-    HasSelectedRelationalResponse (p.at z⁻¹) (zTransfer p z)
+    (inputAmplitude (p.at z⁻¹) 1,
+        (netlist (p.at z⁻¹)).masonResponseTransform.toLinearMap
+          (inputAmplitude (p.at z⁻¹) 1)) ∈
+      (netlist (p.at z⁻¹)).behavior
 
 /-- On the explicit common domain, all applicable DCDR views in the X-01 spine agree.
 
@@ -354,7 +341,8 @@ lemma zCrossSemantics_agree (p : UnitDelayParameters)
   packagedScattering :=
     zTransfer_eq_packagedScattering_entry p z h.hasNonzeroDenominator
   relationalBehavior :=
-    zTransfer_hasSelectedRelationalResponse p z h.hasNonzeroDenominator
+    (mem_behavior_iff_eq_masonResponseTransform
+      (p.at z⁻¹) h.hasNonzeroDenominator _ _).2 rfl
 
 end
 
