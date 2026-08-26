@@ -236,8 +236,7 @@ lemma constantJumpRegressionWeightedGaussian_apply (x : Space 2) :
       (x constantJumpRegressionSelected) ^ 2 * constantJumpRegressionGaussianTwo x := by
   have hcoordinate : Function.HasTemperateGrowth
       (fun y : Space 2 => y constantJumpRegressionSelected) := by
-    simpa [Space.coordCLM_apply, Space.coord_apply] using
-      (Space.coordCLM constantJumpRegressionSelected).hasTemperateGrowth
+    exact Space.eval_hasTemperateGrowth constantJumpRegressionSelected
   have hweight := hcoordinate.pow 2
   rw [constantJumpRegressionWeightedGaussian]
   simpa [Pi.pow_apply, smul_eq_mul] using
