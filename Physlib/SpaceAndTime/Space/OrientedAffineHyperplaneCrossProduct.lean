@@ -27,6 +27,8 @@ unchanged by tangential projection or reflection across the tangent plane.
   tangent vector by the unit normal preserves its norm.
 - `OrientedAffineHyperplane.normalVector_cross_normalize_normalVector_cross`: the normalized
   normal cross tangent axis has the expected in-plane quarter-turn.
+- `OrientedAffineHyperplane.normalVector_cross_eq_of_tangent_pairings`: oriented tangent
+  pairings determine a normal cross product.
 
 ## iii. Table of contents
 
@@ -112,6 +114,65 @@ lemma tangent_cross_normalize_normalVector_cross
     hTangent, zero_smul, sub_zero, smul_smul]
   congr 1
   field_simp [norm_ne_zero_iff.mpr hv]
+
+/-- Oriented tangent pairings determine the cross product of a vector jump with the stored normal.
+
+The hypothesis is the scalar form produced by an Ampere thin loop directed along `tangent`: the
+field jump pairs with the loop direction exactly as the tangent surface current pairs with the
+oriented spanning-surface normal `normalVector cross tangent`. -/
+lemma normalVector_cross_eq_of_tangent_pairings
+    (plane : OrientedAffineHyperplane 3)
+    (fieldJump surfaceCurrent : EuclideanSpace ℝ (Fin 3))
+    (hCurrent : plane.IsTangent surfaceCurrent)
+    (hPairing : ∀ tangent : plane.tangentSubmodule,
+      inner ℝ fieldJump (tangent : EuclideanSpace ℝ (Fin 3)) =
+        inner ℝ surfaceCurrent
+          (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3)))) :
+    plane.normalVector ⨯ₑ₃ fieldJump = surfaceCurrent := by
+  have hCrossTangent : plane.IsTangent (plane.normalVector ⨯ₑ₃ fieldJump) := by
+    exact Space.inner_self_cross plane.normalVector fieldJump
+  have hPair : ∀ tangent : plane.tangentSubmodule,
+      inner ℝ (plane.normalVector ⨯ₑ₃ fieldJump)
+          (tangent : EuclideanSpace ℝ (Fin 3)) =
+        inner ℝ surfaceCurrent (tangent : EuclideanSpace ℝ (Fin 3)) := by
+    intro tangent
+    let rotated : plane.tangentSubmodule :=
+      ⟨-(plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))), by
+        change plane.normalComponent
+          (-(plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3)))) = 0
+        rw [normalComponent, inner_neg_right, Space.inner_self_cross, neg_zero]⟩
+    have hTangent : inner ℝ plane.normalVector
+        (tangent : EuclideanSpace ℝ (Fin 3)) = 0 :=
+      ((plane.mem_tangentSubmodule tangent).mp tangent.property)
+    have hRotated : inner ℝ plane.normalVector
+        (rotated : EuclideanSpace ℝ (Fin 3)) = 0 :=
+      ((plane.mem_tangentSubmodule rotated).mp rotated.property)
+    have hRotate :
+        plane.normalVector ⨯ₑ₃ (rotated : EuclideanSpace ℝ (Fin 3)) = tangent := by
+      change plane.normalVector ⨯ₑ₃
+        (-(plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3)))) = tangent
+      rw [← neg_one_smul ℝ, Space.cross_smul,
+        Space.cross_cross_eq_smul_sub_smul', plane.inner_normalVector_self,
+        hTangent, one_smul, zero_smul]
+      simp
+    calc
+      inner ℝ (plane.normalVector ⨯ₑ₃ fieldJump)
+          (tangent : EuclideanSpace ℝ (Fin 3)) =
+          inner ℝ (plane.normalVector ⨯ₑ₃ fieldJump)
+            (plane.normalVector ⨯ₑ₃ (rotated : EuclideanSpace ℝ (Fin 3))) := by
+              rw [hRotate]
+      _ = inner ℝ fieldJump (rotated : EuclideanSpace ℝ (Fin 3)) := by
+        rw [Space.inner_cross_cross, plane.inner_normalVector_self,
+          hRotated, one_mul]
+        simp
+      _ = inner ℝ surfaceCurrent
+          (plane.normalVector ⨯ₑ₃ (rotated : EuclideanSpace ℝ (Fin 3))) := hPairing rotated
+      _ = inner ℝ surfaceCurrent (tangent : EuclideanSpace ℝ (Fin 3)) := by rw [hRotate]
+  have hProjection :=
+    (plane.tangentialProjection_eq_iff_inner_eq_on_tangent
+      (plane.normalVector ⨯ₑ₃ fieldJump) surfaceCurrent).mpr hPair
+  simpa only [plane.tangentialProjection_eq_self_of_isTangent _ hCrossTangent,
+    plane.tangentialProjection_eq_self_of_isTangent _ hCurrent] using hProjection
 
 end OrientedAffineHyperplane
 
