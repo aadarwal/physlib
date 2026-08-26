@@ -16,8 +16,10 @@ This file evaluates the DATE'14, SysCon'15, and SFG-TR'14 source-side formulas a
 coupler data. The calculations unfold the source records and formulas directly; they do not use
 the bridge theorems being tested.
 
-The SysCon fixture uses through amplitude `3/5`, cross amplitude `4/5`, field attenuation `1/4`,
-and the named phases zero and `pi`. A second, valid 3-4-5 fixture witnesses that the previously
+The SysCon fixture uses through amplitude `3/5`, cross amplitude `4/5`, source scalar `x_r=1/4`,
+and the named phases zero and `pi`. Physlib maps `x_r` to its round-trip field attenuation based
+on Def. 9's two `sqrt(x_r)` half arcs (`HOL-CORPUS.md:244-247`); this is not a source
+field-vs-power classification. A second, valid 3-4-5 fixture witnesses that the previously
 recorded but provenance-uncertain Thm. 6 denominator differs from the norm-square of Thm. 5.
 
 ## ii. Key results
@@ -39,7 +41,7 @@ recorded but provenance-uncertain Thm. 6 denominator differs from the norm-squar
 ## iv. References and non-claims
 
 The source statements are transcribed at `HOL-CORPUS.md:194-198`, `HOL-CORPUS.md:244-249`, and
-`HOL-CORPUS.md:332-334`. The disputed power denominator is not in that corpus entry; it is a
+`HOL-CORPUS.md:345-346`. The disputed power denominator is not in that corpus entry; it is a
 previously recorded transcription of uncertain provenance. These fixtures do not classify the
 discrepancy as a source error. They make no response-extremum, reciprocity, causality, omitted-loss,
 bandwidth, dispersion, or measurement-validation claim.
@@ -187,7 +189,7 @@ lemma sourceBridgeRegression_dateFourPortChain_entries :
 
 /-! ## B. SysCon amplitude, power, and series -/
 
-/-- Exact SysCon 3-4-5 data at zero phase and quarter round-trip field attenuation. -/
+/-- Exact SysCon 3-4-5 data at zero phase and source scalar `x_r=1/4`. -/
 def sourceBridgeRegressionSysConParameters : SysConParameters where
   phase := 0
   fieldAttenuation := 1 / 4

@@ -3,12 +3,18 @@
 ## Branch and cutoff scope
 
 - Branch: `optics/s2-microring`
-- Integration base at this draft: `optics/development` at `64246c8e`
-- New production module:
+- Integration base at this draft: `optics/development` at `33ee2ab7`
+- New umbrella production module:
   `Physlib/Optics/Systems/Microring/SourceBridge.lean`
+- New per-source production modules:
+  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean`,
+  `Physlib/Optics/Systems/Microring/SourceBridgeSysCon.lean`, and
+  `Physlib/Optics/Systems/Microring/SourceBridgeSfg.lean`.
 - New regression module:
   `Physlib/Optics/Systems/Microring/SourceBridgeRegression.lean`
 - No existing Microring module was edited in this slice.
+- The per-source split preserves every declaration name and statement from cutoff `64646116`.
+  It addresses the 1500-line style-lint limit and is not a review finding.
 - `Physlib.lean`, `Physlib/Optics/API-map.yaml`, `goal.md`, and `tbd.md` were not edited by this
   branch. Changes to those files visible in the worktree came from the required development merge.
 
@@ -21,9 +27,10 @@ public import Physlib.Optics.Systems.Microring.SourceBridge
 public import Physlib.Optics.Systems.Microring.SourceBridgeRegression
 ```
 
-Register the two modules as the DATE'14, SysCon'15, and SFG-TR'14 source-parameter, port-order,
-reference-plane, amplitude, power, rejection-ratio, and regression bridge for the proved add-drop
-microring realization.
+The umbrella publicly re-exports the three per-source modules. Register it and the regression as
+the DATE'14, SysCon'15, and SFG-TR'14 source-parameter, port-order, algebraic channel-sign,
+amplitude, power, rejection-ratio, and regression bridge for the proved add-drop microring
+realization.
 
 ## N7 and network declarations used
 
@@ -121,9 +128,13 @@ unitarity by hand here.
 - `dateFourPortTransmissionInverse`
 - `dateFourPortTransmission_mul_explicitInverse`
 - `dateFourPortTransmissionInverse_eq`
+- `dateBackwardFirstFinEquiv`, `dateBackwardFirstFinEquiv_data`
 - `dateFourPortBackwardFirstChainMatrix`
+- `dateFourPortBackwardFirstChainMatrix_reindex`
 - `dateSourceFourPortChainTransform_eq`
 - `dateFourPortChainMatrix_eq_n5Response`
+- `dateFourPortChainMatrix_eq_reindexed_n5Response`
+- `dateFourPortBehavior_iff_n5Response`
 
 ### SysCon'15 amplitude, series, derived power, and rejection ratio
 
@@ -206,7 +217,9 @@ unitarity by hand here.
   `sourceBridgeRegression_dateTwoPortBehavior`.
 - IP-04: `dateFourPortBehavior`, `dateFourPortChainMatrix`,
   `dateN5FourPortScattering`, `dateN5FourPortScattering_eq_source`,
-  `dateFourPortChainMatrix_eq_n5Response`,
+  `dateBackwardFirstFinEquiv`, `dateFourPortBackwardFirstChainMatrix_reindex`,
+  `dateFourPortChainMatrix_eq_reindexed_n5Response`,
+  `dateFourPortBehavior_iff_n5Response`,
   `sourceBridgeRegression_dateFourPort_transfers`,
   `sourceBridgeRegression_dateFourPortChain_entries`.
 - IP-05: `SysConParameters.toAddDrop`, `sysConDropTransfer`,
@@ -261,6 +274,9 @@ method.
   Thm. 7 ratio. Their agreement is evidence, not a classification of the unverified Thm. 6 text.
 - The source's bare `10 log` base is not assumed. `powerRatioInBase` carries the base explicitly;
   base ten maps to Physlib's power-ratio dB convention, and base `exp 1` maps to natural log.
+- SysCon Def. 9 supplies two `sqrt(x_r)` half arcs (`HOL-CORPUS.md:244-247`). Mapping `x_r` to
+  Physlib's round-trip field attenuation is the bridge dictionary's inference, not a source
+  classification of `x_r` as a field or power quantity.
 - DATE and SysCon quotient definitions are totalized. N5 response meaning is asserted only under
   the exact solve/contraction gates. The SysCon `tsum` is totalized and has geometric feedback
   meaning only under `SysConParameters.IsContractive`.
@@ -272,12 +288,14 @@ method.
 
 ## Gates
 
-After the `64246c8e` development sync, this chained mutex-protected gate passed:
+After the `33ee2ab7` development sync, this chained mutex-protected gate passed with temporary
+registrations for the three per-source production modules and the regression module:
 
 ```text
 lake --wfail build Physlib.Optics.Systems.Microring.SourceBridgeRegression
 lake exe runPhyslibLinters
 ```
 
-`git diff --check` and the Unicode-codepoint line audit pass; both new files have maximum line
-length at most 100. Run `./scripts/lint-style.sh` on committed state before reporting the cutoff.
+`Physlib.lean` was restored byte-for-byte after the gate. The Unicode-codepoint line audit and
+`git diff --check` pass. Run `./scripts/lint-style.sh` on committed state before reporting the
+cutoff.
