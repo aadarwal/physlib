@@ -236,12 +236,14 @@ PR unless maintainers explicitly ask to retain it.
   corollary, not the definition. One-sided traces and even independent source-free Maxwell
   extensions on both sides do not imply an interface jump law; the regression pins that negative
   result. `IsPlanarIntegralMacroscopicMaxwell` now states the literal sourceful finite-cell laws
-  with explicit integrability, and `HasPlanarMaxwellThinCellRegularity` states every required
-  principal, lateral, short-edge, volume-source, surface-source, and flux-rate limit. Their proved
-  consequence has the positive-minus-negative `D` jump, `n × (H_positive - H_negative)` current
-  orientation, Faraday minus sign, and Ampere--Maxwell displacement-current plus sign; the
-  affine-time regression makes both derivative signs nonzero. No theorem yet obtains the literal
-  finite-cell premise from differential or weak Maxwell equations via Stokes/divergence.
+  with explicit integrability. `HasPlanarMaxwellThinCellRegularity` stores source continuity and
+  only the residual lateral, bulk, short-edge, and flux-rate limits. The principal and sheet limits
+  are derived from the one-sided traces and source continuity together with the finite-cell
+  integrability witnesses. Their proved consequence has the positive-minus-negative `D` jump,
+  `n × (H_positive - H_negative)` current orientation, Faraday minus sign, and Ampere--Maxwell
+  displacement-current plus sign; the affine-time regression makes both derivative signs nonzero.
+  No theorem yet obtains the literal finite-cell premise from differential or weak Maxwell
+  equations via Stokes/divergence.
 - [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
   complex-carrier candidates are off shell and retain independent positive frequencies and complex
   wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined

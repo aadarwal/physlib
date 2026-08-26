@@ -469,6 +469,12 @@ public import Physlib.Optics.Systems.Cascade.Identical
 public import Physlib.Optics.Systems.Cascade.IdenticalRegression
 public import Physlib.Optics.Systems.Cascade.Termination
 public import Physlib.Optics.Systems.Cascade.TerminationRegression
+public import Physlib.Optics.Systems.DCDR.Bridge
+public import Physlib.Optics.Systems.DCDR.Graph
+public import Physlib.Optics.Systems.DCDR.Mason
+public import Physlib.Optics.Systems.DCDR.Netlist
+public import Physlib.Optics.Systems.DCDR.Response
+public import Physlib.Optics.Systems.DCDR.ResponseRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
@@ -829,8 +835,11 @@ public import Physlib.SpaceAndTime.Space.EuclideanGroup.AffineGroup
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.SpaceAndTime.Space.Integrals.OrientedRectangle
 public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCell
 public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCellConvergence
+public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCellStokes
+public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCellStokesRegression
 public import Physlib.SpaceAndTime.Space.Integrals.RadialAngularMeasure
 public import Physlib.SpaceAndTime.Space.Integrals.ThinCellLimit
 public import Physlib.SpaceAndTime.Space.IsDistBounded
