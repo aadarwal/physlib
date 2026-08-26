@@ -79,8 +79,8 @@ variable {P : PortModeFamily.{u, v}} {Q : PortModeFamily.{w, x}}
 
 /-- The identity equivalence of a dependent port family. -/
 def refl (P : PortModeFamily.{u, v}) : P.Equiv P where
-  portEquiv := Equiv.refl P.Port
-  modeEquiv _ := Equiv.refl _
+  portEquiv := _root_.Equiv.refl P.Port
+  modeEquiv _ := _root_.Equiv.refl _
 
 /-- Composition of dependent port-family equivalences. -/
 def trans (first : P.Equiv Q) (second : Q.Equiv R) : P.Equiv R where
@@ -92,13 +92,13 @@ def trans (first : P.Equiv Q) (second : Q.Equiv R) : P.Equiv R where
 def symm (equiv : P.Equiv Q) : Q.Equiv P where
   portEquiv := equiv.portEquiv.symm
   modeEquiv port :=
-    (Equiv.cast
+    (_root_.Equiv.cast
       (congrArg Q.Mode (equiv.portEquiv.apply_symm_apply port)).symm).trans
         (equiv.modeEquiv (equiv.portEquiv.symm port)).symm
 
 /-- The flattened channel equivalence induced by dependent port and mode relabelling. -/
 def channelEquiv (equiv : P.Equiv Q) : P.Channel ≃ Q.Channel :=
-  Equiv.sigmaCongr equiv.portEquiv equiv.modeEquiv
+  _root_.Equiv.sigmaCongr equiv.portEquiv equiv.modeEquiv
 
 /-- The induced channel equivalence relabels both the port and its dependent mode. -/
 @[simp]
@@ -148,9 +148,8 @@ lemma transport_mateEquiv (equiv : P.Equiv Q) (connection : PortConnection P)
     (connection.transport equiv).mateEquiv
         (connection.transportLocalChannelEquiv equiv channel) =
       connection.transportLocalChannelEquiv equiv (connection.mateEquiv channel) := by
-  rcases channel with mode | mode
-  · rfl
-  · simp [transport, transportLocalChannelEquiv]
+  rcases channel with mode | mode <;>
+    simp [transport, transportLocalChannelEquiv, PortConnection.mateEquiv]
 
 end PortConnection
 
@@ -172,7 +171,7 @@ def transport (equiv : P.Equiv Q) (family : PortConnectionFamily P index) :
     rintro ⟨firstIndex, firstEnd⟩ ⟨secondIndex, secondEnd⟩ hPort
     apply family.endpointPort_injective
     apply equiv.portEquiv.injective
-    simpa [PortConnection.endpointPort, transport] using hPort
+    cases firstEnd <;> cases secondEnd <;> exact hPort
 
 /-- The connected-channel equivalence induced by transport of the ambient port family. -/
 def transportChannelEquiv (equiv : P.Equiv Q) (family : PortConnectionFamily P index) :
@@ -219,15 +218,23 @@ def transportUnconnectedPortEquiv (equiv : P.Equiv Q)
     apply port.2
     refine ⟨⟨connectionIndex, endpoint⟩, ?_⟩
     apply equiv.portEquiv.injective
-    simpa [PortConnection.endpointPort, transport] using hPort⟩
+    cases endpoint <;> exact hPort⟩
   invFun port := ⟨equiv.portEquiv.symm port.1, by
     intro hEndpoint
     rcases hEndpoint with ⟨⟨connectionIndex, endpoint⟩, hPort⟩
     apply port.2
     refine ⟨⟨connectionIndex, endpoint⟩, ?_⟩
-    simpa [PortConnection.endpointPort, transport] using congrArg equiv.portEquiv hPort⟩
-  left_inv := by rintro ⟨port, hPort⟩; apply Subtype.ext; simp
-  right_inv := by rintro ⟨port, hPort⟩; apply Subtype.ext; simp
+    cases endpoint <;>
+      exact (congrArg equiv.portEquiv hPort).trans
+        (equiv.portEquiv.apply_symm_apply port.1)⟩
+  left_inv := by
+    rintro ⟨port, hPort⟩
+    apply Subtype.ext
+    exact equiv.portEquiv.symm_apply_apply port
+  right_inv := by
+    rintro ⟨port, hPort⟩
+    apply Subtype.ext
+    exact equiv.portEquiv.apply_symm_apply port
 
 /-- Transport sends structurally external channels to structurally external channels. -/
 def transportExternalChannelEquiv (equiv : P.Equiv Q)
@@ -248,8 +255,14 @@ def transportExternalChannelEquiv (equiv : P.Equiv Q)
     refine ⟨family.transportChannelEquiv equiv source, ?_⟩
     rw [family.transport_channelEmbedding]
     simpa using congrArg equiv.channelEquiv hSource⟩
-  left_inv := by rintro ⟨channel, hChannel⟩; apply Subtype.ext; simp
-  right_inv := by rintro ⟨channel, hChannel⟩; apply Subtype.ext; simp
+  left_inv := by
+    rintro ⟨channel, hChannel⟩
+    apply Subtype.ext
+    exact equiv.channelEquiv.symm_apply_apply channel
+  right_inv := by
+    rintro ⟨channel, hChannel⟩
+    apply Subtype.ext
+    exact equiv.channelEquiv.apply_symm_apply channel
 
 /-- Transported external boundaries are equivalent as dependent port-mode families. -/
 def transportExternalPortModeFamilyEquiv (equiv : P.Equiv Q)
@@ -267,6 +280,7 @@ lemma transportExternalChannelEquiv_boundaryChannelEquiv
     family.transportExternalChannelEquiv equiv (family.boundaryChannelEquiv channel) =
       (family.transport equiv).boundaryChannelEquiv
         ((family.transportExternalPortModeFamilyEquiv equiv).channelEquiv channel) := by
+  apply Subtype.ext
   rfl
 
 end PortConnectionFamily
@@ -410,11 +424,18 @@ lemma externalOutgoingReadout_transport
   rcases transportedEndpoint with ⟨transportedExternal⟩
   obtain ⟨sourceExternal, rfl⟩ :=
     (family.transportExternalChannelEquiv equiv).surjective transportedExternal
-  rw [ModeAmplitude.restrictEmbedding_apply, ModeAmplitude.restrictEmbedding_apply,
-    ModeAmplitude.reindex_apply, ModeAmplitude.reindex_apply]
-  exact congrArg outgoing
-    ((Outgoing.relabelEquiv equiv.channelEquiv).symm_apply_apply
-      (Outgoing.mk sourceExternal.1))
+  change outgoing
+      ((Outgoing.relabelEquiv equiv.channelEquiv).symm
+        (Outgoing.relabelEquiv equiv.channelEquiv (Outgoing.mk sourceExternal.1))) =
+    (family.externalOutgoingReadout.toLinearMap outgoing)
+      ((Outgoing.relabelEquiv
+        (family.transportExternalChannelEquiv equiv)).symm
+          (Outgoing.relabelEquiv
+            (family.transportExternalChannelEquiv equiv)
+              (Outgoing.mk sourceExternal)))
+  rw [Equiv.symm_apply_apply, Equiv.symm_apply_apply,
+    family.externalOutgoingReadout_apply, ModeAmplitude.restrictEmbedding_apply]
+  rfl
 
 /-- Closure membership is invariant after transporting the ambient behavior and both external
 amplitudes. -/
@@ -441,19 +462,46 @@ lemma mem_closeBehavior_transport_iff
     refine ⟨incident, outgoing, ?_, ?_, ?_⟩
     · simpa only [incident, outgoing, LinearBehavior.mem_reindex_iff] using hBehavior
     · apply (ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)).injective
-      rw [ModeAmplitude.reindex_reindex_symm, family.incidentAssembly_transport]
-      simpa only [outgoing, ModeAmplitude.reindex_reindex_symm] using hIncident
+      calc
+        ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv) incident =
+            transportedIncident := by
+              exact ModeAmplitude.reindex_reindex_symm _ _
+        _ = (family.transport equiv).incidentAssembly transportedOutgoing
+              (ModeAmplitude.reindex
+                (Incident.relabelEquiv
+                  (family.transportExternalChannelEquiv equiv)) input) := hIncident
+        _ = (family.transport equiv).incidentAssembly
+              (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing)
+              (ModeAmplitude.reindex
+                (Incident.relabelEquiv
+                  (family.transportExternalChannelEquiv equiv)) input) := by
+                    rw [outgoing, ModeAmplitude.reindex_reindex_symm]
+        _ = ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv)
+              (family.incidentAssembly outgoing input) :=
+                family.incidentAssembly_transport equiv outgoing input
     · apply (ModeAmplitude.reindex
         (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv))).injective
-      rw [ModeAmplitude.reindex_reindex_symm, ← family.externalOutgoingReadout_transport]
-      simpa only [outgoing, ModeAmplitude.reindex_reindex_symm] using hOutput
+      calc
+        ModeAmplitude.reindex
+              (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv)) output =
+            (family.transport equiv).externalOutgoingReadout.toLinearMap
+              transportedOutgoing := hOutput
+        _ = (family.transport equiv).externalOutgoingReadout.toLinearMap
+              (ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing) := by
+                rw [outgoing, ModeAmplitude.reindex_reindex_symm]
+        _ = ModeAmplitude.reindex
+              (Outgoing.relabelEquiv (family.transportExternalChannelEquiv equiv))
+              (family.externalOutgoingReadout.toLinearMap outgoing) :=
+                family.externalOutgoingReadout_transport equiv outgoing
   · rintro ⟨incident, outgoing, hBehavior, hIncident, hOutput⟩
     refine ⟨ModeAmplitude.reindex (Incident.relabelEquiv equiv.channelEquiv) incident,
       ModeAmplitude.reindex (Outgoing.relabelEquiv equiv.channelEquiv) outgoing, ?_, ?_, ?_⟩
     · simpa only [LinearBehavior.mem_reindex_iff,
         ModeAmplitude.reindex_symm_reindex] using hBehavior
-    · rw [family.incidentAssembly_transport, ← hIncident]
-    · rw [family.externalOutgoingReadout_transport, ← hOutput]
+    · rw [hIncident]
+      exact (family.incidentAssembly_transport equiv outgoing input).symm
+    · rw [hOutput]
+      exact (family.externalOutgoingReadout_transport equiv outgoing).symm
 
 /-- Singular-safe closure is covariant under a dependent ambient port-family equivalence. -/
 lemma closeBehavior_transport
