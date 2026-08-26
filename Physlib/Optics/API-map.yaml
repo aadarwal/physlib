@@ -567,7 +567,7 @@ Requirements:
       (Physlib.ZTransform.not_isSchurStable_onePole_two,
       Physlib.ZTransform.candidatePoles_twoPole, Physlib.ZTransform.isSchurStable_twoPole)
 
-  - description: "The delay-transfer layer supplies finite formal-delay tuples, retained polynomial-quotient models and their evaluation domains, N5F compilation of rational component entries, solve/response-domain-preserving Laplace and reciprocal-Z reparameterizations, an abstract internal-determinant/candidate-singularity and reduced-response/cancellation schema, finite zero/pole sets with degree bounds, Schur/BIBO equivalence for the explicitly stated nonzero proper causal one-pole class, and proof-gated frequency response under `q = exp (-s * τ) = z⁻¹`. The production all-pass specialization retains the physical ring wiring, derives its cleared external response from the compiled N5 equations, and has exact resonance, antiresonance, and non-real quadrature regressions. The row remains incomplete: generic symbolic rationality of eliminated external responses, a network-level no-cancellation or reachability/observability bridge from candidate singularities to actual poles, general proper-rational BIBO equivalence, and response-derived group delay/dispersion are withheld; no rationality in physical frequency is claimed."
+  - description: "The delay-transfer layer supplies finite formal-delay tuples, retained polynomial-quotient models and their evaluation domains, N5F compilation of rational component entries, solve/response-domain-preserving Laplace and reciprocal-Z reparameterizations, an abstract internal-determinant/candidate-singularity and reduced-response/cancellation schema, finite zero/pole sets with degree bounds, Schur/BIBO equivalence for the explicitly stated nonzero proper causal one-pole class, proof-gated frequency response under `q = exp (-s * τ) = z⁻¹`, and branch-audited local group delay and dispersion for selected N5F response entries. The production all-pass specialization retains the physical ring wiring, derives its cleared external response from the compiled N5 equations, and has exact resonance, antiresonance, non-real quadrature, group-delay, and dispersion regressions. The row remains incomplete: generic symbolic rationality of eliminated external responses, a network-level no-cancellation or reachability/observability bridge from candidate singularities to actual poles, and general proper-rational BIBO equivalence are withheld; no rationality in physical frequency is claimed."
     done: false
     location: >-
       Physlib/Optics/Systems/DelayTransfer/Basic.lean
@@ -624,9 +624,21 @@ Requirements:
       (Optics.DelayTransfer.frequencyDelayEvaluation_quadrature,
       Optics.DelayTransfer.unitCirclePoint_quadrature,
       Optics.DelayTransfer.allPassRationalNetlist_quadrature_compiled_entry_via_equations,
-      Optics.DelayTransfer.allPassRationalNetlist_frequency_quadrature_response_entry)
+      Optics.DelayTransfer.allPassRationalNetlist_frequency_quadrature_response_entry);
+      Physlib/Optics/Systems/DelayTransfer/GroupDelay.lean
+      (Optics.DelayTransfer.frequencyGroupDelayDomain,
+      Optics.DelayTransfer.frequencyGroupDelay,
+      Optics.DelayTransfer.frequencyGroupDelayDispersionDomain,
+      Optics.DelayTransfer.frequencyGroupDelayDispersion,
+      Optics.DelayTransfer.RationalNetlist.frequencyGroupDelay_eq_of_extension_hasDerivAt,
+      Optics.DelayTransfer.RationalNetlist.frequencyGroupDelayDispersion_eq_of_extension_hasDerivAt);
+      Physlib/Optics/Systems/DelayTransfer/GroupDelayRegression.lean
+      (Optics.DelayTransfer.pureDelay_groupDelay_three,
+      Optics.DelayTransfer.chirpedDelay_groupDelay_at_five,
+      Optics.DelayTransfer.chirpedDelay_dispersion_two_fifths,
+      Optics.DelayTransfer.allPassRationalNetlist_frequencyGroupDelay_quadrature)
 
-  - description: "The neutral signal-flow layer supplies finite node equations, exact unique-solvability, classical forward-path Mason gain, edge-indexed multigraph enumeration with parallel-edge identity, distinguished terminals, and extraction from coefficient or system matrices. For every finite FlatNetlist, feedbackSignalFlowGraph extracts the scalar graph C*S from the N5 feedback operator 1-C*S. Its graph determinant is nonzero exactly when the relational netlist is well posed; on that precise gate, feedbackMasonTransform equals the proof-gated feedback inverse and masonResponseTransform equals the behavior-derived typed external response. Independent generic evidence extracts a principal I-by-I feedback loop, expands its forward-path numerator I and loop-family determinant 2, obtains Mason gain I/2, and matches the direct-path-plus-loop expression with the separately derived N5 self-response 1+4I without either agreement theorem. The singular determinant follows directly from a noninjective feedback operator. The all-pass microring now supplies the first system instance: on HasNonzeroDenominator, its independently defined reduced two-node circulation model has the exact scalar solve denominator and direct path/loop enumeration agrees with raw N5 channel elimination. No reduction from the complete graph is claimed. The FlatNetlist graph is matrix-level and sums parallel gains; it does not replace the edge-indexed layer, instantiate DCDR, present every external response as one distinguished-terminal graph, or claim contraction, causality, passivity, reciprocity, or a complete ring cross-semantics result."
+  - description: "The neutral signal-flow layer supplies finite node equations, exact unique-solvability, classical forward-path Mason gain, edge-indexed multigraph enumeration with parallel-edge identity, distinguished terminals, and extraction from coefficient or system matrices. For every finite FlatNetlist, feedbackSignalFlowGraph extracts the scalar graph C*S from the N5 feedback operator 1-C*S. Its graph determinant is nonzero exactly when the relational netlist is well posed; on that precise gate, feedbackMasonTransform equals the proof-gated feedback inverse and masonResponseTransform equals the behavior-derived typed external response. Independent generic evidence extracts a principal I-by-I feedback loop, expands its forward-path numerator I and loop-family determinant 2, obtains Mason gain I/2, and matches the direct-path-plus-loop expression with the separately derived N5 self-response 1+4I without either agreement theorem. The singular determinant follows directly from a noninjective feedback operator. The all-pass microring supplies an independently enumerated reduced-loop instance, and the audited DCDR graph instantiates the same generic N5/Mason agreement on its exact solve gate. No reduction from either complete graph to its audited reduced graph is claimed. The FlatNetlist graph is matrix-level and sums parallel gains; it does not replace the edge-indexed layer, present every external response as one distinguished-terminal graph, or itself claim contraction, causality, passivity, reciprocity, or system-specific recurrence/Z agreement."
     done: true
     location: >-
       Physlib/Mathematics/SignalFlowGraph/Basic.lean
@@ -679,7 +691,12 @@ Requirements:
       Optics.flatNetlistMasonRegression_n5_response_a_to_a,
       Optics.flatNetlistMasonRegression_n5_response_eq_direct_mason);
       Physlib/Optics/Network/FlatNetlistMasonSingularRegression.lean
-      (Optics.flatNetlistMasonRegression_singular_graphDet_eq_zero)
+      (Optics.flatNetlistMasonRegression_singular_graphDet_eq_zero);
+      Physlib/Optics/Systems/DCDR/Mason.lean
+      (Optics.DCDR.feedbackSignalFlowGraph_graphDet_ne_zero_iff,
+      Optics.DCDR.masonResponse_eq_eliminationResponse,
+      Optics.DCDR.auditedMasonResponse_eq_eliminationResponse,
+      Optics.DCDR.auditedMasonResponse_eq_masonResponse)
 
   - description: "The API connects finite complex modal coordinates to zero-attenuation, transverse, dispersion-matched plane-wave carriers in one homogeneous medium at a common positive angular frequency. Coefficients scale complex carrier amplitudes before ordinary-real realization; finite synthesis remains a source-free fixed-medium Maxwell solution. An explicit singleton material-Jones bridge proves that scaling a modal coordinate and scaling the framed Jones data give exactly the same complete complex carrier, without introducing a coercion or claiming flux normalization. The actual one-period Poynting mean is integrated over either the abstract measured profile or a measurable planar GeometricAperture carrying restricted normalized two-dimensional Hausdorff measure. Under explicit pairwise integrability, mutual flux orthogonality, unit normalization, and incident/outgoing role hypotheses, the resulting signed actual integrated flux equals ModeAmplitude.power on the supplied finite synthesis image. Exact singleton regressions pin electric versus magnetic-field-strength phasors, complex coefficient phase, arbitrary period start, Maxwell preservation, and power twenty-five. No modal completeness, raw-Jones coercion, interface boundary, omitted-channel, evanescent-power, reciprocity, or device-losslessness claim is made."
     done: true
