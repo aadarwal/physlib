@@ -59,38 +59,24 @@ lemma polarizerModeCarrierRegression_output_electricAmplitude :
           polarizerModePowerRegressionAnalyzerAngle polarizerModePowerRegressionInputAngle)
         ()).electricAmplitude =
       WithLp.toLp 2 ![(0 : ℂ), (1 + Complex.I) / 2, (1 + Complex.I) / 2] := by
-  calc
-    _ = (ComplexMonochromaticPlaneWave.ofReal
-        (((JonesMatrix.linearPolarizer polarizerModePowerRegressionAnalyzerAngle).act
-          (JonesVector.scale polarizerModePowerRegressionAmplitude
-            (JonesVector.linearPolarization
-              polarizerModePowerRegressionInputAngle))).toMaterialPlaneWave
-              polarizerModeNormalizationRegressionMedium
-              polarizerModeNormalizationRegressionFrame 1 (by norm_num))).electricAmplitude :=
-      congrArg ComplexMonochromaticPlaneWave.electricAmplitude
-        (JonesMatrix.linearPolarizer_scaledWave_eq polarizerModePowerRegressionAmplitude
-          polarizerModePowerRegressionAnalyzerAngle polarizerModePowerRegressionInputAngle
-          polarizerModeNormalizationRegressionMedium polarizerModeNormalizationRegressionFrame 1
-          (by norm_num))
-    _ = polarizerModeNormalizationRegressionFrame.embedJones
-        ((JonesMatrix.linearPolarizer polarizerModePowerRegressionAnalyzerAngle).act
-          (JonesVector.scale polarizerModePowerRegressionAmplitude
-            (JonesVector.linearPolarization polarizerModePowerRegressionInputAngle))) :=
-      JonesVector.ofReal_toMaterialPlaneWave_electricAmplitude _ _ _ _ _
-    _ = _ := by
-      rw [JonesMatrix.linearPolarizer_act_scaled_linearPolarization]
-      ext i
-      fin_cases i <;>
-        simp [PolarizationFrame.embedJones_apply,
-          polarizerModeNormalizationRegressionFrame,
-          polarizerModePowerRegressionInputAngle, polarizerModePowerRegressionAnalyzerAngle,
-          polarizerModePowerRegressionAmplitude, JonesVector.scale,
-          JonesVector.linearPolarization, Real.Angle.cos_coe, Real.Angle.sin_coe,
-          Real.cos_pi_div_four, Real.sin_pi_div_four]
-      all_goals
-        have hsqrt : Real.sqrt 2 * Real.sqrt 2 = 2 :=
-          Real.mul_self_sqrt (by norm_num)
-        apply Complex.ext <;> norm_num <;> nlinarith
+  simp only [MaterialJonesMode.linearPolarizationFamily,
+    JonesMatrix.linearPolarizerOutputAmplitude,
+    PropagatingHarmonicModeFamily.scaledWave, MaterialJonesMode.family,
+    MaterialJonesMode.amplitude,
+    ComplexMonochromaticPlaneWave.scaleElectricAmplitude_electricAmplitude]
+  rw [JonesVector.ofReal_toMaterialPlaneWave_electricAmplitude]
+  ext i
+  fin_cases i <;>
+    simp [PolarizationFrame.embedJones_apply,
+      polarizerModeNormalizationRegressionFrame,
+      polarizerModePowerRegressionInputAngle, polarizerModePowerRegressionAnalyzerAngle,
+      polarizerModePowerRegressionAmplitude,
+      JonesVector.linearPolarization, Real.Angle.cos_coe, Real.Angle.sin_coe,
+      Real.cos_pi_div_four, Real.sin_pi_div_four]
+  all_goals
+    have hsqrt : Real.sqrt 2 * Real.sqrt 2 = 2 :=
+      Real.mul_self_sqrt (by norm_num)
+    apply Complex.ext <;> norm_num <;> nlinarith
 
 end
 
