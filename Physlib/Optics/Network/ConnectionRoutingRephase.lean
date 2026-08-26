@@ -144,10 +144,6 @@ lemma idealRouting_rephase_eq_iff [DecidableEq family.Channel]
           (gauge.outgoing
             (Outgoing.mk (family.channelEmbedding channel)) : ℂ)⁻¹ = 1 at hEntry
     apply Subtype.ext
-    change
-      (gauge.incident
-          (Incident.mk (family.channelEmbedding (family.mateEquiv channel))) : ℂ) =
-        (gauge.outgoing (Outgoing.mk (family.channelEmbedding channel)) : ℂ)
     calc
       (gauge.incident
             (Incident.mk (family.channelEmbedding (family.mateEquiv channel))) : ℂ) =
@@ -213,12 +209,6 @@ lemma partialRouting_rephase_eq [Fintype family.Channel]
         incident = family.channelEmbedding (family.mateEquiv channel)
     · subst incident
       rw [if_pos rfl]
-      change
-        (gauge.incident
-            (Incident.mk (family.channelEmbedding (family.mateEquiv channel))) : ℂ) *
-            1 *
-            (gauge.outgoing
-              (Outgoing.mk (family.channelEmbedding channel)) : ℂ)⁻¹ = 1
       rw [hMatched channel]
       field_simp [Circle.coe_ne_zero]
     · rw [if_neg hIncident]
@@ -248,10 +238,6 @@ lemma partialRouting_rephase_eq_iff [Fintype family.Channel]
           (gauge.outgoing
             (Outgoing.mk (family.channelEmbedding channel)) : ℂ)⁻¹ = 1 at hEntry
     apply Subtype.ext
-    change
-      (gauge.incident
-          (Incident.mk (family.channelEmbedding (family.mateEquiv channel))) : ℂ) =
-        (gauge.outgoing (Outgoing.mk (family.channelEmbedding channel)) : ℂ)
     calc
       (gauge.incident
             (Incident.mk (family.channelEmbedding (family.mateEquiv channel))) : ℂ) =
@@ -334,7 +320,7 @@ lemma externalOutgoingReadout_rephase_eq [DecidableEq P.Channel]
 /-- External readout sends a rephased ambient outgoing amplitude to the corresponding rephased
 external output. -/
 lemma externalOutgoingReadout_apply_rephase [Fintype P.Channel]
-    [DecidableEq P.Channel] [Fintype family.ExternalChannel]
+    [DecidableEq P.Channel]
     (gauge : ChannelEndGauge P.Channel)
     (outgoing : ModeAmplitude (Outgoing P.Channel)) :
     family.externalOutgoingReadout.toLinearMap
@@ -354,7 +340,7 @@ lemma externalOutgoingReadout_apply_rephase [Fintype P.Channel]
 /-- Matched rephasing commutes with assembly of routed outgoing data and external incident data.
 -/
 lemma incidentAssembly_rephase [Fintype family.Channel]
-    [DecidableEq family.Channel] [Fintype family.ExternalChannel]
+    [DecidableEq family.Channel]
     [Fintype P.Channel] [DecidableEq P.Channel]
     (gauge : ChannelEndGauge P.Channel) (hMatched : family.IsMatchedGauge gauge)
     (outgoing : ModeAmplitude (Outgoing P.Channel))
