@@ -940,14 +940,18 @@ lemma responseRegression_swappedEdgeListGain_lower :
 /-- The first swapped feedback-return edge list vanishes at edge seven. -/
 lemma responseRegression_swappedEdgeListGain_upperReturn :
     edgeListGain responseRegressionSwappedMultigraph [0, 4, 10, 7, 9, 1, 2] = 0 := by
-  simp [edgeListGain, responseRegressionSwappedMultigraph,
-    topologyProjection_feedbackEdgeGain, signalMultigraph]
+  have hFeedback : responseRegressionSwappedMultigraph.gain 7 = 0 := by
+    simpa [responseRegressionSwappedMultigraph, signalMultigraph] using
+      topologyProjection_feedbackEdgeGain
+  simp [edgeListGain, hFeedback]
 
 /-- The second swapped feedback-return edge list vanishes at edge seven. -/
 lemma responseRegression_swappedEdgeListGain_lowerReturn :
     edgeListGain responseRegressionSwappedMultigraph [3, 1, 6, 7, 8, 4, 5] = 0 := by
-  simp [edgeListGain, responseRegressionSwappedMultigraph,
-    topologyProjection_feedbackEdgeGain, signalMultigraph]
+  have hFeedback : responseRegressionSwappedMultigraph.gain 7 = 0 := by
+    simpa [responseRegressionSwappedMultigraph, signalMultigraph] using
+      topologyProjection_feedbackEdgeGain
+  simp [edgeListGain, hFeedback]
 
 /-- Direct swapped eleven-edge enumeration gives numerator `-347 * I`. -/
 lemma responseRegression_swappedEdgeMasonNumerator :
