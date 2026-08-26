@@ -42,7 +42,7 @@ The one-pole Z-transform candidate and Schur characterizations are in
 `Physlib/Mathematics/ZTransform/StabilityRegression.lean:89-106`. The generic candidate-pole
 definition and BIBO sufficiency result are in
 `Physlib/Mathematics/ZTransform/Stability.lean:202-236`. Regression row S-07 requests an audited
-unstable parameter case at `goal.md:2552`; the DCDR instance remains the responsibility of the
+unstable parameter case at `goal.md:2556`; the DCDR instance remains the responsibility of the
 S7D lane.
 
 No physical resonance, network transfer-pole, DCDR topology, or general proper-rational BIBO

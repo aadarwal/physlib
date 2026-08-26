@@ -4,7 +4,7 @@
 
 - Branch: `optics/s4-delay-transfer`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s4-delay-transfer`
-- Synced by fast-forward merge onto `optics/development` at `64246c8e` before cutoff.
+- Synced by merge onto `optics/development` at `33ee2ab7` before cutoff.
 - This slice changes only the four new Lean files below plus this handoff note.
 
 ## Files and registrations requested
@@ -33,7 +33,7 @@ This slice implements these literal S4P bullets from `goal.md:2258-2271`:
 - “frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention”.
 
 It also supplies a generic stable/unstable one-pole strictness fixture relevant to regression row
-S-07 at `goal.md:2552`. The DCDR topology-specific instance remains assigned to S7D.
+S-07 at `goal.md:2556`. The DCDR topology-specific instance remains assigned to S7D.
 
 ## Production declarations
 
