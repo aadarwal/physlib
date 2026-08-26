@@ -312,10 +312,9 @@ The validation lane should bind at least these public names:
 
 ## Gate record
 
-The slice is synchronized through the controller-approved development head `cb6c5d2b` by merge
-head `1981979a`. At that
-post-sync source head, this single locked command exited successfully with temporary sorted
-registrations:
+The slice-1b repair is synchronized to the exact controller target `aff2484e` by merge head
+`36c989be`. At repair source commit `4c457fc0`, this single locked command exited successfully
+with temporary sorted registrations:
 
 ```text
 lake-lock env bash -c 'lake exe cache get &&
@@ -328,11 +327,6 @@ Both DCDR modules built with warnings as errors. `runPhyslibLinters` passed for 
 QuantumInfo. `lint_all` exited zero after its build, registry, legal-import, duplicate-tag,
 sorry/pseudo-attribution, declaration-linter, and transitive-import checks. Its advisory style and
 transitive-import inventories named only pre-existing files, with neither DCDR module present.
-The file-import inventory named four unregistered development-side thin-cell modules and neither
+The file-import inventory named five unregistered development-side thin-cell modules and neither
 DCDR module. `Physlib.lean` was then restored byte-identically to SHA-256
 `9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
-
-After the Lean changes were committed, `./scripts/lint-style.sh` named only synchronized
-development-side findings in
-`Physlib/Electromagnetism/ThreeDimension/BoundaryConditions/OneSidedTraceRegression.lean:176`
-and `:189`; neither DCDR module was named.
