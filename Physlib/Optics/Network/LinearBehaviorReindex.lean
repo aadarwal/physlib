@@ -8,12 +8,12 @@ module
 public import Physlib.Optics.Network.LinearBehavior
 
 /-!
-# Compositional relabelling of linear optical behaviors
+# Inverse relabelling of linear optical behaviors
 
 ## i. Overview
 
-This file records inverse cancellation and functorial composition for transporting a finite
-linear behavior along index equivalences.
+This file records that transporting a finite linear behavior along index equivalences and then
+transporting it back along their inverses recovers the original relation.
 
 ## ii. Key results
 
