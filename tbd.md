@@ -79,6 +79,15 @@ PR unless maintainers explicitly ask to retain it.
   cross geometry, instantaneous referenced-field connectors and guarded period replacement,
   pointwise/common-interval normal cancellation, the fixed-frequency superposed-field endpoint,
   and their exact regressions should remain reviewable in that order.
+- [ ] Human-check the algebraic Fresnel scattering precursor before upstreaming. Confirm that the
+  normalized transmission is `sqrt ((Y2 chi_t) / (Y1 chi_i)) * t` with the real sign of `t`
+  retained, and that coordinates `0` and `1` denote the negative and positive sides. The second
+  column `(τ, -r)` is an orthogonal equal-norm completion of the established left-incident column
+  `(r, τ)`, not a reverse-incidence Maxwell derivation, reciprocity statement, outgoing-port model,
+  or proof of physical channel completeness. Recheck the exact oblique s/p matrices and their
+  direct radical power computations. A complete interface scattering model still needs reverse
+  incidence, oriented external frames, reference-plane transport, and strictly positive retained
+  propagating-channel normal admittances.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
   upstream diff.
 

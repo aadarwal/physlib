@@ -332,6 +332,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFlux
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFluxRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterference
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterferenceRegression
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScattering
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.IntegralBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
