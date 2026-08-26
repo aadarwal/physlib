@@ -419,6 +419,23 @@ lemma reuseRegression_cross_amplitudes_nonzero :
           (Outgoing.mk ⟨(.third, true), ()⟩) ≠ 0 := by
   norm_num [reuseRegressionOutgoing]
 
+/-- The three routed incident coordinates equal the preceding nonzero outgoing coordinates, with
+distinct values `2`, `6`, and `30`. -/
+lemma reuseRegression_cross_equations :
+    reuseRegressionIncident
+          (Incident.mk ⟨(.second, false), ()⟩) =
+        reuseRegressionOutgoing
+          (Outgoing.mk ⟨(.first, true), ()⟩) ∧
+      reuseRegressionIncident
+          (Incident.mk ⟨(.third, false), ()⟩) =
+        reuseRegressionOutgoing
+          (Outgoing.mk ⟨(.second, true), ()⟩) ∧
+      reuseRegressionIncident
+          (Incident.mk ⟨(.fourth, false), ()⟩) =
+        reuseRegressionOutgoing
+          (Outgoing.mk ⟨(.third, true), ()⟩) := by
+  norm_num [reuseRegressionIncident, reuseRegressionOutgoing]
+
 /-!
 
 ## E. Raw equations for the right parenthesization
