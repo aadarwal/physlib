@@ -61,7 +61,9 @@ namespace AllPass
 
 open Physlib.ZTransform
 
-/-! ## A. Independent causal recurrence -/
+/-!
+## A. Independent causal recurrence
+-/
 
 /-- The strictly positive feedback lag of the one-delay all-pass recurrence. -/
 def zFeedbackLags : Finset ℕ := {1}
@@ -219,7 +221,9 @@ lemma causalOutput_unitImpulse_eq_impulseResponseFormula (through attenuation : 
     (causalOutput_isRecurrenceSolution through attenuation unitImpulse_isCausal)
     (impulseResponseFormula_isRecurrenceSolution through attenuation)
 
-/-! ## B. Transform laws -/
+/-!
+## B. Transform laws
+-/
 
 /-- The transfer function attached to the independently stated all-pass recurrence. -/
 def zTransfer (through attenuation z : ℂ) : ℂ :=

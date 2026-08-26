@@ -67,7 +67,9 @@ namespace AllPass
 open Physlib.ZTransform
 open DelayTransfer
 
-/-! ## A. Fixed-carrier evaluation point -/
+/-!
+## A. Fixed-carrier evaluation point
+-/
 
 /-- The selected Z evaluation point whose reciprocal is the fixed-carrier phase factor. -/
 def carrierPoint (p : Parameters) : ℂ :=
@@ -86,7 +88,9 @@ lemma loopCoefficient_eq_fieldAttenuation_mul_carrierPoint_inv (p : Parameters) 
   rw [carrierPoint_inv]
   rfl
 
-/-! ## B. N5 response and circulation series -/
+/-!
+## B. N5 response and circulation series
+-/
 
 /-- After the formal loop factor is identified with `a*z⁻¹`, the recurrence and fixed-ring
 denominators have exactly the same nonvanishing gate. This does not identify the analytic ROC with
@@ -223,7 +227,9 @@ lemma zTransfer_eq_responseTransform_entry (p : Parameters) (z : ℂ)
   rw [zTransfer_eq_throughTransfer p z hUnitary hDenominator hLoop,
     responseTransform_entry_through_input p hDenominator]
 
-/-! ## C. Sequence-level response bridge -/
+/-!
+## C. Sequence-level response bridge
+-/
 
 /-- On the common convergence and solve domain, the transform of the causal recurrence output is
 the N5 input-to-through response entry times the input transform. The summability hypotheses are
@@ -271,7 +277,9 @@ lemma transform_causalOutput_carrierPoint_eq_responseTransform_entry_mul (p : Pa
     hInput hInputSummable hOutputSummable hUnitary hContractive.hasNonzeroDenominator
     (loopCoefficient_eq_fieldAttenuation_mul_carrierPoint_inv p)
 
-/-! ## D. Mason, scattering, and chain views -/
+/-!
+## D. Mason, scattering, and chain views
+-/
 
 /-- The recurrence transfer equals the complete extracted Mason response entry. -/
 lemma zTransfer_eq_masonResponseTransform_entry (p : Parameters) (z : ℂ)
@@ -306,7 +314,9 @@ lemma zTransfer_eq_backwardFirstChainTransform_entry (p : Parameters) (z : ℂ)
     backwardFirstChainTransform_eq_matrix p hDenominator hTransmission]
   rfl
 
-/-! ## E. Common-domain cross-semantics agreement -/
+/-!
+## E. Common-domain cross-semantics agreement
+-/
 
 /-- The common domain on which every all-pass ring semantics in X-01 is meaningful.
 

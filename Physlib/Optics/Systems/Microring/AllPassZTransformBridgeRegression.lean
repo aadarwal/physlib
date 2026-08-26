@@ -53,7 +53,9 @@ namespace AllPass
 open DelayTransfer
 open Physlib.ZTransform
 
-/-! ## A. Independent cross-semantics agreement -/
+/-!
+## A. Independent cross-semantics agreement
+-/
 
 /-- The resonant point lies in the named absolute ROC by the strict pole-radius bound. -/
 lemma allPassZRegression_one_mem_zTransferROC :
@@ -115,7 +117,9 @@ lemma allPassZRegression_cross_semantics :
   · exact hAgreement.backwardFirstChain.symm.trans hTransfer
   · exact hAgreement.relationalBehavior
 
-/-! ## B. Fixed-carrier phase-sign sentinel -/
+/-!
+## B. Fixed-carrier phase-sign sentinel
+-/
 
 /-- The `3-4-5` fixture at positive quarter-turn round-trip phase. -/
 def allPassZRegressionQuarterTurnParameters : Parameters where
@@ -228,7 +232,9 @@ lemma allPassZRegression_quarterTurn_agreement :
     allPassZRegression_quarterTurn_throughTransfer]
   simpa [allPassZRegressionQuarterTurnParameters] using allPassZRegression_transfer_I
 
-/-! ## C. Load-bearing unitary-coupler gate -/
+/-!
+## C. Load-bearing unitary-coupler gate
+-/
 
 /-- A deliberately nonunitary coupler with the same through amplitude and carrier factor as the
 resonant fixture. -/

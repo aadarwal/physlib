@@ -56,7 +56,9 @@ namespace AllPass
 
 open Physlib.ZTransform
 
-/-! ## A. Causal recurrence samples -/
+/-!
+## A. Causal recurrence samples
+-/
 
 /-- The causal impulse response of the exact resonant `3-4-5` fixture. -/
 def allPassZRegressionOutput : ℤ → ℂ :=
@@ -107,7 +109,9 @@ lemma allPassZRegression_output_two : allPassZRegressionOutput 2 = -12 / 125 := 
     zFeedbackCoefficients, zFeedforwardCoefficients, unitImpulse] at hAtTwo ⊢
   exact hAtTwo
 
-/-! ## B. Reciprocal-variable transfer values -/
+/-!
+## B. Reciprocal-variable transfer values
+-/
 
 /-- Direct expansion of the coefficient symbols gives the resonant transfer `1 / 7`. -/
 lemma allPassZRegression_transfer_one : zTransfer (3 / 5) (1 / 2) 1 = 1 / 7 := by
