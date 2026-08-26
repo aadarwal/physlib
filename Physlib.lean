@@ -469,6 +469,11 @@ public import Physlib.Optics.Systems.Microring.Observables
 public import Physlib.Optics.Systems.Microring.ObservablesFrequency
 public import Physlib.Optics.Systems.Microring.ObservablesPower
 public import Physlib.Optics.Systems.Microring.ObservablesRegression
+public import Physlib.Optics.Systems.Microring.SourceBridge
+public import Physlib.Optics.Systems.Microring.SourceBridgeDate
+public import Physlib.Optics.Systems.Microring.SourceBridgeRegression
+public import Physlib.Optics.Systems.Microring.SourceBridgeSfg
+public import Physlib.Optics.Systems.Microring.SourceBridgeSysCon
 public import Physlib.Optics.Systems.PolarizerRetarder
 public import Physlib.Particles.BeyondTheStandardModel.GeorgiGlashow.Basic
 public import Physlib.Particles.BeyondTheStandardModel.PatiSalam.Basic
