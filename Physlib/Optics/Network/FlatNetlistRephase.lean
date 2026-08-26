@@ -276,10 +276,7 @@ namespace FlatNetlist
 variable (netlist : FlatNetlist.{u, v, w, x})
 variable [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
 
-/-- The external channel family is finite under the standard flat-netlist hypotheses. -/
-local instance flatRephaseExternalChannelFintype : Fintype netlist.ExternalChannel := by
-  classical
-  infer_instance
+attribute [local instance] eliminationExternalChannelFintype
 
 /-- The assembled component relation after changing all ambient incident and outgoing phase
 coordinates. -/
@@ -338,9 +335,7 @@ private lemma mem_toBehavior_rephase_responseTransform_iff
   rw [ModeTransform.toBehavior_rephase,
     netlist.rephasedBehavior_eq gauge hMatched]
   simp only [LinearBehavior.mem_rephase_iff]
-  exact (ModeTransform.mem_toBehavior_iff_toLinearMap
-    (netlist.responseTransform hWellPosed) _ _).trans
-      (netlist.mem_behavior_iff_eq_responseTransform hWellPosed _ _).symm
+  rw [netlist.toBehavior_responseTransform hWellPosed]
 
 /-- The covariantly rephased original response has exactly the rephased external graph. -/
 lemma toBehavior_rephase_responseTransform
@@ -446,35 +441,11 @@ section Finite
 
 variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype outer.Channel]
 
-/-- The inner stage's structurally external channels inherit ambient finiteness. -/
-local instance appendRephaseInnerExternalChannelFintype :
-    Fintype inner.ExternalChannel := by
-  classical
-  infer_instance
-
-/-- The inner boundary channel type inherits finiteness from its external-channel presentation.
--/
-local instance appendRephaseBoundaryChannelFintype :
-    Fintype inner.externalPortModeFamily.Channel :=
-  Fintype.ofEquiv _ inner.boundaryChannelEquiv.symm
-
-/-- The flattened connected channels are the finite sum of both stages' connected channels. -/
-local instance appendRephaseConnectedChannelFintype :
-    Fintype (inner.append outer).Channel :=
-  Fintype.ofEquiv _ (inner.appendChannelEquiv outer).symm
-
-/-- The final outer boundary inherits finiteness from the finite intermediate boundary. -/
-local instance appendRephaseOuterExternalChannelFintype :
-    Fintype outer.ExternalChannel := by
-  classical
-  infer_instance
-
-/-- The flattened external channel family is finite under the two-stage structural hypotheses.
--/
-local instance appendRephaseExternalChannelFintype :
-    Fintype (inner.append outer).ExternalChannel := by
-  classical
-  infer_instance
+attribute [local instance] twoStageInnerExternalChannelFintype
+attribute [local instance] twoStageBoundaryChannelFintype
+attribute [local instance] twoStageAppendChannelFintype
+attribute [local instance] twoStageOuterExternalChannelFintype
+attribute [local instance] twoStageAppendExternalChannelFintype
 
 /-- Pointwise staged covariance, isolated so finite-index instance normalization occurs before
 relation extensionality. -/
@@ -494,6 +465,11 @@ private lemma mem_closeBehavior_append_rephase_eq_staged
         ((inner.append outer).externalGauge gauge).outgoing := by
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
   simp only [LinearBehavior.mem_rephase_iff]
+  have hExternalFintype :
+      rephaseExternalChannelFintype (inner.append outer) =
+        twoStageAppendExternalChannelFintype inner outer :=
+    Subsingleton.elim _ _
+  rw [hExternalFintype]
   rw [inner.closeBehavior_append outer behavior]
   exact Iff.rfl
 
