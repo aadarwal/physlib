@@ -21,24 +21,26 @@ pivot inverse is `(8/7)I`. Consequently the backward-first chain has diagonal
 The scalar data are expanded from the parameter definitions. The chain entries unfold the generic
 N3T block construction and never use `nominalBackwardFirstChainTransform_eq_matrix` or
 `zChainCrossSemantics_agree`. The causal, reciprocal-Z, raw N5, and eleven-branch Mason values reuse
-the accepted independent nonzero-loop audit. Swapping the nominal reference-plane order gives the
-opposite diagonal and is rejected at the same fixture.
+the accepted independent nonzero-loop audit. A synthetic swap of the two N3T diagonal slots is
+rejected at the same fixture. It is not an endpoint-reindex test: the coherent scalar formulas make
+`transfer p.reverse = transfer p` for every `p`.
 
 ## ii. Key results
 
 - `DCDR.zChainRegression_reverse_transfer`: the independently expanded pivot scalar.
+- `DCDR.zChainRegression_transfer_reverse_eq`: why scalar endpoint reversal is not a sentinel.
 - `DCDR.zChainRegression_independent_packaged_blocks`: the four raw-N7 N5 blocks.
 - `DCDR.zChainRegression_pivotInverse_entry`: the independently solved inverse pivot.
 - `DCDR.zChainRegression_chain_leading`: the exact `(8/7)I` leading entry.
 - `DCDR.zChainRegression_independent_common_point`: all independent DCDR X-01 anchors together.
-- `DCDR.zChainRegression_chain_ne_wrongReferencePlaneMatrix`: fail-capable ordering sentinel.
+- `DCDR.zChainRegression_chain_ne_wrongDiagonalOrderMatrix`: fail-capable N3T-order sentinel.
 
 ## iii. Table of contents
 
 - A. Exact scalar data and pivot
 - B. Independent backward-first chain entries
 - C. Extended common-domain witness
-- D. Wrong-reference-plane sentinel
+- D. N3T diagonal-order sentinel
 
 ## iv. References
 
@@ -669,20 +671,20 @@ lemma zChainRegression_productionAgreement_with_independent_anchor :
 
 /-!
 
-## D. Wrong-reference-plane sentinel
+## D. N3T diagonal-order sentinel
 
 -/
 
-/-- The deliberately wrong reference-plane matrix swaps the two correct diagonal entries. -/
-def zChainRegressionWrongReferencePlaneMatrix : BackwardFirstChainTransform Unit Unit
+/-- The deliberately wrong N3T block order swaps the two correct diagonal entries. -/
+def zChainRegressionWrongDiagonalOrderMatrix : BackwardFirstChainTransform Unit Unit
   | Sum.inl _, Sum.inl _ => -(7 / 8) * Complex.I
   | Sum.inl _, Sum.inr _ => 0
   | Sum.inr _, Sum.inl _ => 0
   | Sum.inr _, Sum.inr _ => (8 / 7) * Complex.I
 
-/-- The same fixture rejects the wrong nominal reference-plane order. -/
-lemma zChainRegression_chain_ne_wrongReferencePlaneMatrix :
-    zChainRegressionChain ≠ zChainRegressionWrongReferencePlaneMatrix := by
+/-- The same fixture rejects the synthetic wrong N3T diagonal order. -/
+lemma zChainRegression_chain_ne_wrongDiagonalOrderMatrix :
+    zChainRegressionChain ≠ zChainRegressionWrongDiagonalOrderMatrix := by
   intro hWrong
   have hLeading := congrArg
     (fun chain : BackwardFirstChainTransform Unit Unit =>

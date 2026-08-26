@@ -20,14 +20,14 @@ contains no equality between the ring and DCDR response values.
 The ring fixture has response `1/7` and backward-first diagonal `(7, 1/7)`. The DCDR fixture uses
 `z = I`, response `-(7/8)I`, and diagonal `((8/7)I, -(7/8)I)`. Independent recurrence, raw N5,
 Mason, and chain anchors establish those different values without invoking the joint predicate.
-The DCDR wrong-reference-plane matrix swaps its diagonal and is rejected on the same fixture.
+The synthetic wrong N3T diagonal order is rejected on the same DCDR fixture.
 
 ## ii. Key results
 
 - `Optics.RingDCDRX01Agreement`: the joint predicate with no cross-system value equality.
 - `Optics.ringDCDRX01Regression_hasAgreement`: one accepted ring and one DCDR inhabit it.
 - `Optics.ringDCDRX01Regression_independentAnchors`: independently pinned unequal values.
-- `Optics.ringDCDRX01Regression_wrongReferencePlane_rejected`: fail-capable joint sentinel.
+- `Optics.ringDCDRX01Regression_wrongDiagonalOrder_rejected`: fail-capable joint sentinel.
 
 ## iii. Table of contents
 
@@ -140,16 +140,16 @@ lemma ringDCDRX01Regression_independentAnchors :
 
 -/
 
-/-- The joint fixture rejects the swapped DCDR reference-plane matrix while retaining both stated
-leading values `7` and `(8/7)I`. -/
-lemma ringDCDRX01Regression_wrongReferencePlane_rejected :
-    DCDR.zChainRegressionChain ≠ DCDR.zChainRegressionWrongReferencePlaneMatrix ∧
+/-- The joint fixture rejects swapped DCDR N3T diagonal slots while retaining the two independently
+stated leading values `7` and `(8/7)I`. -/
+lemma ringDCDRX01Regression_wrongDiagonalOrder_rejected :
+    DCDR.zChainRegressionChain ≠ DCDR.zChainRegressionWrongDiagonalOrderMatrix ∧
       AllPass.allPassChainRegressionResonanceChain
           (Sum.inl (BackwardWave.mk ())) (Sum.inl (BackwardWave.mk ())) = 7 ∧
       DCDR.zChainRegressionChain
           (Sum.inl (BackwardWave.mk ())) (Sum.inl (BackwardWave.mk ())) =
         (8 / 7) * Complex.I :=
-  ⟨DCDR.zChainRegression_chain_ne_wrongReferencePlaneMatrix,
+  ⟨DCDR.zChainRegression_chain_ne_wrongDiagonalOrderMatrix,
     AllPass.allPassChainRegression_resonance_chain_inl_inl,
     DCDR.zChainRegression_chain_leading⟩
 
