@@ -57,7 +57,8 @@ S4P restricts its Schur/BIBO result to the proper causal one-pole class at
 
 FMICS'15 Eq. 3 prints verbatim: “The general expression for the photonic transmittance is given
 as follows: `T_i = t_{a_i} G_i z^{m_i}`.” This file uses the unit-attenuation formal-`q`
-specialization and the separate Physlib legend `q = z⁻¹`.
+specialization and the reciprocal reparameterization `q = z⁻¹` defined at
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:397-455`.
 
 FMICS'15 Table 1 prints “Active DCDR Circuit with Unit Delay” with `m1 = m2 = m3 = 1`,
 “Optical Amplifier in the Fiber Path” with those delays and `G_i > 1`,

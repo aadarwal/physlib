@@ -14,8 +14,9 @@ public import Physlib.Optics.Systems.DCDR.MultipleDelayPolynomial
 
 FMICS'15 Eq. 3 prints verbatim: “The general expression for the photonic transmittance is given
 as follows: `T_i = t_{a_i} G_i z^{m_i}`.” This dictionary takes `t_{a_i} = 1`, renames the
-retained polynomial indeterminate to formal `q`, and uses Physlib's reciprocal legend
-`q = z⁻¹`. Its path substitution is therefore `T_i = G_i*q^m_i = G_i/z^m_i`.
+retained polynomial indeterminate to formal `q`, and uses the reciprocal reparameterization at
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:397-455`. Thus `q = z⁻¹`, and its path
+substitution is `T_i = G_i*q^m_i = G_i/z^m_i`.
 
 FMICS'15 Table 1 prints these four configurations:
 

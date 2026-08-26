@@ -54,8 +54,10 @@ U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic
 Processing Systems”, FMICS 2015, LNCS 9128, Equation 3, Theorem 3, and Table 1, pp. 169--174.
 
 Physlib retains formal `q` and states reciprocal `z` results only through `q = z⁻¹`. This is
-a coordinate legend, not a physical-frequency claim. The coherent N7 `t`/`-I*k` construction
-is the source's own unprinted coherent branch; the printed incoherent graph remains separate.
+a coordinate legend, not a physical-frequency claim; its defining reparameterization is at
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:397-455`. The coherent N7 `t`/`-I*k`
+construction is the source's own unprinted coherent branch; the printed incoherent graph remains
+separate.
 -/
 
 @[expose] public section
