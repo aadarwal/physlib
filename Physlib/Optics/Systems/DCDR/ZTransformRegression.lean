@@ -20,9 +20,11 @@ circulation series, fixed N5 response, complete Mason response, typed packaged s
 original relational behavior at that same exact value.
 
 The nonreal `z = I` anchor expands `q = z⁻¹ = -I` directly and reaches the raw compiled response
-without `zCrossSemantics_agree`. The active-amplifier sentinel has loop gain `-4`: its algebraic
-transfer is `-67/20`, while Mathlib's totalized nonsummable geometric `tsum` makes the unguarded
-circulation expression `1/4`. Thus the contraction/Schur gates can detect a real divergence.
+without `zCrossSemantics_agree`. The separate stable point with loop polynomial `-(1/4)q²`
+exercises the proved lag-two geometric ROC criterion at `z = 1`. The active-amplifier sentinel has
+loop gain `-4`: its algebraic transfer is `-67/20`, while Mathlib's totalized nonsummable geometric
+`tsum` makes the unguarded circulation expression `1/4`. Thus the contraction/Schur gates can
+detect a real divergence.
 
 These are algebraic discrete-time fixtures, not physical resonance claims. No coherent--incoherent
 equivalence, BIBO conclusion, modal or electromagnetic power statement, Maxwell time-domain
@@ -35,6 +37,7 @@ unit-normalized bridge at
 ## ii. Key results
 
 - `DCDR.zRegression_crossSemantics`: every applicable DCDR view is pinned at `-1`.
+- `DCDR.zRegression_stable_one_mem_zTransferROC`: nonzero-loop ROC membership is derived.
 - `DCDR.zRegression_nonreal_raw_compiled`: the `z = I`, `q = -I` compiled anchor.
 - `DCDR.zRegression_active_circulation_ne_transfer`: the load-bearing contraction sentinel.
 
@@ -214,6 +217,26 @@ lemma zRegression_one_mem_zTransferROC :
     rw [delaySymbol_zFeedbackCoefficients,
       zRegression_loopPolynomial_expansion]
     norm_num
+
+/-- The stable nonzero-loop fixture retains exactly lag two. -/
+lemma zRegression_stable_zFeedbackLags :
+    zFeedbackLags stableUnitDelayParameters = {2} := by
+  rw [zFeedbackLags, stable_loopPolynomial_expansion]
+  ext n
+  simp [Polynomial.mem_support_iff]
+
+/-- The retained stable feedback coefficient is the square of `I/2`. -/
+lemma zRegression_stable_zFeedbackCoefficient_two :
+    zFeedbackCoefficients stableUnitDelayParameters 2 = (Complex.I / 2) ^ 2 := by
+  rw [zFeedbackCoefficients, stable_loopPolynomial_expansion]
+  norm_num [Complex.I_sq]
+
+/-- The strict lag-two geometric criterion proves that `z = 1` belongs to the actual ROC. -/
+lemma zRegression_stable_one_mem_zTransferROC :
+    (1 : ℂ) ∈ zTransferROC stableUnitDelayParameters := by
+  apply mem_zTransferROC_of_lagTwoGeometric stableUnitDelayParameters (Complex.I / 2) 1
+    zRegression_stable_zFeedbackLags zRegression_stable_zFeedbackCoefficient_two
+  norm_num
 
 /-- The unit cancelled factor is nonzero at the selected reciprocal point. -/
 lemma zRegression_noPoleCancellation :
