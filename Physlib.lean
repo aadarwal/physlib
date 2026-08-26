@@ -460,6 +460,8 @@ public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
 public import Physlib.Optics.Systems.Cascade.Heterogeneous
 public import Physlib.Optics.Systems.Cascade.HeterogeneousRegression
+public import Physlib.Optics.Systems.DCDR.Topology
+public import Physlib.Optics.Systems.DCDR.TopologyRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
