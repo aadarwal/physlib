@@ -182,6 +182,30 @@ def positiveSideSample {d : ℕ} {P V : Type*} [Zero V]
       simpa [OrientedAffineHyperplane.openHalfSpace] using hHeight⟩
   else 0
 
+/-- Sampling a restricted ambient field at a strictly negative height recovers the ambient
+field value at the corresponding normal-offset point. -/
+lemma negativeSideSample_restrictFieldToSide_of_neg
+    {d : ℕ} {P V : Type*} [Zero V]
+    (plane : OrientedAffineHyperplane d) (field : P → Space d → V)
+    (parameter : P) (x : plane.carrier) (offset : plane.tangentSubmodule)
+    (height : ℝ) (hheight : height < 0) :
+    plane.negativeSideSample (plane.restrictFieldToSide .negative field)
+        parameter x offset height =
+      field parameter (plane.normalOffsetPoint x offset height) := by
+  simp [negativeSideSample, hheight, restrictFieldToSide]
+
+/-- Sampling a restricted ambient field at a strictly positive height recovers the ambient
+field value at the corresponding normal-offset point. -/
+lemma positiveSideSample_restrictFieldToSide_of_pos
+    {d : ℕ} {P V : Type*} [Zero V]
+    (plane : OrientedAffineHyperplane d) (field : P → Space d → V)
+    (parameter : P) (x : plane.carrier) (offset : plane.tangentSubmodule)
+    (height : ℝ) (hheight : 0 < height) :
+    plane.positiveSideSample (plane.restrictFieldToSide .positive field)
+        parameter x offset height =
+      field parameter (plane.normalOffsetPoint x offset height) := by
+  simp [positiveSideSample, hheight, restrictFieldToSide]
+
 /-- A carrier point displaced by a bundled tangent vector remains in the carrier. -/
 def tangentPoint {d : ℕ} (plane : OrientedAffineHyperplane d) (x : plane.carrier)
     (offset : plane.tangentSubmodule) : plane.carrier :=
