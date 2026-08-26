@@ -385,6 +385,8 @@ public import Physlib.Optics.Network.TwoPortBehaviorRegression
 public import Physlib.Optics.Network.TwoPortCascade
 public import Physlib.Optics.Network.TwoPortCascadeRegression
 public import Physlib.Optics.Network.TwoPortChain
+public import Physlib.Optics.Network.TwoPortChainFold
+public import Physlib.Optics.Network.TwoPortChainFoldRegression
 public import Physlib.Optics.Network.TwoPortChainRegression
 public import Physlib.Optics.Network.TwoPortChainScattering
 public import Physlib.Optics.Network.TwoPortChainScatteringRegression
@@ -456,6 +458,8 @@ public import Physlib.Optics.Rays.Resonator
 public import Physlib.Optics.Rays.ResonatorRegression
 public import Physlib.Optics.Rays.Transfer
 public import Physlib.Optics.Rays.TransferRegression
+public import Physlib.Optics.Systems.Cascade.Heterogeneous
+public import Physlib.Optics.Systems.Cascade.HeterogeneousRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
