@@ -1,4 +1,4 @@
-# S7D slice 7 handoff: formal multiple-delay DCDR family
+# S7D slice 7b handoff: admissibility-gated unit-delay bridge
 
 ## Cutoff identity
 
@@ -8,7 +8,7 @@
 - Exact sync merge commit:
   `4a3b03fa46af638049eea1c951a2b4c244b8fc72`.
 - Gated Lean source head:
-  `cef347516e35d64595f072d0572f0a9a75783bf6`.
+  `79bebe56b9fe17694b20502865ed65598306aeac`.
 - The final cutoff is this HANDOFF-only child of the gated source head.
 - No development head later than the named target was merged.
 
@@ -20,11 +20,13 @@ particular:
 > "active/passive, unit-delay, and multiple-delay specializations;"
 
 The earlier DCDR spine supplied active/passive fixtures and
-`UnitDelayParameters`. This cutoff supplies the missing formal
-`q^{m_i}` family and exact multiple-delay fixtures. Thus the
-“multiple-delay” part closes here; the “active/passive” and “unit-delay”
-parts remain discharged by the earlier slices and are connected to this family by
-literal specialization lemmas.
+`UnitDelayParameters`. Slice 7 supplied the missing formal `q^{m_i}` family
+and exact multiple-delay fixtures. This 7b cutoff establishes precisely how
+the old unit-delay rational family is connected to the new family: setting
+`(m1,m2,m3)=(1,1,1)` gives the same polynomial data and pointwise compiled
+N7 netlist, while response-domain membership and the selected N5 response
+agree only under the old `UnitDelayParameters.IsAdmissible` gate. The
+negative-gain regression shows why that gate cannot be dropped.
 
 ## Printed source text
 
@@ -70,15 +72,16 @@ physical-frequency interpretation is made.
 The controller requested an early split when the coherent-only WIP reached
 1208 lines. The final dependency order is:
 
-1. `MultipleDelay.lean` — 752 lines; parameters, polynomial data,
-   literal unit-delay specialization, rational component family, and selected
-   N5 response.
+1. `MultipleDelay.lean` — 879 lines; parameters, polynomial data,
+   rational component family, selected N5 response, and the
+   admissibility-gated unit-delay rational bridge.
 2. `MultipleDelayPolynomial.lean` — 318 lines; expansions, degree bounds,
    cancellation-aware reduction, and generalized pole bound.
 3. `MultipleDelaySource.lean` — 300 lines; the eight-symbol FMICS'15
    source dictionary and printed Theorem-3 polynomials.
-4. `MultipleDelayRegression.lean` — 437 lines; four Table-1 fixtures and
-   the tight degree-four pole fixture.
+4. `MultipleDelayRegression.lean` — 626 lines; four Table-1 fixtures, the
+   tight degree-four pole fixture, a nontrivial shared-response anchor, and
+   the negative-gain validity sentinel.
 
 Requested sorted registrations:
 
@@ -141,6 +144,26 @@ response domain.
 `(m1,m2,m3)=(1,1,1)` literally. Separate lemmas prove equality of all three
 path polynomials, the coherent denominator, and the selected coherent
 numerator with the earlier unit-delay family.
+
+## Unit-delay rational bridge and validity gate
+
+The unit-exponent embedding has pointwise scattering equality component by
+component and therefore compiles to the same coherent N7 flat netlist as the
+old rational family at every formal `q`. This algebraic compilation equality
+does not identify stored model validity.
+
+Under `hp : p.IsAdmissible`, denominator equality and the two families'
+well-posedness characterizations give an iff between response-domain
+membership. On that common domain, both independently certified N5 entries
+evaluate the same numerator and denominator, so the selected responses are
+equal. This is the exact sense in which the embedding is a rational-family
+specialization.
+
+The gate is load-bearing. At `upperGain=-1`, `lowerGain=1`, and
+`feedbackGain=0`, the old response domain is empty because the old component
+validity predicate rejects the negative real gain. The embedded family has
+positive exponents and denominator one, so formal `q=0` lies in its response
+domain. Thus no unconditional response-domain equivalence is claimed.
 
 ## Polynomial, reduction, and pole layer
 
@@ -224,6 +247,12 @@ normalized physical-coupler claim.
   evaluation, not by the generalized pole-cardinality lemma.
 - The final `ncard=4=natDegree` anchor combines the independently expanded
   degree and pole set.
+- At gains `(2,3/2,1/2)` and formal `q=1/2`, the old and embedded numerator
+  and denominator values are expanded independently to `13/16`; each selected
+  response is therefore pinned to `1` without using the bridge lemma.
+- The negative-gain sentinel extracts the old stored validity predicate
+  directly from response-domain membership and separately constructs an
+  embedded domain point from the primitive denominator expansion.
 
 Changing a Table exponent, a Theorem-3 source index, the coherent cross gauge,
 the reciprocal-coordinate convention, or the tight fixture's path data breaks
@@ -303,6 +332,13 @@ introduces no `theorem` declaration.
   `multipleDelayRationalNetlist_responseTransform_eq`,
   `multipleDelayRationalEliminationResponse`,
   `multipleDelayRationalEliminationResponse_eq_responseModel`.
+- Admissibility-gated unit-delay rational bridge:
+  `multipleDelayEvaluatedPathScattering_one_eq_evaluatedPathScattering`,
+  `UnitDelayParameters.toMultipleDelayParameters_rationalComponents_scattering_eq`,
+  `UnitDelayParameters.toMultipleDelayParameters_rationalNetlist_compile_eq`,
+  `UnitDelayParameters.toMultipleDelayParameters_responseModel_eval_eq`,
+  `UnitDelayParameters.mem_rationalNetlist_responseDomain_iff_toMultipleDelayParameters`,
+  `UnitDelayParameters.rationalEliminationResponse_eq_toMultipleDelayParameters`.
 
 ### `Optics.DCDR` in `MultipleDelayPolynomial.lean`
 
@@ -382,22 +418,45 @@ In `Optics.DCDR`:
   `tightMultipleDelayResponseReduction`,
   `tightMultipleDelay_zPoles_eq_four`,
   `tightMultipleDelay_ncard_actualPoles_eq_four`,
-  `tightMultipleDelay_ncard_actualPoles_eq_natDegree`.
+  `tightMultipleDelay_ncard_actualPoles_eq_natDegree`,
+  `unitDelayBridgeCoupler`,
+  `unitDelayBridgeParameters`,
+  `unitDelayBridgeQ`,
+  `unitDelayBridgeParameters_isAdmissible`,
+  `unitDelayBridge_old_polynomial_evaluations`,
+  `unitDelayBridge_embedded_polynomial_evaluations`,
+  `unitDelayBridgeOldDomainProof`,
+  `unitDelayBridgeEmbeddedDomainProof`,
+  `unitDelayBridge_old_response_eq_one`,
+  `unitDelayBridge_embedded_response_eq_one`,
+  `unitDelayBridge_both_responses_eq_one`,
+  `unitDelayValidityCounterexample`,
+  `unitDelayValidityCounterexample_predicates`,
+  `unitDelayValidityCounterexample_old_responseDomain_eq_empty`,
+  `unitDelayValidityCounterexample_embedded_denominator_at_zero`,
+  `unitDelayValidityCounterexample_embedded_responseDomain_nonempty`,
+  `unitDelayValidityGate_is_loadBearing`.
 
 ## Validation map
 
 Validation should bind at least:
 
 - `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_data`
-  (`MultipleDelay.lean:341`).
+  (`MultipleDelay.lean:353`).
 - `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_denominatorPolynomial`
-  (`MultipleDelay.lean:382`).
+  (`MultipleDelay.lean:394`).
 - `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_responseNumeratorPolynomial`
-  (`MultipleDelay.lean:399`).
+  (`MultipleDelay.lean:411`).
 - `Optics.DCDR.multipleDelayRationalNetlist_compile_eq`
-  (`MultipleDelay.lean:572`).
+  (`MultipleDelay.lean:584`).
 - `Optics.DCDR.multipleDelayRationalEliminationResponse_eq_responseModel`
-  (`MultipleDelay.lean:720`).
+  (`MultipleDelay.lean:732`).
+- `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_rationalNetlist_compile_eq`
+  (`MultipleDelay.lean:808`).
+- `Optics.DCDR.UnitDelayParameters.mem_rationalNetlist_responseDomain_iff_toMultipleDelayParameters`
+  (`MultipleDelay.lean:845`).
+- `Optics.DCDR.UnitDelayParameters.rationalEliminationResponse_eq_toMultipleDelayParameters`
+  (`MultipleDelay.lean:865`).
 - `Optics.DCDR.MultipleDelayParameters.denominatorPolynomial_natDegree_le`
   (`MultipleDelayPolynomial.lean:142`).
 - `Optics.DCDR.MultipleDelayParameters.responseNumeratorPolynomial_natDegree_le`
@@ -411,13 +470,17 @@ Validation should bind at least:
 - `Optics.DCDRSourceBridge.MultipleDelaySourceParameters.printedDenominatorPolynomial_natDegree_le`
   (`MultipleDelaySource.lean:230`).
 - All four `table*_*printedPolynomials` anchors
-  (`MultipleDelayRegression.lean:107,143,176,211`).
+  (`MultipleDelayRegression.lean:116,152,185,220`).
 - `Optics.DCDR.tightMultipleDelay_denominatorPolynomial_natDegree_eq_four`
-  (`MultipleDelayRegression.lean:289`).
+  (`MultipleDelayRegression.lean:298`).
 - `Optics.DCDR.tightMultipleDelay_zPoles_eq_four`
-  (`MultipleDelayRegression.lean:351`).
+  (`MultipleDelayRegression.lean:360`).
 - `Optics.DCDR.tightMultipleDelay_ncard_actualPoles_eq_natDegree`
-  (`MultipleDelayRegression.lean:427`).
+  (`MultipleDelayRegression.lean:436`).
+- `Optics.DCDR.unitDelayBridge_both_responses_eq_one`
+  (`MultipleDelayRegression.lean:553`).
+- `Optics.DCDR.unitDelayValidityGate_is_loadBearing`
+  (`MultipleDelayRegression.lean:615`).
 
 ## Non-claims
 
@@ -430,28 +493,32 @@ normalized passive physical coupler.
 
 ## Gate record
 
-At committed source head `cef34751`:
+At committed source head `79bebe56`:
 
 - `lake-lock exe cache get`: green; no files to download.
-- Temporary-registration `lake --wfail build Physlib`: green, 4975 jobs,
-  including all four new modules.
-- `lake exe sorry_lint`: green.
-- `lake exe runPhyslibLinters Physlib`: green.
-- `lake exe runPhyslibLinters QuantumInfo`: green.
-- `lake exe api_map_index`: completed successfully.
-- `lake exe lint_all`: the lane declarations, sorry check, build, and illegal
-  imports are green. It prints the pinned repository's pre-existing aggregate
-  style/transitive-import backlog. Its import check, with this slice
-  temporarily registered, names only the unrelated pending
-  `FluxDirection`, `FluxDirectionRegression`, and prior-slice
+- Targeted `lake-lock build` of `MultipleDelay` and
+  `MultipleDelayRegression`: green, 2786 jobs, with no warning.
+- Temporary-registration `lake-lock --wfail build Physlib`: green, 4975 jobs,
+  including all four modules in the requested repository-sorted order.
+- `lake-lock exe sorry_lint`: green.
+- `lake-lock exe runPhyslibLinters Physlib`: green for both Physlib and
+  QuantumInfo declarations.
+- `lake-lock exe api_map_index`: completed successfully; 34 maps and 649
+  requirements indexed.
+- `lake-lock exe lint_all`: this slice's build, declaration lints, sorry audit,
+  and illegal-import check are green. The command prints the pinned
+  repository's pre-existing aggregate style/transitive-import backlog. Its
+  import check, with this slice temporarily registered, names only the
+  unrelated pending `FluxDirection`, `FluxDirectionRegression`, and
   `PassiveCaseRegression` registrations.
-- `./scripts/lint-style.sh`: green on committed state. Maximum new-file line
-  length is 98 codepoints; all four files are below 1500 lines.
-- `lake exe module_doc_lint`: the repository command remains nonzero on its
-  broad pre-existing documentation backlog. With all four new modules
-  temporarily registered, none is reported. Direct application of the shipped
-  linter's literal-heading and exact-TOC algorithm confirms all four new
-  modules clean.
+- `./scripts/lint-style.sh`: green globally on committed state. Direct shipped
+  style checks are also green on every DCDR module. Maximum line length among
+  the four slice-7 files is 98 codepoints; every DCDR file is below 1500 lines.
+- `lake-lock exe module_doc_lint`: the repository command remains nonzero on
+  its broad pre-existing documentation backlog. With all four modules
+  temporarily registered, filtered output names none of them; their literal
+  headings and exact TOCs match the shipped algorithm.
 - Static house audit: zero `sorry`, `axiom`, `native_decide`,
-  `maxHeartbeats`, or `theorem`; production imports no regression module;
-  `Physlib.lean` is byte-identical to the exact sync target.
+  `maxHeartbeats`, or `theorem`; production imports no regression module.
+  `Physlib.lean` was restored byte-for-byte to SHA-256
+  `01969994b8598317a61650e9a88f5c32b21c369b9958c5c18c7a4822d0f1d56b`.
