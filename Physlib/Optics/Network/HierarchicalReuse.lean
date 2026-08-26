@@ -225,7 +225,6 @@ lemma innerBoundaryBehavior_eq_of_boundaryRelation
               (Incident.relabelEquiv replacement.boundaryChannelEquiv.symm)
               (Outgoing.relabelEquiv replacement.boundaryChannelEquiv.symm) := by
                 rw [innerBoundaryBehavior, hBoundary]
-                rfl
     _ = (inner.closeBehavior behavior).reindex
           ((Incident.relabelEquiv
             (inner.boundaryExternalChannelEquiv replacement boundary)).trans
@@ -279,7 +278,6 @@ local instance replacementTargetAppendChannelFintype :
   Fintype.ofEquiv _
     (replacement.appendChannelEquiv (outer.transport boundary)).symm
 
-omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel] in
 /-- Closing a transported outer family and then presenting the final appended boundary is the
 same as first transporting the outer closure and then presenting that boundary. -/
 lemma transportedOuterClosure_reindex
@@ -310,8 +308,6 @@ lemma transportedOuterClosure_reindex
         (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm)
     (outer.closeBehavior_transport boundary boundaryBehavior)
 
-omit [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
-  [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel] in
 /-- The two routes from an outer external relation to the replacement's final boundary induce
 the same behavior relabelling. -/
 lemma replacementExternal_reindex
@@ -418,8 +414,7 @@ lemma replaceInnerFamily
                 (inner.innerBoundaryBehavior behavior))
     _ = _ := by
       convert replacementExternal_reindex
-        (inner := inner) (replacement := replacement)
-        (boundary := boundary) (outer := outer)
+        inner replacement boundary outer
         (outer.closeBehavior (inner.innerBoundaryBehavior behavior)) using 1 <;> rfl
 
 end PortConnectionFamily
