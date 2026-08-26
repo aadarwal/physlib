@@ -600,6 +600,15 @@ def physicalPortSuite9aHostileIndexedOutput :
         (3 - 8 * Complex.I) / 5
     | ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩ => 3 * Complex.I
 
+/-- The hostile family has the same three indexed channel coordinates. -/
+lemma physicalPortSuite9a_hostile_sum_indexed
+    (value : physicalPortSuite9aHostileFamily.IndexedChannel → ℂ) :
+    (∑ channel, value channel) =
+      value physicalPortSuite9aBeamFirstIndexed +
+        value physicalPortSuite9aBeamSecondIndexed +
+          value physicalPortSuite9aMirrorIndexed :=
+  physicalPortSuite9a_sum_indexed value
+
 /-- The primitive indexed matrix after swapping only the two beam output rows. -/
 def physicalPortSuite9aHostileExplicitIndexedTransform :
     ModeTransform physicalPortSuite9aHostileFamily.IndexedChannel
@@ -657,15 +666,15 @@ lemma physicalPortSuite9a_hostile_indexed_action :
       simp [physicalPortSuite9aHostileExplicitIndexedTransform,
         physicalPortSuite9aIndexedInput, physicalPortSuite9aHostileIndexedOutput,
         ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-        dotProduct, physicalPortSuite9a_sum_indexed]
+        dotProduct, physicalPortSuite9a_hostile_sum_indexed]
     all_goals ring_nf
   · cases port
     cases mode
     simp [physicalPortSuite9aHostileExplicitIndexedTransform,
       physicalPortSuite9aIndexedInput, physicalPortSuite9aHostileIndexedOutput,
       ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-      dotProduct, physicalPortSuite9a_sum_indexed]
-    ring
+      dotProduct, physicalPortSuite9a_hostile_sum_indexed]
+    ring_nf
 
 /-- The hostile exact output in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aHostileAggregateOutput :
