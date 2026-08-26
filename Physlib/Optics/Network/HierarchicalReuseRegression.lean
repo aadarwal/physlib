@@ -795,7 +795,7 @@ lemma reuseRegression_hostile_embed_thirdLeft :
     reuseRegressionHostileFamily.channelEmbedding
         ⟨Sum.inr (), Sum.inl ()⟩ =
       (⟨(.first, false), ()⟩ : ReuseRegressionChannel) := by
-  change (⟨reuseRegressionLeftFirstWestBoundary.1, ()⟩ : ReuseRegressionChannel) = _
+  classical
   rfl
 
 /-- The hostile transport leaves the third connection's fourth-west endpoint fixed. -/
@@ -803,6 +803,7 @@ lemma reuseRegression_hostile_embed_thirdRight :
     reuseRegressionHostileFamily.channelEmbedding
         ⟨Sum.inr (), Sum.inr ()⟩ =
       (⟨(.fourth, false), ()⟩ : ReuseRegressionChannel) := by
+  classical
   change
     (⟨(Equiv.swap reuseRegressionLeftThirdEastBoundary
           reuseRegressionLeftFirstWestBoundary reuseRegressionLeftFourthWestBoundary).1,
