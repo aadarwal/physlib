@@ -1731,8 +1731,11 @@ PR unless maintainers explicitly ask to retain it.
   cofactor numerators, retains parallel edge identity, carries distinguished terminals, and has
   direct G-01/G-03 regressions. `FlatNetlist.feedbackSignalFlowGraph` extracts `C * S`, the graph
   determinant is nonzero exactly when the relational netlist is well posed, and the Mason-
-  assembled external transform equals the N5 response on that gate. The singular regression pins
-  a zero graph determinant and assigns no response semantics to the totalized inverse there.
+  assembled external transform equals the N5 response on that gate. Independent evidence extracts
+  the principal `I`-by-`I` feedback loop, expands its forward-path numerator `I` and loop-family
+  determinant `2`, and matches its Mason gain `I / 2` with the separately derived N5 self-response
+  `1 + 4 * I` after the explicit input/output couplings. The singular determinant follows directly
+  from a noninjective feedback operator and assigns no response semantics to the totalized inverse.
 - [ ] Human-check the generic S6/N5 bridge before upstreaming. Confirm the source/sink entry order,
   the identification of the graph system matrix with `1 - C * S`, and the distinction between the
   matrix gain graph, which sums parallel edges, and the separate edge-indexed enumeration layer.

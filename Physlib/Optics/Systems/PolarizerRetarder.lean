@@ -6,7 +6,9 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Components.Polarizer.Mueller
-public import Physlib.Optics.Components.Retarder.MuellerRegression
+public import Physlib.Optics.Components.Retarder.Mueller
+public import Physlib.Optics.Components.Retarder.WavePlate
+public import Physlib.Optics.Polarization.Mueller.Algebra
 
 /-!
 # Polarizer-retarder systems
@@ -120,10 +122,21 @@ lemma quarterWavePlate_zero_comp_linearPolarizer_pi_div_four_act_horizontal :
         JonesVector.horizontal =
       JonesVector.scale JonesVector.unitEqualAmplitude
         JonesVector.minusIQuadrature := by
+  have hQuarterWavePlate :
+      (quarterWavePlate 0).act JonesVector.diagonal =
+        JonesVector.minusIQuadrature := by
+    have hPhase : (0 : Real.Angle) - ((Real.pi / 2 : ℝ) : Real.Angle) =
+        ((-Real.pi / 2 : ℝ) : Real.Angle) := by
+      rw [zero_sub, ← Real.Angle.coe_neg]
+      congr 1
+      ring
+    rw [quarterWavePlate, ← JonesVector.equalAmplitudeRelativePhase_zero,
+      linearRetarder_zero_axis_act_equalAmplitudeRelativePhase, hPhase,
+      JonesVector.equalAmplitudeRelativePhase_neg_pi_div_two]
   rw [← JonesVector.linearPolarization_zero, comp_act,
     linearPolarizer_act_linearPolarization, act_scale,
     JonesVector.linearPolarization_pi_div_four,
-    quarterWavePlate_zero_act_diagonal]
+    hQuarterWavePlate]
   congr 1
   rw [zero_sub, Real.Angle.cos_neg]
   change (Real.cos (Real.pi / 4) : ℂ) = JonesVector.unitEqualAmplitude

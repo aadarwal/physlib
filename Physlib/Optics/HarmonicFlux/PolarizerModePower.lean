@@ -44,7 +44,8 @@ The modal identity alone is coordinate algebra. Its electromagnetic interpretati
 explicit `IsApertureFluxOrthonormal` hypotheses in section C and remains restricted to these
 singleton synthesis images. The input and output planes may have opposite outward normals. The
 ideal zero-thickness analyzer still models no reflected, absorbed, thermal, or internal field and
-supplies no complete-device passivity or modal-completeness result.
+supplies no complete-device passivity or modal-completeness result. Inputs are pure scaled linear
+Jones states; partially polarized states and coherency-matrix mixtures are not modeled here.
 -/
 
 @[expose] public section
