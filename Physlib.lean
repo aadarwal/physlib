@@ -387,6 +387,8 @@ public import Physlib.Optics.Network.HierarchicalRegression
 public import Physlib.Optics.Network.HierarchicalReuse
 public import Physlib.Optics.Network.HierarchicalReuseRegression
 public import Physlib.Optics.Network.LinearBehavior
+public import Physlib.Optics.Network.LinearBehaviorConservation
+public import Physlib.Optics.Network.LinearBehaviorConservationRegression
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
 public import Physlib.Optics.Network.LinearBehaviorReindex
