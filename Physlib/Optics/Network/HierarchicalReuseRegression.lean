@@ -135,8 +135,9 @@ lemma reuseRegression_secondEast_unconnected_first :
       Set.range reuseRegressionFirstFamily.endpointEmbedding := by
   rintro ⟨⟨index, endpoint⟩, hPort⟩
   cases index
-  cases endpoint <;>
-    exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+  cases endpoint
+  · exact ReuseRegressionComponent.noConfusion (congrArg Prod.fst hPort)
+  · exact Bool.noConfusion (congrArg Prod.snd hPort)
 
 /-- The third component's west port is external after the first stage. -/
 lemma reuseRegression_thirdWest_unconnected_first :
@@ -211,9 +212,10 @@ lemma reuseRegression_thirdEast_unconnected_second :
         Set.range reuseRegressionSecondFamily.endpointEmbedding := by
   rintro ⟨⟨index, endpoint⟩, hPort⟩
   cases index
-  cases endpoint <;>
-    exact ReuseRegressionComponent.noConfusion
+  cases endpoint
+  · exact ReuseRegressionComponent.noConfusion
       (congrArg (fun port => port.1.1) hPort)
+  · exact Bool.noConfusion (congrArg (fun port => port.1.2) hPort)
 
 /-- The fourth component's west port is external after the first two stages. -/
 lemma reuseRegression_fourthWest_unconnected_second :
@@ -315,43 +317,19 @@ abbrev reuseRegressionLeftFamily :
       (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
         reuseRegressionSecondFamily))
 
-/-- The ambient fixture channels are finite. -/
-local instance reuseRegressionChannelFintype : Fintype ReuseRegressionChannel :=
-  Fintype.ofFinite _
-
-/-- The right-associated connected channels are finite. -/
-local instance reuseRegressionRightChannelFintype :
-    Fintype reuseRegressionRightFamily.Channel := Fintype.ofFinite _
-
-/-- The left-associated connected channels are finite. -/
-local instance reuseRegressionLeftChannelFintype :
-    Fintype reuseRegressionLeftFamily.Channel := Fintype.ofFinite _
-
-/-- The right-associated external channels are finite. -/
-local instance reuseRegressionRightExternalFintype :
-    Fintype reuseRegressionRightFamily.ExternalChannel := Fintype.ofFinite _
-
-/-- The left-associated external channels are finite. -/
-local instance reuseRegressionLeftExternalFintype :
-    Fintype reuseRegressionLeftFamily.ExternalChannel := Fintype.ofFinite _
-
-/-- Classical equality on ambient channels for raw assembly. -/
-local instance reuseRegressionChannelDecidableEq : DecidableEq ReuseRegressionChannel :=
-  Classical.decEq _
-
-/-- Classical equality on right-associated connected channels. -/
-local instance reuseRegressionRightChannelDecidableEq :
-    DecidableEq reuseRegressionRightFamily.Channel := Classical.decEq _
-
-/-- Classical equality on left-associated connected channels. -/
-local instance reuseRegressionLeftChannelDecidableEq :
-    DecidableEq reuseRegressionLeftFamily.Channel := Classical.decEq _
-
 /-!
 
 ## D. The hand-expanded state
 
 -/
+
+/-- A sum over the four regression components expands in their declared finite order. -/
+lemma reuseRegression_sum_component {R : Type*} [AddCommMonoid R]
+    (f : ReuseRegressionComponent → R) :
+    ∑ component, f component =
+      f .first + f .second + f .third + f .fourth := by
+  change ∑ component ∈ {.first, .second, .third, .fourth}, f component = _
+  simp [add_assoc]
 
 /-- The hand-expanded ambient incident state. Its west-port values are `1`, `2`, `6`, and `30`.
 -/
@@ -406,7 +384,9 @@ lemma reuseRegression_mem_componentBehavior :
   rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
   cases component <;> cases port <;> cases mode <;>
     simp [ModeAmplitude.reindex_apply, Matrix.mulVec, dotProduct, Fintype.sum_sigma,
-      reuseRegressionScattering, reuseRegressionIncident, reuseRegressionOutgoing]
+      Fintype.sum_prod_type, Fintype.sum_bool, Fintype.sum_unique,
+      reuseRegression_sum_component, reuseRegressionScattering,
+      reuseRegressionIncident, reuseRegressionOutgoing]
 
 /-- The three forward cross-component amplitudes are all nonzero and pairwise distinguish the
 three cascade stages. -/
@@ -497,7 +477,10 @@ lemma reuseRegression_right_incidentAssembly :
   cases component <;> cases port <;> cases mode
   · let external : reuseRegressionRightFamily.ExternalChannel :=
       ⟨⟨(.first, false), ()⟩, reuseRegression_right_firstWest_external⟩
-    change reuseRegressionIncident (Incident.mk external.1) = _
+    change reuseRegressionIncident (Incident.mk external.1) =
+      reuseRegressionRightFamily.incidentAssembly reuseRegressionOutgoing
+        (reuseRegressionExternalInput reuseRegressionRightFamily)
+          (Incident.mk external.1)
     rw [reuseRegressionRightFamily.incidentAssembly_apply_external]
     rfl
   · rw [show (⟨(.first, true), ()⟩ : ReuseRegressionChannel) =
@@ -532,7 +515,10 @@ lemma reuseRegression_right_incidentAssembly :
     rfl
   · let external : reuseRegressionRightFamily.ExternalChannel :=
       ⟨⟨(.fourth, true), ()⟩, reuseRegression_right_fourthEast_external⟩
-    change reuseRegressionIncident (Incident.mk external.1) = _
+    change reuseRegressionIncident (Incident.mk external.1) =
+      reuseRegressionRightFamily.incidentAssembly reuseRegressionOutgoing
+        (reuseRegressionExternalInput reuseRegressionRightFamily)
+          (Incident.mk external.1)
     rw [reuseRegressionRightFamily.incidentAssembly_apply_external]
     rfl
 
@@ -622,7 +608,10 @@ lemma reuseRegression_left_incidentAssembly :
   cases component <;> cases port <;> cases mode
   · let external : reuseRegressionLeftFamily.ExternalChannel :=
       ⟨⟨(.first, false), ()⟩, reuseRegression_left_firstWest_external⟩
-    change reuseRegressionIncident (Incident.mk external.1) = _
+    change reuseRegressionIncident (Incident.mk external.1) =
+      reuseRegressionLeftFamily.incidentAssembly reuseRegressionOutgoing
+        (reuseRegressionExternalInput reuseRegressionLeftFamily)
+          (Incident.mk external.1)
     rw [reuseRegressionLeftFamily.incidentAssembly_apply_external]
     rfl
   · rw [show (⟨(.first, true), ()⟩ : ReuseRegressionChannel) =
@@ -657,7 +646,10 @@ lemma reuseRegression_left_incidentAssembly :
     rfl
   · let external : reuseRegressionLeftFamily.ExternalChannel :=
       ⟨⟨(.fourth, true), ()⟩, reuseRegression_left_fourthEast_external⟩
-    change reuseRegressionIncident (Incident.mk external.1) = _
+    change reuseRegressionIncident (Incident.mk external.1) =
+      reuseRegressionLeftFamily.incidentAssembly reuseRegressionOutgoing
+        (reuseRegressionExternalInput reuseRegressionLeftFamily)
+          (Incident.mk external.1)
     rw [reuseRegressionLeftFamily.incidentAssembly_apply_external]
     rfl
 
@@ -761,13 +753,15 @@ All mode fibers remain the singleton fiber; only the selected subsystem port is 
 def reuseRegressionHostileBoundaryEquiv :
     reuseRegressionSecondFamily.externalPortModeFamily.Equiv
       (reuseRegressionFirstFamily.append
-        reuseRegressionSecondFamily).externalPortModeFamily where
-  portEquiv :=
-    (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
-      reuseRegressionSecondFamily).portEquiv.trans
-        (Equiv.swap reuseRegressionLeftThirdEastBoundary
-          reuseRegressionLeftFirstWestBoundary)
-  modeEquiv _ := Equiv.refl Unit
+        reuseRegressionSecondFamily).externalPortModeFamily := by
+  classical
+  exact
+    { portEquiv :=
+        (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
+          reuseRegressionSecondFamily).portEquiv.trans
+            (Equiv.swap reuseRegressionLeftThirdEastBoundary
+              reuseRegressionLeftFirstWestBoundary)
+      modeEquiv := fun _ => Equiv.refl Unit }
 
 /-- The hostile third family and the first two correct stages form a valid but wrongly lifted
 left-associated connection family. -/
@@ -775,14 +769,6 @@ abbrev reuseRegressionHostileFamily :
     PortConnectionFamily reuseRegressionPortModeFamily ((Unit ⊕ Unit) ⊕ Unit) :=
   (reuseRegressionFirstFamily.append reuseRegressionSecondFamily).append
     (reuseRegressionThirdFamily.transport reuseRegressionHostileBoundaryEquiv)
-
-/-- The hostile connected channels are finite. -/
-local instance reuseRegressionHostileChannelFintype :
-    Fintype reuseRegressionHostileFamily.Channel := Fintype.ofFinite _
-
-/-- Classical equality on hostile connected channels. -/
-local instance reuseRegressionHostileChannelDecidableEq :
-    DecidableEq reuseRegressionHostileFamily.Channel := Classical.decEq _
 
 /-- The hostile transport sends the third connection's left endpoint to the drive port. -/
 lemma reuseRegression_hostile_embed_thirdLeft :
