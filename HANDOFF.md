@@ -17,7 +17,7 @@ Register these four new modules in sorted order in `Physlib.lean`:
 - `Physlib.Optics.Systems.Cascade.HeterogeneousRegression`
 
 The shipped registry linters were run with those imports added temporarily. The temporary
-`Physlib.lean` edit was removed byte-identically before commit.
+`Physlib.lean` edit was removed byte-identically before the cutoff gate record.
 
 ## Declarations
 
@@ -198,6 +198,34 @@ The asymmetric neutral fixture has exact leading entries `1` and `7`, so reversa
 
 ## Gate record
 
-The slice 1b exact-source registered gate is pending until the candidate source commit exists.
-Before cutoff, this section will name that immutable source commit, the single locked command,
-every stage's status, and the identical pre/post SHA-256 of the temporary `Physlib.lean` edit.
+The exact post-sync source head gated for slice 1b is
+`9ec827ae903c57c845e2d93c4837595502e03b56`. It contains the merge of the required
+`aff2484e` target and every Lean change in this cutoff. With the four modules temporarily
+registered in sorted order, this single locked command exited successfully:
+
+```text
+lake-lock env bash -c 'set -euo pipefail && lake exe cache get &&
+  lake --wfail build Physlib.Optics.Network.TwoPortChainFold
+    Physlib.Optics.Network.TwoPortChainFoldRegression
+    Physlib.Optics.Systems.Cascade.Heterogeneous
+    Physlib.Optics.Systems.Cascade.HeterogeneousRegression &&
+  lake exe runPhyslibLinters && lake exe lint_all'
+```
+
+- Cache retrieval downloaded no files.
+- All four modules built with warnings as errors; Lake completed 2756 jobs successfully.
+- `runPhyslibLinters` passed for `Physlib` and `QuantumInfo`.
+- `lint_all` exited zero. Its build, illegal-import, PhyslibAlpha-import, duplicate-tag,
+  sorry/pseudo, and second declaration-linter stages passed.
+- The file-import inventory named only five unregistered files already present in sync target
+  `aff2484e`: `IntegralMacroscopicMaxwell`, `PlanarThinCell` in Electromagnetism,
+  `PlanarThinCell`, `PlanarThinCellConvergence`, and `ThinCellLimit` in SpaceAndTime. It named no
+  S7C file because all four S7C modules were registered for the gate.
+- Advisory style and transitive-import inventories named only pre-existing repository files and
+  no S7C file.
+- The committed-state `./scripts/lint-style.sh` check passed at the exact source head.
+- The temporary registry edit was restored byte-identically. Pre-edit and post-edit SHA-256 were
+  both `9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
+
+The final cutoff-record commit changes only this handoff; no Lean source differs from the exact
+gated source head above.
