@@ -1,244 +1,153 @@
-# S4 delay-transfer slice 3b handoff
+# S4 delay-transfer slice 4 handoff
 
 ## Branch and synchronization
 
 - Branch: `optics/s4-delay-transfer`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s4-delay-transfer`
-- Synced by merge onto `optics/development` at `33ee2ab7` before cutoff.
-- Slice 3b adds one neutral production Z-transform module, revises the four slice-3 modules,
-  and refreshes this handoff note.
+- Pre-cutoff synchronization onto the registered `optics/development` head is pending.
+- Slice 4 adds only the two new group-delay modules and refreshes this handoff note.
 
 ## Files and registrations requested
 
 Register these modules in sorted order in `Physlib.lean`:
 
-- `Physlib.Mathematics.ZTransform.OnePole`
-- `Physlib.Optics.Systems.DelayTransfer.FrequencyResponse`
-- `Physlib.Optics.Systems.DelayTransfer.FrequencyResponseRegression`
-- `Physlib.Optics.Systems.DelayTransfer.Stability`
-- `Physlib.Optics.Systems.DelayTransfer.StabilityRegression`
+- `Physlib.Optics.Systems.DelayTransfer.GroupDelay`
+- `Physlib.Optics.Systems.DelayTransfer.GroupDelayRegression`
 
 Files:
 
-- `Physlib/Mathematics/ZTransform/OnePole.lean`
-- `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean`
-- `Physlib/Optics/Systems/DelayTransfer/FrequencyResponseRegression.lean`
-- `Physlib/Optics/Systems/DelayTransfer/Stability.lean`
-- `Physlib/Optics/Systems/DelayTransfer/StabilityRegression.lean`
+- `Physlib/Optics/Systems/DelayTransfer/GroupDelay.lean`
+- `Physlib/Optics/Systems/DelayTransfer/GroupDelayRegression.lean`
 
 ## Goal text implemented
 
-This slice implements these literal S4P bullets from `goal.md:2258-2271`:
+This slice implements the literal S4P extension from `goal.md:2269-2271`:
 
-- “degree and finiteness bounds”;
-- “discrete-time Schur stability and BIBO equivalence only for a stated proper causal rational
-  class”; and
-- “frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention”.
+> **Physlib extension (source claim unverified):** group delay and dispersion through a local
+> logarithmic derivative or another branch-audited construction, not an unqualified global
+> complex argument.
 
-It also supplies a generic stable/unstable one-pole strictness fixture relevant to regression row
-S-07 at `goal.md:2556`. The DCDR topology-specific instance remains assigned to S7D.
+There is no additional named regression-row claim. The exact sign and nonzero-dispersion fixtures
+audit this extension locally.
 
 ## Production declarations
 
-### `OnePole.lean`
+### Scalar API in `Optics.DelayTransfer`
 
-In namespace `Physlib.ZTransform`:
+- `localLogDerivativeDomain`
+- `localLogDerivative`
+- `localGroupDelay`
+- `localGroupDelayDispersionDomain`
+- `localGroupDelayDispersion`
+- `mem_localLogDerivativeDomain_iff`
+- `eventually_ne_zero_of_mem_localLogDerivativeDomain`
+- `mem_localLogDerivativeDomain_of_hasDerivAt`
+- `localLogDerivative_eq_of_hasDerivAt`
+- `localGroupDelay_eq_of_hasDerivAt`
+- `localLogDerivative_eventuallyEq`
+- `localLogDerivative_eq_of_eventuallyEq`
+- `localGroupDelay_eventuallyEq`
+- `localGroupDelay_eq_of_eventuallyEq`
+- `mem_localGroupDelayDispersionDomain_iff`
+- `localGroupDelayDispersion_eq_of_hasDerivAt`
+- `localGroupDelayDispersion_eq_of_eventuallyEq`
 
-- `onePoleFeedbackCoefficients`
-- `onePoleFeedbackCoefficients_one`
-- `delaySymbol_onePoleFeedbackCoefficients`
-- `candidatePoles_onePoleFeedbackCoefficients`
-- `isSchurStable_onePoleFeedbackCoefficients_iff`
-- `isAbsSummable_geometricSeq_iff_norm_lt_one`
-- `sphere_subset_ROC_geometricSeq_of_norm_lt_one`
+### Network API in `Optics.DelayTransfer.RationalNetlist`
 
-### `Stability.lean`
-
-In namespace `Optics.DelayTransfer.ReducedRationalResponse`:
-
-- `zeroFinset`
-- `poleFinset`
-- `zeros_eq_coe_zeroFinset`
-- `poles_eq_coe_poleFinset`
-- `finite_zeros`
-- `finite_poles`
-- `card_zeroFinset_le_natDegree`
-- `card_poleFinset_le_natDegree`
-- `zZeros`
-- `zZeroFinset`
-- `zZeros_eq_coe_zZeroFinset`
-- `finite_zZeros`
-- `card_zZeroFinset_le_natDegree`
-- `zPoles`
-- `zPoleFinset`
-- `zPoles_eq_coe_zPoleFinset`
-- `finite_zPoles`
-- `card_zPoleFinset_le_natDegree`
-- `IsSchurStable`
-- `AllZerosInsideUnitDisk`
-- `IsProper`
-- `onePoleReducedResponse`
-- `onePoleReducedResponse_isProper`
-- `onePoleReducedResponse_eval`
-- `zPoles_eq_candidatePoles_of_denominator_eq_recurrence`
-- `isSchurStable_iff_zTransform_of_denominator_eq_recurrence`
-
-In namespace `Optics.DelayTransfer`:
-
-- `ProperCausalOnePole`
-- `isBoundedSeq_unitImpulse`
-- `isBoundedSeq_geometricSeq_of_norm_le_one`
-- `not_isBIBOStable_geometricSeq_of_one_lt_norm`
-- `norm_convolution_geometricSeq_self`
-- `not_isBIBOStable_geometricSeq_of_norm_eq_one`
-- `norm_lt_one_of_isBIBOStable_geometricSeq`
-- `isBIBOStable_geometricSeq_iff`
-- `isBIBOStable_geometricSeq_iff_isSchurStable_onePole`
-- `isAbsSummable_geometricSeq_iff_isBIBOStable`
-
-In namespace `Optics.DelayTransfer.ProperCausalOnePole`:
-
-- `response`
-- `impulseResponse`
-- `response_isProper`
-- `impulseResponse_isCausal`
-- `transform_impulseResponse_eq_response_eval`
-- `response_denominator_eq_recurrenceDenominator`
-- `response_zPoles_eq_candidatePoles`
-- `response_isSchurStable_iff_zTransform`
-- `isBIBOStable_of_isSchurStable`
-- `isSchurStable_of_isBIBOStable`
-- `isBIBOStable_iff_isSchurStable`
-
-### `FrequencyResponse.lean`
-
-In namespace `Optics.DelayTransfer`:
-
-- `imaginaryFrequency`
-- `frequencyDelayEvaluation`
-- `frequencyDelayEvaluation_apply`
-- `unitCirclePoint`
-- `norm_unitCirclePoint`
-- `unitCirclePoint_ne_zero`
-- `zInverseEvaluation_unitCirclePoint`
-
-In namespace `Optics.DelayTransfer.RationalNetlist`:
-
-- `frequencyResponseDomain`
-- `mem_frequencyResponseDomain_iff`
-- `frequencyResponse`
-- `frequencyResponse_eq_formalDelay`
-- `unitCirclePoint_mem_reciprocalZ_responseDomain_iff`
-- `unitCirclePoint_mem_reciprocalZ_responseDomain`
-- `frequencyResponse_eq_reciprocalZ`
+- `frequencyResponseEntry`
+- `frequencyResponseEntry_eq`
+- `frequencyResponseEntry_eq_zero`
+- `frequencyGroupDelayDomain`
+- `frequencyGroupDelay`
+- `frequencyGroupDelayDispersionDomain`
+- `frequencyGroupDelayDispersion`
+- `mem_frequencyGroupDelayDomain_iff`
+- `mem_frequencyGroupDelayDispersionDomain_iff`
+- `frequencyResponseEntry_eventuallyEq_of_extension`
+- `mem_frequencyGroupDelayDomain_of_extension`
+- `frequencyGroupDelay_eq_of_extension_hasDerivAt`
+- `mem_frequencyGroupDelayDispersionDomain_of_extension`
+- `frequencyGroupDelayDispersion_eq_of_extension_hasDerivAt`
 
 ## Regression declarations
 
-### `StabilityRegression.lean`
+In `Optics.DelayTransfer`:
 
-- `stableOnePole`
-- `stableOnePole_zeros`
-- `stableOnePole_formalPoles`
-- `stableOnePole_zPoles`
-- `stableOnePole_numerator_natDegree`
-- `stableOnePole_denominator_natDegree`
-- `stableOnePole_allZerosInsideUnitDisk`
-- `stableOnePole_transform_one`
-- `stableOnePole_isSchurStable`
-- `stableOnePole_isBIBOStable`
-- `unstableOnePole`
-- `unstableOnePole_zPoles`
-- `unstableOnePole_not_isSchurStable`
-- `unstableOnePole_not_isBIBOStable`
-
-### `FrequencyResponseRegression.lean`
-
-- `frequencyDelayEvaluation_quadrature`
-- `unitCirclePoint_quadrature`
-- `allPassRationalNetlistFrequencyQuadratureDomain`
-- `allPassRationalNetlist_quadrature_compiled_entry_via_equations`
-- `allPassRationalNetlist_frequency_quadrature_response_entry`
-- `allPassRationalNetlist_frequency_eq_reciprocalZ_quadrature_entry`
+- `chirpedDelayResponse`
+- `chirpedDelayResponse_ne_zero`
+- `hasDerivAt_chirpedDelayResponse`
+- `chirpedDelayResponse_localLogDerivativeDomain`
+- `chirpedDelayResponse_localGroupDelay`
+- `chirpedDelayResponse_localGroupDelayDispersionDomain`
+- `chirpedDelayResponse_localGroupDelayDispersion`
+- `pureDelay_groupDelay_three`
+- `chirpedDelay_groupDelay_at_five`
+- `chirpedDelay_dispersion_two_fifths`
+- `zeroCrossingResponse`
+- `zeroCrossing_not_mem_localLogDerivativeDomain`
 
 ## Exact validation bindings
 
 The validation lane should bind at least these public names:
 
-- `Optics.DelayTransfer.ReducedRationalResponse.card_zeroFinset_le_natDegree`
-- `Optics.DelayTransfer.ReducedRationalResponse.card_poleFinset_le_natDegree`
-- `Optics.DelayTransfer.ReducedRationalResponse.card_zZeroFinset_le_natDegree`
-- `Optics.DelayTransfer.ReducedRationalResponse.card_zPoleFinset_le_natDegree`
-- `Optics.DelayTransfer.ReducedRationalResponse.AllZerosInsideUnitDisk`
-- `Optics.DelayTransfer.ProperCausalOnePole.transform_impulseResponse_eq_response_eval`
-- `Optics.DelayTransfer.ProperCausalOnePole.response_isSchurStable_iff_zTransform`
-- `Optics.DelayTransfer.ProperCausalOnePole.isBIBOStable_iff_isSchurStable`
-- `Physlib.ZTransform.candidatePoles_onePoleFeedbackCoefficients`
-- `Physlib.ZTransform.isSchurStable_onePoleFeedbackCoefficients_iff`
-- `Physlib.ZTransform.sphere_subset_ROC_geometricSeq_of_norm_lt_one`
-- `Optics.DelayTransfer.RationalNetlist.mem_frequencyResponseDomain_iff`
-- `Optics.DelayTransfer.RationalNetlist.frequencyResponse_eq_formalDelay`
-- `Optics.DelayTransfer.RationalNetlist.frequencyResponse_eq_reciprocalZ`
-- `Optics.DelayTransfer.frequencyDelayEvaluation_quadrature`
-- `Optics.DelayTransfer.unitCirclePoint_quadrature`
-- `Optics.DelayTransfer.allPassRationalNetlist_frequency_quadrature_response_entry`
-- `Optics.DelayTransfer.allPassRationalNetlist_quadrature_compiled_entry_via_equations`
-- `Optics.DelayTransfer.unstableOnePole_not_isBIBOStable`
+- `Optics.DelayTransfer.localLogDerivativeDomain`
+- `Optics.DelayTransfer.eventually_ne_zero_of_mem_localLogDerivativeDomain`
+- `Optics.DelayTransfer.localGroupDelay`
+- `Optics.DelayTransfer.mem_localGroupDelayDispersionDomain_iff`
+- `Optics.DelayTransfer.RationalNetlist.mem_frequencyGroupDelayDomain_iff`
+- `Optics.DelayTransfer.RationalNetlist.mem_frequencyGroupDelayDispersionDomain_iff`
+- `Optics.DelayTransfer.RationalNetlist.frequencyGroupDelay_eq_of_extension_hasDerivAt`
+- `Optics.DelayTransfer.RationalNetlist.frequencyGroupDelayDispersion_eq_of_extension_hasDerivAt`
+- `Optics.DelayTransfer.chirpedDelayResponse_localGroupDelay`
+- `Optics.DelayTransfer.chirpedDelayResponse_localGroupDelayDispersion`
+- `Optics.DelayTransfer.pureDelay_groupDelay_three`
+- `Optics.DelayTransfer.chirpedDelay_dispersion_two_fifths`
+- `Optics.DelayTransfer.zeroCrossing_not_mem_localLogDerivativeDomain`
 
 ## Cross-module conventions and reused results
 
-- `ReducedRationalResponse` is only an abstract coprime quotient, and its evaluation, numerator
-  roots, and denominator roots are defined in
-  `Physlib/Optics/Systems/DelayTransfer/Poles.lean:122-154`. No network response certificate is
-  present there; this slice preserves that narrowing.
-- Formal Laplace evaluation is literally `q_i = exp (-s * τ_i)`, while reciprocal-Z evaluation is
-  literally `q = z⁻¹`, in
-  `Physlib/Optics/Systems/DelayTransfer/Basic.lean:225-239`.
-- Laplace response-domain preimage and proof-gated response transport are reused from
-  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:320-394`.
-- Reciprocal-Z response-domain preimage and proof-gated response transport are reused from
-  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:441-495`.
-- N5F defines `responseDomain` as solve-domain membership intersected with stored component
-  validity in `Physlib/Optics/Network/ParameterizedResponse.lean:436-472`. The two conditions are
-  not collapsed in this slice.
-- `IsAbsSummable`, `IsBoundedSeq`, `convolution`, `IsBIBOStable`, the unit-circle ROC sufficiency
-  lemma, `candidatePoles`, and `IsSchurStable` are reused from
-  `Physlib/Mathematics/ZTransform/Stability.lean:111-232`.
-- The general result actually used for BIBO sufficiency is
-  `isBIBOStable_of_sphere_subset_ROC` at
-  `Physlib/Mathematics/ZTransform/Stability.lean:211-215`; no general converse is added.
-- The causal geometric impulse response and its transform on `‖a‖ < ‖z‖` are reused from
-  `Physlib/Mathematics/ZTransform/Convergence.lean:237-268`.
-- The lag-one recurrence coefficient family, exact candidate-pole singleton, Schur
-  characterization, absolute-summability criterion, and unit-circle ROC bridge now live in the
-  neutral production module `Physlib/Mathematics/ZTransform/OnePole.lean:58-108`. Production
-  delay-transfer code imports no Z-transform regression fixture.
-- The necessity proof probes BIBO stability with the unit impulse and uses the independently
-  proved right-identity formula from
-  `Physlib/Mathematics/ZTransform/Convolution.lean:189-199`.
-- The non-real all-pass frequency fixture invokes the channel-equation solver
-  `allPassRationalNetlist_responseThrough` from
-  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:845-912` directly. It then uses
-  the production Laplace and reciprocal-Z response transports from
-  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:384-495`; it does not cite any prior
-  formal-delay, Laplace, or reciprocal-Z response-value anchor.
-- The audited source wording for all nonzero numerator roots inside the unit disk is quoted in
-  `goal.md:2273-2278`. The API deliberately uses `AllZerosInsideUnitDisk`, not “resonance”.
+- The selected frequency substitution is literally `q_i = exp (-I * omega * tau_i)`, and the
+  reciprocal-Z unit-circle point uses the opposite exponential before inversion, in
+  `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:77-120`.
+- `frequencyResponseDomain` is the exact preimage of the Laplace response domain, and
+  `frequencyResponse` is proof-gated by membership in that set, in
+  `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:174-203`.
+- Retained-entry regularity and network solvability are independent gates, as documented in
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:16-24`. This slice preserves both by using
+  the existing `frequencyResponseDomain` and then requiring an interior point.
+- Mathlib defines `deriv` to be the derivative when it exists and zero otherwise in
+  `.lake/packages/mathlib/Mathlib/Analysis/Calculus/Deriv/Basic.lean:148-154`. Every physical
+  interpretation here therefore has a separate named differentiability domain.
+- Differentiability plus a nonzero value supplies an eventually nonzero germ through
+  `ContinuousAt.eventually_ne`, defined in
+  `.lake/packages/mathlib/Mathlib/Topology/Separation/Basic.lean:706-712`.
+- The regression differentiates the displayed complex exponential with `HasDerivAt.cexp` from
+  `.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/ExpDeriv.lean:127-136`.
+
+## Totalized-versus-gated split
+
+- `localLogDerivative`, `localGroupDelay`, and `localGroupDelayDispersion` are total functions.
+  Their claimed meanings require `localLogDerivativeDomain` or
+  `localGroupDelayDispersionDomain`, respectively.
+- `frequencyResponseEntry` is zero outside the N5F proof-gated frequency-response domain. Its
+  value is used for derivatives only at an interior domain point, so this arbitrary outside value
+  is locally irrelevant.
+- Network group delay additionally requires differentiability and a nonzero selected response
+  entry. Network dispersion additionally requires differentiability of local group delay.
 
 ## Non-claims
 
-- Generic `ReducedRationalResponse` values remain abstract polynomial quotients. No declaration
-  identifies their roots with zeros or actual poles of a selected N5F network response entry.
-- No reachability, observability, hidden-mode, or network no-cancellation theorem is added.
-- No Schur/BIBO equivalence is claimed for arbitrary proper causal rational responses. The exact
-  equivalence is only for the named nonzero one-pole class `1 / (1 - a*q)`.
-- No rational dependence on physical frequency is claimed, and no dispersion model is supplied.
-- The choice `s = I*ω` is not presented as a bridge to the phasor layer's time convention.
-- Imaginary-axis substitution alone is not claimed to imply time-domain causality.
-- The removed formal root `q = 0` has no finite reciprocal `z` and formally represents `z = ∞`.
-- No passivity, physical resonance, DCDR topology, group-delay, or dispersion theorem is claimed.
-- The local logarithmic-derivative extension remains slice 4 work.
+- No global `Complex.arg`, global phase branch, phase unwrap, or continuity-across-zeros result is
+  supplied.
+- No group-delay or dispersion interpretation is made outside the named domains.
+- No rational dependence on physical frequency follows from the formal-delay model.
+- No material-dispersion, time-domain causality, passivity, units, or source-parity theorem is
+  claimed.
+- The quantity named dispersion is literally the angular-frequency derivative of local group
+  delay, not a constitutive material dispersion law.
+- The scalar regression is not an N5F network realization.
 
 ## Gate record
 
 The final post-sync chained build/lint gate and byte-identical `Physlib.lean` restoration are
-recorded in the cutoff commit message/report after this note is committed.
+pending the registered `optics/development` synchronization.
