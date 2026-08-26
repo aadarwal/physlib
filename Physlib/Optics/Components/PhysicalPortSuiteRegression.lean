@@ -235,6 +235,20 @@ local instance physicalPortSuite9aLocalChannelDecidableEq
   · change DecidableEq (Mirror.portFamily Unit).Channel
     infer_instance
 
+/-- The indexed mixed family has exactly its two beam channels and one mirror channel. -/
+local instance physicalPortSuite9aIndexedChannelFintype :
+    Fintype physicalPortSuite9aFamily.IndexedChannel where
+  elems := {⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩,
+    ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩,
+    ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩}
+  complete channel := by
+    rcases channel with ⟨component, ⟨port, mode⟩⟩
+    cases component
+    · cases port <;> cases mode <;> simp
+    · cases port
+      cases mode
+      simp
+
 /-- The indexed Phase 9a channels have decidable equality. -/
 local instance physicalPortSuite9aIndexedChannelDecidableEq :
     DecidableEq physicalPortSuite9aFamily.IndexedChannel :=
@@ -368,6 +382,24 @@ def physicalPortSuite9aAggregateOutput :
   ModeAmplitude.reindex physicalPortSuite9aFamily.channelEquiv
     physicalPortSuite9aIndexedOutput
 
+/-- Aggregate input evaluation is indexed input evaluation at the inverse reassociation. -/
+lemma physicalPortSuite9aAggregateInput_apply
+    (channel : physicalPortSuite9aFamily.IndexedChannel) :
+    physicalPortSuite9aAggregateInput
+        (physicalPortSuite9aFamily.channelEquiv channel) =
+      physicalPortSuite9aIndexedInput channel := by
+  rw [physicalPortSuite9aAggregateInput, ModeAmplitude.reindex_apply,
+    Equiv.symm_apply_apply]
+
+/-- Aggregate output evaluation is indexed output evaluation at the inverse reassociation. -/
+lemma physicalPortSuite9aAggregateOutput_apply
+    (channel : physicalPortSuite9aFamily.IndexedChannel) :
+    physicalPortSuite9aAggregateOutput
+        (physicalPortSuite9aFamily.channelEquiv channel) =
+      physicalPortSuite9aIndexedOutput channel := by
+  rw [physicalPortSuite9aAggregateOutput, ModeAmplitude.reindex_apply,
+    Equiv.symm_apply_apply]
+
 /-- The first aggregate beam-splitter channel. -/
 abbrev physicalPortSuite9aBeamFirst :
     physicalPortSuite9aFamily.aggregatePortModeFamily.Channel :=
@@ -388,10 +420,14 @@ lemma physicalPortSuite9a_aggregate_input_coordinates :
     physicalPortSuite9aAggregateInput physicalPortSuite9aBeamFirst = 1 ∧
       physicalPortSuite9aAggregateInput physicalPortSuite9aBeamSecond = 2 ∧
       physicalPortSuite9aAggregateInput physicalPortSuite9aMirror = 3 := by
-  simp [physicalPortSuite9aAggregateInput, physicalPortSuite9aBeamFirst,
-    physicalPortSuite9aBeamSecond, physicalPortSuite9aMirror,
-    physicalPortSuite9aIndexedInput, ScatteringComponentFamily.channelEquiv,
-    physicalPortSuite9aFamily, physicalPortSuite9aPortFamily]
+  constructor
+  · rw [physicalPortSuite9aAggregateInput_apply]
+    rfl
+  constructor
+  · rw [physicalPortSuite9aAggregateInput_apply]
+    rfl
+  · rw [physicalPortSuite9aAggregateInput_apply]
+    rfl
 
 /-- The aggregate output records both beam values and the phase-`I` mirror value. -/
 lemma physicalPortSuite9a_aggregate_output_coordinates :
@@ -400,10 +436,14 @@ lemma physicalPortSuite9a_aggregate_output_coordinates :
       physicalPortSuite9aAggregateOutput physicalPortSuite9aBeamSecond =
         (6 - 4 * Complex.I) / 5 ∧
       physicalPortSuite9aAggregateOutput physicalPortSuite9aMirror = 3 * Complex.I := by
-  simp [physicalPortSuite9aAggregateOutput, physicalPortSuite9aBeamFirst,
-    physicalPortSuite9aBeamSecond, physicalPortSuite9aMirror,
-    physicalPortSuite9aIndexedOutput, ScatteringComponentFamily.channelEquiv,
-    physicalPortSuite9aFamily, physicalPortSuite9aPortFamily]
+  constructor
+  · rw [physicalPortSuite9aAggregateOutput_apply]
+    rfl
+  constructor
+  · rw [physicalPortSuite9aAggregateOutput_apply]
+    rfl
+  · rw [physicalPortSuite9aAggregateOutput_apply]
+    rfl
 
 /-- The mixed family's aggregate action is the exact independently expanded output. -/
 lemma physicalPortSuite9a_aggregate_action :
@@ -477,6 +517,17 @@ abbrev physicalPortSuite9aHostileFamily : ScatteringComponentFamily where
   portFamily := physicalPortSuite9aPortFamily
   scattering := physicalPortSuite9aHostileScattering
 
+/-- Hostile aggregate channels are finite through their explicit indexed reassociation. -/
+local instance physicalPortSuite9aHostileAggregateChannelFintype :
+    Fintype physicalPortSuite9aHostileFamily.aggregatePortModeFamily.Channel :=
+  Fintype.ofEquiv physicalPortSuite9aHostileFamily.IndexedChannel
+    physicalPortSuite9aHostileFamily.channelEquiv
+
+/-- Hostile aggregate channels have decidable equality in indexed coordinates. -/
+local instance physicalPortSuite9aHostileAggregateChannelDecidableEq :
+    DecidableEq physicalPortSuite9aHostileFamily.aggregatePortModeFamily.Channel :=
+  Classical.decEq _
+
 /-- The hostile indexed output swaps the two beam values and leaves `3I` at the mirror. -/
 def physicalPortSuite9aHostileIndexedOutput :
     ModeAmplitude physicalPortSuite9aHostileFamily.IndexedChannel :=
@@ -527,6 +578,15 @@ def physicalPortSuite9aHostileAggregateOutput :
   ModeAmplitude.reindex physicalPortSuite9aHostileFamily.channelEquiv
     physicalPortSuite9aHostileIndexedOutput
 
+/-- Hostile aggregate evaluation is hostile indexed evaluation after reassociation. -/
+lemma physicalPortSuite9aHostileAggregateOutput_apply
+    (channel : physicalPortSuite9aHostileFamily.IndexedChannel) :
+    physicalPortSuite9aHostileAggregateOutput
+        (physicalPortSuite9aHostileFamily.channelEquiv channel) =
+      physicalPortSuite9aHostileIndexedOutput channel := by
+  rw [physicalPortSuite9aHostileAggregateOutput, ModeAmplitude.reindex_apply,
+    Equiv.symm_apply_apply]
+
 /-- The hostile aggregate action forces the exact endpoint-swapped output. -/
 lemma physicalPortSuite9a_hostile_aggregate_action :
     physicalPortSuite9aHostileFamily.assembledScatteringMatrix.toModeTransform.toLinearMap
@@ -548,11 +608,14 @@ lemma physicalPortSuite9a_hostile_output_coordinates :
         (3 - 8 * Complex.I) / 5 ∧
       physicalPortSuite9aHostileAggregateOutput physicalPortSuite9aMirror =
         3 * Complex.I := by
-  simp [physicalPortSuite9aHostileAggregateOutput, physicalPortSuite9aBeamFirst,
-    physicalPortSuite9aBeamSecond, physicalPortSuite9aMirror,
-    physicalPortSuite9aHostileIndexedOutput, physicalPortSuite9aHostileFamily,
-    physicalPortSuite9aFamily, ScatteringComponentFamily.channelEquiv,
-    physicalPortSuite9aPortFamily]
+  constructor
+  · rw [physicalPortSuite9aHostileAggregateOutput_apply]
+    rfl
+  constructor
+  · rw [physicalPortSuite9aHostileAggregateOutput_apply]
+    rfl
+  · rw [physicalPortSuite9aHostileAggregateOutput_apply]
+    rfl
 
 /-- Swapping one beam output endpoint changes the first aggregate output coordinate. -/
 lemma physicalPortSuite9a_output_ne_hostile :
