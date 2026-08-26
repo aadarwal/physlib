@@ -12,11 +12,13 @@ public import Physlib.Optics.Systems.DCDR.Poles
 
 ## i. Overview
 
-This file supplies two exact one-delay DCDR fixtures. Both use coherent N7 couplers with
+This file supplies exact one-delay DCDR fixtures. The stable and active fixtures use coherent N7
+couplers with
 `t = 3/5` and `k = 4/5`. The positive anchor has gains `(61/64, 1, 1)` and reduced reciprocal-Z
 poles of norm `1/2`. The audited active fixture has gains `(17/4, 2, 2)`, so all three gains are
 strictly greater than one as in FMICS'15 Table 1's optical-amplifier configuration. Its reduced
-response has the explicit pole `2 * I`, outside the open unit disk.
+response has the explicit pole `2 * I`, outside the open unit disk. A third fixture uses
+`t = 1`, `k = 0`, and unit gains to realize response-indexed cancellation at `q = 1`.
 
 Every polynomial and pole fact below is expanded directly from the rational data. The proofs do
 not use `mem_candidateSingularities_iff`, either `ResponseReduction` pole-set theorem, or a Schur
@@ -25,9 +27,11 @@ wiring-derived response polynomial change.
 
 FMICS'15 Theorem 4 concerns the separately printed incoherent `1 - k`/`k` response. Its stability
 hypotheses are represented by `PrintedIncoherentStabilityConditions`, including the source's
-second, nonzero hypothesis recorded by the parity ledger. No theorem identifies those printed
-conditions with the coherent N7 fixture. The source's own unprinted coherent branch is the one
-modeled here.
+complex square root, non-strict norm bound, and the source's second, nonzero hypothesis recorded
+by the parity ledger. The non-strict source audit predicate is deliberately separate from S4's
+strict Schur predicate; no implication in either direction is proved while the source strictness
+question remains open. No theorem identifies those printed conditions with the coherent N7
+fixture. The source's own unprinted coherent branch is the one modeled here.
 
 ## ii. Key definitions and results
 
@@ -36,7 +40,9 @@ modeled here.
 - `stableResponseReduction`, `unstableResponseReduction`: explicit no-cancellation reductions.
 - `stable_rationalZEliminationResponse_one`: proof-gated stable network response at `z = 1`.
 - `unstable_rationalZEliminationResponse_one`: proof-gated active network response at `z = 1`.
-- `unstableResponseReduction_zero_mem_actualZeros`: direct active reduced zero.
+- `stable_rationalZEliminationResponse_I`: asymmetric reciprocal-Z response anchor.
+- `unstableResponseReduction_zero_mem_formalZeros`: direct formal-`q` zero, not Z evidence.
+- `cancellationSentinelResponseReduction`: response-indexed cancellation fixture.
 - `stableReducedResponse_isSchurStable`: direct positive stability anchor.
 - `unstableReducedResponse_two_mul_I_mem_zPoles`: explicit outside pole.
 - `unstableReducedResponse_not_isSchurStable`: direct failure of the Schur premise.
@@ -47,6 +53,7 @@ modeled here.
 - B. Exact coherent parameter fixtures
 - C. Hand-expanded rational data and reductions
 - D. Stable and unstable reciprocal-Z anchors
+- E. Response-indexed cancellation sentinel
 
 ## iv. References and non-claims
 
@@ -55,9 +62,10 @@ Processing Systems", FMICS 2015, LNCS 9128, Table 1 and Theorem 4. The correspon
 audit is recorded at `HOL-CORPUS.md:307-308`.
 
 The active fixture is an exact coherent regression, not a reconstruction of the paper's passive
-decimal pole list. The printed incoherent theorem is retained only as an audit predicate. No
-physical resonance theorem, physical-frequency interpretation, material amplifier model,
-passivity claim, power observable, or DCDR BIBO theorem is asserted. S4's BIBO equivalence at
+decimal pole list. The printed incoherent theorem is retained only as a non-strict audit predicate,
+with no implication to or from strict Schur stability. No physical resonance theorem,
+physical-frequency interpretation, material amplifier model, passivity claim, power observable,
+or DCDR BIBO theorem is asserted. S4's BIBO equivalence at
 `Physlib/Optics/Systems/DelayTransfer/Stability.lean:374-403` is only for
 `ProperCausalOnePole`; both denominators here have a nonzero quadratic coefficient.
 -/
@@ -81,12 +89,27 @@ def printedIncoherentStabilityExpression
     (G1 G2 G3 k1 k2 : ℂ) : ℂ :=
   k1 * k2 * G1 * G2 + (1 - k1) * (1 - k2) * G2 * G3
 
-/-- The two printed incoherent stability hypotheses, including the source's necessary nonzero
-condition for the displayed roots to be valid poles. -/
+/-- The two printed incoherent stability hypotheses, including the complex square root and the
+source's necessary nonzero condition for the displayed roots to be valid poles.
+
+The source uses the non-strict bound `≤ 1`; this is not S4's strict Schur predicate.
+-/
 def PrintedIncoherentStabilityConditions
     (G1 G2 G3 k1 k2 : ℂ) : Prop :=
-  ‖printedIncoherentStabilityExpression G1 G2 G3 k1 k2‖ ≤ 1 ∧
+  ‖Complex.sqrt (printedIncoherentStabilityExpression G1 G2 G3 k1 k2)‖ ≤ 1 ∧
     printedIncoherentStabilityExpression G1 G2 G3 k1 k2 ≠ 0
+
+/-- The printed source predicate admits its norm-one boundary point, so its non-strict bound does
+not imply the corresponding strict square-root bound. -/
+lemma printedIncoherentStabilityConditions_boundary :
+    PrintedIncoherentStabilityConditions 1 1 1 1 1 := by
+  norm_num [PrintedIncoherentStabilityConditions,
+    printedIncoherentStabilityExpression]
+
+/-- At the same source boundary point, the printed square-root norm is not strictly below one. -/
+lemma printedIncoherentStabilityConditions_boundary_not_strict :
+    ¬‖Complex.sqrt (printedIncoherentStabilityExpression 1 1 1 1 1)‖ < 1 := by
+  norm_num [printedIncoherentStabilityExpression]
 
 /-!
 
@@ -115,6 +138,19 @@ def unstableAmplifierParameters : UnitDelayParameters where
   lowerGain := 2
   feedbackGain := 2
 
+/-- The exact `t = 1`, `k = 0` coherent coupler used to expose response cancellation. -/
+def cancellationSentinelCoupler : DirectionalCoupler.Parameters where
+  throughAmplitude := 1
+  crossAmplitude := 0
+
+/-- Unit-gain parameters whose selected raw response is `q * (1 - q^2) / (1 - q^2)`. -/
+def cancellationSentinelParameters : UnitDelayParameters where
+  firstCoupler := cancellationSentinelCoupler
+  secondCoupler := cancellationSentinelCoupler
+  upperGain := 1
+  lowerGain := 1
+  feedbackGain := 1
+
 /-- The stable positive anchor has algebraically admissible nonnegative gains. -/
 lemma stableUnitDelayParameters_isAdmissible :
     stableUnitDelayParameters.IsAdmissible := by
@@ -124,6 +160,11 @@ lemma stableUnitDelayParameters_isAdmissible :
 lemma unstableAmplifierParameters_isAdmissible :
     unstableAmplifierParameters.IsAdmissible := by
   norm_num [UnitDelayParameters.IsAdmissible, unstableAmplifierParameters]
+
+/-- The cancellation sentinel has algebraically admissible unit gains. -/
+lemma cancellationSentinelParameters_isAdmissible :
+    cancellationSentinelParameters.IsAdmissible := by
+  norm_num [UnitDelayParameters.IsAdmissible, cancellationSentinelParameters]
 
 /-- All three active-fixture gains satisfy Table 1's strict amplifier inequalities. -/
 lemma unstableAmplifierParameters_all_gains_gt_one :
@@ -234,6 +275,39 @@ lemma unstable_responseNumeratorPolynomial_expansion :
       norm_num [pow_succ, Complex.I_mul_I]]
   ring
 
+/-- The common raw factor of the cancellation sentinel. -/
+def cancellationSentinelFactor : Polynomial ℂ :=
+  1 - X ^ 2
+
+/-- Direct loop expansion for the unit-through cancellation sentinel. -/
+lemma cancellationSentinel_loopPolynomial_expansion :
+    cancellationSentinelParameters.loopPolynomial = X ^ 2 := by
+  simp [UnitDelayParameters.loopPolynomial, UnitDelayParameters.upperPolynomial,
+    UnitDelayParameters.lowerPolynomial, UnitDelayParameters.feedbackPolynomial,
+    cancellationSentinelParameters, cancellationSentinelCoupler,
+    DirectionalCoupler.crossCoefficient]
+  ring
+
+/-- Direct denominator expansion exposes the common factor `1 - q^2`. -/
+lemma cancellationSentinel_denominatorPolynomial_expansion :
+    cancellationSentinelParameters.denominatorPolynomial = cancellationSentinelFactor := by
+  rw [UnitDelayParameters.denominatorPolynomial,
+    cancellationSentinel_loopPolynomial_expansion]
+  rfl
+
+/-- Direct expansion of the selected response numerator gives `q * (1 - q^2)`. -/
+lemma cancellationSentinel_responseNumeratorPolynomial_expansion :
+    cancellationSentinelParameters.responseNumeratorPolynomial =
+      X * cancellationSentinelFactor := by
+  simp [UnitDelayParameters.responseNumeratorPolynomial,
+    UnitDelayParameters.directPolynomial, UnitDelayParameters.denominatorPolynomial,
+    UnitDelayParameters.loopPolynomial, UnitDelayParameters.feedbackReadoutPolynomial,
+    UnitDelayParameters.feedbackDrivePolynomial, UnitDelayParameters.upperPolynomial,
+    UnitDelayParameters.lowerPolynomial, UnitDelayParameters.feedbackPolynomial,
+    cancellationSentinelParameters, cancellationSentinelCoupler,
+    cancellationSentinelFactor, DirectionalCoupler.crossCoefficient]
+  ring
+
 /-- The stable numerator is a nonzero polynomial. -/
 lemma stableNumerator_ne_zero : stableNumerator ≠ 0 := by
   intro hZero
@@ -292,6 +366,14 @@ def unstableReducedResponse : DelayTransfer.ReducedRationalResponse where
   denominator_ne_zero := unstableDenominator_ne_zero
   isCoprime := unstableNumerator_isCoprime
 
+/-- The reduced quotient `q / 1` left by the cancellation sentinel. -/
+def cancellationSentinelReducedResponse : DelayTransfer.ReducedRationalResponse where
+  numerator := X
+  denominator := 1
+  numerator_ne_zero := Polynomial.X_ne_zero
+  denominator_ne_zero := one_ne_zero
+  isCoprime := isCoprime_one_right
+
 /-- The stable response reduction removes only the unit polynomial. -/
 def stableRationalReduction : DelayTransfer.RationalReduction where
   rawNumerator := stableUnitDelayParameters.responseNumeratorPolynomial
@@ -320,6 +402,24 @@ def unstableRationalReduction : DelayTransfer.RationalReduction where
     rw [unstable_denominatorPolynomial_expansion]
     simp [unstableReducedResponse]
 
+/-- The response-indexed common-factor reduction of the cancellation sentinel. -/
+def cancellationSentinelRationalReduction : DelayTransfer.RationalReduction where
+  rawNumerator := cancellationSentinelParameters.responseNumeratorPolynomial
+  rawDenominator := cancellationSentinelParameters.denominatorPolynomial
+  cancelledFactor := cancellationSentinelFactor
+  reduced := cancellationSentinelReducedResponse
+  cancelledFactor_ne_zero := by
+    intro hZero
+    have hEvaluation := congrArg (Polynomial.eval 0) hZero
+    norm_num [cancellationSentinelFactor] at hEvaluation
+  rawNumerator_eq := by
+    rw [cancellationSentinel_responseNumeratorPolynomial_expansion]
+    simp [cancellationSentinelReducedResponse]
+    ring
+  rawDenominator_eq := by
+    rw [cancellationSentinel_denominatorPolynomial_expansion]
+    simp [cancellationSentinelReducedResponse]
+
 /-- The stable reduction is tied to the selected compiled DCDR response polynomials. -/
 def stableResponseReduction : ResponseReduction stableUnitDelayParameters where
   reduction := stableRationalReduction
@@ -329,6 +429,13 @@ def stableResponseReduction : ResponseReduction stableUnitDelayParameters where
 /-- The active reduction is tied to the selected compiled DCDR response polynomials. -/
 def unstableResponseReduction : ResponseReduction unstableAmplifierParameters where
   reduction := unstableRationalReduction
+  rawNumerator_eq := rfl
+  rawDenominator_eq := rfl
+
+/-- The cancellation reduction tied to the selected compiled DCDR response polynomials. -/
+def cancellationSentinelResponseReduction :
+    ResponseReduction cancellationSentinelParameters where
+  reduction := cancellationSentinelRationalReduction
   rawNumerator_eq := rfl
   rawDenominator_eq := rfl
 
@@ -426,6 +533,86 @@ lemma unstable_rationalZEliminationResponse_one :
     unstable_denominatorPolynomial_expansion]
   norm_num [unstableNumerator, unstableDenominator]
 
+/-- At `z = I`, S4's reciprocal evaluation selects the formal delay `q = -I`. -/
+lemma zInverseEvaluation_I :
+    DelayTransfer.zInverseEvaluation Complex.I =
+      (fun _ : Fin 1 => -Complex.I) := by
+  funext delay
+  rw [DelayTransfer.zInverseEvaluation_apply, Complex.inv_I]
+
+/-- The asymmetric formal delay `q = -I` belongs to the stable compiled response domain. -/
+lemma stable_neg_I_mem_responseDomain :
+    (fun _ : Fin 1 => -Complex.I) ∈
+      (rationalNetlist stableUnitDelayParameters).responseDomain := by
+  apply rationalNetlist_mem_responseDomain stableUnitDelayParameters (-Complex.I)
+    stableUnitDelayParameters_isAdmissible
+  rw [stable_denominatorPolynomial_expansion]
+  norm_num [stableDenominator, Complex.I_mul_I]
+
+/-- The reciprocal-Z value `z = I` belongs to the stable proof-gated response domain. -/
+lemma stable_I_mem_reciprocalZResponseDomain :
+    Complex.I ∈
+      (rationalNetlist stableUnitDelayParameters).reciprocalZ.responseDomain := by
+  have hMembership := congrArg (fun domain : Set ℂ => Complex.I ∈ domain)
+    ((rationalNetlist stableUnitDelayParameters).responseDomain_reciprocalZ)
+  apply hMembership.mpr
+  change DelayTransfer.zInverseEvaluation Complex.I ∈
+    (rationalNetlist stableUnitDelayParameters).responseDomain
+  rw [zInverseEvaluation_I]
+  exact stable_neg_I_mem_responseDomain
+
+/-- Direct rational-data expansion gives the formal-delay response at `q = -I`. -/
+lemma stable_rationalEliminationResponse_neg_I :
+    rationalEliminationResponse stableUnitDelayParameters (-Complex.I)
+      stable_neg_I_mem_responseDomain = -(7 / 8) * Complex.I := by
+  rw [rationalEliminationResponse_eq_responseModel,
+    DelayTransfer.RationalModel.eval_eq]
+  simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
+  rw [stable_responseNumeratorPolynomial_expansion,
+    stable_denominatorPolynomial_expansion]
+  norm_num [stableNumerator, stableDenominator, Complex.I_mul_I]
+  rw [show (-Complex.I) ^ 3 = Complex.I by
+    norm_num [pow_succ, Complex.I_mul_I]]
+  ring
+
+/-- S4 reciprocal transport and direct rational expansion give the asymmetric `z = I` value.
+
+The proof deliberately instantiates the generic reciprocal-Z response transport instead of the
+DCDR-specific `rationalZEliminationResponse_eq_responseModel` bridge.
+-/
+lemma stable_rationalZEliminationResponse_I :
+    rationalZEliminationResponse stableUnitDelayParameters Complex.I
+      stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I := by
+  have hResponse :=
+    (rationalNetlist stableUnitDelayParameters).response_reciprocalZ_reindex_of_evaluation_eq
+      stable_I_mem_reciprocalZResponseDomain zInverseEvaluation_I
+        stable_neg_I_mem_responseDomain
+  have hEntry := congrArg (fun response =>
+      response (Outgoing.mk (rationalOutputChannel stableUnitDelayParameters))
+        (Incident.mk (rationalInputChannel stableUnitDelayParameters))) hResponse
+  exact hEntry.trans stable_rationalEliminationResponse_neg_I
+
+/-- Reversing the substitution to the formal value `q = I` flips the imaginary response sign. -/
+lemma stable_responseModel_I_expansion :
+    (responseModel stableUnitDelayParameters).eval (fun _ : Fin 1 => Complex.I) =
+      (7 / 8) * Complex.I := by
+  rw [DelayTransfer.RationalModel.eval_eq]
+  simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
+  rw [stable_responseNumeratorPolynomial_expansion,
+    stable_denominatorPolynomial_expansion]
+  norm_num [stableNumerator, stableDenominator, Complex.I_mul_I]
+  ring
+
+/-- The non-real anchor distinguishes `q = z⁻¹` from the reversed substitution `q = z`. -/
+lemma stable_rationalZEliminationResponse_I_ne_reversed :
+    rationalZEliminationResponse stableUnitDelayParameters Complex.I
+        stable_I_mem_reciprocalZResponseDomain ≠
+      (responseModel stableUnitDelayParameters).eval (fun _ : Fin 1 => Complex.I) := by
+  rw [stable_rationalZEliminationResponse_I, stable_responseModel_I_expansion]
+  intro hEqual
+  have hImaginary := congrArg Complex.im hEqual
+  norm_num at hImaginary
+
 /-- The stable denominator has a nonzero quadratic coefficient, so it is not an S4 one-pole
 denominator. -/
 lemma stableDenominator_ne_onePoleDenominator (a : ℂ) :
@@ -492,11 +679,79 @@ lemma unstableResponseReduction_two_mul_I_mem_actualPoles :
   simpa [ResponseReduction.actualPoles, unstableResponseReduction,
     unstableRationalReduction] using unstableReducedResponse_two_mul_I_mem_zPoles
 
-/-- Direct numerator substitution shows that `q = 0` is a reduced zero of the active response. -/
-lemma unstableResponseReduction_zero_mem_actualZeros :
-    0 ∈ unstableResponseReduction.actualZeros := by
+/-- Direct numerator substitution shows that `q = 0` is a formal-delay zero of the active
+response. It represents `z = ∞`, so it is not evidence of a finite reciprocal-Z zero. -/
+lemma unstableResponseReduction_zero_mem_formalZeros :
+    0 ∈ unstableResponseReduction.formalZeros := by
   change unstableNumerator.eval 0 = 0
   norm_num [unstableNumerator]
+
+/-!
+
+## E. Response-indexed cancellation sentinel
+
+-/
+
+/-- The cancellation sentinel's reduced quotient evaluates to the formal delay `q`. -/
+lemma cancellationSentinelReducedResponse_eval (q : ℂ) :
+    cancellationSentinelReducedResponse.eval q = q := by
+  simp [DelayTransfer.ReducedRationalResponse.eval,
+    cancellationSentinelReducedResponse]
+
+/-- Direct substitution makes `q = 1` a root of the raw response denominator. -/
+lemma cancellationSentinel_one_mem_rawDenominatorRoots :
+    (1 : ℂ) ∈ cancellationSentinelRationalReduction.rawDenominatorRoots := by
+  change cancellationSentinelParameters.denominatorPolynomial.eval 1 = 0
+  rw [cancellationSentinel_denominatorPolynomial_expansion]
+  norm_num [cancellationSentinelFactor]
+
+/-- The compiled internal feedback operator is singular at the cancelled value `q = 1`.
+
+This proof uses the operator definition of `candidateSingularities`, the generic N5 well-posedness
+gate, and the directly expanded scalar denominator. It does not use
+`mem_candidateSingularities_iff` or either response-reduction pole-set theorem.
+-/
+lemma cancellationSentinel_one_mem_candidateSingularities :
+    (1 : ℂ) ∈ candidateSingularities cancellationSentinelParameters := by
+  change ¬Function.Bijective
+    ((rationalNetlist cancellationSentinelParameters).compile
+      (fun _ : Fin 1 => (1 : ℂ))).feedbackOperator.toLinearMap
+  intro hBijective
+  have hFixedBijective : Function.Bijective
+      (netlist (cancellationSentinelParameters.at 1)).feedbackOperator.toLinearMap := by
+    rw [← rationalNetlist_feedbackOperator_eq cancellationSentinelParameters 1]
+    exact hBijective
+  have hFixed :
+      (netlist (cancellationSentinelParameters.at 1)).IsWellPosed :=
+    ((netlist
+      (cancellationSentinelParameters.at 1)).isWellPosed_iff_feedbackOperator_bijective).2
+        hFixedBijective
+  have hDenominator : (cancellationSentinelParameters.at 1).denominator = 0 := by
+    rw [← cancellationSentinelParameters.eval_denominatorPolynomial]
+    exact cancellationSentinel_one_mem_rawDenominatorRoots
+  exact (not_isWellPosed_of_denominator_eq_zero
+    (cancellationSentinelParameters.at 1) hDenominator) hFixed
+
+/-- The nonzero reciprocal point `z = 1` is therefore an internal candidate pole. -/
+lemma cancellationSentinel_one_mem_candidatePoles :
+    (1 : ℂ) ∈ candidatePoles cancellationSentinelParameters := by
+  constructor
+  · norm_num
+  · simpa using cancellationSentinel_one_mem_candidateSingularities
+
+/-- The response-indexed no-cancellation criterion fails at the singular value `q = 1`. -/
+lemma cancellationSentinel_not_noPoleCancellation :
+    ¬cancellationSentinelRationalReduction.NoPoleCancellation 1 := by
+  simp [DelayTransfer.RationalReduction.NoPoleCancellation,
+    cancellationSentinelRationalReduction, cancellationSentinelFactor]
+
+/-- After the common factor is removed, `z = 1` is not an actual response pole. -/
+lemma cancellationSentinel_one_not_mem_actualPoles :
+    (1 : ℂ) ∉ cancellationSentinelResponseReduction.actualPoles := by
+  simp [ResponseReduction.actualPoles, cancellationSentinelResponseReduction,
+    cancellationSentinelRationalReduction, cancellationSentinelReducedResponse,
+    DelayTransfer.ReducedRationalResponse.zPoles,
+    DelayTransfer.ReducedRationalResponse.poles]
 
 end
 
