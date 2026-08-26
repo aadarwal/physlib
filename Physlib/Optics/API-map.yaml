@@ -293,7 +293,7 @@ Requirements:
       Optics.MachZehnder.balanced_phase_factor_ratio_eq_output_ratio);
       Physlib/Optics/Systems/MachZehnder/Regression.lean
 
-  - description: "The all-pass and add-drop portions model one- and two-bus microrings as explicit FlatNetlists assembled from the common directional-coupler and fixed-carrier matched-propagation components. Their complete-state well-posedness is equivalent to the exact scalar feedback-denominator gates, and N5 elimination derives the through/drop responses and contraction-gated round-trip-series forms. For the all-pass ring, the exhaustive input-side/through-side bus boundary is relabeled into typed left/right coordinates; separately derived directional equations identify the singular-safe relation, on HasNonzeroDenominator, with an independently specified reflectionless two-port behavior and scattering realization without a reciprocity inference. Its backward-first chain view exists exactly when throughTransfer is nonzero; under that independent pivot gate it is diag(throughTransfer⁻¹, throughTransfer), has the regrouped singular-safe graph, and converts back to the packaged scattering law. The complete relational behavior is also identified with the generic N5-extracted Mason response on the solve gate. An independently defined reduced two-node circulation model has determinant 1-t*gamma and reconstructs the through transfer; no graph reduction from the complete graph is claimed. Direct path/loop enumeration and raw channel elimination meet at 1/7 without either bridge theorem. The S3 layer derives squared-modulus powers, routes lossless through/drop balance through N6 component conservation, names resonance and antiresonance phase conditions, proves gated critical-coupling extinction and recovery, fixes positive-domain base-ten decibel rejection ratios, and proves through/drop power periodicity under an explicit constant group-index N5F model on responseDomain. The source bridge maps the audited DATE'14 two- and four-port equations and the SysCon'15/SFG add-drop formulas to those derived N5 responses under explicit unitary, denominator, pivot, port-order, principal-root, and logarithm-base gates. IP-03, IP-04, and IP-05 are discharged and IP-12 is conditional; the printed SysCon power denominator and its unspecified logarithm base keep IP-06 and IP-07 open. Exact response, source-coordinate, critical-coupling, and one-FSR regressions pin the implemented statements independently. The umbrella remains incomplete: the all-pass causal Z leg, DCDR, named phase extrema, bandwidth, linewidth, quality factor, response-derived group delay, reciprocity, material realization, and source-level S0 agreement remain open."
+  - description: "The all-pass and add-drop portions model one- and two-bus microrings as explicit FlatNetlists assembled from the common directional-coupler and fixed-carrier matched-propagation components. Their complete-state well-posedness is equivalent to the exact scalar feedback-denominator gates, and N5 elimination derives the through/drop responses and contraction-gated round-trip-series forms. For the all-pass ring, the exhaustive input-side/through-side bus boundary is relabeled into typed left/right coordinates; separately derived directional equations identify the singular-safe relation, on HasNonzeroDenominator, with an independently specified reflectionless two-port behavior and scattering realization without a reciprocity inference. Its backward-first chain view exists exactly when throughTransfer is nonzero; under that independent pivot gate it is diag(throughTransfer⁻¹, throughTransfer), has the regrouped singular-safe graph, and converts back to the packaged scattering law. The complete relational behavior is also identified with the generic N5-extracted Mason response on the solve gate. An independently defined reduced two-node circulation model has determinant 1-t*gamma and reconstructs the through transfer; no graph reduction from the complete graph is claimed. Direct path/loop enumeration and raw channel elimination meet at 1/7 without either bridge theorem. The all-pass causal layer is derived through a rational N7/N5F netlist with the same wiring; on the explicit intersection of absolute ROC membership, component validity, contraction, reciprocal-Z loop matching, and the chain pivot, its causal transform, rational response, circulation series, fixed N5 response, complete Mason response, typed scattering, backward-first chain, and original relation agree. The S3 layer derives squared-modulus powers, routes lossless through/drop balance through N6 component conservation, names resonance and antiresonance phase conditions, proves gated critical-coupling extinction and recovery, fixes positive-domain base-ten decibel rejection ratios, and proves through/drop power periodicity under an explicit constant group-index N5F model on responseDomain. The source bridge maps the audited DATE'14 two- and four-port equations and the SysCon'15/SFG add-drop formulas to those derived N5 responses under explicit unitary, denominator, pivot, port-order, principal-root, and logarithm-base gates. IP-03, IP-04, and IP-05 are discharged and IP-12 is conditional; the printed SysCon power denominator and its unspecified logarithm base keep IP-06 and IP-07 open. Exact real/nonreal response, cross-semantics, source-coordinate, critical-coupling, and one-FSR regressions pin the implemented statements independently. The umbrella remains incomplete: DCDR, named phase extrema, bandwidth, linewidth, quality factor, reciprocity, material realization, and the remaining source-level comparisons remain open."
     done: false
     location: >-
       Physlib/Optics/Systems/Microring/AllPass.lean
@@ -330,6 +330,13 @@ Requirements:
       Optics.AllPass.allPassChainRegression_critical_throughTransfer,
       Optics.AllPass.allPassChainRegression_critical_isWellPosed,
       Optics.AllPass.allPassChainRegression_critical_not_hasBijectiveRightToLeftTransmission);
+      Physlib/Optics/Systems/Microring/AllPassDelayTransfer.lean
+      (Optics.DelayTransfer.allPassRationalComponents,
+      Optics.DelayTransfer.allPassRationalNetlist,
+      Optics.DelayTransfer.allPassRationalNetlist_compile_eq,
+      Optics.DelayTransfer.allPassRationalNetlist_responseThrough,
+      Optics.DelayTransfer.allPassRationalNetlist_response_entry,
+      Optics.DelayTransfer.allPassRationalNetlist_response_cleared);
       Physlib/Optics/Systems/Microring/AllPassMason.lean
       (Optics.AllPass.loopSignalFlowGraph,
       Optics.AllPass.systemMatrix_loopSignalFlowGraph,
@@ -383,6 +390,35 @@ Requirements:
       Optics.AllPass.toBehavior_packagedTwoPortScattering,
       Optics.AllPass.packagedTwoPortScattering_eq_twoPortScatteringTransform,
       Optics.AllPass.externalBehavior_eq_twoPortBehavior);
+      Physlib/Optics/Systems/Microring/AllPassZTransform.lean
+      (Optics.AllPass.zFeedbackLags,
+      Optics.AllPass.zFeedforwardLags,
+      Optics.AllPass.impulseResponseFormula,
+      Optics.AllPass.causalOutput,
+      Optics.AllPass.zTransfer,
+      Optics.AllPass.zTransferROC,
+      Optics.AllPass.mem_zTransferROC_of_norm_feedback_lt_norm,
+      Optics.AllPass.transform_causalOutput_cleared,
+      Optics.AllPass.transform_causalImpulseResponse_eq_zTransfer);
+      Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean
+      (Optics.AllPass.carrierPoint,
+      Optics.AllPass.recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator,
+      Optics.AllPass.zFeedback_isSchurStable_of_isContractive,
+      Optics.AllPass.reciprocalZThroughResponse,
+      Optics.AllPass.zTransfer_eq_reciprocalZThroughResponse,
+      Optics.AllPass.IsZCrossSemanticsDomain,
+      Optics.AllPass.ZCrossSemanticsAgreement,
+      Optics.AllPass.zCrossSemantics_agree);
+      Physlib/Optics/Systems/Microring/AllPassZTransformRegression.lean
+      (Optics.AllPass.allPassZRegression_output_zero,
+      Optics.AllPass.allPassZRegression_output_one,
+      Optics.AllPass.allPassZRegression_output_two,
+      Optics.AllPass.allPassZRegression_transfer_I_ne_conjugate);
+      Physlib/Optics/Systems/Microring/AllPassZTransformBridgeRegression.lean
+      (Optics.AllPass.allPassZRegression_resonance_crossSemanticsDomain,
+      Optics.AllPass.allPassZRegression_cross_semantics,
+      Optics.AllPass.allPassZRegression_quarterTurn_rawN5F_agreement,
+      Optics.AllPass.allPassZRegression_nonunitary_transfers_ne);
       Physlib/Optics/Systems/Microring/AddDropNetwork.lean
       (Optics.AddDrop.Parameters, Optics.AddDrop.Parameters.roundTripCoefficient,
       Optics.AddDrop.Parameters.loopGain, Optics.AddDrop.Parameters.denominator,
@@ -531,7 +567,7 @@ Requirements:
       (Physlib.ZTransform.not_isSchurStable_onePole_two,
       Physlib.ZTransform.candidatePoles_twoPole, Physlib.ZTransform.isSchurStable_twoPole)
 
-  - description: "The delay-transfer layer supplies finite formal-delay tuples, retained polynomial-quotient models and their evaluation domains, N5F compilation of rational component entries, solve/response-domain-preserving Laplace and reciprocal-Z reparameterizations, an abstract internal-determinant/candidate-singularity and reduced-response/cancellation schema, finite zero/pole sets with degree bounds, Schur/BIBO equivalence for the explicitly stated nonzero proper causal one-pole class, and proof-gated frequency response under `q = exp (-s * τ) = z⁻¹`. Exact all-pass regressions pin resonance, antiresonance, and non-real quadrature evaluations through the compiled N5 equations. The row remains incomplete: symbolic rationality of the eliminated external response, a network-level no-cancellation or reachability/observability bridge from candidate singularities to actual poles, general proper-rational BIBO equivalence, and response-derived group delay/dispersion are withheld; no rationality in physical frequency is claimed."
+  - description: "The delay-transfer layer supplies finite formal-delay tuples, retained polynomial-quotient models and their evaluation domains, N5F compilation of rational component entries, solve/response-domain-preserving Laplace and reciprocal-Z reparameterizations, an abstract internal-determinant/candidate-singularity and reduced-response/cancellation schema, finite zero/pole sets with degree bounds, Schur/BIBO equivalence for the explicitly stated nonzero proper causal one-pole class, and proof-gated frequency response under `q = exp (-s * τ) = z⁻¹`. The production all-pass specialization retains the physical ring wiring, derives its cleared external response from the compiled N5 equations, and has exact resonance, antiresonance, and non-real quadrature regressions. The row remains incomplete: generic symbolic rationality of eliminated external responses, a network-level no-cancellation or reachability/observability bridge from candidate singularities to actual poles, general proper-rational BIBO equivalence, and response-derived group delay/dispersion are withheld; no rationality in physical frequency is claimed."
     done: false
     location: >-
       Physlib/Optics/Systems/DelayTransfer/Basic.lean
@@ -547,9 +583,15 @@ Requirements:
       Optics.DelayTransfer.RationalNetlist.mem_compileBehavior_iff_unguardedResponse,
       Optics.DelayTransfer.RationalNetlist.response_laplace,
       Optics.DelayTransfer.RationalNetlist.response_reciprocalZ);
+      Physlib/Optics/Systems/Microring/AllPassDelayTransfer.lean
+      (Optics.DelayTransfer.allPassRationalComponents,
+      Optics.DelayTransfer.allPassRationalNetlist,
+      Optics.DelayTransfer.allPassRationalNetlist_compile_eq,
+      Optics.DelayTransfer.allPassRationalNetlist_responseThrough,
+      Optics.DelayTransfer.allPassRationalNetlist_response_entry,
+      Optics.DelayTransfer.allPassRationalNetlist_response_cleared);
       Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean
-      (Optics.DelayTransfer.allPassRationalNetlist_response_entry,
-      Optics.DelayTransfer.allPassRationalNetlist_laplace_quadrature_response_entry,
+      (Optics.DelayTransfer.allPassRationalNetlist_laplace_quadrature_response_entry,
       Optics.DelayTransfer.allPassRationalNetlist_reciprocalZ_quadrature_response_entry);
       Physlib/Optics/Systems/DelayTransfer/Poles.lean
       (Optics.DelayTransfer.InternalDeterminantPolynomial,

@@ -1696,6 +1696,19 @@ PR unless maintainers explicitly ask to retain it.
   posed while zero through transfer prevents this chain view. The chain gate is neither claimed
   nor inferred to be the netlist solve gate, and no reciprocity, passivity, losslessness, delay,
   causality, ROC, source-parity, or complete X-01 result follows.
+- [x] Complete the all-pass causal-Z ring instance of X-01. `allPassRationalNetlist` retains the
+  actual N7 component entries and S2 wiring; its compiled channel equations derive the cleared
+  response `(1 - t*a*q) * H = t - a*q`. On a named intersection of the absolute ROC, component
+  validity, contraction, reciprocal-Z loop match, and chain pivot, `zCrossSemantics_agree`
+  identifies the causal impulse-response transform, proof-gated rational/N5F response,
+  circulation series, fixed N5 response, complete Mason response, typed scattering,
+  backward-first chain, and original relation. Real and nonreal fixtures retain independent raw
+  channel-equation anchors. This closes only the ring half of X-01; the DCDR half remains open.
+- [ ] Human-check the all-pass causal-Z bridge before upstreaming. Confirm `q = z⁻¹`, the
+  negative-exponential quarter-turn sign, the exact separation between absolute ROC membership,
+  the N5 denominator gate, contraction/Schur stability, and the nonzero chain pivot, and the
+  load-bearing unitary-coupler counterexample. No material dispersion, physical time delay,
+  reciprocity, Maxwell time-domain realization, or ROC/N5 equivalence is claimed.
 - [ ] Add one transport operation for a `PortConnectionFamily` along an equivalence of port
   families. This is the shared missing machinery behind both N5H inner-family replacement by an
   equal boundary relation and literal three-stage append associativity; treat it as one gap, not

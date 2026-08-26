@@ -518,11 +518,16 @@ public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
 public import Physlib.Optics.Systems.Microring.AllPassChain
 public import Physlib.Optics.Systems.Microring.AllPassChainRegression
+public import Physlib.Optics.Systems.Microring.AllPassDelayTransfer
 public import Physlib.Optics.Systems.Microring.AllPassMason
 public import Physlib.Optics.Systems.Microring.AllPassMasonRegression
 public import Physlib.Optics.Systems.Microring.AllPassRegression
 public import Physlib.Optics.Systems.Microring.AllPassTwoPort
 public import Physlib.Optics.Systems.Microring.AllPassTwoPortBoundary
+public import Physlib.Optics.Systems.Microring.AllPassZTransform
+public import Physlib.Optics.Systems.Microring.AllPassZTransformBridge
+public import Physlib.Optics.Systems.Microring.AllPassZTransformBridgeRegression
+public import Physlib.Optics.Systems.Microring.AllPassZTransformRegression
 public import Physlib.Optics.Systems.Microring.Observables
 public import Physlib.Optics.Systems.Microring.ObservablesFrequency
 public import Physlib.Optics.Systems.Microring.ObservablesPower

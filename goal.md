@@ -2385,8 +2385,12 @@ is claimed. Direct path/loop enumeration and raw channel elimination meet indepe
 exact `1 / 7` fixture. Its exhaustive bus boundary and complete reflectionless typed scattering
 law are also identified on the same solve gate. On the additional exact gate `throughTransfer ≠
 0`, its backward-first chain matrix is `diag(throughTransfer⁻¹, throughTransfer)` and converts
-back to the packaged typed scattering law. The causal Z-transform leg remains separate, so X-01
-is not yet complete.
+back to the packaged typed scattering law. The causal recurrence is now derived through the same
+rational N7/N5F netlist, with its absolute ROC, algebraic solve gate, contraction/Schur condition,
+and chain pivot kept distinct. On their explicit intersection, one theorem identifies the causal
+transform, rational response, circulation series, fixed N5 response, complete Mason response,
+typed scattering, backward-first chain, and original relational behavior. This completes the ring
+instance of X-01; the DCDR half remains separate, so X-01 as a two-system regression is still open.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2813,11 +2817,11 @@ current integration base; a designed package whose prerequisite is merely active
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | done | completed N3T core plus the N7 directional coupler and matched propagation | independent all-pass/add-drop field relations (`PhysicalRealization.lean:123-180`), N7 primitive realization and N5 response identification (`PhysicalRealization.lean:186-492`), and DATE/SysCon/SFG source-specific chain and response views (`PhysicalSourceBridge.lean:275-360,407-465`), with hostile fixtures in `PhysicalRegression.lean`; IP-66--IP-69 |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
-| S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, and the gated source bridge are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, and DATE/SysCon/SFG response identifications are complete under their stated gates; IP-06/IP-07 source questions and the remaining S0/S4+ integrations stay open |
+| S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, the gated source bridge, and the all-pass X-01 ring instance are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, DATE/SysCon/SFG response identifications, and common-domain causal-Z/N5F/N5/Mason/scattering/chain/relational agreement are complete under their stated gates; IP-06/IP-07 source questions and the remaining physical/source extensions stay open |
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
 | S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; network reachability/no-cancellation and broader rational BIBO remain |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: generic core, exact N5 agreement, and the all-pass relational/N5/chain/reduced-Mason value instance are complete; Z and DCDR X-01 legs remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, and independently enumerated ring regressions |
+| S6 Mason | in progress: generic core, exact N5 agreement, and the complete all-pass ring X-01 instance are integrated; the DCDR half remains | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, independently enumerated, and common-domain causal-Z ring regressions |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | in progress | N4C, N5H, N6c, S4P--S6 | controller-managed worker is formalizing the audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | in progress | N3T, N5H, S0, S4P | controller-managed worker is formalizing source-backed cascades plus the Physlib-original full lattice |
