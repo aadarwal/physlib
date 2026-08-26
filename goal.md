@@ -512,9 +512,6 @@ Ownership rules:
 ### D.3. Not yet present
 
 - [ ] outgoing/limiting-absorption semantics, kept separate from positive-side decay;
-- [ ] the normalized-mode Malus power bridge and the polarization chain's remaining physical
-  observables; the propagating material-wave irradiance and actual mean-flux Malus laws are
-  complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
 - [ ] a physical time-reversed external-port pairing and convention-aware reciprocity. The local
@@ -1290,17 +1287,21 @@ quadrature output remains algebraically named, without electromagnetic-power or 
 
 ##### P6b-3. Physical polarization observables
 
-Status: unblocked by the completed P5b/E3b bridge; implementation remains.
+Status: complete on the fork. Export locations:
+`Optics/Polarization/HarmonicMaterialWave.lean` and
+`Optics/Systems/PolarizerRetarderPhysical*.lean`.
 
 Deliverables:
 
-- a connected example starting at P1b's `harmonicWaveX` bridge and passing through a P5a polarizer
-  and P6a wave plate; and
-- field realization, irradiance, and normalized-power observables, using P5b/E3b before any
+- [x] a connected example starting at P1b's `harmonicWaveX` bridge and passing through a P5a
+  polarizer and P6a wave plate; and
+- [x] field realization, irradiance, and normalized-power observables, using P5b/E3b before any
   physical-power claim.
 
-Exit: the reduced connected chain is realized as electromagnetic fields and its physical
-observables agree through named normalization bridge theorems.
+Exit achieved: the reduced connected chain is realized as electromagnetic fields and its
+irradiance, modal-coordinate power, and signed actual aperture flux agree through named P5b/E3b
+normalization bridge theorems. This coherent singleton result is not a complete-device power
+balance and makes no partially polarized or coherency-mixture claim.
 
 ### H.2. Electromagnetic-interface milestone
 
@@ -2789,7 +2790,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
-| P6b-3 physical observables | unblocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement remain to implement |
+| P6b-3 physical observables | done | P1b, P5b, P6b-2, E3b | potential-derived input bridge, ordered material carrier, irradiance, modal power, separately normalized signed actual flux, and hostile phase/axis/sign regressions |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, interface-oriented side-decaying carrier geometry, its complex-bilinear s/p frame, transverse positive-medium Maxwell qualification, and named nonzero half-space evanescence are complete; separate outgoing semantics remain |
@@ -2832,7 +2833,7 @@ current integration base; a designed package whose prerequisite is merely active
 
 The long-running goal is complete only when:
 
-- [ ] the polarization milestone P1a--P6b, including every lettered subpackage, is complete;
+- [x] the polarization milestone P1a--P6b, including every lettered subpackage, is complete;
 - [ ] the electromagnetic-interface milestone E0--E6, including E3s/E3a/E3b and E4a/E4b, is
   complete;
 - [ ] the typed finite-network milestone N1--N7, including N3T, N4C, N5F/N5H, and N6a/N6b/N6c,

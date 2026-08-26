@@ -37,7 +37,8 @@ quarter-wave plate.
 The E3b normalization hypotheses are proved for this coherent singleton fixture; they are not
 inferred from raw Jones unitarity. The result does not cover partially polarized or coherency-
 matrix mixtures and does not model rejected polarization, absorption, heating, or a complete
-scattering device.
+scattering device. Counting measure supplies one measured profile weight and is not geometric
+aperture area.
 -/
 
 @[expose] public section

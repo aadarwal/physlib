@@ -1209,6 +1209,15 @@ PR unless maintainers explicitly ask to retain it.
   `unitEqualAmplitude` times `minusIQuadrature`. This simultaneously checks the positive analyzer
   amplitude and negative third Stokes coordinate; it is not yet a circular-handedness, irradiance,
   detector-power, or modal-power statement.
+- [ ] Human-check P6b-3's physical chain: the exact P1b horizontal carrier, `pi / 4` analyzer, and
+  positive zero-axis quarter-wave plate must give Jones output `(1/2, -I/2)`, embedded electric
+  amplitude `(0, 1/2, -I/2)`, input/output irradiances `1` and `1/2`, incident/outgoing signed
+  fluxes `-1` and `1/2`, and separate E3b normalization witnesses. Confirm that counting measure
+  is only a measured-profile sentinel and that no rejected-polarization, absorption, complete-
+  device, partially polarized, or coherency-mixture claim is made.
+- [ ] Optionally strengthen the harmonic-material regression with a second exact free-space
+  fixture having `mu0 != 1`, so the constitutive `mu0^-1` factor in the magnetic-field-strength
+  bridge is numerically detectable as well as symbolically proved.
 
 ## Modal and network semantics
 
