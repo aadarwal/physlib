@@ -350,23 +350,39 @@ lemma physicalPortSuite9a_indexed_action :
           (fun selected =>
             (physicalPortSuite9aFamily.scattering selected).toModeTransform))
         physicalPortSuite9aIndexedInput ⟨.beamSplitter, channel⟩ = _
-    rw [ModeTransform.blockDiagonal'_apply,
-      physicalPortSuite9aIndexedInput_restrict_beam,
-      physicalPortSuite9a_beam_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port <;> cases mode <;> rfl
+    calc
+      _ = (physicalPortSuite9aFamily.scattering .beamSplitter).toModeTransform.toLinearMap
+            (physicalPortSuite9aIndexedInput.restrictEmbedding
+              (Function.Embedding.sigmaMk .beamSplitter)) channel :=
+        ModeTransform.blockDiagonal'_apply
+          (fun selected =>
+            (physicalPortSuite9aFamily.scattering selected).toModeTransform)
+          physicalPortSuite9aIndexedInput .beamSplitter channel
+      _ = _ := by
+        rw [physicalPortSuite9aIndexedInput_restrict_beam,
+          physicalPortSuite9a_beam_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port <;> cases mode <;> rfl
   · change ModeTransform.toLinearMap
         (Matrix.blockDiagonal'
           (fun selected =>
             (physicalPortSuite9aFamily.scattering selected).toModeTransform))
         physicalPortSuite9aIndexedInput ⟨.mirror, channel⟩ = _
-    rw [ModeTransform.blockDiagonal'_apply,
-      physicalPortSuite9aIndexedInput_restrict_mirror,
-      physicalPortSuite9a_mirror_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port
-    cases mode
-    rfl
+    calc
+      _ = (physicalPortSuite9aFamily.scattering .mirror).toModeTransform.toLinearMap
+            (physicalPortSuite9aIndexedInput.restrictEmbedding
+              (Function.Embedding.sigmaMk .mirror)) channel :=
+        ModeTransform.blockDiagonal'_apply
+          (fun selected =>
+            (physicalPortSuite9aFamily.scattering selected).toModeTransform)
+          physicalPortSuite9aIndexedInput .mirror channel
+      _ = _ := by
+        rw [physicalPortSuite9aIndexedInput_restrict_mirror,
+          physicalPortSuite9a_mirror_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port
+        cases mode
+        rfl
 
 /-- The mixed input in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aAggregateInput :
@@ -550,23 +566,40 @@ lemma physicalPortSuite9a_hostile_indexed_action :
           (fun selected =>
             (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform))
         physicalPortSuite9aIndexedInput ⟨.beamSplitter, channel⟩ = _
-    rw [ModeTransform.blockDiagonal'_apply,
-      physicalPortSuite9aIndexedInput_restrict_beam,
-      physicalPortSuite9a_hostile_beam_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port <;> cases mode <;> rfl
+    calc
+      _ = ModeTransform.toLinearMap
+            (physicalPortSuite9aHostileFamily.scattering .beamSplitter).toModeTransform
+            (physicalPortSuite9aIndexedInput.restrictEmbedding
+              (Function.Embedding.sigmaMk .beamSplitter)) channel :=
+        ModeTransform.blockDiagonal'_apply
+          (fun selected =>
+            (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform)
+          physicalPortSuite9aIndexedInput .beamSplitter channel
+      _ = _ := by
+        rw [physicalPortSuite9aIndexedInput_restrict_beam,
+          physicalPortSuite9a_hostile_beam_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port <;> cases mode <;> rfl
   · change ModeTransform.toLinearMap
         (Matrix.blockDiagonal'
           (fun selected =>
             (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform))
         physicalPortSuite9aIndexedInput ⟨.mirror, channel⟩ = _
-    rw [ModeTransform.blockDiagonal'_apply,
-      physicalPortSuite9aIndexedInput_restrict_mirror,
-      physicalPortSuite9a_mirror_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port
-    cases mode
-    rfl
+    calc
+      _ = (physicalPortSuite9aHostileFamily.scattering .mirror).toModeTransform.toLinearMap
+            (physicalPortSuite9aIndexedInput.restrictEmbedding
+              (Function.Embedding.sigmaMk .mirror)) channel :=
+        ModeTransform.blockDiagonal'_apply
+          (fun selected =>
+            (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform)
+          physicalPortSuite9aIndexedInput .mirror channel
+      _ = _ := by
+        rw [physicalPortSuite9aIndexedInput_restrict_mirror,
+          physicalPortSuite9a_mirror_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port
+        cases mode
+        rfl
 
 /-- The hostile exact output in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aHostileAggregateOutput :
