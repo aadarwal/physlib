@@ -147,6 +147,17 @@ lemma principalFaceNormal {plane : OrientedAffineHyperplane 3}
   exact plane.tangent_cross_quarterTurnTangent_of_norm_eq_one
     pillbox.tangent pillbox.tangent_norm
 
+/-- The ordered pillbox affine frame has signed volume one. -/
+lemma orientedVolume {plane : OrientedAffineHyperplane 3}
+    (pillbox : PlanarPillboxFamily plane) :
+    inner ℝ (basis.repr pillbox.tangentDirection)
+      (basis.repr pillbox.quarterTurnDirection ⨯ₑ₃
+        basis.repr pillbox.normalDirection) = 1 := by
+  rw [pillbox.firstFaceNormal]
+  change inner ℝ (pillbox.tangent : EuclideanSpace ℝ (Fin 3))
+    pillbox.tangent = 1
+  rw [real_inner_self_eq_norm_sq, pillbox.tangent_norm, one_pow]
+
 /-! ## B. Ambient half-face integrability -/
 
 /-- Outer-variable integrability of the four lateral half-face fluxes of one ambient field.
@@ -167,6 +178,7 @@ structure AmbientHalfLateralIntegrable {plane : OrientedAffineHyperplane 3}
           v • plane.quarterTurnTangent pillbox.tangent) w))
         (pillbox.tangent : EuclideanSpace ℝ (Fin 3)))
     volume (-pillbox.radius scale) (pillbox.radius scale)
+
   /-- Integrability of the negative-tangent lateral half-face flux. -/
   firstLower : IntervalIntegrable
     (fun v ↦ ∫ w in lower..upper,
@@ -190,6 +202,29 @@ structure AmbientHalfLateralIntegrable {plane : OrientedAffineHyperplane 3}
         (u • pillbox.tangent +
           -(pillbox.radius scale) • plane.quarterTurnTangent pillbox.tangent) w))
         (plane.quarterTurnTangent pillbox.tangent : EuclideanSpace ℝ (Fin 3)))
+    volume (-pillbox.radius scale) (pillbox.radius scale)
+
+/-- Integrability of the middle and outer iterated integrals of one ambient scalar density on
+one closed normal half of a pillbox.
+
+The innermost normal integrals remain the literal half-cell integrals. These hypotheses are the
+two Fubini levels needed to regroup negative- and positive-side volume terms. -/
+structure AmbientHalfVolumeIntegrable {plane : OrientedAffineHyperplane 3}
+    (pillbox : PlanarPillboxFamily plane) {P : Type*}
+    (density : P → Space → ℝ) (parameter : P)
+    (x : plane.carrier) (scale : ℕ) (lower upper : ℝ) : Prop where
+  /-- Each middle-coordinate integral of the normal half-integral is integrable. -/
+  middle : ∀ u : ℝ, IntervalIntegrable
+    (fun v ↦ ∫ w in lower..upper,
+      density parameter (plane.normalOffsetPoint x
+        (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w))
+    volume (-pillbox.radius scale) (pillbox.radius scale)
+  /-- The outer-coordinate integral of the iterated half-box integral is integrable. -/
+  outer : IntervalIntegrable
+    (fun u ↦ ∫ v in -pillbox.radius scale..pillbox.radius scale,
+      ∫ w in lower..upper,
+        density parameter (plane.normalOffsetPoint x
+          (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w))
     volume (-pillbox.radius scale) (pillbox.radius scale)
 
 /-- Local split-box regularity and the half-face integrability needed to express its outer flux
@@ -256,6 +291,41 @@ private lemma positiveSideSample_integral_eq_ambient
       ∫ w in 0..halfThickness,
         inner ℝ (positiveField parameter
           (plane.normalOffsetPoint x offset w)) normal := by
+  apply intervalIntegral.integral_congr_Ioo_of_le hhalfThickness
+  intro w hw
+  simp [OrientedAffineHyperplane.positiveSideSample, hw.1,
+    OrientedAffineHyperplane.TwoSidedField.ofFields,
+    OrientedAffineHyperplane.restrictFieldToSide]
+
+private lemma negativeScalarSideSample_integral_eq_ambient
+    {plane : OrientedAffineHyperplane 3} {P : Type*}
+    (negativeDensity positiveDensity : P → Space → ℝ)
+    (parameter : P) (x : plane.carrier) (offset : plane.tangentSubmodule)
+    (halfThickness : ℝ) (hhalfThickness : 0 ≤ halfThickness) :
+    (∫ w in -halfThickness..0,
+      plane.negativeSideSample
+        (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+          negativeDensity positiveDensity).negative parameter x offset w) =
+      ∫ w in -halfThickness..0,
+        negativeDensity parameter (plane.normalOffsetPoint x offset w) := by
+  apply intervalIntegral.integral_congr_Ioo_of_le
+    (neg_nonpos.mpr hhalfThickness)
+  intro w hw
+  simp [OrientedAffineHyperplane.negativeSideSample, hw.2,
+    OrientedAffineHyperplane.TwoSidedField.ofFields,
+    OrientedAffineHyperplane.restrictFieldToSide]
+
+private lemma positiveScalarSideSample_integral_eq_ambient
+    {plane : OrientedAffineHyperplane 3} {P : Type*}
+    (negativeDensity positiveDensity : P → Space → ℝ)
+    (parameter : P) (x : plane.carrier) (offset : plane.tangentSubmodule)
+    (halfThickness : ℝ) (hhalfThickness : 0 ≤ halfThickness) :
+    (∫ w in 0..halfThickness,
+      plane.positiveSideSample
+        (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+          negativeDensity positiveDensity).positive parameter x offset w) =
+      ∫ w in 0..halfThickness,
+        positiveDensity parameter (plane.normalOffsetPoint x offset w) := by
   apply intervalIntegral.integral_congr_Ioo_of_le hhalfThickness
   intro w hw
   simp [OrientedAffineHyperplane.positiveSideSample, hw.1,
@@ -486,6 +556,151 @@ private lemma lateralFaceAverage_eq_normalized_affineSplitBoxLateralFlux
   dsimp only
   rw [hFirstUpper, hFirstLower, hSecondUpper, hSecondLower]
   ring
+
+/-- The existing two-sided pillbox volume average of restricted ambient densities equals the
+normalized sum of the two affine half-box iterated integrals. -/
+lemma volumeAverage_ofFields_eq_normalized_affineSplitVolume
+    {plane : OrientedAffineHyperplane 3} (pillbox : PlanarPillboxFamily plane)
+    {P : Type*} (negativeDensity positiveDensity : P → Space → ℝ)
+    (parameter : P) (x : plane.carrier) (scale : ℕ)
+    (negativeIntegrable : AmbientHalfVolumeIntegrable pillbox negativeDensity
+      parameter x scale (-(pillbox.halfThickness scale)) 0)
+    (positiveIntegrable : AmbientHalfVolumeIntegrable pillbox positiveDensity
+      parameter x scale 0 (pillbox.halfThickness scale)) :
+    pillbox.volumeAverage
+        (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+          negativeDensity positiveDensity) parameter x scale =
+      ((2 * pillbox.radius scale) ^ 2)⁻¹ *
+        ((∫ u in -pillbox.radius scale..pillbox.radius scale,
+            ∫ v in -pillbox.radius scale..pillbox.radius scale,
+              ∫ w in -pillbox.halfThickness scale..0,
+                negativeDensity parameter
+                  (affineBoxPoint (x : Space) pillbox.tangentDirection
+                    pillbox.quarterTurnDirection pillbox.normalDirection u v w)) +
+          ∫ u in -pillbox.radius scale..pillbox.radius scale,
+            ∫ v in -pillbox.radius scale..pillbox.radius scale,
+              ∫ w in 0..pillbox.halfThickness scale,
+                positiveDensity parameter
+                  (affineBoxPoint (x : Space) pillbox.tangentDirection
+                    pillbox.quarterTurnDirection pillbox.normalDirection u v w)) := by
+  let radius := pillbox.radius scale
+  let thickness := pillbox.halfThickness scale
+  have hMiddle (u : ℝ) :
+      (∫ v in -radius..radius,
+        (∫ w in -thickness..0,
+          negativeDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)) +
+        ∫ w in 0..thickness,
+          positiveDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)) =
+        (∫ v in -radius..radius, ∫ w in -thickness..0,
+          negativeDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)) +
+        ∫ v in -radius..radius, ∫ w in 0..thickness,
+          positiveDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w) := by
+    exact intervalIntegral.integral_add
+      (negativeIntegrable.middle u) (positiveIntegrable.middle u)
+  unfold PlanarPillboxFamily.volumeAverage
+  apply congrArg (((2 * pillbox.radius scale) ^ 2)⁻¹ * ·)
+  calc
+    (∫ u in -radius..radius, ∫ v in -radius..radius,
+        splitNormalIntegral thickness
+          (plane.negativeSideSample
+            (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+              negativeDensity positiveDensity).negative parameter x
+              (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent))
+          (plane.positiveSideSample
+            (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+              negativeDensity positiveDensity).positive parameter x
+              (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent))) =
+      ∫ u in -radius..radius,
+        ((∫ v in -radius..radius, ∫ w in -thickness..0,
+          negativeDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)) +
+        ∫ v in -radius..radius, ∫ w in 0..thickness,
+          positiveDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)) := by
+      apply intervalIntegral.integral_congr
+      intro u _
+      calc
+        _ = ∫ v in -radius..radius,
+            (∫ w in -thickness..0,
+              negativeDensity parameter (plane.normalOffsetPoint x
+                (u • pillbox.tangent +
+                  v • plane.quarterTurnTangent pillbox.tangent) w)) +
+            ∫ w in 0..thickness,
+              positiveDensity parameter (plane.normalOffsetPoint x
+                (u • pillbox.tangent +
+                  v • plane.quarterTurnTangent pillbox.tangent) w) := by
+          apply intervalIntegral.integral_congr
+          intro v _
+          change splitNormalIntegral thickness
+              (plane.negativeSideSample
+                (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+                  negativeDensity positiveDensity).negative parameter x
+                  (u • pillbox.tangent +
+                    v • plane.quarterTurnTangent pillbox.tangent))
+              (plane.positiveSideSample
+                (OrientedAffineHyperplane.TwoSidedField.ofFields plane
+                  negativeDensity positiveDensity).positive parameter x
+                  (u • pillbox.tangent +
+                    v • plane.quarterTurnTangent pillbox.tangent)) =
+            (∫ w in -thickness..0,
+              negativeDensity parameter (plane.normalOffsetPoint x
+                (u • pillbox.tangent +
+                  v • plane.quarterTurnTangent pillbox.tangent) w)) +
+            ∫ w in 0..thickness,
+              positiveDensity parameter (plane.normalOffsetPoint x
+                (u • pillbox.tangent +
+                  v • plane.quarterTurnTangent pillbox.tangent) w)
+          unfold splitNormalIntegral
+          rw [negativeScalarSideSample_integral_eq_ambient
+              negativeDensity positiveDensity parameter x
+              (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent)
+              thickness (pillbox.halfThickness_pos scale).le,
+            positiveScalarSideSample_integral_eq_ambient
+              negativeDensity positiveDensity parameter x
+              (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent)
+              thickness (pillbox.halfThickness_pos scale).le]
+        _ = _ := hMiddle u
+    _ = (∫ u in -radius..radius, ∫ v in -radius..radius,
+          ∫ w in -thickness..0,
+            negativeDensity parameter (plane.normalOffsetPoint x
+              (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w)) +
+        ∫ u in -radius..radius, ∫ v in -radius..radius,
+          ∫ w in 0..thickness,
+            positiveDensity parameter (plane.normalOffsetPoint x
+              (u • pillbox.tangent + v • plane.quarterTurnTangent pillbox.tangent) w) :=
+      intervalIntegral.integral_add negativeIntegrable.outer positiveIntegrable.outer
+    _ = _ := by
+      congr 1
+      · apply intervalIntegral.integral_congr
+        intro u _
+        apply intervalIntegral.integral_congr
+        intro v _
+        apply intervalIntegral.integral_congr
+        intro w _
+        change negativeDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent +
+              v • plane.quarterTurnTangent pillbox.tangent) w) =
+          negativeDensity parameter
+            (affineBoxPoint (x : Space) pillbox.tangentDirection
+              pillbox.quarterTurnDirection pillbox.normalDirection u v w)
+        rw [pillbox.affineBoxPoint_eq_normalOffsetPoint]
+      · apply intervalIntegral.integral_congr
+        intro u _
+        apply intervalIntegral.integral_congr
+        intro v _
+        apply intervalIntegral.integral_congr
+        intro w _
+        change positiveDensity parameter (plane.normalOffsetPoint x
+            (u • pillbox.tangent +
+              v • plane.quarterTurnTangent pillbox.tangent) w) =
+          positiveDensity parameter
+            (affineBoxPoint (x : Space) pillbox.tangentDirection
+              pillbox.quarterTurnDirection pillbox.normalDirection u v w)
+        rw [pillbox.affineBoxPoint_eq_normalOffsetPoint]
 
 /-! ## D. Normalized split-pillbox divergence -/
 
