@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.Port
 
 /-!
