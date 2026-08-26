@@ -50,7 +50,8 @@ namespace DirectionalCoupler
 
 /-!
 ## A. Exact nested-sum fixture
--//-- The normalized `3–4–5` through/cross amplitude pair. -/
+-/
+/-- The normalized `3–4–5` through/cross amplitude pair. -/
 def directionalCouplerRegressionParameters : Parameters where
   throughAmplitude := 3 / 5
   crossAmplitude := 4 / 5

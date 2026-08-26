@@ -226,10 +226,11 @@ PR unless maintainers explicitly ask to retain it.
   `E` and `H` and normal `D` and `B`, but does not remove bound polarization charge, bulk sources,
   or material response. `PlanarMacroscopicTrace` itself is pointwise carrier data obtained honestly
   from globally defined fields. E4b now separately supplies `PlanarMacroscopicSideFields` with
-  genuine full-open-half-space traces. `PlanarThinCell` proves the local laws conditionally from
-  the literal finite integral-Maxwell predicate and its explicit reduced regularity contract; the
-  remaining gap is constructing that integral premise from differential or weak Maxwell through
-  oriented Stokes/divergence machinery.
+  genuine full-open-half-space traces. Local split-cell Stokes/divergence and
+  `HasPlanarFiniteSheetMaxwellPremise` derive the literal finite integral-Maxwell predicate, and
+  `PlanarThinCell` derives the local laws from that predicate plus its reduced regularity contract.
+  The remaining gap is deriving the explicit finite-sheet carrier/interchange premise from weak or
+  measure-valued Maxwell equations.
 - [ ] Human-check E4b's one-sided-trace convention before upstreaming. `oneSidedNhds` is the comap
   of ambient neighborhoods along the open-half-space subtype inclusion, and its ambient image is
   exactly `nhdsWithin` that full half-space. The explicit normal approach is only a convergence
@@ -242,8 +243,11 @@ PR unless maintainers explicitly ask to retain it.
   integrability witnesses. Their proved consequence has the positive-minus-negative `D` jump,
   `n × (H_positive - H_negative)` current orientation, Faraday minus sign, and Ampere--Maxwell
   displacement-current plus sign; the affine-time regression makes both derivative signs nonzero.
-  No theorem yet obtains the literal finite-cell premise from differential or weak Maxwell
-  equations via Stokes/divergence.
+  `HasPlanarFiniteSheetMaxwellPremise` explicitly supplies the finite carrier-source
+  identifications, local half-cell regularity, and witnessed time/integral interchanges;
+  `FiniteSheetIntegralMaxwell` derives the four literal finite-cell laws from the sidewise
+  differential Maxwell equations and that premise. No theorem yet derives the premise itself from
+  weak or measure-valued Maxwell equations.
 - [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
   complex-carrier candidates are off shell and retain independent positive frequencies and complex
   wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined
