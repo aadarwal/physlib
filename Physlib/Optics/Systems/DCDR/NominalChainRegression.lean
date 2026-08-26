@@ -86,7 +86,18 @@ lemma zChainRegression_forward_transfer :
     Parameters.upperCoefficient, Parameters.lowerCoefficient,
     Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient]
   ring_nf
-  norm_num [pow_two, Complex.I_mul_I]
+  have hI5 : Complex.I ^ 5 = Complex.I := by
+    calc
+      Complex.I ^ 5 = (Complex.I * Complex.I) * (Complex.I * Complex.I) * Complex.I := by
+        ring
+      _ = Complex.I := by rw [Complex.I_mul_I]; norm_num
+  have hI7 : Complex.I ^ 7 = -Complex.I := by
+    calc
+      Complex.I ^ 7 = (Complex.I * Complex.I) * (Complex.I * Complex.I) *
+          (Complex.I * Complex.I) * Complex.I := by ring
+      _ = -Complex.I := by rw [Complex.I_mul_I]; ring
+  rw [hI5, hI7]
+  ring
 
 /-- Direct parameter expansion gives the independently stated reverse transmission `-(7/8)I`. -/
 lemma zChainRegression_reverse_transfer :
@@ -553,8 +564,7 @@ lemma zChainRegression_chain_lowerRight :
     TwoPortScatteringTransform.toBackwardFirstChainTransform_eq_blockFormula]
   unfold TwoPortScatteringTransform.backwardFirstChainBlockFormula
   simp only [Matrix.fromBlocks_apply₂₂]
-  rw [zChainRegression_leftReflection_eq_zero, Matrix.mul_zero,
-    Matrix.zero_apply, sub_zero]
+  rw [zChainRegression_leftReflection_eq_zero, Matrix.mul_zero, sub_zero]
   exact zChainRegression_leftToRightTransmission_entry
 
 /-- The production chain agrees with the independently folded N3T chain and its four entries.
