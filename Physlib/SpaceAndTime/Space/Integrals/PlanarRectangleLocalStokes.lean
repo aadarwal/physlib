@@ -49,7 +49,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Local rectangle regularity -/
+/-!
+## A. Local rectangle regularity
+-/
 
 /-- Regularity of one ambient vector field on one parameterized affine rectangle.
 
@@ -99,7 +101,9 @@ lemma of_differentiable
 
 end PlanarRectangleStokesRegularity
 
-/-! ## B. Local oriented Stokes theorem -/
+/-!
+## B. Local oriented Stokes theorem
+-/
 
 /-- The curl flux through an affine rectangle equals its clockwise circulation under regularity
 confined to that rectangle.

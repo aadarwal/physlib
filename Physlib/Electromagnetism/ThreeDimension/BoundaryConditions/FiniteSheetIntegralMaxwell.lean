@@ -64,7 +64,9 @@ variable {plane : OrientedAffineHyperplane 3}
   {cells : PlanarMaxwellThinCells plane}
   {rates : PlanarMaxwellThinCellFluxRates sidewise.fields cells}
 
-/-! ## A. Finite divergence laws -/
+/-!
+## A. Finite divergence laws
+-/
 
 /-- The electric-displacement pillbox obeys the literal finite electric Gauss law under the
 explicit finite-sheet premise. -/
@@ -125,7 +127,9 @@ lemma magneticGauss
     premise.magneticCarrierFace t x scale]
   ring
 
-/-! ## B. Finite circulation laws -/
+/-!
+## B. Finite circulation laws
+-/
 
 /-- The electric-field thin loop obeys the literal finite Faraday law under the explicit
 finite-sheet premise. -/
@@ -183,7 +187,9 @@ lemma ampereMaxwell
   rw [mul_add, premise.ampereMaxwellBulk t x tangent scale,
     premise.magneticCarrierLine t x tangent scale]
 
-/-! ## C. Integral and boundary packages -/
+/-!
+## C. Integral and boundary packages
+-/
 
 /-- Sidewise differential Maxwell fields satisfying the explicit finite-sheet premise obey all
 four literal finite integral Maxwell laws. -/
@@ -203,7 +209,7 @@ sidewise differential Maxwell fields satisfy the full sourceful planar boundary 
 
 The premise appears explicitly: this result does not derive a sheet model from classical smooth
 Maxwell equations alone. -/
-theorem isPlanarMacroscopicBoundary
+lemma isPlanarMacroscopicBoundary
     (premise : HasPlanarFiniteSheetMaxwellPremise sidewise surfaceCharge surfaceCurrent
       cells rates)
     (regularity : HasPlanarMaxwellThinCellRegularity

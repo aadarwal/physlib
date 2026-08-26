@@ -48,7 +48,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Local affine-box regularity -/
+/-!
+## A. Local affine-box regularity
+-/
 
 /-- Regularity of one ambient vector field on one parameterized affine box.
 
@@ -105,7 +107,9 @@ lemma of_differentiable
 
 end AffineBoxDivergenceRegularity
 
-/-! ## B. Set-integral divergence theorem -/
+/-!
+## B. Set-integral divergence theorem
+-/
 
 /-- The local regularity record supplies continuity of every cofactor-weighted flux coordinate. -/
 private lemma affineBoxFlux_continuousOn
@@ -335,7 +339,9 @@ lemma setIntegral_div_affineBox_of_localRegularity
       integral_congr_ae hDensityAE.symm
     _ = _ := by rw [hGauss]
 
-/-! ## C. Iterated affine-box divergence theorem -/
+/-!
+## C. Iterated affine-box divergence theorem
+-/
 
 /-- The first-coordinate face flux converts to its ordered `(second, third)` iterated integral. -/
 private lemma affineBoxFaceZeroFlux_setIntegral_eq_iterated

@@ -62,7 +62,9 @@ open Space Time
 
 noncomputable section
 
-/-! ## A. Finite-sheet premise -/
+/-!
+## A. Finite-sheet premise
+-/
 
 /-- Finite carrier-source identifications, local split-cell calculus, and witnessed flux
 interchanges for two sidewise differential Maxwell extensions.
@@ -215,7 +217,9 @@ variable {plane : OrientedAffineHyperplane 3}
   {cells : PlanarMaxwellThinCells plane}
   {rates : PlanarMaxwellThinCellFluxRates sidewise.fields cells}
 
-/-! ## B. Divergence consequences -/
+/-!
+## B. Divergence consequences
+-/
 
 /-- The normalized split-pillbox divergence of electric displacement is the literal bulk free-
 charge volume average. The finite-sheet premise supplies only the integral regrouping; the
@@ -273,7 +277,9 @@ lemma magneticGaussBulk
     sidewise.positiveMaxwell.gaussLawMagnetic]
   simp
 
-/-! ## C. Curl consequences -/
+/-!
+## C. Curl consequences
+-/
 
 /-- Differential Faraday law identifies the split electric curl flux with minus the split
 magnetic time-derivative flux before any finite-flux interchange is used. -/

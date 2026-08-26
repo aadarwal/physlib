@@ -45,7 +45,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Split-box terms and regularity -/
+/-!
+## A. Split-box terms and regularity
+-/
 
 /-- Local divergence regularity for independent fields on the negative and positive half-boxes.
 
@@ -144,7 +146,9 @@ def affineSplitBoxCarrierJump
       inner ℝ (negativeField (affineBoxPoint center first second third u v 0))
         (basis.repr first ⨯ₑ₃ basis.repr second)
 
-/-! ## B. Two-half divergence identity -/
+/-!
+## B. Two-half divergence identity
+-/
 
 /-- The split box's outer flux equals its two bulk divergence integrals plus the retained
 positive-minus-negative carrier-face jump. -/

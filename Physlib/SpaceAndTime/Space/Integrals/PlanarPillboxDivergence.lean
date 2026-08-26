@@ -55,7 +55,9 @@ noncomputable section
 
 namespace PlanarPillboxFamily
 
-/-! ## A. Pillbox frame geometry -/
+/-!
+## A. Pillbox frame geometry
+-/
 
 /-- The pillbox tangent, regarded as a direction in the affine-box parameterization. -/
 def tangentDirection {plane : OrientedAffineHyperplane 3}
@@ -138,7 +140,9 @@ lemma orientedVolume {plane : OrientedAffineHyperplane 3}
     pillbox.tangent = 1
   rw [real_inner_self_eq_norm_sq, pillbox.tangent_norm, one_pow]
 
-/-! ## B. Ambient half-face integrability -/
+/-!
+## B. Ambient half-face integrability
+-/
 
 /-- Outer-variable integrability of the four lateral half-face fluxes of one ambient field.
 
@@ -227,7 +231,9 @@ structure DivergenceRegularity {plane : OrientedAffineHyperplane 3}
   positiveLateral : AmbientHalfLateralIntegrable pillbox positiveField parameter x scale
     0 (pillbox.halfThickness scale)
 
-/-! ## C. Open-side integral bridges -/
+/-!
+## C. Open-side integral bridges
+-/
 
 private lemma normalizedSquareAverage_eq_normalized_iteratedIntegral
     (radius : ℝ) (f : ℝ → ℝ → ℝ) :
@@ -682,7 +688,9 @@ lemma volumeAverage_ofFields_eq_normalized_affineSplitVolume
               pillbox.quarterTurnDirection pillbox.normalDirection u v w)
         rw [pillbox.affineBoxPoint_eq_normalOffsetPoint]
 
-/-! ## D. Normalized split-pillbox divergence -/
+/-!
+## D. Normalized split-pillbox divergence
+-/
 
 /-- The normalized principal-plus-lateral pillbox flux equals the normalized sum of bulk
 divergence and the retained positive-minus-negative carrier-face flux.

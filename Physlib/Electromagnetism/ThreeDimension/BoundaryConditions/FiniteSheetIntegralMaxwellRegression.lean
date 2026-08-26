@@ -59,7 +59,9 @@ open Space Time
 
 noncomputable section
 
-/-! ## A. Positive sidewise Maxwell fixture -/
+/-!
+## A. Positive sidewise Maxwell fixture
+-/
 
 /-- The coordinate thin-cell fields, regarded as two independent source-free ambient Maxwell
 extensions. -/
@@ -118,7 +120,9 @@ def planarFiniteSheetRegressionFluxRates :
       planarThinCellRegressionCells :=
   planarThinCellRegressionFluxRates
 
-/-! ## B. Positive finite-sheet premise -/
+/-!
+## B. Positive finite-sheet premise
+-/
 
 /-- Two constant ambient vector fields have the local split-pillbox regularity and lateral
 integrability required by the finite-sheet premise. -/
@@ -410,7 +414,9 @@ lemma planarFiniteSheetRegression_premise :
           planarThinCellRegression_magneticJump_pairing tangent
       _ = _ := (planarThinCellRegression_surfaceCurrentLine tangent t x scale).symm
 
-/-! ## C. Reconstructed integral and boundary laws -/
+/-!
+## C. Reconstructed integral and boundary laws
+-/
 
 /-- The production finite-sheet bridge reconstructs all four literal integral Maxwell laws for
 the positive fixture. -/
@@ -435,7 +441,9 @@ lemma planarFiniteSheetRegression_boundary_from_premise :
   cases hSources
   exact planarThinCellRegression_regular
 
-/-! ## D. Hostile source-free control -/
+/-!
+## D. Hostile source-free control
+-/
 
 /-- The coordinate zero vector used by the hostile fixture is the additive zero. -/
 private lemma planarFiniteSheetRegression_zeroVector :

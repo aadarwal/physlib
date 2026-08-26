@@ -48,7 +48,9 @@ namespace AffineSplitBoxDivergenceRegression
 
 noncomputable section
 
-/-! ## A. Two-sided polynomial fixture -/
+/-!
+## A. Two-sided polynomial fixture
+-/
 
 /-- The origin used as the split-box center. -/
 def center : Space :=
@@ -147,7 +149,9 @@ lemma regularity : AffineSplitBoxDivergenceRegularity negativeField positiveFiel
     center first second third 1 1 ∅ ∅ :=
   ⟨negativeRegularity, positiveRegularity⟩
 
-/-! ## B. Independent flux and divergence computations -/
+/-!
+## B. Independent flux and divergence computations
+-/
 
 /-- Every negative-side first- or second-lateral cofactor pairing vanishes. -/
 lemma negativeLateralPairings (u v w : ℝ) :
@@ -229,7 +233,9 @@ lemma outerFlux_exact :
   rw [affineSplitBoxOuterFlux, principalFlux_exact, lateralFlux_exact]
   norm_num
 
-/-! ## C. Production-theorem sentinel -/
+/-!
+## C. Production-theorem sentinel
+-/
 
 /-- The production split-box theorem agrees with all independent exact evaluations. -/
 lemma production_and_exact :

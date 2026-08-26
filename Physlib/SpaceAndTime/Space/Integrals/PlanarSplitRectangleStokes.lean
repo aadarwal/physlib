@@ -48,7 +48,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Split-rectangle terms and regularity -/
+/-!
+## A. Split-rectangle terms and regularity
+-/
 
 /-- Local Stokes regularity for independent fields on the negative and positive half-rectangles.
 The common first-coordinate interval is `[-radius, radius]`; the second-coordinate intervals are
@@ -179,7 +181,9 @@ def planarSplitRectangleCarrierJump
       inner ℝ (negativeField (planarRectanglePoint center first second u 0))
         (basis.repr first)
 
-/-! ## B. Two-half Stokes identity -/
+/-!
+## B. Two-half Stokes identity
+-/
 
 /-- The split rectangle's outer circulation equals its two bulk curl fluxes plus the retained
 positive-minus-negative carrier line jump. -/
