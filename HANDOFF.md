@@ -1,13 +1,14 @@
-# S7D DCDR slice 2 handoff
+# S7D DCDR slice 2b handoff
 
 ## Branch and cutoff scope
 
 - Branch: `optics/s7d-dcdr`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s7d-dcdr`
-- Exact controller sync target: `782ba5c7`
-- Sync merge head before the slice-2 cutoff edits: `7d5b0aea`
+- Exact controller sync target: `329d5a59`
+- Sync merge head before the slice-2b cutoff edits: `fcfd057b`
 - Slice 2 adds the N5 elimination response, the certified-graph Mason response, the generic
   N5/Mason specialization, independent S-06 anchors, and a miswired-edge negative control.
+- Slice 2b adds exhaustive nonzero-feedback loop topology and a concrete singular N5 anchor.
 - The topology implementation is mechanically split without moving any declaration out of
   `Optics.DCDR`. `Topology.lean` remains a compatibility re-export.
 - `Physlib.lean` is never committed by this lane. The final gate temporarily registers every
@@ -35,7 +36,7 @@ Files in the cutoff:
 - `Physlib/Optics/Systems/DCDR/TopologyRegression.lean` (451 lines)
 - `Physlib/Optics/Systems/DCDR/Response.lean` (545 lines)
 - `Physlib/Optics/Systems/DCDR/Mason.lean` (208 lines)
-- `Physlib/Optics/Systems/DCDR/ResponseRegression.lean` (1004 lines)
+- `Physlib/Optics/Systems/DCDR/ResponseRegression.lean` (1396 lines)
 
 Every DCDR Lean file is below the 1500-line `ERR_NUM_LIN` cap.
 
@@ -56,6 +57,13 @@ It satisfies the literal G-04 row:
 The positive S-06 fixture computes N5 elimination and edge-level Mason enumeration independently.
 The negative control swaps two launch-edge sources and proves that its Mason response does not
 equal the unchanged N5 response.
+
+Slice 2b takes reviewer option 1(b). Its nonzero-feedback point has loop gains `-1` and `2`.
+It proves that every nonempty loop refinement contains edge seven, enumerates exactly two return
+stems, identifies the two closed edge lists, and proves that their node sets intersect at
+`{1, 6}`. Their signed determinant expansion is `1 - (-1) - 2 = 0`, matching the raw N5
+denominator. A raw nonzero homogeneous complete N5 state directly disproves functional
+well-posedness without either production gate iff.
 
 This slice does not satisfy S-07:
 
@@ -96,18 +104,24 @@ entrywise instantiation of the merged generic
 
 ### Independent regression anchors
 
-At `ResponseRegression.lean:84-146`, the N5 anchor opens
+At `ResponseRegression.lean:87-149`, the N5 anchor opens
 `toBehavior_responseTransform`, obtains raw scattering and assembly witnesses, and solves all
 eight projected equations to `-163`. It never uses `eliminationResponse_eq_transfer`.
 
-At `ResponseRegression.lean:151-551`, the Mason anchor proves every nonempty loop refinement
+At `ResponseRegression.lean:154-554`, the Mason anchor proves every nonempty loop refinement
 contains zero-gain feedback edge seven, classifies all supported forward paths, identifies their
 edge refinements, and multiplies their gains. It obtains numerator and quotient `-163` without
 `masonGain_eq_gain`, `edgeMasonGain_eq_gain`, or an elimination theorem.
 
-At `ResponseRegression.lean:565-998`, the negative control swaps the first-coupler launch-edge
+At `ResponseRegression.lean:568-1001`, the negative control swaps the first-coupler launch-edge
 sources. Direct enumeration gives `-347 * I`, and
 `responseRegression_swappedEdge_fails_s06` proves inequality with the unchanged N5 value.
+
+At `ResponseRegression.lean:1006-1390`, the nonzero-feedback fixture enumerates the only two
+simple loop stems, closes them through edge seven, computes gains `-1` and `2`, proves the
+cycles touch, and records the signed edge-determinant expansion. The state
+`[0, 1, -I, 1, 2, -I, 1, -3I]` satisfies all eight homogeneous equations, lifts to a raw
+nonzero complete N5 realization, and directly contradicts single-valuedness.
 
 ## Complete declaration inventory
 
@@ -323,81 +337,114 @@ declaration names and namespaces are unchanged.
 
 ### ResponseRegression.lean
 
-- `responseRegressionExternalChannelFintype` (local) (line 67)
-- `topologyProjection_hasNonzeroDenominator` (line 74)
-- `responseRegression_eliminationResponse` (line 84)
-- `responseRegressionNodeRank` (line 151)
-- `responseRegressionNodeRank_lt` (line 154)
-- `responseRegression_edgeChoice_contains_feedbackEdge` (line 161)
-- `topologyProjection_feedbackEdgeGain` (line 187)
-- `responseRegression_edgeFamilyGain_eq_zero` (line 192)
-- `responseRegression_edgeGraphDetOn` (line 207)
-- `responseRegression_edgeGraphDet` (line 235)
-- `responseRegressionSupportedForwardPaths` (line 242)
-- `responseRegressionAdjacent` (line 247)
-- `responseRegression_refiningEdgeLists_nonempty_iff_isChain` (line 251)
-- `responseRegression_adjacent_zero` (line 276)
-- `responseRegression_adjacent_two` (line 281)
-- `responseRegression_adjacent_three` (line 286)
-- `responseRegression_adjacent_four` (line 291)
-- `responseRegression_adjacent_five` (line 296)
-- `responseRegression_adjacent_six` (line 301)
-- `responseRegression_adjacent_one` (line 306)
-- `responseRegression_not_adjacent_seven` (line 311)
-- `responseRegression_chain_from_seven_eq_singleton` (line 316)
-- `responseRegression_upperPath_cases` (line 324)
-- `responseRegression_lowerPath_cases` (line 366)
-- `responseRegression_supportedForwardPath_cases` (line 408)
-- `responseRegression_supportedForwardPaths` (line 437)
-- `responseRegression_refiningEdges_upper` (line 457)
-- `responseRegression_refiningEdges_lower` (line 463)
-- `responseRegression_refiningEdges_upperReturn` (line 469)
-- `responseRegression_refiningEdges_lowerReturn` (line 475)
-- `responseRegression_edgeMasonNumerator_eq_supportedSum` (line 481)
-- `responseRegression_edgeListGain_upper` (line 501)
-- `responseRegression_edgeListGain_lower` (line 509)
-- `responseRegression_edgeListGain_upperReturn` (line 518)
-- `responseRegression_edgeListGain_lowerReturn` (line 524)
-- `responseRegression_edgeMasonNumerator` (line 530)
-- `responseRegression_auditedMasonResponse` (line 547)
-- `responseRegression_s06` (line 554)
-- `responseRegressionSwappedEdgeSource` (line 565)
-- `responseRegressionSwappedMultigraph` (line 569)
-- `responseRegression_swappedEdgeSource_ne` (line 575)
-- `responseRegression_swappedNodeRank_lt` (line 583)
-- `responseRegression_swappedEdgeChoice_contains_feedbackEdge` (line 591)
-- `responseRegression_swappedEdgeFamilyGain_eq_zero` (line 617)
-- `responseRegression_swappedEdgeGraphDetOn` (line 632)
-- `responseRegression_swappedEdgeGraphDet` (line 658)
-- `responseRegressionSwappedAdjacent` (line 663)
-- `responseRegression_swappedRefiningEdgeLists_nonempty_iff_isChain` (line 667)
-- `responseRegression_swappedAdjacent_zero` (line 692)
-- `responseRegression_swappedAdjacent_two` (line 697)
-- `responseRegression_swappedAdjacent_three` (line 702)
-- `responseRegression_swappedAdjacent_four` (line 707)
-- `responseRegression_swappedAdjacent_five` (line 712)
-- `responseRegression_swappedAdjacent_six` (line 717)
-- `responseRegression_swappedAdjacent_one` (line 722)
-- `responseRegression_swappedNotAdjacent_seven` (line 727)
-- `responseRegression_swappedChain_from_seven_eq_singleton` (line 732)
-- `responseRegression_swappedUpperPath_cases` (line 740)
-- `responseRegression_swappedLowerPath_cases` (line 784)
-- `responseRegression_swappedSupportedForwardPath_cases` (line 828)
-- `responseRegressionSwappedSupportedForwardPaths` (line 856)
-- `responseRegression_swappedSupportedForwardPaths` (line 861)
-- `responseRegression_swappedRefiningEdges_upper` (line 881)
-- `responseRegression_swappedRefiningEdges_lower` (line 887)
-- `responseRegression_swappedRefiningEdges_upperReturn` (line 893)
-- `responseRegression_swappedRefiningEdges_lowerReturn` (line 899)
-- `responseRegression_swappedEdgeMasonNumerator_eq_supportedSum` (line 905)
-- `responseRegression_swappedEdgeListGain_upper` (line 923)
-- `responseRegression_swappedEdgeListGain_lower` (line 932)
-- `responseRegression_swappedEdgeListGain_upperReturn` (line 941)
-- `responseRegression_swappedEdgeListGain_lowerReturn` (line 949)
-- `responseRegression_swappedEdgeMasonNumerator` (line 957)
-- `responseRegressionSwappedMasonResponse` (line 976)
-- `responseRegression_swappedMasonResponse` (line 981)
-- `responseRegression_swappedEdge_fails_s06` (line 989)
+- `responseRegressionExternalChannelFintype` (local) (line 70)
+- `topologyProjection_hasNonzeroDenominator` (line 77)
+- `responseRegression_eliminationResponse` (line 87)
+- `responseRegressionNodeRank` (line 154)
+- `responseRegressionNodeRank_lt` (line 157)
+- `responseRegression_edgeChoice_contains_feedbackEdge` (line 164)
+- `topologyProjection_feedbackEdgeGain` (line 190)
+- `responseRegression_edgeFamilyGain_eq_zero` (line 195)
+- `responseRegression_edgeGraphDetOn` (line 210)
+- `responseRegression_edgeGraphDet` (line 238)
+- `responseRegressionSupportedForwardPaths` (line 245)
+- `responseRegressionAdjacent` (line 250)
+- `responseRegression_refiningEdgeLists_nonempty_iff_isChain` (line 254)
+- `responseRegression_adjacent_zero` (line 279)
+- `responseRegression_adjacent_two` (line 284)
+- `responseRegression_adjacent_three` (line 289)
+- `responseRegression_adjacent_four` (line 294)
+- `responseRegression_adjacent_five` (line 299)
+- `responseRegression_adjacent_six` (line 304)
+- `responseRegression_adjacent_one` (line 309)
+- `responseRegression_not_adjacent_seven` (line 314)
+- `responseRegression_chain_from_seven_eq_singleton` (line 319)
+- `responseRegression_upperPath_cases` (line 327)
+- `responseRegression_lowerPath_cases` (line 369)
+- `responseRegression_supportedForwardPath_cases` (line 411)
+- `responseRegression_supportedForwardPaths` (line 440)
+- `responseRegression_refiningEdges_upper` (line 460)
+- `responseRegression_refiningEdges_lower` (line 466)
+- `responseRegression_refiningEdges_upperReturn` (line 472)
+- `responseRegression_refiningEdges_lowerReturn` (line 478)
+- `responseRegression_edgeMasonNumerator_eq_supportedSum` (line 484)
+- `responseRegression_edgeListGain_upper` (line 504)
+- `responseRegression_edgeListGain_lower` (line 512)
+- `responseRegression_edgeListGain_upperReturn` (line 521)
+- `responseRegression_edgeListGain_lowerReturn` (line 527)
+- `responseRegression_edgeMasonNumerator` (line 533)
+- `responseRegression_auditedMasonResponse` (line 550)
+- `responseRegression_s06` (line 557)
+- `responseRegressionSwappedEdgeSource` (line 568)
+- `responseRegressionSwappedMultigraph` (line 572)
+- `responseRegression_swappedEdgeSource_ne` (line 578)
+- `responseRegression_swappedNodeRank_lt` (line 586)
+- `responseRegression_swappedEdgeChoice_contains_feedbackEdge` (line 594)
+- `responseRegression_swappedEdgeFamilyGain_eq_zero` (line 620)
+- `responseRegression_swappedEdgeGraphDetOn` (line 635)
+- `responseRegression_swappedEdgeGraphDet` (line 661)
+- `responseRegressionSwappedAdjacent` (line 666)
+- `responseRegression_swappedRefiningEdgeLists_nonempty_iff_isChain` (line 670)
+- `responseRegression_swappedAdjacent_zero` (line 695)
+- `responseRegression_swappedAdjacent_two` (line 700)
+- `responseRegression_swappedAdjacent_three` (line 705)
+- `responseRegression_swappedAdjacent_four` (line 710)
+- `responseRegression_swappedAdjacent_five` (line 715)
+- `responseRegression_swappedAdjacent_six` (line 720)
+- `responseRegression_swappedAdjacent_one` (line 725)
+- `responseRegression_swappedNotAdjacent_seven` (line 730)
+- `responseRegression_swappedChain_from_seven_eq_singleton` (line 735)
+- `responseRegression_swappedUpperPath_cases` (line 743)
+- `responseRegression_swappedLowerPath_cases` (line 787)
+- `responseRegression_swappedSupportedForwardPath_cases` (line 831)
+- `responseRegressionSwappedSupportedForwardPaths` (line 859)
+- `responseRegression_swappedSupportedForwardPaths` (line 864)
+- `responseRegression_swappedRefiningEdges_upper` (line 884)
+- `responseRegression_swappedRefiningEdges_lower` (line 890)
+- `responseRegression_swappedRefiningEdges_upperReturn` (line 896)
+- `responseRegression_swappedRefiningEdges_lowerReturn` (line 902)
+- `responseRegression_swappedEdgeMasonNumerator_eq_supportedSum` (line 908)
+- `responseRegression_swappedEdgeListGain_upper` (line 926)
+- `responseRegression_swappedEdgeListGain_lower` (line 935)
+- `responseRegression_swappedEdgeListGain_upperReturn` (line 944)
+- `responseRegression_swappedEdgeListGain_lowerReturn` (line 952)
+- `responseRegression_swappedEdgeMasonNumerator` (line 960)
+- `responseRegressionSwappedMasonResponse` (line 979)
+- `responseRegression_swappedMasonResponse` (line 984)
+- `responseRegression_swappedEdge_fails_s06` (line 992)
+- `responseRegressionSingularParameters` (line 1006)
+- `responseRegression_singularEdgeGains` (line 1024)
+- `responseRegressionUpperLoop` (line 1036)
+- `responseRegressionLowerLoop` (line 1039)
+- `responseRegressionSingularLoopStems` (line 1042)
+- `responseRegressionSingularAdjacent` (line 1047)
+- `responseRegression_singularRefiningEdgeLists_nonempty_iff_isChain` (line 1051)
+- `responseRegression_singularAdjacent_one` (line 1076)
+- `responseRegression_singularAdjacent_two` (line 1081)
+- `responseRegression_singularAdjacent_three` (line 1086)
+- `responseRegression_singularAdjacent_four` (line 1091)
+- `responseRegression_singularAdjacent_five` (line 1096)
+- `responseRegression_singularAdjacent_six` (line 1101)
+- `responseRegression_singularNotAdjacent_seven` (line 1106)
+- `responseRegression_singularChain_from_seven_eq_singleton` (line 1111)
+- `responseRegression_singularLoopStem_cases` (line 1119)
+- `responseRegression_singularLoopStems` (line 1173)
+- `responseRegression_singularEdgeChoice_contains_feedbackEdge` (line 1191)
+- `responseRegression_singularUpperLoopEdges` (line 1218)
+- `responseRegression_singularLowerLoopEdges` (line 1225)
+- `responseRegression_singularLoops_touch` (line 1232)
+- `responseRegression_singularUpperLoopGain` (line 1237)
+- `responseRegression_singularLowerLoopGain` (line 1243)
+- `responseRegression_singularLoopSum_eq_loopGain` (line 1249)
+- `responseRegression_singularDenominator` (line 1262)
+- `responseRegressionSingularState` (line 1271)
+- `responseRegression_singularForwardEquations` (line 1275)
+- `responseRegression_singularState_ne_zero` (line 1287)
+- `responseRegression_singularIsNodeSolution` (line 1293)
+- `responseRegression_singularEdgeGraphDet` (line 1305)
+- `responseRegression_singularEdgeGraphDet_expansion` (line 1330)
+- `responseRegression_singular_exists_raw_n5_state` (line 1342)
+- `responseRegression_singular_not_isWellPosed` (line 1367)
 
 ## Exact validation bindings
 
@@ -426,6 +473,13 @@ The validation lane should bind at least these public names:
 - `Optics.DCDR.responseRegression_s06`
 - `Optics.DCDR.responseRegression_swappedMasonResponse`
 - `Optics.DCDR.responseRegression_swappedEdge_fails_s06`
+- `Optics.DCDR.responseRegression_singularLoopStems`
+- `Optics.DCDR.responseRegression_singularEdgeChoice_contains_feedbackEdge`
+- `Optics.DCDR.responseRegression_singularLoops_touch`
+- `Optics.DCDR.responseRegression_singularLoopSum_eq_loopGain`
+- `Optics.DCDR.responseRegression_singularEdgeGraphDet_expansion`
+- `Optics.DCDR.responseRegression_singular_exists_raw_n5_state`
+- `Optics.DCDR.responseRegression_singular_not_isWellPosed`
 
 ## Cross-module conventions and reused results
 
@@ -440,9 +494,10 @@ The validation lane should bind at least these public names:
 - The edge-retaining transfer/Mason theorem is
   `TerminatedMultigraph.transfer_eq_edgeMason` at
   `Physlib/Mathematics/SignalFlowGraph/Terminated.lean:254-259`.
-- `edgeGraphDetOn`, `edgeGraphDet`, and `edgeMasonNumerator` are defined at
-  `Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean:117-122` and lines 213-215.
-  `edgeMasonGain_eq_gain` is the existing theorem at lines 227-230.
+- `edgeGraphDetOn` and `edgeGraphDet` are the signed edge-family sums at
+  `Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean:116-122`. Their identity with the
+  system determinant is at lines 132-137. `edgeMasonNumerator` is defined at lines 213-215,
+  and `edgeMasonGain_eq_gain` is the existing theorem at lines 227-230.
 - The N7 cross coefficient is exactly `-Complex.I * crossAmplitude` at
   `Physlib/Optics/Components/DirectionalCoupler.lean:68-70`; the mixer order is at lines 72-76.
 - Fixed-carrier path phase and transmission coefficients are defined at
@@ -481,6 +536,8 @@ docs do not describe the coherent construction as a departure from the source.
 - The asymmetric numeric fixtures are hostile algebraic sentinels, not physical devices.
 - No full X-01 DCDR cross-semantics theorem is claimed.
 - No parity-ledger status is edited by this lane.
+- The singular fixture proves failure of well-posedness only; it does not define a pole,
+  instability, or time-domain response.
 
 ## Gate record
 
@@ -515,3 +572,8 @@ files.
 
 `Physlib.lean` was restored byte-identically to SHA-256
 `d6279000556c059e0a352aac530487e353adc7e5fa1f7c05b2bce229ec34f510` and has no diff.
+
+## Slice 2b gate record
+
+Pending at the committed repair source head. The final record will name the exact chained gate,
+style result, registry restore hash, and HANDOFF-only cutoff child.
