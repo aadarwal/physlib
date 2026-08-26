@@ -376,30 +376,11 @@ lemma replaceInnerFamily
   rw [replacement.closeBehavior_append (outer.transport boundary),
     inner.closeBehavior_append outer,
     inner.innerBoundaryBehavior_eq_of_boundaryRelation replacement boundary behavior hBoundary]
-  calc
-    _ = ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
-          (Incident.relabelEquiv (outer.transportExternalChannelEquiv boundary))
-          (Outgoing.relabelEquiv
-            (outer.transportExternalChannelEquiv boundary))).reindex
-        (Incident.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
-        (Outgoing.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm := by
-            exact transportedOuterClosure_reindex
-              (inner := inner) (replacement := replacement)
-              (boundary := boundary) (outer := outer)
-              (inner.innerBoundaryBehavior behavior)
-    _ = ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
-          (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer).symm)
-          (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer).symm)).reindex
-        (Incident.relabelEquiv
-          (inner.replacementExternalChannelEquiv replacement boundary outer))
-        (Outgoing.relabelEquiv
-          (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
-            exact replacementExternal_reindex
-              (inner := inner) (replacement := replacement)
-              (boundary := boundary) (outer := outer)
-              (outer.closeBehavior (inner.innerBoundaryBehavior behavior))
+  rw [outer.closeBehavior_transport boundary (inner.innerBoundaryBehavior behavior)]
+  exact replacementExternal_reindex
+    (inner := inner) (replacement := replacement)
+    (boundary := boundary) (outer := outer)
+    (outer.closeBehavior (inner.innerBoundaryBehavior behavior))
 
 end PortConnectionFamily
 
