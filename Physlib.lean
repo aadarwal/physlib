@@ -467,6 +467,8 @@ public import Physlib.Optics.Systems.Cascade.Heterogeneous
 public import Physlib.Optics.Systems.Cascade.HeterogeneousRegression
 public import Physlib.Optics.Systems.Cascade.Identical
 public import Physlib.Optics.Systems.Cascade.IdenticalRegression
+public import Physlib.Optics.Systems.Cascade.Termination
+public import Physlib.Optics.Systems.Cascade.TerminationRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
