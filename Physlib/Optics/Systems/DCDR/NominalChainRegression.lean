@@ -86,6 +86,10 @@ lemma zChainRegression_forward_transfer :
     Parameters.upperCoefficient, Parameters.lowerCoefficient,
     Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient]
   ring_nf
+  have hI3 : Complex.I ^ 3 = -Complex.I := by
+    calc
+      Complex.I ^ 3 = (Complex.I * Complex.I) * Complex.I := by ring
+      _ = -Complex.I := by rw [Complex.I_mul_I]; ring
   have hI5 : Complex.I ^ 5 = Complex.I := by
     calc
       Complex.I ^ 5 = (Complex.I * Complex.I) * (Complex.I * Complex.I) * Complex.I := by
@@ -96,7 +100,7 @@ lemma zChainRegression_forward_transfer :
       Complex.I ^ 7 = (Complex.I * Complex.I) * (Complex.I * Complex.I) *
           (Complex.I * Complex.I) * Complex.I := by ring
       _ = -Complex.I := by rw [Complex.I_mul_I]; ring
-  rw [hI5, hI7]
+  rw [hI3, hI5, hI7]
   ring
 
 /-- Direct parameter expansion gives the independently stated reverse transmission `-(7/8)I`. -/
