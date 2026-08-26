@@ -692,6 +692,159 @@ lemma passiveCoherentReducedResponse_isSchurStable :
   have hNormNonnegative := norm_nonneg z
   nlinarith
 
+/-!
+
+## D. Decimal pole-list audit
+
+-/
+
+/-- FMICS'15 p. 175's positive displayed pole, retained as an exact rational real. -/
+def passiveReportedPoleMagnitude : ℝ := 905539 / 1000000
+
+/-- Multiplication by `z²` turns `D(z⁻¹)` into this finite reciprocal-`z` polynomial. -/
+def passivePrintedZDenominator : Polynomial ℂ :=
+  X ^ 2 - C (41 / 50)
+
+/-- The printed decimal's integer square misses the integer required by the `z` denominator. -/
+lemma passiveReportedPole_integer_square_ne :
+    (905539 : ℕ) ^ 2 ≠ 820000 * 10 ^ 6 := by
+  norm_num
+
+/-- Both signed printed `z` candidates give the same nonzero exact `z`-form evaluation. -/
+lemma passiveReportedPoles_zForm_evaluation :
+    passivePrintedZDenominator.eval (passiveReportedPoleMagnitude : ℂ) =
+        880521 / 1000000000000 ∧
+      passivePrintedZDenominator.eval (-(passiveReportedPoleMagnitude : ℂ)) =
+        880521 / 1000000000000 := by
+  constructor <;>
+    norm_num [passivePrintedZDenominator, passiveReportedPoleMagnitude]
+
+/-- Thus neither signed displayed decimal is a root in the reciprocal-`z` coordinate. -/
+lemma passiveReportedPoles_zForm_nonroots :
+    passivePrintedZDenominator.eval (passiveReportedPoleMagnitude : ℂ) ≠ 0 ∧
+      passivePrintedZDenominator.eval (-(passiveReportedPoleMagnitude : ℂ)) ≠ 0 := by
+  rw [passiveReportedPoles_zForm_evaluation.1,
+    passiveReportedPoles_zForm_evaluation.2]
+  norm_num
+
+/-- In the equivalent formal coordinate `q = z⁻¹`, both evaluations remain nonzero. -/
+lemma passiveReportedPoles_qForm_evaluation :
+    passivePrintedDenominator.eval (passiveReportedPoleMagnitude : ℂ)⁻¹ =
+        880521 / 820000880521 ∧
+      passivePrintedDenominator.eval (-(passiveReportedPoleMagnitude : ℂ))⁻¹ =
+        880521 / 820000880521 := by
+  constructor <;>
+    norm_num [passivePrintedDenominator, passiveReportedPoleMagnitude]
+
+/-- The two decimals fail the formal-`q` denominator after the explicit reciprocal map. -/
+lemma passiveReportedPoles_qForm_nonroots :
+    passivePrintedDenominator.eval (passiveReportedPoleMagnitude : ℂ)⁻¹ ≠ 0 ∧
+      passivePrintedDenominator.eval (-(passiveReportedPoleMagnitude : ℂ))⁻¹ ≠ 0 := by
+  rw [passiveReportedPoles_qForm_evaluation.1,
+    passiveReportedPoles_qForm_evaluation.2]
+  norm_num
+
+/-- Neither supplied decimal is an actual reciprocal-`z` pole of the reduced quotient. -/
+lemma passiveReportedPoles_not_mem_zPoles :
+    (passiveReportedPoleMagnitude : ℂ) ∉ passivePrintedReducedResponse.zPoles ∧
+      -(passiveReportedPoleMagnitude : ℂ) ∉ passivePrintedReducedResponse.zPoles := by
+  constructor
+  · rintro ⟨_, hRoot⟩
+    exact passiveReportedPoles_qForm_nonroots.1 hRoot
+  · rintro ⟨_, hRoot⟩
+    exact passiveReportedPoles_qForm_nonroots.2 hRoot
+
+/-- Their reciprocals are equivalently absent from the formal-`q` pole set. -/
+lemma passiveReportedReciprocals_not_mem_poles :
+    (passiveReportedPoleMagnitude : ℂ)⁻¹ ∉ passivePrintedReducedResponse.poles ∧
+      (-(passiveReportedPoleMagnitude : ℂ))⁻¹ ∉
+        passivePrintedReducedResponse.poles := by
+  exact passiveReportedPoles_qForm_nonroots
+
+/-- Exact rational squaring traps the true positive reciprocal-`z` pole tightly. -/
+lemma passiveReportedPole_rational_squeeze :
+    (9055385 / 10000000 : ℝ) < passivePrintedReciprocalPoleMagnitude ∧
+      passivePrintedReciprocalPoleMagnitude < 9055386 / 10000000 := by
+  have hSquare := passivePrintedReciprocalPoleMagnitude_sq
+  have hNonnegative : 0 ≤ passivePrintedReciprocalPoleMagnitude :=
+    Real.sqrt_nonneg _
+  constructor
+  · have hLowerSquare :
+        (9055385 / 10000000 : ℝ) ^ 2 < 41 / 50 := by
+      norm_num
+    nlinarith
+  · have hUpperSquare :
+        (41 / 50 : ℝ) < (9055386 / 10000000) ^ 2 := by
+      norm_num
+    nlinarith
+
+/-- The positive source decimal exceeds the exact `z` pole by between four and five tenths of a
+millionth.
+-/
+lemma passiveReportedPole_absoluteError :
+    (4 / 10000000 : ℝ) <
+        |passiveReportedPoleMagnitude - passivePrintedReciprocalPoleMagnitude| ∧
+      |passiveReportedPoleMagnitude - passivePrintedReciprocalPoleMagnitude| <
+        5 / 10000000 := by
+  have hSqueeze := passiveReportedPole_rational_squeeze
+  have hPositive :
+      0 < passiveReportedPoleMagnitude - passivePrintedReciprocalPoleMagnitude := by
+    unfold passiveReportedPoleMagnitude
+    nlinarith [hSqueeze.2]
+  rw [abs_of_pos hPositive]
+  unfold passiveReportedPoleMagnitude
+  constructor <;> nlinarith [hSqueeze.1, hSqueeze.2]
+
+/-- The negative signed decimal has the same certified absolute error from its exact `z` pole. -/
+lemma passiveReportedNegativePole_absoluteError :
+    (4 / 10000000 : ℝ) <
+        |(-passiveReportedPoleMagnitude) -
+          (-passivePrintedReciprocalPoleMagnitude)| ∧
+      |(-passiveReportedPoleMagnitude) -
+          (-passivePrintedReciprocalPoleMagnitude)| < 5 / 10000000 := by
+  simpa only [neg_sub_neg, abs_neg] using passiveReportedPole_absoluteError
+
+/-!
+
+## E. Printed claim audit
+
+-/
+
+/-- At the passive source point, FMICS'15 Theorem 4's printed expression is exactly `41/50`. -/
+lemma passiveCase_printedTheoremFourExpression :
+    printedIncoherentStabilityExpression
+      DCDRSourceBridge.passiveCaseSourceParameters.G1
+      DCDRSourceBridge.passiveCaseSourceParameters.G2
+      DCDRSourceBridge.passiveCaseSourceParameters.G3
+      DCDRSourceBridge.passiveCaseSourceParameters.k1
+      DCDRSourceBridge.passiveCaseSourceParameters.k2 = 41 / 50 := by
+  norm_num [printedIncoherentStabilityExpression,
+    DCDRSourceBridge.passiveCaseSourceParameters]
+
+/-- Both non-strict hypotheses printed in FMICS'15 Theorem 4 hold at the passive point. -/
+lemma passivePrintedTheoremFourConditions :
+    PrintedIncoherentStabilityConditions
+      DCDRSourceBridge.passiveCaseSourceParameters.G1
+      DCDRSourceBridge.passiveCaseSourceParameters.G2
+      DCDRSourceBridge.passiveCaseSourceParameters.G3
+      DCDRSourceBridge.passiveCaseSourceParameters.k1
+      DCDRSourceBridge.passiveCaseSourceParameters.k2 := by
+  rw [PrintedIncoherentStabilityConditions,
+    passiveCase_printedTheoremFourExpression]
+  constructor
+  · have hNonnegative : (0 : ℂ) ≤ 41 / 50 :=
+      (RCLike.nonneg_iff).2 ⟨by norm_num, by norm_num⟩
+    have hSquare : Real.sqrt (41 / 50) ^ 2 = 41 / 50 :=
+      Real.sq_sqrt (by norm_num)
+    have hSqrtNonnegative : 0 ≤ Real.sqrt (41 / 50) :=
+      Real.sqrt_nonneg _
+    have hBound : Real.sqrt (41 / 50) ≤ 1 := by
+      nlinarith
+    rw [Complex.sqrt_of_nonneg hNonnegative, Complex.norm_real,
+      Real.norm_eq_abs, abs_of_nonneg hSqrtNonnegative]
+    exact hBound
+  · norm_num
+
 end
 
 end Optics.DCDR
