@@ -27,6 +27,8 @@ transport.
 
 - `fresnelScatteringRegression_s_normalizedTransmission`: exact normalized s transmission.
 - `fresnelScatteringRegression_p_normalizedTransmission`: exact normalized p transmission.
+- `fresnelScatteringRegression_s_power`: direct s-kernel power computation.
+- `fresnelScatteringRegression_p_power`: direct p-kernel power computation.
 - `fresnelScatteringRegression_kernel_values`: both exact matrices and losslessness certificates.
 
 ## iii. Table of contents
@@ -87,6 +89,28 @@ lemma fresnelScatteringRegression_p_normalizedTransmission :
 ## B. Exact s/p kernels
 -/
 
+/-- The displayed s kernel preserves the squared norm of every two-coordinate complex input. -/
+lemma fresnelScatteringRegression_s_power (left right : ℂ) :
+    Complex.normSq
+          (((5 / 11 : ℝ) : ℂ) * left + ((4 * Real.sqrt 6 / 11 : ℝ) : ℂ) * right) +
+        Complex.normSq
+          (((4 * Real.sqrt 6 / 11 : ℝ) : ℂ) * left + ((-5 / 11 : ℝ) : ℂ) * right) =
+      Complex.normSq left + Complex.normSq right := by
+  have hSix : Real.sqrt (6 : ℝ) ^ 2 = 6 := Real.sq_sqrt (by norm_num)
+  simp [Complex.normSq_apply]
+  nlinarith
+
+/-- The displayed p kernel preserves the squared norm of every two-coordinate complex input. -/
+lemma fresnelScatteringRegression_p_power (left right : ℂ) :
+    Complex.normSq
+          (((-1 / 5 : ℝ) : ℂ) * left + ((2 * Real.sqrt 6 / 5 : ℝ) : ℂ) * right) +
+        Complex.normSq
+          (((2 * Real.sqrt 6 / 5 : ℝ) : ℂ) * left + ((1 / 5 : ℝ) : ℂ) * right) =
+      Complex.normSq left + Complex.normSq right := by
+  have hSix : Real.sqrt (6 : ℝ) ^ 2 = 6 := Real.sq_sqrt (by norm_num)
+  simp [Complex.normSq_apply]
+  nlinarith
+
 /-- The unequal-admittance fixture fixes both normalized scalar kernels and their losslessness.
 
 The two diagonal signs differ in each kernel, while the s and p first-column reflections remain
@@ -109,21 +133,38 @@ lemma fresnelScatteringRegression_kernel_values :
       (4 / 5) (3 / 5)).IsLossless := by
   rcases jonesBoundaryRegression_fresnelCoefficient_values with ⟨hrs, hts, hrp, htp⟩
   have hFactor := fresnelFluxRegression_oblique.1
-  constructor
-  · ext i j
+  have hSMatrix :
+      (jonesBoundaryRegressionInterface.sFresnelScatteringKernel
+        (4 / 5) (3 / 5)).toModeTransform =
+        !![
+          (((5 / 11 : ℝ) : ℂ)), (((4 * Real.sqrt 6 / 11 : ℝ) : ℂ));
+          (((4 * Real.sqrt 6 / 11 : ℝ) : ℂ)), (((-5 / 11 : ℝ) : ℂ))] := by
+    ext i j
     fin_cases i <;> fin_cases j <;>
       simp [sFresnelScatteringKernel, scalarFresnelScatteringKernel, hrs, hts, hFactor,
         fresnelScatteringRegression_s_normalizedTransmission]; norm_num
-  constructor
-  · ext i j
+  have hPMatrix :
+      (jonesBoundaryRegressionInterface.pFresnelScatteringKernel
+        (4 / 5) (3 / 5)).toModeTransform =
+        !![
+          (((-1 / 5 : ℝ) : ℂ)), (((2 * Real.sqrt 6 / 5 : ℝ) : ℂ));
+          (((2 * Real.sqrt 6 / 5 : ℝ) : ℂ)), (((1 / 5 : ℝ) : ℂ))] := by
+    ext i j
     fin_cases i <;> fin_cases j <;>
       simp [pFresnelScatteringKernel, scalarFresnelScatteringKernel, hrp, htp, hFactor,
         fresnelScatteringRegression_p_normalizedTransmission]; norm_num
-  exact ⟨
-    jonesBoundaryRegressionInterface.sFresnelScatteringKernel_isLossless
-      (by norm_num) (by norm_num),
-    jonesBoundaryRegressionInterface.pFresnelScatteringKernel_isLossless
-      (by norm_num) (by norm_num)⟩
+  refine ⟨hSMatrix, hPMatrix, ?_, ?_⟩
+  · rw [ScatteringMatrix.isLossless_iff_isPowerPreserving, hSMatrix]
+    intro input
+    simpa [ModeAmplitude.power_eq_sum_normSq, ModeTransform.toLinearMap,
+      Matrix.toLpLin_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two,
+      neg_div] using
+      fresnelScatteringRegression_s_power (input 0) (input 1)
+  · rw [ScatteringMatrix.isLossless_iff_isPowerPreserving, hPMatrix]
+    intro input
+    simpa [ModeAmplitude.power_eq_sum_normSq, ModeTransform.toLinearMap,
+      Matrix.toLpLin_apply, Matrix.mulVec, dotProduct, Fin.sum_univ_two] using
+      fresnelScatteringRegression_p_power (input 0) (input 1)
 
 end
 

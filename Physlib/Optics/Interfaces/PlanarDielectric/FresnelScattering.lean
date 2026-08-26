@@ -84,8 +84,8 @@ lemma powerNormalizedFresnelTransmissionCoefficient_sq
 
 Coordinate `0` denotes the negative-side channel and coordinate `1` the positive-side channel.
 The first column is the supplied left-incident reflection and normalized transmission. The second
-column is its real symmetric unitary completion; this definition alone is not a reverse-incidence
-derivation. -/
+column is its real symmetric orthogonal equal-norm completion, which is unitary under the balance
+hypothesis below. This definition alone is not a reverse-incidence derivation. -/
 def scalarFresnelScatteringKernel (reflection transmission fluxFactor : ℝ) :
     ScatteringMatrix (Fin 2) where
   toModeTransform := !![
