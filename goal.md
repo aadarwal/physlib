@@ -1439,7 +1439,9 @@ Owner: Optics, importing E3a.
   and conjugation derived from the adopted peak-phasor convention;
 - [x] the propagating material plane-wave mean Poynting vector and nonnegative irradiance,
   including impedance and the exact raw-Jones-amplitude bridge;
-- [x] signed normal flux density of a propagating material plane wave;
+- [x] signed normal flux density of a propagating material plane wave, plus a strict positive local
+  mean-flux predicate whose nonzero referenced-wave specialization is equivalent to strict phase
+  direction without assigning an incident, transmitted, or outgoing role;
 - [x] a pointwise bridge from Euclidean phasor realization to the componentwise real part of a
   positive-exponential complex-carrier scaling, without broadening the Jones foundations;
 - [x] local electric and material magnetic-field-strength phasors for the off-shell complex

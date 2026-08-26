@@ -1008,6 +1008,12 @@ PR unless maintainers explicitly ask to retain it.
   ordered mixed term must be `1 / 4 * n dot (E_F cross conj H_G)`, the Hermitian completion must
   conjugate the exchanged term, and self-pairing must reduce to `1 / 2 * Re (n dot
   (E cross conj H))`. Confirm that magnetic field strength `H`, not induction `B`, is integrated.
+- [ ] Human-check the strict local flux-direction connector before upstreaming. Confirm that
+  `HasPositiveMeanNormalFluxInto` uses the actual mean of `E cross H` at the oriented plane's
+  stored point, with magnetic field strength `H` and the selected side normal. The strict positive
+  irradiance hypothesis is load-bearing in its equivalence with strict phase direction. Neither
+  predicate assigns an incident, transmitted, outward, or outgoing wave role or supplies a
+  radiation or limiting-absorption condition.
 - [x] Decide the fork's surface-measure boundary for E3b. The abstract theorem continues to take a
   supplied measure on a profile-coordinate type. The physical specialization separately uses
   Mathlib's normalized two-dimensional Hausdorff measure on ambient `Space`, restricted to a
