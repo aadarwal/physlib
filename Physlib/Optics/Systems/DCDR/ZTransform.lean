@@ -131,18 +131,28 @@ lemma lagTwoGeometricImpulse_step (r : ℂ) (n : ℤ) :
   cases n with
   | ofNat n =>
       rcases n with _ | _ | n
-      · norm_num [lagTwoGeometricImpulse, geometricSeq_natCast, unitImpulse]
-      · norm_num [lagTwoGeometricImpulse, geometricSeq_natCast, unitImpulse]
-      · simp only [lagTwoGeometricImpulse, geometricSeq_natCast]
-        rw [show ((n + 2 : ℕ) : ℤ) - 2 = (n : ℤ) by omega,
-          geometricSeq_natCast]
-        simp only [unitImpulse, if_neg (by omega)]
+      · norm_num [lagTwoGeometricImpulse, geometricSeq, zScale,
+          unitStep, unitImpulse]
+      · norm_num [lagTwoGeometricImpulse, geometricSeq, zScale,
+          unitStep, unitImpulse]
+      · simp only [lagTwoGeometricImpulse]
+        have hIndex : Int.ofNat (n + 1 + 1) = Int.ofNat (n + 2) := by
+          congr 1
+        rw [hIndex]
+        simp only [Int.ofNat_eq_natCast]
+        have hSub : ((n + 2 : ℕ) : ℤ) - 2 = (n : ℤ) := by omega
+        rw [hSub, geometricSeq_natCast, geometricSeq_natCast,
+          geometricSeq_natCast, geometricSeq_natCast]
+        have hNonzero : ((n + 2 : ℕ) : ℤ) ≠ 0 := by omega
+        simp only [unitImpulse, if_neg hNonzero]
         ring
   | negSucc n =>
-      have hn : -(n : ℤ) - 1 < 0 := by omega
-      have hnTwo : -(n : ℤ) - 1 - 2 < 0 := by omega
-      simp [lagTwoGeometricImpulse, geometricSeq_isCausal _ _ hn,
-        geometricSeq_isCausal _ _ hnTwo, unitImpulse, Int.negSucc_eq]
+      simp only [lagTwoGeometricImpulse]
+      rw [geometricSeq_isCausal r (Int.negSucc n) (by omega),
+        geometricSeq_isCausal (-r) (Int.negSucc n) (by omega),
+        geometricSeq_isCausal r (Int.negSucc n - 2) (by omega),
+        geometricSeq_isCausal (-r) (Int.negSucc n - 2) (by omega)]
+      simp [unitImpulse]
 
 /-- The lag-two geometric kernel has an absolutely convergent transform when
 `‖r‖ < ‖z‖`. Equivalently, its lag-two coefficient satisfies `‖r ^ 2‖ < ‖z‖ ^ 2`. -/
@@ -150,17 +160,19 @@ lemma summable_seriesTerm_lagTwoGeometricImpulse {r z : ℂ} (hrz : ‖r‖ < �
     Summable (seriesTerm (lagTwoGeometricImpulse r) z) := by
   have hz : 0 < ‖z‖ := lt_of_le_of_lt (norm_nonneg r) hrz
   have hRatio : ‖r * z⁻¹‖ < 1 := by
-    rw [norm_mul, norm_inv, mul_inv, div_lt_one hz]
+    rw [norm_mul, norm_inv, ← div_eq_mul_inv, div_lt_one hz]
     exact hrz
   have hPositive : Summable (seriesTerm (geometricSeq r) z) := by
-    convert summable_geometric_of_norm_lt_one hRatio using 1
-    funext n
-    rw [seriesTerm, geometricSeq_natCast, mul_pow]
+    have hGeometric : Summable (fun n : ℕ => (r * z⁻¹) ^ n) :=
+      summable_geometric_of_norm_lt_one hRatio
+    exact hGeometric.congr fun n => by
+      rw [seriesTerm, geometricSeq_natCast, mul_pow]
   have hNegative : Summable (seriesTerm (geometricSeq (-r)) z) := by
     have hNegativeRatio : ‖(-r) * z⁻¹‖ < 1 := by simpa using hRatio
-    convert summable_geometric_of_norm_lt_one hNegativeRatio using 1
-    funext n
-    rw [seriesTerm, geometricSeq_natCast, mul_pow]
+    have hGeometric : Summable (fun n : ℕ => ((-r) * z⁻¹) ^ n) :=
+      summable_geometric_of_norm_lt_one hNegativeRatio
+    exact hGeometric.congr fun n => by
+      rw [seriesTerm, geometricSeq_natCast, mul_pow]
   exact summable_seriesTerm_const_mul (1 / 2)
     (summable_seriesTerm_add hPositive hNegative)
 
@@ -197,9 +209,8 @@ lemma causalOutput_eq_lagTwoGeometricImpulse (p : UnitDelayParameters) (r : ℂ)
     (causalOutput_isRecurrenceSolution p unitImpulse_isCausal)
   rw [IsRecurrenceSolution]
   funext n
-  rw [hLags, delayCombination, Finset.sum_singleton, hCoefficient]
-  simp only [Pi.add_apply]
-  rw [delayCombination]
+  simp only [Pi.add_apply, delayCombination]
+  rw [hLags, Finset.sum_singleton, hCoefficient]
   calc
     (∑ k ∈ zFeedforwardLags p,
         zFeedforwardCoefficients p k * lagTwoGeometricImpulse r (n - k)) =
@@ -214,35 +225,13 @@ lemma causalOutput_eq_lagTwoGeometricImpulse (p : UnitDelayParameters) (r : ℂ)
             zFeedforwardCoefficients p k * lagTwoGeometricImpulse r (n - 2 - k)) +
         ∑ k ∈ zFeedforwardLags p,
           zFeedforwardCoefficients p k * unitImpulse (n - k) := by
+      simp_rw [mul_add]
+      rw [Finset.sum_add_distrib]
+      congr 1
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro k _
       ring
-
-/-- Strict lag-two geometric decay proves membership in the actual DCDR transfer ROC.
-
-The hypotheses expose the retained lag and its square root. The analytic inequality
-`‖r‖ < ‖z‖` is equivalent to `‖r ^ 2‖ < ‖z‖ ^ 2`; it is not an algebraic solve gate.
--/
-lemma mem_zTransferROC_of_lagTwoGeometric (p : UnitDelayParameters) (r z : ℂ)
-    (hLags : zFeedbackLags p = {2})
-    (hCoefficient : zFeedbackCoefficients p 2 = r ^ 2)
-    (hrz : ‖r‖ < ‖z‖) : z ∈ zTransferROC p := by
-  have hz : z ≠ 0 := norm_ne_zero_iff.mp (ne_of_gt
-    (lt_of_le_of_lt (norm_nonneg r) hrz))
-  have hOutput : Summable (seriesTerm (causalOutput p unitImpulse) z) := by
-    rw [causalOutput_eq_lagTwoGeometricImpulse p r hLags hCoefficient]
-    exact summable_seriesTerm_delayCombination _ _
-      (summable_seriesTerm_lagTwoGeometricImpulse hrz)
-  have hRatio : ‖r * z⁻¹‖ < 1 := by
-    rw [norm_mul, norm_inv, mul_inv, div_lt_one (norm_pos_iff.mpr hz)]
-    exact hrz
-  have hDenominator :
-      1 - delaySymbol (zFeedbackLags p) (zFeedbackCoefficients p) z⁻¹ ≠ 0 := by
-    rw [hLags, delaySymbol, Finset.sum_singleton, hCoefficient]
-    intro hZero
-    have hOne : r ^ 2 * z⁻¹ ^ 2 = 1 := sub_eq_zero.mp hZero
-    have hNorm := congrArg norm hOne
-    rw [← mul_pow, norm_pow, norm_one] at hNorm
-    nlinarith [sq_nonneg ‖r * z⁻¹‖]
-  exact ⟨⟨⟨hz, summable_seriesTerm_unitImpulse z⟩, ⟨hz, hOutput⟩⟩, hDenominator⟩
 
 /-!
 
@@ -263,6 +252,36 @@ identified with the compiled rational response domain or a stability predicate.
 def zTransferROC (p : UnitDelayParameters) : Set ℂ :=
   iirROC (zFeedbackLags p) (zFeedbackCoefficients p) unitImpulse
     (causalOutput p unitImpulse)
+
+/-- Strict lag-two geometric decay proves membership in the actual DCDR transfer ROC.
+
+The hypotheses expose the retained lag and its square root. The analytic inequality
+`‖r‖ < ‖z‖` is equivalent to `‖r ^ 2‖ < ‖z‖ ^ 2`; it is not an algebraic solve gate.
+-/
+lemma mem_zTransferROC_of_lagTwoGeometric (p : UnitDelayParameters) (r z : ℂ)
+    (hLags : zFeedbackLags p = {2})
+    (hCoefficient : zFeedbackCoefficients p 2 = r ^ 2)
+    (hrz : ‖r‖ < ‖z‖) : z ∈ zTransferROC p := by
+  have hz : z ≠ 0 := norm_ne_zero_iff.mp (ne_of_gt
+    (lt_of_le_of_lt (norm_nonneg r) hrz))
+  have hOutput : Summable (seriesTerm (causalOutput p unitImpulse) z) := by
+    rw [causalOutput_eq_lagTwoGeometricImpulse p r hLags hCoefficient]
+    exact summable_seriesTerm_delayCombination _ _
+      (summable_seriesTerm_lagTwoGeometricImpulse hrz)
+  have hRatio : ‖r * z⁻¹‖ < 1 := by
+    rw [norm_mul, norm_inv, ← div_eq_mul_inv,
+      div_lt_one (norm_pos_iff.mpr hz)]
+    exact hrz
+  have hDenominator :
+      1 - delaySymbol (zFeedbackLags p) (zFeedbackCoefficients p) z⁻¹ ≠ 0 := by
+    rw [hLags, delaySymbol, Finset.sum_singleton, hCoefficient]
+    intro hZero
+    have hOne : r ^ 2 * z⁻¹ ^ 2 = 1 := (sub_eq_zero.mp hZero).symm
+    have hNorm := congrArg norm hOne
+    rw [← mul_pow, norm_pow, norm_one] at hNorm
+    have hRatioNonneg : 0 ≤ ‖r * z⁻¹‖ := norm_nonneg _
+    nlinarith
+  exact ⟨⟨⟨hz, summable_seriesTerm_unitImpulse z⟩, ⟨hz, hOutput⟩⟩, hDenominator⟩
 
 /-- Membership in the DCDR transfer ROC includes a nonzero Z coordinate. -/
 lemma ne_zero_of_mem_zTransferROC {p : UnitDelayParameters} {z : ℂ}

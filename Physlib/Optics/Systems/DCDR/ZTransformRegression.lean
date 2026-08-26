@@ -223,13 +223,15 @@ lemma zRegression_stable_zFeedbackLags :
     zFeedbackLags stableUnitDelayParameters = {2} := by
   rw [zFeedbackLags, stable_loopPolynomial_expansion]
   ext n
-  simp [Polynomial.mem_support_iff]
+  simp
 
 /-- The retained stable feedback coefficient is the square of `I/2`. -/
 lemma zRegression_stable_zFeedbackCoefficient_two :
     zFeedbackCoefficients stableUnitDelayParameters 2 = (Complex.I / 2) ^ 2 := by
   rw [zFeedbackCoefficients, stable_loopPolynomial_expansion]
-  norm_num [Complex.I_sq]
+  norm_num
+  rw [div_pow, Complex.I_sq]
+  norm_num
 
 /-- The strict lag-two geometric criterion proves that `z = 1` belongs to the actual ROC. -/
 lemma zRegression_stable_one_mem_zTransferROC :
