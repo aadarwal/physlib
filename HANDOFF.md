@@ -2,14 +2,17 @@
 
 ## Cutoff and synchronization
 
-This phase synchronized exactly onto the controller-authorized registered head
-`110eb5cde9fcaf9990f77aec7ad7276032c6c01a`. The synchronization merge is
-`3e64308943d3e0dc43dca86f0ca554189a8015b7`. The gated source is
-`b9dc4cbb9a8a47e4d995e1be56ddf40d697615b1`. This cutoff is its HANDOFF-only
-child.
+This phase remains based on the controller-authorized registered head
+`110eb5cde9fcaf9990f77aec7ad7276032c6c01a`. The exact synchronization merge is
+`3e64308943d3e0dc43dca86f0ca554189a8015b7`; no re-sync occurred during repair.
 
-Relative to the sync target, the source adds exactly the five authorized Phase 9a files.
-No pre-existing file changed. `Physlib.lean` remains byte-identical to the sync target.
+The original KK-2 source was `b9dc4cbb9a8a47e4d995e1be56ddf40d697615b1`. The exact KK-3
+repair source is `daadda47412242c6aae6ec549e83ac8da07d8773`. This cutoff is its
+HANDOFF-only child.
+
+Relative to the sync target, the production delta remains exactly the five authorized Phase 9a
+files. No pre-existing source module changed. `Physlib.lean` remains byte-identical to the sync
+target.
 
 ## Goal and phase boundary
 
@@ -18,143 +21,180 @@ The controlling N7 text at `goal.md:2184-2185` on the cutoff says:
 > component-owned physical-port packaging for the remaining beam-splitter, mirror,
 > polarization, and interface primitives consumed by `ScatteringComponentFamily`;
 
-Phase 9a supplies only the beam-splitter and mirror members. Polarization and interface
-packaging remain open for the separately authorized Phase 9b, which has not started. The
-fixed-carrier propagation bullet at `goal.md:2186-2187` also remains open.
+The repaired independence discipline at `goal.md:2193-2194` says:
 
-The component laws and packaging are Physlib-original. Every result is a `lemma`; the phase
+> an independent behavioral specification for every component, followed by a realization lemma
+> proving that its matrix or relation satisfies that specification; and
+
+Phase 9a supplies only the beam-splitter and mirror members. Polarization and interface
+packaging remain open for Phase 9b, which has not started. The frequency-parameterized
+propagation item at `goal.md:2186-2187` also remains open.
+
+The component laws and packaging are Physlib-original. Every result is a `lemma`; this phase
 asserts no literal printed physics theorem.
 
 ## Authorized files
 
-- `Physlib/Optics/Components/BeamSplitter.lean` (240 lines);
-- `Physlib/Optics/Components/BeamSplitterPhysical.lean` (221 lines);
-- `Physlib/Optics/Components/Mirror.lean` (161 lines);
-- `Physlib/Optics/Components/MirrorPhysical.lean` (203 lines); and
-- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean` (793 lines).
+- `Physlib/Optics/Components/BeamSplitter.lean` (276 lines);
+- `Physlib/Optics/Components/BeamSplitterPhysical.lean` (224 lines);
+- `Physlib/Optics/Components/Mirror.lean` (168 lines);
+- `Physlib/Optics/Components/MirrorPhysical.lean` (206 lines); and
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean` (794 lines).
 
-No additive edit to an existing Components, Network, or Mode module was needed. Production
-imports no regression module.
+Production imports no regression module. No additive edit to an existing Components, Network,
+or Mode module was needed.
 
-## Independent beam-splitter law
+## Independent beam-splitter equations
 
 `BeamSplitter.Parameters` records independent real through and cross amplitudes at
-`BeamSplitter.lean:66`. The declared transform at line 93 is
-`[[t, -I*k], [-I*k, t]]`; it is not an alias of `DirectionalCoupler`. The independent
-incident-to-outgoing behavior is defined before the scattering adapter at line 147. Exact graph
-realization is proved at line 178.
+`Physlib/Optics/Components/BeamSplitter.lean:68`. The separately declared matrix
+`BeamSplitter.mixing` is at line 95 and is not an alias of `DirectionalCoupler`.
 
-The normalized-modal-power factor `t² + k²` is defined at line 73. Exact scaling is proved at
-line 195, power preservation under `IsUnitary` at line 225, and algebraic losslessness at line
-231. The negative-quadrature cross phase is declared model data, not a reciprocity or
-reverse-incidence Maxwell derivation.
+The repaired independent output law is defined at line 133. It constructs two linear maps from
+incident endpoint amplitudes directly:
 
-## Independent mirror law
+- first output: `t * firstInput + (-I * k) * secondInput`;
+- second output: `(-I * k) * firstInput + t * secondInput`.
 
-`Mirror.Parameters` stores one complex reflection coefficient at `Mirror.lean:61`.
-`Mirror.reflection` is the same-mode scalar transform at line 70. The independent one-port
-behavior is defined at line 113, and the scattering graph realizes it exactly at line 141.
-Unit squared modulus is the explicit algebraic hypothesis at line 66; modal losslessness under
-that hypothesis is proved at line 149.
+Neither `BeamSplitter.outputMap` nor `BeamSplitter.behavior` calls `mixing`, `scattering`, or a
+matrix action. `BeamSplitter.outputMap_apply` exposes both equations at line 158, and
+`BeamSplitter.mem_behavior_iff` makes them the behavior-membership equation at line 179.
+
+The scattering adapter stores `mixing` separately at line 200. Its action is derived from matrix
+blocks at line 204. `BeamSplitter.scattering_realizes_behavior` at line 214 now rewrites the
+matrix action to the two independent endpoint equations and expands the cross coefficient. It is
+not a wrapper-level definitional equality.
+
+Exact normalized-modal-power scaling remains at line 231, power preservation under
+`Parameters.IsUnitary` at line 261, and algebraic losslessness at line 267.
+
+## Independent mirror equation
+
+`Mirror.Parameters` stores one complex reflection coefficient at
+`Physlib/Optics/Components/Mirror.lean:63`. The separately declared scalar matrix
+`Mirror.reflection` is at line 72.
+
+The repaired `Mirror.outputMap` at line 98 constructs coefficient-times-corresponding-mode
+directly from endpoint reindexing and scalar multiplication. It calls neither `reflection` nor
+`scattering`. Its explicit equation is at line 108, and `Mirror.mem_behavior_iff` makes that
+equation behavior membership at line 123.
+
+The scattering adapter is constructed separately at line 137. Its matrix action is proved at
+line 141. `Mirror.scattering_realizes_behavior` at line 148 derives the endpoint equation from
+that matrix action. Modal losslessness under the explicit unit-phase hypothesis is at line 156.
 
 ## Component-owned physical ports
 
 The beam splitter owns distinct `first` and `second` ports at
-`BeamSplitterPhysical.lean:64`. Its `PortModeFamily` and pinned raw-channel equivalence are at
-lines 76 and 81. Independent behavior and scattering are transported separately at lines 153
-and 169, with exact graph realization at line 184. The direct singleton
-`ScatteringComponentFamily` witness is at line 202.
+`Physlib/Optics/Components/BeamSplitterPhysical.lean:67`. Its `PortModeFamily` and pinned
+raw-channel equivalence are at lines 79 and 84. Independent behavior and scattering are
+transported separately at lines 156 and 172. Exact graph realization is at line 187, and the
+direct singleton `ScatteringComponentFamily` witness is at line 205.
 
-The mirror owns one `surface` port at `MirrorPhysical.lean:63`. Its `PortModeFamily` and pinned
-equivalence are at lines 75 and 80. Independent behavior and scattering are at lines 133 and
-149, exact graph realization is at line 166, and the direct component-family witness is at line
-184. In both components, ownership is present in the construction rather than recovered by a
-post-hoc channel identification.
+The mirror owns one `surface` port at
+`Physlib/Optics/Components/MirrorPhysical.lean:66`. Its `PortModeFamily` and pinned equivalence
+are at lines 78 and 83. Independent behavior and scattering are at lines 136 and 152. Exact graph
+realization is at line 169, and the direct component-family witness is at line 187.
+
+These adapters now transport independently stated endpoint equations rather than matrices that
+were postulated to be unrelated. Ownership remains present by construction.
 
 ## Fail-capable mixed-family regression
 
 The positive fixture uses beam parameters `t = 3/5`, `k = 4/5`, beam input `(1, 2)`, mirror
-phase `I`, and mirror input `3`. Primitive matrix multiplication gives the exact outputs
+phase `I`, and mirror input `3`. Primitive matrix multiplication gives
 `((3 - 8I)/5, (6 - 4I)/5)` and `3I` at
-`PhysicalPortSuiteRegression.lean:101` and `:124`.
+`Physlib/Optics/Components/PhysicalPortSuiteRegression.lean:102` and `:125`.
 
-The mixed component family is built at lines 187-213. An explicit three-channel indexed matrix
-is defined at line 348 and proved entrywise equal to the family matrix at line 367. Its action is
-expanded as three concrete finite sums at line 411. The aggregate input and output coordinates
-are proved at lines 481 and 495, then joined by the raw aggregate action at line 511.
+The mixed family is built at lines 188-214. An explicit three-channel matrix is at line 349 and
+is proved entrywise equal to the family matrix at line 368. Its action is expanded as three
+finite sums at line 412. Aggregate input/output coordinates are proved at lines 482 and 496,
+then joined by the raw aggregate action at line 512.
 
-The hostile fixture swaps only the beam output endpoint order at line 526. Its independently
-written indexed matrix is at line 613, its direct finite-sum action is at line 655, and its
-aggregate output is proved at line 716. On the same input the hostile values are
-`((6 - 4I)/5, (3 - 8I)/5)` and `3I`, as recorded at line 729. The first output inequality is at
-line 746, and the full output functions differ at line 756. The valid graph member is anchored
-at line 782.
+The hostile fixture swaps only the beam output endpoint order at line 527. Its independently
+written indexed matrix is at line 614, and its finite-sum action is at line 656. On the same input
+the hostile values are `((6 - 4I)/5, (3 - 8I)/5)` and `3I`, proved at line 730. The first output
+inequality is at line 747, and the full outputs differ at line 757. The valid graph member remains
+anchored at line 783.
 
-This negative case can fail if the endpoint lift, local channel order, component index, or
-aggregate reindex is wrong. It is not a mere type-level or zero-amplitude sentinel.
+The KK-2 repair changed no regression proof or coefficient. Only its module-doc non-claim fence
+changed, so the accepted primitive and hostile derivations remain intact.
 
-### Anchor-independence map
+### Path-qualified anchor-independence map
 
-- `physicalPortSuite9a_beam_raw_action` unfolds the primitive beam matrix. It is independent of
-  both physical-port modules, both realization lemmas, and every assembled-family action lemma.
-- `physicalPortSuite9a_mirror_raw_action` unfolds the primitive scalar matrix. It is independent
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean`:
+  `physicalPortSuite9a_beam_raw_action` unfolds the primitive beam matrix. It is independent of
+  both physical-port modules, all realization lemmas, and assembled-family action lemmas.
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean`:
+  `physicalPortSuite9a_mirror_raw_action` unfolds the primitive scalar matrix. It is independent
   of mirror physical-port packaging, its realization lemma, and assembled-family action lemmas.
-- `physicalPortSuite9a_indexedScatteringMatrix_eq_explicit` is an entrywise finite-case proof. It
-  is independent of the component-family projection lemmas and assembled-matrix entry helpers.
-- `physicalPortSuite9a_indexed_action` expands `Matrix.mulVec` and all three sums. It is
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean`:
+  `physicalPortSuite9a_indexedScatteringMatrix_eq_explicit` is an entrywise finite-case proof. It
+  is independent of component-family projection lemmas and assembled-matrix entry helpers.
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean`:
+  `physicalPortSuite9a_indexed_action` expands `Matrix.mulVec` and all three sums. It is
   independent of assembled-matrix action helpers and both component realization lemmas.
-- `physicalPortSuite9a_aggregate_action` uses the raw indexed action and explicit reindexing. It
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean`:
+  `physicalPortSuite9a_aggregate_action` uses the raw indexed action and explicit reindexing. It
   is independent of every packaged assembled-action lemma.
-- The hostile explicit-matrix equality, action, coordinates, and inequality repeat the finite
-  expansion for the swapped endpoint. They are independent of the positive packaging and action
-  lemmas under test.
+- `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean`:
+  `physicalPortSuite9a_hostile_indexedScatteringMatrix_eq_explicit`,
+  `physicalPortSuite9a_hostile_indexed_action`,
+  `physicalPortSuite9a_hostile_aggregate_action`, and
+  `physicalPortSuite9a_hostile_action_ne` repeat the finite expansion for the swapped endpoint.
+  They are independent of positive packaging and assembled-action lemmas under test.
 
-A declaration-name grep over the regression is empty for
-`assembledScatteringMatrix_apply_component`, `assembledScatteringMatrix_entry`, both
-`componentFamily_*` projection lemmas, both physical-scattering realization/adapter lemmas, and
-both raw scattering-realization lemmas.
+A declaration-name grep over
+`Physlib/Optics/Components/PhysicalPortSuiteRegression.lean` remains empty for both
+`assembledScatteringMatrix_*` helpers, both `componentFamily_*` projections, both physical
+realization/adapter lemmas, and both raw scattering-realization lemmas.
 
-## Non-claims
+## Per-module non-claim boundary
 
-- The matrices describe fixed-carrier algebraic modal amplitudes. Their power statements are
-  squared-amplitude bookkeeping, not electromagnetic energy or power theorems.
-- The symmetric beam matrix and one-port mirror coefficient are declared reduced laws. No
-  reciprocity, time reversal, reverse-incidence Maxwell, or modal-completeness claim is made.
-- No geometry, coating, material interface, propagation, reference-plane, bandwidth, stability,
-  causality, dispersion, measurement, or physical-realization claim is made.
-- Exact “realization” means equality of the independent algebraic behavior and scattering graph;
-  it does not certify fabrication or a Maxwell boundary-value model.
-- The regression coefficients are fail-capable algebraic sentinels, not measured component data.
-  Human verification remains required by `AI-POLICY.md`.
+All five module docs now state the full applicable boundary explicitly:
+
+- modal losslessness is squared-amplitude bookkeeping, not electromagnetic power;
+- no reciprocity or time-reversal law is asserted;
+- no reverse-incidence Maxwell law or modal completeness is asserted;
+- no propagation, causality, or dispersion is asserted; and
+- exact graph realization is not a physical-realization claim.
+
+The matrices are fixed-carrier reduced laws. No geometry, coating, material interface,
+reference-plane, bandwidth, stability, measurement, or fabrication claim is made. Human
+verification remains required by `AI-POLICY.md`.
 
 ## Reviewer map
 
-1. Read `BeamSplitter.lean:62-181` for the independent mixer, behavior, and realization.
-2. Read `BeamSplitter.lean:186-235` for exact modal-power scaling and unitary classification.
-3. Read `Mirror.lean:57-153` for the one-port law, independent behavior, and realization.
-4. Read both Physical modules from their A sections through their direct family witnesses.
-5. Read `PhysicalPortSuiteRegression.lean:62-179` for primitive nonzero component actions.
-6. Read lines 183-518 for the explicit indexed matrix and positive aggregate action.
-7. Read lines 522-759 for the hostile endpoint-swap matrix, action, and inequality.
+1. Read `Physlib/Optics/Components/BeamSplitter.lean:123-197` for the matrix-free endpoint law.
+2. Read `Physlib/Optics/Components/BeamSplitter.lean:200-220` for substantive realization.
+3. Read `Physlib/Optics/Components/Mirror.lean:88-133` for its matrix-free endpoint law.
+4. Read `Physlib/Optics/Components/Mirror.lean:137-154` for substantive realization.
+5. Read both Physical modules from their A sections through their direct family witnesses.
+6. Read `Physlib/Optics/Components/PhysicalPortSuiteRegression.lean:62-180` for raw actions.
+7. Read lines 184-519 for the positive explicit matrix and aggregate action.
+8. Read lines 523-760 for the hostile endpoint-swap matrix, action, and inequality.
 
 ## Exact validation record
 
-The exact gated source `b9dc4cbb9a8a47e4d995e1be56ddf40d697615b1` was checked under
-`lake-lock`. Temporary sorted registration of all five modules was used for declaration linters
-and then removed.
+The exact repair source `daadda47412242c6aae6ec549e83ac8da07d8773` was checked under
+`lake-lock`. Temporary sorted registration of all five modules was used for declaration and
+module-document linters, then removed.
 
+- targeted builds of `Physlib.Optics.Components.BeamSplitter` and
+  `Physlib.Optics.Components.Mirror`: passed;
 - targeted build of `Physlib.Optics.Components.PhysicalPortSuiteRegression`: passed,
   2719 jobs;
 - `runPhyslibLinters`: Physlib and QuantumInfo passed, including `simpNF`;
+- `module_doc_lint`: no diagnostic names any Phase 9a module; the command remains globally red on
+  the pre-existing repository-wide documentation backlog;
 - committed-state `lint-style.sh`: passed;
 - `git diff --check`: passed;
-- file lengths are 240, 221, 161, 203, and 793, all below 1500 lines;
-- the per-file maximum line lengths are 97, 99, 99, 99, and 100 Unicode codepoints;
+- file lengths are 276, 224, 168, 206, and 794, all below 1500 lines;
+- per-file maxima are 97, 99, 99, 99, and 100 Unicode codepoints;
 - no file contains `theorem`, `sorry`, `axiom`, `native_decide`, `maxHeartbeats`, or
   `Lean.ofReduceBool`;
-- all module docs use the four literal required headings and matching section TOCs;
 - production imports no regression module; and
-- relative to `110eb5cd`, the source diff contains exactly the five authorized new files.
+- the repaired behavior sections contain no call to `mixing`, `reflection`, or `scattering`.
 
 Temporary registration was restored byte-identically. `Physlib.lean` had SHA-256
 `a76a905b6d702efe94fa12ef5bd68cf6dfee745428ae35ac155dc148b6de574d` before and after the gate.
