@@ -353,6 +353,7 @@ public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.FlatNetlistEliminationRegression
 public import Physlib.Optics.Network.FlatNetlistMason
 public import Physlib.Optics.Network.FlatNetlistMasonRegression
+public import Physlib.Optics.Network.FlatNetlistMasonSingularRegression
 public import Physlib.Optics.Network.FlatNetlistRegression
 public import Physlib.Optics.Network.Hierarchical
 public import Physlib.Optics.Network.HierarchicalRegression
