@@ -434,9 +434,35 @@ Requirements:
     done: false
     location: N/A
 
-  - description: "The API shall extract typed signal-flow graphs from suitable scalar network models, derive Mason's gain formula as a calculation theorem, and prove agreement with the linear-equation network semantics before applying it to feedback, add-drop, coupled-ring, and double-coupled double-ring systems."
-    done: false
-    location: N/A
+  - description: "The neutral signal-flow layer supplies finite node equations, exact unique-solvability, classical forward-path Mason gain, edge-indexed multigraph enumeration with parallel-edge identity, distinguished terminals, and extraction from coefficient or system matrices. For every finite FlatNetlist, feedbackSignalFlowGraph extracts the scalar graph C*S from the N5 feedback operator 1-C*S. Its graph determinant is nonzero exactly when the relational netlist is well posed; on that precise gate, feedbackMasonTransform equals the proof-gated feedback inverse and masonResponseTransform equals the behavior-derived typed external response. A nonsymmetric fixture pins internal gain 3/2 and asymmetric external gains 6 and 2, while a singular fixture pins a zero graph determinant. The FlatNetlist graph is matrix-level and sums parallel gains; it does not replace the edge-indexed layer, instantiate a ring or DCDR, present the external response as one distinguished-terminal graph, or claim contraction, causality, passivity, reciprocity, or physical realization."
+    done: true
+    location: >-
+      Physlib/Mathematics/SignalFlowGraph/Basic.lean
+      (Physlib.SignalFlowGraph.IsNodeSolution,
+      Physlib.SignalFlowGraph.existsUnique_isNodeSolution_iff,
+      Physlib.SignalFlowGraph.gain);
+      Physlib/Mathematics/SignalFlowGraph/MasonPath.lean
+      (Physlib.SignalFlowGraph.masonNumerator_eq_adjugate,
+      Physlib.SignalFlowGraph.masonGain_eq_gain);
+      Physlib/Mathematics/SignalFlowGraph/EdgeEnumeration.lean
+      (Physlib.SignalFlowGraph.edgeGraphDet_eq_det,
+      Physlib.SignalFlowGraph.edgeMasonGain_eq_gain);
+      Physlib/Mathematics/SignalFlowGraph/Terminated.lean
+      (Physlib.SignalFlowGraph.TerminatedGraph.transfer,
+      Physlib.SignalFlowGraph.TerminatedGraph.transfer_eq_masonGain);
+      Physlib/Optics/Network/FlatNetlistMason.lean
+      (Optics.FlatNetlist.feedbackSignalFlowGraph,
+      Optics.FlatNetlist.isWellPosed_iff_feedbackSignalFlowGraph_graphDet_ne_zero,
+      Optics.FlatNetlist.feedbackMasonTransform,
+      Optics.FlatNetlist.feedbackMasonTransform_eq_feedbackInverse,
+      Optics.FlatNetlist.masonResponseTransform,
+      Optics.FlatNetlist.responseTransform_eq_masonResponseTransform);
+      Physlib/Optics/Network/FlatNetlistMasonRegression.lean
+      (Optics.flatNetlistMasonRegression_systemMatrix_eq,
+      Optics.flatNetlistMasonRegression_internal_gain,
+      Optics.flatNetlistMasonRegression_response_b_to_a,
+      Optics.flatNetlistMasonRegression_response_a_to_b,
+      Optics.flatNetlistMasonRegression_singular_graphDet_eq_zero)
 
   - description: "The API connects finite complex modal coordinates to zero-attenuation, transverse, dispersion-matched plane-wave carriers in one homogeneous medium at a common positive angular frequency. Coefficients scale complex carrier amplitudes before ordinary-real realization; finite synthesis remains a source-free fixed-medium Maxwell solution. An explicit singleton material-Jones bridge proves that scaling a modal coordinate and scaling the framed Jones data give exactly the same complete complex carrier, without introducing a coercion or claiming flux normalization. The actual one-period Poynting mean is integrated over either the abstract measured profile or a measurable planar GeometricAperture carrying restricted normalized two-dimensional Hausdorff measure. Under explicit pairwise integrability, mutual flux orthogonality, unit normalization, and incident/outgoing role hypotheses, the resulting signed actual integrated flux equals ModeAmplitude.power on the supplied finite synthesis image. Exact singleton regressions pin electric versus magnetic-field-strength phasors, complex coefficient phase, arbitrary period start, Maxwell preservation, and power twenty-five. No modal completeness, raw-Jones coercion, interface boundary, omitted-channel, evanescent-power, reciprocity, or device-losslessness claim is made."
     done: true
