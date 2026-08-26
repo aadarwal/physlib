@@ -171,7 +171,7 @@ lemma idealRouting_rephase_eq_iff [DecidableEq family.Channel]
     rw [ModeTransform.rephase_apply]
     by_cases hOutput : output = family.mateEquiv input
     · subst output
-      rw [family.idealRouting_entry_mate, family.idealRouting_entry_mate]
+      rw [family.idealRouting_entry_mate]
       change
         (gauge.incident
             (Incident.mk (family.channelEmbedding (family.mateEquiv input))) : ℂ) *
@@ -180,8 +180,7 @@ lemma idealRouting_rephase_eq_iff [DecidableEq family.Channel]
               (Outgoing.mk (family.channelEmbedding input)) : ℂ)⁻¹ = 1
       rw [hMatched input]
       field_simp [Circle.coe_ne_zero]
-    · rw [family.idealRouting_entry, family.idealRouting_entry,
-        if_neg hOutput]
+    · rw [family.idealRouting_entry, if_neg hOutput]
       simp
 
 /-- A matched gauge leaves connected unit routing literally unchanged. -/
@@ -209,8 +208,7 @@ lemma partialRouting_rephase_eq [Fintype family.Channel]
   rw [ModeTransform.rephase_apply]
   by_cases hOutgoing : outgoing ∈ Set.range family.channelEmbedding
   · rcases hOutgoing with ⟨channel, rfl⟩
-    rw [family.partialRouting_entry_connected_column,
-      family.partialRouting_entry_connected_column]
+    rw [family.partialRouting_entry_connected_column]
     by_cases hIncident :
         incident = family.channelEmbedding (family.mateEquiv channel)
     · subst incident
@@ -225,8 +223,7 @@ lemma partialRouting_rephase_eq [Fintype family.Channel]
       field_simp [Circle.coe_ne_zero]
     · rw [if_neg hIncident]
       simp
-  · rw [family.partialRouting_entry_of_outgoing_not_mem_range outgoing hOutgoing,
-      family.partialRouting_entry_of_outgoing_not_mem_range outgoing hOutgoing]
+  · rw [family.partialRouting_entry_of_outgoing_not_mem_range outgoing hOutgoing]
     simp
 
 /-- Ambient partial routing is unchanged exactly for mate-matched endpoint phases. -/
@@ -305,14 +302,12 @@ lemma externalIncidentInjection_rephase_eq [DecidableEq P.Channel]
   rw [ModeTransform.rephase_apply]
   by_cases hChannel : ambient = external.1
   · subst ambient
-    rw [family.externalIncidentInjection_entry_external,
-      family.externalIncidentInjection_entry_external]
+    rw [family.externalIncidentInjection_entry_external]
     change
       (gauge.incident (Incident.mk external.1) : ℂ) * 1 *
           (gauge.incident (Incident.mk external.1) : ℂ)⁻¹ = 1
     field_simp [Circle.coe_ne_zero]
-  · rw [family.externalIncidentInjection_entry_of_ne ambient external hChannel,
-      family.externalIncidentInjection_entry_of_ne ambient external hChannel]
+  · rw [family.externalIncidentInjection_entry_of_ne ambient external hChannel]
     simp
 
 /-- External outgoing readout is unchanged when its output gauge is the restriction of the
@@ -328,14 +323,12 @@ lemma externalOutgoingReadout_rephase_eq [DecidableEq P.Channel]
   rw [ModeTransform.rephase_apply]
   by_cases hChannel : ambient = external.1
   · subst ambient
-    rw [family.externalOutgoingReadout_entry_external,
-      family.externalOutgoingReadout_entry_external]
+    rw [family.externalOutgoingReadout_entry_external]
     change
       (gauge.outgoing (Outgoing.mk external.1) : ℂ) * 1 *
           (gauge.outgoing (Outgoing.mk external.1) : ℂ)⁻¹ = 1
     field_simp [Circle.coe_ne_zero]
-  · rw [family.externalOutgoingReadout_entry_of_ne external ambient hChannel,
-      family.externalOutgoingReadout_entry_of_ne external ambient hChannel]
+  · rw [family.externalOutgoingReadout_entry_of_ne external ambient hChannel]
     simp
 
 /-- External readout sends a rephased ambient outgoing amplitude to the corresponding rephased
@@ -376,10 +369,21 @@ lemma incidentAssembly_rephase [Fintype family.Channel]
     (family.externalGauge gauge).incident gauge.incident
       family.externalIncidentInjection external
   rw [family.externalIncidentInjection_rephase_eq gauge] at hExposure
-  rw [incidentAssembly, hRouting, hExposure]
-  exact (map_add (ModeAmplitude.rephase gauge.incident)
-    (family.partialRouting.toLinearMap outgoing)
-      (family.externalIncidentInjection.toLinearMap external)).symm
+  unfold incidentAssembly
+  calc
+    family.partialRouting.toLinearMap
+          (ModeAmplitude.rephase gauge.outgoing outgoing) +
+        family.externalIncidentInjection.toLinearMap
+          (ModeAmplitude.rephase (family.externalGauge gauge).incident external) =
+      ModeAmplitude.rephase gauge.incident
+          (family.partialRouting.toLinearMap outgoing) +
+        ModeAmplitude.rephase gauge.incident
+          (family.externalIncidentInjection.toLinearMap external) :=
+        congrArg₂ (· + ·) hRouting hExposure
+    _ = ModeAmplitude.rephase gauge.incident
+        (family.partialRouting.toLinearMap outgoing +
+          family.externalIncidentInjection.toLinearMap external) :=
+      (map_add (ModeAmplitude.rephase gauge.incident) _ _).symm
 
 end PortConnectionFamily
 
