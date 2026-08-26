@@ -2215,6 +2215,9 @@ time-domain delay, dispersion, polarization, reciprocity, or material model.
 - [x] identify the exhaustive two-channel bus boundary, derive both directional response laws,
   and prove that the singular-safe relabeled behavior equals an independently stated
   reflectionless two-port law on the exact solve gate;
+- [x] prove that the backward-first chain view exists exactly when the bus transmission is
+  nonzero, derive `diag(H⁻¹, H)` under that independent pivot gate, and reconstruct the typed
+  scattering law by the generic round trip;
 - [x] construct the two-bus add-drop ring as an explicit feedback network; and
 - [x] derive its through/drop transfer amplitudes, exact solve gate, and convergent-series bridge.
 
@@ -2357,8 +2360,10 @@ Mason response, and an independently defined two-node circulation model has dete
 `1 - t * gamma` and reconstructs the same through response. No reduction from the complete graph
 is claimed. Direct path/loop enumeration and raw channel elimination meet independently at the
 exact `1 / 7` fixture. Its exhaustive bus boundary and complete reflectionless typed scattering
-law are also identified on the same solve gate. The chain and causal Z-transform legs remain
-separate gates, so X-01 is not yet complete.
+law are also identified on the same solve gate. On the additional exact gate `throughTransfer ≠
+0`, its backward-first chain matrix is `diag(throughTransfer⁻¹, throughTransfer)` and converts
+back to the packaged typed scattering law. The causal Z-transform leg remains separate, so X-01
+is not yet complete.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2789,7 +2794,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
 | S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, and a stated one-pole Schur/BIBO equivalence are complete; network reachability/no-cancellation, broader rational BIBO, and group delay remain |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: generic core, exact N5 agreement, and the all-pass relational/N5/reduced-Mason value instance are complete; chain/Z and DCDR X-01 legs remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, and independently enumerated ring regressions |
+| S6 Mason | in progress: generic core, exact N5 agreement, and the all-pass relational/N5/chain/reduced-Mason value instance are complete; Z and DCDR X-01 legs remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, and independently enumerated ring regressions |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |

@@ -293,7 +293,7 @@ Requirements:
       Optics.MachZehnder.balanced_phase_factor_ratio_eq_output_ratio);
       Physlib/Optics/Systems/MachZehnder/Regression.lean
 
-  - description: "The all-pass and add-drop portions model one- and two-bus microrings as explicit FlatNetlists assembled from the common directional-coupler and fixed-carrier matched-propagation components. Their complete-state well-posedness is equivalent to the exact scalar feedback-denominator gates, and N5 elimination derives the through/drop responses and contraction-gated round-trip-series forms. For the all-pass ring, the exhaustive input-side/through-side bus boundary is relabeled into typed left/right coordinates; separately derived directional equations identify the singular-safe relation, on HasNonzeroDenominator, with an independently specified reflectionless two-port behavior and scattering realization without a reciprocity inference. The complete relational behavior is also identified with the generic N5-extracted Mason response on that gate. An independently defined reduced two-node circulation model has determinant 1-t*gamma and reconstructs the through transfer; no graph reduction from the complete graph is claimed. Direct path/loop enumeration and raw channel elimination meet at 1/7 without either bridge theorem. The S3 layer derives squared-modulus powers, routes lossless through/drop balance through N6 component conservation, names resonance and antiresonance phase conditions, proves gated critical-coupling extinction and recovery, fixes positive-domain base-ten decibel rejection ratios, and proves through/drop power periodicity under an explicit constant group-index N5F model on responseDomain. The source bridge maps the audited DATE'14 two- and four-port equations and the SysCon'15/SFG add-drop formulas to those derived N5 responses under explicit unitary, denominator, pivot, port-order, principal-root, and logarithm-base gates. IP-03, IP-04, and IP-05 are discharged and IP-12 is conditional; the printed SysCon power denominator and its unspecified logarithm base keep IP-06 and IP-07 open. Exact response, source-coordinate, critical-coupling, and one-FSR regressions pin the implemented statements independently. The umbrella remains incomplete: the all-pass chain and causal Z legs, DCDR, named phase extrema, bandwidth, linewidth, quality factor, response-derived group delay, reciprocity, material realization, and source-level S0 agreement remain open."
+  - description: "The all-pass and add-drop portions model one- and two-bus microrings as explicit FlatNetlists assembled from the common directional-coupler and fixed-carrier matched-propagation components. Their complete-state well-posedness is equivalent to the exact scalar feedback-denominator gates, and N5 elimination derives the through/drop responses and contraction-gated round-trip-series forms. For the all-pass ring, the exhaustive input-side/through-side bus boundary is relabeled into typed left/right coordinates; separately derived directional equations identify the singular-safe relation, on HasNonzeroDenominator, with an independently specified reflectionless two-port behavior and scattering realization without a reciprocity inference. Its backward-first chain view exists exactly when throughTransfer is nonzero; under that independent pivot gate it is diag(throughTransfer⁻¹, throughTransfer), has the regrouped singular-safe graph, and converts back to the packaged scattering law. The complete relational behavior is also identified with the generic N5-extracted Mason response on the solve gate. An independently defined reduced two-node circulation model has determinant 1-t*gamma and reconstructs the through transfer; no graph reduction from the complete graph is claimed. Direct path/loop enumeration and raw channel elimination meet at 1/7 without either bridge theorem. The S3 layer derives squared-modulus powers, routes lossless through/drop balance through N6 component conservation, names resonance and antiresonance phase conditions, proves gated critical-coupling extinction and recovery, fixes positive-domain base-ten decibel rejection ratios, and proves through/drop power periodicity under an explicit constant group-index N5F model on responseDomain. The source bridge maps the audited DATE'14 two- and four-port equations and the SysCon'15/SFG add-drop formulas to those derived N5 responses under explicit unitary, denominator, pivot, port-order, principal-root, and logarithm-base gates. IP-03, IP-04, and IP-05 are discharged and IP-12 is conditional; the printed SysCon power denominator and its unspecified logarithm base keep IP-06 and IP-07 open. Exact response, source-coordinate, critical-coupling, and one-FSR regressions pin the implemented statements independently. The umbrella remains incomplete: the all-pass causal Z leg, DCDR, named phase extrema, bandwidth, linewidth, quality factor, response-derived group delay, reciprocity, material realization, and source-level S0 agreement remain open."
     done: false
     location: >-
       Physlib/Optics/Systems/Microring/AllPass.lean
@@ -310,6 +310,26 @@ Requirements:
       Optics.AllPass.throughTransferSeries,
       Optics.AllPass.throughTransfer_eq_roundTripSeries,
       Optics.AllPass.response_through_eq_roundTripSeries);
+      Physlib/Optics/Systems/Microring/AllPassChain.lean
+      (Optics.AllPass.packagedTwoPortScattering_rightToLeftTransmission_entry,
+      Optics.AllPass.packagedTwoPortScattering_hasBijectiveRightToLeftTransmission_iff,
+      Optics.AllPass.backwardFirstChainMatrix,
+      Optics.AllPass.backwardFirstChainTransform,
+      Optics.AllPass.backwardFirstChainTransform_eq_matrix,
+      Optics.AllPass.toBehavior_backwardFirstChainTransform,
+      Optics.AllPass.toBehavior_backwardFirstChainMatrix,
+      Optics.AllPass.backwardFirstChainTransform_roundTrip);
+      Physlib/Optics/Systems/Microring/AllPassChainRegression.lean
+      (Optics.AllPass.allPassChainRegressionResonanceChain,
+      Optics.AllPass.allPassChainRegression_resonance_chain_inl_inl,
+      Optics.AllPass.allPassChainRegression_resonance_chain_inl_inr,
+      Optics.AllPass.allPassChainRegression_resonance_chain_inr_inl,
+      Optics.AllPass.allPassChainRegression_resonance_chain_inr_inr,
+      Optics.AllPass.allPassChainRegressionCriticalParameters,
+      Optics.AllPass.allPassChainRegression_critical_denominator,
+      Optics.AllPass.allPassChainRegression_critical_throughTransfer,
+      Optics.AllPass.allPassChainRegression_critical_isWellPosed,
+      Optics.AllPass.allPassChainRegression_critical_not_hasBijectiveRightToLeftTransmission);
       Physlib/Optics/Systems/Microring/AllPassMason.lean
       (Optics.AllPass.loopSignalFlowGraph,
       Optics.AllPass.systemMatrix_loopSignalFlowGraph,
@@ -356,6 +376,10 @@ Requirements:
       Optics.AllPass.twoPortScattering_realizes_behavior,
       Optics.AllPass.externalBehavior,
       Optics.AllPass.packagedTwoPortScattering,
+      Optics.AllPass.packagedTwoPortScattering_apply_inl_inl,
+      Optics.AllPass.packagedTwoPortScattering_apply_inl_inr,
+      Optics.AllPass.packagedTwoPortScattering_apply_inr_inl,
+      Optics.AllPass.packagedTwoPortScattering_apply_inr_inr,
       Optics.AllPass.toBehavior_packagedTwoPortScattering,
       Optics.AllPass.packagedTwoPortScattering_eq_twoPortScatteringTransform,
       Optics.AllPass.externalBehavior_eq_twoPortBehavior);

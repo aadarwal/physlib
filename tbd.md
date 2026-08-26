@@ -1663,6 +1663,17 @@ PR unless maintainers explicitly ask to retain it.
   of the selected bidirectional component models, not a reciprocity or physical time-reversal
   theorem. This slice makes no chain-pivot, passivity, losslessness, delay, causality, ROC,
   frequency, material, or complete X-01 claim.
+- [x] Add the all-pass backward-first chain leg. The typed scattering pivot is bijective exactly
+  when `throughTransfer ≠ 0`; under that gate and the independent internal solve gate, the
+  behavior-derived chain is `diag(throughTransfer⁻¹, throughTransfer)`, its graph is the
+  backward-first regrouping of the singular-safe N5 relation, and generic reverse conversion
+  reconstructs the packaged scattering law.
+- [ ] Human-check the all-pass chain leg before upstreaming. Confirm that the right-to-left block,
+  not the left-to-right response entry merely inherited from the original one-sided derivation,
+  supplies the pivot. Audit the critical fixture: denominator `16 / 25` makes the netlist well
+  posed while zero through transfer prevents this chain view. The chain gate is neither claimed
+  nor inferred to be the netlist solve gate, and no reciprocity, passivity, losslessness, delay,
+  causality, ROC, source-parity, or complete X-01 result follows.
 - [ ] Add one transport operation for a `PortConnectionFamily` along an equivalence of port
   families. This is the shared missing machinery behind both N5H inner-family replacement by an
   equal boundary relation and literal three-stage append associativity; treat it as one gap, not

@@ -103,6 +103,42 @@ lemma packagedTwoPortScattering_eq_responseTransform_reindex (p : Parameters)
     rcases output with ⟨⟨⟩⟩ <;>
     rcases input with ⟨⟨⟩⟩ <;> rfl
 
+/-- The packaged typed scattering matrix has zero left reflection. -/
+@[simp]
+lemma packagedTwoPortScattering_apply_inl_inl (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedTwoPortScattering p hDenominator
+        (Sum.inl (Outgoing.mk ())) (Sum.inl (Incident.mk ())) = 0 := by
+  rw [packagedTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_input_input p hDenominator
+
+/-- The packaged typed scattering matrix has the all-pass right-to-left entry. -/
+@[simp]
+lemma packagedTwoPortScattering_apply_inl_inr (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedTwoPortScattering p hDenominator
+        (Sum.inl (Outgoing.mk ())) (Sum.inr (Incident.mk ())) = throughTransfer p := by
+  rw [packagedTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_input_through p hDenominator
+
+/-- The packaged typed scattering matrix has the all-pass left-to-right entry. -/
+@[simp]
+lemma packagedTwoPortScattering_apply_inr_inl (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedTwoPortScattering p hDenominator
+        (Sum.inr (Outgoing.mk ())) (Sum.inl (Incident.mk ())) = throughTransfer p := by
+  rw [packagedTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_through_input p hDenominator
+
+/-- The packaged typed scattering matrix has zero right reflection. -/
+@[simp]
+lemma packagedTwoPortScattering_apply_inr_inr (p : Parameters)
+    (hDenominator : p.HasNonzeroDenominator) :
+    packagedTwoPortScattering p hDenominator
+        (Sum.inr (Outgoing.mk ())) (Sum.inr (Incident.mk ())) = 0 := by
+  rw [packagedTwoPortScattering_eq_responseTransform_reindex]
+  exact responseTransform_entry_through_through p hDenominator
+
 /-- The packaged two-port graph is exactly the relabeled singular-safe netlist behavior. -/
 lemma toBehavior_packagedTwoPortScattering (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :

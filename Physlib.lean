@@ -472,6 +472,8 @@ public import Physlib.Optics.Systems.Microring.AddDrop
 public import Physlib.Optics.Systems.Microring.AddDropNetwork
 public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
+public import Physlib.Optics.Systems.Microring.AllPassChain
+public import Physlib.Optics.Systems.Microring.AllPassChainRegression
 public import Physlib.Optics.Systems.Microring.AllPassMason
 public import Physlib.Optics.Systems.Microring.AllPassMasonRegression
 public import Physlib.Optics.Systems.Microring.AllPassRegression
