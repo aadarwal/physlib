@@ -368,6 +368,7 @@ public import Physlib.Optics.Network.Coherency
 public import Physlib.Optics.Network.ConnectionFamily
 public import Physlib.Optics.Network.ConnectionFamilyRegression
 public import Physlib.Optics.Network.ConnectionFamilyTransport
+public import Physlib.Optics.Network.ConnectionRoutingRephase
 public import Physlib.Optics.Network.Conservation
 public import Physlib.Optics.Network.ConservationRegression
 public import Physlib.Optics.Network.ExternalChannel
@@ -379,6 +380,8 @@ public import Physlib.Optics.Network.FlatNetlistMason
 public import Physlib.Optics.Network.FlatNetlistMasonRegression
 public import Physlib.Optics.Network.FlatNetlistMasonSingularRegression
 public import Physlib.Optics.Network.FlatNetlistRegression
+public import Physlib.Optics.Network.FlatNetlistRephase
+public import Physlib.Optics.Network.FlatNetlistRephaseRegression
 public import Physlib.Optics.Network.Hierarchical
 public import Physlib.Optics.Network.HierarchicalRegression
 public import Physlib.Optics.Network.HierarchicalReuse
