@@ -156,19 +156,37 @@ def nodeN7Channel (p : Parameters) : Node → (netlist p).Channel :=
     componentChannel p .leftCoupler ⟨DirectionalCoupler.Port.rightSecond, ()⟩,
     componentChannel p .leftHalfTwo ⟨MatchedPropagation.Port.left, ()⟩]
 
+/-- The unique mode at the left endpoint of a PANDA connection. -/
+def connectionLeftMode (p : Parameters) (connection : Connection) :
+    (netlist p).components.aggregatePortModeFamily.Mode
+      ((netlist p).connections.connection connection).left := by
+  cases connection <;> exact ()
+
+/-- The unique mode at the right endpoint of a PANDA connection. -/
+def connectionRightMode (p : Parameters) (connection : Connection) :
+    (netlist p).components.aggregatePortModeFamily.Mode
+      ((netlist p).connections.connection connection).right := by
+  cases connection <;> exact ()
+
+/-- The aggregate channel at the left endpoint of a PANDA connection. -/
+def connectionLeftChannel (p : Parameters) (connection : Connection) : (netlist p).Channel :=
+  (netlist p).connections.channelEmbedding
+    ⟨connection, Sum.inl (connectionLeftMode p connection)⟩
+
+/-- The aggregate channel at the right endpoint of a PANDA connection. -/
+def connectionRightChannel (p : Parameters) (connection : Connection) : (netlist p).Channel :=
+  (netlist p).connections.channelEmbedding
+    ⟨connection, Sum.inr (connectionRightMode p connection)⟩
+
 /-- Two N7 channels represent the same directed graph boundary when they are identical or are the
 two physical endpoints of one declared PANDA connection. -/
 def RoutedBoundary (p : Parameters) (first second : (netlist p).Channel) : Prop :=
   first = second ∨
     ∃ connection : Connection,
-      (first = ((netlist p).connections.channelEmbedding
-          ⟨connection, Sum.inl ()⟩) ∧
-        second = ((netlist p).connections.channelEmbedding
-          ⟨connection, Sum.inr ()⟩)) ∨
-      (first = ((netlist p).connections.channelEmbedding
-          ⟨connection, Sum.inr ()⟩) ∧
-        second = ((netlist p).connections.channelEmbedding
-          ⟨connection, Sum.inl ()⟩))
+      (first = connectionLeftChannel p connection ∧
+        second = connectionRightChannel p connection) ∨
+      (first = connectionRightChannel p connection ∧
+        second = connectionLeftChannel p connection)
 
 /-- Equality gives a routed-boundary identification. -/
 lemma routedBoundary_refl (p : Parameters) (channel : (netlist p).Channel) :
@@ -177,28 +195,50 @@ lemma routedBoundary_refl (p : Parameters) (channel : (netlist p).Channel) :
 /-- The left and right channels of a physical connection form one routed boundary. -/
 lemma routedBoundary_connection_forward (p : Parameters) (connection : Connection) :
     RoutedBoundary p
-      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inl ()⟩)
-      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inr ()⟩) := by
+      (connectionLeftChannel p connection) (connectionRightChannel p connection) := by
   exact Or.inr ⟨connection, Or.inl ⟨rfl, rfl⟩⟩
 
 /-- The routed-boundary identification is available in the reverse endpoint order. -/
 lemma routedBoundary_connection_reverse (p : Parameters) (connection : Connection) :
     RoutedBoundary p
-      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inr ()⟩)
-      ((netlist p).connections.channelEmbedding ⟨connection, Sum.inl ()⟩) := by
+      (connectionRightChannel p connection) (connectionLeftChannel p connection) := by
   exact Or.inr ⟨connection, Or.inr ⟨rfl, rfl⟩⟩
 
 /-- The node assigned to each physical wire is routed to both of that wire's endpoint channels. -/
 lemma connectionNode_routedBoundaries (p : Parameters) (connection : Connection) :
     RoutedBoundary p (nodeN7Channel p (connectionNode connection))
-        ((netlist p).connections.channelEmbedding ⟨connection, Sum.inl ()⟩) ∧
+        (connectionLeftChannel p connection) ∧
       RoutedBoundary p (nodeN7Channel p (connectionNode connection))
-        ((netlist p).connections.channelEmbedding ⟨connection, Sum.inr ()⟩) := by
-  cases connection <;> constructor
-  all_goals first
-    | exact routedBoundary_refl p _
-    | exact routedBoundary_connection_forward p _
-    | exact routedBoundary_connection_reverse p _
+        (connectionRightChannel p connection) := by
+  cases connection
+  · exact ⟨routedBoundary_refl p _,
+      routedBoundary_connection_forward p .inputToQuarterOne⟩
+  · exact ⟨routedBoundary_connection_reverse p .quarterOneToRight,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_refl p _,
+      routedBoundary_connection_forward p .rightToQuarterTwo⟩
+  · exact ⟨routedBoundary_connection_reverse p .quarterTwoToOutput,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_refl p _,
+      routedBoundary_connection_forward p .outputToQuarterThree⟩
+  · exact ⟨routedBoundary_connection_reverse p .quarterThreeToLeft,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_refl p _,
+      routedBoundary_connection_forward p .leftToQuarterFour⟩
+  · exact ⟨routedBoundary_connection_reverse p .quarterFourToInput,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_refl p _,
+      routedBoundary_connection_forward p .rightToHalfOne⟩
+  · exact ⟨routedBoundary_connection_reverse p .rightHalfJoin,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_connection_reverse p .rightHalfTwoToCoupler,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_refl p _,
+      routedBoundary_connection_forward p .leftToHalfOne⟩
+  · exact ⟨routedBoundary_connection_reverse p .leftHalfJoin,
+      routedBoundary_refl p _⟩
+  · exact ⟨routedBoundary_connection_reverse p .leftHalfTwoToCoupler,
+      routedBoundary_refl p _⟩
 
 /-- Every printed edge source is routed to the incident channel of its owned N7 scattering entry. -/
 lemma edgeInput_routedBoundary (p : Parameters) (edge : Edge) :
@@ -289,17 +329,173 @@ def displayedAction (p : Parameters) (state : Node → ℂ) : Node → ℂ :=
       (p.leftCoupler.throughAmplitude : ℂ) * state 15,
     p.leftHalfOneCoefficient * state 16]
 
+private lemma coefficientMatrix_mulVec_apply_zero (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 0 = displayedAction p state 0 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_one (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 1 = displayedAction p state 1 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_two (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 2 = displayedAction p state 2 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_three (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 3 = displayedAction p state 3 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_four (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 4 = displayedAction p state 4 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_five (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 5 = displayedAction p state 5 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_six (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 6 = displayedAction p state 6 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_seven (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 7 = displayedAction p state 7 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_eight (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 8 = displayedAction p state 8 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_nine (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 9 = displayedAction p state 9 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_ten (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 10 = displayedAction p state 10 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_eleven (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 11 = displayedAction p state 11 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_twelve (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 12 = displayedAction p state 12 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_thirteen (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 13 = displayedAction p state 13 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_fourteen (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 14 = displayedAction p state 14 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_fifteen (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 15 = displayedAction p state 15 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_sixteen (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 16 = displayedAction p state 16 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
+private lemma coefficientMatrix_mulVec_apply_seventeen (p : Parameters) (state : Node → ℂ) :
+    (coefficientMatrix p).mulVec state 17 = displayedAction p state 17 := by
+  simp [Matrix.mulVec, dotProduct, coefficientMatrix,
+    Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
+    Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
+    signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
+    Fin.sum_univ_succ, add_comm]
+
 /-- Summing the 24 retained edges gives the sparse displayed action. -/
 lemma coefficientMatrix_mulVec_eq_displayedAction (p : Parameters) (state : Node → ℂ) :
     (coefficientMatrix p).mulVec state = displayedAction p state := by
-  set_option maxHeartbeats 1000000 in
-    funext output
-    fin_cases output <;>
-      simp [Matrix.mulVec, dotProduct, coefficientMatrix,
-        Physlib.SignalFlowGraph.Multigraph.toMatrix_apply,
-        Physlib.SignalFlowGraph.Multigraph.edgesBetween, Finset.sum_filter,
-        signalMultigraph, edgeSource, edgeTarget, edgeGain, displayedAction,
-        Fin.sum_univ_succ, add_comm]
+  funext output
+  fin_cases output
+  · exact coefficientMatrix_mulVec_apply_zero p state
+  · exact coefficientMatrix_mulVec_apply_one p state
+  · exact coefficientMatrix_mulVec_apply_two p state
+  · exact coefficientMatrix_mulVec_apply_three p state
+  · exact coefficientMatrix_mulVec_apply_four p state
+  · exact coefficientMatrix_mulVec_apply_five p state
+  · exact coefficientMatrix_mulVec_apply_six p state
+  · exact coefficientMatrix_mulVec_apply_seven p state
+  · exact coefficientMatrix_mulVec_apply_eight p state
+  · exact coefficientMatrix_mulVec_apply_nine p state
+  · exact coefficientMatrix_mulVec_apply_ten p state
+  · exact coefficientMatrix_mulVec_apply_eleven p state
+  · exact coefficientMatrix_mulVec_apply_twelve p state
+  · exact coefficientMatrix_mulVec_apply_thirteen p state
+  · exact coefficientMatrix_mulVec_apply_fourteen p state
+  · exact coefficientMatrix_mulVec_apply_fifteen p state
+  · exact coefficientMatrix_mulVec_apply_sixteen p state
+  · exact coefficientMatrix_mulVec_apply_seventeen p state
 
 /-- The forward N7 relation is the node equation of the netlist-entry projection matrix. -/
 def NetlistForwardRelation (p : Parameters) (input : ℂ) (state : Node → ℂ) : Prop :=

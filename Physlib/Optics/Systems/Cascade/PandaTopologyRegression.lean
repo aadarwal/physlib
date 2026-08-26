@@ -121,7 +121,7 @@ lemma topologyThroughPaths_sound (path : List Node) (hPath : path ∈ topologyTh
       path.IsChain TopologyAdjacent := by
   simp only [topologyThroughPaths, Finset.mem_insert, Finset.mem_singleton] at hPath
   rcases hPath with rfl | rfl | rfl | rfl | rfl
-  all_goals native_decide
+  all_goals decide
 
 /-- Every listed drop path is repetition-free, has the declared terminals, and follows retained
 adjacency. -/
@@ -130,7 +130,7 @@ lemma topologyDropPaths_sound (path : List Node) (hPath : path ∈ topologyDropP
       path.IsChain TopologyAdjacent := by
   simp only [topologyDropPaths, Finset.mem_insert, Finset.mem_singleton] at hPath
   rcases hPath with rfl | rfl
-  all_goals native_decide
+  all_goals decide
 
 /-! ## C. Canonically based simple loops -/
 
@@ -161,13 +161,14 @@ def topologyCanonicalLoops : Finset (List Node) :=
 /-- The audit contains six distinct canonically based loops. -/
 lemma topologyCanonicalLoops_card : topologyCanonicalLoops.card = 6 := by decide
 
-/-- Every listed loop closes, has no repeated node before closure, and follows retained adjacency. -/
+/-- Every listed loop closes, has no repeated node before closure, and follows retained
+adjacency. -/
 lemma topologyCanonicalLoops_sound (loop : List Node) (hLoop : loop ∈ topologyCanonicalLoops) :
     loop ≠ [] ∧ loop.head? = loop.getLast? ∧ loop.dropLast.Nodup ∧
       loop.IsChain TopologyAdjacent := by
   simp only [topologyCanonicalLoops, Finset.mem_insert, Finset.mem_singleton] at hLoop
   rcases hLoop with rfl | rfl | rfl | rfl | rfl | rfl
-  all_goals native_decide
+  all_goals decide
 
 /-! ## D. Edge-refinement teeth -/
 

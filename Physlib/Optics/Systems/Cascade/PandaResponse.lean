@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Mathlib.Tactic.Polyrith
 public import Physlib.Optics.Systems.Cascade.PandaBridge
 
 /-!
@@ -403,12 +404,12 @@ theorem nsv16_dropTransfer (p : Parameters) (s : SourceParameters)
         (dropTerminatedMultigraph p) hUnit hState
     _ = sourceDropTransfer s := by
       rw [sourceDropTransfer, sourceDropNumerator_eq_factorized]
-      simp [closedState, sourceCrossCoefficient]
+      simp [closedState, sourceCrossCoefficient, Complex.I_sq]
       ring
 
 /-- The edge-level Mason quotient of the directed projection is the printed through expression on
 the exact response domain. -/
-theorem auditedThroughMasonResponse_eq_source (p : Parameters) (s : SourceParameters)
+lemma auditedThroughMasonResponse_eq_source (p : Parameters) (s : SourceParameters)
     (hDictionary : HasSourceCouplerDictionary p s)
     (hRoot : HasPrincipalRootSelection p s)
     (hNormalization : HasSourceCouplerNormalization s)
@@ -424,7 +425,7 @@ theorem auditedThroughMasonResponse_eq_source (p : Parameters) (s : SourceParame
 
 /-- The edge-level Mason quotient of the directed projection is the printed drop expression on the
 exact response domain. -/
-theorem auditedDropMasonResponse_eq_source (p : Parameters) (s : SourceParameters)
+lemma auditedDropMasonResponse_eq_source (p : Parameters) (s : SourceParameters)
     (hDictionary : HasSourceCouplerDictionary p s)
     (hRoot : HasPrincipalRootSelection p s)
     (hNormalization : HasSourceCouplerNormalization s)
