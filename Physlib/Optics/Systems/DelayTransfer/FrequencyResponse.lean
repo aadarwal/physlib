@@ -59,7 +59,7 @@ asserted. In particular, the requested Physlib extension concerning local logari
 derivatives is deferred to the later group-delay slice.
 
 This module implements the requested “frequency response under the chosen
-`q = exp (-s * τ) = z⁻¹` convention” from `goal.md:2268`.
+`q = exp (-s * τ) = z⁻¹` convention” from `goal.md:2279`.
 -/
 
 @[expose] public section

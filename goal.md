@@ -2221,10 +2221,10 @@ two fixed-carrier half arcs. Its complete-state well-posedness is equivalent to
 round-trip series acquire the geometric-series interpretation only under contraction. The equal
 half-arc attenuation/phase split fixes a model and a drop-port reference-plane convention. Power
 observables, gated parameter recovery, rejection ratios, and nondispersive free spectral range are
-supplied by S3 below. Extrema, reciprocity, material dispersion, and source-parity bridges remain
-later work.
+supplied by S3 below. Extrema, reciprocity, material dispersion, and source-parity claims beyond
+the explicitly gated DATE/SysCon/SFG identifications recorded below remain later work.
 
-#### S3. Ring observables — complete as a Physlib layer; source bridge remains separate
+#### S3. Ring observables — complete as a Physlib layer; source bridge is explicitly gated
 
 - [x] derive observables from the S2 pointwise N5F response and the N6a/N7 normalization and
   conservation theorems;
@@ -2240,33 +2240,44 @@ routed through N6 componentwise conservation. Critical-coupling extinction has a
 the stated parameter gates, and parameter recovery is phase-resolved or explicitly
 critical-coupling-gated rather than an intensity-only identifiability claim. Frequency periodicity
 uses N5F's response domain and a constant group-index model. Resonance and antiresonance are named
-phase conditions, not extremum theorems; no bandwidth, linewidth, quality factor, response-derived
-group delay, reciprocity, material realization, or DATE/SysCon parity bridge is inferred.
+phase conditions, not extremum theorems. The separate source-bridge modules identify the audited
+DATE two- and four-port equations and the SysCon/SFG add-drop formulas with these N5 responses
+under explicit unitary, denominator, pivot, port-order, principal-root, and logarithm-base gates.
+IP-03, IP-04, and IP-05 are discharged and IP-12 is conditional. The printed SysCon power
+denominator and its unspecified logarithm base keep IP-06 and IP-07 open. No bandwidth, linewidth,
+quality factor, response-derived group delay, reciprocity, or material realization is inferred.
 
 #### S4. Delay-variable transfer functions
 
-- build on N5F's parameterized compilation and response domain;
-- formal delay indeterminate `q` and evaluation map;
-- rational transfer functions for finite-delay linear networks whose component entries are
+- [x] build on N5F's parameterized compilation and response domain;
+- [x] formal delay indeterminate `q` and evaluation map;
+- [ ] rational transfer functions for finite-delay linear networks whose component entries are
   rational in the declared finite family of delay variables;
-- proof that evaluating `q = exp (-s*τ)` agrees with the direct frequency response on the
+- [x] proof that evaluating `q = exp (-s*τ)` agrees with the direct frequency response on the
   pointwise well-posed domain;
-- singular internal operators as candidate poles, with actual poles identified only after ruling
+- [ ] singular internal operators as candidate poles, with actual poles identified only after ruling
   out input/output cancellation or hidden unreachable/unobservable singular modes; and
-- no claim of rational dependence on physical frequency without the required model.
+- [x] no claim of rational dependence on physical frequency without the required model.
+
+The shipped component-entry layer retains numerator/denominator representatives and evaluation
+domains, then compiles them through N5F and reparameterizes the proof-gated response along Laplace
+and reciprocal-Z maps. Symbolic rational elimination of the external response is still required
+before the third item can be checked. The internal-determinant/reduced-response API proves the
+candidate-to-actual inclusion and its converse under an explicit no-cancellation predicate, but a
+network-level reachability/observability or no-cancellation theorem remains open.
 
 #### S4P. Poles, zeros, stability, and frequency response
 
-- reduced rational responses and their evaluation domains;
-- zeros and transfer-function poles after cancellation, distinct from candidate singularities of
+- [x] reduced rational responses and their evaluation domains;
+- [x] zeros and transfer-function poles after cancellation, distinct from candidate singularities of
   the internal network operator;
-- degree and finiteness bounds;
-- a reachability/observability or explicit no-cancellation criterion connecting internal
+- [x] degree and finiteness bounds;
+- [ ] a reachability/observability or explicit no-cancellation criterion connecting internal
   singularities to actual poles;
-- discrete-time Schur stability and BIBO equivalence only for a stated proper causal rational
+- [x] discrete-time Schur stability and BIBO equivalence only for a stated proper causal rational
   class;
-- frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention; and
-- **Physlib extension (source claim unverified):** group delay and dispersion through a local
+- [x] frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention; and
+- [ ] **Physlib extension (source claim unverified):** group delay and dispersion through a local
   logarithmic derivative or another branch-audited construction, not an unqualified global
   complex argument.
 
@@ -2760,9 +2771,9 @@ current integration base; a designed package whose prerequisite is merely active
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | unblocked | completed N3T core plus the N7 directional coupler and matched propagation | independent ring behavior, primitive realization, and source-specific chain views |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
-| S2/S3 microrings | in progress: S2 amplitudes/series and S3 observables complete; source bridge open | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated round-trip series, N6 power balance, named phase conditions, critical coupling, gated parameter recovery, rejection ratios, and nondispersive FSR are complete; source parity and the remaining S0/S4+ integrations remain |
-| S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
-| S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
+| S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, and the gated source bridge are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, and DATE/SysCon/SFG response identifications are complete under their stated gates; IP-06/IP-07 source questions and the remaining S0/S4+ integrations stay open |
+| S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
+| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, and a stated one-pole Schur/BIBO equivalence are complete; network reachability/no-cancellation, broader rational BIBO, and group delay remain |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
 | S6 Mason | in progress: generic core and exact N5 agreement complete; ring/DCDR G-04 and broad X-01 instances remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric and singular regressions |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
