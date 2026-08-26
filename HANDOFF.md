@@ -1,287 +1,457 @@
-# S7D slice 6 handoff: exact audit of FMICS'15's passive DCDR case
+# S7D slice 7 handoff: formal multiple-delay DCDR family
 
 ## Cutoff identity
 
 - Branch: `optics/s7d-dcdr`.
-- Exact required sync target: `6df351b47fc836b37b8f7ff539b3b226a6e9b9b5`.
-- Sync operation: clean fast-forward to that exact hash; no later development head was merged.
-- Gated Lean source head: `d222e86db6c314c516c65aadad30a97b67b762f7`.
+- Exact required sync target:
+  `4386499b74e7b78d7ff3a897516d0433e080f374`.
+- Exact sync merge commit:
+  `4a3b03fa46af638049eea1c951a2b4c244b8fc72`.
+- Gated Lean source head:
+  `cef347516e35d64595f072d0572f0a9a75783bf6`.
 - The final cutoff is this HANDOFF-only child of the gated source head.
-- The controller later announced `5fc99609` as a new sync target with no forced mid-slice
-  re-sync; this cutoff intentionally remains based on the required `6df351b4` target.
+- No development head later than the named target was merged.
 
-## Scope and source text
+## Goal text and discharge
 
-This cutoff targets parity row IP-11 at
-`/Users/aadarwal/src/aadarwal/physlib-parity@3e7ee24:PARITY-LEDGER.md:118` and the
-following goal at `goal.md:2425-2426`:
+This slice addresses the literal S7D goal at `goal.md:2425-2433`, in
+particular:
 
-> "an exact or interval-certified, human-audited version of the source's reported unstable
-> passive parameter case."
+> "active/passive, unit-delay, and multiple-delay specializations;"
 
-IP-11 records that the source pole list is supplied as data and asks Physlib for the stronger
-exact audit.
+The earlier DCDR spine supplied active/passive fixtures and
+`UnitDelayParameters`. This cutoff supplies the missing formal
+`q^{m_i}` family and exact multiple-delay fixtures. Thus the
+“multiple-delay” part closes here; the “active/passive” and “unit-delay”
+parts remain discharged by the earlier slices and are connected to this family by
+literal specialization lemmas.
 
-FMICS'15 p. 175 states (`scratchpad/papers/FMICS15_1.txt:640-650`):
+## Printed source text
 
-> "In an effort to validate the stability results provided in [5], we discovered that both given
-> values of poles cannot satisfy the stability conditions. We formally proved the instability of
-> the DCDR in case of passive operation (i.e., G1 = G2 = G3 = 1) with k1 = k2 = 0.9 as follows:
-> unstable psp (lambda z. DCDR (1/z) (1/z) (1/z) 0.9 0.9
-> [0.905539; -0.905539]), where unstable psp sys = not (is stable psp sys) as described in
-> Definition 7."
+FMICS'15 Equation 3 states
+(`scratchpad/papers/FMICS15_1.txt:363-375`):
 
-The ASCII rendering changes typography only. The human-audit sheet below pins each number and
-sign to an exact Lean term.
+> “The general expression for the photonic transmittance is given as
+> follows: `T_i = t_{a_i} G_i z^{m_i}`.”
 
-## Files and registration request
+FMICS'15 Table 1 prints these four rows
+(`scratchpad/papers/FMICS15_1.txt:594-600`):
 
-Substantive slice-6 files:
+> “Active DCDR Circuit with Unit Delay” — `m1 = m2 = m3 = 1`
+>
+> “Optical Amplifier in the Fiber Path” —
+> `(m1 = m2 = m3 = 1) ∧ (G_i > 1)`
+>
+> “Passive DCDR Circuit” — `G1 = G2 = G3 = 1`
+>
+> “DCDR with Multiple Delay” — `m_i` can have different combinations
 
-- `Physlib/Optics/Systems/DCDR/SourceBridge.lean` — 407 lines; the passive source value and its
-  coherent unit-delay dictionary image.
-- `Physlib/Optics/Systems/DCDR/PassiveCaseRegression.lean` — 868 lines; exact printed and coherent
-  quotients, both coordinate root sets, decimal rejection, interval bound, independent Schur
-  anchors, and the printed-claim audit.
+Theorem 3 prints
+(`scratchpad/papers/FMICS15_1.txt:572-578`) the quotient
 
-Registration request, in sorted DCDR order:
+```text
+((1-k1)(1-k2)T1 + k1 k2 T2
+  - (1-2k1)(1-2k2)T1 T2 T3)
+/
+(1 - k1 k2 T1 T3 - (1-k1)(1-k2)T2 T3).
+```
+
+The source uses a positive exponent of its symbol `z`. The source
+dictionary selects `t_{a_i}=1`, names Physlib's retained polynomial
+indeterminate `q`, and then applies the independently declared reciprocal
+reparameterization `q=z⁻¹` at
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:397-455`.
+Consequently its retained path is stated explicitly as
+`G_i*q^m_i = G_i/z^m_i`; no silent coordinate identification or
+physical-frequency interpretation is made.
+
+## Files, split, and registration request
+
+The controller requested an early split when the coherent-only WIP reached
+1208 lines. The final dependency order is:
+
+1. `MultipleDelay.lean` — 752 lines; parameters, polynomial data,
+   literal unit-delay specialization, rational component family, and selected
+   N5 response.
+2. `MultipleDelayPolynomial.lean` — 318 lines; expansions, degree bounds,
+   cancellation-aware reduction, and generalized pole bound.
+3. `MultipleDelaySource.lean` — 300 lines; the eight-symbol FMICS'15
+   source dictionary and printed Theorem-3 polynomials.
+4. `MultipleDelayRegression.lean` — 437 lines; four Table-1 fixtures and
+   the tight degree-four pole fixture.
+
+Requested sorted registrations:
 
 ```lean
-public import Physlib.Optics.Systems.DCDR.PassiveCaseRegression
+public import Physlib.Optics.Systems.DCDR.MultipleDelay
+public import Physlib.Optics.Systems.DCDR.MultipleDelayPolynomial
+public import Physlib.Optics.Systems.DCDR.MultipleDelayRegression
+public import Physlib.Optics.Systems.DCDR.MultipleDelaySource
 ```
 
-The slice-5 `SourceBridge` and `SourceBridgeRegression` registrations are landing separately, as
-the controller specified. `Physlib.lean` was not touched, including temporarily. Production
-imports no regression module.
+Production modules do not import `MultipleDelayRegression`.
+`Physlib.lean` has no committed change. The gate temporarily inserted the
+four registrations and then restored the file byte-for-byte to SHA-256
+`01969994b8598317a61650e9a88f5c32b21c369b9958c5c18c7a4822d0f1d56b`.
 
-Every DCDR file remains below 1500 lines. The largest is the unchanged-code
-`ResponseRegression.lean` at 1417 lines after documentation normalization; the new regression is
-868 lines.
+## Reused conventions and dependency evidence
 
-## Module-doc normalization (doc-only)
+- The unit-delay data and fixed-carrier path realization are
+  `UnitDelayParameters` and `pathAt` at
+  `Physlib/Optics/Systems/DCDR/Poles.lean:82-110`.
+- The existing unit-delay polynomials are at
+  `Physlib/Optics/Systems/DCDR/Poles.lean:143-194`.
+- The retained five component labels and six proof-carrying connections are
+  at `Physlib/Optics/Systems/DCDR/Netlist.lean:87-175`.
+- The coherent cross-arm gauge is
+  `crossCoefficient = -I*crossAmplitude` at
+  `Physlib/Optics/Components/DirectionalCoupler.lean:63-79`.
+- S4's `RationalNetlist` carrier is declared at
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:151-170`.
+- S4's explicit common-factor `RationalReduction` certificate is at
+  `Physlib/Optics/Systems/DelayTransfer/Poles.lean:168-183`.
+- The finite reciprocal-`z` set and its cardinality bound are at
+  `Physlib/Optics/Systems/DelayTransfer/Stability.lean:225-243`.
+- The earlier DCDR reduction pattern is `ResponseReduction` at
+  `Physlib/Optics/Systems/DCDR/Poles.lean:643-705`.
+- The slice-5 real printed dictionary and coherent map are at
+  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:197-248`.
+- The unit-delay at-most-two result is at
+  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:133-162`.
+- S4P restricts its Schur/BIBO result to the named proper causal one-pole
+  class at
+  `Physlib/Optics/Systems/DelayTransfer/Stability.lean:424-457`.
 
-Commit `d222e86d` changes documentation only. It installs the four literal headings required by
-the new house rule, makes each TOC exactly match its section headings, expands formerly inline
-section headings into linter-visible module-doc blocks, and places non-claims first under
-`## iv. References`. No declaration or proof text changed.
+## Coherent multiple-delay family
 
-Touched files:
+`MultipleDelayParameters` stores two coherent couplers, complex
+`G1/G2/G3`, and natural `m1/m2/m3`. Its path laws are exactly
+`G_i*q^m_i`. `IsAdmissible` requires positive retained delays but places
+no passivity or reality restriction on the complex gains; the polynomial and
+fixed-carrier laws remain total outside that proof-gated response domain.
 
-- `DCDR/Bridge.lean`.
-- `DCDR/Graph.lean`.
-- `DCDR/Mason.lean`.
-- `DCDR/Netlist.lean`.
-- `DCDR/Observables.lean`.
-- `DCDR/ObservablesRegression.lean`.
-- `DCDR/PassiveCaseRegression.lean`.
-- `DCDR/Poles.lean`.
-- `DCDR/PolesRegression.lean`.
-- `DCDR/Response.lean`.
-- `DCDR/ResponseRegression.lean`.
-- `DCDR/SourceBridge.lean`.
-- `DCDR/SourceBridgeRegression.lean`.
-- `DCDR/Topology.lean`.
-- `DCDR/TopologyRegression.lean`.
+`multipleDelayRationalNetlist` reuses the existing five component labels and
+six wires. Pointwise compilation is proved equal to the fixed-carrier N7
+netlist, its internal operator has the hand-expanded scalar denominator, and
+the selected N5 elimination response equals
+`responseNumeratorPolynomial / denominatorPolynomial` on the common
+response domain.
 
-All 15 modules build together. An exact file-by-file check using the shipped linter's heading and
-TOC transformation reports all 15 clean, including the three not yet reachable from
-`Physlib.lean`.
+`UnitDelayParameters.toMultipleDelayParameters` stores
+`(m1,m2,m3)=(1,1,1)` literally. Separate lemmas prove equality of all three
+path polynomials, the coherent denominator, and the selected coherent
+numerator with the earlier unit-delay family.
 
-## Controller-brief coordinate correction
+## Polynomial, reduction, and pole layer
 
-The initial slice-6 routing brief assigned `sqrt (41/50)` to the formal-`q` roots of
-`D(q) = 1 - (41/50) q^2`. S7D stopped and reported that this coordinate was inverted. The
-controller confirmed this correction before implementation:
-
-| Coordinate | Exact set | Squared modulus | Meaning |
-|---|---|---:|---|
-| formal `q` | `{sqrt (50/41), -sqrt (50/41)}` | `50/41 > 1` | roots of `D(q)` |
-| reciprocal `z` | `{sqrt (41/50), -sqrt (41/50)}` | `41/50 < 1` | poles for `q=z^-1` |
-
-Every statement in this cutoff uses the corrected ZT-10/IP-76 legend explicitly. The source
-decimals are candidate reciprocal-`z` poles; their reciprocals are the corresponding candidate
-formal-`q` roots.
-
-## Exact printed and coherent quotients
-
-Primitive substitution into FMICS'15 Theorem 3 gives the two printed loop terms separately:
-
-- `k1*k2*G1*G3 = 81/100`;
-- `(1-k1)*(1-k2)*G2*G3 = 1/100`.
-
-Thus the printed denominator is exactly
-`1 - (81/100 + 1/100) q^2 = 1 - (41/50) q^2`. The numerator is
-`(41/50) q - (16/25) q^3`. An explicit Bezout identity proves that the quotient is coprime, so
-the exact denominator roots survive reduction.
-
-The formal-`q` and reciprocal-`z` root sets are enumerated by direct polynomial evaluation, not
-by the abstract S4P pole or Schur lemmas. Their squared-modulus anchors are likewise expanded
-from the exact roots. They conclude `passivePrintedReducedResponse.IsSchurStable`, whose meaning
-is the strict reciprocal-`z` unit-disk predicate at
-`Physlib/Optics/Systems/DelayTransfer/Stability.lean:282-285`.
-
-The coherent dictionary image is audited separately. Its loop coefficient is `-4/5`, so its
-denominator is `1 + (4/5) q^2`; its formal roots are
-`{sqrt (5/4)*I, -sqrt (5/4)*I}` and its reciprocal poles are
-`{sqrt (4/5)*I, -sqrt (4/5)*I}`. Those reciprocal poles also satisfy the strict Schur gate. The
-printed and coherent denominators are proved unequal. This is a divergence result, not an
-equivalence.
-
-## Exact decimal audit
-
-The displayed magnitude is stored as the rational `905539/1000000`. Multiplying
-`D(z^-1)` by `z^2` gives the finite reciprocal-`z` polynomial `z^2 - 41/50`. Direct integer
-arithmetic proves
+The coherent expansions give the source's degree shape without identifying
+its coefficients with the printed incoherent coefficients:
 
 ```text
-905539^2 = 820000880521 != 820000000000 = 820000 * 10^6.
+degree denominator <= max (m1 + m3) (m2 + m3)
+degree numerator   <= max (max m1 m2) (m1 + m2 + m3)
 ```
 
-Both signed `z` evaluations are exactly `880521/10^12`, not zero. Equivalently, evaluating the
-formal denominator at each reciprocal gives `880521/820000880521`, not zero. Therefore neither
-signed decimal belongs to the exact reciprocal-`z` pole set, and neither reciprocal belongs to
-the formal-`q` root set.
-
-The human-checkable rational squeeze is
+`MultipleDelayResponseReduction` reuses
+`DelayTransfer.RationalReduction` by name. Its proof chain is:
 
 ```text
-9055385/10000000 < sqrt (41/50) < 9055386/10000000.
+ncard actual reciprocal-z poles
+  <= degree reduced denominator
+  <= degree raw coherent denominator
+  <= max (m1 + m3) (m2 + m3).
 ```
 
-Each signed displayed decimal therefore has absolute error strictly between `4/10000000` and
-`5/10000000` from the corresponding exact reciprocal-`z` pole. No `Float`, decimal oracle,
-`native_decide`, or imported pole/stability theorem is used.
+“Actual” here always means the reduced reciprocal-`z` pole set under
+`q=z⁻¹`. The raw denominator is formal-`q` data, and cancellation may
+lower the reduced degree. The evaluation lemmas retain both the
+no-cancellation-factor gate and the reduced-denominator domain.
 
-## Printed-claim audit
+## Source dictionary and coherent/printed separation
 
-| Printed item | Lean-checked fact | Disposition |
+`DCDRSourceBridge.MultipleDelaySourceParameters` extends the slice-5 real
+source dictionary with `m1/m2/m3`. It maps the printed symbols to the
+coherent family as follows:
+
+| Printed symbol | Coherent Lean field |
+|---|---|
+| `k1` | first through `sqrt(1-k1)`, first cross `sqrt(k1)` |
+| `k2` | second through `sqrt(1-k2)`, second cross `sqrt(k2)` |
+| `G1,G2,G3` | complex casts of the three real source gains |
+| `m1,m2,m3` | the three natural delay exponents unchanged |
+
+The core `MultipleDelayParameters` permits complex gains; the source bridge
+deliberately remains the real subfamily inherited from the slice-5 dictionary.
+The printed Theorem-3 polynomials retain `1-k` and `k` intensities,
+whereas the coherent family uses square-root amplitudes and the pinned
+`-I` gauge. The dictionary proves symbol/coefficient and unit-delay
+specialization identities only. It proves no coherent–incoherent response,
+pole, or stability equality.
+
+## Exact Table-1 and tight-pole fixtures
+
+Each Table-1 row has a concrete source value and a hand-expanded printed
+numerator/denominator:
+
+| Row | Exact selected data | Direct polynomial anchor |
 |---|---|---|
-| Thm. 3 passive denominator | exact `z` poles have modulus squared `41/50` | stable by Def. 7 |
-| Thm. 4 hypotheses | expression `41/50`; sqrt norm `<= 1`; expression nonzero | both hold |
-| p. 175 pole list | both decimals are nonroots in `z`, and reciprocally in `q` | rounded data |
-| p. 175 prose | prints `unstable psp ...` | conflicts under the exact-pole reading |
+| active unit delay | `G=(2,1,1), k=(0,0), m=(1,1,1)` | `N=2q-2q³, D=1-q²` |
+| optical amplifier | `G=(2,3,4), k=(1,1), m=(1,1,1)` | `N=3q-24q³, D=1-8q²` |
+| passive | `G=(1,1,1), k=(0,0), m=(1,1,1)` | `N=q-q³, D=1-q²` |
+| multiple delay | `G=(1,1,1), k=(0,0), m=(2,1,3)` | `N=q²-q⁶, D=1-q⁴` |
 
-At this passive point `G1 = G2 = G3`, so Theorem 3's printed `G1*G3` term and Theorem 4's printed
-`G1*G2` term have the same exact value. The generic indexing mismatch recorded in slice 5 does
-not explain this particular case.
+The anchors unfold the dictionary and primitive polynomial operations. A
+wrong gain, coupling, or delay exponent changes an exponent or coefficient and
+breaks the corresponding regression.
 
-This is a candidate eighth source finding, restricted to the printed text. A possible alternative
-reading is that the HOL `psp` predicate consumes the displayed pole list as supplied data, so
-"unstable" may reject the rounded numbers as invalid poles rather than locate an actual pole
-outside the unit disk. The script delegated to reference [3] is unavailable (the recorded URL
-returns 404), so this cutoff does not choose between those readings or claim what the script
-implements. It makes no claim about Binh [5].
-
-## Human audit sheet
-
-Lean certifies the right two columns; a human must certify that each source row was transcribed
-and interpreted correctly. Human sign-off remains **OPEN** at this cutoff.
-
-The `SourceParameters` prefix below is
-`Optics.DCDRSourceBridge.passiveCaseSourceParameters`; all other short names are in
-`Optics.DCDR`.
-
-| Printed source | Lean term | Exact checked value |
-|---|---|---|
-| p. 175 `G1 = 1` (`:645-646`) | `SourceParameters.G1` | `1` |
-| p. 175 `G2 = 1` (`:645-646`) | `SourceParameters.G2` | `1` |
-| p. 175 `G3 = 1` (`:645-646`) | `SourceParameters.G3` | `1` |
-| p. 175 `k1 = 0.9` (`:646`) | `SourceParameters.k1` | `9/10` |
-| p. 175 `k2 = 0.9` (`:646`) | `SourceParameters.k2` | `9/10` |
-| p. 175 first pole (`:648`) | `passiveReportedPoleMagnitude` | `905539/1000000` |
-| p. 175 second pole (`:648`) | `-passiveReportedPoleMagnitude` | `-905539/1000000` |
-| Thm. 3 first loop term (`:572-576`) | `passiveCase_printedLoopTerms.1` | `81/100` |
-| Thm. 3 second loop term (`:572-576`) | `passiveCase_printedLoopTerms.2` | `1/100` |
-| Thm. 3 denominator (`:572-576`) | `passivePrintedDenominator` | `1-(41/50)q^2` |
-| corrected formal coordinate | `passivePrintedReducedResponse.poles` | `+/-sqrt(50/41)` |
-| reciprocal coordinate | `passivePrintedReducedResponse.zPoles` | `+/-sqrt(41/50)` |
-| Thm. 4 expression (`:610-618`) | `passiveCase_printedTheoremFourExpression` | `41/50` |
-| first coherent through field | first coupler `throughAmplitude` | `sqrt(1/10)` |
-| first coherent cross field | first coupler `crossAmplitude` | `sqrt(9/10)` |
-| second coherent through field | second coupler `throughAmplitude` | `sqrt(1/10)` |
-| second coherent cross field | second coupler `crossAmplitude` | `sqrt(9/10)` |
-| coherent N7 loop coefficient | `passiveCaseUnitDelayParameters.loopCoefficient` | `-4/5` |
-| coherent N7 denominator | `passiveCoherentDenominator` | `1+(4/5)q^2` |
-
-Human certification requested:
-
-- [ ] The five passive parameters match FMICS'15 p. 175.
-- [ ] The two displayed pole decimals and their signs match p. 175.
-- [ ] Theorem 3 was transcribed with the printed `G1*G3` and `G2*G3` indexing.
-- [ ] Theorem 4 was transcribed with its printed `G1*G2` first term and both hypotheses.
-- [ ] The `q=z^-1` coordinate correction and printed/coherent separation are accepted.
+The separate tight coherent fixture has `m=(2,1,3)`, raw response
+`-q/(1-q⁴)`, and an explicit Bézout identity proving no cancellation.
+Primitive fourth-degree factorization gives the reciprocal-`z` pole set
+`{1,-1,I,-I}`, hence exactly four poles. The raw denominator degree is
+also exactly four, so the generalized cardinality bound is attained and the
+slice-5 bound of two is visibly unit-delay-specific. The coupler
+`through=cross=1` is intentionally an algebraic tightness fixture, not a
+normalized physical-coupler claim.
 
 ## Proof independence and failure sensitivity
 
-- Parameter and coefficient anchors unfold the source dictionary and use exact rational
-  arithmetic.
-- Root sets are derived by factoring the hand-expanded quadratic evaluations.
-- Schur anchors consume those enumerated sets and squared norms, not S4P's general theorem.
-- Decimal nonroot anchors evaluate both coordinate polynomials directly.
-- The rational squeeze compares exact rational squares to `41/50`.
-- The coherent denominator is independently expanded and proved unequal to the printed one.
+- Table fixtures expand the source structures and polynomial primitives; they
+  do not invoke the production coefficient or degree lemmas.
+- The tight coherent denominator and numerator unfold the core construction
+  rather than the polynomial expansion lemmas.
+- Coprimality is an explicit Bézout identity.
+- The four reciprocal poles are enumerated by direct complex factorization and
+  evaluation, not by the generalized pole-cardinality lemma.
+- The final `ncard=4=natDegree` anchor combines the independently expanded
+  degree and pole set.
 
-Changing a sign, source index, `41/50`, displayed decimal, or the `q=z^-1` convention breaks one
-or more fixtures.
+Changing a Table exponent, a Theorem-3 source index, the coherent cross gauge,
+the reciprocal-coordinate convention, or the tight fixture's path data breaks
+one or more anchors.
 
-## Public declarations and validation map
+## Public declarations
 
-Production declarations in `Optics.DCDRSourceBridge`:
+All declarations are lemmas/definitions/structures/instances; this cutoff
+introduces no `theorem` declaration.
 
-- `passiveCaseSourceParameters` (`SourceBridge.lean:389`).
-- `passiveCaseUnitDelayParameters` (`SourceBridge.lean:400`).
+### `Optics.DCDR` in `MultipleDelay.lean`
+
+- Data and scalar layer:
+  `MultipleDelayParameters`,
+  `MultipleDelayParameters.IsAdmissible`,
+  `multipleDelayPathAt`,
+  `transmissionCoefficient_multipleDelayPathAt`,
+  `MultipleDelayParameters.at`,
+  `MultipleDelayParameters.upperCoefficient_at`,
+  `MultipleDelayParameters.lowerCoefficient_at`,
+  `MultipleDelayParameters.feedbackCoefficient_at`.
+- Polynomial data:
+  `MultipleDelayParameters.upperPolynomial`,
+  `MultipleDelayParameters.lowerPolynomial`,
+  `MultipleDelayParameters.feedbackPolynomial`,
+  `MultipleDelayParameters.loopPolynomial`,
+  `MultipleDelayParameters.denominatorPolynomial`,
+  `MultipleDelayParameters.feedbackDrivePolynomial`,
+  `MultipleDelayParameters.directPolynomial`,
+  `MultipleDelayParameters.feedbackReadoutPolynomial`,
+  `MultipleDelayParameters.responseNumeratorPolynomial`,
+  `MultipleDelayParameters.eval_upperPolynomial`,
+  `MultipleDelayParameters.eval_lowerPolynomial`,
+  `MultipleDelayParameters.eval_feedbackPolynomial`,
+  `MultipleDelayParameters.eval_loopPolynomial`,
+  `MultipleDelayParameters.eval_denominatorPolynomial`,
+  `MultipleDelayParameters.eval_feedbackDrivePolynomial`,
+  `MultipleDelayParameters.eval_directPolynomial`,
+  `MultipleDelayParameters.eval_feedbackReadoutPolynomial`,
+  `MultipleDelayParameters.eval_responseNumeratorPolynomial`,
+  `MultipleDelayParameters.denominatorPolynomial_eval_zero`,
+  `MultipleDelayParameters.denominatorPolynomial_ne_zero`,
+  `MultipleDelayParameters.responseModel`,
+  `MultipleDelayParameters.responseModel_eval`.
+- Unit-delay specialization:
+  `UnitDelayParameters.toMultipleDelayParameters`,
+  `UnitDelayParameters.toMultipleDelayParameters_data`,
+  `UnitDelayParameters.toMultipleDelayParameters_isAdmissible`,
+  `UnitDelayParameters.toMultipleDelayParameters_upperPolynomial`,
+  `UnitDelayParameters.toMultipleDelayParameters_lowerPolynomial`,
+  `UnitDelayParameters.toMultipleDelayParameters_feedbackPolynomial`,
+  `UnitDelayParameters.toMultipleDelayParameters_denominatorPolynomial`,
+  `UnitDelayParameters.toMultipleDelayParameters_responseNumeratorPolynomial`.
+- Rational N7/N5 layer:
+  `multipleDelayRationalPathEntryModel`,
+  `multipleDelayRationalPathEntryModel_eval`,
+  `multipleDelayEvaluatedPathScattering`,
+  `multipleDelayEvaluatedPathScattering_eq`,
+  `multipleDelayRationalComponents`,
+  `multipleDelayRationalNetlist`,
+  `multipleDelayRationalChannelFintype`,
+  `multipleDelayRationalConnectedChannelFintype`,
+  `multipleDelayRationalCompileChannelFintype`,
+  `multipleDelayRationalCompileConnectedChannelFintype`,
+  `multipleDelayRationalCompileChannelDecidableEq`,
+  `multipleDelayRationalCompileConnectedChannelDecidableEq`,
+  `multipleDelayRationalComponents_scattering_eq`,
+  `multipleDelayRationalNetlist_compile_eq`,
+  `multipleDelayRationalNetlist_scatteringTransform_eq`,
+  `multipleDelayRationalNetlist_feedbackOperator_eq`,
+  `multipleDelayRationalNetlist_isWellPosed_iff`,
+  `multipleDelayRationalComponents_isValidAt`,
+  `multipleDelayRationalNetlist_mem_responseDomain`,
+  `multipleDelayRationalInputChannel`,
+  `multipleDelayRationalOutputChannel`,
+  `multipleDelayRationalNetlist_feedbackInverse_eq`,
+  `multipleDelayRationalNetlist_responseTransform_eq`,
+  `multipleDelayRationalEliminationResponse`,
+  `multipleDelayRationalEliminationResponse_eq_responseModel`.
+
+### `Optics.DCDR` in `MultipleDelayPolynomial.lean`
+
+- `MultipleDelayParameters.lowerLoopCoefficient`,
+  `MultipleDelayParameters.upperLoopCoefficient`,
+  `MultipleDelayParameters.loopPolynomial_expansion`,
+  `MultipleDelayParameters.directUpperCoefficient`,
+  `MultipleDelayParameters.directLowerCoefficient`,
+  `MultipleDelayParameters.cubicCouplerCoefficient`,
+  `MultipleDelayParameters.responseNumeratorPolynomial_expansion`,
+  `MultipleDelayParameters.upperPolynomial_natDegree_le`,
+  `MultipleDelayParameters.lowerPolynomial_natDegree_le`,
+  `MultipleDelayParameters.feedbackPolynomial_natDegree_le`,
+  `MultipleDelayParameters.denominatorPolynomial_natDegree_le`,
+  `MultipleDelayParameters.responseNumeratorPolynomial_natDegree_le`.
+- `MultipleDelayResponseReduction`,
+  `MultipleDelayResponseReduction.actualPoles`,
+  `MultipleDelayResponseReduction.finite_actualPoles`,
+  `MultipleDelayResponseReduction.ncard_actualPoles_le_reducedDenominatorDegree`,
+  `MultipleDelayResponseReduction.reducedDenominator_natDegree_le_rawDenominatorDegree`,
+  `MultipleDelayResponseReduction.ncard_actualPoles_le_rawDenominatorDegree`,
+  `MultipleDelayResponseReduction.ncard_actualPoles_le_delayShape`,
+  `MultipleDelayResponseReduction.reduced_eval_eq_responseModel`,
+  `MultipleDelayResponseReduction.reduced_eval_eq_rationalEliminationResponse`.
+
+### `Optics.DCDRSourceBridge` in `MultipleDelaySource.lean`
+
+- `MultipleDelaySourceParameters`,
+  `MultipleDelaySourceParameters.toSourceParameters`,
+  `SourceParameters.toMultipleDelaySourceParameters`,
+  `MultipleDelaySourceParameters.toMultipleDelayParameters`,
+  `MultipleDelaySourceParameters.toMultipleDelayParameters_data`,
+  `SourceParameters.toMultipleDelaySourceParameters_coherent`.
+- `MultipleDelaySourceParameters.printedUpperCoefficient`,
+  `MultipleDelaySourceParameters.printedLowerCoefficient`,
+  `MultipleDelaySourceParameters.printedCubicCoefficient`,
+  `MultipleDelaySourceParameters.printedUpperLoopCoefficient`,
+  `MultipleDelaySourceParameters.printedLowerLoopCoefficient`,
+  `MultipleDelaySourceParameters.printedNumeratorPolynomial`,
+  `MultipleDelaySourceParameters.printedDenominatorPolynomial`,
+  `MultipleDelaySourceParameters.printedNumeratorPolynomial_natDegree_le`,
+  `MultipleDelaySourceParameters.printedDenominatorPolynomial_natDegree_le`,
+  `MultipleDelaySourceParameters.finite_zPoles_and_ncard_le_delayShape`,
+  `SourceParameters.toMultipleDelaySourceParameters_printedNumeratorPolynomial`,
+  `SourceParameters.toMultipleDelaySourceParameters_printedDenominatorPolynomial`.
+
+### Regression declarations
+
+In `Optics.DCDRSourceBridge`:
+
+- `tableActiveUnitDelayParameters`,
+  `tableActiveUnitDelayParameters_data`,
+  `tableActiveUnitDelay_printedPolynomials`,
+  `tableOpticalAmplifierParameters`,
+  `tableOpticalAmplifierParameters_data`,
+  `tableOpticalAmplifier_printedPolynomials`,
+  `tablePassiveParameters`,
+  `tablePassiveParameters_data`,
+  `tablePassive_printedPolynomials`,
+  `tableMultipleDelayParameters`,
+  `tableMultipleDelayParameters_data`,
+  `tableMultipleDelay_printedPolynomials`.
+
+In `Optics.DCDR`:
+
+- `tightMultipleDelayCoupler`,
+  `tightMultipleDelayParameters`,
+  `tightMultipleDelayParameters_data`,
+  `tightMultipleDelay_denominatorPolynomial_expansion`,
+  `tightMultipleDelay_responseNumeratorPolynomial_expansion`,
+  `tightMultipleDelay_denominatorPolynomial_natDegree_eq_four`,
+  `tightMultipleDelayNumerator_ne_zero`,
+  `tightMultipleDelayDenominator_ne_zero`,
+  `tightMultipleDelayNumerator_isCoprime`,
+  `tightMultipleDelayReducedResponse`,
+  `tightMultipleDelayRationalReduction`,
+  `tightMultipleDelayResponseReduction`,
+  `tightMultipleDelay_zPoles_eq_four`,
+  `tightMultipleDelay_ncard_actualPoles_eq_four`,
+  `tightMultipleDelay_ncard_actualPoles_eq_natDegree`.
+
+## Validation map
 
 Validation should bind at least:
 
-- `Optics.DCDR.passiveCaseSourceParameters_data` (`PassiveCaseRegression.lean:108`).
-- `Optics.DCDR.passiveCase_printedLoopTerms` (`:142`).
-- `Optics.DCDR.passiveCase_printedDenominatorPolynomial_expansion` (`:169`).
-- `Optics.DCDR.passivePrintedReducedResponse_poles` (`:398`).
-- `Optics.DCDR.passivePrintedReducedResponse_zPoles` (`:444`).
-- `Optics.DCDR.passivePrintedFormalRoot_norm_sq` (`:505`).
-- `Optics.DCDR.passivePrintedReciprocalPole_norm_sq` (`:519`).
-- `Optics.DCDR.passivePrintedReducedResponse_isSchurStable` (`:534`).
-- `Optics.DCDR.passiveCase_coherentDenominatorPolynomial_expansion` (`:196`).
-- `Optics.DCDR.passiveCase_denominatorPolynomials_ne` (`:263`).
-- `Optics.DCDR.passiveCoherentReducedResponse_poles` (`:558`).
-- `Optics.DCDR.passiveCoherentReducedResponse_zPoles` (`:606`).
-- `Optics.DCDR.passiveCoherentReducedResponse_isSchurStable` (`:704`).
-- `Optics.DCDR.passiveReportedPole_integer_square_ne` (`:725`).
-- `Optics.DCDR.passiveReportedPoles_zForm_evaluation` (`:730`).
-- `Optics.DCDR.passiveReportedPoles_qForm_evaluation` (`:747`).
-- `Optics.DCDR.passiveReportedPoles_not_mem_zPoles` (`:764`).
-- `Optics.DCDR.passiveReportedReciprocals_not_mem_poles` (`:774`).
-- `Optics.DCDR.passiveReportedPole_rational_squeeze` (`:781`).
-- `Optics.DCDR.passiveReportedPole_absoluteError` (`:800`).
-- `Optics.DCDR.passivePrintedTheoremFourConditions` (`:841`).
+- `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_data`
+  (`MultipleDelay.lean:341`).
+- `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_denominatorPolynomial`
+  (`MultipleDelay.lean:382`).
+- `Optics.DCDR.UnitDelayParameters.toMultipleDelayParameters_responseNumeratorPolynomial`
+  (`MultipleDelay.lean:399`).
+- `Optics.DCDR.multipleDelayRationalNetlist_compile_eq`
+  (`MultipleDelay.lean:572`).
+- `Optics.DCDR.multipleDelayRationalEliminationResponse_eq_responseModel`
+  (`MultipleDelay.lean:720`).
+- `Optics.DCDR.MultipleDelayParameters.denominatorPolynomial_natDegree_le`
+  (`MultipleDelayPolynomial.lean:142`).
+- `Optics.DCDR.MultipleDelayParameters.responseNumeratorPolynomial_natDegree_le`
+  (`MultipleDelayPolynomial.lean:181`).
+- `Optics.DCDR.MultipleDelayResponseReduction.ncard_actualPoles_le_delayShape`
+  (`MultipleDelayPolynomial.lean:278`).
+- `Optics.DCDRSourceBridge.MultipleDelaySourceParameters.toMultipleDelayParameters_data`
+  (`MultipleDelaySource.lean:148`).
+- `Optics.DCDRSourceBridge.SourceParameters.toMultipleDelaySourceParameters_coherent`
+  (`MultipleDelaySource.lean:165`).
+- `Optics.DCDRSourceBridge.MultipleDelaySourceParameters.printedDenominatorPolynomial_natDegree_le`
+  (`MultipleDelaySource.lean:230`).
+- All four `table*_*printedPolynomials` anchors
+  (`MultipleDelayRegression.lean:107,143,176,211`).
+- `Optics.DCDR.tightMultipleDelay_denominatorPolynomial_natDegree_eq_four`
+  (`MultipleDelayRegression.lean:289`).
+- `Optics.DCDR.tightMultipleDelay_zPoles_eq_four`
+  (`MultipleDelayRegression.lean:351`).
+- `Optics.DCDR.tightMultipleDelay_ncard_actualPoles_eq_natDegree`
+  (`MultipleDelayRegression.lean:427`).
 
 ## Non-claims
 
-This cutoff makes no physical-resonance claim, no coherent-incoherent equivalence claim, no BIBO
-claim beyond S4P's existing gate, no normalized-modal or electromagnetic-power claim, no
-causality or time-domain claim, no physical-frequency claim, no claim about the unavailable HOL
-script's semantics, and no claim about Binh [5]. The Schur result is only the exact algebraic
-reciprocal-`z` pole-location predicate.
+This cutoff makes no physical-resonance claim, no coherent–incoherent
+equivalence claim, no BIBO claim beyond S4P's existing stated-class gate, no
+normalized-modal or electromagnetic-power claim, no causality or time-domain
+claim, no physical-frequency claim, and no claim about the unavailable HOL
+script. The degree-four tight fixture is algebraic and is not asserted to be a
+normalized passive physical coupler.
 
 ## Gate record
 
-At committed source head `d222e86d`:
+At committed source head `cef34751`:
 
-- `lake exe cache get`: green.
-- Full `lake --wfail build` of `Physlib` plus all 15 DCDR targets: green, 4942 jobs.
+- `lake-lock exe cache get`: green; no files to download.
+- Temporary-registration `lake --wfail build Physlib`: green, 4975 jobs,
+  including all four new modules.
 - `lake exe sorry_lint`: green.
-- `lake exe runPhyslibLinters`: green for Physlib and QuantumInfo.
-- `lake exe api_map_index`: green.
-- `lake exe lint_all`: green.
-- `./scripts/lint-style.sh`: green on committed state.
-- `lake exe module_doc_lint`: every DCDR module green; the repository command remains nonzero
-  only on out-of-lane modules at the pinned `6df351b4` sync. The controller's later
-  `5fc99609` battery contains the conductor's outside-lane sweep and did not require a mid-slice
-  re-sync.
-- The exact heading/TOC check passes all 15 DCDR files, including unregistered modules.
-
-`lake exe check_file_imports` reports the expected pending registrations. The DCDR entries are
-`PassiveCaseRegression`, `SourceBridge`, and `SourceBridgeRegression`; the latter two are the
-already dispatched slice-5 registration. The same report contains unrelated Electromagnetism,
-Microring, and SpaceAndTime modules. This cutoff obeys the explicit instruction not to touch
-`Physlib.lean`, which is byte-identical to the sync target.
+- `lake exe runPhyslibLinters Physlib`: green.
+- `lake exe runPhyslibLinters QuantumInfo`: green.
+- `lake exe api_map_index`: completed successfully.
+- `lake exe lint_all`: the lane declarations, sorry check, build, and illegal
+  imports are green. It prints the pinned repository's pre-existing aggregate
+  style/transitive-import backlog. Its import check, with this slice
+  temporarily registered, names only the unrelated pending
+  `FluxDirection`, `FluxDirectionRegression`, and prior-slice
+  `PassiveCaseRegression` registrations.
+- `./scripts/lint-style.sh`: green on committed state. Maximum new-file line
+  length is 98 codepoints; all four files are below 1500 lines.
+- `lake exe module_doc_lint`: the repository command remains nonzero on its
+  broad pre-existing documentation backlog. With all four new modules
+  temporarily registered, none is reported. Direct application of the shipped
+  linter's literal-heading and exact-TOC algorithm confirms all four new
+  modules clean.
+- Static house audit: zero `sorry`, `axiom`, `native_decide`,
+  `maxHeartbeats`, or `theorem`; production imports no regression module;
+  `Physlib.lean` is byte-identical to the exact sync target.
