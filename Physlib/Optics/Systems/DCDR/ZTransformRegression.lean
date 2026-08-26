@@ -295,7 +295,7 @@ lemma zRegression_stable_I_crossSemanticsDomain :
   isAdmissible := stableUnitDelayParameters_isAdmissible
   recurrenceIsContractive := by
     rw [UnitDelayParameters.IsZContractive, zRegression_stable_zFeedbackLags]
-    simp [zRegression_stable_zFeedbackCoefficient_two, norm_pow]
+    norm_num [zRegression_stable_zFeedbackCoefficient_two, norm_pow]
   reducedIsSchurStable := by
     simpa [stableResponseReduction, stableRationalReduction] using
       stableReducedResponse_isSchurStable
@@ -309,9 +309,8 @@ lemma zRegression_stable_I_crossSemanticsDomain :
       DelayTransfer.RationalReduction.NoPoleCancellation]
   mem_reducedEvaluationDomain := by
     rw [Complex.inv_I]
-    simp [stableResponseReduction, stableRationalReduction, stableReducedResponse,
-      DelayTransfer.ReducedRationalResponse.evaluationDomain, stableDenominator,
-      Complex.I_mul_I]
+    change stableDenominator.eval (-Complex.I) ≠ 0
+    norm_num [stableDenominator, Complex.I_mul_I]
 
 /-- The fixed `q = 1` presentation has the scalar N5 solve gate supplied by the common domain. -/
 lemma zRegression_fixed_hasNonzeroDenominator :
@@ -587,9 +586,9 @@ lemma zRegression_stable_I_commonDomain_independent_anchor :
           -(7 / 8) * Complex.I ∧
       rationalZEliminationResponse stableUnitDelayParameters Complex.I
           h.mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
-      eliminationResponse (stableUnitDelayParameters.at (-Complex.I))
+      eliminationResponse (stableUnitDelayParameters.at Complex.I⁻¹)
           (isWellPosed_of_hasNonzeroDenominator
-            (stableUnitDelayParameters.at (-Complex.I)) h.hasNonzeroDenominator) =
+            (stableUnitDelayParameters.at Complex.I⁻¹) h.hasNonzeroDenominator) =
         -(7 / 8) * Complex.I ∧
       auditedMasonResponse (stableUnitDelayParameters.at (-Complex.I)) =
         -(7 / 8) * Complex.I := by
