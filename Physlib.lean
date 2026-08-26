@@ -288,7 +288,10 @@ public import Physlib.Optics.HarmonicFlux.Pairing
 public import Physlib.Optics.HarmonicFlux.PairingAlgebra
 public import Physlib.Optics.HarmonicFlux.PairingRegression
 public import Physlib.Optics.HarmonicFlux.Polarizer
+public import Physlib.Optics.HarmonicFlux.PolarizerModeCarrierRegression
+public import Physlib.Optics.HarmonicFlux.PolarizerModeNormalizationRegression
 public import Physlib.Optics.HarmonicFlux.PolarizerModePower
+public import Physlib.Optics.HarmonicFlux.PolarizerModePowerRegression
 public import Physlib.Optics.HarmonicFlux.PositiveNormalDecay
 public import Physlib.Optics.HarmonicFlux.PositiveNormalDecayRegression
 public import Physlib.Optics.HarmonicFlux.PropagatingMode

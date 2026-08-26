@@ -1194,15 +1194,15 @@ files; the separate P5b follow-up supplies the first two for its propagating pla
 
 Candidate location: the Optics normalization bridge beside E3b, not the Jones core file.
 
-Status: in progress on the fork. The propagating material-wave irradiance and actual mean-flux
-slice is complete, and E3b now supplies the conditional flux-normalized propagating-mode family;
-the polarizer-specific transport to normalized modal power remains to be proved.
+Status: complete on the fork. The propagating material-wave irradiance and actual mean-flux slice,
+the explicit singleton Jones-to-Maxwell-mode carrier bridge, and the conditional E3b transport to
+normalized modal power are connected through the same analyzer output.
 
 Deliverables:
 
 - [x] translate P5a's squared-Jones-intensity theorem to irradiance for the plane-wave family covered
   by E3b; and
-- [ ] translate it through E3b to `ModeAmplitude.power` only for the proved flux-normalized mode
+- [x] translate it through E3b to `ModeAmplitude.power` only for the proved flux-normalized mode
   family.
 
 The completed first slice proves single- and sequential-polarizer irradiance laws, arbitrary-input
@@ -1213,8 +1213,12 @@ model: the discarded component's fate and the component's internal, reflected, a
 thermal fields are not modeled. Local infinite-plane-wave irradiance is not aperture or modal
 power, and contraction alone is not called electromagnetic passivity.
 
-Exit pending: make physical Malus power a corollary of P5a plus the completed E3b normalization
-bridge rather than a second intensity definition.
+Exit achieved: `linearPolarizer_scaledWave_eq` proves that the analyzer's modal output is exactly
+the material wave constructed from P5a's Jones output. Its modal-coordinate power obeys Malus'
+law, and separate incident/outgoing `IsApertureFluxOrthonormal` proofs transport that identity to
+actual integrated one-period normal Poynting flux. The exact regression uses wave impedance
+`1 / 2`, opposite input/output normals, complex coordinate `1 + I`, and a `pi / 4` analyzer to pin
+input power two, output power one, both flux signs, and the coherent output carrier.
 
 #### P6a. Retarder and wave-plate core
 
@@ -1286,7 +1290,7 @@ quadrature output remains algebraically named, without electromagnetic-power or 
 
 ##### P6b-3. Physical polarization observables
 
-Status: blocked on P5b and E3b.
+Status: unblocked by the completed P5b/E3b bridge; implementation remains.
 
 Deliverables:
 
@@ -2712,11 +2716,11 @@ current integration base; a designed package whose prerequisite is merely active
 | P3c Poincare classification | done | P3b-1, P3b-2 | closed-ball, boundary/interior, exact phase-fiber, rank-one factorization, orbit-quotient, and canonical-axis suites |
 | P4 deterministic Mueller | done | P1a, P2a, P3a, P3b-1 | transported real action, Pauli trace/reality, cone, algebra, unitary, and regression suites |
 | P5a Jones polarizer/Malus | done | P1a, P2b, P3b-2, P4 | projection, contraction, coherent/intensity Malus, coherency, arbitrary-Stokes Mueller, and convention-regression suites |
-| P5b physical Malus bridge | in progress | P5a, E3b | propagating material-wave irradiance and actual mean-flux Malus laws complete; transport through the completed normalized-mode bridge remains |
+| P5b physical Malus bridge | done | P5a, E3b | exact Jones/modal carrier agreement, cosine-squared coordinate power, and conditional incident/outgoing normalized actual-flux transport |
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
-| P6b-3 physical observables | blocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement |
+| P6b-3 physical observables | unblocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement remain to implement |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, interface-oriented side-decaying carrier geometry, its complex-bilinear s/p frame, transverse positive-medium Maxwell qualification, and named nonzero half-space evanescence are complete; separate outgoing semantics remain |
@@ -2917,8 +2921,8 @@ human verification recorded in `tbd.md`.
    ordered polarizer--retarder system: the reference axis has eigenvalue one, the orthogonal axis
    has relative phase `exp (-I * retardance)`, `M.comp N` applies `N` first, and neither Jones
    unitarity nor fixed Stokes intensity implies electromagnetic power. Keep P6b-3's
-   field/irradiance continuation can now use P5b's propagating material-wave Malus theorem, while
-   its normalized-power portion remains blocked on E3b's mode-normalization bridge.
+   field/irradiance continuation can now use P5b's propagating material-wave Malus theorem, and
+   its normalized-power portion is unblocked by P5b's explicit E3b transport.
 5. Preserve E0's exposure-only public Maxwell repair, the completed E1 material layer, E2a's
    off-shell harmonic carrier: positive frequency and wave number remain independent, the built-in
    `B = (κ / ω) n × E` candidate is not described as Maxwell-derived, and transversality and
@@ -2971,9 +2975,9 @@ human verification recorded in `tbd.md`.
    the completed named evanescent semantics and develop outgoing semantics separately before any
    modal normalization; do not make evanescent-port power claims early.
 6. Keep polarizers and retarders as separate component PR concepts and do not translate Jones
-   intensity into physical power before E3b. P5b's propagating material-wave irradiance and actual
-   mean-flux Malus laws are now complete, while its normalized-power endpoint remains blocked on
-   E3b's flux-normalized mode family.
+   intensity into physical power without E3b's explicit hypotheses. P5b now connects the Jones
+   analyzer output to the same Maxwell carrier, then obtains normalized modal and actual-flux
+   Malus laws only under separately proved incident/outgoing flux normalization.
 7. Keep the new source-to-Lean parity ledger as a human-owned gate while developing its independent
    infrastructure: N2a typed routing, N3 behavior semantics, N3T chain views, and N4C certified
    compilation. Do not claim HOL parity from a formula or case-study topic alone.

@@ -1488,17 +1488,23 @@ PR unless maintainers explicitly ask to retain it.
   coverage; the theorem makes no claim for embeddings that are merely disjoint.
 - [ ] Add the electromagnetic normalization theorem before equating modal unitary or passive
   predicates with physical losslessness or passivity.
-- [ ] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
+- [x] Keep P5a's contraction and Malus results explicitly about squared raw Jones intensity and
   raw Stokes coordinates. The separate P5b/E3b follow-up now supplies propagating plane-wave
   irradiance, actual mean-flux corollaries, and a conditional geometric-aperture modal-power
-  normalization for declared propagating Maxwell families. P5b must still transport the analyzer
-  law through that bridge; no raw-Jones coercion, modal completeness, or complete-device
+  normalization for declared propagating Maxwell families. The completed analyzer bridge proves
+  exact Jones/modal carrier agreement and transports Malus power only through explicit incident
+  and outgoing normalization proofs; no raw-Jones coercion, modal completeness, or complete-device
   electromagnetic-passivity conclusion follows automatically.
 - [ ] Human-check P5b-1's ideal-analyzer boundary: its actual-field Malus theorem constructs input
   and output plane waves in the same medium, propagation frame, frequency, and phase convention.
   It models no reflection, refraction, internal component field, absorption, heating, or fate of
   the discarded orthogonal polarization, so irradiance contraction must not be presented as a
   complete component energy balance.
+- [ ] Human-check P5b-2's normalized-mode bridge before upstreaming. Verify that modal and Jones
+  scaling give the same complete complex carrier, that the input and output normalization proofs
+  are separate and use opposite outward-normal signs, and that the exact `ε = 4`, `μ = 1`,
+  `1 + I`, `pi / 4` fixture really gives input power two and output power one. Confirm that no
+  coercion, modal completeness, rejected-polarization balance, or device-passivity claim is made.
 - [ ] Supply an induced operator-norm bridge before expressing passivity as a matrix norm bound;
   the ambient norm inherited by the raw matrix alias is not that operator norm.
 - [x] Represent component behavior independently of invertibility, with graph behaviors only as a
