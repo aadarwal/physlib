@@ -317,6 +317,20 @@ abbrev reuseRegressionLeftFamily :
       (reuseRegressionFirstFamily.prependExternalPortModeFamilyEquiv
         reuseRegressionSecondFamily))
 
+/-- Raw assembly uses the same ambient equality test as relational closure. -/
+local instance reuseRegressionClosureChannelDecidableEq : DecidableEq ReuseRegressionChannel :=
+  PortConnectionFamily.closureChannelDecidableEq
+
+/-- Right-associated raw assembly uses the closure equality test on connected channels. -/
+local instance reuseRegressionRightClosureConnectedDecidableEq :
+    DecidableEq reuseRegressionRightFamily.Channel :=
+  reuseRegressionRightFamily.closureConnectedChannelDecidableEq
+
+/-- Left-associated raw assembly uses the closure equality test on connected channels. -/
+local instance reuseRegressionLeftClosureConnectedDecidableEq :
+    DecidableEq reuseRegressionLeftFamily.Channel :=
+  reuseRegressionLeftFamily.closureConnectedChannelDecidableEq
+
 /-!
 
 ## D. The hand-expanded state
@@ -384,9 +398,10 @@ lemma reuseRegression_mem_componentBehavior :
   rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
   cases component <;> cases port <;> cases mode <;>
     simp [ModeAmplitude.reindex_apply, Matrix.mulVec, dotProduct, Fintype.sum_sigma,
-      Fintype.sum_prod_type, Fintype.sum_bool, Fintype.sum_unique,
+      Fintype.sum_prod_type,
       reuseRegression_sum_component, reuseRegressionScattering,
-      reuseRegressionIncident, reuseRegressionOutgoing]
+      reuseRegressionIncident, reuseRegressionOutgoing] <;>
+    norm_num
 
 /-- The three forward cross-component amplitudes are all nonzero and pairwise distinguish the
 three cascade stages. -/
@@ -770,12 +785,17 @@ abbrev reuseRegressionHostileFamily :
   (reuseRegressionFirstFamily.append reuseRegressionSecondFamily).append
     (reuseRegressionThirdFamily.transport reuseRegressionHostileBoundaryEquiv)
 
+/-- Hostile raw assembly uses the closure equality test on its connected channels. -/
+local instance reuseRegressionHostileClosureConnectedDecidableEq :
+    DecidableEq reuseRegressionHostileFamily.Channel :=
+  reuseRegressionHostileFamily.closureConnectedChannelDecidableEq
+
 /-- The hostile transport sends the third connection's left endpoint to the drive port. -/
 lemma reuseRegression_hostile_embed_thirdLeft :
     reuseRegressionHostileFamily.channelEmbedding
         ⟨Sum.inr (), Sum.inl ()⟩ =
       (⟨(.first, false), ()⟩ : ReuseRegressionChannel) := by
-  change ⟨reuseRegressionLeftFirstWestBoundary.1, ()⟩ = _
+  change (⟨reuseRegressionLeftFirstWestBoundary.1, ()⟩ : ReuseRegressionChannel) = _
   rfl
 
 /-- The hostile transport leaves the third connection's fourth-west endpoint fixed. -/
@@ -784,8 +804,9 @@ lemma reuseRegression_hostile_embed_thirdRight :
         ⟨Sum.inr (), Sum.inr ()⟩ =
       (⟨(.fourth, false), ()⟩ : ReuseRegressionChannel) := by
   change
-    ⟨(Equiv.swap reuseRegressionLeftThirdEastBoundary
-        reuseRegressionLeftFirstWestBoundary reuseRegressionLeftFourthWestBoundary).1, ()⟩ = _
+    (⟨(Equiv.swap reuseRegressionLeftThirdEastBoundary
+          reuseRegressionLeftFirstWestBoundary reuseRegressionLeftFourthWestBoundary).1,
+        ()⟩ : ReuseRegressionChannel) = _
   rw [Equiv.swap_apply_of_ne_of_ne
     reuseRegression_leftFourthWest_ne_leftThirdEast
     reuseRegression_leftFourthWest_ne_leftFirstWest]
