@@ -136,6 +136,139 @@ def dynInput : ModeAmplitude (Incident dynConnections.ExternalChannel) :=
 def dynOutput : ModeAmplitude (Outgoing dynConnections.ExternalChannel) :=
   dynOutgoing.restrictEmbedding dynConnections.externalOutgoingEmbedding
 
+def dynInputPort :
+    (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Port :=
+  ⟨rectangularRingComponent 0 0, LatticeSitePort.west⟩
+
+def dynOutputPort :
+    (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Port :=
+  ⟨rectangularRingComponent 1 1, LatticeSitePort.east⟩
+
+def dynSiteIndex :
+    (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Port →
+      Option (Fin 2 × Fin 2)
+  | ⟨Sum.inl site, _⟩ => some site
+  | ⟨Sum.inr _, _⟩ => none
+
+def dynSitePortLabel :
+    (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Port →
+      Option LatticeSitePort
+  | ⟨Sum.inl _, port⟩ => some port
+  | ⟨Sum.inr _, _⟩ => none
+
+lemma dynInputPort_not_horizontal :
+    dynInputPort ∉
+      Set.range (rectangularHorizontalConnections dynParameters).endpointEmbedding := by
+  rintro ⟨⟨⟨⟨row, column⟩, half⟩, endpoint⟩, hPort⟩
+  change (rectangularHorizontalConnection dynParameters
+    ((row, column), half)).endpointPort endpoint = dynInputPort at hPort
+  cases half <;> cases endpoint <;>
+    simp only [rectangularHorizontalConnection, PortConnection.endpointPort] at hPort
+  · have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynInputPort] at hLabel
+  · have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynInputPort, rectangularHorizontalCouplerComponent] at hLabel
+  · have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynInputPort, rectangularHorizontalCouplerComponent] at hLabel
+  · have hSite := congrArg dynSiteIndex hPort
+    have hColumn : column.succ = (0 : Fin 2) := by
+      exact congrArg Prod.snd (Option.some.inj hSite)
+    have hValue := congrArg Fin.val hColumn
+    change column.1.val + 1 = 0 at hValue
+    omega
+
+lemma dynOutputPort_not_horizontal :
+    dynOutputPort ∉
+      Set.range (rectangularHorizontalConnections dynParameters).endpointEmbedding := by
+  rintro ⟨⟨⟨⟨row, column⟩, half⟩, endpoint⟩, hPort⟩
+  change (rectangularHorizontalConnection dynParameters
+    ((row, column), half)).endpointPort endpoint = dynOutputPort at hPort
+  cases half <;> cases endpoint <;>
+    simp only [rectangularHorizontalConnection, PortConnection.endpointPort] at hPort
+  · have hSite := congrArg dynSiteIndex hPort
+    have hColumn : (column.1 : Fin 2) = 1 := by
+      exact congrArg Prod.snd (Option.some.inj hSite)
+    have hValue := congrArg Fin.val hColumn
+    omega
+  · have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynOutputPort, rectangularHorizontalCouplerComponent] at hLabel
+  · have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynOutputPort, rectangularHorizontalCouplerComponent] at hLabel
+  · have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynOutputPort] at hLabel
+
+lemma dynInputPort_not_vertical :
+    dynInputPort ∉
+      Set.range (rectangularVerticalConnections dynParameters).endpointEmbedding := by
+  rintro ⟨⟨⟨⟨row, column⟩, half⟩, endpoint⟩, hPort⟩
+  change (rectangularVerticalConnection dynParameters
+    ((row, column), half)).endpointPort endpoint = dynInputPort at hPort
+  cases half <;> cases endpoint <;>
+    simp only [rectangularVerticalConnection, PortConnection.endpointPort] at hPort
+  all_goals
+    have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynInputPort, rectangularVerticalCouplerComponent] at hLabel
+
+lemma dynOutputPort_not_vertical :
+    dynOutputPort ∉
+      Set.range (rectangularVerticalConnections dynParameters).endpointEmbedding := by
+  rintro ⟨⟨⟨⟨row, column⟩, half⟩, endpoint⟩, hPort⟩
+  change (rectangularVerticalConnection dynParameters
+    ((row, column), half)).endpointPort endpoint = dynOutputPort at hPort
+  cases half <;> cases endpoint <;>
+    simp only [rectangularVerticalConnection, PortConnection.endpointPort] at hPort
+  all_goals
+    have hLabel := congrArg dynSitePortLabel hPort
+    simp [dynSitePortLabel, dynOutputPort, rectangularVerticalCouplerComponent] at hLabel
+
+lemma dynPort_not_flat
+    (port : (rectangularLatticeComponents dynParameters).aggregatePortModeFamily.Port)
+    (hHorizontal : port ∉
+      Set.range (rectangularHorizontalConnections dynParameters).endpointEmbedding)
+    (hVertical : port ∉
+      Set.range (rectangularVerticalConnections dynParameters).endpointEmbedding) :
+    port ∉ Set.range dynConnections.endpointEmbedding := by
+  change port ∉ Set.range
+    (((rectangularLatticeRowHierarchy dynParameters).inner.append
+      (rectangularLatticeRowHierarchy dynParameters).outer).endpointEmbedding)
+  rw [(rectangularLatticeRowHierarchy
+    dynParameters).inner.mem_range_append_endpointEmbedding_iff]
+  rintro (hInner | ⟨boundary, hBoundary, hPort⟩)
+  · exact hHorizontal hInner
+  · apply hVertical
+    rcases hBoundary with ⟨⟨index, endpoint⟩, hEndpoint⟩
+    refine ⟨⟨index, endpoint⟩, ?_⟩
+    change (rectangularVerticalConnection dynParameters index).endpointPort endpoint = port
+    have hUnderlying := congrArg Subtype.val hEndpoint
+    have hSelected := hUnderlying.trans hPort
+    have hLift :
+        (((rectangularLatticeRowHierarchy
+          dynParameters).outer.connection index).endpointPort endpoint).1 =
+          ((rectangularVerticalConnections
+            dynParameters).connection index).endpointPort endpoint := by
+      cases endpoint <;> rfl
+    exact hLift ▸ hSelected
+
+lemma dynInputChannel_not_connected :
+    dynRingChannel 0 0 .west ∉ Set.range dynConnections.channelEmbedding := by
+  intro hConnected
+  apply dynPort_not_flat dynInputPort dynInputPort_not_horizontal dynInputPort_not_vertical
+  exact (dynConnections.channel_mem_range_channelEmbedding_iff
+    (dynRingChannel 0 0 .west)).mp hConnected
+
+lemma dynOutputChannel_not_connected :
+    dynRingChannel 1 1 .east ∉ Set.range dynConnections.channelEmbedding := by
+  intro hConnected
+  apply dynPort_not_flat dynOutputPort dynOutputPort_not_horizontal dynOutputPort_not_vertical
+  exact (dynConnections.channel_mem_range_channelEmbedding_iff
+    (dynRingChannel 1 1 .east)).mp hConnected
+
+def dynExternalInput : dynConnections.ExternalChannel :=
+  ⟨dynRingChannel 0 0 .west, dynInputChannel_not_connected⟩
+
+def dynExternalOutput : dynConnections.ExternalChannel :=
+  ⟨dynRingChannel 1 1 .east, dynOutputChannel_not_connected⟩
+
 lemma dyn_mem_componentBehavior :
     (dynIncident, dynOutgoing) ∈
       (rectangularLatticeNetlist dynParameters).componentBehavior := by
@@ -373,6 +506,14 @@ lemma dyn_crossParameters :
 
 lemma dyn_outputPathValue :
     dynOutgoing (Outgoing.mk (dynRingChannel 1 1 .east)) = -630 := by
+  rfl
+
+lemma dyn_inputValue :
+    dynInput (Incident.mk dynExternalInput) = 1 := by
+  rfl
+
+lemma dyn_outputValue :
+    dynOutput (Outgoing.mk dynExternalOutput) = -630 := by
   rfl
 
 lemma dyn_flat_and_rowDecomposition :
