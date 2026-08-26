@@ -1592,12 +1592,15 @@ Owner: SpaceAndTime and Electromagnetism.
 - [x] derivation that E4a's tangential and normal boundary predicates hold under the corresponding
   thin-loop and pillbox limits.
 
-The neutral weak-calculus prerequisite now includes selected-coordinate splitting, coordinate
-hyperplane distributions, and the identity that differentiating the positive-half-space
-Heaviside distribution in the inward `+e_last` direction gives the boundary delta. Its independent
-one-dimensional Gaussian regression pins normalization and normal reversal only, not multi-axis
-coordinate selection. This tempered-distribution identity neither represents arbitrary sidewise
-Maxwell fields nor derives the finite-sheet premise.
+The neutral weak-calculus prerequisite now includes selected-coordinate splitting, pushforward of
+tangential distributions onto coordinate hyperplanes, and the identity that differentiating a
+selected positive-coordinate Heaviside distribution in the inward `+e_i` direction gives the
+corresponding boundary delta. An independent `Fin 2` Gaussian regression distinguishes selected
+and swapped coordinate hyperplanes, while the retained one-dimensional Gaussian regression pins
+normalization and the sign under normal reversal. An anisotropic `Fin 2` point-source fixture also
+pins generic pushforward coefficient preservation and coordinate placement. None of these neutral
+tempered-distribution results represents arbitrary sidewise Maxwell fields or derives the
+finite-sheet premise.
 
 The local-calculus chain is complete. `PlanarRectangleLocalStokes.lean` and
 `AffineBoxLocalDivergence.lean` prove oriented Stokes and divergence identities for independent

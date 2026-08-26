@@ -150,6 +150,7 @@ public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
 public import Physlib.Mathematics.Distribution.Basic
 public import Physlib.Mathematics.Distribution.CoordinateHyperplane
 public import Physlib.Mathematics.Distribution.CoordinateHyperplaneDelta
+public import Physlib.Mathematics.Distribution.CoordinateHyperplaneDeltaRegression
 public import Physlib.Mathematics.Distribution.CoordinateSplit
 public import Physlib.Mathematics.Distribution.Heaviside
 public import Physlib.Mathematics.Distribution.HeavisideRegression
@@ -367,6 +368,7 @@ public import Physlib.Optics.Network.Coherency
 public import Physlib.Optics.Network.ConnectionFamily
 public import Physlib.Optics.Network.ConnectionFamilyRegression
 public import Physlib.Optics.Network.ConnectionFamilyTransport
+public import Physlib.Optics.Network.ConnectionRoutingRephase
 public import Physlib.Optics.Network.Conservation
 public import Physlib.Optics.Network.ConservationRegression
 public import Physlib.Optics.Network.ExternalChannel
@@ -378,6 +380,8 @@ public import Physlib.Optics.Network.FlatNetlistMason
 public import Physlib.Optics.Network.FlatNetlistMasonRegression
 public import Physlib.Optics.Network.FlatNetlistMasonSingularRegression
 public import Physlib.Optics.Network.FlatNetlistRegression
+public import Physlib.Optics.Network.FlatNetlistRephase
+public import Physlib.Optics.Network.FlatNetlistRephaseRegression
 public import Physlib.Optics.Network.Hierarchical
 public import Physlib.Optics.Network.HierarchicalRegression
 public import Physlib.Optics.Network.HierarchicalReuse
@@ -519,6 +523,10 @@ public import Physlib.Optics.Systems.DCDR.SourceBridge
 public import Physlib.Optics.Systems.DCDR.SourceBridgeRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
+public import Physlib.Optics.Systems.DCDR.ZTransform
+public import Physlib.Optics.Systems.DCDR.ZTransformBridge
+public import Physlib.Optics.Systems.DCDR.ZTransformMasonRegression
+public import Physlib.Optics.Systems.DCDR.ZTransformRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
