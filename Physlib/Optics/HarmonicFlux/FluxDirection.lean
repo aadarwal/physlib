@@ -13,9 +13,9 @@ public import Physlib.Optics.HarmonicFlux.ReferencedMaterialWave
 ## i. Overview
 
 This file gives a local, observable direction predicate for a harmonic carrier: its actual
-time-averaged Poynting vector at a reference plane has strictly positive component into a selected
-geometric side. For a nonzero-flux referenced material Jones wave, this direction is equivalent
-to the already proved strict phase direction.
+time-averaged Poynting flux density at an oriented plane's stored point has strictly positive
+component into a selected geometric side. For a nonzero-flux referenced material Jones wave,
+this direction is equivalent to the already proved strict phase direction.
 
 The equivalence uses the positive-medium result that the mean Poynting vector is the Jones
 irradiance times the real propagation vector. Strictly positive irradiance is explicit, so zero
@@ -37,8 +37,10 @@ fields and grazing carriers are not silently assigned a direction.
 ## iv. References
 
 This is a Physlib-original connector between existing field observables and propagation geometry.
-It is not a Sommerfeld radiation condition, limiting-absorption theorem, group-velocity or
-causality statement, source-selection principle, or evanescent-wave direction convention.
+Positive local mean flux and phase direction do not assign an incident, transmitted, or outgoing
+wave role. In particular, this is not an outgoing-wave or Sommerfeld radiation condition,
+limiting-absorption theorem, group-velocity or causality statement, source-selection principle,
+or evanescent-wave direction convention.
 -/
 
 @[expose] public section
@@ -120,8 +122,9 @@ lemma timeAveragedPoyntingVector_planePoint
 /-- For a nonzero-flux referenced propagating material Jones wave, positive local mean power flow
 into a geometric side is equivalent to strict phase direction into that side.
 
-This is a propagating positive-medium result. It does not promote either side condition to a
-radiation or limiting-absorption condition. -/
+This is a propagating positive-medium result. It does not assign an incident, transmitted, or
+outgoing wave role, nor promote either side condition to an outgoing-wave, radiation, or
+limiting-absorption condition. -/
 lemma hasPositiveMeanNormalFluxInto_iff_isPhaseDirectedInto
     (h : IsReferencedMaterialJonesWave plane medium wave frame J)
     (side : OrientedAffineHyperplane.Side)

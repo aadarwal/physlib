@@ -286,6 +286,8 @@ public import Physlib.Optics.HarmonicFlux.ApertureRegressionOrthogonality
 public import Physlib.Optics.HarmonicFlux.Basic
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWave
 public import Physlib.Optics.HarmonicFlux.ComplexMaterialWaveRegression
+public import Physlib.Optics.HarmonicFlux.FluxDirection
+public import Physlib.Optics.HarmonicFlux.FluxDirectionRegression
 public import Physlib.Optics.HarmonicFlux.GeometricAperture
 public import Physlib.Optics.HarmonicFlux.MaterialJonesMode
 public import Physlib.Optics.HarmonicFlux.MaterialWave
@@ -330,6 +332,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFlux
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFluxRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterference
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterferenceRegression
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScattering
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.IntegralBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundaryRegression
@@ -491,6 +495,7 @@ public import Physlib.Optics.Systems.DCDR.Mason
 public import Physlib.Optics.Systems.DCDR.Netlist
 public import Physlib.Optics.Systems.DCDR.Observables
 public import Physlib.Optics.Systems.DCDR.ObservablesRegression
+public import Physlib.Optics.Systems.DCDR.PassiveCaseRegression
 public import Physlib.Optics.Systems.DCDR.Poles
 public import Physlib.Optics.Systems.DCDR.PolesRegression
 public import Physlib.Optics.Systems.DCDR.Response

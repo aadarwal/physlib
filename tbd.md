@@ -79,6 +79,15 @@ PR unless maintainers explicitly ask to retain it.
   cross geometry, instantaneous referenced-field connectors and guarded period replacement,
   pointwise/common-interval normal cancellation, the fixed-frequency superposed-field endpoint,
   and their exact regressions should remain reviewable in that order.
+- [ ] Human-check the algebraic Fresnel scattering precursor before upstreaming. Confirm that the
+  normalized transmission is `sqrt ((Y2 chi_t) / (Y1 chi_i)) * t` with the real sign of `t`
+  retained, and that coordinates `0` and `1` denote the negative and positive sides. The second
+  column `(τ, -r)` is an orthogonal equal-norm completion of the established left-incident column
+  `(r, τ)`, not a reverse-incidence Maxwell derivation, reciprocity statement, outgoing-port model,
+  or proof of physical channel completeness. Recheck the exact oblique s/p matrices and their
+  direct radical power computations. A complete interface scattering model still needs reverse
+  incidence, oriented external frames, reference-plane transport, and strictly positive retained
+  propagating-channel normal admittances.
 - [ ] Rebase every proposed PR onto the then-current `upstream/master` and remove this file from the
   upstream diff.
 
@@ -1008,6 +1017,12 @@ PR unless maintainers explicitly ask to retain it.
   ordered mixed term must be `1 / 4 * n dot (E_F cross conj H_G)`, the Hermitian completion must
   conjugate the exchanged term, and self-pairing must reduce to `1 / 2 * Re (n dot
   (E cross conj H))`. Confirm that magnetic field strength `H`, not induction `B`, is integrated.
+- [ ] Human-check the strict local flux-direction connector before upstreaming. Confirm that
+  `HasPositiveMeanNormalFluxInto` uses the actual mean of `E cross H` at the oriented plane's
+  stored point, with magnetic field strength `H` and the selected side normal. The strict positive
+  irradiance hypothesis is load-bearing in its equivalence with strict phase direction. Neither
+  predicate assigns an incident, transmitted, outward, or outgoing wave role or supplies a
+  radiation or limiting-absorption condition.
 - [x] Decide the fork's surface-measure boundary for E3b. The abstract theorem continues to take a
   supplied measure on a profile-coordinate type. The physical specialization separately uses
   Mathlib's normalized two-dimensional Hausdorff measure on ambient `Space`, restricted to a
