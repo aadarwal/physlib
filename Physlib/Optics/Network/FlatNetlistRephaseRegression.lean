@@ -529,6 +529,57 @@ def routingRephaseRegressionHostileIncident :
     | .fourth, false => 30 * Complex.I
     | _, _ => 0
 
+/-- The hostile incident state is exactly the primitive rephasing by the hostile incident gauge.
+This coordinatewise expansion uses no routing-covariance result. -/
+lemma routingRephaseRegression_hostile_incident_eq_rephase :
+    routingRephaseRegressionHostileIncident =
+      ModeAmplitude.rephase routingRephaseRegressionHostileGauge.incident
+        reuseRegressionIncident := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  cases component <;> cases port <;> cases mode <;>
+    norm_num [routingRephaseRegressionHostileIncident, reuseRegressionIncident,
+      routingRephaseRegressionHostileGauge, routingRephaseRegressionGauge,
+      routingRephaseRegressionI, routingRephaseRegressionNegI,
+      Complex.ext_iff]
+
+/-- At the mismatched first-east to second-west direction, primitive transform rephasing changes
+the ideal-routing mate coefficient from one to exactly `-I`. -/
+lemma routingRephaseRegression_hostile_idealRouting_mate_entry :
+    (reuseRegressionRightFamily.idealRouting.rephase
+          (reuseRegressionRightFamily.connectedGauge
+            routingRephaseRegressionHostileGauge).outgoing
+          (reuseRegressionRightFamily.connectedGauge
+            routingRephaseRegressionHostileGauge).incident)
+        (Incident.mk
+          (reuseRegressionRightFamily.mateEquiv
+            (⟨Sum.inl (), Sum.inl ()⟩ : reuseRegressionRightFamily.Channel)))
+        (Outgoing.mk
+          (⟨Sum.inl (), Sum.inl ()⟩ : reuseRegressionRightFamily.Channel)) =
+      -Complex.I := by
+  rw [ModeTransform.rephase_apply,
+    reuseRegressionRightFamily.idealRouting_entry_mate]
+  change (1 : ℂ) * 1 * Complex.I⁻¹ = -Complex.I
+  rw [Complex.inv_I]
+  ring
+
+/-- The hostile primitive rephasing therefore does not retain a unit mate coefficient. -/
+lemma routingRephaseRegression_hostile_idealRouting_mate_entry_ne_one :
+    (reuseRegressionRightFamily.idealRouting.rephase
+          (reuseRegressionRightFamily.connectedGauge
+            routingRephaseRegressionHostileGauge).outgoing
+          (reuseRegressionRightFamily.connectedGauge
+            routingRephaseRegressionHostileGauge).incident)
+        (Incident.mk
+          (reuseRegressionRightFamily.mateEquiv
+            (⟨Sum.inl (), Sum.inl ()⟩ : reuseRegressionRightFamily.Channel)))
+        (Outgoing.mk
+          (⟨Sum.inl (), Sum.inl ()⟩ : reuseRegressionRightFamily.Channel)) ≠
+      1 := by
+  rw [routingRephaseRegression_hostile_idealRouting_mate_entry]
+  norm_num [Complex.ext_iff]
+
 /-- The hostile second-west incident coordinate is exactly `2`. -/
 lemma routingRephaseRegression_hostile_incident_secondWest :
     routingRephaseRegressionHostileIncident
