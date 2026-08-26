@@ -20,11 +20,21 @@ same linear map in the new labels.
 Relabeling changes only the names of modes. It does not select propagation directions, physical
 reference planes, or time-reversal partners. Consequently, this file makes no reciprocity claim.
 
-## ii. Main definitions
+## ii. Key results
 
 - `ModeAmplitude.reindex`: the isometric relabeling of modal amplitudes.
 - `ModeTransform.reindex`: relabeling the input and output indices of a transform.
 - `ScatteringMatrix.reindex`: relabeling the channels of a scattering matrix.
+
+## iii. Table of contents
+
+- A. Mode amplitudes
+- B. Covariant mode transforms
+- C. Invariance of modal predicates
+- D. Compatibility with transform composition
+- E. Scattering-coordinate changes
+
+## iv. References
 
 -/
 
@@ -34,7 +44,9 @@ namespace Optics
 
 noncomputable section
 
-/-! ## A. Mode amplitudes -/
+/-!
+## A. Mode amplitudes
+-/
 
 /-- Relabeling finite mode amplitudes is a complex-linear isometry. -/
 def ModeAmplitude.reindex {ι ι' : Type*} [Fintype ι] [Fintype ι'] (e : ι ≃ ι') :
@@ -80,7 +92,9 @@ lemma ModeAmplitude.reindex_directSum {ι ι' κ κ' : Type*}
   funext i
   rcases i with i | i <;> rfl
 
-/-! ## B. Covariant mode transforms -/
+/-!
+## B. Covariant mode transforms
+-/
 
 /-- Relabel the input and output indices of a mode transform by equivalences. -/
 def ModeTransform.reindex {ι ι' κ κ' : Type*} (eIn : ι ≃ ι') (eOut : κ ≃ κ')
@@ -132,7 +146,9 @@ lemma ModeTransform.toLinearMap_reindex_eq {ι ι' κ κ' : Type*}
   simpa only [ModeAmplitude.reindex_reindex_symm] using
     ModeTransform.toLinearMap_reindex_apply eIn eOut T (ModeAmplitude.reindex eIn.symm a)
 
-/-! ## C. Invariance of modal predicates -/
+/-!
+## C. Invariance of modal predicates
+-/
 
 /-- Relabeling input and output modes preserves and reflects power preservation. -/
 lemma ModeTransform.isPowerPreserving_reindex_iff {ι ι' κ κ' : Type*}
@@ -164,7 +180,9 @@ lemma ModeTransform.isPassive_reindex_iff {ι ι' κ κ' : Type*}
     rw [ModeTransform.toLinearMap_reindex_apply]
     simpa only [ModeAmplitude.power_reindex] using hT a
 
-/-! ## D. Compatibility with transform composition -/
+/-!
+## D. Compatibility with transform composition
+-/
 
 /-- Relabeling a cascade is the cascade of the consistently relabeled transforms. -/
 lemma ModeTransform.reindex_mul {ι ι' κ κ' μ μ' : Type*} [Fintype κ] [Fintype κ']
@@ -183,7 +201,9 @@ lemma ModeTransform.reindex_directSum {ι ι' κ κ' μ μ' ν ν' : Type*}
       (T.reindex eIn eOut).directSum (U.reindex fIn fOut) := by
   ext (o | o) (i | i) <;> rfl
 
-/-! ## E. Scattering-coordinate changes -/
+/-!
+## E. Scattering-coordinate changes
+-/
 
 /-- Relabel the common incident and outgoing channel index of a scattering matrix. -/
 def ScatteringMatrix.reindex {ι κ : Type*} (e : ι ≃ κ)

@@ -31,13 +31,14 @@ side-relative angle.
 - A. Stored-normal flux
 - B. Side-relative flux
 
-## iv. Scope
+## iv. References
 
 The plane and its sides remain purely geometric. Positive stored-normal flux points from the
 negative side toward the positive side, but neither side is assigned an incident, reflected,
 transmitted, or outgoing role. The identities include zero Jones data, negative cosine, and
 grazing incidence. They apply only to the propagating ordinary-real material wave, not to a
 complex attenuating or evanescent carrier.
+
 -/
 
 @[expose] public section

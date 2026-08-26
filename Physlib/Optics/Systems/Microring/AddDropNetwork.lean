@@ -74,7 +74,9 @@ noncomputable section
 
 namespace AddDrop
 
-/-! ## A. Parameters and algebraic transfer amplitudes -/
+/-!
+## A. Parameters and algebraic transfer amplitudes
+-/
 
 /-- Fixed-carrier parameters of a symmetric-arc add-drop microring. -/
 structure Parameters where
@@ -344,7 +346,9 @@ theorem dropTransfer_eq_standard (p : Parameters) :
   rw [Complex.I_sq]
   ring
 
-/-! ## B. Explicit component family and feedback wiring -/
+/-!
+## B. Explicit component family and feedback wiring
+-/
 
 /-- The two couplers and two matched-propagation arcs of the add-drop ring. -/
 inductive Component
@@ -819,7 +823,9 @@ lemma dropCoupler_rightFirst_not_connected (p : Parameters) :
   cases connection <;> rcases channel with mode | mode <;> cases mode
   all_goals cases hChannel
 
-/-! ## C. External channels and coherent excitation -/
+/-!
+## C. External channels and coherent excitation
+-/
 
 /-- The packaged external input channel on the first bus. -/
 def inputChannel (p : Parameters) : (netlist p).ExternalChannel :=
@@ -891,7 +897,9 @@ lemma inputAmplitude_apply_drop (p : Parameters) (amplitude : ℂ) :
   rw [inputAmplitude]
   simp [Ne.symm (inputChannel_ne_dropChannel p)]
 
-/-! ## D. Exact component and routing equations -/
+/-!
+## D. Exact component and routing equations
+-/
 
 /-- The input-coupler restriction satisfies the corresponding N7 physical behavior. -/
 lemma inputCoupler_physicalBehavior_of_scatteringEquation (p : Parameters)

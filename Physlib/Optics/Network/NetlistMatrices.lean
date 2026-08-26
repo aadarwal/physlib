@@ -23,14 +23,7 @@ Mapping coefficients into
 kernel. The equality proof is extensional, so it does not identify the constructive equality
 decisions used here with the kernel's local classical decisions.
 
-## ii. Scope
-
-The matrices encode component action, topology, and boundary exposure only. They do not invert the
-feedback operator, decide a determinant, assert unique solvability, or assign gain, phase, delay,
-passivity, losslessness, or reciprocity to a physical wire. The output exposure is kept distinct
-from its coordinate readout.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `FiniteNetlistData.scatteringMatrix`: executable block-diagonal component matrix `S`.
 - `FiniteNetlistData.routingMatrix`: executable ambient return matrix `C`.
@@ -44,11 +37,18 @@ from its coordinate readout.
 - `FiniteNetlistData.mem_toFlatNetlist_behavior_iff_matrixEquations`: evaluated executable
   equations are exactly the compiled singular-safe external relation.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Executable connected and external channel indices
 - B. Shaped coefficient matrices
 - C. Soundness with respect to the typed N4 kernel
+
+## iv. References
+
+The matrices encode component action, topology, and boundary exposure only. They do not invert the
+feedback operator, decide a determinant, assert unique solvability, or assign gain, phase, delay,
+passivity, losslessness, or reciprocity to a physical wire. The output exposure is kept distinct
+from its coordinate readout.
 
 -/
 

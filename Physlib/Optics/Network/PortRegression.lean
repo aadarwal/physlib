@@ -24,10 +24,7 @@ nonsymmetric two-channel scattering matrix separately fixes the incident-to-outg
 and column orientation. Finally, a typed local `C * S` definition and action theorem fix the
 incident-space product order required by later network elimination.
 
-## ii. Scope
-
-These are algebraic finite-mode regressions. They do not claim global endpoint uniqueness,
-feedback solvability, path phase, reciprocity, electromagnetic flux, or a physical splitter.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -35,6 +32,11 @@ feedback solvability, path phase, reciprocity, electromagnetic flux, or a physic
 - B. Flattening and endpoint mating
 - C. Exact ideal routing
 - D. Oriented scattering and the local `C * S` seam
+
+## iv. References
+
+These are algebraic finite-mode regressions. They do not claim global endpoint uniqueness,
+feedback solvability, path phase, reciprocity, electromagnetic flux, or a physical splitter.
 
 -/
 

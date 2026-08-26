@@ -40,6 +40,9 @@ algebraic formula on each side of a fixed boundary.
 - C. Exact phase characterization
 - D. Sphere representatives and the orbit-set equivalence
 - E. Canonical-axis checks
+
+## iv. References
+
 -/
 
 @[expose] public section

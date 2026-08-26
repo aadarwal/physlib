@@ -56,7 +56,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. External two-port coordinates -/
+/-!
+## A. External two-port coordinates
+-/
 
 /-- The left-then-right sum labels select the input-side and through-side external channels. -/
 def twoPortExternalChannel (p : Parameters) :
@@ -155,7 +157,9 @@ noncomputable def twoPortExternalOutgoingEquiv (p : Parameters) :
   (Outgoing.relabelEquiv (twoPortExternalChannelEquiv p).symm).trans
     Outgoing.splitSumEquiv
 
-/-! ## B. Directional circulation equations -/
+/-!
+## B. Directional circulation equations
+-/
 
 /-- A component-scattering equation implies the local left-bus coupler equation. -/
 lemma scatteringEquation_coupler_leftFirst (p : Parameters)
@@ -284,7 +288,9 @@ lemma scatteringSolution_apply_leftFirst (p : Parameters)
     throughTransfer]
   ring
 
-/-! ## C. Complete bus response -/
+/-!
+## C. Complete bus response
+-/
 
 /-- The proof-gated N5 response obeys both directional bus laws and has zero same-side reflection.
 

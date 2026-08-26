@@ -64,7 +64,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. The reduced circulation model -/
+/-!
+## A. The reduced circulation model
+-/
 
 /-- The independently defined two-node signal-flow graph of one circulation direction.
 
@@ -129,7 +131,9 @@ lemma loopMasonThroughTransfer_eq_throughTransfer (p : Parameters)
   rw [loopMasonThroughTransfer, loopMasonGain_eq p hDenominator, throughTransfer]
   simp [div_eq_mul_inv, mul_assoc]
 
-/-! ## B. Agreement with the complete N5 graph -/
+/-!
+## B. Agreement with the complete N5 graph
+-/
 
 /-- The complete extracted feedback graph and the scalar ring denominator have the same exact
 nonvanishing gate. -/

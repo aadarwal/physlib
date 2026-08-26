@@ -32,16 +32,7 @@ linear-map composition and block-diagonal mode-transform composition.
 Finite behaviors can also be transported along input and output index equivalences. This is a
 change of labels for the complete relation, not an assumption that the relation is functional.
 
-## ii. Scope
-
-The behavior type and its relational compositions require no finite index types, matrix inverse,
-or unique-solvability hypothesis. They are fixed-frequency complex-linear semantics only: no
-causality, delay, source, termination, passivity, electromagnetic normalization, or physical
-realization is included. Parallel composition does not duplicate or sum an amplitude, and it does
-not reuse one amplitude as more than one input. A feedback-solution relation is not an inverse or a
-well-posedness assertion.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `LinearBehavior`: a complex submodule of paired input and output mode amplitudes.
 - `LinearBehavior.ofLinearMap`: the graph behavior of a complex-linear map.
@@ -60,12 +51,21 @@ well-posedness assertion.
 - `ModeTransform.toBehavior_directSum`: block-diagonal action agrees with relational parallel
   composition.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Behaviors and functional graphs
 - B. Identity and series composition
 - C. Parallel composition
 - D. Feedback-solution relations
+
+## iv. References
+
+The behavior type and its relational compositions require no finite index types, matrix inverse,
+or unique-solvability hypothesis. They are fixed-frequency complex-linear semantics only: no
+causality, delay, source, termination, passivity, electromagnetic normalization, or physical
+realization is included. Parallel composition does not duplicate or sum an amplitude, and it does
+not reuse one amplitude as more than one input. A feedback-solution relation is not an inverse or a
+well-posedness assertion.
 
 -/
 

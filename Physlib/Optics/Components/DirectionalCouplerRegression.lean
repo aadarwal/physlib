@@ -48,8 +48,9 @@ noncomputable section
 
 namespace DirectionalCoupler
 
-/-! ## A. Exact nested-sum fixture -/
-/-- The normalized `3–4–5` through/cross amplitude pair. -/
+/-!
+## A. Exact nested-sum fixture
+-//-- The normalized `3–4–5` through/cross amplitude pair. -/
 def directionalCouplerRegressionParameters : Parameters where
   throughAmplitude := 3 / 5
   crossAmplitude := 4 / 5
@@ -105,7 +106,9 @@ def directionalCouplerRegressionSameSide :
     | Sum.inr ⟨Sum.inl ()⟩ => (9 - 16 * Complex.I) / 5
     | Sum.inr ⟨Sum.inr ()⟩ => (12 - 12 * Complex.I) / 5
 
-/-! ## B. Independent behavior and hostile outputs -/
+/-!
+## B. Independent behavior and hostile outputs
+-/
 
 /-- The exact state satisfies the independently declared directional mixing equations. -/
 lemma directionalCouplerRegression_mem :
@@ -161,7 +164,9 @@ lemma directionalCouplerRegression_sameSide_not_mem :
     directionalCouplerRegressionSameSide, ModeAmplitude.restrictInl,
     ModeAmplitude.restrictInr] at hReal
 
-/-! ## C. Scattering realization -/
+/-!
+## C. Scattering realization
+-/
 
 /-- The typed scattering realization produces the exact opposite-side mixed output. -/
 lemma directionalCouplerRegression_scattering_action :

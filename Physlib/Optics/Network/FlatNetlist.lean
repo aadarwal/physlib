@@ -33,18 +33,7 @@ These relations remain meaningful when the feedback equation has no solution or 
 solutions. Eliminating only the explicit component output gives the equivalent implicit equation
 `(1 - C * S) a = E_in u`; no matrix inverse or uniqueness hypothesis is used.
 
-## ii. Scope
-
-This file gives fixed-frequency relational semantics, not a solver or executable compiler. It does
-not assert that either behavior is total, single-valued, passive, lossless, reciprocal, causal, or
-electromagnetically normalized. In particular, `1 - C * S` is not inverted here. Well-posedness
-must later concern uniqueness of the complete solution state, which is stronger than uniqueness of
-the externally observed output. `componentBehavior` is the graph of the already assembled
-block-diagonal transform. The component-family bridge identifies this graph with simultaneous
-satisfaction of every canonically restricted local component graph, without choosing a component
-ordering.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `FlatNetlist`: component and connection data for a typed flat network.
 - `FlatNetlist.scatteringTransform`: the block-diagonal component law `S`.
@@ -59,13 +48,24 @@ ordering.
   enumerations and unbundled matrix-vector actions.
 - `FlatNetlist.mem_behavior_iff_feedbackEquation`: the equivalent implicit feedback relation.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Flat netlists and shaped transforms
 - B. Component and return behaviors
 - C. Complete solution states
 - D. External relational behavior
 - E. The implicit feedback equation
+
+## iv. References
+
+This file gives fixed-frequency relational semantics, not a solver or executable compiler. It does
+not assert that either behavior is total, single-valued, passive, lossless, reciprocal, causal, or
+electromagnetically normalized. In particular, `1 - C * S` is not inverted here. Well-posedness
+must later concern uniqueness of the complete solution state, which is stronger than uniqueness of
+the externally observed output. `componentBehavior` is the graph of the already assembled
+block-diagonal transform. The component-family bridge identifies this graph with simultaneous
+satisfaction of every canonically restricted local component graph, without choosing a component
+ordering.
 
 -/
 

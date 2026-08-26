@@ -41,15 +41,7 @@ of the physical response domain are then proved strict:
 * `-Complex.I` is declared valid but is not algebraically solvable; and
 * `2` is algebraically solvable but is not declared valid.
 
-## ii. Scope
-
-The coefficients are exact algebraic sentinels, not passive, lossless, reciprocal, causal, or
-physically normalized optical components. The stored validity predicate is data supplied with the
-component, not a proved physical bound. The parameter is an abstract complex variable: no physical
-angular frequency, Laplace variable, delay variable, or `Z`-transform variable is named, and no
-free-spectral-range or resonance-linewidth statement is made.
-
-## iii. Key results
+## ii. Key results
 
 - `parameterizedResponseRegression_feedbackOperator_eq`: the exact compiled internal operator.
 - `parameterizedResponseRegression_solveDomain_eq`: the algebraic solve domain is exactly
@@ -67,13 +59,21 @@ free-spectral-range or resonance-linewidth statement is made.
 - `parameterizedResponseRegression_response_i` and `parameterizedResponseRegression_response_zero`:
   exact hand-expanded responses at two admissible parameter values.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. A parameterized shared-link network
 - B. The exact internal operator and its inverse
 - C. The algebraic solve domain and its singular parameter
 - D. The exact rational family and evaluation commutation
 - E. Strictness of both response-domain inclusions
+
+## iv. References
+
+The coefficients are exact algebraic sentinels, not passive, lossless, reciprocal, causal, or
+physically normalized optical components. The stored validity predicate is data supplied with the
+component, not a proved physical bound. The parameter is an abstract complex variable: no physical
+angular frequency, Laplace variable, delay variable, or `Z`-transform variable is named, and no
+free-spectral-range or resonance-linewidth statement is made.
 
 -/
 

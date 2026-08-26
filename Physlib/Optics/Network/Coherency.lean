@@ -31,23 +31,7 @@ decorrelated superposition, whose second-order data is the sum of the two cohere
 same channel power is exactly additive. The interference term is therefore proved to be exactly
 the difference between the two models rather than dropped.
 
-## ii. Scope and non-claims
-
-Coherency data is not redefined here: `CoherencyMatrix`, `CoherencyMatrix.map`,
-`CoherencyMatrix.trace`, and the self-adjoint congruence
-`Matrix.selfAdjointCongruence` are used as given.
-
-`CoherencyMatrix.ofAmplitude` is rank-one second-order data, so it models a fully coherent field
-and nothing else. `CoherencyMatrix.incoherentSum` is the second-order data of two mutually
-uncorrelated contributions; calling it incoherent is a modelling statement about the input, not a
-theorem, and every result that uses it states it as a hypothesis on the supplied data.
-
-All powers are `ModeAmplitude.power`, normalized modal power. No spectral density, temporal
-coherence function, bandwidth, detector model, or ergodicity assumption is introduced: a coherency
-matrix here is a fixed second-order datum at one frequency, not a time average that has been
-proved to exist.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `CoherencyMatrix.ofAmplitude`: rank-one coherency data of a coherent mode amplitude.
 - `CoherencyMatrix.channelPower`: the per-channel power observable, a diagonal entry.
@@ -67,14 +51,31 @@ proved to exist.
   `CoherencyMatrix.trace_map_of_isPowerPreserving`: passivity and conservation of transport.
 - `FlatNetlist.responseCoherency` and its passivity, conservation, and coherent-input laws.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Second-order data of a mode amplitude
 - B. Coherency transport by a mode transform
-- C. Decorrelated superposition, including diagonal incoherent inputs
+- C. Decorrelated superposition
+  - C.1. Diagonal incoherent inputs
 - D. The interference cross term
 - E. Passivity and conservation of coherency transport
 - F. Network response coherency
+
+## iv. References
+
+Coherency data is not redefined here: `CoherencyMatrix`, `CoherencyMatrix.map`,
+`CoherencyMatrix.trace`, and the self-adjoint congruence
+`Matrix.selfAdjointCongruence` are used as given.
+
+`CoherencyMatrix.ofAmplitude` is rank-one second-order data, so it models a fully coherent field
+and nothing else. `CoherencyMatrix.incoherentSum` is the second-order data of two mutually
+uncorrelated contributions; calling it incoherent is a modelling statement about the input, not a
+theorem, and every result that uses it states it as a hypothesis on the supplied data.
+
+All powers are `ModeAmplitude.power`, normalized modal power. No spectral density, temporal
+coherence function, bandwidth, detector model, or ergodicity assumption is introduced: a coherency
+matrix here is a fixed second-order datum at one frequency, not a time average that has been
+proved to exist.
 
 -/
 

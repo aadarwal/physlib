@@ -33,7 +33,7 @@ channel-sign gauge, represented by `dateThroughGauge`.
 - A. DATE'14 parameter and algebraic channel-sign dictionary
 - B. DATE'14 transfer fields and four-port formula container
 
-## iv. References and non-claims
+## iv. References
 
 DATE'14 Def. 3 and Thms. 1--2 are summarized at `HOL-CORPUS.md:194-198`.
 
@@ -50,6 +50,7 @@ pivot gates `t != 0` and `R != 0`; the four-port N5 bridge also requires the rin
 denominator to be nonzero. The DATE transfer quotients and their norm-square powers are also
 totalized at zero denominator. Their algebraic identities remain meaningful there, but an N5
 response claim requires the displayed nonzero-denominator gate.
+
 -/
 @[expose] public section
 
@@ -58,7 +59,9 @@ namespace Optics
 noncomputable section
 
 namespace MicroringSourceBridge
-/-! ## A. DATE'14 parameter and algebraic channel-sign dictionary -/
+/-!
+## A. DATE'14 parameter and algebraic channel-sign dictionary
+-/
 
 /-- The six real DATE'14 microring parameters from `HOL-CORPUS.md:194-196`. -/
 structure DateParameters where
@@ -466,7 +469,9 @@ def dateAddGauge (amplitude : ℂ) : ℂ :=
 def dateIdentityGauge (amplitude : ℂ) : ℂ :=
   amplitude
 
-/-! ## B. DATE'14 transfer fields and four-port formula container -/
+/-!
+## B. DATE'14 transfer fields and four-port formula container
+-/
 
 /-- DATE's common four-port denominator `1-r^2*tau*exp(-j*delta)`
 (`HOL-CORPUS.md:196`). -/

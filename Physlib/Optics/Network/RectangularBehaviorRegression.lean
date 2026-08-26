@@ -22,11 +22,7 @@ The tests establish component actions directly from membership equations before 
 generic composition laws. They also check output uniqueness or reject a plausible wrong output
 for the elementary graph behaviors.
 
-## ii. Scope
-
-These are fixed-frequency complex-amplitude regressions. Copy is an explicit algebraic component,
-not wire fan-out, a passive splitter, or quantum cloning. Coherent cancellation does not by itself
-identify a physical absorption mechanism, and branch selection is not a termination model.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -35,6 +31,12 @@ identify a physical absorption mechanism, and branch selection is not a terminat
 - C. Weighted one-sided inverse
 - D. Reverse-order idempotent and kernel
 - E. Modal-power sentinels
+
+## iv. References
+
+These are fixed-frequency complex-amplitude regressions. Copy is an explicit algebraic component,
+not wire fan-out, a passive splitter, or quantum cloning. Coherent cancellation does not by itself
+identify a physical absorption mechanism, and branch selection is not a termination model.
 
 -/
 

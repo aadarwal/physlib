@@ -25,13 +25,13 @@ introduces no declarations or additional claims.
 
 ## iii. Table of contents
 
-- A. DATE'14 bridges, re-exported from `SourceBridgeDate`
-- B. SysCon'15 bridges, re-exported from `SourceBridgeSysCon`
-- C. SFG-TR'14 bridges, re-exported from `SourceBridgeSfg`
+- A. Module contents
 
 ## iv. References
 
 The imported modules give the source locations, parameter dictionaries, solve gates, and
 respective non-claims. The SFG-TR section is catalogued at `HOL-CORPUS.md:335-349`, with Def. 35
 and Thm. 7 at `HOL-CORPUS.md:345-346`.
+
+## A. Module contents
 -/

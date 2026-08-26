@@ -56,7 +56,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. Exact resonance fixture -/
+/-!
+## A. Exact resonance fixture
+-/
 
 /-- A `3-4-5` coupler, half field retention, and zero round-trip phase. -/
 def allPassRegressionResonanceParameters : Parameters where
@@ -213,7 +215,9 @@ lemma allPassRegression_resonance_response_eq_series :
   rw [allPassRegression_resonance_responseTransform_entry,
     allPassRegression_resonance_throughTransferSeries]
 
-/-! ## B. Exact antiresonance fixture -/
+/-!
+## B. Exact antiresonance fixture
+-/
 
 /-- The same exact fixture with a half-turn round-trip phase. -/
 def allPassRegressionAntiresonanceParameters : Parameters where

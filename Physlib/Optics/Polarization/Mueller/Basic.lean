@@ -26,25 +26,30 @@ Later modules derive the Pauli trace formula, functorial laws, and the normalize
 algebraic Jones unitarity. Those consequences are not yet theorems about irradiance, Poynting
 flux, or normalized modal power.
 
-## ii. Main definitions
+## ii. Key results
 
 - `MuellerMatrix`: a wrapped real `4 × 4` matrix in the selected Stokes basis.
 - `JonesMatrix.selfAdjointMap`: Jones congruence on arbitrary self-adjoint matrices.
 - `JonesMatrix.stokesLinearMap`: the transported real-linear Stokes action.
 - `JonesMatrix.mueller`: the real matrix representing that action.
 
-## iii. Main results
-
 - `JonesMatrix.mueller_coherency` and `JonesMatrix.mueller_jones`: the two commuting squares.
 - `JonesMatrix.mueller_isPhysical`: preservation of the physical Stokes cone.
 - `JonesMatrix.actPhysicalStokes`: the induced map on physical Stokes data.
 
-## iv. Conventions
+## iii. Table of contents
+
+- A. Raw Mueller matrices
+- B. Jones-induced Stokes action
+- C. Physical Stokes data
+
+## iv. References
 
 Rows of a Mueller matrix index output Stokes coordinates and columns index input coordinates. The
 later trace-formula module uses `stokesPauliIndexEquiv` to supply the audited order
 `(σ₀, σ₃, σ₁, σ₂)`. In particular, the third polarization coordinate's sign is already fixed by
 the repository's Stokes convention; no extra sign is inserted in that formula.
+
 -/
 
 @[expose] public section

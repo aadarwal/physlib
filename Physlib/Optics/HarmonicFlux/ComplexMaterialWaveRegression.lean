@@ -37,12 +37,13 @@ constant-depth planes. Positive third-coordinate displacement by `u` scales the 
 - B. Actual-field mean flux at the origin
 - C. Squared-envelope decay
 
-## iv. Scope
+## iv. References
 
 These are exact regressions for Physlib's own complex-carrier, medium, and harmonic-flux APIs. The
 fixtures already satisfy the source-free macroscopic Maxwell equations, but this file assigns them
 no interface, transmitted, outgoing, evanescent-field, Fresnel, total internal reflection,
 aperture-power, or modal-power role.
+
 -/
 
 @[expose] public section

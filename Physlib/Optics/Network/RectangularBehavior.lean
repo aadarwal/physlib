@@ -21,7 +21,23 @@ Each operation is defined first as a complex-linear map and then embedded as a g
 Their composition laws therefore connect the implicit behavior layer to later executable network
 assembly without requiring any inverse.
 
-## ii. Scope
+## ii. Key results
+
+- `LinearBehavior.copy`: equal amplitudes on two output branches.
+- `LinearBehavior.coherentSum`: coherent addition of two input branches.
+- `LinearBehavior.selectLeft` and `LinearBehavior.selectRight`: coordinate selection.
+- `LinearBehavior.weightedSplit`: two independently weighted output branches.
+- `LinearBehavior.weightedCombine`: coherent weighted addition of two input branches.
+- `LinearBehavior.weightedSplit_series_weightedCombine_eq_identity`: a sufficient algebraic
+  coefficient equation for a one-sided identity.
+
+## iii. Table of contents
+
+- A. Weighted split and combine maps
+- B. Rectangular graph behaviors
+- C. Composition and modal-power laws
+
+## iv. References
 
 These operations are algebraic constraints on fixed-frequency amplitudes. Copy's proved power law
 doubles normalized modal power, so it is not passive on any mode family admitting a nonzero
@@ -34,22 +50,6 @@ Selecting one branch does not model a physical termination or absorption of the 
 weighted split whose coefficient norm squares sum to one is an isometry from its one-family input,
 not a complete square lossless optical device; such a device requires another independent input
 channel and a unitary completion.
-
-## iii. Key definitions and results
-
-- `LinearBehavior.copy`: equal amplitudes on two output branches.
-- `LinearBehavior.coherentSum`: coherent addition of two input branches.
-- `LinearBehavior.selectLeft` and `LinearBehavior.selectRight`: coordinate selection.
-- `LinearBehavior.weightedSplit`: two independently weighted output branches.
-- `LinearBehavior.weightedCombine`: coherent weighted addition of two input branches.
-- `LinearBehavior.weightedSplit_series_weightedCombine_eq_identity`: a sufficient algebraic
-  coefficient equation for a one-sided identity.
-
-## iv. Table of contents
-
-- A. Weighted split and combine maps
-- B. Rectangular graph behaviors
-- C. Composition and modal-power laws
 
 -/
 

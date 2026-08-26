@@ -46,11 +46,12 @@ zero normal Poynting flux.
 - B. Exact separate-wave fluxes
 - C. Connected actual-flux balances
 
-## iv. Scope
+## iv. References
 
 All propagating fluxes are evaluated at the stored interface point and averaged over the carrier's
 own period. The transmitted zero-flux regression holds at every spatial point. No aperture,
 whole-plane, outgoing-wave, causal, or modal-power claim is made.
+
 -/
 
 @[expose] public section

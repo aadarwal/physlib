@@ -11,10 +11,22 @@ public import Physlib.Optics.Polarization.Poincare
 /-!
 # Unitary Jones-induced Mueller transformations
 
+## i. Overview
+
 This file proves the normalized consequences of algebraic Jones unitarity: coherency-trace and raw
 Stokes-intensity preservation, fixation of the unpolarized axis, preservation of polarization
 norm, an action on unit-intensity physical Stokes data, and preservation of the Poincare sphere.
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Unitary Jones transformations
+
+## iv. References
+
 These remain raw polarization-amplitude statements, not irradiance or Poynting-flux theorems.
+
 -/
 
 @[expose] public section

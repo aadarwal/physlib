@@ -17,13 +17,7 @@ separately wrapped left and right incident and outgoing channel families. This f
 canonical adapter between those presentations. It changes only index labels: every matrix entry
 and the induced graph behavior are preserved.
 
-## ii. Scope
-
-The binary sum records the declared left/right port order. The adapter does not select propagation
-directions, pair time-reversed modes, infer a chain view, or impose losslessness, reciprocity,
-passivity, or transmission-block invertibility.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `TwoPortScatteringTransform`: a transform from left/right incident channels to left/right
   outgoing channels.
@@ -34,10 +28,16 @@ passivity, or transmission-block invertibility.
 - `ScatteringMatrix.mem_toTwoPortScatteringBehavior_iff`: behavior-level agreement with the
   oriented scattering transform.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Typed two-port scattering adapter
 - B. Agreement of graph behaviors
+
+## iv. References
+
+The binary sum records the declared left/right port order. The adapter does not select propagation
+directions, pair time-reversed modes, infer a chain view, or impose losslessness, reciprocity,
+passivity, or transmission-block invertibility.
 
 -/
 

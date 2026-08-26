@@ -66,7 +66,9 @@ universe u
 
 namespace MatchedPropagation
 
-/-! ## A. Fixed-carrier parameters and scalar transmission -/
+/-!
+## A. Fixed-carrier parameters and scalar transmission
+-/
 
 /-- Parameters of a fixed-carrier matched propagation component.
 
@@ -120,7 +122,9 @@ lemma transmission_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Paramete
   simp only [ModeTransform.toLinearMap, Matrix.toEuclideanLin,
     map_smul, Matrix.toLpLin_one, LinearMap.smul_apply, LinearMap.id_apply]
 
-/-! ## B. Independent behavioral specification -/
+/-!
+## B. Independent behavioral specification
+-/
 
 /-- The independent fixed-carrier matched-propagation behavior.
 
@@ -146,7 +150,9 @@ lemma mem_behavior_iff [Fintype ι] [DecidableEq ι] (p : Parameters)
   rw [behavior, ReflectionlessTwoPort.mem_behavior_iff]
   simp only [transmission_toLinearMap_apply]
 
-/-! ## C. Scattering realization -/
+/-!
+## C. Scattering realization
+-/
 
 /-- The zero-reflection scattering realization of fixed-carrier matched propagation. -/
 def scattering (p : Parameters) (ι : Type u) : ScatteringMatrix (ι ⊕ ι) :=

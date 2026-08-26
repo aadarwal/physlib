@@ -58,10 +58,11 @@ reflected, and transmitted directions are `(3/5, 0, 4/5)`, `(3/5, 0, -4/5)`, and
 - C. Superposed-wave normal-flux balance
 - D. Dummy zero-reflection labels
 
-## iv. Scope
+## iv. References
 
 These are exact stored-point regressions. They do not assert full-vector Poynting additivity,
 aperture power, total internal reflection, lossy-media behavior, or scattering unitarity.
+
 -/
 
 @[expose] public section

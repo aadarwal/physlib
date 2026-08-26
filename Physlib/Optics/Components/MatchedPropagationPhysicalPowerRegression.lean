@@ -36,12 +36,13 @@ radiation channels.
 
 ## iii. Table of contents
 
-- A. Exact physical-coordinate normalized modal power
+- A. Exact physical-coordinate power
 - B. Physical classification boundaries
 
 ## iv. References
 
 This is a source-neutral coordinate-invariance regression.
+
 -/
 
 @[expose] public section

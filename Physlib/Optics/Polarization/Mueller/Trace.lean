@@ -10,9 +10,20 @@ public import Physlib.Optics.Polarization.Mueller.Basic
 /-!
 # Pauli trace formula for Jones-induced Mueller matrices
 
+## i. Overview
+
 This file derives every induced Mueller entry from the audited Stokes-ordered Pauli trace pairing.
 It separately proves that the complex trace has zero imaginary part, so the real matrix entries are
 a theorem about Jones congruence rather than a projection that silently discards complex data.
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Pauli trace coefficients and reality
+
+## iv. References
+
 -/
 
 @[expose] public section

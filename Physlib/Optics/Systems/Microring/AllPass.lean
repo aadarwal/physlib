@@ -75,7 +75,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. Parameters and algebraic response -/
+/-!
+## A. Parameters and algebraic response
+-/
 
 /-- Fixed-carrier parameters of a single-mode all-pass microring. -/
 structure Parameters where
@@ -195,7 +197,9 @@ theorem throughTransfer_eq_standard (p : Parameters) (hUnitary : p.coupler.IsUni
   rw [mul_pow, show (-Complex.I : ℂ) ^ 2 = -1 by norm_num [Complex.I_sq], neg_one_mul]
   linear_combination -p.loopCoefficient * hNormalization
 
-/-! ## B. Explicit component family and feedback wiring -/
+/-!
+## B. Explicit component family and feedback wiring
+-/
 
 /-- The two physical components of the all-pass ring. -/
 inductive Component
@@ -534,7 +538,9 @@ lemma inputAmplitude_apply_through (p : Parameters) (amplitude : ℂ) :
   rw [inputAmplitude]
   simp [Ne.symm (inputChannel_ne_throughChannel p)]
 
-/-! ## C. Exact component and routing equations -/
+/-!
+## C. Exact component and routing equations
+-/
 
 /-- The local physical coupler sends the left bus/ring inputs to the right bus output. -/
 lemma couplerScattering_apply_rightFirst (p : Parameters)
@@ -624,7 +630,9 @@ lemma propagationScattering_apply_left (p : Parameters)
   have hCoordinate := congrArg (fun amplitude => amplitude (Sum.inl (Outgoing.mk ()))) hRaw
   simpa [outgoing, Parameters.loopCoefficient, ModeAmplitude.reindex_apply] using hCoordinate
 
-/-! ## D. Well-posedness and N5 elimination -/
+/-!
+## D. Well-posedness and N5 elimination
+-/
 
 /-- The connected coordinate at the coupler's right second-arm endpoint. -/
 def connectedCouplerRightSecond (p : Parameters) : (netlist p).ConnectedChannel :=
@@ -1239,7 +1247,9 @@ lemma responseTransform_entry_through_input (p : Parameters)
   have hResponse := response_through p hDenominator 1
   simpa [inputAmplitude, Matrix.toLpLin_apply] using hResponse
 
-/-! ## E. Convergent multiple-round-trip view -/
+/-!
+## E. Convergent multiple-round-trip view
+-/
 
 /-- The totalized `tsum` of circulation powers, with series meaning only under summability. -/
 def roundTripSeries (p : Parameters) : ℂ :=

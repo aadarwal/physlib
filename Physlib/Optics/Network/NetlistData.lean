@@ -26,7 +26,26 @@ successful certificate constructs the existing proof-carrying `FlatNetlist` sema
 The Boolean is the exhaustive finite decision procedure for that specification, not an independent
 oracle; any later optimized checker must be proved equivalent to the same proposition.
 
-## ii. Scope
+## ii. Key results
+
+- `FiniteNetlistShape`: finite dependent component, port, and mode sizes.
+- `FiniteConnectionSpec`: a bidirectional physical-port connection with explicit mode maps in both
+  directions.
+- `FiniteNetlistData`: local scattering entries and a finite array of connection specifications.
+- `FiniteNetlistData.mapGains`: change only the local coefficient representation.
+- `FiniteNetlistData.WellFormed`: mutually inverse mode maps and globally unique endpoint ports.
+- `FiniteNetlistData.wellFormed_eq_true_iff`: Boolean reflection of the certificate.
+- `FiniteNetlistData.toFlatNetlist`: proof-carrying compilation into the N4 relational kernel.
+- `FiniteNetlistData.compile?`: checked compilation that rejects malformed finite data.
+
+## iii. Table of contents
+
+- A. Finite netlist shapes
+- B. Executable connection and component data
+- C. Decidable well-formedness
+- D. Compilation to typed flat netlists
+
+## iv. References
 
 The checker certifies only finite shape, mutually inverse mode matching, and one-to-one physical
 wiring. It does not check component passivity, losslessness, reciprocity, physical realizability,
@@ -39,25 +58,6 @@ The coefficient type is unrestricted at the data boundary. Compilation to the cu
 complex-valued optics kernel takes an explicit coefficient ring homomorphism. Generic
 executable assembly of `S`, `C`, `E_in`, and `E_out`, together with its entrywise soundness, is a
 separate layer built on this certified boundary.
-
-## iii. Key definitions and results
-
-- `FiniteNetlistShape`: finite dependent component, port, and mode sizes.
-- `FiniteConnectionSpec`: a bidirectional physical-port connection with explicit mode maps in both
-  directions.
-- `FiniteNetlistData`: local scattering entries and a finite array of connection specifications.
-- `FiniteNetlistData.mapGains`: change only the local coefficient representation.
-- `FiniteNetlistData.WellFormed`: mutually inverse mode maps and globally unique endpoint ports.
-- `FiniteNetlistData.wellFormed_eq_true_iff`: Boolean reflection of the certificate.
-- `FiniteNetlistData.toFlatNetlist`: proof-carrying compilation into the N4 relational kernel.
-- `FiniteNetlistData.compile?`: checked compilation that rejects malformed finite data.
-
-## iv. Table of contents
-
-- A. Finite netlist shapes
-- B. Executable connection and component data
-- C. Decidable well-formedness
-- D. Compilation to typed flat netlists
 
 -/
 

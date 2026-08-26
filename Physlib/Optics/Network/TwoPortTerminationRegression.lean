@@ -17,16 +17,18 @@ four-wave solution pins the load orientation, and a reversed-law candidate is re
 asymmetric device gives three distinct output waves and pins the complete output order
 `(bL, (aR, bR))`.
 
-## ii. Scope
-
-The scalar return law is an algebraic orientation sentinel. It makes no passivity, losslessness,
-impedance, absorption, or physical-load claim.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Loaded identity behavior
 - B. Asymmetric complete-solution order
 - C. Reversed-orientation rejection
+
+## iv. References
+
+The scalar return law is an algebraic orientation sentinel. It makes no passivity, losslessness,
+impedance, absorption, or physical-load claim.
 
 -/
 

@@ -26,14 +26,7 @@ well-posedness exactly by injectivity of the pivot together with solvability for
 wave. Bijectivity of the pivot is then used only as a stronger sufficient hypothesis for the
 closed reflection and forward-transmission formulas.
 
-## ii. Scope and convention
-
-The load transform maps the forward wave `bR` arriving at the right boundary to the backward wave
-`aR` returning toward the device. The reported forward response is `bR` at that boundary, not
-transmission through or absorption by a physical load. No complete chain inverse, passivity,
-losslessness, causality, impedance model, or electromagnetic realization is assumed.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `BackwardFirstChainTransform.rightTerminationPivot`: `K₁₁ - Γ K₂₁`.
 - `BackwardFirstChainTransform.rightTerminationIncidentBlock`: `Γ K₂₂ - K₁₂`.
@@ -47,12 +40,19 @@ losslessness, causality, impedance model, or electromagnetic realization is assu
   `BackwardFirstChainTransform.rightTerminatedTransmissionTransform`: bijective-pivot response
   conveniences with closed block formulas.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Termination pivot and relational equations
 - B. Exact well-posedness criterion
 - C. Exact-gate responses and bijective-pivot formulas
 - D. Zero-return specialization
+
+## iv. References
+
+The load transform maps the forward wave `bR` arriving at the right boundary to the backward wave
+`aR` returning toward the device. The reported forward response is `bR` at that boundary, not
+transmission through or absorption by a physical load. No complete chain inverse, passivity,
+losslessness, causality, impedance model, or electromagnetic realization is assumed.
 
 -/
 

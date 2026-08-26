@@ -40,10 +40,11 @@ that cannot be recovered from a single real value.
 - B. Referenced magnetic amplitude
 - C. Temporal quadrature values
 
-## iv. Scope
+## iv. References
 
 These exact regressions assign no boundary equality, interface side, surface-source condition,
 Fresnel coefficient, observable, or power meaning.
+
 -/
 
 @[expose] public section

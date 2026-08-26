@@ -26,10 +26,11 @@ halved exactly.
 - A. Analyzer data and modal powers
 - B. Actual incident and outgoing flux
 
-## iv. Scope
+## iv. References
 
 These are exact convention checks for the explicit singleton model. They establish neither modal
 completeness nor the fate of the polarizer's rejected polarization.
+
 -/
 
 @[expose] public section

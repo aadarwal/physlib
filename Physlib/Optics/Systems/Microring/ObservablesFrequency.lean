@@ -62,7 +62,9 @@ noncomputable section
 
 namespace AddDrop
 
-/-! ## A. N5F parameterized compilation and response -/
+/-!
+## A. N5F parameterized compilation and response
+-/
 
 /-- A parameterized N7 component family obtained from frequency-indexed ring parameters.
 
@@ -210,7 +212,9 @@ lemma parameterizedNetlist_response_drop_power_eq_closedForm
   rw [parameterizedNetlist_response_drop_power,
     dropPower_eq_closedForm _ hDomain.2.fieldAttenuation_nonneg]
 
-/-! ## B. Nondispersive group-index model -/
+/-!
+## B. Nondispersive group-index model
+-/
 
 /-- A nondispersive round-trip model with constant group index and affine angular-frequency
 phase. -/
@@ -425,7 +429,9 @@ lemma dropPower_add_angularFSR (model : NondispersiveGroupIndexModel)
   simp only [parametersAt] at hCos
   rw [hCos]
 
-/-! ## C. Proof-gated free-spectral-range periodicity -/
+/-!
+## C. Proof-gated free-spectral-range periodicity
+-/
 
 /-- Under the nondispersive group-index hypothesis, the proof-gated N5F through response power is
 periodic with angular-frequency period `angularFSR`. -/

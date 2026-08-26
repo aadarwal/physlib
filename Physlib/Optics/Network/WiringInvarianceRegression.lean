@@ -22,18 +22,20 @@ The transported netlists remain multivalued at zero input and have no solution f
 input. These checks make the invariance result exercise relational semantics directly: neither
 fixture admits an inverse-based or unique-solution shortcut.
 
-## ii. Scope
-
-The scalar component coefficients remain algebraic sentinels. The tests establish wiring
-presentation invariance only; they make no passivity, losslessness, reciprocity, causality, or
-electromagnetic-normalization claim. A non-involutive index-direction sentinel requires a future
-fixture with at least three connections.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Shared finite instances
 - B. Endpoint-presentation exchange
 - C. Connection-index type change
+
+## iv. References
+
+The scalar component coefficients remain algebraic sentinels. The tests establish wiring
+presentation invariance only; they make no passivity, losslessness, reciprocity, causality, or
+electromagnetic-normalization claim. A non-involutive index-direction sentinel requires a future
+fixture with at least three connections.
 
 -/
 

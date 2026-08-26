@@ -19,7 +19,7 @@ a Jones vector, a coherency matrix can represent partially polarized light. The 
 generic in its index type so the same object can retain polarization coherences both within and
 between optical modes.
 
-## ii. Main definitions
+## ii. Key results
 
 - `CoherencyMatrix`: a complex matrix together with positive semidefiniteness.
 - `CoherencyMatrix.toSelfAdjoint`: coherency data as a bundled self-adjoint matrix.
@@ -28,12 +28,20 @@ between optical modes.
 - `PolarizationCoherency`: coherency data on two polarization coordinates.
 - `MultimodePolarizationCoherency`: joint mode-polarization coherency data.
 
-## iii. Scope
+## iii. Table of contents
+
+- A. General coherency data
+- B. Diagonal and trace observables
+- C. Linear transformation of coherency data
+- D. Polarization specializations
+
+## iv. References
 
 No Jones-purity or rank-one assumption is stored here. Pure-state constructions and their rank,
 determinant, and phase-invariance results belong in a later module that imports the Jones API.
 Finiteness assumptions occur only on operations that form finite sums; they are not fields of the
 coherency structure.
+
 -/
 
 @[expose] public section
@@ -45,7 +53,9 @@ open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
 
-/-! ## A. General coherency data -/
+/-!
+## A. General coherency data
+-/
 
 /-- A complex positive-semidefinite matrix describing optical second-order coherences.
 
@@ -74,7 +84,9 @@ def toSelfAdjoint {ι : Type*} (C : CoherencyMatrix ι) :
 lemma toSelfAdjoint_val {ι : Type*} (C : CoherencyMatrix ι) :
     C.toSelfAdjoint.val = C.toMatrix := rfl
 
-/-! ## B. Diagonal and trace observables -/
+/-!
+## B. Diagonal and trace observables
+-/
 
 /-- Every diagonal entry of a coherency matrix is nonnegative in Mathlib's scoped complex star
 order. -/
@@ -106,7 +118,9 @@ lemma coe_trace {ι : Type*} [Fintype ι] (C : CoherencyMatrix ι) :
     (C.trace : ℂ) = Matrix.trace C.toMatrix := by
   exact (Complex.eq_re_of_ofReal_le C.posSemidef.trace_nonneg).symm
 
-/-! ## C. Linear transformation of coherency data -/
+/-!
+## C. Linear transformation of coherency data
+-/
 
 /-- Transform coherency data by the linear amplitude map `A`, sending `C` to `A * C * Aᴴ`. -/
 def map {ι κ : Type*} [Fintype ι] [Finite κ]
@@ -145,7 +159,9 @@ lemma map_map {ι κ μ : Type*} [Fintype ι] [Fintype κ] [Finite μ]
 
 end CoherencyMatrix
 
-/-! ## D. Polarization specializations -/
+/-!
+## D. Polarization specializations
+-/
 
 /-- Coherency data for two polarization coordinates. -/
 abbrev PolarizationCoherency := CoherencyMatrix (Fin 2)

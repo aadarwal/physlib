@@ -24,7 +24,7 @@ proof-gated Laplace response domain. `frequencyResponse` exists only with member
 domain. It is the N5F response at the exponential delay tuple, and in the one-delay case it
 equals the reciprocal-Z response at `unitCirclePoint`.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `imaginaryFrequency`: the embedding `ω ↦ I * ω`.
 - `frequencyDelayEvaluation`: the delay tuple `q_i = exp (-I * ω * τ_i)`.
@@ -40,7 +40,7 @@ equals the reciprocal-Z response at `unitCirclePoint`.
 - B. Proof-gated network frequency response
 - C. One-delay reciprocal-Z agreement
 
-## iv. References and non-claims
+## iv. References
 
 The substitution `laplaceEvaluation` is defined as `exp (-s * τ_i)` in
 `Physlib/Optics/Systems/DelayTransfer/Basic.lean:225-227`. The exact N5F response-domain
@@ -60,6 +60,7 @@ derivatives is deferred to the later group-delay slice.
 
 This module implements the requested “frequency response under the chosen
 `q = exp (-s * τ) = z⁻¹` convention” from `goal.md:2279`.
+
 -/
 
 @[expose] public section

@@ -19,10 +19,7 @@ and the noncommuting Schur-product order. A singular chain with a bijective lead
 full-chain invertibility is unnecessary, while a chain with zero leading block and nonzero
 off-diagonal blocks has no scattering view.
 
-## ii. Scope
-
-These are fixed-frequency algebraic orientation sentinels. They make no losslessness, passivity,
-reciprocity, causality, or physical-realization claim.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -32,6 +29,11 @@ reciprocity, causality, or physical-realization claim.
 - D. Independent non-cancelling chain-to-scattering formula
 - E. Singular chain with a valid scattering pivot
 - F. Wrong-pivot negative case
+
+## iv. References
+
+These are fixed-frequency algebraic orientation sentinels. They make no losslessness, passivity,
+reciprocity, causality, or physical-realization claim.
 
 -/
 

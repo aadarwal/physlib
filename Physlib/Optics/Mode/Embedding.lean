@@ -21,7 +21,7 @@ The same maps zero-extend a rectangular mode transform into full input and outpu
 This is the linear-algebra interface needed to include a connected optical system in an ambient
 family containing exposed channels.
 
-## ii. Main definitions
+## ii. Key results
 
 - `ModeAmplitude.restrictEmbedding`: restrict an ambient amplitude along an embedding.
 - `ModeAmplitude.restrictEmbeddingLinearMap`: the bundled complex-linear amplitude restriction.
@@ -32,7 +32,15 @@ family containing exposed channels.
 - `ModeTransform.rangeProjector`: map ambient amplitudes onto the selected coordinates.
 - `ModeTransform.zeroExtend`: include a transform in full input and output mode families.
 
-## iii. Scope
+## iii. Table of contents
+
+- A. Restricted amplitudes
+- B. Restriction and zero extension
+- C. The selected-coordinate projector
+- D. Power and norm laws
+- E. Zero-extending mode transforms
+
+## iv. References
 
 Amplitude restriction and its bundled linear map do not require finite index families. The matrix,
 power, and norm results concern finite power-normalized coordinate families. A restriction is

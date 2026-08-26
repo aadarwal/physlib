@@ -80,7 +80,9 @@ noncomputable section
 
 namespace Microring
 
-/-! ## A. Field and power attenuation -/
+/-!
+## A. Field and power attenuation
+-/
 
 /-- A real scalar tagged for use as a field-amplitude attenuation factor. -/
 structure FieldAttenuation where
@@ -131,7 +133,9 @@ lemma isFieldAttenuation_powerToField {powerFactor : PowerAttenuation}
   · exact Real.sqrt_nonneg powerFactor.value
   · exact Real.sqrt_le_one.mpr hPower.2
 
-/-! ## B. Amplitude and power coupling -/
+/-!
+## B. Amplitude and power coupling
+-/
 
 /-- Through and cross field amplitudes for one ideal directional coupler. -/
 structure CouplingParameters where
@@ -223,7 +227,9 @@ def CouplingParameters.toTwoPortScattering (p : CouplingParameters) :
   ({ toModeTransform := DirectionalCoupler.mixing p.toDirectionalCoupler Unit } :
     ScatteringMatrix (Unit ⊕ Unit)).toTwoPortScatteringTransform
 
-/-! ## C. Physical propagation parameters -/
+/-!
+## C. Physical propagation parameters
+-/
 
 /-- Nondispersive fixed-carrier propagation data for one complete ring circulation. -/
 structure PhysicalParameters where
@@ -318,7 +324,9 @@ lemma PhysicalParameters.IsValid.isPowerAttenuation {p : PhysicalParameters}
   · apply Real.exp_le_one_iff.mpr
     nlinarith [mul_nonneg hp.2.1 hp.1]
 
-/-! ## D. One-bus and two-bus parameter maps -/
+/-!
+## D. One-bus and two-bus parameter maps
+-/
 
 /-- Physical data for a one-bus all-pass microring. -/
 structure AllPassPhysicalParameters where

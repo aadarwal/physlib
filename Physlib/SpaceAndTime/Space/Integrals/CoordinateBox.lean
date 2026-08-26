@@ -52,7 +52,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Coordinate box integrals -/
+/-!
+## A. Coordinate box integrals
+-/
 
 /-- An integrable scalar function on an ordered `Fin 2` box has the corresponding ordered
 iterated interval integral. -/
@@ -249,7 +251,9 @@ lemma finThree_setIntegral_Icc_eq_iterated
     exact hContinuous.continuousOn.integrableOn_compact
       (isCompact_Icc.prod isCompact_Icc)
 
-/-! ## B. Coordinate face integrals -/
+/-!
+## B. Coordinate face integrals
+-/
 
 /-- Fixing coordinate zero of an integrable `Fin 3` box density leaves coordinates one and two
 in that order. -/

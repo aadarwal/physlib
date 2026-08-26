@@ -37,7 +37,7 @@ angular frequency.
 At `z = 0`, `zInverseEvaluation` uses the field's totalized inverse. It has no reciprocal-Z
 interpretation there.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `DelayTuple`: an assignment to a finite family of formal delay variables.
 - `DelayPolynomial`, `DelayRational`: the polynomial ring and its fraction field.
@@ -55,7 +55,7 @@ interpretation there.
 - B. Rational presentations and their evaluation domains
 - C. Laplace and reciprocal-z substitutions
 
-## iv. References and non-claims
+## iv. References
 
 This module implements the convention required by `goal.md` section E.8 and section H.4 S4.
 It is source-neutral. Delay variables are formal, and no declaration says that a rational function
@@ -63,6 +63,7 @@ of them is rational in physical frequency. Such a statement would require a sepa
 and dispersion model. No pole, zero, resonance, stability, causality, or global phase claim is
 made here. This module does not construct a symbolically eliminated external response in the
 fraction field; that requires a separate determinant/adjugate development.
+
 -/
 
 @[expose] public section

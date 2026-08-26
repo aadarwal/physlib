@@ -23,7 +23,19 @@ propagation direction remains separate data. It identifies the complete electric
 fields of this purely harmonic solution from the same amplitude and component-phase data used to
 build the Jones vector.
 
-## ii. Scope
+## ii. Key results
+
+- `harmonicWaveX_electricField_transverse_eq_realize`: componentwise transverse realization.
+- `harmonicWaveX_electricField_eq_realize`: realization of the complete electric field.
+- `harmonicWaveX_magneticField_eq_realize`: realization of the compatible magnetic field.
+
+## iii. Table of contents
+
+- A. Carrier and fixed propagation frame
+- B. Plane-wave and electric-field bridge
+- C. Magnetic-field bridge
+
+## iv. References
 
 This module does not define an inverse amplitude-phase decomposition for arbitrary Jones vectors:
 signed amplitudes mean such data is not unique. It also does not reconstruct an electromagnetic
@@ -31,11 +43,6 @@ potential, which would require a gauge choice, and it makes no claim that square
 is irradiance or modal power. The explicit `harmonicWaveX` source contains no arbitrary static
 background, and this bridge does not extend to one. The magnetic result is for `B`, not `H`.
 
-## iii. Main results
-
-- `harmonicWaveX_electricField_transverse_eq_realize`: componentwise transverse realization.
-- `harmonicWaveX_electricField_eq_realize`: realization of the complete electric field.
-- `harmonicWaveX_magneticField_eq_realize`: realization of the compatible magnetic field.
 -/
 
 @[expose] public section
@@ -46,7 +53,9 @@ open Electromagnetism Electromagnetism.ElectromagneticPotential Space Matrix
 
 noncomputable section
 
-/-! ## A. Carrier and fixed propagation frame -/
+/-!
+## A. Carrier and fixed propagation frame
+-/
 
 /-- The propagation direction of `harmonicWaveX` in three spatial dimensions.
 
@@ -115,7 +124,9 @@ lemma JonesVector.realizeMagneticHarmonicWaveXFrame_eq
       Matrix.cons_val_one, div_eq_mul_inv] <;>
     ring
 
-/-! ## B. Plane-wave and electric-field bridge -/
+/-!
+## B. Plane-wave and electric-field bridge
+-/
 
 /-- The positive-wave-number harmonic solution is a plane wave in the named propagation
 direction. -/
@@ -158,7 +169,9 @@ lemma harmonicWaveX_electricField_eq_realize
       harmonicWaveX_electricField_transverse_eq_realize
         F hk amplitude phaseOffset t x (1 : Fin 2)
 
-/-! ## C. Magnetic-field bridge -/
+/-!
+## C. Magnetic-field bridge
+-/
 
 /-- The magnetic field of `harmonicWaveX` equals the compatible fixed-frame realization of the
 same Jones amplitude-phase data. -/

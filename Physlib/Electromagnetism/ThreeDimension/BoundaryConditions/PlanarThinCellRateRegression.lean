@@ -49,7 +49,9 @@ open Filter Matrix Space Time
 
 noncomputable section
 
-/-! ## A. Affine-time fields -/
+/-!
+## A. Affine-time fields
+-/
 
 /-- The first coordinate vector used by the compensating circulations. -/
 def planarThinCellRateRegressionCirculationVector : EuclideanSpace ℝ (Fin 3) :=
@@ -144,7 +146,9 @@ def planarThinCellRateRegressionBulkSources :
     PlanarMaxwellBulkSources planarThinCellRegressionPlane :=
   planarThinCellRegressionBulkSources
 
-/-! ## B. Exact finite-loop values -/
+/-!
+## B. Exact finite-loop values
+-/
 
 /-- Integrating constants on the two open half-intervals gives the half-thickness times their sum.
 The endpoints remain unassigned to either open side. -/
@@ -672,7 +676,9 @@ lemma planarThinCellRateRegression_electricFluxRate_ne_zero
   exact mul_ne_zero (by norm_num)
     (planarThinCellRegressionHalfThickness_pos scale).ne'
 
-/-! ## C. Integrability and Maxwell signs -/
+/-!
+## C. Integrability and Maxwell signs
+-/
 
 /-- Both electric-displacement principal faces are integrable in the rate fixture. -/
 private lemma planarThinCellRateRegression_electricGaussPrincipal_integrable

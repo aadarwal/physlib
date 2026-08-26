@@ -49,7 +49,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Affine-box divergence theorem -/
+/-!
+## A. Affine-box divergence theorem
+-/
 
 /-- The integral of divergence over an ordered affine box, including its signed frame determinant,
 equals the sum of the outward oriented fluxes through the three pairs of opposite faces.

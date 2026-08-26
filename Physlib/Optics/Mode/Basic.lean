@@ -18,20 +18,7 @@ modulus of a component is its contribution to the total modal power. Consequentl
 called power-preserving when it preserves the sum of these squared moduli for every input. The
 power and losslessness terminology in this file is internal to that normalization convention.
 
-## ii. Scope and conventions
-
-`ModeAmplitude` uses Mathlib's complex `EuclideanSpace`, whose `L²` inner product is the natural
-one for a finite family of mutually power-orthogonal channels. Evanescent or non-power-orthogonal
-modes require a more general flux pairing. Finite power-orthogonal radiation channels fit this
-API, while an unmodeled radiation continuum requires an integration layer.
-
-The index type may encode ports, propagation directions, polarizations, spatial modes, or a
-combination of these. A `ModeTransform ι κ` has input modes indexed by `ι` and output modes
-indexed by `κ`; its row index is therefore an output mode and its column index is an input mode. A
-`ScatteringMatrix ι` uses the same channel index set for distinct incident and outgoing amplitude
-spaces.
-
-## iii. Main definitions
+## ii. Key results
 
 - `ModeAmplitude`: a complex Euclidean space of power-normalized mode amplitudes.
 - `ModeAmplitude.power`: the total modal power.
@@ -48,7 +35,24 @@ spaces.
 - `ScatteringMatrix`: a wrapped square transform from incident to outgoing amplitudes.
 - `ScatteringMatrix.IsLossless`: a scattering matrix is unitary.
 
-## iv. Future connections
+## iii. Table of contents
+
+- A. Mode amplitudes and power
+- B. Mode transforms
+- C. Scattering matrices
+
+## iv. References
+
+`ModeAmplitude` uses Mathlib's complex `EuclideanSpace`, whose `L²` inner product is the natural
+one for a finite family of mutually power-orthogonal channels. Evanescent or non-power-orthogonal
+modes require a more general flux pairing. Finite power-orthogonal radiation channels fit this
+API, while an unmodeled radiation continuum requires an integration layer.
+
+The index type may encode ports, propagation directions, polarizations, spatial modes, or a
+combination of these. A `ModeTransform ι κ` has input modes indexed by `ι` and output modes
+indexed by `κ`; its row index is therefore an output mode and its column index is an input mode. A
+`ScatteringMatrix ι` uses the same channel index set for distinct incident and outgoing amplitude
+spaces.
 
 These definitions are independent of how a mode is obtained from an electromagnetic field. Later
 files can connect the normalization convention to Poynting flux and use the resulting scattering
@@ -66,7 +70,9 @@ open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
 
-/-! ## A. Mode amplitudes and power -/
+/-!
+## A. Mode amplitudes and power
+-/
 
 /-- The complex Euclidean space of amplitudes for optical modes indexed by `ι`.
 
@@ -237,7 +243,9 @@ lemma ModeAmplitude.power_directSum {ι μ : Type*} [Fintype ι] [Fintype μ]
   simp only [ModeAmplitude.power_eq_sum_normSq, Fintype.sum_sum_type,
     ModeAmplitude.directSum_apply_inl, ModeAmplitude.directSum_apply_inr]
 
-/-! ## B. Mode transforms -/
+/-!
+## B. Mode transforms
+-/
 
 /-- A complex matrix mapping mode amplitudes indexed by `ι` to amplitudes indexed by `κ`.
 
@@ -584,7 +592,9 @@ lemma ModeTransform.isPowerPreserving_iff_mem_unitaryGroup {ι : Type*}
   rw [ModeTransform.isPowerPreserving_iff_conjTranspose_mul_self,
     Matrix.mem_unitaryGroup_iff', Matrix.star_eq_conjTranspose]
 
-/-! ## C. Scattering matrices -/
+/-!
+## C. Scattering matrices
+-/
 
 /-- A scattering matrix from incident to outgoing amplitudes on channels indexed by `ι`.
 

@@ -43,7 +43,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Affine box geometry -/
+/-!
+## A. Affine box geometry
+-/
 
 /-- The point with affine coordinates `(u, v, w)` in the ordered spatial frame
 `(first, second, third)` about `center`. -/
@@ -73,7 +75,9 @@ lemma fderiv_affineBoxCoordinatePoint (center first second third : Space)
     fun_prop
   fin_cases i <;> simp [fderiv_apply hId]
 
-/-! ## B. Directional derivatives of field pairings -/
+/-!
+## B. Directional derivatives of field pairings
+-/
 
 /-- Differentiating a fixed-direction field pairing in box coordinate `i` differentiates the
 field in the corresponding ordered spatial direction. -/

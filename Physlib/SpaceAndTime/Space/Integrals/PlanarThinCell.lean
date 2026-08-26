@@ -41,7 +41,7 @@ explicit hypothesis.
 ## iii. Table of contents
 
 - A. Normalized interval and square averages
-- A.1. Integrability of iterated cell integrals
+  - A.1. Integrability of iterated cell integrals
 - B. Planar sample geometry
 - C. Thin-loop families
 - D. Pillbox families
@@ -49,6 +49,7 @@ explicit hypothesis.
 ## iv. References
 
 This is neutral geometry and integration infrastructure for the E4b Maxwell boundary derivation.
+
 -/
 
 @[expose] public section
@@ -61,7 +62,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Normalized interval and square averages -/
+/-!
+## A. Normalized interval and square averages
+-/
 
 /-- The interval integral over `[-radius, radius]`, divided by its signed length `2 * radius`.
 
@@ -92,7 +95,9 @@ the shared endpoint. -/
 def splitNormalIntegral (halfThickness : ℝ) (negative positive : ℝ → ℝ) : ℝ :=
   (∫ w in -halfThickness..0, negative w) + ∫ w in 0..halfThickness, positive w
 
-/-! ### A.1. Integrability of iterated cell integrals -/
+/-!
+### A.1. Integrability of iterated cell integrals
+-/
 
 /-- Integrability on the symmetric interval used by a normalized cell average. -/
 def SymmetricIntervalIntegrable (radius : ℝ) (f : ℝ → ℝ) : Prop :=
@@ -130,7 +135,9 @@ def SplitBoxIntegrable (radius halfThickness : ℝ)
 
 namespace OrientedAffineHyperplane
 
-/-! ## B. Planar sample geometry -/
+/-!
+## B. Planar sample geometry
+-/
 
 /-- An ambient point displaced tangentially from a carrier point and then by a signed amount
 along the stored normal. Positive offsets lie on the positive side and negative offsets on the
@@ -307,7 +314,9 @@ lemma tangent_cross_quarterTurnTangent_of_norm_eq_one
 
 end OrientedAffineHyperplane
 
-/-! ## C. Thin-loop families -/
+/-!
+## C. Thin-loop families
+-/
 
 /-- Positive shrinking planar-cell scales whose thickness vanishes relative to their principal
 radius. The aspect-ratio condition is the geometric gate used to kill normalized short-edge and
@@ -458,7 +467,9 @@ def SpanningSurfaceIntegrable {plane : OrientedAffineHyperplane 3}
 
 end PlanarThinLoopFamily
 
-/-! ## D. Pillbox families -/
+/-!
+## D. Pillbox families
+-/
 
 /-- A sequence of planar pillboxes shrinking to one carrier point. The stored unit tangent and its
 oriented quarter-turn parameterize the principal faces. -/

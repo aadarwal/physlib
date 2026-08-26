@@ -65,7 +65,9 @@ noncomputable section
 
 namespace MachZehnder
 
-/-! ## A. Parameters and component family -/
+/-!
+## A. Parameters and component family
+-/
 
 /-- The two couplers and two fixed-carrier arms of a Mach--Zehnder interferometer. -/
 structure Parameters where
@@ -226,7 +228,9 @@ instance componentChannelDecidableEq (p : Parameters) (component : Component) :
     DecidableEq ((components p).portFamily component).Channel := by
   cases component <;> change DecidableEq (Sigma fun _ : Fin _ => Unit) <;> infer_instance
 
-/-! ## B. Physical wiring and external channels -/
+/-!
+## B. Physical wiring and external channels
+-/
 
 /-- The four arm-end connections between the two couplers and two propagation components. -/
 inductive Connection
@@ -545,7 +549,9 @@ lemma leftInput_apply (p : Parameters) (first second : ℂ) (port : ExternalPort
     | .outputSecond => 0) = _
   rw [Equiv.symm_apply_apply]
 
-/-! ## C. Component and routing coordinate laws -/
+/-!
+## C. Component and routing coordinate laws
+-/
 
 /-- Embed one local component channel into the aggregate Mach--Zehnder boundary. -/
 @[reducible]
@@ -907,7 +913,9 @@ lemma lowerArm_outgoing_left (p : Parameters)
     (localIncident p incident .lowerArm) (armChannel 0) = _
   rw [armScattering_apply_left, localIncident_apply]
 
-/-! ## D. N5 well-posedness and extracted amplitudes -/
+/-!
+## D. N5 well-posedness and extracted amplitudes
+-/
 
 /-- A solution of the N5 feedback equation is the N4 incident assembly of component outputs and
 the supplied external input. -/

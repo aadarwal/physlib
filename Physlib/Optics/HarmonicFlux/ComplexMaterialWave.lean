@@ -38,7 +38,7 @@ an amplitude envelope scaled by `exp (-alpha * u)` scales mean flux by `exp (-2 
 - A. Local material phasors
 - B. Actual-field harmonic flux
 
-## iv. Scope
+## iv. References
 
 These identities are local, kinematic, and off shell. They allow zero electric amplitude and
 require no transversality, dispersion, Maxwell, passivity, conservation, or nonnegativity
@@ -52,6 +52,7 @@ is assumed here.
 The results are flux-density identities, not aperture-integrated or modal power. They introduce
 no interface side, incident, reflected, transmitted, outgoing, evanescent, Fresnel, total internal
 reflection, or half-space-support claim; the ordinary-real fields remain globally defined.
+
 -/
 
 @[expose] public section

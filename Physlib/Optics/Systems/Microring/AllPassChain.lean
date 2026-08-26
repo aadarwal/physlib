@@ -58,7 +58,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. Scalar pivot -/
+/-!
+## A. Scalar pivot
+-/
 
 /-- A constant amplitude on the singleton backward-wave family. -/
 private def backwardAmplitude (value : ℂ) : ModeAmplitude (BackwardWave Unit) :=
@@ -183,7 +185,9 @@ lemma packagedTwoPortScattering_hasBijectiveRightToLeftTransmission
   (packagedTwoPortScattering_hasBijectiveRightToLeftTransmission_iff p hDenominator).2
     hTransmission
 
-/-! ## B. Explicit backward-first chain matrix -/
+/-!
+## B. Explicit backward-first chain matrix
+-/
 
 /-- The totalized explicit all-pass chain matrix in backward-first order.
 
@@ -244,7 +248,9 @@ lemma backwardFirstChainTransform_eq_matrix (p : Parameters)
       packagedTwoPortScattering_rightToLeftTransmissionInverse_entry p hDenominator
         hTransmission]
 
-/-! ## C. Behavioral agreement and round trip -/
+/-!
+## C. Behavioral agreement and round trip
+-/
 
 /-- The derived chain graph is the backward-first regrouping of the singular-safe N5 behavior. -/
 lemma toBehavior_backwardFirstChainTransform (p : Parameters)

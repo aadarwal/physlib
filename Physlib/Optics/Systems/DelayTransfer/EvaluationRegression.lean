@@ -37,7 +37,7 @@ proved entry by entry. The proof-gated response anchor therefore exercises ratio
 pointwise compilation, S2 wiring, and N5 elimination without invoking the general commutation
 theorem.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `allPassDelayModel`: the retained one-delay rational presentation.
 - `allPassDelayModel_eq_throughTransfer`: agreement with the S2 all-pass response.
@@ -62,7 +62,7 @@ theorem.
 - C. Compiled rational-netlist regression
 - D. Non-real convention anchor
 
-## iv. References and non-claims
+## iv. References
 
 The all-pass transfer, loop coefficient, and solve gate are defined in
 `Physlib/Optics/Systems/Microring/AllPass.lean:114-188`. The two exact phase fixtures and transfer
@@ -74,6 +74,7 @@ The compiled fixture reuses `AllPass.componentPortFamily`, `AllPass.Connection`,
 Here `q` is a formal propagation factor. The declarations make no rational-in-frequency,
 dispersion, group-delay, global-phase, stability, or physical-resonance claim. They do not perform
 symbolic external-response elimination in the fraction field.
+
 -/
 
 @[expose] public section

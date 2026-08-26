@@ -80,7 +80,9 @@ noncomputable section
 
 namespace Microring
 
-/-! ## A. Exact attenuation and coupling data -/
+/-!
+## A. Exact attenuation and coupling data
+-/
 
 /-- The exact `3-4-5` amplitude coupler used by the physical fixtures. -/
 def physicalRegressionCoupling : CouplingParameters where
@@ -167,7 +169,9 @@ lemma physicalRegression_quarterAttenuation :
     Real.exp_neg, Real.exp_add, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
   norm_num
 
-/-! ## B. Exact zero-, quarter-, and half-turn physical phase points -/
+/-!
+## B. Exact zero-, quarter-, and half-turn physical phase points
+-/
 
 /-- A rational zero-optical-depth, zero-phase physical propagation point. -/
 def physicalRegressionRationalZeroPhase : PhysicalParameters where
@@ -261,7 +265,9 @@ lemma physicalRegression_quarterTurn_carrierPhaseFactor :
   push_cast
   ring
 
-/-! ## C. Maps to the named S2 parameters -/
+/-!
+## C. Maps to the named S2 parameters
+-/
 
 /-- The physical point whose derived parameters are the named S2 all-pass resonance point. -/
 def physicalRegressionAllPass : AllPassPhysicalParameters where
@@ -331,7 +337,9 @@ lemma physicalRegression_addDropHalfTurn_toParameters :
     physicalRegressionQuarterAttenuation]
   ring
 
-/-! ## D. Direct internal-field anchors -/
+/-!
+## D. Direct internal-field anchors
+-/
 
 /-- Direct one-bus internal fields at the exact resonance fixture. -/
 def physicalRegressionAllPassInternalFields : AllPassInternalFields where
@@ -379,7 +387,9 @@ lemma physicalRegression_addDrop_fieldRelation :
   rw [Complex.I_sq]
   norm_num
 
-/-! ## E. Independent N5 response anchors -/
+/-!
+## E. Independent N5 response anchors
+-/
 
 /-- The physical one-bus topology is well posed at the named exact point. -/
 lemma physicalRegression_allPass_isWellPosed :
@@ -456,7 +466,9 @@ lemma physicalRegression_addDrop_responses :
       AddDrop.dropChannel).trans
         AddDrop.addDropRegression_resonance_responseTransform_entry_drop
 
-/-! ## F. Independently expanded source-composition anchors -/
+/-!
+## F. Independently expanded source-composition anchors
+-/
 
 open MicroringSourceBridge
 open scoped ComplexOrder

@@ -54,7 +54,9 @@ noncomputable section
 
 namespace AddDrop
 
-/-! ## A. Exact well-posedness and N5 response -/
+/-!
+## A. Exact well-posedness and N5 response
+-/
 
 /-- The forward-circulating input-coupler coordinate vanishes in a homogeneous fixed point. -/
 lemma forwardLoop_inputCoupler_leftSecond_eq_zero (p : Parameters)
@@ -725,7 +727,9 @@ lemma responseTransform_entry_drop_input (p : Parameters)
   have hResponse := response_drop p hDenominator 1
   simpa [inputAmplitude, Matrix.toLpLin_apply] using hResponse
 
-/-! ## B. Convergent multiple-round-trip view -/
+/-!
+## B. Convergent multiple-round-trip view
+-/
 
 /-- The totalized `tsum` of circulation powers, with series meaning only under summability. -/
 def roundTripSeries (p : Parameters) : ℂ :=

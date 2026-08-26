@@ -22,11 +22,7 @@ coordinate is independently shown to have power one and to map to zero, proving 
 partial routing is passive but not globally power-preserving. A separate connected amplitude
 checks exact preservation on the selected subspace.
 
-## ii. Scope
-
-The complement-coordinate amplitude is excluded from this internal-wiring contribution. Its zero
-output does not describe absorption, a matched termination, radiation, or a complete incident-field
-boundary condition. All power statements use only normalized finite modal coordinates.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -36,6 +32,12 @@ boundary condition. All power statements use only normalized finite modal coordi
 - D. Omitted-coordinate power witness
 - E. Connected-subspace power
 - F. Cascade-orientation witness
+
+## iv. References
+
+The complement-coordinate amplitude is excluded from this internal-wiring contribution. Its zero
+output does not describe absorption, a matched termination, radiation, or a complete incident-field
+boundary condition. All power statements use only normalized finite modal coordinates.
 
 -/
 

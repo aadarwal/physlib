@@ -33,12 +33,13 @@ radiation channels.
 
 ## iii. Table of contents
 
-- A. Exact physical-port normalized-modal-power preservation
+- A. Exact physical power preservation
 - B. Physical power-gain witness
 
 ## iv. References
 
 This is a source-neutral coordinate-invariance regression.
+
 -/
 
 @[expose] public section
@@ -49,7 +50,9 @@ noncomputable section
 
 namespace DirectionalCoupler
 
-/-! ## A. Exact physical power preservation -/
+/-!
+## A. Exact physical power preservation
+-/
 
 /-- The physical incident fixture has normalized modal power `30`. -/
 lemma directionalCouplerPhysicalPowerRegression_incident_power :
@@ -79,7 +82,9 @@ lemma directionalCouplerPhysicalPowerRegression_isLossless :
   physicalScattering_isLossless directionalCouplerRegressionParameters
     directionalCouplerPowerRegression_isValid.isUnitary
 
-/-! ## B. Physical power-gain witness -/
+/-!
+## B. Physical power-gain witness
+-/
 
 /-- A unit physical pulse entering the first arm from the left side. -/
 def directionalCouplerPhysicalPowerRegressionGainInput :

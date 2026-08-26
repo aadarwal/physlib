@@ -27,7 +27,7 @@ sufficiency direction passes the unit-circle region-of-convergence result to
 `Physlib.ZTransform.isBIBOStable_of_sphere_subset_ROC`; it does not rederive the general BIBO
 theorem. Necessity is proved for this class with explicit bounded inputs.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `ReducedRationalResponse.zeroFinset`, `poleFinset`: finite distinct polynomial roots.
 - `ReducedRationalResponse.card_zeroFinset_le_natDegree`: the zero degree bound.
@@ -49,7 +49,7 @@ theorem. Necessity is proved for this class with explicit bounded inputs.
 - C. The nonzero proper causal one-pole class
 - D. The stated-class Schur and BIBO equivalence
 
-## iv. References and non-claims
+## iv. References
 
 `Physlib.ZTransform.IsBIBOStable`,
 `Physlib.ZTransform.isBIBOStable_of_sphere_subset_ROC`, and
@@ -71,6 +71,7 @@ observability theorem, and no physical-frequency, passivity, group-delay, or dis
 
 This module implements the requested “degree and finiteness bounds” at `goal.md:2274` and the
 stated-class Schur/BIBO requirement at `goal.md:2277-2278`.
+
 -/
 
 @[expose] public section

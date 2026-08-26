@@ -20,16 +20,7 @@ graph is the behavior.
 Relational series composition then yields ordinary matrix multiplication, with the later component
 on the left.
 
-## ii. Scope
-
-These are fixed-frequency complex-linear semantics. This file does not infer chain functionality
-from a scattering matrix and introduces no block inverse. Such an inference requires an appropriate
-transmission-block hypothesis.
-
-Series composition identifies the complete middle state literally. Different labels, direction
-orders, phase gauges, or reference planes require an explicit adapter behavior.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `BackwardFirstTwoPortBehavior.HasLeftToRightChainView`: the proof gate for a chain transform.
 - `BackwardFirstTwoPortBehavior.leftToRightChainTransform`: the matrix derived from a functional
@@ -40,10 +31,19 @@ orders, phase gauges, or reference planes require an explicit adapter behavior.
 - `BackwardFirstTwoPortBehavior.leftToRightChainTransform_series`: relational series becomes
   matrix cascade.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Behavior-derived chain transforms
 - B. Chain transforms under series composition
+
+## iv. References
+
+These are fixed-frequency complex-linear semantics. This file does not infer chain functionality
+from a scattering matrix and introduces no block inverse. Such an inference requires an appropriate
+transmission-block hypothesis.
+
+Series composition identifies the complete middle state literally. Different labels, direction
+orders, phase gauges, or reference planes require an explicit adapter behavior.
 
 -/
 

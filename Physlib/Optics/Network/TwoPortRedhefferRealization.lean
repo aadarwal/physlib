@@ -30,7 +30,7 @@ reciprocity, passivity, losslessness, convergence, or physical-realization assum
 ## iii. Table of contents
 
 - A. Internal-equation equivalence
-- B. Realization of relational series composition
+- B. Behavioral realization
 
 ## iv. References
 
@@ -47,6 +47,7 @@ variable {ι : Type u} {κ : Type v} {μ : Type w}
 /-!
 ## A. Internal-equation equivalence
 -/
+
 private lemma redhefferBlockEquations_iff_internalEquations
     [Fintype ι] [DecidableEq ι] [Fintype κ] [DecidableEq κ]
     [Fintype μ] [DecidableEq μ]
@@ -151,6 +152,7 @@ private lemma redhefferBlockEquations_iff_internalEquations
 /-!
 ## B. Behavioral realization
 -/
+
 /-- The Redheffer block formula has exactly the relational series behavior after backward-first
 regrouping. -/
 lemma toBackwardFirstBehavior_redhefferBlockFormula

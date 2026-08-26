@@ -43,7 +43,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Affine rectangle geometry -/
+/-!
+## A. Affine rectangle geometry
+-/
 
 /-- The point with affine coordinates `(u, v)` in the ordered spatial frame `(first, second)`
 about `center`. -/
@@ -74,7 +76,9 @@ lemma fderiv_planarRectanglePoint_second (center first second : Space) (p : ℝ 
   rw [fderiv_fst, fderiv_snd]
   simp
 
-/-! ## B. Directional derivatives of field pairings -/
+/-!
+## B. Directional derivatives of field pairings
+-/
 
 /-- Differentiating a field pairing along the first rectangle coordinate differentiates the field
 in the first spatial direction. -/

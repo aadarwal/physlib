@@ -47,7 +47,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Oriented rectangular Stokes identity -/
+/-!
+## A. Oriented rectangular Stokes identity
+-/
 
 /-- The coordinate divergence used for the clockwise rectangle boundary is the curl flux through
 the oriented surface `second × first`. -/

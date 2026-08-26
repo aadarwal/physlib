@@ -41,7 +41,7 @@ an independently differentiated scalar extension give its exact network group de
 - B. Exact sign, dispersion, and zero-domain anchors
 - C. Compiled all-pass group-delay anchor
 
-## iv. References and non-claims
+## iv. References
 
 The local logarithmic-derivative domains and totalized quantities are defined in
 `Physlib/Optics/Systems/DelayTransfer/GroupDelay.lean:76-185`. This regression derives exact
@@ -59,6 +59,7 @@ differentiability remains withheld, and the production network formulas require 
 local regularity. No material-dispersion law, rational-in-frequency result, time-domain causality
 statement, passivity claim, units assignment, or source-parity claim is made. The coefficient
 called dispersion is literally the derivative of the displayed local group delay.
+
 -/
 
 @[expose] public section

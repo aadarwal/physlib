@@ -44,11 +44,12 @@ zero mean normal flux.
 - B. Nontransverse material-shell fixture
 - C. Nontransverse mean flux
 
-## iv. Scope
+## iv. References
 
 These exact regressions test the selected carrier, transversality, material, and
 Poynting conventions. They assign no interface boundary condition, transmitted or outgoing role,
 Fresnel coefficient, total-internal-reflection balance, aperture power, or modal power.
+
 -/
 
 @[expose] public section

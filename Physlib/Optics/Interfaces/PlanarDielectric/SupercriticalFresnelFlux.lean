@@ -48,12 +48,13 @@ port, or supply outgoing, causal, limiting-absorption, aperture-power, or modal-
 - A. Separate-wave total-reflection flux
 - B. Actual superposed-field total-reflection flux
 
-## iv. Scope
+## iv. References
 
 The boundary hypotheses are reduced complex-amplitude balances and referenced carrier connectors.
 They are not derived here from integral Maxwell laws. No nonzero incident amplitude is required;
 the zero solution remains a valid degenerate case. A later named physical-classification layer may
 add a nonzero incident guard when the phrase "an incident field is totally reflected" is intended.
+
 -/
 
 @[expose] public section

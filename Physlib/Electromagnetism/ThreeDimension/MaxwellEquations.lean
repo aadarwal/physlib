@@ -9,14 +9,15 @@ public import Physlib.Electromagnetism.ThreeDimension.Basic
 public import Physlib.Electromagnetism.Dynamics.IsExtrema
 
 /-!
+# Maxwell's equations in three dimensions
 
-# A. Maxwell's equations in three dimensions
+## i. Overview
 
 Maxwell's equations relate electric and magnetic fields to electric charge and current. In three
 spatial dimensions they can be written using the familiar divergence, curl, and time-derivative
 operators of vector calculus.
 
-## A.1. Main results
+## ii. Key results
 
 This module proves the four differential equations:
 
@@ -26,7 +27,11 @@ This module proves the four differential equations:
 - `faradayLaw`, relating the curl of the electric field to the time derivative of the magnetic
   field.
 
-## A.2. Relation to the covariant formulation
+## iii. Table of contents
+
+- A. Differential Maxwell laws
+
+## iv. References
 
 The electric and magnetic fields are obtained from an electromagnetic potential. Gauss's law for
 the electric field and Ampère's law are derived from the covariant extremality condition
@@ -34,11 +39,11 @@ the electric field and Ampère's law are derived from the covariant extremality 
 smoothness assumptions. The results therefore connect the tensorial backend to the standard
 three-dimensional presentation.
 
-## A.3. Current scope
-
 The statements here are pointwise differential equations in free space. Integral formulations,
 boundary conditions, and constitutive laws for material media are outside the current scope of this
 module.
+
+## A. Differential Maxwell laws
 
 -/
 

@@ -24,11 +24,12 @@ frequency response. It introduces no declarations or additional claims.
 
 ## iii. Table of contents
 
-- A. Fixed-frequency power observables, re-exported from `ObservablesPower`
-- B. Proof-gated frequency observables, re-exported from `ObservablesFrequency`
+- A. Module contents
 
 ## iv. References
 
 The imported modules state their N5F, N6, and N7 declaration locations and their respective
 non-claims.
+
+## A. Module contents
 -/

@@ -34,7 +34,7 @@ evaluating the formal delays, compiling, and eliminating gives the compiled rela
 domains are exact preimages, and their proof-gated responses are the original rational-delay
 response evaluated at `q_i = exp (-s * τ_i)` or `q = z⁻¹`.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `RationalComponentFamily`: component scattering entries presented as rational delay models.
 - `RationalComponentFamily.toParameterizedComponentFamily`: pointwise N5F component family.
@@ -55,7 +55,7 @@ response evaluated at `q_i = exp (-s * τ_i)` or `q = z⁻¹`.
 - C. N5F evaluation commutation
 - D. Laplace and reciprocal-z reparameterization
 
-## iv. References and non-claims
+## iv. References
 
 The domain split is inherited from
 `Physlib/Optics/Network/ParameterizedResponse.lean:441-468`: `solveDomain` is algebraic
@@ -69,6 +69,7 @@ causality, stability, resonance, group-delay, or dispersion claim. No eliminatio
 reproved here. In particular, symbolic rational elimination of the external response is future
 work; this module only evaluates retained component presentations pointwise into N5F.
 No degree or finiteness bound for an eliminated response is proved here.
+
 -/
 
 @[expose] public section

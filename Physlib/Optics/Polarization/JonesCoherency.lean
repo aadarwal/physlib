@@ -24,12 +24,21 @@ For nonzero Jones vectors, the construction represents fully polarized light. Ge
 `PolarizationCoherency` values need not arise from a Jones vector and can represent partially
 polarized light.
 
-## ii. Main results
+## ii. Key results
 
 - `JonesVector.coherency`: the pure coherency matrix of a Jones vector.
 - `JonesVector.coherency_trace`: pure coherency trace equals squared Jones intensity.
 - `JonesVector.coherency_scale_of_norm_eq_one`: global unit-phase invariance.
 - `JonesMatrix.act_coherency`: Jones action commutes with coherency transport.
+
+## iii. Table of contents
+
+- A. Pure coherency data
+- B. Global phase
+- C. Jones transformations
+
+## iv. References
+
 -/
 
 @[expose] public section
@@ -41,7 +50,9 @@ open scoped ComplexConjugate ComplexOrder
 
 noncomputable section
 
-/-! ## A. Pure coherency data -/
+/-!
+## A. Pure coherency data
+-/
 
 namespace JonesVector
 
@@ -81,7 +92,9 @@ lemma coherency_trace (J : JonesVector) : J.coherency.trace = J.intensity := by
     JonesVector.intensity_eq_sum_normSq]
   simp [dotProduct, Complex.mul_conj]
 
-/-! ## B. Global phase -/
+/-!
+## B. Global phase
+-/
 
 /-- Scaling a Jones vector scales its pure coherency matrix by the squared scalar modulus. -/
 lemma coherency_scale_toMatrix (z : ℂ) (J : JonesVector) :
@@ -111,7 +124,9 @@ lemma coherency_phaseShift (phase : ℝ) (J : JonesVector) :
 
 end JonesVector
 
-/-! ## C. Jones transformations -/
+/-!
+## C. Jones transformations
+-/
 
 namespace JonesMatrix
 

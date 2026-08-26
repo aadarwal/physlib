@@ -24,7 +24,19 @@ followed by left/right outgoing amplitudes. `TwoPortScatteringBehavior.toBackwar
 only this reversible regrouping. It does not solve an equation or assume that either view is
 functional.
 
-## ii. Scope
+## ii. Key results
+
+- `BackwardFirstTravellingWaveState`: backward and forward amplitudes at one reference plane.
+- `BackwardFirstTwoPortBehavior`: a relation between left and right travelling-wave states.
+- `TwoPortScatteringBehavior`: the same physical variables grouped as incident and outgoing data.
+- `TwoPortScatteringBehavior.toBackwardFirst`: reversible backward-first regrouping.
+
+## iii. Table of contents
+
+- A. Travelling-wave states and two-port relations
+- B. Scattering-coordinate regrouping
+
+## iv. References
 
 These are fixed-frequency complex-linear semantics. The reference-plane orientation and state
 ordering are explicit, but no phase convention, propagation segment, termination, passivity,
@@ -38,18 +50,6 @@ partners.
 
 Here “two-port” means two reference planes carrying four travelling waves. It is not the
 separately named internal-ring two-port model used in some integrated-photonics sources.
-
-## iii. Key definitions and results
-
-- `BackwardFirstTravellingWaveState`: backward and forward amplitudes at one reference plane.
-- `BackwardFirstTwoPortBehavior`: a relation between left and right travelling-wave states.
-- `TwoPortScatteringBehavior`: the same physical variables grouped as incident and outgoing data.
-- `TwoPortScatteringBehavior.toBackwardFirst`: reversible backward-first regrouping.
-
-## iv. Table of contents
-
-- A. Travelling-wave states and two-port relations
-- B. Scattering-coordinate regrouping
 
 -/
 

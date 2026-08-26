@@ -34,11 +34,12 @@ repository's algebraic quadrature name rather than assigning a circular-polariza
 - A. Constant quadrature-state flux
 - B. Instantaneous versus mean linear-state flux
 
-## iv. Scope
+## iv. References
 
 These regressions use arbitrary oriented polarization frames and homogeneous isotropic media.
 They introduce no observer-dependent handedness, interface normal, aperture power, modal
 normalization, outgoing-wave role, or evanescence claim.
+
 -/
 
 @[expose] public section

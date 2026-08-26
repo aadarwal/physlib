@@ -10,10 +10,21 @@ public import Physlib.Optics.Polarization.Mueller.Algebra
 /-!
 # Regression theorems for deterministic Mueller conventions
 
+## i. Overview
+
 The algebraically named matrix diag(1, I) detects the selected Stokes ordering, factor, third
 coordinate sign, and Jones/Mueller action agreement without assigning a handedness name or an
 optical-component interpretation. A separate scalar regression distinguishes Jones amplitude
 scaling from Mueller intensity scaling.
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Sign- and scaling-sensitive regressions
+
+## iv. References
+
 -/
 
 @[expose] public section

@@ -24,7 +24,7 @@ used. For an N5F frequency-response entry, the audited domain additionally requi
 to lie in the interior of the proof-gated response domain. This makes the arbitrary value of the
 total extension outside that domain locally irrelevant.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `localLogDerivativeDomain`: differentiability and a nonzero response value.
 - `eventually_ne_zero_of_mem_localLogDerivativeDomain`: the audited zero-free germ.
@@ -42,7 +42,7 @@ total extension outside that domain locally irrelevant.
 - A. Scalar local logarithmic derivatives
 - B. Proof-gated frequency-response entries
 
-## iv. References and non-claims
+## iv. References
 
 The proof-gated frequency response and its exact domain are defined in
 `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:174-203`. The underlying N5F
@@ -60,6 +60,7 @@ no global `Complex.arg`, phase-unwrapping, continuity-across-zeros,
 rational-in-physical-frequency, time-domain causality, passivity, material-dispersion, or units
 claim. In particular, the quantity named dispersion below is literally the angular-frequency
 derivative of local group delay, not a constitutive material dispersion law.
+
 -/
 
 @[expose] public section

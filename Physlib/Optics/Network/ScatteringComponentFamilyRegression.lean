@@ -22,12 +22,7 @@ tests pin the dependent-sum reassociation, both cross-component zero directions,
 orientation through nominal incident and outgoing endpoints, and the action on an input supported
 at every aggregate channel.
 
-## ii. Scope
-
-The arbitrary complex coefficients are algebraic sentinels. They make no losslessness, passivity,
-reciprocity, physical-realizability, source, detector, interconnection, or feedback claim.
-Cross-component zeros express absence of direct component scattering before wiring; they do not
-model termination or absorption.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -36,6 +31,13 @@ model termination or absorption.
 - C. Exact block-diagonal entries
 - D. Mixed-amplitude action
 - E. Componentwise behavior
+
+## iv. References
+
+The arbitrary complex coefficients are algebraic sentinels. They make no losslessness, passivity,
+reciprocity, physical-realizability, source, detector, interconnection, or feedback claim.
+Cross-component zeros express absence of direct component scattering before wiring; they do not
+model termination or absorption.
 
 -/
 

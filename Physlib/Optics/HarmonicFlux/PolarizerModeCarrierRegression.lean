@@ -21,7 +21,7 @@ The result retains coherent complex phase as well as the already checked factor-
 reduction. It therefore catches a carrier bridge that preserves only squared norms or swaps a
 transverse polarization coordinate.
 
-## ii. Key result
+## ii. Key results
 
 - `polarizerModeCarrierRegression_output_electricAmplitude`: exact complex carrier sentinel.
 
@@ -29,10 +29,11 @@ transverse polarization coordinate.
 
 - A. Exact analyzer-output carrier
 
-## iv. Scope
+## iv. References
 
 This is a convention regression for the singleton Maxwell carrier. It adds no completeness,
 reflection, absorption, or internal-component field claim.
+
 -/
 
 @[expose] public section

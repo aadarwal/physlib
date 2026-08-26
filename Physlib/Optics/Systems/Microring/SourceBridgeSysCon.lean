@@ -53,7 +53,7 @@ statement.
 - C. SysCon'15 drop response and power
 - D. Log-base-explicit rejection ratios
 
-## iv. References and non-claims
+## iv. References
 
 SysCon Defs. 9--11 and Thms. 5--7 are summarized at `HOL-CORPUS.md:244-249`.
 
@@ -70,6 +70,7 @@ SysCon transfer quotients and their norm-square powers are also totalized at zer
 Their algebraic identities remain meaningful there, but an N5 response claim requires the
 displayed nonzero-denominator or contraction gate. Exact printed-Thm.-6 parity and the source's
 unaudited logarithm base are not claimed.
+
 -/
 @[expose] public section
 
@@ -78,7 +79,9 @@ namespace Optics
 noncomputable section
 
 namespace MicroringSourceBridge
-/-! ## C. SysCon'15 drop response and power -/
+/-!
+## C. SysCon'15 drop response and power
+-/
 
 /-- The six real SysCon'15 drop-response parameters from `HOL-CORPUS.md:244-249`. -/
 structure SysConParameters where
@@ -362,7 +365,9 @@ theorem sysConDropPower_eq_amplitudePowerDenominator (p : SysConParameters)
   simp only [SysConParameters.realLoopGain]
   ring
 
-/-! ## D. Log-base-explicit rejection ratios -/
+/-!
+## D. Log-base-explicit rejection ratios
+-/
 
 /-- Ten times a logarithm in an explicit base, applied to a power ratio. -/
 def powerRatioInBase (base numerator denominator : ℝ) : ℝ :=

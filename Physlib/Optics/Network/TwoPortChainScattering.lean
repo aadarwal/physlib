@@ -20,17 +20,7 @@ Under that exact block hypothesis, the public scattering transform is extracted 
 functional regrouped behavior. Its four-block formula and both conversion round trips are then
 proved as derived results. No inverse of the complete chain or scattering matrix is used.
 
-## ii. Scope and convention
-
-The chain equation is `(aR, bR) = K (bL, aL)`, while scattering rows are `(bL, bR)` and columns are
-`(aL, aR)`. Thus the reverse conversion pivots `K₁₁`, and its lower-left scattering block is
-`K₂₂ - K₂₁ * K₁₁⁻¹ * K₁₂` in precisely that order.
-
-These are fixed-frequency complex-linear semantics. The pivot is a solvability condition for the
-chosen coordinate presentation; it does not imply losslessness, passivity, reciprocity, causality,
-reference-plane transport, or electromagnetic realization.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `BackwardFirstChainTransform.HasBijectiveLeadingBlock`: the exact scattering-view pivot.
 - `BackwardFirstChainTransform.hasScatteringView_iff_hasBijectiveLeadingBlock`: the exact
@@ -42,13 +32,23 @@ reference-plane transport, or electromagnetic realization.
   `TwoPortScatteringTransform.toTwoPortScatteringTransform_toBackwardFirstChainTransform`: the
   matrix round trips.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Backward-first chain blocks
 - B. Leading-block inverse and scattering formula
 - C. Exact scattering-view criterion
 - D. Behavior-derived scattering conversion
 - E. Behavioral and matrix round trips
+
+## iv. References
+
+The chain equation is `(aR, bR) = K (bL, aL)`, while scattering rows are `(bL, bR)` and columns are
+`(aL, aR)`. Thus the reverse conversion pivots `K₁₁`, and its lower-left scattering block is
+`K₂₂ - K₂₁ * K₁₁⁻¹ * K₁₂` in precisely that order.
+
+These are fixed-frequency complex-linear semantics. The pivot is a solvability condition for the
+chosen coordinate presentation; it does not imply losslessness, passivity, reciprocity, causality,
+reference-plane transport, or electromagnetic realization.
 
 -/
 

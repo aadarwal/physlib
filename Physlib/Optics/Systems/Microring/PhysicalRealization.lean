@@ -77,7 +77,9 @@ noncomputable section
 
 namespace Microring
 
-/-! ## A. Typed physical topologies -/
+/-!
+## A. Typed physical topologies
+-/
 
 /-- The typed one-coupler, one-propagation-component topology selected by physical data. -/
 abbrev allPassTopology (p : AllPassPhysicalParameters) : FlatNetlist :=
@@ -117,7 +119,9 @@ abbrev addDropDropChannel (p : AddDropPhysicalParameters) :
     (addDropTopology p).ExternalChannel :=
   AddDrop.dropChannel p.toParameters
 
-/-! ## B. Independent travelling-field relations -/
+/-!
+## B. Independent travelling-field relations
+-/
 
 /-- Internal forward-circulating fields of a one-bus ring at the coupler reference plane. -/
 structure AllPassInternalFields where
@@ -180,7 +184,9 @@ def AddDropFieldRelation (p : AddDropPhysicalParameters)
     internal.inputCouplerInput =
       p.toParameters.secondArcCoefficient * internal.dropCouplerOutput
 
-/-! ## C. N7 realization certificates -/
+/-!
+## C. N7 realization certificates
+-/
 
 /-- Extract the two forward internal one-bus fields from a complete N7 netlist state. -/
 def allPassInternalFieldsOfState (p : AllPassPhysicalParameters)
@@ -359,7 +365,9 @@ lemma addDropTopology_satisfies_fieldRelation (p : AddDropPhysicalParameters)
   rw [AddDrop.outputReadout_apply_drop] at hDrop
   rwa [hThrough, hDrop]
 
-/-! ## D. Relation-level elimination -/
+/-!
+## D. Relation-level elimination
+-/
 
 /-- Under the exact all-pass solve gate, every one-bus relation solution has the S2 transfer. -/
 lemma AllPassFieldRelation.through_eq_transfer {p : AllPassPhysicalParameters}
@@ -426,7 +434,9 @@ lemma AddDropFieldRelation.through_drop_eq_transfer {p : AddDropPhysicalParamete
   · rw [hRelation.2.2.2.1, hDropInput', AddDrop.dropTransfer]
     ring
 
-/-! ## E. Proof-gated N5 consequences -/
+/-!
+## E. Proof-gated N5 consequences
+-/
 
 /-- The proof-gated N5 response of the physical one-bus topology satisfies its field relation. -/
 lemma allPass_physicalResponse_satisfies_fieldRelation (p : AllPassPhysicalParameters)

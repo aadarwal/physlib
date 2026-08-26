@@ -25,14 +25,7 @@ pair channels in different connections.
 Connection-family reindexing changes only the labels used for connection blocks. Exchanging the
 endpoint presentation of every connection similarly changes only the local left/right labels.
 
-## ii. Scope
-
-This file models only channels at connected ports. It does not construct the complementary
-external ports, extend routing by zero to all ambient channels, define components or netlists, or
-solve feedback equations. It assigns no splitter behavior, path phase, delay, attenuation,
-termination, reciprocity data, or electromagnetic power interpretation.
-
-## iii. Key results
+## ii. Key results
 
 - `PortConnection.endpointPort_injective`: the two ends of one local connection are distinct.
 - `PortConnectionFamily.channelEmbedding`: connected dependent channels embed in ambient channels.
@@ -44,13 +37,20 @@ termination, reciprocity data, or electromagnetic power interpretation.
 - `PortConnectionFamily.reindex`: relabel a connection family without changing its connections.
 - `PortConnectionFamily.symm`: exchange the endpoint presentation of every connection.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Connection ends
 - B. Proof-carrying connection families
 - C. Connected channels and blockwise mates
 - D. Connected-channel ideal routing
 - E. Presentation changes
+
+## iv. References
+
+This file models only channels at connected ports. It does not construct the complementary
+external ports, extend routing by zero to all ambient channels, define components or netlists, or
+solve feedback equations. It assigns no splitter behavior, path phase, delay, attenuation,
+termination, reciprocity data, or electromagnetic power interpretation.
 
 -/
 

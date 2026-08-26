@@ -18,16 +18,18 @@ multivalued fail the appropriate predicates. Exact complex gain examples and a n
 cascade then check that proof-required extraction preserves graph membership and behavioral series
 order.
 
-## ii. Scope
-
-The tests concern existence and uniqueness of algebraic outputs only. Being functional does not
-imply being injective or invertible, passivity, causality, or physical realizability.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Predicate boundaries
 - B. Concrete graph extraction
 - C. Composition and extraction order
+
+## iv. References
+
+The tests concern existence and uniqueness of algebraic outputs only. Being functional does not
+imply being injective or invertible, passivity, causality, or physical realizability.
 
 -/
 

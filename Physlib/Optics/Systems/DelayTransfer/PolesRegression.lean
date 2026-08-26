@@ -27,12 +27,13 @@ internal-singularity example.
 
 - A. A completely cancelled linear factor
 
-## iv. References and non-claims
+## iv. References
 
 This regression is algebraic and source-neutral. It checks only an abstract polynomial quotient;
 it does not exhibit a singular internal operator or a cancelled network response. A genuine
 singular-but-cancelled netlist fixture remains future work after symbolic response elimination.
 No network reachability, observability, stability, frequency, or dispersion claim is made.
+
 -/
 
 @[expose] public section

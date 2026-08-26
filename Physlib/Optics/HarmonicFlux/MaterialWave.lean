@@ -44,13 +44,14 @@ Poynting vector formally identifies it as material plane-wave irradiance.
 - C. Actual material-wave flux
 - D. Irradiance as flux magnitude
 
-## iv. Scope
+## iv. References
 
 The medium is the repository's linear, homogeneous, isotropic, nonconducting, nondispersive model,
 and the plane wave uses its positive propagation branch. Irradiance here is local flux density for
 an infinite monochromatic plane wave, not aperture-integrated or modal power. This file introduces
 no interface-normal projection, incident or outgoing role, lossy material, evanescent wave,
 Fresnel coefficient, or finite-beam claim.
+
 -/
 
 @[expose] public section

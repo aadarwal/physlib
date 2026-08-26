@@ -53,7 +53,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. Independent two-port specification -/
+/-!
+## A. Independent two-port specification
+-/
 
 /-- The totalized scalar bus transmission as a one-mode transform. -/
 def twoPortTransmission (p : Parameters) : ModeTransform Unit Unit :=
@@ -77,7 +79,9 @@ lemma twoPortScattering_realizes_behavior (p : Parameters) :
   exact ReflectionlessTwoPort.scattering_realizes_behavior
     (twoPortTransmission p) (twoPortTransmission p)
 
-/-! ## B. Packaged N5 realization -/
+/-!
+## B. Packaged N5 realization
+-/
 
 /-- The singular-safe external netlist behavior in typed left/right scattering coordinates. -/
 def externalBehavior (p : Parameters) : TwoPortScatteringBehavior Unit Unit :=

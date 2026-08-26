@@ -21,10 +21,7 @@ These values pin the load orientation, both pivot subtraction signs, and the dis
 the terminated forward response and the opposite transmission block `K₁₁⁻¹`. The chain has
 determinant `-1`, so its zero-return forward response is not `1 / K₁₁`.
 
-## ii. Scope
-
-The fixtures are exact fixed-frequency algebra. They make no passivity, losslessness, impedance,
-absorption, causality, or physical-load claim.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -33,6 +30,11 @@ absorption, causality, or physical-load claim.
 - C. Well-posed rectangular pivot without surjectivity
 - D. Singular loaded relation without a response transform
 - E. Noncommuting two-mode loaded response
+
+## iv. References
+
+The fixtures are exact fixed-frequency algebra. They make no passivity, losslessness, impedance,
+absorption, causality, or physical-load claim.
 
 -/
 
