@@ -278,36 +278,6 @@ local instance replacementTargetAppendChannelFintype :
   Fintype.ofEquiv _
     (replacement.appendChannelEquiv (outer.transport boundary)).symm
 
-/-- Closing a transported outer family and then presenting the final appended boundary is the
-same as first transporting the outer closure and then presenting that boundary. -/
-lemma transportedOuterClosure_reindex
-    (boundaryBehavior :
-      LinearBehavior (Incident inner.externalPortModeFamily.Channel)
-        (Outgoing inner.externalPortModeFamily.Channel)) :
-    ((outer.transport boundary).closeBehavior
-          (boundaryBehavior.reindex
-            (Incident.relabelEquiv boundary.channelEquiv)
-            (Outgoing.relabelEquiv boundary.channelEquiv))).reindex
-        (Incident.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
-        (Outgoing.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm =
-      ((outer.closeBehavior boundaryBehavior).reindex
-          (Incident.relabelEquiv (outer.transportExternalChannelEquiv boundary))
-          (Outgoing.relabelEquiv
-            (outer.transportExternalChannelEquiv boundary))).reindex
-        (Incident.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
-        (Outgoing.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm := by
-  exact congrArg
-    (fun relation => relation.reindex
-      (Incident.relabelEquiv
-        (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
-      (Outgoing.relabelEquiv
-        (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm)
-    (outer.closeBehavior_transport boundary boundaryBehavior)
-
 /-- The two routes from an outer external relation to the replacement's final boundary induce
 the same behavior relabelling. -/
 lemma replacementExternal_reindex
@@ -421,6 +391,5 @@ lemma replaceInnerFamily
 end PortConnectionFamily
 
 end
-
 
 end Optics
