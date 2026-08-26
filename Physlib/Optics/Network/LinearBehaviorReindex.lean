@@ -80,7 +80,20 @@ lemma reindex_trans
     (behavior.reindex firstInput firstOutput).reindex secondInput secondOutput =
       behavior.reindex (firstInput.trans secondInput) (firstOutput.trans secondOutput) := by
   ext ⟨inputAmplitude, outputAmplitude⟩
-  simp [LinearBehavior.mem_reindex_iff, ModeAmplitude.reindex_apply]
+  simp only [LinearBehavior.mem_reindex_iff, Equiv.trans_symm]
+  have hInput :
+      ModeAmplitude.reindex firstInput.symm
+          (ModeAmplitude.reindex secondInput.symm inputAmplitude) =
+        ModeAmplitude.reindex (secondInput.symm.trans firstInput.symm) inputAmplitude := by
+    ext input
+    rfl
+  have hOutput :
+      ModeAmplitude.reindex firstOutput.symm
+          (ModeAmplitude.reindex secondOutput.symm outputAmplitude) =
+        ModeAmplitude.reindex (secondOutput.symm.trans firstOutput.symm) outputAmplitude := by
+    ext output
+    rfl
+  rw [hInput, hOutput]
 
 end LinearBehavior
 
