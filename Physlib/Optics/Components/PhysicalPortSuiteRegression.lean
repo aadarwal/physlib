@@ -300,7 +300,9 @@ lemma physicalPortSuite9a_sum_indexed
       simp
   rw [hUniv]
   simp [physicalPortSuite9aBeamFirstIndexed,
-    physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed]
+    physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed,
+    physicalPortSuite9aBeamFirstLocal, physicalPortSuite9aBeamSecondLocal,
+    physicalPortSuite9aMirrorLocal]
 
 /-!
 ## C. Raw indexed and aggregate action
@@ -410,6 +412,7 @@ lemma physicalPortSuite9a_indexed_action :
       physicalPortSuite9aIndexedInput, physicalPortSuite9aIndexedOutput,
       ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
       dotProduct, physicalPortSuite9a_sum_indexed]
+    ring
 
 /-- The mixed input in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aAggregateInput :
