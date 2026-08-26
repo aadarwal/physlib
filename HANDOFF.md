@@ -263,3 +263,8 @@ transitive-import inventories named only pre-existing files, with neither DCDR m
 The file-import inventory named four unregistered development-side thin-cell modules and neither
 DCDR module. `Physlib.lean` was then restored byte-identically to SHA-256
 `9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
+
+After the Lean changes were committed, `./scripts/lint-style.sh` named only synchronized
+development-side findings in
+`Physlib/Electromagnetism/ThreeDimension/BoundaryConditions/OneSidedTraceRegression.lean:176`
+and `:189`; neither DCDR module was named.
