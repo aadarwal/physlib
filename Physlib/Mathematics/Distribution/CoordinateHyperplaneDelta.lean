@@ -65,6 +65,8 @@ def coordinateHyperplaneDelta (d : ℕ) (i : Fin d.succ) :
   (Distribution.const ℝ (EuclideanSpace ℝ (Fin d)) (1 : ℝ)).comp
     (coordinateHyperplaneRestriction d i)
 
+/-- Evaluating the coordinate-hyperplane delta is Lebesgue integration of the restricted test
+function over the retained coordinates. -/
 @[simp]
 lemma coordinateHyperplaneDelta_apply (d : ℕ) (i : Fin d.succ)
     (η : 𝓢(EuclideanSpace ℝ (Fin d.succ), ℝ)) :
@@ -110,6 +112,8 @@ lemma coordinateNormalLineRestriction_apply (d : ℕ) (i : Fin d.succ)
     coordinateNormalLineRestriction d i x η r = η (coordinateNormalLine d i x r) :=
   rfl
 
+/-- The derivative of a test function restricted to a selected normal line is its ambient
+Fréchet derivative applied to the positive coordinate-normal vector. -/
 lemma deriv_coordinateNormalLineRestriction (d : ℕ) (i : Fin d.succ)
     (x : EuclideanSpace ℝ (Fin d))
     (η : SchwartzMap (EuclideanSpace ℝ (Fin d.succ)) ℝ) (r : ℝ) :
@@ -152,6 +156,7 @@ lemma integral_Ioi_fderiv_coordinateNormalLine (d : ℕ) (i : Fin d.succ)
     _ = -η (coordinateHyperplaneEmbedding d i x) := by
       simp [line, coordinateNormalLine]
 
+/-- The selected coordinate-normal derivative of a Schwartz function is Lebesgue integrable. -/
 lemma integrable_fderiv_coordinateNormal (d : ℕ) (i : Fin d.succ)
     (η : SchwartzMap (EuclideanSpace ℝ (Fin d.succ)) ℝ) :
     Integrable

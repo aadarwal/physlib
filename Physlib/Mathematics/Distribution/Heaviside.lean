@@ -15,6 +15,8 @@ public import Mathlib.MeasureTheory.Integral.Prod
 
 This file identifies the distributional normal derivative of the positive coordinate
 half-space with the independently defined Lebesgue distribution on its boundary hyperplane.
+The vector `+e_last` points into the positive half-space; this file does not assign it the
+outward-boundary-normal convention used by an oriented region.
 
 ## ii. Key results
 
@@ -46,8 +48,8 @@ noncomputable section
 -/
 
 /-- The distributional derivative of the positive-last-coordinate Heaviside distribution,
-evaluated in the positive last-coordinate direction, is the independently defined boundary
-hyperplane delta. -/
+evaluated in the inward-pointing positive last-coordinate direction, is the independently defined
+boundary hyperplane delta. -/
 lemma fderivD_heavisideStep_last_apply (d : ℕ)
     (η : SchwartzMap (EuclideanSpace ℝ (Fin d.succ)) ℝ) :
     fderivD ℝ (heavisideStep d) η
