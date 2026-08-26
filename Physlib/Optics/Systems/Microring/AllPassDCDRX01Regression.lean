@@ -78,7 +78,7 @@ lemma ringDCDRX01Regression_hasAgreement :
       DCDR.zChainRegression_crossSemanticsDomain := by
   exact ⟨AllPass.zCrossSemantics_agree AllPass.allPassRegressionResonanceParameters 1
       AllPass.allPassZRegression_resonance_crossSemanticsDomain,
-    DCDR.zChainRegression_crossSemanticsAgreement⟩
+    DCDR.zChainRegression_productionAgreement_with_independent_anchor.1⟩
 
 /-!
 
