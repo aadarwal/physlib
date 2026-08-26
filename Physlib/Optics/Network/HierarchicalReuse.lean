@@ -161,6 +161,36 @@ def replacementExternalChannelEquiv
     ((outer.transportExternalChannelEquiv boundary).trans
       (replacement.appendExternalChannelEquiv (outer.transport boundary)).symm)
 
+variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
+variable [Fintype inner.ExternalChannel] [Fintype replacement.ExternalChannel]
+variable [Fintype inner.externalPortModeFamily.Channel]
+variable [Fintype replacement.externalPortModeFamily.Channel]
+
+/-- Equivalent transported closure relations induce equivalent behaviors on the dependent
+boundaries exposed to the next hierarchy stage. -/
+lemma innerBoundaryBehavior_eq_of_boundaryRelation
+    (behavior : LinearBehavior (Incident P.Channel) (Outgoing P.Channel))
+    (hBoundary : replacement.closeBehavior behavior =
+      (inner.closeBehavior behavior).reindex
+        (Incident.relabelEquiv (inner.boundaryExternalChannelEquiv replacement boundary))
+        (Outgoing.relabelEquiv
+          (inner.boundaryExternalChannelEquiv replacement boundary))) :
+    replacement.innerBoundaryBehavior behavior =
+      (inner.innerBoundaryBehavior behavior).reindex
+        (Incident.relabelEquiv boundary.channelEquiv)
+        (Outgoing.relabelEquiv boundary.channelEquiv) := by
+  unfold innerBoundaryBehavior
+  rw [hBoundary, LinearBehavior.reindex_trans, LinearBehavior.reindex_trans]
+  congr 1
+  · apply Equiv.ext
+    rintro ⟨channel⟩
+    apply Incident.ext
+    rfl
+  · apply Equiv.ext
+    rintro ⟨channel⟩
+    apply Outgoing.ext
+    rfl
+
 end PortConnectionFamily
 
 end
