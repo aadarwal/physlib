@@ -276,6 +276,46 @@ noncomputable instance localChannelDecidableEq (component : Component) :
     | exact DirectionalCoupler.channelDecidableEq
     | exact MatchedPropagation.channelDecidableEq
 
+/-- Projected local PANDA component channels remain finite. -/
+noncomputable instance componentsLocalChannelFintype (p : Parameters)
+    (component : (components p).Component) :
+    Fintype ((components p).portFamily component).Channel := by
+  change Fintype (componentPortFamily component).Channel
+  exact localChannelFintype component
+
+/-- Projected local PANDA component channels retain decidable equality. -/
+noncomputable instance componentsLocalChannelDecidableEq (p : Parameters)
+    (component : (components p).Component) :
+    DecidableEq ((components p).portFamily component).Channel := by
+  change DecidableEq (componentPortFamily component).Channel
+  exact localChannelDecidableEq component
+
+/-- Projected PANDA component labels remain finite. -/
+noncomputable instance netlistComponentFintype (p : Parameters) :
+    Fintype (netlist p).components.Component := by
+  change Fintype Component
+  infer_instance
+
+/-- Projected PANDA component labels retain decidable equality. -/
+noncomputable instance netlistComponentDecidableEq (p : Parameters) :
+    DecidableEq (netlist p).components.Component := by
+  change DecidableEq Component
+  infer_instance
+
+/-- Every local channel family exposed by the PANDA netlist is finite. -/
+noncomputable instance netlistLocalChannelFintype (p : Parameters)
+    (component : (netlist p).components.Component) :
+    Fintype ((netlist p).components.portFamily component).Channel := by
+  change Fintype (componentPortFamily component).Channel
+  exact localChannelFintype component
+
+/-- Every local PANDA netlist channel family has decidable equality. -/
+noncomputable instance netlistLocalChannelDecidableEq (p : Parameters)
+    (component : (netlist p).components.Component) :
+    DecidableEq ((netlist p).components.portFamily component).Channel := by
+  change DecidableEq (componentPortFamily component).Channel
+  exact localChannelDecidableEq component
+
 /-- Aggregate PANDA channels are finite. -/
 noncomputable instance channelFintype (p : Parameters) : Fintype (netlist p).Channel := by
   letI : Fintype (components p).IndexedChannel := by
@@ -376,6 +416,19 @@ lemma inputChannel_ne_addChannel (p : Parameters) : inputChannel p ≠ addChanne
   have hValue := congrArg Subtype.val hChannel
   cases hValue
 
+/-- The input channel differs from the through channel. -/
+lemma inputChannel_ne_throughChannel (p : Parameters) :
+    inputChannel p ≠ throughChannel p := by
+  intro hChannel
+  have hValue := congrArg Subtype.val hChannel
+  cases hValue
+
+/-- The input channel differs from the drop channel. -/
+lemma inputChannel_ne_dropChannel (p : Parameters) : inputChannel p ≠ dropChannel p := by
+  intro hChannel
+  have hValue := congrArg Subtype.val hChannel
+  cases hValue
+
 /-- A coherent source supplied only at the input port. -/
 def inputAmplitude (p : Parameters) (amplitude : ℂ) :
     ModeAmplitude (netlist p).ExternalIncident :=
@@ -393,6 +446,20 @@ lemma inputAmplitude_apply_add (p : Parameters) (amplitude : ℂ) :
     inputAmplitude p amplitude (Incident.mk (addChannel p)) = 0 := by
   rw [inputAmplitude]
   simp [inputChannel_ne_addChannel p]
+
+/-- The source-only excitation vanishes at the through port. -/
+@[simp]
+lemma inputAmplitude_apply_through (p : Parameters) (amplitude : ℂ) :
+    inputAmplitude p amplitude (Incident.mk (throughChannel p)) = 0 := by
+  rw [inputAmplitude]
+  simp [inputChannel_ne_throughChannel p]
+
+/-- The source-only excitation vanishes at the drop port. -/
+@[simp]
+lemma inputAmplitude_apply_drop (p : Parameters) (amplitude : ℂ) :
+    inputAmplitude p amplitude (Incident.mk (dropChannel p)) = 0 := by
+  rw [inputAmplitude]
+  simp [inputChannel_ne_dropChannel p]
 
 end Panda
 
