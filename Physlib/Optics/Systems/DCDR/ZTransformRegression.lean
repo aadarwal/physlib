@@ -436,6 +436,46 @@ lemma zRegression_stable_zTransfer_I :
     norm_num [pow_succ, Complex.I_mul_I]]
   ring
 
+/-- Primitive geometric transforms give the lag-two kernel value `4/3` at `z = I`.
+
+This proof expands the kernel itself and does not use the DCDR transfer bridge.
+-/
+lemma zRegression_stable_lagTwoGeometricImpulse_transform_I :
+    transform (lagTwoGeometricImpulse (Complex.I / 2)) Complex.I = 4 / 3 := by
+  have hPositive : Complex.I ∈ ROC (geometricSeq (Complex.I / 2)) := by
+    rw [ROC_geometricSeq (by norm_num)]
+    norm_num
+  have hNegative : Complex.I ∈ ROC (geometricSeq (-(Complex.I / 2))) := by
+    rw [ROC_geometricSeq (by norm_num)]
+    norm_num
+  rw [lagTwoGeometricImpulse, transform_const_mul,
+    transform_add hPositive.2 hNegative.2,
+    transform_geometricSeq (by norm_num) (by norm_num),
+    transform_geometricSeq (by norm_num) (by norm_num), Complex.inv_I]
+  norm_num [Complex.I_mul_I]
+
+/-- The independently solved nonzero-loop recurrence has transform `-(7/8) I` at `z = I`.
+
+The proof uses only the explicit lag-two kernel, finite-delay transform, and primitive geometric
+transform. It does not invoke `transform_causalImpulseResponse_eq_zTransfer` or any rational,
+N5, or Mason agreement.
+-/
+lemma zRegression_stable_causalTransform_I :
+    transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
+      -(7 / 8) * Complex.I := by
+  rw [causalOutput_eq_lagTwoGeometricImpulse stableUnitDelayParameters (Complex.I / 2)
+      zRegression_stable_zFeedbackLags zRegression_stable_zFeedbackCoefficient_two]
+  rw [transform_delayCombination
+    (lagTwoGeometricImpulse_isCausal (Complex.I / 2))
+    (summable_seriesTerm_lagTwoGeometricImpulse (by norm_num))]
+  rw [delaySymbol_zFeedforwardCoefficients,
+    stable_responseNumeratorPolynomial_expansion, Complex.inv_I,
+    zRegression_stable_lagTwoGeometricImpulse_transform_I]
+  norm_num [stableNumerator, Complex.I_mul_I]
+  rw [show (-Complex.I) ^ 3 = Complex.I by
+    norm_num [pow_succ, Complex.I_mul_I]]
+  ring
+
 /-- The raw compiled reciprocal-Z response has the same independently expanded nonreal value. -/
 lemma zRegression_stable_rawCompiled_I :
     rationalZEliminationResponse stableUnitDelayParameters Complex.I
