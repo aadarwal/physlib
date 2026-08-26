@@ -168,7 +168,15 @@ lemma dateTerminationRegressionStage_compositionMatrix :
     show dateTerminationRegressionStage.ring = dateTerminationRegressionRing by rfl,
     dateTerminationRegressionRing_transfers.1,
     dateTerminationRegressionRing_transfers.2,
-    dateTerminationRegressionMatrix, Complex.I_mul_I] <;> ring
+    dateTerminationRegressionMatrix]
+  all_goals ring_nf
+  all_goals (try rw [Complex.I_sq])
+  all_goals (try rw [show Complex.I ^ 3 = -Complex.I by
+    calc
+      Complex.I ^ 3 = Complex.I ^ 2 * Complex.I := by rw [pow_succ]
+      _ = -Complex.I := by rw [Complex.I_sq]; ring])
+  all_goals norm_num
+  all_goals ring
 
 /-- The concrete stage satisfies the complete source Sylvester domain by direct calculation. -/
 lemma dateTerminationRegressionStage_sylvester :
@@ -177,11 +185,23 @@ lemma dateTerminationRegressionStage_sylvester :
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rw [← Matrix.det_reindex_self dateBackwardFirstFinEquiv.symm
       dateTerminationRegressionMatrix, Matrix.det_fin_two]
-    norm_num [Matrix.reindex_apply, dateBackwardFirstFinEquiv,
-      dateTerminationRegressionMatrix, Complex.I_mul_I]
-    ring
-  all_goals norm_num [dateChainEntry, dateBackwardFirstFinEquiv,
-    dateTerminationRegressionMatrix]
+    simp [Matrix.reindex_apply, dateBackwardFirstFinEquiv,
+      dateTerminationRegressionMatrix]
+    ring_nf
+    rw [Complex.I_sq]
+    norm_num
+  · norm_num [dateChainEntry, dateBackwardFirstFinEquiv,
+      dateTerminationRegressionMatrix]
+  · norm_num [dateChainEntry, dateBackwardFirstFinEquiv,
+      dateTerminationRegressionMatrix]
+  · simp [dateChainEntry, dateBackwardFirstFinEquiv,
+      dateTerminationRegressionMatrix]
+    simp only [starRingEnd_apply]
+    norm_num
+  · simp [dateChainEntry, dateBackwardFirstFinEquiv,
+      dateTerminationRegressionMatrix]
+    simp only [starRingEnd_apply]
+    norm_num
 
 /-!
 
@@ -202,8 +222,10 @@ lemma dateTerminationRegression_rawFold_two :
     simp only [Matrix.mul_apply, Fintype.sum_sum_type]
   all_goals simp_rw [← BackwardWave.channelEquiv.symm.sum_comp,
     ← ForwardWave.channelEquiv.symm.sum_comp]
-  all_goals norm_num [dateTerminationRegressionMatrix, Matrix.one_apply,
-    Complex.I_mul_I] <;> ring
+  all_goals simp [dateTerminationRegressionMatrix]
+  all_goals ring_nf
+  all_goals (try rw [Complex.I_sq])
+  all_goals norm_num
 
 /-- The raw three-stage fold is the negative one-stage matrix. -/
 lemma dateTerminationRegression_rawFold_three :
@@ -214,10 +236,11 @@ lemma dateTerminationRegression_rawFold_three :
         dateTerminationRegressionStage.compositionMatrix) *
       dateTerminationRegressionStage.compositionMatrix =
         -dateTerminationRegressionMatrix
-  rw [show
+  have hTwo := dateTerminationRegression_rawFold_two
+  change
     (1 * dateTerminationRegressionStage.compositionMatrix) *
-        dateTerminationRegressionStage.compositionMatrix = -1 by
-      simpa only using dateTerminationRegression_rawFold_two]
+      dateTerminationRegressionStage.compositionMatrix = -1 at hTwo
+  rw [hTwo]
   rw [dateTerminationRegressionStage_compositionMatrix, Matrix.neg_mul,
     Matrix.one_mul]
 
@@ -281,8 +304,8 @@ lemma dateTerminationRegression_negativeOne_pivot_action
 /-- The two-stage raw incident block vanishes. -/
 lemma dateTerminationRegression_negativeOne_incident_action
     (amplitude : ModeAmplitude (ForwardWave Unit)) :
-    ((-1 : BackwardFirstChainTransform Unit Unit).rightTerminationIncidentBlock 0).
-        toLinearMap amplitude = 0 := by
+    ((-1 : BackwardFirstChainTransform Unit Unit).rightTerminationIncidentBlock 0).toLinearMap
+        amplitude = 0 := by
   apply WithLp.ofLp_injective 2
   funext output
   rcases output with ⟨⟨⟩⟩
@@ -302,7 +325,7 @@ lemma dateTerminationRegression_negativeOne_lowerLeft_action
   rcases output with ⟨⟨⟩⟩
   simp [BackwardFirstChainTransform.lowerLeftBlock, Matrix.toBlocks₂₁,
     ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
-    ← BackwardWave.channelEquiv.symm.sum_comp, Matrix.one_apply]
+    ← BackwardWave.channelEquiv.symm.sum_comp]
 
 /-- The two-stage raw lower-right block acts as multiplication by `-1`. -/
 lemma dateTerminationRegression_negativeOne_lowerRight_action
@@ -388,8 +411,8 @@ lemma dateTerminationRegression_two_reflectivity_by_hand :
   let incident :=
     (sourceScalarAmplitude 1 : ModeAmplitude (ForwardWave Unit))
   let response :=
-    (dateCascadeComposition (List.replicate 2 dateTerminationRegressionStage)).
-      rightTerminatedReflectionTransform 0
+    (dateCascadeComposition
+      (List.replicate 2 dateTerminationRegressionStage)).rightTerminatedReflectionTransform 0
         dateTerminationRegressionHypotheses_two.toCascade.hasBijectiveZeroReturnPivot
   change response (BackwardWave.mk ()) (ForwardWave.mk ()) = 0
   have hGraph : (incident, response.toLinearMap incident) ∈ response.toBehavior := by
@@ -402,8 +425,21 @@ lemma dateTerminationRegression_two_reflectivity_by_hand :
       dateCascadeComposition (List.replicate 2 dateTerminationRegressionStage) = -1 := by
     simpa [dateIdenticalCascadeComposition] using
       dateTerminationRegression_rawFold_two
-  rw [hRaw, dateTerminationRegression_negativeOne_pivot_action,
-    dateTerminationRegression_negativeOne_incident_action] at hGraph
+  have hPivotAction (amplitude : ModeAmplitude (BackwardWave Unit)) :
+      ((dateCascadeComposition
+        (List.replicate 2 dateTerminationRegressionStage)).rightTerminationPivot 0).toLinearMap
+          amplitude =
+        sourceScalarAmplitude (-amplitude (BackwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeOne_pivot_action amplitude
+  have hIncidentAction (amplitude : ModeAmplitude (ForwardWave Unit)) :
+      ModeTransform.toLinearMap
+          (BackwardFirstChainTransform.rightTerminationIncidentBlock
+            (dateCascadeComposition
+              (List.replicate 2 dateTerminationRegressionStage)) 0) amplitude = 0 := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeOne_incident_action amplitude
+  rw [hPivotAction, hIncidentAction] at hGraph
   have hCoordinate := congrArg
     (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
       amplitude (BackwardWave.mk ())) hGraph
@@ -422,8 +458,8 @@ lemma dateTerminationRegression_two_transmissivity_by_hand :
   let incident :=
     (sourceScalarAmplitude 1 : ModeAmplitude (ForwardWave Unit))
   let response :=
-    (dateCascadeComposition (List.replicate 2 dateTerminationRegressionStage)).
-      rightTerminatedTransmissionTransform 0
+    (dateCascadeComposition
+      (List.replicate 2 dateTerminationRegressionStage)).rightTerminatedTransmissionTransform 0
         dateTerminationRegressionHypotheses_two.toCascade.hasBijectiveZeroReturnPivot
   change response (ForwardWave.mk ()) (ForwardWave.mk ()) = -1
   have hGraph : (incident, response.toLinearMap incident) ∈ response.toBehavior := by
@@ -437,8 +473,21 @@ lemma dateTerminationRegression_two_transmissivity_by_hand :
       dateCascadeComposition (List.replicate 2 dateTerminationRegressionStage) = -1 := by
     simpa [dateIdenticalCascadeComposition] using
       dateTerminationRegression_rawFold_two
-  rw [hRaw, dateTerminationRegression_negativeOne_pivot_action,
-    dateTerminationRegression_negativeOne_incident_action] at hPivot
+  have hPivotAction (amplitude : ModeAmplitude (BackwardWave Unit)) :
+      ((dateCascadeComposition
+        (List.replicate 2 dateTerminationRegressionStage)).rightTerminationPivot 0).toLinearMap
+          amplitude =
+        sourceScalarAmplitude (-amplitude (BackwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeOne_pivot_action amplitude
+  have hIncidentAction (amplitude : ModeAmplitude (ForwardWave Unit)) :
+      ModeTransform.toLinearMap
+          (BackwardFirstChainTransform.rightTerminationIncidentBlock
+            (dateCascadeComposition
+              (List.replicate 2 dateTerminationRegressionStage)) 0) amplitude = 0 := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeOne_incident_action amplitude
+  rw [hPivotAction, hIncidentAction] at hPivot
   have hBackward : leftBackward = 0 := by
     apply WithLp.ofLp_injective 2
     funext output
@@ -446,9 +495,21 @@ lemma dateTerminationRegression_two_transmissivity_by_hand :
     have hCoordinate := congrArg
       (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
         amplitude (BackwardWave.mk ())) hPivot
-    norm_num [sourceScalarAmplitude] at hCoordinate ⊢
-  rw [hRaw, dateTerminationRegression_negativeOne_lowerLeft_action,
-    dateTerminationRegression_negativeOne_lowerRight_action, hBackward] at hForward
+    norm_num [sourceScalarAmplitude] at hCoordinate
+    exact hCoordinate
+  have hLowerLeftAction (amplitude : ModeAmplitude (BackwardWave Unit)) :
+      (dateCascadeComposition
+        (List.replicate 2 dateTerminationRegressionStage)).lowerLeftBlock.toLinearMap
+          amplitude = 0 := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeOne_lowerLeft_action amplitude
+  have hLowerRightAction (amplitude : ModeAmplitude (ForwardWave Unit)) :
+      (dateCascadeComposition
+        (List.replicate 2 dateTerminationRegressionStage)).lowerRightBlock.toLinearMap
+          amplitude = sourceScalarAmplitude (-amplitude (ForwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeOne_lowerRight_action amplitude
+  rw [hLowerLeftAction, hLowerRightAction] at hForward
   have hCoordinate := congrArg
     (fun amplitude : ModeAmplitude (ForwardWave Unit) =>
       amplitude (ForwardWave.mk ())) hForward
@@ -476,8 +537,8 @@ lemma dateTerminationRegression_three_reflectivity_by_hand :
   let incident :=
     (sourceScalarAmplitude 1 : ModeAmplitude (ForwardWave Unit))
   let response :=
-    (dateCascadeComposition (List.replicate 3 dateTerminationRegressionStage)).
-      rightTerminatedReflectionTransform 0
+    (dateCascadeComposition
+      (List.replicate 3 dateTerminationRegressionStage)).rightTerminatedReflectionTransform 0
         dateTerminationRegressionHypotheses_three.toCascade.hasBijectiveZeroReturnPivot
   change response (BackwardWave.mk ()) (ForwardWave.mk ()) =
     (8 / 17 : ℂ) * Complex.I
@@ -492,24 +553,45 @@ lemma dateTerminationRegression_three_reflectivity_by_hand :
         -dateTerminationRegressionMatrix := by
     simpa [dateIdenticalCascadeComposition] using
       dateTerminationRegression_rawFold_three
-  rw [hRaw, dateTerminationRegression_negativeMatrix_pivot_action,
-    dateTerminationRegression_negativeMatrix_incident_action] at hGraph
+  have hPivotAction (amplitude : ModeAmplitude (BackwardWave Unit)) :
+      ((dateCascadeComposition
+        (List.replicate 3 dateTerminationRegressionStage)).rightTerminationPivot 0).toLinearMap
+          amplitude =
+        sourceScalarAmplitude
+          ((17 / 15 : ℂ) * Complex.I * amplitude (BackwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeMatrix_pivot_action amplitude
+  have hIncidentAction (amplitude : ModeAmplitude (ForwardWave Unit)) :
+      ModeTransform.toLinearMap
+          (BackwardFirstChainTransform.rightTerminationIncidentBlock
+            (dateCascadeComposition
+              (List.replicate 3 dateTerminationRegressionStage)) 0) amplitude =
+        sourceScalarAmplitude (-(8 / 15 : ℂ) * amplitude (ForwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeMatrix_incident_action amplitude
+  rw [hPivotAction, hIncidentAction] at hGraph
   have hCoordinate := congrArg
     (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
       amplitude (BackwardWave.mk ())) hGraph
-  change (17 / 15 : ℂ) * Complex.I *
-      (response.toLinearMap incident) (BackwardWave.mk ()) = -(8 / 15 : ℂ)
-        at hCoordinate
+  dsimp only [incident] at hCoordinate
+  simp only [sourceScalarAmplitude, WithLp.ofLp_toLp] at hCoordinate
   have hFactor : (17 / 15 : ℂ) * Complex.I ≠ 0 := by
     intro hZero
     have hIm := congrArg Complex.im hZero
     norm_num at hIm
+  have hCoordinateResponse :
+      (17 / 15 : ℂ) * Complex.I *
+          (response.toLinearMap incident) (BackwardWave.mk ()) = -(8 / 15 : ℂ) := by
+    simpa only [response, incident, sourceScalarAmplitude,
+      WithLp.ofLp_toLp, mul_one] using hCoordinate
   have hResponse :
       (response.toLinearMap incident) (BackwardWave.mk ()) =
         (8 / 17 : ℂ) * Complex.I := by
     apply mul_left_cancel₀ hFactor
-    rw [hCoordinate]
-    norm_num [Complex.I_mul_I]
+    rw [hCoordinateResponse]
+    ring_nf
+    rw [Complex.I_sq]
+    norm_num
   simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
     dotProduct] at hResponse
   rw [← ForwardWave.channelEquiv.symm.sum_comp] at hResponse
@@ -524,8 +606,8 @@ lemma dateTerminationRegression_three_transmissivity_by_hand :
   let incident :=
     (sourceScalarAmplitude 1 : ModeAmplitude (ForwardWave Unit))
   let response :=
-    (dateCascadeComposition (List.replicate 3 dateTerminationRegressionStage)).
-      rightTerminatedTransmissionTransform 0
+    (dateCascadeComposition
+      (List.replicate 3 dateTerminationRegressionStage)).rightTerminatedTransmissionTransform 0
         dateTerminationRegressionHypotheses_three.toCascade.hasBijectiveZeroReturnPivot
   change response (ForwardWave.mk ()) (ForwardWave.mk ()) =
     -(15 / 17 : ℂ) * Complex.I
@@ -541,13 +623,28 @@ lemma dateTerminationRegression_three_transmissivity_by_hand :
         -dateTerminationRegressionMatrix := by
     simpa [dateIdenticalCascadeComposition] using
       dateTerminationRegression_rawFold_three
-  rw [hRaw, dateTerminationRegression_negativeMatrix_pivot_action,
-    dateTerminationRegression_negativeMatrix_incident_action] at hPivot
+  have hPivotAction (amplitude : ModeAmplitude (BackwardWave Unit)) :
+      ((dateCascadeComposition
+        (List.replicate 3 dateTerminationRegressionStage)).rightTerminationPivot 0).toLinearMap
+          amplitude =
+        sourceScalarAmplitude
+          ((17 / 15 : ℂ) * Complex.I * amplitude (BackwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeMatrix_pivot_action amplitude
+  have hIncidentAction (amplitude : ModeAmplitude (ForwardWave Unit)) :
+      ModeTransform.toLinearMap
+          (BackwardFirstChainTransform.rightTerminationIncidentBlock
+            (dateCascadeComposition
+              (List.replicate 3 dateTerminationRegressionStage)) 0) amplitude =
+        sourceScalarAmplitude (-(8 / 15 : ℂ) * amplitude (ForwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeMatrix_incident_action amplitude
+  rw [hPivotAction, hIncidentAction] at hPivot
   have hPivotCoordinate := congrArg
     (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
       amplitude (BackwardWave.mk ())) hPivot
-  change (17 / 15 : ℂ) * Complex.I * leftBackward (BackwardWave.mk ()) =
-      -(8 / 15 : ℂ) at hPivotCoordinate
+  dsimp only [incident] at hPivotCoordinate
+  simp only [sourceScalarAmplitude, WithLp.ofLp_toLp] at hPivotCoordinate
   have hFactor : (17 / 15 : ℂ) * Complex.I ≠ 0 := by
     intro hZero
     have hIm := congrArg Complex.im hZero
@@ -556,20 +653,42 @@ lemma dateTerminationRegression_three_transmissivity_by_hand :
       leftBackward (BackwardWave.mk ()) = (8 / 17 : ℂ) * Complex.I := by
     apply mul_left_cancel₀ hFactor
     rw [hPivotCoordinate]
-    norm_num [Complex.I_mul_I]
-  rw [hRaw, dateTerminationRegression_negativeMatrix_lowerLeft_action,
-    dateTerminationRegression_negativeMatrix_lowerRight_action] at hForward
+    ring_nf
+    rw [Complex.I_sq]
+    norm_num
+  have hLowerLeftAction (amplitude : ModeAmplitude (BackwardWave Unit)) :
+      (dateCascadeComposition
+        (List.replicate 3 dateTerminationRegressionStage)).lowerLeftBlock.toLinearMap
+          amplitude =
+        sourceScalarAmplitude ((8 / 15 : ℂ) * amplitude (BackwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeMatrix_lowerLeft_action amplitude
+  have hLowerRightAction (amplitude : ModeAmplitude (ForwardWave Unit)) :
+      (dateCascadeComposition
+        (List.replicate 3 dateTerminationRegressionStage)).lowerRightBlock.toLinearMap
+          amplitude =
+        sourceScalarAmplitude
+          (-(17 / 15 : ℂ) * Complex.I * amplitude (ForwardWave.mk ())) := by
+    rw [hRaw]
+    exact dateTerminationRegression_negativeMatrix_lowerRight_action amplitude
+  rw [hLowerLeftAction, hLowerRightAction] at hForward
   have hForwardCoordinate := congrArg
     (fun amplitude : ModeAmplitude (ForwardWave Unit) =>
       amplitude (ForwardWave.mk ())) hForward
-  change (response.toLinearMap incident) (ForwardWave.mk ()) =
-      (8 / 15 : ℂ) * leftBackward (BackwardWave.mk ()) +
-        (-(17 / 15 : ℂ) * Complex.I) at hForwardCoordinate
+  dsimp only [incident] at hForwardCoordinate
+  simp only [WithLp.ofLp_add, Pi.add_apply, sourceScalarAmplitude,
+    WithLp.ofLp_toLp] at hForwardCoordinate
   rw [hBackwardCoordinate] at hForwardCoordinate
+  have hForwardCoordinateResponse :
+      (response.toLinearMap incident) (ForwardWave.mk ()) =
+        (8 / 15 : ℂ) * ((8 / 17 : ℂ) * Complex.I) +
+          (-(17 / 15 : ℂ)) * Complex.I := by
+    simpa only [response, incident, sourceScalarAmplitude,
+      WithLp.ofLp_toLp, mul_one] using hForwardCoordinate
   have hResponse :
       (response.toLinearMap incident) (ForwardWave.mk ()) =
         -(15 / 17 : ℂ) * Complex.I := by
-    rw [hForwardCoordinate]
+    rw [hForwardCoordinateResponse]
     ring
   simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
     dotProduct] at hResponse
@@ -642,13 +761,11 @@ lemma dateTerminationRegressionSingularRing_transfers :
       dateTerminationRegressionSingularRing_phaseData.2.2.2,
       dateTerminationRegressionSingularRing_phaseData.2.1]
     norm_num [dateTerminationRegressionSingularRing]
-    ring
 
 /-- The singular parameter stage retains a valid ring-to-chain pivot. -/
 lemma dateTerminationRegressionSingularStage_hasBijectiveRingTransmission :
     dateTerminationRegressionSingularStage.HasBijectiveRingTransmission := by
-  rw [dateTerminationRegressionSingularStage.
-    hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero]
+  rw [DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero]
   rw [show dateTerminationRegressionSingularStage.ring =
       dateTerminationRegressionSingularRing by rfl,
     dateTerminationRegressionSingularRing_transfers.1]
@@ -694,7 +811,10 @@ lemma dateTerminationRegressionSingularStage_compositionMatrix :
       dateTerminationRegressionSingularRing by rfl,
     dateTerminationRegressionSingularRing_transfers.1,
     dateTerminationRegressionSingularRing_transfers.2,
-    dateTerminationRegressionSingularMatrix, Complex.I_mul_I] <;> ring
+    dateTerminationRegressionSingularMatrix]
+  all_goals ring_nf
+  all_goals (try rw [Complex.I_sq])
+  all_goals norm_num
 
 /-- The raw two-stage product has `M11 = 0` by direct matrix multiplication. -/
 lemma dateTerminationRegressionSingular_rawFold_entry11 :
@@ -708,31 +828,47 @@ lemma dateTerminationRegressionSingular_rawFold_entry11 :
     Fintype.sum_sum_type]
   simp_rw [← BackwardWave.channelEquiv.symm.sum_comp,
     ← ForwardWave.channelEquiv.symm.sum_comp]
-  norm_num [dateTerminationRegressionSingularMatrix, Complex.I_mul_I]
+  norm_num [dateTerminationRegressionSingularMatrix]
+  ring_nf
+  rw [Complex.I_sq]
+  norm_num
 
 /-- The `M11 = 0` chain termination is not well posed. -/
 lemma dateTerminationRegressionSingular_chain_not_wellPosed :
-    ¬(dateIdenticalCascadeComposition dateTerminationRegressionSingularStage 2).
-      HasWellPosedRightTermination (0 : RightLoadTransform Unit) := by
+    ¬(dateIdenticalCascadeComposition
+      dateTerminationRegressionSingularStage 2).HasWellPosedRightTermination
+        (0 : RightLoadTransform Unit) := by
   rw [dateChain_hasWellPosedZeroReturn_iff_entry11_ne_zero,
     dateTerminationRegressionSingular_rawFold_entry11]
+  simp
 
 /-- The same concrete parameter cascade has no well-posed relational zero-return termination. -/
 lemma dateTerminationRegressionSingular_not_wellPosed :
-    ¬(dateIdenticalCascadeBehavior dateTerminationRegressionSingularStage 2).
-      HasWellPosedRightTermination
+    ¬(dateIdenticalCascadeBehavior
+      dateTerminationRegressionSingularStage 2).HasWellPosedRightTermination
         (RightLoadBehavior.zeroReflection : RightLoadBehavior Unit) := by
   intro hWellPosed
-  rw [dateIdenticalCascadeBehavior,
-    dateCascadeBehavior_eq_composition_toBehavior] at hWellPosed
-  · have hChain :
-        (dateIdenticalCascadeComposition dateTerminationRegressionSingularStage 2).
-          HasWellPosedRightTermination (0 : RightLoadTransform Unit) := by
-      simpa [dateIdenticalCascadeComposition] using hWellPosed
-    exact dateTerminationRegressionSingular_chain_not_wellPosed hChain
-  · intro repeated hRepeated
+  have hStages : ∀ repeated ∈
+      List.replicate 2 dateTerminationRegressionSingularStage,
+      repeated.HasBijectiveRingTransmission := by
+    intro repeated hRepeated
     rw [List.eq_of_mem_replicate hRepeated]
     exact dateTerminationRegressionSingularStage_hasBijectiveRingTransmission
+  change BackwardFirstTwoPortBehavior.HasWellPosedRightTermination
+    (dateCascadeBehavior (List.replicate 2 dateTerminationRegressionSingularStage))
+      (RightLoadBehavior.zeroReflection : RightLoadBehavior Unit) at hWellPosed
+  rw [dateCascadeBehavior_eq_composition_toBehavior _ hStages] at hWellPosed
+  have hChain :
+      (dateIdenticalCascadeComposition
+        dateTerminationRegressionSingularStage 2).HasWellPosedRightTermination
+          (0 : RightLoadTransform Unit) := by
+    change (BackwardFirstTwoPortBehavior.terminateRight
+      (dateIdenticalCascadeComposition
+        dateTerminationRegressionSingularStage 2).toBehavior
+      (RightLoadBehavior.ofReflection (0 : RightLoadTransform Unit))).IsFunctional
+    rw [RightLoadBehavior.ofReflection_zero]
+    simpa [dateIdenticalCascadeComposition] using hWellPosed
+  exact dateTerminationRegressionSingular_chain_not_wellPosed hChain
 
 /-- The production cascade gate is genuinely unavailable at the singular parameter point. -/
 lemma dateTerminationRegressionSingular_not_hypotheses :

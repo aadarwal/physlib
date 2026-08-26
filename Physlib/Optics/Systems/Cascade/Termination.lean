@@ -288,11 +288,9 @@ lemma dateChain_rightTerminatedTransmission_entry_zero
   rw [Matrix.mul_apply, ← BackwardWave.channelEquiv.symm.sum_comp]
   simp only [Finset.univ_unique, Finset.sum_singleton]
   rw [dateChain_leadingBlockInverse_entry]
-  simp only [BackwardFirstChainTransform.upperRightBlock,
-    BackwardFirstChainTransform.lowerLeftBlock,
-    BackwardFirstChainTransform.lowerRightBlock]
-  simp [Matrix.toBlocks₁₂, Matrix.toBlocks₂₁, Matrix.toBlocks₂₂,
-    dateChainEntry, dateBackwardFirstFinEquiv]
+  change dateChainEntry matrix 1 1 -
+      dateChainEntry matrix 1 0 * (1 / dateChainEntry matrix 0 0) *
+        dateChainEntry matrix 0 1 = 1 / dateChainEntry matrix 0 0
   have hEntry :=
     (dateChain_hasBijectiveLeadingBlock_iff_entry11_ne_zero matrix).mp hLeading
   rw [dateChain_det_eq_entry11_mul_entry22_sub_entry12_mul_entry21] at hDeterminant
@@ -341,8 +339,7 @@ lemma DateCascadeTerminationHypotheses.hasWellPosedZeroReturn
       (RightLoadBehavior.zeroReflection : RightLoadBehavior Unit) := by
   rw [dateCascadeBehavior_eq_composition_toBehavior stages h.ringTransmission]
   simpa using
-    (dateCascadeComposition stages).
-      toBehavior_hasWellPosedRightTermination_of_hasBijectivePivot
+    (dateCascadeComposition stages).toBehavior_hasWellPosedRightTermination_of_hasBijectivePivot
         (0 : RightLoadTransform Unit) h.hasBijectiveZeroReturnPivot
 
 /-- The left-reflection transform extracted from DATE's terminated relational cascade. -/
@@ -383,7 +380,8 @@ lemma dateTerminatedCascadeReflectionTransform_eq_chain
       (dateCascadeComposition stages).rightTerminatedReflectionTransform 0
         h.hasBijectiveZeroReturnPivot := by
   apply ModeTransform.toBehavior_injective
-  rw [BackwardFirstTwoPortBehavior.toBehavior_rightTerminatedReflectionTransform,
+  rw [dateTerminatedCascadeReflectionTransform,
+    BackwardFirstTwoPortBehavior.toBehavior_rightTerminatedReflectionTransform,
     (dateCascadeComposition stages).toBehavior_rightTerminatedReflectionTransform,
     dateCascadeBehavior_eq_composition_toBehavior stages h.ringTransmission,
     RightLoadBehavior.ofReflection_zero]
@@ -396,7 +394,8 @@ lemma dateTerminatedCascadeTransmissionTransform_eq_chain
       (dateCascadeComposition stages).rightTerminatedTransmissionTransform 0
         h.hasBijectiveZeroReturnPivot := by
   apply ModeTransform.toBehavior_injective
-  rw [BackwardFirstTwoPortBehavior.toBehavior_rightTerminatedTransmissionTransform,
+  rw [dateTerminatedCascadeTransmissionTransform,
+    BackwardFirstTwoPortBehavior.toBehavior_rightTerminatedTransmissionTransform,
     (dateCascadeComposition stages).toBehavior_rightTerminatedTransmissionTransform,
     dateCascadeBehavior_eq_composition_toBehavior stages h.ringTransmission,
     RightLoadBehavior.ofReflection_zero]
@@ -455,7 +454,7 @@ structure DateIdenticalTerminationHypotheses
     dateChainEntry (dateIdenticalCascadeComposition stage count) 0 0 ≠ 0
 
 /-- Joint identical-cascade gates viewed as heterogeneous termination gates. -/
-def DateIdenticalTerminationHypotheses.toCascade
+lemma DateIdenticalTerminationHypotheses.toCascade
     {stage : DateCascadeStage} {count : ℕ}
     (h : DateIdenticalTerminationHypotheses stage count) :
     DateCascadeTerminationHypotheses (List.replicate count stage) where
@@ -484,16 +483,14 @@ lemma dateSylvesterClosedForm_entry11
     dateChainEntry (dateSylvesterClosedForm matrix count) 0 0 =
       dateSylvesterSineCoefficient matrix count * dateChainEntry matrix 0 0 -
         dateSylvesterSineCoefficient matrix ((count : ℤ) - 1) := by
-  simp [dateChainEntry, dateSylvesterClosedForm, dateBackwardFirstFinEquiv,
-    Matrix.one_apply]
+  simp [dateChainEntry, dateSylvesterClosedForm, dateBackwardFirstFinEquiv]
 
 /-- The `M12` entry of DATE's Sylvester matrix form. -/
 lemma dateSylvesterClosedForm_entry12
     (matrix : BackwardFirstChainTransform Unit Unit) (count : ℕ) :
     dateChainEntry (dateSylvesterClosedForm matrix count) 0 1 =
       dateSylvesterSineCoefficient matrix count * dateChainEntry matrix 0 1 := by
-  simp [dateChainEntry, dateSylvesterClosedForm, dateBackwardFirstFinEquiv,
-    Matrix.one_apply]
+  simp [dateChainEntry, dateSylvesterClosedForm, dateBackwardFirstFinEquiv]
 
 /-- A DATE stage's `m11` entry is its backward bus factor divided by `R`. -/
 lemma DateCascadeStage.compositionMatrix_entry11 (stage : DateCascadeStage) :
@@ -505,6 +502,7 @@ lemma DateCascadeStage.compositionMatrix_entry11 (stage : DateCascadeStage) :
     dateFourPortBackwardFirstChainMatrix,
     ← BackwardWave.channelEquiv.symm.sum_comp,
     ← ForwardWave.channelEquiv.symm.sum_comp]
+  simp [div_eq_mul_inv]
 
 /-- A DATE stage's `m12` entry is `-E T / R` in source notation. -/
 lemma DateCascadeStage.compositionMatrix_entry12 (stage : DateCascadeStage) :
@@ -539,17 +537,18 @@ lemma dateIdenticalCascadeComposition_entry11_eq_denominator_div_forwardTransfer
   have hForward :=
     (stage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero).mp
       h.ringTransmission
-  field_simp [dateIdenticalTerminationDenominator, hForward]
-  ring
+  rw [dateIdenticalTerminationDenominator]
+  field_simp [hForward]
 
 /-- The selected identical-cascade denominator is nonzero on the termination domain. -/
 lemma DateIdenticalTerminationHypotheses.denominator_ne_zero
     {stage : DateCascadeStage} {count : ℕ}
     (h : DateIdenticalTerminationHypotheses stage count) :
     dateIdenticalTerminationDenominator stage count ≠ 0 := by
+  have hEntry := h.entry11_ne_zero
   rw [dateIdenticalCascadeComposition_entry11_eq_denominator_div_forwardTransfer
-    stage count h] at h.entry11_ne_zero
-  exact (div_ne_zero_iff.mp h.entry11_ne_zero).1
+    stage count h] at hEntry
+  exact (div_ne_zero_iff.mp hEntry).1
 
 /-- DATE'14 Thm. 6: closed reflection of an identical terminated cascade. -/
 theorem dateIdenticalTerminatedCascade_reflectivity_eq_closedForm
@@ -569,8 +568,9 @@ theorem dateIdenticalTerminatedCascade_reflectivity_eq_closedForm
   have hForward :=
     (stage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero).mp
       h.ringTransmission
-  field_simp [dateIdenticalTerminationDenominator, hForward, h.denominator_ne_zero]
-  ring
+  have hDenominator := h.denominator_ne_zero
+  rw [dateIdenticalTerminationDenominator] at hDenominator ⊢
+  field_simp [hForward, hDenominator]
 
 /-- DATE'14 Thm. 6: closed forward response of an identical terminated cascade. -/
 theorem dateIdenticalTerminatedCascade_transmissivity_eq_closedForm
