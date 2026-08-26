@@ -92,8 +92,8 @@ lemma linearPolarizer_scaledWave_eq (z : ℂ) (analyzer input : Real.Angle)
     (medium : HomogeneousIsotropicMedium)
     {direction : Space.Direction 3} (frame : PolarizationFrame direction)
     (angularFrequency : ℝ) (hFrequency : 0 < angularFrequency) :
-    (MaterialJonesMode.linearPolarizationFamily analyzer medium frame angularFrequency hFrequency
-      ).scaledWave (linearPolarizerOutputAmplitude z analyzer input) () =
+    (MaterialJonesMode.linearPolarizationFamily analyzer medium frame angularFrequency
+      hFrequency).scaledWave (linearPolarizerOutputAmplitude z analyzer input) () =
       Electromagnetism.ThreeDimension.ComplexMonochromaticPlaneWave.ofReal
         (((linearPolarizer analyzer).act
           (JonesVector.scale z (JonesVector.linearPolarization input))).toMaterialPlaneWave
@@ -132,17 +132,17 @@ lemma linearPolarizer_malus_integratedActualMeanNormalFlux
     {inputPoint : Ain → Space} {outputMeasure : Measure Aout}
     {outputPlane : OrientedAffineHyperplane 3} {outputPoint : Aout → Space}
     (hInput : HarmonicFieldProfile.IsApertureFluxOrthonormal inputMeasure inputPlane .incident
-      ((MaterialJonesMode.linearPolarizationFamily input medium frame angularFrequency hFrequency
-        ).modeProfile inputPoint))
+      ((MaterialJonesMode.linearPolarizationFamily input medium frame angularFrequency
+        hFrequency).modeProfile inputPoint))
     (hOutput : HarmonicFieldProfile.IsApertureFluxOrthonormal outputMeasure outputPlane .outgoing
       ((MaterialJonesMode.linearPolarizationFamily analyzer medium frame angularFrequency
         hFrequency).modeProfile outputPoint))
     (startTime : Time) :
-    (MaterialJonesMode.linearPolarizationFamily analyzer medium frame angularFrequency hFrequency
-      ).integratedActualMeanNormalFlux outputMeasure outputPlane outputPoint
+    (MaterialJonesMode.linearPolarizationFamily analyzer medium frame angularFrequency
+      hFrequency).integratedActualMeanNormalFlux outputMeasure outputPlane outputPoint
           (linearPolarizerOutputAmplitude z analyzer input) startTime =
-      -(MaterialJonesMode.linearPolarizationFamily input medium frame angularFrequency hFrequency
-        ).integratedActualMeanNormalFlux inputMeasure inputPlane inputPoint
+      -(MaterialJonesMode.linearPolarizationFamily input medium frame angularFrequency
+        hFrequency).integratedActualMeanNormalFlux inputMeasure inputPlane inputPoint
             (MaterialJonesMode.amplitude z) startTime *
         Real.Angle.cos (input - analyzer) ^ 2 := by
   calc
