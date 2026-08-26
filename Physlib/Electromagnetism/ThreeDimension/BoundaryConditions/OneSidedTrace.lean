@@ -114,6 +114,38 @@ structure PlanarMacroscopicTwoSidedFields (plane : OrientedAffineHyperplane 3) w
   /-- Fields and traces approached from the positive open half-space. -/
   positive : PlanarMacroscopicSideFields plane .positive
 
+namespace PlanarMacroscopicTwoSidedFields
+
+/-- The two open-half-space electric fields, without assigning a value on the carrier. -/
+def electricFieldFamily {plane : OrientedAffineHyperplane 3}
+    (fields : PlanarMacroscopicTwoSidedFields plane) :
+    plane.TwoSidedField Time (EuclideanSpace ℝ (Fin 3)) where
+  negative := fields.negative.electricField
+  positive := fields.positive.electricField
+
+/-- The two open-half-space electric-displacement fields. -/
+def electricDisplacementFamily {plane : OrientedAffineHyperplane 3}
+    (fields : PlanarMacroscopicTwoSidedFields plane) :
+    plane.TwoSidedField Time (EuclideanSpace ℝ (Fin 3)) where
+  negative := fields.negative.electricDisplacement
+  positive := fields.positive.electricDisplacement
+
+/-- The two open-half-space magnetic-induction fields. -/
+def magneticInductionFamily {plane : OrientedAffineHyperplane 3}
+    (fields : PlanarMacroscopicTwoSidedFields plane) :
+    plane.TwoSidedField Time (EuclideanSpace ℝ (Fin 3)) where
+  negative := fields.negative.magneticInduction
+  positive := fields.positive.magneticInduction
+
+/-- The two open-half-space magnetic-field-strength fields. -/
+def magneticFieldStrengthFamily {plane : OrientedAffineHyperplane 3}
+    (fields : PlanarMacroscopicTwoSidedFields plane) :
+    plane.TwoSidedField Time (EuclideanSpace ℝ (Fin 3)) where
+  negative := fields.negative.magneticFieldStrength
+  positive := fields.positive.magneticFieldStrength
+
+end PlanarMacroscopicTwoSidedFields
+
 /-! ## B. Differential Maxwell trace data -/
 
 namespace IsMacroscopicMaxwell
