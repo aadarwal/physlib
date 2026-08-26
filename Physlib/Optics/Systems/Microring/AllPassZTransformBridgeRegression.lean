@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
 public import Physlib.Optics.Systems.Microring.AllPassChainRegression
 public import Physlib.Optics.Systems.Microring.AllPassMasonRegression
 public import Physlib.Optics.Systems.Microring.AllPassZTransformBridge
@@ -15,18 +16,20 @@ public import Physlib.Optics.Systems.Microring.AllPassZTransformRegression
 
 ## i. Overview
 
-The exact recurrence values are compared with raw N5 channel elimination, the convergent
-circulation series, forward-path Mason enumeration, typed scattering, and backward-first chain
-coordinates. A quarter-turn fixture pins the negative-exponential carrier sign at a nonreal point.
+The exact recurrence values are compared with the proof-gated rational/N5F response, raw N5
+channel elimination, the convergent circulation series, complete Mason response, typed
+scattering, backward-first chain coordinates, and the original relational behavior. A
+quarter-turn fixture pins the negative-exponential carrier sign at a nonreal compiled response.
 A deliberately nonunitary coupler proves that the bridge's unitarity hypothesis is load-bearing.
 
-The value anchors are expanded independently of the general bridge lemmas. They do not establish
-an ROC, material delay law, continuous-time realization, reciprocity statement, or electromagnetic
-power normalization.
+The real and nonreal response values have anchors independent of the general bridge lemmas. The
+named ROC witness is an absolute-convergence result; no material delay law, continuous-time
+realization, reciprocity statement, or electromagnetic power normalization is claimed.
 
 ## ii. Key results
 
-- `allPassZRegression_cross_semantics`: independent value agreement across the ring layers.
+- `allPassZRegression_cross_semantics`: exact common-domain agreement across the ring layers.
+- `allPassZRegression_quarterTurn_rawN5F_agreement`: nonreal recurrence/compiled-response anchor.
 
 ## iii. Table of contents
 
@@ -43,36 +46,70 @@ noncomputable section
 
 namespace AllPass
 
+open DelayTransfer
+open Physlib.ZTransform
+
 /-! ## A. Independent cross-semantics agreement -/
 
-/-- At the resonant fixture, direct recurrence-symbol evaluation, raw N5 elimination, the
-circulation series, forward-path Mason enumeration, typed scattering, and the backward-first
-chain all give `1 / 7`. The proof does not use any general Z-to-ring bridge lemma. -/
+/-- The resonant point lies in the named absolute ROC by the strict pole-radius bound. -/
+lemma allPassZRegression_one_mem_zTransferROC :
+    (1 : ℂ) ∈ zTransferROC (3 / 5) (1 / 2) := by
+  apply mem_zTransferROC_of_norm_feedback_lt_norm
+  · norm_num
+  · norm_num
+
+/-- The exact resonant fixture meets every independently stated common-domain gate. -/
+lemma allPassZRegression_resonance_crossSemanticsDomain :
+    IsZCrossSemanticsDomain allPassRegressionResonanceParameters 1 where
+  isValid := allPassRegression_resonance_isValid
+  couplerIsUnitary := allPassRegression_resonance_isValid.1.isUnitary
+  isContractive := allPassRegression_resonance_isContractive
+  loopCoefficient_eq := by
+    rw [allPassRegression_resonance_loopCoefficient]
+    norm_num [allPassRegressionResonanceParameters]
+  mem_zTransferROC := by
+    simpa [allPassRegressionResonanceParameters] using
+      allPassZRegression_one_mem_zTransferROC
+  throughTransfer_ne_zero := allPassChainRegression_resonance_throughTransfer_ne_zero
+
+/-- At the resonant fixture, the causal transform, rational/N5F response, circulation series, raw
+N5 response, complete Mason response, typed scattering, backward-first chain, and original
+relational behavior meet at the exact value `1 / 7`. The N5 and circulation values retain their
+independent channel-equation and geometric-series anchors. -/
 lemma allPassZRegression_cross_semantics :
-    zTransfer (3 / 5) (1 / 2) 1 =
-        (netlist allPassRegressionResonanceParameters).responseTransform
-          allPassRegression_resonance_isWellPosed
-          (Outgoing.mk (throughChannel allPassRegressionResonanceParameters))
-          (Incident.mk (inputChannel allPassRegressionResonanceParameters)) ∧
-      zTransfer (3 / 5) (1 / 2) 1 =
-        throughTransferSeries allPassRegressionResonanceParameters ∧
-      zTransfer (3 / 5) (1 / 2) 1 =
-        loopMasonThroughTransfer allPassRegressionResonanceParameters ∧
-      zTransfer (3 / 5) (1 / 2) 1 =
-        (packagedTwoPortScattering allPassRegressionResonanceParameters
-            allPassChainRegression_resonance_hasNonzeroDenominator).leftToRightTransmission
-          (ForwardWave.mk ()) (ForwardWave.mk ()) ∧
-      zTransfer (3 / 5) (1 / 2) 1 =
-        allPassChainRegressionResonanceChain
-          (Sum.inr (ForwardWave.mk ())) (Sum.inr (ForwardWave.mk ())) := by
-  rw [allPassZRegression_transfer_one,
-    allPassRegression_resonance_responseTransform_entry,
-    allPassRegression_resonance_throughTransferSeries,
-    allPassMasonRegression_loopMasonThroughTransfer,
-    packagedTwoPortScattering_leftToRightTransmission_entry,
-    allPassRegression_resonance_throughTransfer,
-    allPassChainRegression_resonance_chain_inr_inr]
-  simp
+    let p := allPassRegressionResonanceParameters
+    let h := allPassZRegression_resonance_crossSemanticsDomain
+    transform
+        (causalOutput
+          (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) unitImpulse) 1 = 1 / 7 ∧
+      reciprocalZThroughResponse p 1 h.mem_reciprocalZResponseDomain = 1 / 7 ∧
+      throughTransferSeries p = 1 / 7 ∧
+      (netlist p).responseTransform
+          (isWellPosed_of_hasNonzeroDenominator p h.hasNonzeroDenominator)
+          (Outgoing.mk (throughChannel p)) (Incident.mk (inputChannel p)) = 1 / 7 ∧
+      (netlist p).masonResponseTransform
+          (Outgoing.mk (throughChannel p)) (Incident.mk (inputChannel p)) = 1 / 7 ∧
+      (packagedTwoPortScattering p h.hasNonzeroDenominator).leftToRightTransmission
+          (ForwardWave.mk ()) (ForwardWave.mk ()) = 1 / 7 ∧
+      backwardFirstChainTransform p h.hasNonzeroDenominator h.throughTransfer_ne_zero
+          (Sum.inr (ForwardWave.mk ())) (Sum.inr (ForwardWave.mk ())) = 1 / 7 ∧
+      (inputAmplitude p 1,
+          (netlist p).masonResponseTransform.toLinearMap (inputAmplitude p 1)) ∈
+        (netlist p).behavior := by
+  let p := allPassRegressionResonanceParameters
+  let h := allPassZRegression_resonance_crossSemanticsDomain
+  have hAgreement := zCrossSemantics_agree p 1 h
+  have hTransfer :
+      zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) 1 = 1 / 7 := by
+    simpa [p, allPassRegressionResonanceParameters] using allPassZRegression_transfer_one
+  refine ⟨hAgreement.causalImpulseResponse.trans hTransfer, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact hAgreement.rationalN5F.symm.trans hTransfer
+  · simpa [p] using allPassRegression_resonance_throughTransferSeries
+  · simpa [p] using allPassRegression_resonance_responseTransform_entry
+  · exact hAgreement.completeMason.symm.trans hTransfer
+  · exact hAgreement.packagedScattering.symm.trans hTransfer
+  · exact hAgreement.backwardFirstChain.symm.trans hTransfer
+  · exact hAgreement.relationalBehavior
 
 /-! ## B. Fixed-carrier phase-sign sentinel -/
 
@@ -119,8 +156,8 @@ lemma allPassZRegression_quarterTurn_denominator :
   norm_num [allPassZRegressionQuarterTurnParameters]
   ring
 
-/-- Direct N7/N5 expansion at the quarter-turn point gives the same nonreal value as the
-independently expanded recurrence transfer. -/
+/-- Direct closed-form expansion of the fixed-carrier through transfer gives the pinned nonreal
+value. -/
 lemma allPassZRegression_quarterTurn_throughTransfer :
     throughTransfer allPassZRegressionQuarterTurnParameters =
       75 / 109 + 32 / 109 * Complex.I := by
@@ -142,8 +179,41 @@ lemma allPassZRegression_quarterTurn_throughTransfer :
   norm_num [Complex.I_sq]
   ring
 
-/-- The independently expanded recurrence and ring responses agree at the nonreal carrier point,
-without using the general bridge theorem. -/
+/-- The quarter-turn point belongs to the raw reciprocal-Z compiled-response domain. -/
+lemma allPassZRegression_quarterTurn_reciprocalZDomain :
+    Complex.I ∈
+      (allPassRationalNetlist
+        allPassZRegressionQuarterTurnParameters).reciprocalZ.responseDomain := by
+  have hParameters : allPassZRegressionQuarterTurnParameters =
+      allPassRationalQuadratureParameters := rfl
+  rw [hParameters]
+  exact allPassRationalNetlistReciprocalZQuadratureDomain
+
+/-- The raw proof-gated reciprocal-Z response, reached through the compiled N7/N5 equations,
+has the pinned nonreal value. -/
+lemma allPassZRegression_quarterTurn_reciprocalZThroughResponse :
+    reciprocalZThroughResponse allPassZRegressionQuarterTurnParameters Complex.I
+        allPassZRegression_quarterTurn_reciprocalZDomain =
+      75 / 109 + 32 / 109 * Complex.I := by
+  simpa [reciprocalZThroughResponse, allPassZRegressionQuarterTurnParameters,
+    allPassRationalQuadratureParameters] using
+      allPassRationalNetlist_reciprocalZ_quadrature_response_entry
+
+/-- The independently expanded recurrence and raw compiled response agree at the nonreal carrier
+point, without either general Z-to-ring bridge theorem. -/
+lemma allPassZRegression_quarterTurn_rawN5F_agreement :
+    zTransfer
+        (allPassZRegressionQuarterTurnParameters.throughAmplitude : ℂ)
+        (allPassZRegressionQuarterTurnParameters.fieldAttenuation : ℂ)
+        (carrierPoint allPassZRegressionQuarterTurnParameters) =
+      reciprocalZThroughResponse allPassZRegressionQuarterTurnParameters Complex.I
+        allPassZRegression_quarterTurn_reciprocalZDomain := by
+  rw [allPassZRegression_quarterTurn_carrierPoint,
+    allPassZRegression_quarterTurn_reciprocalZThroughResponse]
+  simpa [allPassZRegressionQuarterTurnParameters] using allPassZRegression_transfer_I
+
+/-- The independently expanded recurrence and closed fixed-carrier response also agree at the
+nonreal carrier point, without using the general bridge theorem. -/
 lemma allPassZRegression_quarterTurn_agreement :
     zTransfer
         (allPassZRegressionQuarterTurnParameters.throughAmplitude : ℂ)
@@ -164,7 +234,7 @@ def allPassZRegressionNonunitaryParameters : Parameters where
   fieldAttenuation := 1 / 2
   roundTripPhase := 0
 
-/-- Direct N7/N5 evaluation of the nonunitary fixture gives `59 / 140`. -/
+/-- Direct closed-form evaluation of the nonunitary fixture gives `59 / 140`. -/
 lemma allPassZRegression_nonunitary_throughTransfer :
     throughTransfer allPassZRegressionNonunitaryParameters = 59 / 140 := by
   simp [throughTransfer, allPassZRegressionNonunitaryParameters,
