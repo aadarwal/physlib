@@ -265,18 +265,86 @@ lemma replaceInnerFamily
           (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
   rw [replacement.closeBehavior_append (outer.transport boundary),
     inner.closeBehavior_append outer,
-    inner.innerBoundaryBehavior_eq_of_boundaryRelation replacement boundary behavior hBoundary,
-    outer.closeBehavior_transport boundary]
-  rw [LinearBehavior.reindex_trans, LinearBehavior.reindex_trans]
-  congr 1
-  · apply Equiv.ext
+    inner.innerBoundaryBehavior_eq_of_boundaryRelation replacement boundary behavior hBoundary]
+  have hIncidentEquiv :
+      (Incident.relabelEquiv (outer.transportExternalChannelEquiv boundary)).trans
+          (Incident.relabelEquiv
+            (replacement.appendExternalChannelEquiv
+              (outer.transport boundary)).symm) =
+        (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer).symm).trans
+          (Incident.relabelEquiv
+            (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
+    apply Equiv.ext
     rintro ⟨channel⟩
     apply Incident.ext
-    rfl
-  · apply Equiv.ext
+    simp [replacementExternalChannelEquiv, Incident.relabelEquiv]
+  have hOutgoingEquiv :
+      (Outgoing.relabelEquiv (outer.transportExternalChannelEquiv boundary)).trans
+          (Outgoing.relabelEquiv
+            (replacement.appendExternalChannelEquiv
+              (outer.transport boundary)).symm) =
+        (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer).symm).trans
+          (Outgoing.relabelEquiv
+            (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
+    apply Equiv.ext
     rintro ⟨channel⟩
     apply Outgoing.ext
-    rfl
+    simp [replacementExternalChannelEquiv, Outgoing.relabelEquiv]
+  calc
+    ((outer.transport boundary).closeBehavior
+          ((inner.innerBoundaryBehavior behavior).reindex
+            (Incident.relabelEquiv boundary.channelEquiv)
+            (Outgoing.relabelEquiv boundary.channelEquiv))).reindex
+        (Incident.relabelEquiv
+          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
+        (Outgoing.relabelEquiv
+          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm =
+      ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          (Incident.relabelEquiv (outer.transportExternalChannelEquiv boundary))
+          (Outgoing.relabelEquiv
+            (outer.transportExternalChannelEquiv boundary))).reindex
+        (Incident.relabelEquiv
+          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
+        (Outgoing.relabelEquiv
+          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm := by
+            exact congrArg
+              (fun relation => relation.reindex
+                (Incident.relabelEquiv
+                  (replacement.appendExternalChannelEquiv
+                    (outer.transport boundary))).symm
+                (Outgoing.relabelEquiv
+                  (replacement.appendExternalChannelEquiv
+                    (outer.transport boundary))).symm)
+              (outer.closeBehavior_transport boundary
+                (inner.innerBoundaryBehavior behavior))
+    _ = (outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          ((Incident.relabelEquiv
+            (outer.transportExternalChannelEquiv boundary)).trans
+              (Incident.relabelEquiv
+                (replacement.appendExternalChannelEquiv
+                  (outer.transport boundary)).symm))
+          ((Outgoing.relabelEquiv
+            (outer.transportExternalChannelEquiv boundary)).trans
+              (Outgoing.relabelEquiv
+                (replacement.appendExternalChannelEquiv
+                  (outer.transport boundary)).symm)) :=
+        LinearBehavior.reindex_trans _ _ _ _ _
+    _ = (outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          ((Incident.relabelEquiv (inner.appendExternalChannelEquiv outer).symm).trans
+            (Incident.relabelEquiv
+              (inner.replacementExternalChannelEquiv replacement boundary outer)))
+          ((Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer).symm).trans
+            (Outgoing.relabelEquiv
+              (inner.replacementExternalChannelEquiv replacement boundary outer))) := by
+                rw [hIncidentEquiv, hOutgoingEquiv]
+    _ = ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer).symm)
+          (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer).symm)).reindex
+            (Incident.relabelEquiv
+              (inner.replacementExternalChannelEquiv replacement boundary outer))
+            (Outgoing.relabelEquiv
+              (inner.replacementExternalChannelEquiv replacement boundary outer)) := by
+                exact (LinearBehavior.reindex_trans _ _ _ _ _).symm
 
 end PortConnectionFamily
 
