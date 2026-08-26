@@ -217,14 +217,14 @@ for finite-delay linear networks” is explicitly withheld.
 
 ### Gates
 
-- Synced onto `optics/development` commit `af062790` in merge commit `afbd7baa` before cutoff.
+- Synced onto `optics/development` commit `8db20f71` in merge commit `d1f5e200` before cutoff.
 - All five registered delay-transfer modules, direct Lean checks with
   `-DwarningAsError=true`, the temporary-registry `Physlib` target, and
   `lake exe runPhyslibLinters` passed in one locked chain.
 - The same chain found no `DelayTransfer` style or redundant-import finding, and
   `check_file_imports` reported that all registered files were imported correctly.
 - `Physlib.lean` was restored byte-identically to SHA-256
-  `ad2036c829a114b2a4e18d1035ecb1a30452724b474bd8c6fe038df8fbf5d5cd`.
+  `33525d318799c01166c4127080c99ddccae55cb1a3f204a6c183650e7c931d2e`.
 
 ## Slice 2: candidate singularities and abstract polynomial cancellation
 
@@ -309,4 +309,8 @@ Files:
 
 ### Gates
 
-Pending the post-sync chained Slice 1c gate; the registry will be restored byte-for-byte afterward.
+- The post-sync Slice 1c chain built both pole modules with warnings as errors, built the
+  temporary-registry `Physlib` target, and passed `runPhyslibLinters` and `check_file_imports`.
+- The same chain found no `DelayTransfer` style, shell-style, or redundant-import finding.
+- `Physlib.lean` was restored byte-identically to SHA-256
+  `33525d318799c01166c4127080c99ddccae55cb1a3f204a6c183650e7c931d2e`.
