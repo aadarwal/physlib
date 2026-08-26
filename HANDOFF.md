@@ -34,7 +34,7 @@ Files in the cutoff:
 - `Physlib/Optics/Systems/DCDR/Topology.lean` (46-line compatibility façade)
 - `Physlib/Optics/Systems/DCDR/TopologyRegression.lean` (451 lines)
 - `Physlib/Optics/Systems/DCDR/Response.lean` (545 lines)
-- `Physlib/Optics/Systems/DCDR/Mason.lean` (207 lines)
+- `Physlib/Optics/Systems/DCDR/Mason.lean` (208 lines)
 - `Physlib/Optics/Systems/DCDR/ResponseRegression.lean` (1004 lines)
 
 Every DCDR Lean file is below the 1500-line `ERR_NUM_LIN` cap.
@@ -318,8 +318,8 @@ declaration names and namespaces are unchanged.
 - `auditedMasonResponse_eq_transfer` (line 133)
 - `feedbackSignalFlowGraph_graphDet_ne_zero_iff` (line 166)
 - `masonResponse_eq_eliminationResponse` (line 178)
-- `auditedMasonResponse_eq_eliminationResponse` (line 188)
-- `auditedMasonResponse_eq_masonResponse` (line 197)
+- `auditedMasonResponse_eq_eliminationResponse` (line 189)
+- `auditedMasonResponse_eq_masonResponse` (line 198)
 
 ### ResponseRegression.lean
 

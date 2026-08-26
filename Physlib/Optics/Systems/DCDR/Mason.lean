@@ -184,7 +184,8 @@ lemma masonResponse_eq_eliminationResponse (p : Parameters)
   exact (congrFun (congrFun hAgreement (Outgoing.mk (outputChannel p)))
     (Incident.mk (inputChannel p))).symm
 
-/-- The edge-indexed audited Mason response and N5 elimination agree on their exact common domain. -/
+/-- The edge-indexed audited Mason response and N5 elimination agree on their exact common
+domain. -/
 lemma auditedMasonResponse_eq_eliminationResponse (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :
     auditedMasonResponse p =
