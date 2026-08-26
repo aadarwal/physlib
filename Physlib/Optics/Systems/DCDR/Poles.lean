@@ -62,6 +62,7 @@ No result calls zeros inside the unit disk a resonance, asserts a physical reson
 the printed incoherent equations with the coherent netlist, or supplies power observables.
 Schur stability is only the abstract reduced-denominator predicate imported from S4. The S4 BIBO
 equivalence is stated only for `ProperCausalOnePole`; no two-pole DCDR BIBO theorem is claimed.
+No time-domain impulse-response or causality interpretation is supplied.
 -/
 
 @[expose] public section
@@ -656,8 +657,11 @@ namespace ResponseReduction
 
 variable {p : UnitDelayParameters}
 
-/-- Zeros of the certified reduced DCDR response. -/
-def actualZeros (certificate : ResponseReduction p) : Set ℂ :=
+/-- Formal-`q` zeros of the certified reduced DCDR response.
+
+This is not the reciprocal-coordinate `zZeros` set: in particular, `q = 0` represents `z = ∞`.
+-/
+def formalZeros (certificate : ResponseReduction p) : Set ℂ :=
   certificate.reduction.reduced.zeros
 
 /-- Reciprocal-coordinate poles of the certified reduced DCDR response. -/
