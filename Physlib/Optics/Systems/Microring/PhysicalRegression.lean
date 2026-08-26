@@ -253,10 +253,10 @@ lemma physicalRegression_quarterTurn_lift :
 lemma physicalRegression_quarterTurn_carrierPhaseFactor :
     MatchedPropagation.carrierPhaseFactor
       physicalRegressionRationalQuarterTurn.roundTripPhase = -Complex.I := by
-  simp [PhysicalParameters.roundTripPhase, PhysicalParameters.roundTripPhaseLift,
-    PhysicalParameters.propagationConstant, physicalRegressionRationalQuarterTurn,
-    MatchedPropagation.carrierPhaseFactor, Real.Angle.toCircle_coe, Circle.coe_exp]
-  apply Complex.ext <;> norm_num
+  rw [PhysicalParameters.roundTripPhase, physicalRegression_quarterTurn_lift]
+  change ((-(((Real.pi / 2 : ℝ) : Real.Angle))).toCircle : ℂ) = -Complex.I
+  rw [← Real.Angle.coe_neg, Real.Angle.toCircle_coe, Circle.coe_exp]
+  exact Complex.exp_neg_pi_div_two_mul_I
 
 /-! ## C. Maps to the named S2 parameters -/
 
