@@ -353,11 +353,9 @@ lemma rephasedResponseTransform_eq
           (netlist.connections.externalGauge gauge).incident
           (netlist.connections.externalGauge gauge).outgoing).toBehavior := by
       rw [ModeTransform.toBehavior_rephase]
-      exact congrArg
-        (LinearBehavior.rephase
-          (netlist.connections.externalGauge gauge).incident
-          (netlist.connections.externalGauge gauge).outgoing)
-        (netlist.toBehavior_responseTransform hWellPosed).symm
+      have hResponse := netlist.toBehavior_responseTransform hWellPosed
+      cases hResponse
+      rfl
 
 end FlatNetlist
 
@@ -464,6 +462,7 @@ lemma closeBehavior_append_rephase_eq_staged
         ((inner.append outer).externalGauge gauge).outgoing := by
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched,
     inner.closeBehavior_append outer behavior]
+  rfl
 
 end Finite
 
