@@ -446,6 +446,7 @@ lemma latticeRegression_mem_componentBehavior :
     ScatteringMatrix.toLinearMap_toOrientedModeTransform]
   apply WithLp.ofLp_injective 2
   funext localChannel
+  change (rectangularLatticeComponentPortFamily component).Channel at localChannel
   rcases localChannel with ⟨port, mode⟩
   rw [ModeAmplitude.reindex_apply]
   simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply,
@@ -531,7 +532,9 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
       rcases localChannel with mode | mode <;> cases mode <;>
       simp [latticeRegressionConnections, rectangularLatticeNetlist,
         rectangularHorizontalConnections, rectangularHorizontalConnection,
-        PortConnectionFamily.append, ScatteringComponentFamily.componentChannelEmbedding,
+        PortConnectionFamily.append, PortConnection.mateEquiv,
+        PortConnection.channelEmbedding,
+        ScatteringComponentFamily.componentChannelEmbedding,
         ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
         latticeRegressionOutgoing, latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue, latticeRegressionHorizontalIncidentValue,
@@ -550,6 +553,7 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
         LatticeConnectionFamilies.connectionOnBoundary, rectangularVerticalConnections,
         rectangularVerticalConnection, PortConnectionFamily.append,
         PortConnection.liftBoundary, PortConnection.liftBoundary_modeEquiv,
+        PortConnection.mateEquiv, PortConnection.channelEmbedding,
         ScatteringComponentFamily.componentChannelEmbedding,
         ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
         latticeRegressionOutgoing, latticeRegressionIncidentValue,
@@ -830,7 +834,8 @@ lemma latticeRegressionMiswired_endpointDisjoint :
       PortConnection.endpointPort] at hPort
   all_goals
     have hAxis := congrArg latticeRegressionPortIsHorizontal hPort
-    simp [latticeRegressionPortIsHorizontal] at hAxis
+    simp [latticeRegressionPortIsHorizontal, rectangularRingComponent,
+      rectangularHorizontalCouplerComponent, rectangularVerticalCouplerComponent] at hAxis
 
 /-- The hostile vertical family lifted to the horizontal stage's remaining boundary. -/
 def latticeRegressionMiswiredVerticalBoundaryConnections :=
@@ -896,8 +901,6 @@ lemma latticeRegressionMiswired_incidentAssembly_rejected
   rw [latticeRegressionMiswired_incidentAssembly_ring11North] at hCoordinate
   change (-126 : ℂ) = 0 at hCoordinate
   norm_num at hCoordinate
-
-end
 
 end MicroringCascade
 
