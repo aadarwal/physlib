@@ -27,6 +27,8 @@ to reference the underlying Schwartz maps.
   `f : Space d → F` satisfying the `IsDistBounded f` condition.
 - `distOfFunctionOn s hs f hf` : The distribution obtained by integrating a
   distribution-bounded function only over a measurable set.
+- `distOfFunctionOn_congr` : restricted distributions agree when their ambient functions agree
+  on the restriction set.
 
 ## iii. Table of contents
 
@@ -98,6 +100,18 @@ lemma distOfFunctionOn_apply {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s
   by_cases hx : x ∈ s
   · simp [Set.indicator_of_mem hx]
   · simp [Set.indicator_of_notMem hx]
+
+/-- Restricted function distributions depend only on the supplied function's values inside the
+restriction set. -/
+lemma distOfFunctionOn_congr {d : ℕ} (s : Set (Space d)) (hs : MeasurableSet s)
+    (f g : Space d → F) (hf : IsDistBounded f) (hg : IsDistBounded g)
+    (hfg : Set.EqOn f g s) :
+    distOfFunctionOn s hs f hf = distOfFunctionOn s hs g hg := by
+  ext η
+  rw [distOfFunctionOn_apply, distOfFunctionOn_apply]
+  apply integral_congr_ae
+  filter_upwards [ae_restrict_mem hs] with x hx
+  rw [hfg hx]
 
 /-!
 

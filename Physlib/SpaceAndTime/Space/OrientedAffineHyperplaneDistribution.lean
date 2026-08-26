@@ -24,6 +24,8 @@ definition.
 - `OrientedAffineHyperplane.distOfSidewiseFunction`: the sum of the two open-half-space function
   distributions.
 - `OrientedAffineHyperplane.distOfSidewiseFunction_apply`: its literal two-integral action.
+- `OrientedAffineHyperplane.distOfSidewiseFunction_congr`: equality for ambient extensions that
+  agree on their selected open sides.
 
 ## iii. Table of contents
 
@@ -71,6 +73,17 @@ lemma distOfSidewiseFunction_apply {d : ℕ} (plane : OrientedAffineHyperplane d
         ∫ x in plane.openHalfSpace .positive, η x • f .positive x := by
   rw [distOfSidewiseFunction, _root_.add_apply, distOfFunctionOn_apply,
     distOfFunctionOn_apply]
+
+/-- Sidewise distributions are unchanged when each ambient extension is replaced by a function
+that agrees with it throughout the selected strict open half-space. -/
+lemma distOfSidewiseFunction_congr {d : ℕ} (plane : OrientedAffineHyperplane d)
+    (f g : Side → Space d → F) (hf : ∀ side, IsDistBounded (f side))
+    (hg : ∀ side, IsDistBounded (g side))
+    (hfg : ∀ side, Set.EqOn (f side) (g side) (plane.openHalfSpace side)) :
+    plane.distOfSidewiseFunction f hf = plane.distOfSidewiseFunction g hg := by
+  rw [distOfSidewiseFunction, distOfSidewiseFunction,
+    distOfFunctionOn_congr _ _ _ _ _ _ (hfg .negative),
+    distOfFunctionOn_congr _ _ _ _ _ _ (hfg .positive)]
 
 end OrientedAffineHyperplane
 end

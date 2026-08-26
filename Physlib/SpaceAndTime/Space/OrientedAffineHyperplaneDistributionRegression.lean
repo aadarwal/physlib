@@ -15,7 +15,9 @@ public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistribution
 A one-dimensional bump is supported strictly on the positive side of the coordinate hyperplane.
 Direct expansion of the defining indicators gives a positive value when the nonzero field is
 assigned to that side and zero when the same field is assigned to the negative side. This pins the
-side choice independently of the production application lemma.
+side choice independently of the production application lemma. A second fixture replaces both
+ambient extensions away from their selected sides and proves equality by directly expanding the
+two restricted distributions, independently of the production congruence lemmas.
 
 ## ii. Key results
 
@@ -24,11 +26,14 @@ side choice independently of the production application lemma.
   makes its action on the positive-supported test vanish.
 - `sidewiseDistributionRegression_positive_ne_wrongSide`: the hostile side exchange changes the
   distribution value.
+- `sidewiseDistributionRegression_alteredExtension_eq`: changing both extensions only away from
+  their selected sides leaves the distribution unchanged.
 
 ## iii. Table of contents
 
 - A. Coordinate fixture
 - B. Direct sidewise evaluation
+- C. Off-side extension independence
 
 ## iv. References
 
@@ -278,6 +283,120 @@ lemma sidewiseDistributionRegression_positive_ne_wrongSide :
         sidewiseDistributionRegressionTest := by
   rw [sidewiseDistributionRegression_wrongSide_eq_zero]
   exact ne_of_gt sidewiseDistributionRegression_positive_pos
+
+/-!
+## C. Off-side extension independence
+-/
+
+/-- An alternative pair of ambient extensions. The negative extension is changed on the positive
+side, while the positive extension is changed off the positive side. -/
+def sidewiseDistributionRegressionAlteredExtensionField :
+    OrientedAffineHyperplane.Side → Space 1 → ℝ
+  | .negative =>
+      (sidewiseDistributionRegressionPlane.openHalfSpace .positive).indicator (fun _ => 11)
+  | .positive =>
+      (sidewiseDistributionRegressionPlane.openHalfSpace .positive).indicator (fun _ => 7)
+
+/-- Both altered ambient extensions are distribution bounded. -/
+lemma sidewiseDistributionRegressionAlteredExtensionField_isDistBounded :
+    ∀ side, IsDistBounded (sidewiseDistributionRegressionAlteredExtensionField side) := by
+  intro side
+  cases side
+  · change IsDistBounded
+      ((sidewiseDistributionRegressionPlane.openHalfSpace .positive).indicator
+        (fun _ : Space 1 => (11 : ℝ)))
+    exact
+      (show IsDistBounded (fun _ : Space 1 => (11 : ℝ)) by fun_prop).indicator
+        (sidewiseDistributionRegressionPlane.measurableSet_openHalfSpace .positive)
+  · change IsDistBounded
+      ((sidewiseDistributionRegressionPlane.openHalfSpace .positive).indicator
+        (fun _ : Space 1 => (7 : ℝ)))
+    exact
+      (show IsDistBounded (fun _ : Space 1 => (7 : ℝ)) by fun_prop).indicator
+        (sidewiseDistributionRegressionPlane.measurableSet_openHalfSpace .positive)
+
+/-- The original and altered extensions agree pointwise on each selected open side. -/
+lemma sidewiseDistributionRegression_extension_eqOn :
+    ∀ side, Set.EqOn
+      (sidewiseDistributionRegressionPositiveField side)
+      (sidewiseDistributionRegressionAlteredExtensionField side)
+      (sidewiseDistributionRegressionPlane.openHalfSpace side) := by
+  intro side x hx
+  cases side
+  · have hnotPositive :
+        x ∉ sidewiseDistributionRegressionPlane.openHalfSpace .positive := by
+      intro hPositive
+      change 0 < OrientedAffineHyperplane.Side.negative.sign *
+        sidewiseDistributionRegressionPlane.signedNormalCoordinate x at hx
+      change 0 < OrientedAffineHyperplane.Side.positive.sign *
+        sidewiseDistributionRegressionPlane.signedNormalCoordinate x at hPositive
+      simp only [OrientedAffineHyperplane.Side.sign_negative, neg_one_mul] at hx
+      simp only [OrientedAffineHyperplane.Side.sign_positive, one_mul] at hPositive
+      linarith
+    simp [sidewiseDistributionRegressionPositiveField,
+      sidewiseDistributionRegressionAlteredExtensionField,
+      Set.indicator_of_notMem hnotPositive]
+  · simp [sidewiseDistributionRegressionPositiveField,
+      sidewiseDistributionRegressionAlteredExtensionField, Set.indicator_of_mem hx]
+
+/-- The altered negative-side extension genuinely differs away from its selected side. -/
+lemma sidewiseDistributionRegression_alteredExtension_offSide_ne :
+    sidewiseDistributionRegressionAlteredExtensionField .negative
+        sidewiseDistributionRegressionCenter ≠
+      sidewiseDistributionRegressionPositiveField .negative
+        sidewiseDistributionRegressionCenter := by
+  have hCenter : sidewiseDistributionRegressionCenter ∈
+      sidewiseDistributionRegressionPlane.openHalfSpace .positive := by
+    change 0 < OrientedAffineHyperplane.Side.positive.sign *
+      sidewiseDistributionRegressionPlane.signedNormalCoordinate
+        sidewiseDistributionRegressionCenter
+    simp only [OrientedAffineHyperplane.Side.sign_positive, one_mul]
+    rw [sidewiseDistributionRegression_signedNormalCoordinate]
+    norm_num [sidewiseDistributionRegressionCenter]
+  simp [sidewiseDistributionRegressionAlteredExtensionField,
+    sidewiseDistributionRegressionPositiveField, Set.indicator_of_mem hCenter]
+
+/-- Direct expansion shows that changing both ambient extensions only away from their selected
+sides leaves the resulting sidewise distribution unchanged. -/
+lemma sidewiseDistributionRegression_alteredExtension_eq :
+    sidewiseDistributionRegressionPlane.distOfSidewiseFunction
+        sidewiseDistributionRegressionPositiveField
+        sidewiseDistributionRegressionPositiveField_isDistBounded =
+      sidewiseDistributionRegressionPlane.distOfSidewiseFunction
+        sidewiseDistributionRegressionAlteredExtensionField
+        sidewiseDistributionRegressionAlteredExtensionField_isDistBounded := by
+  ext η
+  simp only [OrientedAffineHyperplane.distOfSidewiseFunction, _root_.add_apply,
+    distOfFunctionOn, distOfFunction_apply]
+  apply congrArg₂ (· + ·)
+  · apply integral_congr_ae
+    filter_upwards with x
+    by_cases hNegative :
+        x ∈ sidewiseDistributionRegressionPlane.openHalfSpace .negative
+    · have hnotPositive :
+          x ∉ sidewiseDistributionRegressionPlane.openHalfSpace .positive := by
+        intro hPositive
+        change 0 < OrientedAffineHyperplane.Side.negative.sign *
+          sidewiseDistributionRegressionPlane.signedNormalCoordinate x at hNegative
+        change 0 < OrientedAffineHyperplane.Side.positive.sign *
+          sidewiseDistributionRegressionPlane.signedNormalCoordinate x at hPositive
+        simp only [OrientedAffineHyperplane.Side.sign_negative, neg_one_mul] at hNegative
+        simp only [OrientedAffineHyperplane.Side.sign_positive, one_mul] at hPositive
+        linarith
+      simp [sidewiseDistributionRegressionPositiveField,
+        sidewiseDistributionRegressionAlteredExtensionField,
+        Set.indicator_of_mem hNegative, Set.indicator_of_notMem hnotPositive]
+    · simp [sidewiseDistributionRegressionAlteredExtensionField,
+        Set.indicator_of_notMem hNegative]
+  · apply integral_congr_ae
+    filter_upwards with x
+    by_cases hPositive :
+        x ∈ sidewiseDistributionRegressionPlane.openHalfSpace .positive
+    · simp [sidewiseDistributionRegressionPositiveField,
+        sidewiseDistributionRegressionAlteredExtensionField,
+        Set.indicator_of_mem hPositive]
+    · simp [sidewiseDistributionRegressionAlteredExtensionField,
+        Set.indicator_of_notMem hPositive]
 
 end
 end Space
