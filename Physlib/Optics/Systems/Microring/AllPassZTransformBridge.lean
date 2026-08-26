@@ -5,6 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
+public import Physlib.Mathematics.ZTransform.Stability
 public import Physlib.Optics.Systems.Microring.AllPassChain
 public import Physlib.Optics.Systems.Microring.AllPassDelayTransfer
 public import Physlib.Optics.Systems.Microring.AllPassMason
@@ -32,9 +33,14 @@ physical group delay, time-domain Maxwell realization, or reciprocity statement 
 - `AllPass.zTransfer_eq_throughTransfer`: the algebraic recurrence/ring bridge.
 - `AllPass.zTransfer_eq_reciprocalZThroughResponse`: the causal recurrence and the proof-gated
   rational/N5F response agree by their common cleared equation.
+- `AllPass.zFeedback_isSchurStable_of_isContractive`: fixed-carrier loop contraction implies
+  Schur stability of the recurrence feedback polynomial.
 - `AllPass.transform_causalOutput_eq_responseTransform_entry_mul`: the sequence-level N5 bridge.
 - `AllPass.zTransfer_eq_masonResponseTransform_entry`: agreement with Mason semantics.
 - `AllPass.zTransfer_eq_backwardFirstChainTransform_entry`: agreement with chain semantics.
+- `AllPass.IsZCrossSemanticsDomain`: the honest intersection of analytic, component, solve,
+  circulation, and chain gates.
+- `AllPass.zCrossSemantics_agree`: the complete ring X-01 agreement on that common domain.
 
 ## iii. Table of contents
 
@@ -42,6 +48,7 @@ physical group delay, time-domain Maxwell realization, or reciprocity statement 
 - B. N5 response and circulation series
 - C. Sequence-level response bridge
 - D. Mason, scattering, and chain views
+- E. Common-domain cross-semantics agreement
 
 ## iv. References
 
@@ -91,6 +98,24 @@ lemma recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator (p : Parameters) (
   simp only [Parameters.HasNonzeroDenominator, Parameters.denominator,
     Parameters.loopGain, hLoop]
   rw [mul_assoc]
+
+/-- Fixed-carrier loop contraction implies Schur stability of the independently stated
+one-delay recurrence. This does not assert that a particular evaluation point belongs to its ROC.
+-/
+lemma zFeedback_isSchurStable_of_isContractive (p : Parameters)
+    (hContractive : p.IsContractive) :
+    IsSchurStable zFeedbackLags
+      (zFeedbackCoefficients
+        (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ)) := by
+  apply isSchurStable_of_sum_norm_lt_one
+  simp only [zFeedbackLags, Finset.sum_singleton, zFeedbackCoefficients, if_pos]
+  have hPhase :
+      ‖MatchedPropagation.carrierPhaseFactor p.roundTripPhase‖ = 1 := by
+    exact Circle.norm_coe _
+  rw [Parameters.IsContractive, Parameters.loopGain, Parameters.loopCoefficient,
+    Parameters.propagation, MatchedPropagation.transmissionCoefficient, norm_mul, norm_mul,
+    hPhase, mul_one, ← norm_mul] at hContractive
+  exact hContractive
 
 /-- Valid component models and the exact ring solve gate put `z` in the reciprocal-Z response
 domain of the rational all-pass netlist. -/
@@ -280,6 +305,117 @@ lemma zTransfer_eq_backwardFirstChainTransform_entry (p : Parameters) (z : ℂ)
   rw [zTransfer_eq_throughTransfer p z hUnitary hDenominator hLoop,
     backwardFirstChainTransform_eq_matrix p hDenominator hTransmission]
   rfl
+
+/-! ## E. Common-domain cross-semantics agreement -/
+
+/-- The common domain on which every all-pass ring semantics in X-01 is meaningful.
+
+The analytic ROC, component validity, fixed-carrier loop contraction, N5 solve gate, and chain
+pivot are deliberately separate conditions. In particular, this structure does not identify ROC
+membership with network well-posedness.
+-/
+structure IsZCrossSemanticsDomain (p : Parameters) (z : ℂ) : Prop where
+  /-- Every N7 component parameter lies in its declared validity domain. -/
+  isValid : p.IsValid
+  /-- The directional-coupler amplitudes obey their unitary parameter law. -/
+  couplerIsUnitary : p.coupler.IsUnitary
+  /-- The fixed-carrier circulation gain is strictly contractive. -/
+  isContractive : p.IsContractive
+  /-- The formal reciprocal-Z factor reproduces the stored fixed-carrier loop coefficient. -/
+  loopCoefficient_eq : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹
+  /-- The selected point belongs to the causal impulse-response transfer ROC. -/
+  mem_zTransferROC :
+    z ∈ zTransferROC (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ)
+  /-- The external bus transmission is nonzero, supplying the backward-first chain pivot. -/
+  throughTransfer_ne_zero : throughTransfer p ≠ 0
+
+/-- A common-domain witness supplies the fixed-frequency N5 solve gate. -/
+lemma IsZCrossSemanticsDomain.hasNonzeroDenominator {p : Parameters} {z : ℂ}
+    (h : IsZCrossSemanticsDomain p z) : p.HasNonzeroDenominator :=
+  h.isContractive.hasNonzeroDenominator
+
+/-- A common-domain witness supplies the proof-gated rational reciprocal-Z response point. -/
+lemma IsZCrossSemanticsDomain.mem_reciprocalZResponseDomain {p : Parameters} {z : ℂ}
+    (h : IsZCrossSemanticsDomain p z) :
+    z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain :=
+  allPassRationalNetlist_mem_reciprocalZ_responseDomain p z
+    h.loopCoefficient_eq h.isValid h.hasNonzeroDenominator
+
+/-- Fixed-carrier contraction in the common domain gives recurrence Schur stability, independently
+of the separately stored ROC-membership witness. -/
+lemma IsZCrossSemanticsDomain.zFeedback_isSchurStable {p : Parameters} {z : ℂ}
+    (h : IsZCrossSemanticsDomain p z) :
+    IsSchurStable zFeedbackLags
+      (zFeedbackCoefficients
+        (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ)) :=
+  zFeedback_isSchurStable_of_isContractive p h.isContractive
+
+/-- Proof object collecting the complete all-pass X-01 agreement on a common domain. -/
+structure ZCrossSemanticsAgreement (p : Parameters) (z : ℂ)
+    (h : IsZCrossSemanticsDomain p z) : Prop where
+  /-- The causal impulse-response transform equals the recurrence transfer. -/
+  causalImpulseResponse :
+    transform
+        (causalOutput
+          (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) unitImpulse) z =
+      zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z
+  /-- The recurrence transfer equals the rational/N5F reciprocal-Z response. -/
+  rationalN5F :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      reciprocalZThroughResponse p z h.mem_reciprocalZResponseDomain
+  /-- The recurrence transfer equals the convergent circulation series. -/
+  circulationSeries :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      throughTransferSeries p
+  /-- The recurrence transfer equals the selected fixed-frequency N5 response entry. -/
+  fixedN5Response :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      (netlist p).responseTransform
+        (isWellPosed_of_hasNonzeroDenominator p h.hasNonzeroDenominator)
+        (Outgoing.mk (throughChannel p)) (Incident.mk (inputChannel p))
+  /-- The recurrence transfer equals the complete extracted Mason response entry. -/
+  completeMason :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      (netlist p).masonResponseTransform
+        (Outgoing.mk (throughChannel p)) (Incident.mk (inputChannel p))
+  /-- The recurrence transfer equals the packaged typed-scattering entry. -/
+  packagedScattering :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      (packagedTwoPortScattering p h.hasNonzeroDenominator).leftToRightTransmission
+        (ForwardWave.mk ()) (ForwardWave.mk ())
+  /-- The recurrence transfer equals the backward-first chain bottom-right entry. -/
+  backwardFirstChain :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      backwardFirstChainTransform p h.hasNonzeroDenominator h.throughTransfer_ne_zero
+        (Sum.inr (ForwardWave.mk ())) (Sum.inr (ForwardWave.mk ()))
+  /-- The complete Mason action on a unit left input belongs to the original relational behavior. -/
+  relationalBehavior :
+    (inputAmplitude p 1,
+        (netlist p).masonResponseTransform.toLinearMap (inputAmplitude p 1)) ∈
+      (netlist p).behavior
+
+/-- On the explicitly intersected common domain, the causal Z-transform, rational/N5F,
+fixed-frequency N5, circulation-series, complete Mason, typed-scattering, backward-first-chain,
+and singular-safe relational semantics all agree. -/
+lemma zCrossSemantics_agree (p : Parameters) (z : ℂ)
+    (h : IsZCrossSemanticsDomain p z) : ZCrossSemanticsAgreement p z h where
+  causalImpulseResponse := transform_causalImpulseResponse_eq_zTransfer h.mem_zTransferROC
+  rationalN5F := zTransfer_eq_reciprocalZThroughResponse p z
+    h.mem_reciprocalZResponseDomain h.loopCoefficient_eq h.isValid h.couplerIsUnitary
+    h.hasNonzeroDenominator
+  circulationSeries := zTransfer_eq_throughTransferSeries p z
+    h.couplerIsUnitary h.isContractive h.loopCoefficient_eq
+  fixedN5Response := zTransfer_eq_responseTransform_entry p z h.couplerIsUnitary
+    h.hasNonzeroDenominator h.loopCoefficient_eq
+  completeMason := zTransfer_eq_masonResponseTransform_entry p z h.couplerIsUnitary
+    h.hasNonzeroDenominator h.loopCoefficient_eq
+  packagedScattering := zTransfer_eq_packagedScattering_entry p z h.couplerIsUnitary
+    h.hasNonzeroDenominator h.loopCoefficient_eq
+  backwardFirstChain := zTransfer_eq_backwardFirstChainTransform_entry p z
+    h.couplerIsUnitary h.hasNonzeroDenominator h.loopCoefficient_eq
+    h.throughTransfer_ne_zero
+  relationalBehavior :=
+    (mem_behavior_iff_eq_masonResponseTransform p h.hasNonzeroDenominator _ _).2 rfl
 
 end AllPass
 
