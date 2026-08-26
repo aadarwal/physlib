@@ -26,9 +26,9 @@ lift of the angle they are equivalent to the equation of motion of `SimplePendul
 
 ## ii. Key results
 
-- `SimplePendulum.toCanonicalMomentum` is the canonical momentum `p = ∂L/∂θ̇ = I θ̇`, as a
+- `SimplePendulum.canonicalMomentum` is the canonical momentum `p = ∂L/∂θ̇ = I θ̇`, as a
   linear equivalence between velocities and momenta, with its value recorded by
-  `toCanonicalMomentum_eq`.
+  `canonicalMomentum_eq`.
 - `SimplePendulum.hamiltonian` is the Legendre transform of the Lagrangian, computed by
   `hamiltonian_eq` to be `½ (1/I) ‖p‖² + V(θ)`, smooth by `hamiltonian_contDiff`, with the
   two partial gradients `gradient_hamiltonian_position_eq` and
@@ -48,7 +48,6 @@ lift of the angle they are equivalent to the equation of motion of `SimplePendul
 
 - A. The canonical momentum and the Hamiltonian
   - A.1. The canonical momentum
-    - A.1.1. Equality for the canonical momentum
   - A.2. The Hamiltonian
     - A.2.1. Equality for the Hamiltonian
     - A.2.2. Smoothness of the Hamiltonian
@@ -102,32 +101,19 @@ velocities and momenta.
 
 /-- The canonical momentum of the simple pendulum, `p = ∂L/∂θ̇ = I θ̇`, as a linear
   equivalence between velocities and momenta in the angular chart. -/
-noncomputable def toCanonicalMomentum (t : Time) (x : EuclideanSpace ℝ (Fin 1)) :
+noncomputable def canonicalMomentum (t : Time) (x : EuclideanSpace ℝ (Fin 1)) :
     EuclideanSpace ℝ (Fin 1) ≃ₗ[ℝ] EuclideanSpace ℝ (Fin 1) where
   toFun v := gradient (S.lagrangian t x ·) v
   invFun p := (1 / S.inertia) • p
-  left_inv v := by
-    simp [S.gradient_lagrangian_velocity_eq, smul_smul, S.inertia_ne_zero]
-  right_inv p := by
-    simp [S.gradient_lagrangian_velocity_eq, smul_smul, S.inertia_ne_zero]
-  map_add' v1 v2 := by
-    simp [S.gradient_lagrangian_velocity_eq]
-  map_smul' c v := by
-    simp [S.gradient_lagrangian_velocity_eq]
-    module
-
-/-!
-
-#### A.1.1. Equality for the canonical momentum
-
-A simple equality for the canonical momentum.
-
--/
+  left_inv v := by simp [S.gradient_lagrangian_velocity_eq, smul_smul, S.inertia_ne_zero]
+  right_inv p := by simp [S.gradient_lagrangian_velocity_eq, smul_smul, S.inertia_ne_zero]
+  map_add' v1 v2 := by simp [S.gradient_lagrangian_velocity_eq]
+  map_smul' c v := by simp [S.gradient_lagrangian_velocity_eq]; module
 
 /-- The canonical momentum of the simple pendulum is the angular momentum `I θ̇` about the
   pivot. -/
-lemma toCanonicalMomentum_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
-    S.toCanonicalMomentum t x v = S.inertia • v :=
+lemma canonicalMomentum_eq (t : Time) (x v : EuclideanSpace ℝ (Fin 1)) :
+    S.canonicalMomentum t x v = S.inertia • v :=
   S.gradient_lagrangian_velocity_eq t x v
 
 /-!
@@ -148,8 +134,8 @@ canonical momentum.
   Legendre transform `H(t, p, θ) = ⟪p, θ̇⟫ - L(t, θ, θ̇)` of the Lagrangian, the angular
   velocity `θ̇` being recovered from the momentum by inverting the canonical momentum. -/
 noncomputable def hamiltonian (t : Time) (p x : EuclideanSpace ℝ (Fin 1)) : ℝ :=
-  ⟪p, (S.toCanonicalMomentum t x).symm p⟫_ℝ -
-    S.lagrangian t x ((S.toCanonicalMomentum t x).symm p)
+  ⟪p, (S.canonicalMomentum t x).symm p⟫_ℝ -
+    S.lagrangian t x ((S.canonicalMomentum t x).symm p)
 
 /-!
 
@@ -166,7 +152,7 @@ lemma hamiltonian_eq :
     S.hamiltonian = fun _ p x =>
       (1 / (2 : ℝ)) * (1 / S.inertia) * ⟪p, p⟫_ℝ + S.potentialEnergy x := by
   funext t p x
-  simp only [hamiltonian, toCanonicalMomentum, lagrangian, one_div, LinearEquiv.coe_symm_mk',
+  simp only [hamiltonian, canonicalMomentum, lagrangian, one_div, LinearEquiv.coe_symm_mk',
     inner_smul_right, inner_smul_left, starRingEnd_apply, star_trivial]
   field_simp [S.inertia_ne_zero]
   ring
@@ -235,11 +221,11 @@ motion or not.
   canonical momentum of the lift is the energy of the lift. This holds whether or not the lift
   satisfies the equation of motion. -/
 lemma hamiltonian_eq_energy (θ : Time → EuclideanSpace ℝ (Fin 1)) :
-    (fun t => S.hamiltonian t (S.toCanonicalMomentum t (θ t) (∂ₜ θ t)) (θ t)) = S.energy θ := by
+    (fun t => S.hamiltonian t (S.canonicalMomentum t (θ t) (∂ₜ θ t)) (θ t)) = S.energy θ := by
   funext t
   rw [hamiltonian_eq]
   unfold energy kineticEnergy
-  simp only [toCanonicalMomentum_eq, inner_smul_left, inner_smul_right, starRingEnd_apply,
+  simp only [canonicalMomentum_eq, inner_smul_left, inner_smul_right, starRingEnd_apply,
     star_trivial]
   field_simp [S.inertia_ne_zero]
 
@@ -276,10 +262,10 @@ angular momentum against the torque.
 lemma equationOfMotion_iff_hamiltonEqOp_eq_zero (θ : Time → EuclideanSpace ℝ (Fin 1))
     (hθ : ContDiff ℝ ∞ θ) :
     S.EquationOfMotion θ ↔
-      S.hamiltonEqOp (fun t => S.toCanonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0 := by
+      S.hamiltonEqOp (fun t => S.canonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0 := by
   rw [hamiltonEqOp, hamiltonEqOp_eq_zero_iff_hamiltons_equations,
     S.equationOfMotion_iff_newtons_2nd_law θ]
-  simp only [toCanonicalMomentum_eq, gradient_hamiltonian_momentum_eq, one_div, smul_smul,
+  simp only [canonicalMomentum_eq, gradient_hamiltonian_momentum_eq, one_div, smul_smul,
     ne_eq, S.inertia_ne_zero, not_false_eq_true, inv_mul_cancel₀, one_smul, implies_true,
     Time.deriv_smul _ S.inertia (deriv_differentiable_of_contDiff θ hθ),
     gradient_hamiltonian_position_eq, true_and, eq_neg_iff_add_eq_zero]
@@ -315,9 +301,9 @@ fourth entry states the same variational principle through the variational calcu
 lemma equationOfMotion_tfae (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : ContDiff ℝ ∞ θ) :
     List.TFAE [S.EquationOfMotion θ,
       ∀ t, ∂ₜ (∂ₜ θ) t 0 + S.ω ^ 2 * Real.sin (θ t 0) = 0,
-      S.hamiltonEqOp (fun t => S.toCanonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0,
+      S.hamiltonEqOp (fun t => S.canonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0,
       (δ (q':=θ), ∫ t, S.lagrangian t (q' t) (fderiv ℝ q' t 1)) = 0,
-      (δ (pq':= fun t => (S.toCanonicalMomentum t (θ t) (∂ₜ θ t), θ t)),
+      (δ (pq':= fun t => (S.canonicalMomentum t (θ t) (∂ₜ θ t), θ t)),
         ∫ t, ⟪(pq' t).1, ∂ₜ (Prod.snd ∘ pq') t⟫_ℝ -
           S.hamiltonian t (pq' t).1 (pq' t).2) = 0] := by
   rw [← S.equationOfMotion_iff_hamiltonEqOp_eq_zero θ hθ,
@@ -328,12 +314,12 @@ lemma equationOfMotion_tfae (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Co
     ← S.equationOfMotion_iff_gradLagrangian_zero θ hθ]
   simp only [List.tfae_cons_self]
   show List.TFAE [S.EquationOfMotion θ,
-    S.hamiltonEqOp (fun t => S.toCanonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0]
+    S.hamiltonEqOp (fun t => S.canonicalMomentum t (θ t) (∂ₜ θ t)) θ = 0]
   rw [← S.equationOfMotion_iff_hamiltonEqOp_eq_zero θ hθ]
   simp only [List.tfae_cons_self, List.tfae_singleton]
   · exact hθ
   · exact S.contDiff_lagrangian _
-  · simp only [S.toCanonicalMomentum_eq]; fun_prop
+  · simp only [S.canonicalMomentum_eq]; fun_prop
   · exact S.hamiltonian_contDiff _
 
 end SimplePendulum
