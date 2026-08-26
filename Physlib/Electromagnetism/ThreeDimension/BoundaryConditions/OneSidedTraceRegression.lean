@@ -173,7 +173,7 @@ def oneSidedTraceRegressionPositiveMagneticFieldStrength : MagneticFieldStrength
 
 /-- Constant negative-side fields with a unit tangential electric trace. -/
 def oneSidedTraceRegressionNegative :
-  PlanarMacroscopicSideFields oneSidedTraceRegressionPlane .negative :=
+    PlanarMacroscopicSideFields oneSidedTraceRegressionPlane .negative :=
   PlanarMacroscopicSideFields.ofFields oneSidedTraceRegressionPlane .negative
     oneSidedTraceRegressionNegativeElectricField
     oneSidedTraceRegressionNegativeElectricDisplacement
@@ -186,7 +186,7 @@ def oneSidedTraceRegressionNegative :
 
 /-- Constant positive-side fields whose tangential electric trace differs from the negative side. -/
 def oneSidedTraceRegressionPositive :
-  PlanarMacroscopicSideFields oneSidedTraceRegressionPlane .positive :=
+    PlanarMacroscopicSideFields oneSidedTraceRegressionPlane .positive :=
   PlanarMacroscopicSideFields.ofFields oneSidedTraceRegressionPlane .positive
     oneSidedTraceRegressionPositiveElectricField
     oneSidedTraceRegressionPositiveElectricDisplacement
