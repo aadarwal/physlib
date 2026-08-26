@@ -103,10 +103,22 @@ lemma zChainRegression_forward_transfer :
   rw [hI3, hI5, hI7]
   ring
 
+/-- Swapping the two couplers leaves the algebraic scalar transfer unchanged.
+
+This is an identity of the coherent component formulas, not a physical reciprocity claim.
+-/
+lemma zChainRegression_transfer_reverse_eq (p : Parameters) :
+    transfer p.reverse = transfer p := by
+  simp only [transfer, Parameters.responseNumerator, Parameters.denominator,
+    Parameters.loopGain, Parameters.directGain, Parameters.feedbackReadoutGain,
+    Parameters.feedbackDrive, Parameters.reverse, Parameters.upperCoefficient,
+    Parameters.lowerCoefficient, Parameters.feedbackCoefficient]
+  ring
+
 /-- Direct parameter expansion gives the independently stated reverse transmission `-(7/8)I`. -/
 lemma zChainRegression_reverse_transfer :
     transfer zChainRegressionParameters.reverse = -(7 / 8) * Complex.I := by
-  change transfer zChainRegressionParameters = -(7 / 8) * Complex.I
+  rw [zChainRegression_transfer_reverse_eq]
   exact zChainRegression_forward_transfer
 
 /-- The stable fixed-carrier N5 denominator gate, restated at the chain fixture. -/
