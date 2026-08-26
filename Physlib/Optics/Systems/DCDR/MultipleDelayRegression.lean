@@ -539,7 +539,9 @@ lemma unitDelayBridge_embedded_response_eq_one :
     multipleDelayRationalEliminationResponse
         unitDelayBridgeParameters.toMultipleDelayParameters unitDelayBridgeQ
         unitDelayBridgeEmbeddedDomainProof = 1 := by
-  rw [multipleDelayRationalEliminationResponse_eq_responseModel]
+  rw [multipleDelayRationalEliminationResponse_eq_responseModel
+    unitDelayBridgeParameters.toMultipleDelayParameters
+    unitDelayBridgeParameters.toMultipleDelayParameters_isAdmissible]
   rw [DelayTransfer.RationalModel.eval_eq]
   simp only [MultipleDelayParameters.responseModel,
     MvPolynomial.eval_toMvPolynomial]
