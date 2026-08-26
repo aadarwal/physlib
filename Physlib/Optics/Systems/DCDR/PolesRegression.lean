@@ -34,6 +34,8 @@ modeled here.
 - `stableUnitDelayParameters`: exact stable positive anchor.
 - `unstableAmplifierParameters`: exact audited `G_i > 1` active fixture.
 - `stableResponseReduction`, `unstableResponseReduction`: explicit no-cancellation reductions.
+- `stable_rationalZEliminationResponse_one`: proof-gated stable network response at `z = 1`.
+- `unstable_rationalZEliminationResponse_one`: proof-gated active network response at `z = 1`.
 - `stableReducedResponse_isSchurStable`: direct positive stability anchor.
 - `unstableReducedResponse_two_mul_I_mem_zPoles`: explicit outside pole.
 - `unstableReducedResponse_not_isSchurStable`: direct failure of the Schur premise.
@@ -350,6 +352,78 @@ lemma unstableResponseReduction_noPoleCancellation :
 ## D. Stable and unstable reciprocal-Z anchors
 
 -/
+
+/-- The regular value `q = 1` belongs to the stable compiled response domain. -/
+lemma stable_one_mem_responseDomain :
+    (fun _ : Fin 1 => (1 : ℂ)) ∈
+      (rationalNetlist stableUnitDelayParameters).responseDomain := by
+  apply rationalNetlist_mem_responseDomain stableUnitDelayParameters 1
+    stableUnitDelayParameters_isAdmissible
+  rw [stable_denominatorPolynomial_expansion]
+  norm_num [stableDenominator]
+
+/-- The regular value `q = 1` belongs to the active compiled response domain. -/
+lemma unstable_one_mem_responseDomain :
+    (fun _ : Fin 1 => (1 : ℂ)) ∈
+      (rationalNetlist unstableAmplifierParameters).responseDomain := by
+  apply rationalNetlist_mem_responseDomain unstableAmplifierParameters 1
+    unstableAmplifierParameters_isAdmissible
+  rw [unstable_denominatorPolynomial_expansion]
+  norm_num [unstableDenominator]
+
+/-- The reciprocal-Z value `z = 1` belongs to the stable proof-gated response domain. -/
+lemma stable_one_mem_reciprocalZResponseDomain :
+    (1 : ℂ) ∈ (rationalNetlist stableUnitDelayParameters).reciprocalZ.responseDomain := by
+  have hMembership := congrArg (fun domain : Set ℂ => (1 : ℂ) ∈ domain)
+    ((rationalNetlist stableUnitDelayParameters).responseDomain_reciprocalZ)
+  apply hMembership.mpr
+  have hEvaluation : DelayTransfer.zInverseEvaluation (1 : ℂ) =
+      (fun _ : Fin 1 => 1) := by
+    funext delay
+    rw [DelayTransfer.zInverseEvaluation_apply]
+    norm_num
+  change DelayTransfer.zInverseEvaluation (1 : ℂ) ∈
+    (rationalNetlist stableUnitDelayParameters).responseDomain
+  rw [hEvaluation]
+  exact stable_one_mem_responseDomain
+
+/-- The reciprocal-Z value `z = 1` belongs to the active proof-gated response domain. -/
+lemma unstable_one_mem_reciprocalZResponseDomain :
+    (1 : ℂ) ∈ (rationalNetlist unstableAmplifierParameters).reciprocalZ.responseDomain := by
+  have hMembership := congrArg (fun domain : Set ℂ => (1 : ℂ) ∈ domain)
+    ((rationalNetlist unstableAmplifierParameters).responseDomain_reciprocalZ)
+  apply hMembership.mpr
+  have hEvaluation : DelayTransfer.zInverseEvaluation (1 : ℂ) =
+      (fun _ : Fin 1 => 1) := by
+    funext delay
+    rw [DelayTransfer.zInverseEvaluation_apply]
+    norm_num
+  change DelayTransfer.zInverseEvaluation (1 : ℂ) ∈
+    (rationalNetlist unstableAmplifierParameters).responseDomain
+  rw [hEvaluation]
+  exact unstable_one_mem_responseDomain
+
+/-- Direct rational-data expansion gives the stable proof-gated network response at `z = 1`. -/
+lemma stable_rationalZEliminationResponse_one :
+    rationalZEliminationResponse stableUnitDelayParameters 1
+      stable_one_mem_reciprocalZResponseDomain = -1 := by
+  rw [rationalZEliminationResponse_eq_responseModel,
+    DelayTransfer.RationalModel.eval_eq]
+  simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
+  rw [stable_responseNumeratorPolynomial_expansion,
+    stable_denominatorPolynomial_expansion]
+  norm_num [stableNumerator, stableDenominator]
+
+/-- Direct rational-data expansion gives the active proof-gated network response at `z = 1`. -/
+lemma unstable_rationalZEliminationResponse_one :
+    rationalZEliminationResponse unstableAmplifierParameters 1
+      unstable_one_mem_reciprocalZResponseDomain = -67 / 20 := by
+  rw [rationalZEliminationResponse_eq_responseModel,
+    DelayTransfer.RationalModel.eval_eq]
+  simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
+  rw [unstable_responseNumeratorPolynomial_expansion,
+    unstable_denominatorPolynomial_expansion]
+  norm_num [unstableNumerator, unstableDenominator]
 
 /-- The stable denominator has a nonzero quadratic coefficient, so it is not an S4 one-pole
 denominator. -/

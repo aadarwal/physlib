@@ -379,6 +379,17 @@ noncomputable instance rationalCompileConnectedChannelDecidableEq
     (p : UnitDelayParameters) (value : DelayTransfer.DelayTuple 1) :
     DecidableEq ((rationalNetlist p).compile value).ConnectedChannel := Classical.decEq _
 
+/-- Reciprocal-Z reparameterization retains the finite aggregate DCDR channel family. -/
+noncomputable instance rationalReciprocalZChannelFintype (p : UnitDelayParameters) :
+    Fintype (rationalNetlist p).reciprocalZ.Channel :=
+  inferInstanceAs (Fintype (rationalNetlist p).Channel)
+
+/-- Reciprocal-Z reparameterization retains the finite connected DCDR channel family. -/
+noncomputable instance rationalReciprocalZConnectedChannelFintype
+    (p : UnitDelayParameters) :
+    Fintype (rationalNetlist p).reciprocalZ.ConnectedChannel :=
+  inferInstanceAs (Fintype (rationalNetlist p).ConnectedChannel)
+
 /-- Evaluating all rational component entries recovers the fixed-carrier DCDR component family. -/
 lemma rationalComponents_scattering_eq (p : UnitDelayParameters) (q : ℂ) :
     (rationalComponents p).scattering (fun _ => q) = componentScattering (p.at q) := by
@@ -557,6 +568,49 @@ lemma rationalEliminationResponse_eq_responseModel (p : UnitDelayParameters) (q 
     rfl
   rw [hEntry, eliminationResponse_eq_transfer (p.at q) hDenominator]
   exact (responseModel_eval p q).symm
+
+/-- The selected proof-gated response entry after S4's reciprocal substitution `q = z⁻¹`. -/
+def rationalZEliminationResponse (p : UnitDelayParameters) (z : ℂ)
+    (hZ : z ∈ (rationalNetlist p).reciprocalZ.responseDomain) : ℂ :=
+  ((rationalNetlist p).reciprocalZ.response hZ).reindex
+      (Incident.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
+      (Outgoing.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
+    (Outgoing.mk (rationalOutputChannel p)) (Incident.mk (rationalInputChannel p))
+
+/-- The proof-gated reciprocal-Z response is the retained quotient evaluated at `q = z⁻¹`. -/
+lemma rationalZEliminationResponse_eq_responseModel (p : UnitDelayParameters) (z : ℂ)
+    (hZ : z ∈ (rationalNetlist p).reciprocalZ.responseDomain) :
+    rationalZEliminationResponse p z hZ =
+      (responseModel p).eval (fun _ : Fin 1 => z⁻¹) := by
+  have hDelayRaw : DelayTransfer.zInverseEvaluation z ∈
+      (rationalNetlist p).responseDomain := by
+    have hDomainMembership := congrArg (fun domain : Set ℂ => z ∈ domain)
+      ((rationalNetlist p).responseDomain_reciprocalZ)
+    exact hDomainMembership.mp hZ
+  have hEvaluation : DelayTransfer.zInverseEvaluation z = (fun _ : Fin 1 => z⁻¹) := by
+    funext delay
+    exact DelayTransfer.zInverseEvaluation_apply z delay
+  have hDelay : (fun _ : Fin 1 => z⁻¹) ∈ (rationalNetlist p).responseDomain := by
+    rw [← hEvaluation]
+    exact hDelayRaw
+  have hResponse :=
+    (rationalNetlist p).response_reciprocalZ_reindex_of_evaluation_eq
+      hZ hEvaluation hDelay
+  have hEntry := congrArg (fun response =>
+      response (Outgoing.mk (rationalOutputChannel p))
+        (Incident.mk (rationalInputChannel p))) hResponse
+  have hModel := rationalEliminationResponse_eq_responseModel p z⁻¹ hDelay
+  change (rationalNetlist p).toParameterizedNetlist.response hDelay
+      (Outgoing.mk (rationalOutputChannel p))
+      (Incident.mk (rationalInputChannel p)) =
+    (responseModel p).eval (fun _ : Fin 1 => z⁻¹) at hModel
+  change ((rationalNetlist p).reciprocalZ.response hZ).reindex
+      (Incident.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
+      (Outgoing.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
+        (Outgoing.mk (rationalOutputChannel p))
+        (Incident.mk (rationalInputChannel p)) =
+    (responseModel p).eval (fun _ : Fin 1 => z⁻¹)
+  exact hEntry.trans hModel
 
 /-!
 
