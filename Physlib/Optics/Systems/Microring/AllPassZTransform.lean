@@ -164,6 +164,13 @@ lemma zTransfer_eq (through attenuation z : ℂ) :
   rw [zTransfer, transferFunction, delaySymbol_zFeedbackCoefficients,
     delaySymbol_zFeedforwardCoefficients]
 
+/-- Away from a recurrence-denominator zero, the transfer obeys its cleared equation. -/
+lemma recurrenceDenominator_mul_zTransfer {through attenuation z : ℂ}
+    (hDenominator : 1 - through * attenuation * z⁻¹ ≠ 0) :
+    (1 - through * attenuation * z⁻¹) * zTransfer through attenuation z =
+      through - attenuation * z⁻¹ := by
+  rw [zTransfer_eq, mul_div_cancel₀ _ hDenominator]
+
 /-- On the convergence and nonzero-denominator domain, the constructed output transform is its
 transfer times the input transform. -/
 lemma transform_causalOutput {through attenuation z : ℂ} {input : ℤ → ℂ}

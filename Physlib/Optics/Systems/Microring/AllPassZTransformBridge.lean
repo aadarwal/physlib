@@ -6,6 +6,7 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Systems.Microring.AllPassChain
+public import Physlib.Optics.Systems.Microring.AllPassDelayTransfer
 public import Physlib.Optics.Systems.Microring.AllPassMason
 public import Physlib.Optics.Systems.Microring.AllPassZTransform
 
@@ -29,6 +30,8 @@ physical group delay, time-domain Maxwell realization, or reciprocity statement 
 
 - `AllPass.carrierPoint`: the fixed-carrier Z evaluation point.
 - `AllPass.zTransfer_eq_throughTransfer`: the algebraic recurrence/ring bridge.
+- `AllPass.zTransfer_eq_reciprocalZThroughResponse`: the causal recurrence and the proof-gated
+  rational/N5F response agree by their common cleared equation.
 - `AllPass.transform_causalOutput_eq_responseTransform_entry_mul`: the sequence-level N5 bridge.
 - `AllPass.zTransfer_eq_masonResponseTransform_entry`: agreement with Mason semantics.
 - `AllPass.zTransfer_eq_backwardFirstChainTransform_entry`: agreement with chain semantics.
@@ -55,6 +58,7 @@ noncomputable section
 namespace AllPass
 
 open Physlib.ZTransform
+open DelayTransfer
 
 /-! ## A. Fixed-carrier evaluation point -/
 
@@ -76,6 +80,91 @@ lemma loopCoefficient_eq_fieldAttenuation_mul_carrierPoint_inv (p : Parameters) 
   rfl
 
 /-! ## B. N5 response and circulation series -/
+
+/-- After the formal loop factor is identified with `a*z⁻¹`, the recurrence and fixed-ring
+denominators have exactly the same nonvanishing gate. This does not identify the analytic ROC with
+the algebraic N5 solve domain. -/
+lemma recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator (p : Parameters) (z : ℂ)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹) :
+    1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹ ≠ 0 ↔
+      p.HasNonzeroDenominator := by
+  simp only [Parameters.HasNonzeroDenominator, Parameters.denominator,
+    Parameters.loopGain, hLoop]
+  rw [mul_assoc]
+
+/-- Valid component models and the exact ring solve gate put `z` in the reciprocal-Z response
+domain of the rational all-pass netlist. -/
+lemma allPassRationalNetlist_mem_reciprocalZ_responseDomain (p : Parameters) (z : ℂ)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹)
+    (hp : p.IsValid) (hDenominator : p.HasNonzeroDenominator) :
+    z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain := by
+  change zInverseEvaluation z ∈
+    (allPassRationalNetlist p).toParameterizedNetlist.responseDomain
+  convert allPassRationalNetlist_mem_responseDomain p z⁻¹ hLoop hp hDenominator using 1
+  rfl
+
+/-- The selected input-to-through entry of the proof-gated reciprocal-Z response. -/
+noncomputable def reciprocalZThroughResponse (p : Parameters) (z : ℂ)
+    (hZ : z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain) : ℂ :=
+  (((allPassRationalNetlist p).reciprocalZ.response
+        hZ).reindex
+      (Incident.relabelEquiv
+        (allPassRationalNetlist p).reciprocalZExternalChannelEquiv)
+      (Outgoing.relabelEquiv
+        (allPassRationalNetlist p).reciprocalZExternalChannelEquiv))
+    (Outgoing.mk (allPassRationalFormalThroughChannel p))
+    (Incident.mk (allPassRationalFormalInputChannel p))
+
+/-- The reciprocal-Z response obeys the same cleared equation as the causal recurrence transfer.
+
+The response side is transported to the formal-delay model and then discharged by
+`allPassRationalNetlist_response_cleared`, whose proof expands the compiled N7 component and N5
+wiring equations.
+-/
+lemma recurrenceDenominator_mul_reciprocalZThroughResponse (p : Parameters) (z : ℂ)
+    (hZ : z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹)
+    (hp : p.IsValid) (hUnitary : p.coupler.IsUnitary)
+    (hDenominator : p.HasNonzeroDenominator) :
+    (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹) *
+        reciprocalZThroughResponse p z hZ =
+      (p.throughAmplitude : ℂ) - (p.fieldAttenuation : ℂ) * z⁻¹ := by
+  have hResponse := (allPassRationalNetlist p).response_reciprocalZ_reindex hZ
+  have hTransport := congrArg
+    (fun transform =>
+      (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹) *
+        transform (Outgoing.mk (allPassRationalFormalThroughChannel p))
+          (Incident.mk (allPassRationalFormalInputChannel p)))
+    hResponse
+  have hCleared := allPassRationalNetlist_response_cleared
+    p z⁻¹ hLoop hp hUnitary hDenominator
+  change
+    (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹) *
+        (((allPassRationalNetlist p).reciprocalZ.response hZ).reindex
+          (Incident.relabelEquiv
+            (allPassRationalNetlist p).reciprocalZExternalChannelEquiv)
+          (Outgoing.relabelEquiv
+            (allPassRationalNetlist p).reciprocalZExternalChannelEquiv))
+          (Outgoing.mk (allPassRationalFormalThroughChannel p))
+          (Incident.mk (allPassRationalFormalInputChannel p)) =
+      (p.throughAmplitude : ℂ) - (p.fieldAttenuation : ℂ) * z⁻¹
+  exact hTransport.trans hCleared
+
+/-- On the rational response domain, the causal recurrence transfer equals the proof-gated
+reciprocal-Z response derived from the compiled N7/N5 channel equations. -/
+lemma zTransfer_eq_reciprocalZThroughResponse (p : Parameters) (z : ℂ)
+    (hZ : z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹)
+    (hp : p.IsValid) (hUnitary : p.coupler.IsUnitary)
+    (hDenominator : p.HasNonzeroDenominator) :
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+      reciprocalZThroughResponse p z hZ := by
+  have hRecurrenceDenominator :=
+    (recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator p z hLoop).2 hDenominator
+  apply mul_left_cancel₀ hRecurrenceDenominator
+  rw [recurrenceDenominator_mul_zTransfer hRecurrenceDenominator,
+    recurrenceDenominator_mul_reciprocalZThroughResponse
+      p z hZ hLoop hp hUnitary hDenominator]
 
 /-- Evaluating the recurrence delay at the stored carrier factor recovers the N7/N5 all-pass
 through transfer. -/
