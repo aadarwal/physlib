@@ -421,7 +421,7 @@ lemma. Its concrete values are
 ```text
 zero phase: source composition = -32/91, and the root gate holds;
 half turn: source composition = -32*I/109;
-           N7/N5 drop transfer = 32*I/109;
+           totalized algebraic drop transfer = 32*I/109;
            the root gate fails.
 ```
 
@@ -446,8 +446,8 @@ The validation lane should bind these public names:
 - The stage list is not a physical interconnection of add-drop ports and is not a scalar cascade
   transfer law.
 - No DATE lattice, quadruple-ring, coupled-lattice, or full `M x N` lattice result is claimed.
-- No dispersion, bending loss, bandwidth, causality, resonance, or measurement validation is
-  claimed.
+- No dispersion, bending loss, bandwidth, causality, resonance, passivity, losslessness,
+  reciprocity, or measurement validation is claimed.
 - No power statement is made. Any later power interpretation is normalized modal power until the
   finite common-frequency Maxwell and aperture-flux hypotheses at
   `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:60-90` are supplied.
@@ -487,3 +487,148 @@ The temporary registry was restored byte-identically: `Physlib.lean` had SHA-256
 `d6279000556c059e0a352aac530487e353adc7e5fa1f7c05b2bce229ec34f510` before and after. The source
 commits change only the two slice-4a Lean files; this final cutoff commit changes only
 `HANDOFF.md`.
+
+# S7C slice 4a-b: Y rework
+
+## Cutoff and synchronization
+
+Reviewer Y passed and closed the scoped production composition and the half-turn branch sentinel;
+neither construction was changed. This rework adds the requested N5-strength anchor,
+denominator-zero control, and missing non-claims. PANDA remains deferred until Y2 is ready.
+
+The required sync target was `f4a7636d313a4ac2590e4cf89384e4578501f49f`. It was merged before
+the rework in `9f1c9d412ac69eaaaead0a1b5510f4f36c4565ea`; the target is an ancestor of
+the gated source. The target deleted the lane-local HANDOFF and created the only merge conflict,
+so this required lane handoff was retained; all target code and registry changes were accepted.
+
+## Y-1: independent raw-N5 anchor
+
+`sourceMappedSfgRegression_zeroPhase_transfer_eq_rawN5` states
+
+```text
+sfgAddDropStageTransfer zeroPhase =
+  (AddDrop.netlist zeroPhase).responseTransform
+    addDropRegression_resonance_isWellPosed
+    (Outgoing.mk (AddDrop.dropChannel zeroPhase))
+    (Incident.mk (AddDrop.inputChannel zeroPhase)).
+```
+
+The left side uses the direct source-quotient evaluation `-32/91`. The right side uses
+`AddDrop.addDropRegression_resonance_responseTransform_entry_drop`, whose proof eliminates raw
+scattering, routing, and external-readout equations at
+`Physlib/Optics/Systems/Microring/AddDropRegression.lean:267-344`. Neither production comparison
+lemma in `SourceMappedSfg` is used.
+
+The half-turn comparison is now described only as a comparison with the totalized algebraic
+`AddDrop.dropTransfer`. It is not called an N7/N5 response comparison.
+
+## Y-2: exact denominator-zero control
+
+The singular point is
+
+```text
+inputThroughAmplitude = 1
+inputCrossAmplitude = 1
+dropThroughAmplitude = 1
+dropCrossAmplitude = 1
+fieldAttenuation = 1
+roundTripPhase = 0.
+```
+
+Direct expansion proves
+
+```text
+firstArcCoefficient = secondArcCoefficient = roundTripCoefficient = 1
+denominator = 0
+Complex.sqrt roundTripCoefficient = firstArcCoefficient
+sfgAddDropStageTransfer = 0
+AddDrop.dropTransfer = 0.
+```
+
+Thus the principal-root gate still holds, while both scalar quotients return their totalized
+division-by-zero value. Separately,
+`sourceMappedSfgRegressionSingular_not_hasNonzeroDenominator` proves the scalar N5 solve gate
+false.
+
+The raw N5 failure does not use `AddDrop.isWellPosed_iff` or the source-comparison lemmas.
+`sourceMappedSfgRegressionSingular_feedbackKernel` exhibits
+
+```text
+feedbackOperator (AddDrop.singularIncident singularPoint) = 0,
+```
+
+and `AddDrop.singularIncident_ne_zero` supplies nonzeroness. The generic
+`FlatNetlist.isWellPosed_iff_feedbackOperator_injective` criterion then proves
+`sourceMappedSfgRegressionSingular_not_isWellPosed`.
+
+## New declaration inventory
+
+All new names are in `Optics.MicroringCascade` and
+`Physlib/Optics/Systems/Cascade/SourceMappedSfgRegression.lean`.
+
+- `sourceMappedSfgRegression_zeroPhase_transfer_eq_rawN5`
+- `sourceMappedSfgRegressionSingularParameters`
+- `sourceMappedSfgRegressionSingular_arcCoefficients`
+- `sourceMappedSfgRegressionSingular_roundTripCoefficient`
+- `sourceMappedSfgRegressionSingular_denominator`
+- `sourceMappedSfgRegressionSingular_not_hasNonzeroDenominator`
+- `sourceMappedSfgRegressionSingular_rootGate`
+- `sourceMappedSfgRegressionSingular_sfgTransfer`
+- `sourceMappedSfgRegressionSingular_dropTransfer`
+- `sourceMappedSfgRegressionSingular_feedbackKernel`
+- `sourceMappedSfgRegressionSingular_not_isWellPosed`
+
+No production declaration was added, removed, renamed, or restated. The production module's
+non-claims now explicitly include passivity, losslessness, and reciprocity.
+
+## Y2 validation bindings
+
+The validation lane should bind:
+
+- raw N5 equality: `sourceMappedSfgRegression_zeroPhase_transfer_eq_rawN5`;
+- exact zero denominator: `sourceMappedSfgRegressionSingular_denominator`;
+- root gate at the singular point: `sourceMappedSfgRegressionSingular_rootGate`;
+- totalized scalar values: `sourceMappedSfgRegressionSingular_sfgTransfer` and
+  `sourceMappedSfgRegressionSingular_dropTransfer`;
+- failed scalar solve gate: `sourceMappedSfgRegressionSingular_not_hasNonzeroDenominator`;
+- raw kernel: `sourceMappedSfgRegressionSingular_feedbackKernel`; and
+- failed N5 well-posedness: `sourceMappedSfgRegressionSingular_not_isWellPosed`.
+
+## Scope and non-claims after Y
+
+- The stage list is bookkeeping, not a physical add-drop interconnection or scalar cascade law.
+- No new SFG-TR source theorem or IP-12 status change is claimed.
+- No PANDA, NSV'16 Def. 11 or Thms. 5-6, IP-13, or IP-14 claim is made.
+- No DATE, quadruple-ring, coupled-lattice, or full `M x N` lattice result is claimed.
+- No validity, passivity, losslessness, reciprocity, impedance match, dispersion, bending loss,
+  bandwidth, causality, resonance, or measurement-validation claim is made.
+- The singular fixture is not asserted to satisfy N7 component validity.
+- No power claim is made; the normalized-modal-power electromagnetic gate remains the one cited
+  at `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:60-90`.
+
+## Exact Y2 validation record
+
+The exact implementation source head was
+`5e4f4ff8e86e886cdbf4ff1cd2c8610be5f98ca2`. One `lake-lock env bash` hold temporarily
+registered only `SourceMappedSfg` and `SourceMappedSfgRegression` and ran the cumulative
+eight-module warning-free build, repository declaration linters, `lint_all`, scoped style,
+diff/banned-token/100-codepoint audits, and the committed-state style inventory.
+
+Results:
+
+- cache: no files to download; 8690 already decompressed;
+- cumulative `--wfail` build: passed, 2766 jobs;
+- `runPhyslibLinters`: Physlib and QuantumInfo passed;
+- `lint_all`: full build successful; file/illegal/alpha/TODO/sorry stages completed; declaration
+  linters passed for Physlib and QuantumInfo;
+- scoped style, `git diff --check`, banned-token, and Unicode-codepoint checks passed for both
+  SFG files; and
+- the final repository-wide style inventory returned nonzero only for synced files outside S7C:
+  the S7D-owned `Physlib/Optics/Systems/DCDR/Topology.lean` line-count entry and isolated `by`
+  entries at `Physlib/SpaceAndTime/Space/Integrals/OrientedRectangle.lean:95,133` from the named
+  sync target. No S7C file was named or exempted.
+
+The temporary registry was restored byte-identically: `Physlib.lean` had SHA-256
+`d2c910c6696d9f902cdb8f1af0a71082ae536a94951283ef38cad10051e6a6b9` before and after. The
+implementation commit changes only the two SFG files; the final cutoff commit changes only this
+HANDOFF.
