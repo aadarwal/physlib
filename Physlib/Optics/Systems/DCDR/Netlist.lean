@@ -24,10 +24,6 @@ exactly the source-side input and output channels exposed. The component laws ar
 Coherent N7 `t`/`-I * k` is the source's own unprinted coherent branch; the printed
 incoherent `1 - k`/`k` model is a different case, compared only if reference [3] surfaces.
 
-This is a fixed-carrier, single-mode topology. Power means normalized modal power, not
-electromagnetic power. No passivity, losslessness, reciprocity, causality, time-domain behavior,
-stability, pole, zero, resonance, bandwidth, or material realization is asserted here.
-
 ## ii. Key results
 
 - `DCDR.netlist`: the explicit two-coupler, three-path N7 flat netlist.
@@ -41,6 +37,10 @@ stability, pole, zero, resonance, bandwidth, or material realization is asserted
 
 ## iv. References
 
+This is a fixed-carrier, single-mode topology. Power means normalized modal power, not
+electromagnetic power. No passivity, losslessness, reciprocity, causality, time-domain behavior,
+stability, pole, zero, resonance, bandwidth, or material realization is asserted here.
+
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definition 8 and Theorem 3 (p. 173).
 -/
@@ -53,7 +53,11 @@ noncomputable section
 
 namespace DCDR
 
-/-! ## A. N7 parameters and explicit flat netlist -/
+/-!
+
+## A. N7 parameters and explicit flat netlist
+
+-/
 
 /-- The two N7 couplers and three fixed-carrier N7 propagation paths of a DCDR. -/
 structure Parameters where
@@ -280,7 +284,11 @@ noncomputable instance connectedChannelFintype (p : Parameters) :
 noncomputable instance connectedChannelDecidableEq (p : Parameters) :
     DecidableEq (netlist p).ConnectedChannel := Classical.decEq _
 
-/-! ## B. External channels and forward coordinates -/
+/-!
+
+## B. External channels and forward coordinates
+
+-/
 
 /-- The aggregate channel owned by a selected first-coupler port. -/
 def firstCouplerChannel (p : Parameters) (port : DirectionalCoupler.Port) :
@@ -415,4 +423,3 @@ end DCDR
 end
 
 end Optics
-

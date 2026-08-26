@@ -27,12 +27,6 @@ A negative-control multigraph swaps the two first-coupler launch edges, matching
 `topologySwappedNetlist`. Its independently enumerated Mason response is unequal to the N5
 response, so the S-06 fixture is capable of detecting that wiring error.
 
-These are hostile algebraic topology fixtures. Their couplers are not unitary or passive. No
-contraction, convergence, causality, delay, pole, zero, stability, resonance, bandwidth,
-reciprocity, losslessness, power, or material realization is asserted. Power would mean
-normalized modal power, not electromagnetic power before the separately gated
-Poynting-normalization bridge.
-
 ## ii. Key results
 
 - `DCDR.responseRegression_eliminationResponse`: raw N5 equations give the numeric response.
@@ -51,6 +45,12 @@ Poynting-normalization bridge.
 - E. Nonzero-feedback loop and singularity audit
 
 ## iv. References
+
+These are hostile algebraic topology fixtures. Their couplers are not unitary or passive. No
+contraction, convergence, causality, delay, pole, zero, stability, resonance, bandwidth,
+reciprocity, losslessness, power, or material realization is asserted. Power would mean
+normalized modal power, not electromagnetic power before the separately gated
+Poynting-normalization bridge.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal Processing
 Systems", FMICS 2015, LNCS 9128, Definitions 1-4 and 8 and Theorem 3 (pp. 167-173).
@@ -71,7 +71,11 @@ local instance responseRegressionExternalChannelFintype (p : Parameters) :
     Fintype (netlist p).ExternalChannel :=
   (netlist p).eliminationExternalChannelFintype
 
-/-! ## A. Independent N5 elimination anchor -/
+/-!
+
+## A. Independent N5 elimination anchor
+
+-/
 
 /-- The projection fixture's feedback coefficient makes its scalar denominator one. -/
 lemma topologyProjection_hasNonzeroDenominator :
@@ -148,7 +152,11 @@ lemma responseRegression_eliminationResponse :
       simpa [output] using hResponse.symm
     _ = -163 := hOutputValue
 
-/-! ## B. Direct loop-refinement audit -/
+/-!
+
+## B. Direct loop-refinement audit
+
+-/
 
 /-- A topological rank that increases along every retained edge except the feedback edge. -/
 def responseRegressionNodeRank : Node → ℕ := ![0, 1, 2, 2, 3, 3, 4, 5]
@@ -239,7 +247,11 @@ lemma responseRegression_edgeGraphDet :
     edgeGraphDet (signalMultigraph topologyProjectionParameters) = 1 := by
   exact responseRegression_edgeGraphDetOn Finset.univ
 
-/-! ## C. Direct forward-path audit -/
+/-!
+
+## C. Direct forward-path audit
+
+-/
 
 /-- Forward node paths that have at least one refinement by the retained eleven edges. -/
 def responseRegressionSupportedForwardPaths : Finset (List Node) :=
@@ -562,7 +574,11 @@ lemma responseRegression_s06 :
   rw [responseRegression_auditedMasonResponse,
     responseRegression_eliminationResponse]
 
-/-! ## D. Miswired-edge negative control -/
+/-!
+
+## D. Miswired-edge negative control
+
+-/
 
 /-- Edge sources after swapping the first coupler's two launch wires. -/
 def responseRegressionSwappedEdgeSource : Edge → Node :=
@@ -1000,7 +1016,11 @@ lemma responseRegression_swappedEdge_fails_s06 :
   have hReal := congrArg Complex.re hEqual
   norm_num at hReal
 
-/-! ## E. Nonzero-feedback loop and singularity audit -/
+/-!
+
+## E. Nonzero-feedback loop and singularity audit
+
+-/
 
 /-- An asymmetric nonzero-feedback fixture whose two touching loop gains sum to one. -/
 def responseRegressionSingularParameters : Parameters where

@@ -30,7 +30,7 @@ paper, while the strict conclusion fails. This records the paper's non-strict/st
 does not re-credit the two nonzero hypotheses to Physlib and does not identify the printed model
 with the coherent fixtures.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `insideZerosParameters`: coherent response with finite zeros at `±1/2`.
 - `insideZerosResponseReduction_allZerosInsideUnitDisk`: direct positive anchor.
@@ -47,15 +47,15 @@ with the coherent fixtures.
 - D. Direct coherent zero-location anchors
 - E. Printed incoherent strictness boundary
 
-## iv. References and non-claims
-
-U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
-Processing Systems", FMICS 2015, LNCS 9128, Definition 7 and Theorem 5.
+## iv. References
 
 No statement calls the zero-location condition "resonance". This file introduces neither
 normalized-modal power nor electromagnetic power; no E3b power bridge is used. It supplies no
 physical-frequency, passivity, BIBO, coherent/incoherent equivalence, or material-model claim and
 gives no causality or time-domain interpretation.
+
+U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
+Processing Systems", FMICS 2015, LNCS 9128, Definition 7 and Theorem 5.
 -/
 
 @[expose] public section

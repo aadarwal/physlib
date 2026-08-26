@@ -34,7 +34,7 @@ reduced poles only under S4's explicit pointwise no-cancellation criterion.
 Coherent N7 `t`/`-I * k` is the FMICS'15 source's own unprinted coherent branch. Its printed
 incoherent `1 - k`/`k` formulas are a different case and are not identified with this response.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `UnitDelayParameters`: two coherent couplers and three real formal-delay gains.
 - `rationalNetlist`: the complete one-delay DCDR `RationalNetlist`.
@@ -51,10 +51,7 @@ incoherent `1 - k`/`k` formulas are a different case and are not identified with
 - C. Compiled response certificate
 - D. Candidate singularities and response-indexed reduction
 
-## iv. References and non-claims
-
-U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
-Processing Systems", FMICS 2015, LNCS 9128, Definition 8, Table 1, and Theorem 4.
+## iv. References
 
 The nonnegative formal gains admit Table 1's active-amplifier case; they are not a material
 amplifier law or a passivity certificate. Formal `q` and reciprocal `z` are not physical frequency.
@@ -63,6 +60,9 @@ the printed incoherent equations with the coherent netlist, or supplies power ob
 Schur stability is only the abstract reduced-denominator predicate imported from S4. The S4 BIBO
 equivalence is stated only for `ProperCausalOnePole`; no two-pole DCDR BIBO theorem is claimed.
 No time-domain impulse-response or causality interpretation is supplied.
+
+U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
+Processing Systems", FMICS 2015, LNCS 9128, Definition 8, Table 1, and Theorem 4.
 -/
 
 @[expose] public section

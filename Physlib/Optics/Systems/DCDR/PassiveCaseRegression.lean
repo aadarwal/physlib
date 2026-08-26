@@ -37,7 +37,7 @@ The mapped coherent N7 model is audited separately. Its denominator is
 are imaginary, and its reciprocal poles are also strictly inside the unit disk. No theorem below
 identifies the two response models.
 
-## ii. Key declarations
+## ii. Key results
 
 - `passivePrintedReducedResponse_poles`: exact formal-`q` roots.
 - `passivePrintedReducedResponse_zPoles`: exact reciprocal-`z` poles.
@@ -56,7 +56,11 @@ identifies the two response models.
 - D. Decimal pole-list audit
 - E. Printed claim audit
 
-## iv. References and non-claims
+## iv. References
+
+No result claims physical resonance, coherent--incoherent equivalence, BIBO stability beyond
+S4P's stated gate, normalized-modal or electromagnetic power, causality or time-domain behavior,
+or a physical-frequency interpretation of formal `q` or reciprocal `z`.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
 Processing Systems”, FMICS 2015, LNCS 9128, Definition 7, Theorems 3--4, pp. 170, 173--175.
@@ -67,10 +71,6 @@ proves. It makes no claim about Binh [5]. The checked set-based facts expose a p
 conflict: the p. 175 prose says unstable, while the printed denominator and Definition 7's strict
 pole-location criterion give stability. The alternative reading—that “unstable” rejects the
 rounded supplied pole list rather than locating an actual pole outside the unit disk—remains open.
-
-No result claims physical resonance, coherent--incoherent equivalence, BIBO stability beyond
-S4P's stated gate, normalized-modal or electromagnetic power, causality or time-domain behavior,
-or a physical-frequency interpretation of formal `q` or reciprocal `z`.
 -/
 
 @[expose] public section

@@ -35,7 +35,7 @@ denominator, pole, or stability equivalence between these two models is asserted
 printed decimals by rational data only. `passiveCaseUnitDelayParameters` is its coherent N7 image
 through the same dictionary; it does not identify the coherent and printed incoherent responses.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `DCDR.UnitDelayParameters.loopCoefficient`: the coherent quadratic loop coefficient.
 - `DCDR.UnitDelayParameters.denominatorPolynomial_natDegree_le_two`: the raw degree bound.
@@ -56,7 +56,11 @@ through the same dictionary; it does not identify the coherent and printed incoh
 - D. Printed incoherent coefficient data
 - E. FMICS'15 passive case data
 
-## iv. References and non-claims
+## iv. References
+
+No result here claims physical resonance, coherent--incoherent equivalence, a general BIBO
+theorem, normalized-modal or electromagnetic power, causality or a time-domain realization, or
+a physical-frequency interpretation of formal `q` or reciprocal `z`.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
 Processing Systems”, FMICS 2015, LNCS 9128, Theorems 1--4, pp. 170--175.
@@ -72,10 +76,6 @@ Theorem 4 expression contains `G1*G2`. Both are recorded without silently identi
 Consequently this file does not force a strict corrected Theorem 4 bridge. The coherent N7
 `t`/`-I*k` construction is the source's own unprinted coherent branch; the printed incoherent
 `1-k`/`k` graph is a different case.
-
-No result here claims physical resonance, coherent--incoherent equivalence, a general BIBO
-theorem, normalized-modal or electromagnetic power, causality or a time-domain realization, or
-a physical-frequency interpretation of formal `q` or reciprocal `z`.
 -/
 
 @[expose] public section
