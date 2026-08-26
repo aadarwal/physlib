@@ -186,7 +186,8 @@ lemma latticeRegression_sitePort_sum (f : LatticeSitePort → ℂ) :
       {.west, .east, .north, .south} by
     ext port
     cases port <;> simp]
-  simp
+  simp only [Finset.mem_insert, reduceCtorEq, Finset.mem_singleton, or_self, not_false_eq_true,
+    Finset.sum_insert, Finset.sum_singleton]
   ring
 
 /-- A direct enumeration of the two single-mode channels of a series coupler. -/
