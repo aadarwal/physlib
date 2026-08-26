@@ -4,10 +4,11 @@
 
 - Branch: `optics/s0-physical-ring`.
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s0-physical-ring`.
-- Development head merged at cutoff: `9f23e522`.
-- Post-sync merge commit: `32514e95`.
+- Development head merged at the slice 1b cutoff: `f8e035ae`.
+- Slice 1b post-sync merge commit: `afa8cd7f`.
+- Original post-sync merge commit: `32514e95`.
 - Crash-safe implementation commits: `5cac7028` and `96367bf0`.
-- Slice 1b crash-safe commits begin at `c0014de3`.
+- Slice 1b implementation commits: `c0014de3`, `e6bd38e5`, `78ea4615`, and `ea7472fd`.
 - The four recovered files were substantive but ungated drafts. They are now complete for the
   stated S0 contract and pass the post-sync build and declaration-linter gates.
 - No existing production module, registry, API map, `goal.md`, or `tbd.md` is changed by the lane
@@ -396,10 +397,11 @@ The validation lane should bind at least these fully qualified names:
 
 ## Gate record
 
-After merging `optics/development`, the following single locked command exited successfully:
+After merging development head `f8e035ae` at `afa8cd7f`, the following single slice 1b locked
+command exited successfully:
 
 ```text
-lake-lock env bash -c 'lake build <four S0 modules> &&
+lake-lock env bash -c 'lake --wfail build <four S0 modules> &&
   lake exe runPhyslibLinters && lake exe lint_all'
 ```
 
