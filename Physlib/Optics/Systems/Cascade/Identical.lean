@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Chebyshev.Basic
-public import Mathlib.LinearAlgebra.Matrix.Charpoly.Coeff
 public import Physlib.Optics.Systems.Cascade.Heterogeneous
 
 /-!
