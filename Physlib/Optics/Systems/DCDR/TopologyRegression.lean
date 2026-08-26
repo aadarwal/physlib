@@ -22,10 +22,12 @@ The connection fixture separately expands all twelve endpoints of the six physic
 matrix anchors do not use `coefficientMatrix_eq_displayed`; they enumerate the concrete retained
 edges through `Multigraph.toMatrix`.
 
-A second numeric fixture hand-computes all eleven assembled N7 entries and an eight-coordinate
-unit-input solution, then crosses the relational bridge to complete netlist equations. Its
-negative control swaps the first coupler's two launch ports in an actual `FlatNetlist`; the
-production lift then fails the rewired incident-assembly equation at the upper path.
+A second numeric fixture hand-computes all eleven graph gains and an eight-coordinate unit-input
+solution, then crosses the relational bridge to complete netlist equations.
+`topologyProjection_n7Entries` is a numeric specialization of
+`edgeGain_eq_n7ScatteringEntry`, not an independent raw-transform expansion. Its negative control
+swaps the first coupler's two launch ports in an actual `FlatNetlist`; the production lift then
+fails the rewired incident-assembly equation at the upper path.
 
 These are hostile algebraic topology fixtures. The coupler values are not unitary or passive, and
 the tests assert no response, power, stability, pole, zero, resonance, causality, reciprocity, or
