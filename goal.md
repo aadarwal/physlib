@@ -2326,10 +2326,10 @@ extraction, and independent definition-level regressions. `FlatNetlist.feedbackS
 now extracts the scalar graph `C * S` from the N5 feedback operator `1 - C * S`; its graph-
 determinant gate is exactly relational well-posedness. Entrywise Mason gains reconstruct the
 proof-gated feedback inverse, and `FlatNetlist.responseTransform_eq_masonResponseTransform`
-proves equality with the typed external N5 response. A nonsymmetric fixture pins internal gain
-orientation through a principal `I`-by-`I` loop. Its forward-path numerator `I`, loop-family
-determinant `2`, and Mason gain `I / 2` are expanded independently; separately derived N5
-elimination gives `1 + 4 * I`, which equals the direct path plus the enumerated loop response
+proves equality with the typed external N5 response. A nonsymmetric netlist fixture gives
+independent value agreement on its principal symmetric `I`-by-`I` loop. Its forward-path numerator
+`I`, loop-family determinant `2`, and Mason gain `I / 2` are expanded independently; separately
+derived N5 elimination gives `1 + 4 * I`, which equals the direct path plus the enumerated loop response
 without either agreement theorem. A singular determinant is obtained directly from a known
 noninjective feedback operator. The generic S6/N5 bridge is therefore complete. Ring- and DCDR-
 specific G-04/X-01 instantiations remain in the S7 system suite rather than being inferred from
