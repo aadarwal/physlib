@@ -1,231 +1,231 @@
-# S7C slice 1b handoff
+# S7C slice 2 handoff
 
 ## Cutoff
 
 - Branch: `optics/s7c-cascade`
-- Required sync target used: `aff2484ecc7fd14f456b0c85a71d282c6b4f4052`
-- Sync merge: `cf0061a59fdfe47db06e1b6628ea3ba8b4bad867`
-- Slice: heterogeneous DATE cascade (IP-15 / H-03), neutral N3T fold, and U2 sign sentinel
+- Required sync target: `aff2484ecc7fd14f456b0c85a71d282c6b4f4052`
+- Target merge already present: `cf0061a59fdfe47db06e1b6628ea3ba8b4bad867`
+- Prior slice-1 U2-ready cutoff: `74ceb587ae085fe891b0f093390202e43d3ed592`
+- Slice: identical DATE cascades and Sylvester/Chebyshev form (IP-16/IP-17, H-04/H-05)
+
+`aff2484e` is an ancestor of this cutoff. No later development head was selected.
 
 ## Files and registrations
 
-Register these four new modules in sorted order in `Physlib.lean`:
+Slice 2 adds these modules, in sorted registry order:
+
+- `Physlib.Optics.Systems.Cascade.Identical`
+- `Physlib.Optics.Systems.Cascade.IdenticalRegression`
+
+This branch still contains the four U2-ready slice-1 modules. Because the required sync target's
+registry predates their conductor merge, the exact cutoff gate temporarily registered all six:
 
 - `Physlib.Optics.Network.TwoPortChainFold`
 - `Physlib.Optics.Network.TwoPortChainFoldRegression`
 - `Physlib.Optics.Systems.Cascade.Heterogeneous`
 - `Physlib.Optics.Systems.Cascade.HeterogeneousRegression`
+- `Physlib.Optics.Systems.Cascade.Identical`
+- `Physlib.Optics.Systems.Cascade.IdenticalRegression`
 
-The shipped registry linters were run with those imports added temporarily. The temporary
-`Physlib.lean` edit was removed byte-identically before the cutoff gate record.
+If slice 1 has already been registered when this cutoff is merged, only the two slice-2 imports
+remain to add. No `Physlib.lean` edit is committed on this branch.
 
 ## Declarations
 
-### `Physlib/Optics/Network/TwoPortChainFold.lean`
+### `Physlib/Optics/Systems/Cascade/Identical.lean`
 
-- `BackwardFirstTwoPortBehavior.seriesFold`
-- `BackwardFirstTwoPortBehavior.seriesFold_hasLeftToRightChainView`
-- `BackwardFirstChainTransform.fold`
-- `BackwardFirstChainTransform.fold_append`
-- `BackwardFirstChainTransform.fold_replicate`
-- `BackwardFirstChainTransform.seriesFold_map_toBehavior_hasLeftToRightChainView`
-- `BackwardFirstChainTransform.leftToRightChainTransform_seriesFold`
-- `BackwardFirstChainTransform.seriesFold_map_toBehavior_eq_fold_toBehavior`
-- `ChainableTwoPortScattering`, including fields `scattering` and
-  `hasBijectiveRightToLeftTransmission`
-- `ChainableTwoPortScattering.behavior`
-- `ChainableTwoPortScattering.chainTransform`
-- `ChainableTwoPortScattering.toBehavior_chainTransform`
-- `ChainableTwoPortScattering.behaviorFold`
-- `ChainableTwoPortScattering.chainFold`
-- `ChainableTwoPortScattering.behaviorFold_eq_chainFold_toBehavior`
-- `ChainableTwoPortScattering.behaviorFold_hasLeftToRightChainView`
-- `ChainableTwoPortScattering.leftToRightChainTransform_behaviorFold`
+- `MicroringCascade.dateIdenticalCascadeBehavior`
+- `MicroringCascade.dateIdenticalCascadeComposition`
+- `MicroringCascade.dateIdenticalCascadeComposition_eq_pow`
+- `MicroringCascade.dateIdenticalCascadeBehavior_eq_pow_toBehavior`
+- `MicroringCascade.dateChainEntry`
+- `MicroringCascade.dateChainHalfTrace`
+- `MicroringCascade.dateChebyshevCoefficient`
+- `MicroringCascade.dateChebyshevClosedForm`
+- `MicroringCascade.dateChain_trace_eq_entry11_add_entry22`
+- `MicroringCascade.dateChebyshevCoefficient_recurrence`
+- `MicroringCascade.dateChain_sq_eq_trace_smul_sub_one`
+- `MicroringCascade.dateChain_pow_eq_chebyshevClosedForm_of_det_eq_one`
+- `MicroringCascade.DateSylvesterHypotheses`, with fields:
+  - `det_eq_one`
+  - `entry11_re_gt_neg_one`
+  - `entry11_re_lt_one`
+  - `entry22_eq_conj_entry11`
+  - `entry12_eq_conj_entry21`
+- `MicroringCascade.dateSylvesterAngle`
+- `MicroringCascade.dateSylvesterSineCoefficient`
+- `MicroringCascade.dateSylvesterClosedForm`
+- `MicroringCascade.DateSylvesterHypotheses.halfTrace_eq_entry11_re`
+- `MicroringCascade.DateSylvesterHypotheses.sin_angle_ne_zero`
+- `MicroringCascade.DateSylvesterHypotheses.halfTrace_eq_cos_angle`
+- `MicroringCascade.DateSylvesterHypotheses.chebyshevCoefficient_eq_sineCoefficient`
+- `MicroringCascade.dateChain_pow_eq_sylvesterClosedForm`
+- `MicroringCascade.dateIdenticalCascadeComposition_eq_sylvesterClosedForm`
 
-### `Physlib/Optics/Network/TwoPortChainFoldRegression.lean`
+### `Physlib/Optics/Systems/Cascade/IdenticalRegression.lean`
 
-- `twoPortChainFoldRegressionList`
-- `twoPortChainFoldRegression_fold_entry`
-- `twoPortChainFoldRegression_reverse_entry`
-- `twoPortChainFoldRegression_ne_reverse`
+- `MicroringCascade.dateIdenticalCascadeRegression_two_by_hand`
+- `MicroringCascade.dateIdenticalCascadeRegression_three_by_hand`
+- `MicroringCascade.dateSylvesterRegressionMatrix`
+- `MicroringCascade.dateSylvesterRegressionMatrix_det`
+- `MicroringCascade.dateSylvesterRegressionMatrix_hypotheses`
+- `MicroringCascade.dateSylvesterRegressionMatrix_pow_two`
+- `MicroringCascade.dateSylvesterRegressionMatrix_pow_three`
+- `MicroringCascade.dateSylvesterRegressionMatrix_closedForm_two`
+- `MicroringCascade.dateSylvesterRegressionMatrix_closedForm_three`
+- `MicroringCascade.dateSylvesterRegression_identity_exact_failure`
+- `MicroringCascade.dateSylvesterRegression_identity_not_hypotheses`
+- `MicroringCascade.dateSylvesterRegression_identity_closedForm_false`
 
-### `Physlib/Optics/Systems/Cascade/Heterogeneous.lean`
+## Exact source domain
 
-- `MicroringCascade.DateCascadeStage`, including fields `ring` and `busLength`
-- `MicroringCascade.DateCascadeStage.busPhase`
-- `MicroringCascade.DateCascadeStage.backwardContinuityFactor`
-- `MicroringCascade.DateCascadeStage.forwardContinuityFactor`
-- `MicroringCascade.DateCascadeStage.continuityChainMatrix`
-- `MicroringCascade.DateCascadeStage.behavior`
-- `MicroringCascade.DateCascadeStage.compositionMatrix`
-- `MicroringCascade.DateCascadeStage.HasBijectiveRingTransmission`
-- `MicroringCascade.DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
-- `MicroringCascade.DateCascadeStage.behavior_eq_compositionMatrix_toBehavior`
-- `MicroringCascade.dateCascadeBehavior`
-- `MicroringCascade.dateCascadeComposition`
-- `MicroringCascade.dateCascadeBehavior_eq_composition_toBehavior`
-- `MicroringCascade.dateCascadeBehavior_hasLeftToRightChainView`
-- `MicroringCascade.dateCascade_leftToRightChainTransform_eq_composition`
-
-### `Physlib/Optics/Systems/Cascade/HeterogeneousRegression.lean`
-
-- `MicroringCascade.dateCascadeRegressionHandProduct`
-- `MicroringCascade.dateCascadeRegression_twoRing_inl_inl`
-- `MicroringCascade.dateCascadeRegression_twoRing_inl_inr`
-- `MicroringCascade.dateCascadeRegression_twoRing_inr_inl`
-- `MicroringCascade.dateCascadeRegression_twoRing_inr_inr`
-- `MicroringCascade.dateCascadeRegressionQuarterTurnRing`
-- `MicroringCascade.dateCascadeRegressionQuarterTurnStage`
-- `MicroringCascade.dateCascadeRegressionZeroBusStage`
-- `MicroringCascade.dateCascadeRegression_quarterTurn_busPhase`
-- `MicroringCascade.dateCascadeRegression_quarterTurn_signedContinuity`
-- `MicroringCascade.dateCascadeRegression_quarterTurnRing_fieldAttenuation`
-- `MicroringCascade.dateCascadeRegression_quarterTurnRing_phaseFactor`
-- `MicroringCascade.dateCascadeRegression_quarterTurnRing_denominator`
-- `MicroringCascade.dateCascadeRegression_quarterTurnRing_forwardTransfer`
-- `MicroringCascade.dateCascadeRegression_quarterTurnRing_backwardTransfer`
-- `MicroringCascade.dateCascadeRegression_zeroBus_backwardContinuity`
-- `MicroringCascade.dateCascadeRegression_quarterTurn_then_zero_inl_inl`
-
-## Scope and milestone disposition
-
-This slice discharges the quoted S7C bullet "arbitrary heterogeneous microring cascades"
-(`goal.md:2411`). It satisfies H-03, quoted as "arbitrary cascade behavior equals the folded chain
-matrix" (`goal.md:2579`), through
-`MicroringCascade.dateCascadeBehavior_eq_composition_toBehavior`. Its exact domain is
+The source hypothesis `|m| = 1` is represented as the actual matrix determinant equation
 
 ```text
-∀ stage ∈ stages, stage.HasBijectiveRingTransmission
+Matrix.det matrix = 1
 ```
 
-and `DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero` identifies that
-gate exactly with `dateForwardTransfer stage.ring ≠ 0`.
+and not as a matrix norm. `DateSylvesterHypotheses` retains all four source conditions:
 
-This also discharges IP-15 under that gate: DATE Def. 6's opposite-sign continuity matrix and
-Thm. 3's heterogeneous product are represented by `DateCascadeStage.continuityChainMatrix` and
-`dateCascadeBehavior_eq_composition_toBehavior`. The independent H-03 fixture is the four-entry
-hand product in `HeterogeneousRegression.lean`; it does not use the headline theorem or the
-generic fold agreement theorem. The quarter-turn sentinel independently expands the carrier
-exponential and pins the DATE continuity signs to `I` backward and `-I` forward. The consuming
-two-stage entry is `I`, so swapping the factors or dropping the backward negation breaks it.
-Both hostile mutations were checked mechanically. Dropping the negation left `-I = I`; swapping
-the factors additionally left `I = -I`. The production file was restored before the clean build.
+```text
+Matrix.det matrix = 1
+-1 < Re(m11)
+Re(m11) < 1
+m22 = conj(m11)
+m12 = conj(m21)
+```
 
-The neutral `BackwardFirstChainTransform.fold_replicate` supplies the generic matrix-power half
-needed later for H-04, quoted as "an identical-`N` cascade equals the corresponding matrix power"
-(`goal.md:2580`). It does not by itself discharge H-04/IP-16. This slice does not claim H-05,
-H-06, or S-08. Their quoted rows are:
+`dateChainEntry` uses the source reindex in which `0` is backward and `1` is forward. Diagonal
+conjugacy proves `trace(matrix)/2 = Re(m11)`. The strict interval puts
+`dateSylvesterAngle matrix = arccos(Re(m11))` in `(0, pi)`, hence its sine is nonzero.
 
-- "the Sylvester/Chebyshev cascade form holds with its determinant and trace-domain assumptions"
-  (`goal.md:2581`);
-- "terminated-cascade reflection and transmission agree with relational termination"
-  (`goal.md:2582`); and
-- "Physlib extension: the `M × N` lattice flattening agrees with its row/column decomposition"
-  (`goal.md:2593`).
+The source sine display is represented exactly as
 
-The remaining S7C bullets are likewise withheld: "a Sylvester/Chebyshev closed form with its
-actual determinant and trace-domain assumptions", "terminated reflection and transmission",
-"the source-backed uncoupled row-sublattice result", "coupled row/column decompositions and the
-full `M × N` lattice theorem, explicitly classified as Physlib-original rather than DATE'14
-parity", and the source-mapped SFG/PANDA cases (`goal.md:2413-2418`).
+```text
+sin(N * theta) / sin(theta) * matrix
+  - sin((N - 1) * theta) / sin(theta) * 1
+```
+
+The definition is totalized, while `dateChain_pow_eq_sylvesterClosedForm` and the identical
+cascade corollary require the complete source structure. The weaker polynomial identity
+`dateChain_pow_eq_chebyshevClosedForm_of_det_eq_one` needs only determinant one; no source sine
+claim is inferred from that weaker fact.
+
+## Milestone and parity disposition
+
+This slice discharges the quoted S7C bullets:
+
+- "an identical-`N` cascade as a chain-matrix power" (`goal.md:2421`); and
+- "a Sylvester/Chebyshev closed form with its actual determinant and trace-domain assumptions"
+  (`goal.md:2422`).
+
+It satisfies H-04, quoted as "an identical-`N` cascade equals the corresponding matrix power"
+(`goal.md:2589`), through `dateIdenticalCascadeComposition_eq_pow`. This equality is totalized and
+needs no ring pivot. Its relational graph corollary separately requires
+`stage.HasBijectiveRingTransmission`.
+
+It satisfies H-05, quoted as "the Sylvester/Chebyshev cascade form holds with its determinant and
+trace-domain assumptions" (`goal.md:2590`), through
+`dateIdenticalCascadeComposition_eq_sylvesterClosedForm` under the complete structure above.
+
+Thus the declarations identify discharges for:
+
+- IP-16, DATE'14 Thm. 4, through `dateIdenticalCascadeComposition_eq_pow`; and
+- IP-17, DATE'14's unnumbered Sylvester result, through
+  `dateIdenticalCascadeComposition_eq_sylvesterClosedForm`.
+
+The source rows are recorded at
+`/Users/aadarwal/src/aadarwal/physlib-parity/PARITY-LEDGER.md:123-124`. A ledger status flip still
+belongs to the conductor/reviewer gate, not this lane.
+
+## Independent regressions
+
+The H-04 regressions unfold `List.replicate`, `dateCascadeComposition`, and the neutral fold
+directly at `N = 2` and `N = 3`. They do not call
+`dateIdenticalCascadeComposition_eq_pow` or `fold_replicate`.
+
+The H-05 positive fixture is `diag(I, -I)`. Its determinant and source structure are computed
+directly. Its powers are independently expanded entry by entry through `Matrix.mul_apply`:
+
+```text
+matrix ^ 2 = -1
+matrix ^ 3 = -matrix
+```
+
+The two source sine candidates are evaluated independently to those same values. Neither proof
+calls Cayley--Hamilton, the Chebyshev power lemma, or either Sylvester headline theorem.
+
+The negative control is the identity matrix. It satisfies determinant one, the lower bound, and
+both conjugacy equations, but fails only `Re(m11) < 1`. At this excluded boundary,
+`theta = 0`, totalized `sin(theta) / sin(theta) = 0`, and the following is proved:
+
+```text
+(1 : BackwardFirstChainTransform Unit Unit) ^ 1 != dateSylvesterClosedForm 1 1
+```
+
+The failed source condition is therefore load-bearing, and the fixture can fail mechanically.
 
 ## Validation bindings
 
 The validation lane should bind these exact public names:
 
-- `Optics.BackwardFirstChainTransform.fold`
-- `Optics.BackwardFirstChainTransform.fold_replicate`
-- `Optics.BackwardFirstChainTransform.leftToRightChainTransform_seriesFold`
-- `Optics.BackwardFirstChainTransform.seriesFold_map_toBehavior_eq_fold_toBehavior`
-- `Optics.ChainableTwoPortScattering.behaviorFold_eq_chainFold_toBehavior`
-- `Optics.twoPortChainFoldRegression_fold_entry`
-- `Optics.twoPortChainFoldRegression_reverse_entry`
-- `Optics.twoPortChainFoldRegression_ne_reverse`
-- `Optics.MicroringCascade.DateCascadeStage.continuityChainMatrix`
-- `Optics.MicroringCascade.DateCascadeStage.`
-  `hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
-- `Optics.MicroringCascade.dateCascadeComposition`
-- `Optics.MicroringCascade.dateCascadeBehavior_eq_composition_toBehavior`
-- `Optics.MicroringCascade.dateCascade_leftToRightChainTransform_eq_composition`
-- `Optics.MicroringCascade.dateCascadeRegression_twoRing_inl_inl`
-- `Optics.MicroringCascade.dateCascadeRegression_twoRing_inl_inr`
-- `Optics.MicroringCascade.dateCascadeRegression_twoRing_inr_inl`
-- `Optics.MicroringCascade.dateCascadeRegression_twoRing_inr_inr`
-- `Optics.MicroringCascade.dateCascadeRegression_quarterTurn_busPhase`
-- `Optics.MicroringCascade.dateCascadeRegression_quarterTurn_signedContinuity`
-- `Optics.MicroringCascade.dateCascadeRegression_quarterTurn_then_zero_inl_inl`
+- `Optics.MicroringCascade.dateIdenticalCascadeComposition_eq_pow`
+- `Optics.MicroringCascade.dateIdenticalCascadeBehavior_eq_pow_toBehavior`
+- `Optics.MicroringCascade.DateSylvesterHypotheses`
+- `Optics.MicroringCascade.dateChebyshevClosedForm`
+- `Optics.MicroringCascade.dateChain_pow_eq_chebyshevClosedForm_of_det_eq_one`
+- `Optics.MicroringCascade.dateSylvesterClosedForm`
+- `Optics.MicroringCascade.dateChain_pow_eq_sylvesterClosedForm`
+- `Optics.MicroringCascade.dateIdenticalCascadeComposition_eq_sylvesterClosedForm`
+- `Optics.MicroringCascade.dateIdenticalCascadeRegression_two_by_hand`
+- `Optics.MicroringCascade.dateIdenticalCascadeRegression_three_by_hand`
+- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_pow_two`
+- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_pow_three`
+- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_closedForm_two`
+- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_closedForm_three`
+- `Optics.MicroringCascade.dateSylvesterRegression_identity_exact_failure`
+- `Optics.MicroringCascade.dateSylvesterRegression_identity_closedForm_false`
 
-The asymmetric neutral fixture has exact leading entries `1` and `7`, so reversal is detectable.
+The prior U2 Markdown nit is fixed here: the full name
+`Optics.MicroringCascade.DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
+is now one code span.
 
 ## Reused anchors and conventions
 
-- DATE Defs. 4-7 and Thm. 3 are recorded at
-  `/Users/aadarwal/src/aadarwal/physlib-parity/HOL-CORPUS.md:199-203`; the source has
-  `a_(n+1) = b_n exp(-j phi)` and `c_(n+1) = d_n exp(+j phi)`.
-- The source-backed scope limit is at `HOL-CORPUS.md:210-216`: only the uncoupled row sublattice
-  is verified; no DATE `M × N` theorem exists.
-- `BackwardFirstTwoPortBehavior.leftToRightChainTransform_series` fixes later-on-the-left order at
-  `Physlib/Optics/Network/TwoPortChain.lean:149-157`.
-- The scattering pivot and graph extraction APIs are at
-  `Physlib/Optics/Network/TwoPortScatteringChain.lean:149-175,523-539`.
-- DATE's source four-port scattering and exact nonzero pivot gate are at
-  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:861-866,909-926`.
-- The typed DATE backward-first matrix and chain bridge are at
-  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:1024-1051`.
-- `MatchedPropagation.carrierPhaseFactor` is `exp (-I * phase)` at
-  `Physlib/Optics/Components/MatchedPropagation.lean:93-99`. Consequently DATE's backward
-  coordinate uses argument `-phi`, while its forward coordinate uses `phi`.
-- The modal-to-electromagnetic power bridge and all its qualifications are at
-  `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:15-23,60-90`.
+- DATE Thm. 4 and the unnumbered Sylvester result are recorded at
+  `/Users/aadarwal/src/aadarwal/physlib-parity/HOL-CORPUS.md:204-207`.
+- The ledger records IP-16/IP-17 and the complete source assumptions at
+  `/Users/aadarwal/src/aadarwal/physlib-parity/PARITY-LEDGER.md:123-124`.
+- The neutral fold and its replicate-to-power result are at
+  `Physlib/Optics/Network/TwoPortChainFold.lean:90-114`.
+- DATE coordinate `0` backward and coordinate `1` forward are fixed at
+  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:990-1022`.
+- The one-stage DATE product `continuity ** ring` is at
+  `Physlib/Optics/Systems/Cascade/Heterogeneous.lean:145-148`.
+- Mathlib's second-kind recurrence and base values are in
+  `Mathlib/RingTheory/Polynomial/Chebyshev.lean:265-304`.
+- Mathlib's real trigonometric characterization is in
+  `Mathlib/Analysis/SpecialFunctions/Trigonometric/Chebyshev/Basic.lean:147-156`.
+- The modal-to-electromagnetic power bridge and its qualifications are at
+  `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`.
 
 ## Non-claims
 
-- The neutral fold makes no ring, propagation, source-parity, termination, passivity,
-  reciprocity, causality, or electromagnetic claim.
+- The source sine form is claimed only under all fields of `DateSylvesterHypotheses`.
+- The determinant-one Chebyshev core does not weaken the source sine theorem's trace domain.
+- The totalized sine quotient is not asserted at a zero denominator or outside the strict bound.
+- "Resonance" terminology is withheld.
 - No quadruple-ring parity row is claimed.
-- No coupled lattice, full `M × N` lattice, termination, Sylvester/Chebyshev, resonance, or
-  SFG-TR'14/NSV'16 comparison is claimed in this slice.
-- Effective index is fixed at the selected carrier. There is no dispersion, bending-loss,
-  bandwidth, causality, or material-realization claim.
+- No termination, coupled lattice, full `M x N` lattice, or Physlib-original lattice result is
+  claimed in this slice.
+- Effective index is fixed at the selected carrier. There is no dispersion, bending loss,
+  bandwidth, causality, passivity, reciprocity, or material-realization claim.
 - Power remains normalized modal power. Electromagnetic power requires the finite,
   common-frequency, Maxwell-qualified, pairwise-integrable, mutually flux-orthogonal,
   unit-normalized measured-profile hypotheses of the cited bridge.
-- DATE matrices and quotients are totalized algebraic expressions. Relational chain meaning is
-  asserted only under every stage's exact bijective-transmission gate. No denominator nonzero,
-  passivity, reciprocity, losslessness, or N5 well-posedness condition is silently inferred.
 - Any later SFG-TR'14/NSV'16 comparison must retain IP-12's explicit principal-root versus
-  selected-half-arc branch equality; this slice makes no such comparison.
+  selected-half-arc equality; this slice makes no such comparison.
 
 ## Gate record
 
-The exact post-sync source head gated for slice 1b is
-`9ec827ae903c57c845e2d93c4837595502e03b56`. It contains the merge of the required
-`aff2484e` target and every Lean change in this cutoff. With the four modules temporarily
-registered in sorted order, this single locked command exited successfully:
-
-```text
-lake-lock env bash -c 'set -euo pipefail && lake exe cache get &&
-  lake --wfail build Physlib.Optics.Network.TwoPortChainFold
-    Physlib.Optics.Network.TwoPortChainFoldRegression
-    Physlib.Optics.Systems.Cascade.Heterogeneous
-    Physlib.Optics.Systems.Cascade.HeterogeneousRegression &&
-  lake exe runPhyslibLinters && lake exe lint_all'
-```
-
-- Cache retrieval downloaded no files.
-- All four modules built with warnings as errors; Lake completed 2756 jobs successfully.
-- `runPhyslibLinters` passed for `Physlib` and `QuantumInfo`.
-- `lint_all` exited zero. Its build, illegal-import, PhyslibAlpha-import, duplicate-tag,
-  sorry/pseudo, and second declaration-linter stages passed.
-- The file-import inventory named only five unregistered files already present in sync target
-  `aff2484e`: `IntegralMacroscopicMaxwell`, `PlanarThinCell` in Electromagnetism,
-  `PlanarThinCell`, `PlanarThinCellConvergence`, and `ThinCellLimit` in SpaceAndTime. It named no
-  S7C file because all four S7C modules were registered for the gate.
-- Advisory style and transitive-import inventories named only pre-existing repository files and
-  no S7C file.
-- The committed-state `./scripts/lint-style.sh` check passed at the exact source head.
-- The temporary registry edit was restored byte-identically. Pre-edit and post-edit SHA-256 were
-  both `9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
-
-The final cutoff-record commit changes only this handoff; no Lean source differs from the exact
-gated source head above.
+The exact-source cutoff gate record will be inserted after the temporary-registry full gate.

@@ -104,7 +104,7 @@ theorem dateIdenticalCascadeComposition_eq_pow
     BackwardFirstChainTransform.fold_replicate]
 
 /-- On the exact DATE ring pivot, the repeated relational cascade is the graph of the power. -/
-theorem dateIdenticalCascadeBehavior_eq_pow_toBehavior
+lemma dateIdenticalCascadeBehavior_eq_pow_toBehavior
     (stage : DateCascadeStage) (count : ℕ)
     (hTransmission : stage.HasBijectiveRingTransmission) :
     dateIdenticalCascadeBehavior stage count =
