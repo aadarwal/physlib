@@ -69,6 +69,11 @@ open scoped ComplexConjugate
 
 noncomputable section
 
+/-- The regression uses the same finite external family as production N6c transport. -/
+local instance coherencyRegressionExternalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  (netlist p).coherencyExternalChannelFintype
+
 /-!
 
 ## A. Stable raw response matrix
