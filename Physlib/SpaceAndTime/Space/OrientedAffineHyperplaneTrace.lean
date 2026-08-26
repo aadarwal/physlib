@@ -31,6 +31,7 @@ jump condition, surface-source law, or regularity strong enough to exchange limi
 - `OrientedAffineHyperplane.oneSidedNhds`: the full selected-half-space neighborhood filter.
 - `OrientedAffineHyperplane.map_oneSidedNhds`: its ambient image is `nhdsWithin` the half-space.
 - `OrientedAffineHyperplane.HasOneSidedTrace`: convergence through that full filter.
+- `OrientedAffineHyperplane.TwoSidedField`: independent fields on the two open half-spaces.
 - `OrientedAffineHyperplane.HasOneSidedTrace.unique`: uniqueness of the trace.
 - `OrientedAffineHyperplane.HasOneSidedTrace.tendsto_sideApproach`: a trace controls the normal
   approach as a corollary.
@@ -42,6 +43,7 @@ jump condition, surface-source law, or regularity strong enough to exchange limi
 - A. Half-space neighborhood filters
 - B. One-sided traces
 - C. Restrictions of ambient fields
+- D. Two-sided fields
 
 ## iv. References
 
@@ -155,6 +157,25 @@ lemma hasOneSidedTrace_restrict {P V : Type*} [TopologicalSpace V]
       (plane.restrictFieldToBoundary field) := by
   intro p x
   exact (hContinuous p x).tendsto.comp Filter.tendsto_comap
+
+/-! ## D. Two-sided fields -/
+
+/-- Independent parameterized fields on the two open half-spaces of an oriented hyperplane. -/
+structure TwoSidedField (plane : OrientedAffineHyperplane d) (P V : Type*) where
+  /-- The field on the negative open half-space. -/
+  negative : plane.SideField .negative P V
+  /-- The field on the positive open half-space. -/
+  positive : plane.SideField .positive P V
+
+namespace TwoSidedField
+
+/-- Restrict one ambient field to both open half-spaces. -/
+def ofField {P V : Type*} (plane : OrientedAffineHyperplane d)
+    (field : P → Space d → V) : plane.TwoSidedField P V where
+  negative := plane.restrictFieldToSide .negative field
+  positive := plane.restrictFieldToSide .positive field
+
+end TwoSidedField
 
 end
 end OrientedAffineHyperplane
