@@ -123,24 +123,48 @@ lemma mixing_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
 ## B. Independent behavioral specification
 -/
 
-/-- The independently specified endpoint output map of the beam splitter. -/
+/-- The independently specified endpoint output map of the beam splitter.
+
+This definition states the two through/cross equations directly. It does not use the matrix
+`mixing` or the scattering realization.
+-/
 def outputMap [Fintype ι] [DecidableEq ι] (p : Parameters) :
     ModeAmplitude (Incident (ι ⊕ ι)) →ₗ[ℂ]
       ModeAmplitude (Outgoing (ι ⊕ ι)) :=
+  let rawIncident :=
+    (ModeAmplitude.reindex
+      (Incident.channelEquiv : Incident (ι ⊕ ι) ≃ ι ⊕ ι)).toLinearEquiv.toLinearMap
+  let firstIncident :=
+    (ModeAmplitude.restrictInlLinearMap :
+      ModeAmplitude (ι ⊕ ι) →ₗ[ℂ] ModeAmplitude ι).comp rawIncident
+  let secondIncident :=
+    (ModeAmplitude.restrictInrLinearMap :
+      ModeAmplitude (ι ⊕ ι) →ₗ[ℂ] ModeAmplitude ι).comp rawIncident
+  let firstOutgoing :=
+    (p.throughAmplitude : ℂ) • firstIncident +
+      (-Complex.I * (p.crossAmplitude : ℂ)) • secondIncident
+  let secondOutgoing :=
+    (-Complex.I * (p.crossAmplitude : ℂ)) • firstIncident +
+      (p.throughAmplitude : ℂ) • secondIncident
   (ModeAmplitude.reindex
       (Outgoing.channelEquiv.symm :
         (ι ⊕ ι) ≃ Outgoing (ι ⊕ ι))).toLinearEquiv.toLinearMap.comp
-    ((mixing p ι).toLinearMap.comp
-      (ModeAmplitude.reindex
-        (Incident.channelEquiv : Incident (ι ⊕ ι) ≃ ι ⊕ ι)).toLinearEquiv.toLinearMap)
+    (ModeAmplitude.directSumLinearEquiv.toLinearMap.comp
+      (firstOutgoing.prod secondOutgoing))
 
 /-- The independent output map removes endpoint wrappers, mixes, and restores them. -/
 lemma outputMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
     (incident : ModeAmplitude (Incident (ι ⊕ ι))) :
     outputMap p incident =
       ModeAmplitude.reindex Outgoing.channelEquiv.symm
-        ((mixing p ι).toLinearMap
-          (ModeAmplitude.reindex Incident.channelEquiv incident)) := by
+        (((p.throughAmplitude : ℂ) •
+            (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInl +
+          (-Complex.I * (p.crossAmplitude : ℂ)) •
+            (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInr).directSum
+        ((-Complex.I * (p.crossAmplitude : ℂ)) •
+            (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInl +
+          (p.throughAmplitude : ℂ) •
+            (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInr)) := by
   rfl
 
 /-- The independent beam-splitter behavior, defined before its scattering realization. -/
@@ -153,8 +177,18 @@ def behavior [Fintype ι] [DecidableEq ι] (p : Parameters) :
 lemma mem_behavior_iff [Fintype ι] [DecidableEq ι] (p : Parameters)
     (incident : ModeAmplitude (Incident (ι ⊕ ι)))
     (outgoing : ModeAmplitude (Outgoing (ι ⊕ ι))) :
-    (incident, outgoing) ∈ behavior p ↔ outgoing = outputMap p incident := by
-  rw [behavior, LinearBehavior.mem_ofLinearMap_iff]
+    (incident, outgoing) ∈ behavior p ↔
+      outgoing =
+        ModeAmplitude.reindex Outgoing.channelEquiv.symm
+          (((p.throughAmplitude : ℂ) •
+              (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInl +
+            (-Complex.I * (p.crossAmplitude : ℂ)) •
+              (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInr).directSum
+          ((-Complex.I * (p.crossAmplitude : ℂ)) •
+              (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInl +
+            (p.throughAmplitude : ℂ) •
+              (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInr)) := by
+  rw [behavior, LinearBehavior.mem_ofLinearMap_iff, outputMap_apply]
 
 /-!
 ## C. Scattering realization and unitary classification
