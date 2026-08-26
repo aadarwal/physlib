@@ -219,13 +219,21 @@ abbrev physicalPortSuite9aFamily : ScatteringComponentFamily where
 local instance physicalPortSuite9aLocalChannelFintype
     (component : PhysicalPortSuite9aComponent) :
     Fintype (physicalPortSuite9aFamily.portFamily component).Channel := by
-  cases component <;> infer_instance
+  cases component
+  · change Fintype (BeamSplitter.portFamily Unit).Channel
+    infer_instance
+  · change Fintype (Mirror.portFamily Unit).Channel
+    infer_instance
 
 /-- Every Phase 9a local channel family has decidable equality. -/
 local instance physicalPortSuite9aLocalChannelDecidableEq
     (component : PhysicalPortSuite9aComponent) :
     DecidableEq (physicalPortSuite9aFamily.portFamily component).Channel := by
-  cases component <;> infer_instance
+  cases component
+  · change DecidableEq (BeamSplitter.portFamily Unit).Channel
+    infer_instance
+  · change DecidableEq (Mirror.portFamily Unit).Channel
+    infer_instance
 
 /-- The indexed Phase 9a channels have decidable equality. -/
 local instance physicalPortSuite9aIndexedChannelDecidableEq :
@@ -327,18 +335,26 @@ lemma physicalPortSuite9a_indexed_action :
         (fun selected =>
           (physicalPortSuite9aFamily.scattering selected).toModeTransform))
       physicalPortSuite9aIndexedInput ⟨component, channel⟩ = _
-  rw [ModeTransform.blockDiagonal'_apply]
-  cases component
-  · rw [physicalPortSuite9aIndexedInput_restrict_beam,
-      physicalPortSuite9a_beam_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port <;> cases mode <;> rfl
-  · rw [physicalPortSuite9aIndexedInput_restrict_mirror,
-      physicalPortSuite9a_mirror_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port
-    cases mode
-    rfl
+  calc
+    _ = (physicalPortSuite9aFamily.scattering component).toModeTransform.toLinearMap
+          (physicalPortSuite9aIndexedInput.restrictEmbedding
+            (Function.Embedding.sigmaMk component)) channel :=
+      ModeTransform.blockDiagonal'_apply
+        (fun selected =>
+          (physicalPortSuite9aFamily.scattering selected).toModeTransform)
+        physicalPortSuite9aIndexedInput component channel
+    _ = _ := by
+      cases component
+      · rw [physicalPortSuite9aIndexedInput_restrict_beam,
+          physicalPortSuite9a_beam_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port <;> cases mode <;> rfl
+      · rw [physicalPortSuite9aIndexedInput_restrict_mirror,
+          physicalPortSuite9a_mirror_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port
+        cases mode
+        rfl
 
 /-- The mixed input in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aAggregateInput :
@@ -374,7 +390,8 @@ lemma physicalPortSuite9a_aggregate_input_coordinates :
       physicalPortSuite9aAggregateInput physicalPortSuite9aMirror = 3 := by
   simp [physicalPortSuite9aAggregateInput, physicalPortSuite9aBeamFirst,
     physicalPortSuite9aBeamSecond, physicalPortSuite9aMirror,
-    physicalPortSuite9aIndexedInput]
+    physicalPortSuite9aIndexedInput, ScatteringComponentFamily.channelEquiv,
+    physicalPortSuite9aFamily, physicalPortSuite9aPortFamily]
 
 /-- The aggregate output records both beam values and the phase-`I` mirror value. -/
 lemma physicalPortSuite9a_aggregate_output_coordinates :
@@ -385,7 +402,8 @@ lemma physicalPortSuite9a_aggregate_output_coordinates :
       physicalPortSuite9aAggregateOutput physicalPortSuite9aMirror = 3 * Complex.I := by
   simp [physicalPortSuite9aAggregateOutput, physicalPortSuite9aBeamFirst,
     physicalPortSuite9aBeamSecond, physicalPortSuite9aMirror,
-    physicalPortSuite9aIndexedOutput]
+    physicalPortSuite9aIndexedOutput, ScatteringComponentFamily.channelEquiv,
+    physicalPortSuite9aFamily, physicalPortSuite9aPortFamily]
 
 /-- The mixed family's aggregate action is the exact independently expanded output. -/
 lemma physicalPortSuite9a_aggregate_action :
@@ -436,8 +454,14 @@ lemma physicalPortSuite9a_hostile_beam_local_action :
     physicalPortSuite9aHostileBeamScattering.toModeTransform.toLinearMap
         physicalPortSuite9aBeamLocalInput =
       physicalPortSuite9aHostileBeamLocalOutput := by
-  rw [physicalPortSuite9aHostileBeamScattering, ModeTransform.toLinearMap_reindex_eq,
-    ModeAmplitude.reindex_refl, physicalPortSuite9a_beam_local_action]
+  rw [physicalPortSuite9aHostileBeamScattering, ModeTransform.toLinearMap_reindex_eq]
+  have hInput :
+      ModeAmplitude.reindex (Equiv.refl _).symm physicalPortSuite9aBeamLocalInput =
+        physicalPortSuite9aBeamLocalInput := by
+    apply WithLp.ofLp_injective 2
+    funext channel
+    rfl
+  rw [hInput, physicalPortSuite9a_beam_local_action]
   rfl
 
 /-- The hostile family changes only the beam-splitter output endpoint assignment. -/
@@ -476,18 +500,26 @@ lemma physicalPortSuite9a_hostile_indexed_action :
         (fun selected =>
           (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform))
       physicalPortSuite9aIndexedInput ⟨component, channel⟩ = _
-  rw [ModeTransform.blockDiagonal'_apply]
-  cases component
-  · rw [physicalPortSuite9aIndexedInput_restrict_beam,
-      physicalPortSuite9a_hostile_beam_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port <;> cases mode <;> rfl
-  · rw [physicalPortSuite9aIndexedInput_restrict_mirror,
-      physicalPortSuite9a_mirror_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port
-    cases mode
-    rfl
+  calc
+    _ = (physicalPortSuite9aHostileFamily.scattering component).toModeTransform.toLinearMap
+          (physicalPortSuite9aIndexedInput.restrictEmbedding
+            (Function.Embedding.sigmaMk component)) channel :=
+      ModeTransform.blockDiagonal'_apply
+        (fun selected =>
+          (physicalPortSuite9aHostileFamily.scattering selected).toModeTransform)
+        physicalPortSuite9aIndexedInput component channel
+    _ = _ := by
+      cases component
+      · rw [physicalPortSuite9aIndexedInput_restrict_beam,
+          physicalPortSuite9a_hostile_beam_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port <;> cases mode <;> rfl
+      · rw [physicalPortSuite9aIndexedInput_restrict_mirror,
+          physicalPortSuite9a_mirror_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port
+        cases mode
+        rfl
 
 /-- The hostile exact output in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aHostileAggregateOutput :
@@ -519,7 +551,8 @@ lemma physicalPortSuite9a_hostile_output_coordinates :
   simp [physicalPortSuite9aHostileAggregateOutput, physicalPortSuite9aBeamFirst,
     physicalPortSuite9aBeamSecond, physicalPortSuite9aMirror,
     physicalPortSuite9aHostileIndexedOutput, physicalPortSuite9aHostileFamily,
-    physicalPortSuite9aFamily]
+    physicalPortSuite9aFamily, ScatteringComponentFamily.channelEquiv,
+    physicalPortSuite9aPortFamily]
 
 /-- Swapping one beam output endpoint changes the first aggregate output coordinate. -/
 lemma physicalPortSuite9a_output_ne_hostile :
@@ -564,7 +597,7 @@ lemma physicalPortSuite9a_assembled_mem :
       physicalPortSuite9aFamily.assembledScatteringMatrix.toOrientedModeTransform.toBehavior := by
   rw [ModeTransform.mem_toBehavior_iff_toLinearMap,
     ScatteringMatrix.toLinearMap_toOrientedModeTransform,
-    physicalPortSuite9aIncident, ModeAmplitude.reindex_symm_reindex,
+    physicalPortSuite9aIncident, ModeAmplitude.reindex_reindex_symm,
     physicalPortSuite9a_aggregate_action]
   rfl
 
