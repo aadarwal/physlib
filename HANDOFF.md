@@ -345,3 +345,145 @@ sync-target AllPass-Z modules, and the committed-style inventory named only the 
 
 The source commit changes only the two slice-3 Lean files. This final cutoff commit changes only
 `HANDOFF.md`.
+
+# S7C slice 4a: stagewise SFG-TR add-drop mapping
+
+## Cutoff scope and synchronization
+
+This cutoff implements slice 4a only. It covers the SFG-TR'14 half of the goal text
+"the source-mapped SFG-TR'14 add-drop case and NSV'16 PANDA Vernier case." The NSV'16 PANDA
+half is intentionally deferred to slice 4b, as authorized by the controller; IP-13 and IP-14
+remain TBD and no goal.md milestone row is claimed closed by 4a alone.
+
+The required sync target was `0ea95dd99639300ec686534810467fe5cd4c2550`. It was merged before
+implementation in merge commit `05d016a7b279a225ccfe8e876597d6780048092f`, and ancestry was
+rechecked at the gate.
+
+The U2 split-code-span Markdown nit is absent after the intervening handoff replacement; this
+edit does not reintroduce the split declaration span.
+
+## Construction and source disposition
+
+The existing IP-12 dictionary is reused, not replicated:
+
+- `SfgParameters.ofAddDrop` maps Physlib data to the five source coefficients at
+  `Physlib/Optics/Systems/Microring/SourceBridgeSfg.lean:64-74`;
+- `sfgAddDropTransfer` stores the printed quotient at that file's lines 85-91; and
+- `sfgAddDropTransfer_eq_dropTransfer` requires the explicit principal-root equality at
+  that file's lines 98-105.
+
+`sfgAddDropStageTransfer` is literally the function composition
+
+```text
+sfgAddDropTransfer composed with SfgParameters.ofAddDrop.
+```
+
+The list construction applies that dictionary independently to each stage record. It does not
+claim that the listed drop ports are physically interconnected and does not introduce a scalar
+cascade formula. Thus this is a cascade-context instantiation of already discharged IP-12, not a
+new source theorem or a second parity discharge.
+
+## Production declaration inventory
+
+All names are in `Optics.MicroringCascade` and are defined in
+`Physlib/Optics/Systems/Cascade/SourceMappedSfg.lean`.
+
+- `sfgAddDropStageTransfer`
+- `sfgAddDropStageTransfer_eq_dropTransfer`
+- `sfgAddDropStageTransfers`
+- `sfgAddDropStageTransfers_eq_dropTransfers`
+
+Both comparison lemmas retain, for each compared stage, the exact gate
+
+```text
+Complex.sqrt p.roundTripCoefficient = p.firstArcCoefficient.
+```
+
+## Regression inventory and independent anchors
+
+All names are in `Optics.MicroringCascade` and are defined in
+`Physlib/Optics/Systems/Cascade/SourceMappedSfgRegression.lean`.
+
+- `sourceMappedSfgRegression_sqrt_quarter`
+- `sourceMappedSfgRegression_sqrt_neg_quarter`
+- `sourceMappedSfgRegression_zeroPhase_transfer`
+- `sourceMappedSfgRegression_halfTurn_transfer`
+- `sourceMappedSfgRegression_twoStage_list`
+- `sourceMappedSfgRegression_zeroPhase_rootGate`
+- `sourceMappedSfgRegression_halfTurn_not_rootGate`
+- `sourceMappedSfgRegression_halfTurn_transfer_ne_dropTransfer`
+
+The two fixtures are the exact `3-4-5` add-drop records at
+`Physlib/Optics/Systems/Microring/AddDropRegression.lean:62-69,402-409`. The regression unfolds
+the composed source dictionary and quotient directly; it invokes neither production comparison
+lemma. Its concrete values are
+
+```text
+zero phase: source composition = -32/91, and the root gate holds;
+half turn: source composition = -32*I/109;
+           N7/N5 drop transfer = 32*I/109;
+           the root gate fails.
+```
+
+The half-turn fixture therefore makes both the gate and the claimed comparison genuinely able to
+fail. It is not a regression oracle routed through the bridge theorem.
+
+## Validation bindings
+
+The validation lane should bind these public names:
+
+- list-level positive statement: `sfgAddDropStageTransfers_eq_dropTransfers`;
+- direct ordered-list anchor: `sourceMappedSfgRegression_twoStage_list`;
+- inhabited gate: `sourceMappedSfgRegression_zeroPhase_rootGate`;
+- failing gate: `sourceMappedSfgRegression_halfTurn_not_rootGate`; and
+- false ungated comparison: `sourceMappedSfgRegression_halfTurn_transfer_ne_dropTransfer`.
+
+## Scope and non-claims
+
+- This cutoff makes no new SFG-TR'14 source claim and does not change IP-12's status.
+- IP-13 and IP-14, NSV'16 Def. 11 and Thms. 5-6, the 18-node PANDA graph, and its Mason/N7
+  derivation remain for slice 4b.
+- The stage list is not a physical interconnection of add-drop ports and is not a scalar cascade
+  transfer law.
+- No DATE lattice, quadruple-ring, coupled-lattice, or full `M x N` lattice result is claimed.
+- No dispersion, bending loss, bandwidth, causality, resonance, or measurement validation is
+  claimed.
+- No power statement is made. Any later power interpretation is normalized modal power until the
+  finite common-frequency Maxwell and aperture-flux hypotheses at
+  `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:60-90` are supplied.
+- Human verification of the bibliographic statement and source transcription remains required by
+  `AI-POLICY.md`.
+
+## Exact validation record
+
+The exact implementation source head was
+`43b8153b714eef51a11efc775d14566be68fe491`. The single Lean lock hold temporarily registered the
+four unmerged cascade modules, including both slice-4a modules, and ran
+
+```text
+lake exe cache get &&
+lake --wfail build <the eight cumulative S7C cascade modules> &&
+lake exe runPhyslibLinters &&
+lake exe lint_all &&
+./scripts/lint-style.sh &&
+the diff, banned-token, and 100-codepoint audits.
+```
+
+Results:
+
+- cache: no files to download; 8690 already decompressed;
+- targeted warning-free build: passed, 2766 jobs;
+- `runPhyslibLinters`: Physlib and QuantumInfo passed;
+- `lint_all`: full build successful; file/illegal/alpha/TODO/sorry stages completed; declaration
+  linters passed for Physlib and QuantumInfo;
+- the repository inventories named no S7C file;
+- direct scoped style, `git diff --check`, banned-token, and Unicode-codepoint audits passed for
+  both new files; and
+- the final repository-wide style command returned nonzero only for the synced S7D-owned
+  `Physlib/Optics/Systems/DCDR/Topology.lean` 2035-line inventory entry. This cutoff does not edit
+  or exempt that file.
+
+The temporary registry was restored byte-identically: `Physlib.lean` had SHA-256
+`d6279000556c059e0a352aac530487e353adc7e5fa1f7c05b2bce229ec34f510` before and after. The source
+commits change only the two slice-4a Lean files; this final cutoff commit changes only
+`HANDOFF.md`.
