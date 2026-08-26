@@ -47,6 +47,11 @@ noncomputable section
 
 open Physlib.SignalFlowGraph
 
+/-- The regression uses the same finite external-channel instance as N5 elimination. -/
+local instance zMasonRegressionExternalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  (netlist p).eliminationExternalChannelFintype
+
 /-!
 
 ## A. Stable raw N5 and Mason audit
@@ -74,8 +79,9 @@ lemma zRegression_stable_fixed_forwardEquations_I :
     simp [zRegressionStableFixedState, UnitDelayParameters.at,
       stableUnitDelayParameters, poleRegressionCoupler,
       Parameters.upperCoefficient, Parameters.lowerCoefficient,
-      Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient] <;>
-    ring
+      Parameters.feedbackCoefficient, DirectionalCoupler.crossCoefficient]
+  all_goals ring_nf
+  all_goals norm_num [pow_two, Complex.I_mul_I]
 
 /-- The complete raw N5 relation independently reads `-(7/8) I` at `q = -I`.
 
@@ -108,13 +114,12 @@ lemma zRegression_stable_eliminationResponse_neg_I :
     rw [(netlist p).toBehavior_responseTransform hWellPosed]
     exact hMember
   have hOutput :=
-    ModeTransform.mem_toBehavior_iff_toLinearMap.mp hResponseMember
-  have hReadout := congrArg
-    (fun value ⇒ value (Outgoing.mk (outputChannel p))) hProjection
+    (ModeTransform.mem_toBehavior_iff_toLinearMap _ _ _).mp hResponseMember
+  have hState := congrArg (fun value ↦ value (7 : Node)) hProjection
   have hOutputValue : output (Outgoing.mk (outputChannel p)) =
       -(7 / 8) * Complex.I := by
     rw [outputReadout_apply_output]
-    simpa [zRegressionStableFixedState, forwardState] using hReadout
+    simpa [zRegressionStableFixedState, forwardState] using hState
   have hResponse := responseTransform_apply_inputAmplitude p hWellPosed 1
   calc
     eliminationResponse p hWellPosed =
@@ -146,12 +151,12 @@ def zRegressionStableLowerLoopEdge : Node → Edge := ![0, 9, 0, 4, 10, 0, 7, 0]
 /-- The dependent upper-cycle edge selection. -/
 def zRegressionStableUpperLoopChoice :
     ∀ node ∈ zRegressionStableUpperLoopNodes, Edge :=
-  fun node _ ⇒ zRegressionStableUpperLoopEdge node
+  fun node _ ↦ zRegressionStableUpperLoopEdge node
 
 /-- The dependent lower-cycle edge selection. -/
 def zRegressionStableLowerLoopChoice :
     ∀ node ∈ zRegressionStableLowerLoopNodes, Edge :=
-  fun node _ ⇒ zRegressionStableLowerLoopEdge node
+  fun node _ ↦ zRegressionStableLowerLoopEdge node
 
 /-- A selected loop edge records its source and permutation target. -/
 private lemma zRegression_stable_selectedEndpoints
@@ -211,6 +216,26 @@ private lemma zRegression_stable_noEdgeSource_seven (edge : Edge) :
     edgeSource edge ≠ 7 := by
   fin_cases edge <;> simp [edgeSource]
 
+/-- Every nonempty loop refinement contains the sole rank-return edge seven. -/
+private lemma zRegression_stable_edgeChoice_contains_feedbackEdge
+    {nodes : Finset Node} {permutation : Equiv.Perm Node}
+    {choice : ∀ node ∈ nodes, Edge} (hNodes : nodes.Nonempty)
+    (hPermutation : permutation ∈ loopFamilies nodes)
+    (hChoice : choice ∈ edgeChoices
+      (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) nodes permutation) :
+    ∃ node, ∃ hNode : node ∈ nodes, choice node hNode = 7 := by
+  by_contra hMissing
+  push Not at hMissing
+  obtain ⟨node, hNode, hMax⟩ :=
+    Finset.exists_max_image nodes responseRegressionNodeRank hNodes
+  have hPermutationNode : permutation node ∈ nodes :=
+    zRegression_stable_permutation_mem hPermutation node hNode
+  have hEndpoints := zRegression_stable_selectedEndpoints hChoice node hNode
+  have hRank := responseRegressionNodeRank_lt (choice node hNode)
+    (hMissing node hNode)
+  rw [hEndpoints.1, hEndpoints.2] at hRank
+  exact (Nat.not_lt_of_ge (hMax (permutation node) hPermutationNode)) hRank
+
 /-- Every nonempty loop-family refinement is one of the two displayed touching cycles. -/
 private lemma zRegression_stable_loopFamily_cases
     {nodes : Finset Node} {permutation : Equiv.Perm Node}
@@ -222,12 +247,8 @@ private lemma zRegression_stable_loopFamily_cases
         permutation = zRegressionStableUpperLoopPermutation) ∨
       (nodes = zRegressionStableLowerLoopNodes ∧
         permutation = zRegressionStableLowerLoopPermutation) := by
-  have hChoiceSingular : choice ∈ edgeChoices
-      (signalMultigraph responseRegressionSingularParameters) nodes permutation := by
-    simpa [signalMultigraph] using hChoice
   obtain ⟨feedbackNode, hFeedbackNode, hFeedbackEdge⟩ :=
-    responseRegression_singularEdgeChoice_contains_feedbackEdge hNodes hPermutation
-      hChoiceSingular
+    zRegression_stable_edgeChoice_contains_feedbackEdge hNodes hPermutation hChoice
   have hFeedbackEndpoints :=
     zRegression_stable_selectedEndpoints hChoice feedbackNode hFeedbackNode
   have hFeedbackNodeEq : feedbackNode = 6 := by
@@ -327,18 +348,22 @@ private lemma zRegression_stable_loopFamily_cases
     refine Or.inl ⟨hNodesEqual, Equiv.ext ?_⟩
     intro node
     fin_cases node
-    · simpa [zRegressionStableUpperLoopPermutation] using hFixedOutside 0 (by decide)
+    · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 0 (by decide)
     · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
         hPermutation1
     · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
         hPermutation2
-    · simpa [zRegressionStableUpperLoopPermutation] using hFixedOutside 3 (by decide)
-    · simpa [zRegressionStableUpperLoopPermutation] using hFixedOutside 4 (by decide)
+    · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 3 (by decide)
+    · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 4 (by decide)
     · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
         hPermutation5
     · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
         hPermutation6
-    · simpa [zRegressionStableUpperLoopPermutation] using hFixedOutside 7 (by decide)
+    · simpa [zRegressionStableUpperLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 7 (by decide)
   · have hPermutation1 : permutation 1 = 3 := by
       simpa [hLower, edgeTarget] using hEndpoints1.2.symm
     have h3 : (3 : Node) ∈ nodes := by
@@ -425,18 +450,22 @@ private lemma zRegression_stable_loopFamily_cases
     refine Or.inr ⟨hNodesEqual, Equiv.ext ?_⟩
     intro node
     fin_cases node
-    · simpa [zRegressionStableLowerLoopPermutation] using hFixedOutside 0 (by decide)
+    · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 0 (by decide)
     · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
         hPermutation1
-    · simpa [zRegressionStableLowerLoopPermutation] using hFixedOutside 2 (by decide)
+    · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 2 (by decide)
     · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
         hPermutation3
     · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
         hPermutation4
-    · simpa [zRegressionStableLowerLoopPermutation] using hFixedOutside 5 (by decide)
+    · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 5 (by decide)
     · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
         hPermutation6
-    · simpa [zRegressionStableLowerLoopPermutation] using hFixedOutside 7 (by decide)
+    · simpa [zRegressionStableLowerLoopPermutation, Equiv.swap_apply_def] using
+        hFixedOutside 7 (by decide)
 
 /-- The displayed upper permutation is a loop family on its four nodes. -/
 lemma zRegression_stable_upperLoopPermutation_mem :
@@ -455,18 +484,98 @@ lemma zRegression_stable_lowerLoopPermutation_mem :
     List.support_formPerm_le ([1, 3, 4, 6] : List Node)
 
 /-- The upper loop has exactly the edge choice `8, 1, 6, 7`. -/
+private lemma zRegression_stable_upperLoopChoice_mem :
+    zRegressionStableUpperLoopChoice ∈
+      edgeChoices (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
+        zRegressionStableUpperLoopNodes zRegressionStableUpperLoopPermutation := by
+  have hFiber (node : Node) (hNode : node ∈ zRegressionStableUpperLoopNodes) :
+      (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).edgesBetween
+          node (zRegressionStableUpperLoopPermutation node) =
+        {zRegressionStableUpperLoopEdge node} := by
+    simp only [zRegressionStableUpperLoopNodes, Finset.mem_insert,
+      Finset.mem_singleton] at hNode
+    rcases hNode with rfl | rfl | rfl | rfl <;> decide
+  apply Finset.mem_pi.mpr
+  intro node hNode
+  rw [hFiber node hNode]
+  simp [zRegressionStableUpperLoopChoice]
+
+/-- Every upper-cycle refinement is the displayed dependent edge choice. -/
+private lemma zRegression_stable_upperLoopChoice_unique
+    {choice : ∀ node ∈ zRegressionStableUpperLoopNodes, Edge}
+    (hChoice : choice ∈
+      edgeChoices (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
+        zRegressionStableUpperLoopNodes zRegressionStableUpperLoopPermutation) :
+    choice = zRegressionStableUpperLoopChoice := by
+  have hFiber (node : Node) (hNode : node ∈ zRegressionStableUpperLoopNodes) :
+      (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).edgesBetween
+          node (zRegressionStableUpperLoopPermutation node) =
+        {zRegressionStableUpperLoopEdge node} := by
+    simp only [zRegressionStableUpperLoopNodes, Finset.mem_insert,
+      Finset.mem_singleton] at hNode
+    rcases hNode with rfl | rfl | rfl | rfl <;> decide
+  funext node hNode
+  have hSelected := Finset.mem_pi.mp hChoice node hNode
+  rw [hFiber node hNode] at hSelected
+  simpa [zRegressionStableUpperLoopChoice] using hSelected
+
 lemma zRegression_stable_upperLoopChoices :
     edgeChoices (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
         zRegressionStableUpperLoopNodes zRegressionStableUpperLoopPermutation =
       {zRegressionStableUpperLoopChoice} := by
-  decide
+  ext choice
+  simp only [Finset.mem_singleton]
+  constructor
+  · exact zRegression_stable_upperLoopChoice_unique
+  · rintro rfl
+    exact zRegression_stable_upperLoopChoice_mem
 
 /-- The lower loop has exactly the edge choice `9, 4, 10, 7`. -/
+private lemma zRegression_stable_lowerLoopChoice_mem :
+    zRegressionStableLowerLoopChoice ∈
+      edgeChoices (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
+        zRegressionStableLowerLoopNodes zRegressionStableLowerLoopPermutation := by
+  have hFiber (node : Node) (hNode : node ∈ zRegressionStableLowerLoopNodes) :
+      (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).edgesBetween
+          node (zRegressionStableLowerLoopPermutation node) =
+        {zRegressionStableLowerLoopEdge node} := by
+    simp only [zRegressionStableLowerLoopNodes, Finset.mem_insert,
+      Finset.mem_singleton] at hNode
+    rcases hNode with rfl | rfl | rfl | rfl <;> decide
+  apply Finset.mem_pi.mpr
+  intro node hNode
+  rw [hFiber node hNode]
+  simp [zRegressionStableLowerLoopChoice]
+
+/-- Every lower-cycle refinement is the displayed dependent edge choice. -/
+private lemma zRegression_stable_lowerLoopChoice_unique
+    {choice : ∀ node ∈ zRegressionStableLowerLoopNodes, Edge}
+    (hChoice : choice ∈
+      edgeChoices (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
+        zRegressionStableLowerLoopNodes zRegressionStableLowerLoopPermutation) :
+    choice = zRegressionStableLowerLoopChoice := by
+  have hFiber (node : Node) (hNode : node ∈ zRegressionStableLowerLoopNodes) :
+      (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).edgesBetween
+          node (zRegressionStableLowerLoopPermutation node) =
+        {zRegressionStableLowerLoopEdge node} := by
+    simp only [zRegressionStableLowerLoopNodes, Finset.mem_insert,
+      Finset.mem_singleton] at hNode
+    rcases hNode with rfl | rfl | rfl | rfl <;> decide
+  funext node hNode
+  have hSelected := Finset.mem_pi.mp hChoice node hNode
+  rw [hFiber node hNode] at hSelected
+  simpa [zRegressionStableLowerLoopChoice] using hSelected
+
 lemma zRegression_stable_lowerLoopChoices :
     edgeChoices (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
         zRegressionStableLowerLoopNodes zRegressionStableLowerLoopPermutation =
       {zRegressionStableLowerLoopChoice} := by
-  decide
+  ext choice
+  simp only [Finset.mem_singleton]
+  constructor
+  · exact zRegression_stable_lowerLoopChoice_unique
+  · rintro rfl
+    exact zRegression_stable_lowerLoopChoice_mem
 
 /-- The upper family contains one cycle. -/
 lemma zRegression_stable_upperLoopCount :
@@ -486,13 +595,25 @@ lemma zRegression_stable_upperLoopFamilyGain :
         zRegressionStableUpperLoopNodes zRegressionStableUpperLoopChoice = 61 / 100 := by
   rw [edgeFamilyGain]
   simp only [zRegressionStableUpperLoopChoice]
-  rw [Finset.prod_attach]
-  simp [zRegressionStableUpperLoopNodes, Finset.prod_insert,
-    zRegressionStableUpperLoopEdge, signalMultigraph, edgeGain,
-    UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
-    Parameters.upperCoefficient, Parameters.feedbackCoefficient,
-    DirectionalCoupler.crossCoefficient]
-  norm_num [Complex.I_mul_I]
+  calc
+    (∏ x ∈ zRegressionStableUpperLoopNodes.attach,
+        (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).gain
+          (zRegressionStableUpperLoopEdge x)) =
+        ∏ node ∈ zRegressionStableUpperLoopNodes,
+          (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).gain
+            (zRegressionStableUpperLoopEdge node) :=
+      Finset.prod_attach zRegressionStableUpperLoopNodes
+        (fun node ↦
+          (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).gain
+            (zRegressionStableUpperLoopEdge node))
+    _ = 61 / 100 := by
+      simp [zRegressionStableUpperLoopNodes, Finset.prod_insert,
+        zRegressionStableUpperLoopEdge, signalMultigraph, edgeGain,
+        UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
+        Parameters.upperCoefficient, Parameters.feedbackCoefficient,
+        DirectionalCoupler.crossCoefficient]
+      ring_nf
+      norm_num [pow_succ, Complex.I_mul_I]
 
 /-- Direct multiplication gives lower feedback-loop gain `-9/25`. -/
 lemma zRegression_stable_lowerLoopFamilyGain :
@@ -500,13 +621,25 @@ lemma zRegression_stable_lowerLoopFamilyGain :
         zRegressionStableLowerLoopNodes zRegressionStableLowerLoopChoice = -9 / 25 := by
   rw [edgeFamilyGain]
   simp only [zRegressionStableLowerLoopChoice]
-  rw [Finset.prod_attach]
-  simp [zRegressionStableLowerLoopNodes, Finset.prod_insert,
-    zRegressionStableLowerLoopEdge, signalMultigraph, edgeGain,
-    UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
-    Parameters.lowerCoefficient, Parameters.feedbackCoefficient,
-    DirectionalCoupler.crossCoefficient]
-  norm_num [Complex.I_mul_I]
+  calc
+    (∏ x ∈ zRegressionStableLowerLoopNodes.attach,
+        (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).gain
+          (zRegressionStableLowerLoopEdge x)) =
+        ∏ node ∈ zRegressionStableLowerLoopNodes,
+          (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).gain
+            (zRegressionStableLowerLoopEdge node) :=
+      Finset.prod_attach zRegressionStableLowerLoopNodes
+        (fun node ↦
+          (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))).gain
+            (zRegressionStableLowerLoopEdge node))
+    _ = -9 / 25 := by
+      simp [zRegressionStableLowerLoopNodes, Finset.prod_insert,
+        zRegressionStableLowerLoopEdge, signalMultigraph, edgeGain,
+        UnitDelayParameters.at, stableUnitDelayParameters, poleRegressionCoupler,
+        Parameters.lowerCoefficient, Parameters.feedbackCoefficient,
+        DirectionalCoupler.crossCoefficient]
+      ring_nf
+      norm_num [pow_succ, Complex.I_mul_I]
 
 /-- Every other nonempty node set has zero total loop-family contribution. -/
 private lemma zRegression_stable_nonLoopFamilySum_eq_zero
@@ -564,6 +697,7 @@ lemma zRegression_stable_upperFamilySum :
       rw [zRegression_stable_upperLoopChoices]
       simp [zRegression_stable_upperLoopCount,
         zRegression_stable_upperLoopFamilyGain]
+      ring
 
 /-- The lower node set contributes the signed gain `9/25`. -/
 lemma zRegression_stable_lowerFamilySum :
@@ -601,6 +735,7 @@ lemma zRegression_stable_lowerFamilySum :
       rw [zRegression_stable_lowerLoopChoices]
       simp [zRegression_stable_lowerLoopCount,
         zRegression_stable_lowerLoopFamilyGain]
+      ring
 
 /-- Direct two-cycle enumeration gives every induced edge determinant. -/
 lemma zRegression_stable_edgeGraphDetOn (nodes : Finset Node) :
@@ -608,7 +743,7 @@ lemma zRegression_stable_edgeGraphDetOn (nodes : Finset Node) :
         (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) nodes =
       1 - (if zRegressionStableUpperLoopNodes ⊆ nodes then 61 / 100 else 0) +
         (if zRegressionStableLowerLoopNodes ⊆ nodes then 9 / 25 else 0) := by
-  let contribution : Finset Node → ℂ := fun selected ⇒
+  let contribution : Finset Node → ℂ := fun selected ↦
     ∑ permutation ∈ loopFamilies selected,
       ∑ choice ∈ edgeChoices
           (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
@@ -646,15 +781,46 @@ lemma zRegression_stable_edgeGraphDetOn (nodes : Finset Node) :
               (Finset.nonempty_iff_ne_empty.mpr hEmpty) hUpper hLower
     _ = 1 - (if zRegressionStableUpperLoopNodes ⊆ nodes then 61 / 100 else 0) +
           (if zRegressionStableLowerLoopNodes ⊆ nodes then 9 / 25 else 0) := by
-      simp only [Finset.sum_ite_irrel, Finset.sum_const_zero, add_zero,
-        Finset.mem_powerset]
-      by_cases hUpper : zRegressionStableUpperLoopNodes ⊆ nodes <;>
-        by_cases hLower : zRegressionStableLowerLoopNodes ⊆ nodes <;>
-        simp [hUpper, hLower]
+      have hSplit (selected : Finset Node) :
+          (if selected = ∅ then (1 : ℂ)
+            else if selected = zRegressionStableUpperLoopNodes then -61 / 100
+            else if selected = zRegressionStableLowerLoopNodes then 9 / 25
+            else 0) =
+          (if selected = ∅ then 1 else 0) +
+            (if selected = zRegressionStableUpperLoopNodes then -61 / 100 else 0) +
+              (if selected = zRegressionStableLowerLoopNodes then 9 / 25 else 0) := by
+        by_cases hEmpty : selected = ∅
+        · subst selected
+          simp [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+        · by_cases hUpper : selected = zRegressionStableUpperLoopNodes
+          · subst selected
+            simp [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+          · by_cases hLower : selected = zRegressionStableLowerLoopNodes
+            · subst selected
+              simp [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+            · simp [hEmpty, hUpper, hLower]
+      simp_rw [hSplit, Finset.sum_add_distrib]
+      simp [Finset.mem_powerset]
+
+/-- Edge refinements depend only on the retained topology, not on the branch gains. -/
+private lemma zRegression_stable_refiningEdgeLists_eq (path : List Node) :
+    refiningEdgeLists
+        (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) path =
+      refiningEdgeLists (signalMultigraph topologyProjectionParameters) path := by
+  change refiningEdgeLists
+      ((signalMultigraph topologyProjectionParameters).setGain
+        (edgeGain (stableUnitDelayParameters.at (-Complex.I)))) path = _
+  induction path with
+  | nil => rfl
+  | cons first rest ih =>
+      cases rest with
+      | nil => rfl
+      | cons second tail =>
+          simp only [refiningEdgeLists, Multigraph.setGain_edgesBetween, ih]
 
 /-- Supported stable paths use the same four node lists as the topology audit. -/
 def zRegressionStableSupportedForwardPaths : Finset (List Node) :=
-  (forwardPaths 0 7).filter fun path ⇒
+  (forwardPaths 0 7).filter fun path ↦
     (refiningEdgeLists
       (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) path).Nonempty
 
@@ -663,8 +829,14 @@ lemma zRegression_stable_supportedForwardPaths :
     zRegressionStableSupportedForwardPaths =
       { [0, 2, 5, 7], [0, 3, 4, 7],
         [0, 2, 5, 6, 1, 3, 4, 7], [0, 3, 4, 6, 1, 2, 5, 7] } := by
-  change responseRegressionSupportedForwardPaths = _
-  exact responseRegression_supportedForwardPaths
+  calc
+    zRegressionStableSupportedForwardPaths =
+        responseRegressionSupportedForwardPaths := by
+      unfold zRegressionStableSupportedForwardPaths responseRegressionSupportedForwardPaths
+      apply Finset.filter_congr
+      intro path _
+      rw [zRegression_stable_refiningEdgeLists_eq]
+    _ = _ := responseRegression_supportedForwardPaths
 
 /-- The upper direct path refines to edges zero, one, and two. -/
 lemma zRegression_stable_refiningEdges_upper :
@@ -708,7 +880,9 @@ lemma zRegression_stable_edgeListGain_lower :
   simp [edgeListGain, signalMultigraph, edgeGain, UnitDelayParameters.at,
     stableUnitDelayParameters, poleRegressionCoupler, Parameters.lowerCoefficient,
     DirectionalCoupler.crossCoefficient]
-  norm_num [Complex.I_mul_I]
+  ring_nf
+  rw [show Complex.I ^ 3 = -Complex.I by
+    norm_num [pow_succ, Complex.I_mul_I]]
   ring
 
 /-- The first feedback-return path has gain `-(549/2500) I`. -/
@@ -719,8 +893,9 @@ lemma zRegression_stable_edgeListGain_upperReturn :
     stableUnitDelayParameters, poleRegressionCoupler, Parameters.upperCoefficient,
     Parameters.lowerCoefficient, Parameters.feedbackCoefficient,
     DirectionalCoupler.crossCoefficient]
-  norm_num [Complex.I_mul_I]
-  ring
+  ring_nf
+  rw [show Complex.I ^ 5 = Complex.I by
+    norm_num [pow_succ, Complex.I_mul_I]]
 
 /-- The second feedback-return path also has gain `-(549/2500) I`. -/
 lemma zRegression_stable_edgeListGain_lowerReturn :
@@ -730,36 +905,37 @@ lemma zRegression_stable_edgeListGain_lowerReturn :
     stableUnitDelayParameters, poleRegressionCoupler, Parameters.upperCoefficient,
     Parameters.lowerCoefficient, Parameters.feedbackCoefficient,
     DirectionalCoupler.crossCoefficient]
-  norm_num [Complex.I_mul_I]
-  ring
+  ring_nf
+  rw [show Complex.I ^ 5 = Complex.I by
+    norm_num [pow_succ, Complex.I_mul_I]]
 
 /-- Removing the upper direct path leaves only the lower-loop cofactor `34/25`. -/
 lemma zRegression_stable_upperPathCofactor :
     edgeGraphDetOn (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
         (Finset.univ \ [0, 2, 5, 7].toFinset) = 34 / 25 := by
-  rw [zRegression_stable_edgeGraphDetOn]
-  norm_num [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+  rw [zRegression_stable_edgeGraphDetOn, if_neg (by decide), if_pos (by decide)]
+  norm_num
 
 /-- Removing the lower direct path leaves only the upper-loop cofactor `39/100`. -/
 lemma zRegression_stable_lowerPathCofactor :
     edgeGraphDetOn (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
         (Finset.univ \ [0, 3, 4, 7].toFinset) = 39 / 100 := by
-  rw [zRegression_stable_edgeGraphDetOn]
-  norm_num [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+  rw [zRegression_stable_edgeGraphDetOn, if_pos (by decide), if_neg (by decide)]
+  norm_num
 
 /-- Each feedback-return path visits every node, so its cofactor is one. -/
 lemma zRegression_stable_upperReturnPathCofactor :
     edgeGraphDetOn (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
         (Finset.univ \ [0, 2, 5, 6, 1, 3, 4, 7].toFinset) = 1 := by
-  rw [zRegression_stable_edgeGraphDetOn]
-  norm_num [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+  rw [zRegression_stable_edgeGraphDetOn, if_neg (by decide), if_neg (by decide)]
+  norm_num
 
 /-- The other feedback-return path also visits every node and has unit cofactor. -/
 lemma zRegression_stable_lowerReturnPathCofactor :
     edgeGraphDetOn (signalMultigraph (stableUnitDelayParameters.at (-Complex.I)))
         (Finset.univ \ [0, 3, 4, 6, 1, 2, 5, 7].toFinset) = 1 := by
-  rw [zRegression_stable_edgeGraphDetOn]
-  norm_num [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+  rw [zRegression_stable_edgeGraphDetOn, if_neg (by decide), if_neg (by decide)]
+  norm_num
 
 /-- Unsupported paths contribute an empty edge-refinement sum at the stable fixture. -/
 lemma zRegression_stable_edgeMasonNumerator_eq_supportedSum :
@@ -775,6 +951,7 @@ lemma zRegression_stable_edgeMasonNumerator_eq_supportedSum :
                 (Finset.univ \ path.toFinset) := by
   rw [edgeMasonNumerator]
   symm
+  unfold zRegressionStableSupportedForwardPaths
   apply Finset.sum_subset (Finset.filter_subset _ _)
   intro path hPath hUnsupported
   have hEmpty : refiningEdgeLists
@@ -809,8 +986,9 @@ lemma zRegression_stable_edgeMasonNumerator :
 lemma zRegression_stable_edgeGraphDet :
     edgeGraphDet
         (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) = 3 / 4 := by
-  rw [edgeGraphDet, zRegression_stable_edgeGraphDetOn]
-  norm_num [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+  rw [edgeGraphDet, zRegression_stable_edgeGraphDetOn,
+    if_pos (by decide), if_pos (by decide)]
+  norm_num
 
 /-- Independent eleven-branch Mason enumeration gives `-(7/8) I` at `q = -I`. -/
 lemma zRegression_stable_auditedMasonResponse_neg_I :
@@ -823,4 +1001,3 @@ lemma zRegression_stable_auditedMasonResponse_neg_I :
 end
 
 end Optics.DCDR
-
