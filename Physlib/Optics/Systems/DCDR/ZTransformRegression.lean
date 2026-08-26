@@ -448,11 +448,19 @@ lemma zRegression_stable_lagTwoGeometricImpulse_transform_I :
   have hNegative : Complex.I ∈ ROC (geometricSeq (-(Complex.I / 2))) := by
     rw [ROC_geometricSeq (by norm_num)]
     norm_num
-  rw [lagTwoGeometricImpulse, transform_const_mul,
-    transform_add hPositive.2 hNegative.2,
+  unfold lagTwoGeometricImpulse
+  rw [transform_const_mul]
+  change (1 / 2) * transform
+    (geometricSeq (Complex.I / 2) + geometricSeq (-(Complex.I / 2))) Complex.I = 4 / 3
+  rw [transform_add hPositive.2 hNegative.2,
     transform_geometricSeq (by norm_num) (by norm_num),
     transform_geometricSeq (by norm_num) (by norm_num), Complex.inv_I]
-  norm_num [Complex.I_mul_I]
+  have hProduct : Complex.I / 2 * Complex.I = -(1 / 2 : ℂ) := by
+    ring_nf
+    rw [Complex.I_sq]
+    norm_num
+  rw [hProduct]
+  norm_num
 
 /-- The independently solved nonzero-loop recurrence has transform `-(7/8) I` at `z = I`.
 

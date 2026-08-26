@@ -799,8 +799,7 @@ lemma zRegression_stable_edgeGraphDetOn (nodes : Finset Node) :
               zRegressionStableLowerLoopNodes by decide]
           · by_cases hLower : selected = zRegressionStableLowerLoopNodes
             · subst selected
-              simp [hEmpty, hUpper, show zRegressionStableLowerLoopNodes ≠
-                zRegressionStableUpperLoopNodes by decide]
+              simp [hEmpty, hUpper]
             · simp [hEmpty, hUpper, hLower]
       simp_rw [hSplit, Finset.sum_add_distrib]
       simp only [Finset.sum_ite_eq', Finset.mem_powerset, Finset.empty_subset,
@@ -809,25 +808,41 @@ lemma zRegression_stable_edgeGraphDetOn (nodes : Finset Node) :
         by_cases hLower : zRegressionStableLowerLoopNodes ⊆ nodes <;>
         simp [hUpper, hLower] <;> ring
 
-/-- Edge refinements depend only on the retained topology, not on the branch gains. -/
-private lemma zRegression_stable_refiningEdgeLists_eq (path : List Node) :
-    refiningEdgeLists
-        (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) path =
-      refiningEdgeLists (signalMultigraph topologyProjectionParameters) path := by
-  change refiningEdgeLists
-      ((signalMultigraph topologyProjectionParameters).setGain
-        (edgeGain (stableUnitDelayParameters.at (-Complex.I)))) path = _
+/-- Refinement nonemptiness is the retained topology's consecutive-node adjacency. -/
+private lemma zRegression_stable_refiningEdgeLists_nonempty_iff_isChain
+    (path : List Node) :
+    (refiningEdgeLists
+      (signalMultigraph (stableUnitDelayParameters.at (-Complex.I))) path).Nonempty ↔
+      path.IsChain responseRegressionAdjacent := by
   induction path with
-  | nil => rfl
+  | nil => simp [refiningEdgeLists]
   | cons first rest ih =>
       cases rest with
-      | nil => rfl
+      | nil => simp [refiningEdgeLists]
       | cons second tail =>
-          simp only [refiningEdgeLists]
-          apply Finset.biUnion_congr
-          · exact Multigraph.setGain_edgesBetween _ _ first second
-          · intro edge _
-            rw [ih]
+          constructor
+          · rintro ⟨edgeList, hEdgeList⟩
+            rw [refiningEdgeLists] at hEdgeList
+            rcases Finset.mem_biUnion.mp hEdgeList with ⟨edge, hEdge, hImage⟩
+            rcases Finset.mem_image.mp hImage with ⟨tailList, hTailList, rfl⟩
+            have hAdjacent : responseRegressionAdjacent first second := by
+              simpa [responseRegressionAdjacent, Multigraph.edgesBetween,
+                signalMultigraph] using ⟨edge, hEdge⟩
+            exact List.IsChain.cons_cons hAdjacent
+              (ih.mp ⟨tailList, hTailList⟩)
+          · intro hChain
+            obtain ⟨edge, hEdge⟩ := hChain.rel
+            have hStableEdge : edge ∈
+                (signalMultigraph
+                  (stableUnitDelayParameters.at (-Complex.I))).edgesBetween first second := by
+              apply Multigraph.mem_edgesBetween.mpr
+              simpa [responseRegressionAdjacent, signalMultigraph] using
+                (Multigraph.mem_edgesBetween.mp hEdge)
+            obtain ⟨tailList, hTailList⟩ := ih.mpr hChain.tail
+            refine ⟨edge :: tailList, ?_⟩
+            rw [refiningEdgeLists]
+            exact Finset.mem_biUnion.mpr ⟨edge, hStableEdge,
+              Finset.mem_image.mpr ⟨tailList, hTailList, rfl⟩⟩
 
 /-- Supported stable paths use the same four node lists as the topology audit. -/
 def zRegressionStableSupportedForwardPaths : Finset (List Node) :=
@@ -840,14 +855,24 @@ lemma zRegression_stable_supportedForwardPaths :
     zRegressionStableSupportedForwardPaths =
       { [0, 2, 5, 7], [0, 3, 4, 7],
         [0, 2, 5, 6, 1, 3, 4, 7], [0, 3, 4, 6, 1, 2, 5, 7] } := by
-  calc
-    zRegressionStableSupportedForwardPaths =
-        responseRegressionSupportedForwardPaths := by
-      unfold zRegressionStableSupportedForwardPaths responseRegressionSupportedForwardPaths
-      apply Finset.filter_congr
-      intro path _
-      rw [zRegression_stable_refiningEdgeLists_eq]
-    _ = _ := responseRegression_supportedForwardPaths
+  ext path
+  simp only [zRegressionStableSupportedForwardPaths, Finset.mem_filter]
+  constructor
+  · rintro ⟨hPath, hRefinement⟩
+    have hTopologyRefinement :
+        (refiningEdgeLists (signalMultigraph topologyProjectionParameters) path).Nonempty :=
+      (responseRegression_refiningEdgeLists_nonempty_iff_isChain path).mpr
+        ((zRegression_stable_refiningEdgeLists_nonempty_iff_isChain path).mp hRefinement)
+    rcases responseRegression_supportedForwardPath_cases hPath hTopologyRefinement with
+      rfl | rfl | rfl | rfl <;> simp
+  · intro hPath
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hPath
+    rcases hPath with rfl | rfl | rfl | rfl
+    all_goals
+      constructor
+      · apply mem_forwardPaths_iff.mpr
+        decide
+      · decide
 
 /-- The upper direct path refines to edges zero, one, and two. -/
 lemma zRegression_stable_refiningEdges_upper :
