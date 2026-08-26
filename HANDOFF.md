@@ -1,10 +1,11 @@
-# S7C slice 1 handoff
+# S7C slice 1b handoff
 
 ## Cutoff
 
 - Branch: `optics/s7c-cascade`
-- Required sync target used: `12b4200d72b181f215e9d6d889a5feab5cb65a82`
-- Slice: heterogeneous DATE cascade (IP-15 / H-03) plus the authorized neutral N3T fold
+- Required sync target used: `aff2484ecc7fd14f456b0c85a71d282c6b4f4052`
+- Sync merge: `cf0061a59fdfe47db06e1b6628ea3ba8b4bad867`
+- Slice: heterogeneous DATE cascade (IP-15 / H-03), neutral N3T fold, and U2 sign sentinel
 
 ## Files and registrations
 
@@ -73,6 +74,18 @@ The shipped registry linters were run with those imports added temporarily. The 
 - `MicroringCascade.dateCascadeRegression_twoRing_inl_inr`
 - `MicroringCascade.dateCascadeRegression_twoRing_inr_inl`
 - `MicroringCascade.dateCascadeRegression_twoRing_inr_inr`
+- `MicroringCascade.dateCascadeRegressionQuarterTurnRing`
+- `MicroringCascade.dateCascadeRegressionQuarterTurnStage`
+- `MicroringCascade.dateCascadeRegressionZeroBusStage`
+- `MicroringCascade.dateCascadeRegression_quarterTurn_busPhase`
+- `MicroringCascade.dateCascadeRegression_quarterTurn_signedContinuity`
+- `MicroringCascade.dateCascadeRegression_quarterTurnRing_fieldAttenuation`
+- `MicroringCascade.dateCascadeRegression_quarterTurnRing_phaseFactor`
+- `MicroringCascade.dateCascadeRegression_quarterTurnRing_denominator`
+- `MicroringCascade.dateCascadeRegression_quarterTurnRing_forwardTransfer`
+- `MicroringCascade.dateCascadeRegression_quarterTurnRing_backwardTransfer`
+- `MicroringCascade.dateCascadeRegression_zeroBus_backwardContinuity`
+- `MicroringCascade.dateCascadeRegression_quarterTurn_then_zero_inl_inl`
 
 ## Scope and milestone disposition
 
@@ -92,7 +105,11 @@ This also discharges IP-15 under that gate: DATE Def. 6's opposite-sign continui
 Thm. 3's heterogeneous product are represented by `DateCascadeStage.continuityChainMatrix` and
 `dateCascadeBehavior_eq_composition_toBehavior`. The independent H-03 fixture is the four-entry
 hand product in `HeterogeneousRegression.lean`; it does not use the headline theorem or the
-generic fold agreement theorem.
+generic fold agreement theorem. The quarter-turn sentinel independently expands the carrier
+exponential and pins the DATE continuity signs to `I` backward and `-I` forward. The consuming
+two-stage entry is `I`, so swapping the factors or dropping the backward negation breaks it.
+Both hostile mutations were checked mechanically. Dropping the negation left `-I = I`; swapping
+the factors additionally left `I = -I`. The production file was restored before the clean build.
 
 The neutral `BackwardFirstChainTransform.fold_replicate` supplies the generic matrix-power half
 needed later for H-04, quoted as "an identical-`N` cascade equals the corresponding matrix power"
@@ -125,7 +142,8 @@ The validation lane should bind these exact public names:
 - `Optics.twoPortChainFoldRegression_reverse_entry`
 - `Optics.twoPortChainFoldRegression_ne_reverse`
 - `Optics.MicroringCascade.DateCascadeStage.continuityChainMatrix`
-- `Optics.MicroringCascade.DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
+- `Optics.MicroringCascade.DateCascadeStage.`
+  `hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
 - `Optics.MicroringCascade.dateCascadeComposition`
 - `Optics.MicroringCascade.dateCascadeBehavior_eq_composition_toBehavior`
 - `Optics.MicroringCascade.dateCascade_leftToRightChainTransform_eq_composition`
@@ -133,6 +151,9 @@ The validation lane should bind these exact public names:
 - `Optics.MicroringCascade.dateCascadeRegression_twoRing_inl_inr`
 - `Optics.MicroringCascade.dateCascadeRegression_twoRing_inr_inl`
 - `Optics.MicroringCascade.dateCascadeRegression_twoRing_inr_inr`
+- `Optics.MicroringCascade.dateCascadeRegression_quarterTurn_busPhase`
+- `Optics.MicroringCascade.dateCascadeRegression_quarterTurn_signedContinuity`
+- `Optics.MicroringCascade.dateCascadeRegression_quarterTurn_then_zero_inl_inl`
 
 The asymmetric neutral fixture has exact leading entries `1` and `7`, so reversal is detectable.
 
@@ -175,20 +196,8 @@ The asymmetric neutral fixture has exact leading entries `1` and `7`, so reversa
 - Any later SFG-TR'14/NSV'16 comparison must retain IP-12's explicit principal-root versus
   selected-half-arc branch equality; this slice makes no such comparison.
 
-## Gate
+## Gate record
 
-With the four modules temporarily registered, one `lake-lock` hold ran cache retrieval, both
-regression builds, `runPhyslibLinters`, and full `lint_all` on sync head `12b4200d`.
-
-- Cache retrieval downloaded nothing.
-- Both regression targets built successfully.
-- `runPhyslibLinters` passed for `Physlib` and `QuantumInfo` twice.
-- Full build, import registration, illegal-import, PhyslibAlpha-import, duplicate-tag, and
-  sorry/pseudo checks passed.
-- `lint_all` reproduced only the existing whole-repository style and transitive-import backlog;
-  no finding named a file in this slice.
-- Direct `scripts/lint-style.py` checking of all four new files passed before and after commit.
-- The required committed-state `scripts/lint-style.sh` check reproduced two unrelated baseline
-  `ERR_IND` findings at
-  `Physlib/Electromagnetism/ThreeDimension/BoundaryConditions/OneSidedTraceRegression.lean:176`
-  and `:189`. This slice does not modify that file; no finding named a file in this slice.
+The slice 1b exact-source registered gate is pending until the candidate source commit exists.
+Before cutoff, this section will name that immutable source commit, the single locked command,
+every stage's status, and the identical pre/post SHA-256 of the temporary `Physlib.lean` edit.
