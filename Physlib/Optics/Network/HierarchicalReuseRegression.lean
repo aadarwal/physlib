@@ -78,18 +78,21 @@ abbrev reuseRegressionPortModeFamily : PortModeFamily where
 /-- The ambient channel type of the four-component fixture. -/
 abbrev ReuseRegressionChannel := reuseRegressionPortModeFamily.Channel
 
-/-- The block-diagonal component operator. Each nonzero entry crosses from the west incident
-port to the east outgoing port of the same component. -/
-def reuseRegressionComponentOperator :
-    ModeTransform (Incident ReuseRegressionChannel) (Outgoing ReuseRegressionChannel) :=
-  fun output input =>
-    match output.channel.1.1, output.channel.1.2,
-        input.channel.1.1, input.channel.1.2 with
+/-- The block-diagonal scattering matrix. Each nonzero entry crosses from the west incident port
+to the east outgoing port of the same component. -/
+def reuseRegressionScattering : ScatteringMatrix ReuseRegressionChannel where
+  toModeTransform := fun output input =>
+    match output.1.1, output.1.2, input.1.1, input.1.2 with
     | .first, true, .first, false => 2
     | .second, true, .second, false => 3
     | .third, true, .third, false => 5
     | .fourth, true, .fourth, false => 7
     | _, _, _, _ => 0
+
+/-- The oriented incident-to-outgoing operator supplied by the fixture scattering matrix. -/
+def reuseRegressionComponentOperator :
+    ModeTransform (Incident ReuseRegressionChannel) (Outgoing ReuseRegressionChannel) :=
+  reuseRegressionScattering.toOrientedModeTransform
 
 /-- The relational graph of the supplied four-component operator. -/
 def reuseRegressionComponentBehavior :
@@ -347,6 +350,78 @@ local instance reuseRegressionLeftChannelDecidableEq :
 /-!
 
 ## D. The hand-expanded state
+
+-/
+
+/-- The hand-expanded ambient incident state. Its west-port values are `1`, `2`, `6`, and `30`.
+-/
+def reuseRegressionIncident : ModeAmplitude (Incident ReuseRegressionChannel) :=
+  WithLp.toLp 2 fun endpoint =>
+    match endpoint.channel.1.1, endpoint.channel.1.2 with
+    | .first, false => 1
+    | .second, false => 2
+    | .third, false => 6
+    | .fourth, false => 30
+    | _, _ => 0
+
+/-- The hand-expanded ambient outgoing state. Its east-port values are `2`, `6`, `30`, and
+`210`. -/
+def reuseRegressionOutgoing : ModeAmplitude (Outgoing ReuseRegressionChannel) :=
+  WithLp.toLp 2 fun endpoint =>
+    match endpoint.channel.1.1, endpoint.channel.1.2 with
+    | .first, true => 2
+    | .second, true => 6
+    | .third, true => 30
+    | .fourth, true => 210
+    | _, _ => 0
+
+/-- Restrict the hand-expanded ambient incident state to any family's external input labels. -/
+def reuseRegressionExternalInput {index : Type*}
+    (family : PortConnectionFamily reuseRegressionPortModeFamily index) :
+    ModeAmplitude (Incident family.ExternalChannel) :=
+  WithLp.toLp 2 fun endpoint =>
+    reuseRegressionIncident (Incident.mk endpoint.channel.1)
+
+/-- Restrict the hand-expanded ambient outgoing state to any family's external output labels. -/
+def reuseRegressionExternalOutput {index : Type*}
+    (family : PortConnectionFamily reuseRegressionPortModeFamily index) :
+    ModeAmplitude (Outgoing family.ExternalChannel) :=
+  WithLp.toLp 2 fun endpoint =>
+    reuseRegressionOutgoing (Outgoing.mk endpoint.channel.1)
+
+/-- The hand-expanded incident and outgoing amplitudes satisfy the supplied component operator
+before any wiring equation is used. -/
+lemma reuseRegression_mem_componentBehavior :
+    (reuseRegressionIncident, reuseRegressionOutgoing) ∈
+      reuseRegressionComponentBehavior := by
+  classical
+  rw [reuseRegressionComponentBehavior, ModeTransform.mem_toBehavior_iff_toLinearMap,
+    reuseRegressionComponentOperator,
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform]
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  rw [ModeAmplitude.reindex_apply]
+  simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply]
+  rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
+  cases component <;> cases port <;> cases mode <;>
+    simp [ModeAmplitude.reindex_apply, Matrix.mulVec, dotProduct, Fintype.sum_sigma,
+      reuseRegressionScattering, reuseRegressionIncident, reuseRegressionOutgoing]
+
+/-- The three forward cross-component amplitudes are all nonzero and pairwise distinguish the
+three cascade stages. -/
+lemma reuseRegression_cross_amplitudes_nonzero :
+    reuseRegressionOutgoing
+          (Outgoing.mk ⟨(.first, true), ()⟩) ≠ 0 ∧
+      reuseRegressionOutgoing
+          (Outgoing.mk ⟨(.second, true), ()⟩) ≠ 0 ∧
+      reuseRegressionOutgoing
+          (Outgoing.mk ⟨(.third, true), ()⟩) ≠ 0 := by
+  norm_num [reuseRegressionOutgoing]
+
+/-!
+
+## E. Raw equations for the right parenthesization
 
 -/
 
