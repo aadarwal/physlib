@@ -43,16 +43,16 @@ model. No result identifies that printed model with the coherent N7 DCDR netlist
 
 ## iv. References
 
-The generic congruence `Gamma_out = H * Gamma_in * H^H`, rank-one construction, diagonal data,
-and cross-term identity are from `Physlib/Optics/Network/Coherency.lean`. The complete DCDR N5
-coordinates are derived from the forward and reverse N7 equations in
-`Physlib/Optics/Systems/DCDR/NominalChain.lean`.
-
 All channel powers and traces are normalized-modal second-order quantities. This module makes no
 claim of physical resonance, power flux, electromagnetic energy, reciprocity, physical time
 reversal, physical reference planes, coherent--incoherent equivalence, causality or Maxwell
 time-domain meaning, physical-frequency meaning, or HOL-script semantics. N6b reciprocity remains
 blocked on its separate convention data.
+
+The generic congruence `Gamma_out = H * Gamma_in * H^H`, rank-one construction, diagonal data,
+and cross-term identity are from `Physlib/Optics/Network/Coherency.lean`. The complete DCDR N5
+coordinates are derived from the forward and reverse N7 equations in
+`Physlib/Optics/Systems/DCDR/NominalChain.lean`.
 -/
 
 @[expose] public section

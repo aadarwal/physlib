@@ -49,15 +49,15 @@ with the independent values.
 
 ## iv. References
 
-The scalar and all four fixed response entries are independently derived from the raw N7
-equations in `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`. Generic N6c definitions
-are in `Physlib/Optics/Network/Coherency.lean`.
-
 The word decorrelated refers only to supplied second-order illumination data. It is not the
 separately printed FMICS'15 incoherent coefficient model. These regressions make no physical
 resonance, power-flux, electromagnetic-energy, reciprocity, time-reversal, reference-plane,
 coherent--incoherent-equivalence, causality, physical-frequency, or HOL-script claim. N6b remains
 blocked on separate convention data.
+
+The scalar and all four fixed response entries are independently derived from the raw N7
+equations in `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`. Generic N6c definitions
+are in `Physlib/Optics/Network/Coherency.lean`.
 -/
 
 @[expose] public section
