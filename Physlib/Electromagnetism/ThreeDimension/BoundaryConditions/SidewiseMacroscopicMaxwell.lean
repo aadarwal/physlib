@@ -47,7 +47,9 @@ open Space Time
 
 noncomputable section
 
-/-! ## A. Sidewise differential Maxwell data -/
+/-!
+## A. Sidewise differential Maxwell data
+-/
 
 /-- Two independent globally differentiable macroscopic Maxwell extensions, one for each open
 half-space of an oriented plane.
@@ -90,7 +92,9 @@ structure PlanarSidewiseMacroscopicMaxwell (plane : OrientedAffineHyperplane 3) 
 
 namespace PlanarSidewiseMacroscopicMaxwell
 
-/-! ## B. Selected-side fields and sources -/
+/-!
+## B. Selected-side fields and sources
+-/
 
 /-- Restrict the two ambient Maxwell extensions to their selected open half-spaces and retain
 their genuine one-sided carrier traces. -/

@@ -32,7 +32,7 @@ states the same law directly for the actual one-period-averaged Poynting vectors
 - A. Material irradiance
 - B. Actual mean Poynting flux
 
-## iv. Scope
+## iv. References
 
 The field-level statement models an ideal zero-thickness analyzer by applying its Jones matrix and
 then constructing the output wave with the same medium, propagation frame, angular frequency, and
@@ -42,6 +42,7 @@ contraction is not called electromagnetic passivity or absorption here.
 
 These results concern local flux density for an infinite plane wave. They include zero input but
 assert no aperture-integrated power, normalized modal power, or component energy balance.
+
 -/
 
 @[expose] public section

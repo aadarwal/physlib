@@ -22,21 +22,7 @@ algebraic expression `a = C b + E_in u` and the external outgoing exposure `E_ou
 reads `y = E_outᴴ b`. The coordinate and power laws below show that connected and external
 coordinates remain distinct on both sides of the network boundary.
 
-## ii. Scope
-
-External status is defined first at the channel level. `UnconnectedPort` separately records the
-complement of the endpoint-port range, and external channels are the dependent sum of modeled mode
-fibers over those ports. There is no one-channel-per-port identification: an unconnected port with
-several modeled modes contributes several external channels, while one with an empty mode fiber
-contributes none.
-
-The endpoint exposures assign or select amplitudes at already declared external coordinates; they
-do not choose the supplied incoming-wave data or model its source impedance, termination,
-feedback solvability, electromagnetic power, or electromagnetic boundary condition. Complement
-outgoing coordinates are absent from `C b` because `C` does not route them internally, not because
-they are absorbed. Consequently, the modal-power identities below are not network energy balances.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `PortConnectionFamily.ExternalChannel`: ambient channels outside the connected range.
 - `PortConnectionFamily.channelPartitionEquiv`: connected and external channels exactly partition
@@ -50,11 +36,28 @@ they are absorbed. Consequently, the modal-power identities below are not networ
 - `PortConnectionFamily.incidentAssembly_power`: connected and external modal powers add because
   their incident-coordinate ranges are disjoint.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. The external-channel complement
 - B. External endpoint exposure
+  - B.1. Incident injection
+  - B.2. Outgoing exposure and readout
+  - B.3. Connected-external boundary decomposition
 - C. The assembled incident amplitude
+
+## iv. References
+
+External status is defined first at the channel level. `UnconnectedPort` separately records the
+complement of the endpoint-port range, and external channels are the dependent sum of modeled mode
+fibers over those ports. There is no one-channel-per-port identification: an unconnected port with
+several modeled modes contributes several external channels, while one with an empty mode fiber
+contributes none.
+
+The endpoint exposures assign or select amplitudes at already declared external coordinates; they
+do not choose the supplied incoming-wave data or model its source impedance, termination,
+feedback solvability, electromagnetic power, or electromagnetic boundary condition. Complement
+outgoing coordinates are absent from `C b` because `C` does not route them internally, not because
+they are absorbed. Consequently, the modal-power identities below are not network energy balances.
 
 -/
 

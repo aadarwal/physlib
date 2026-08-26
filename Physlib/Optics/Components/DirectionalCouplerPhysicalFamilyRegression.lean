@@ -39,7 +39,9 @@ This is a source-neutral network-integration regression.
 namespace Optics
 noncomputable section
 namespace DirectionalCoupler
-/-! ## A. One-component family and aggregate states -/
+/-!
+## A. One-component family and aggregate states
+-/
 /-- A one-component family using the public four-port scattering law directly. -/
 abbrev directionalCouplerPhysicalRegressionComponentFamily : ScatteringComponentFamily where
   Component := Unit
@@ -86,7 +88,9 @@ lemma directionalCouplerPhysicalFamilyRegression_embedding_leftFirst :
         ⟨Port.leftFirst, ()⟩ =
       ⟨⟨(), Port.leftFirst⟩, ()⟩ := rfl
 
-/-! ## B. Component restrictions and assembled action -/
+/-!
+## B. Component restrictions and assembled action
+-/
 /-- Restricting the aggregate incident state recovers the local physical fixture. -/
 lemma directionalCouplerPhysicalFamilyRegression_incident_restrict :
     directionalCouplerPhysicalFamilyRegressionIncident.restrictEmbedding
@@ -140,7 +144,9 @@ lemma directionalCouplerPhysicalFamilyRegression_assembled_action :
     directionalCouplerPhysicalRegression_scattering_action] at hLocal
   exact hLocal
 
-/-! ## C. Relational membership and hostile rejection -/
+/-!
+## C. Relational membership and hostile rejection
+-/
 /-- The aggregate state satisfies the order-free local component relation. -/
 lemma directionalCouplerPhysicalFamilyRegression_componentwise_mem :
     (directionalCouplerPhysicalFamilyRegressionIncident,

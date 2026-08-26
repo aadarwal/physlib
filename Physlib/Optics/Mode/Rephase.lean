@@ -17,7 +17,22 @@ This file defines unit-complex phase changes of finite power-normalized modal co
 Rephasing amplitudes is a complex-linear isometry, while mode transforms and scattering matrices
 change covariantly so that their action represents the same linear map in the new coordinates.
 
-## ii. Phase convention
+## ii. Key results
+
+- `ModePhaseGauge`: a unit-complex phase for each mode.
+- `ModeAmplitude.rephase`: the isometric phase change of modal amplitudes.
+- `ModeTransform.rephase`: the covariant phase change of a transform.
+- `ScatteringMatrix.rephase`: independently rephasing its incident and outgoing coordinates.
+
+## iii. Table of contents
+
+- A. Phase gauges and mode amplitudes
+- B. Covariant mode transforms
+- C. Invariance of modal predicates
+- D. Compatibility with transform composition
+- E. Scattering-coordinate changes
+
+## iv. References
 
 For an input phase gauge `gIn` and output phase gauge `gOut`, amplitudes change as
 `a' i = gIn i * a i` and a transform changes entrywise as
@@ -34,13 +49,6 @@ It is not an optical component that changes a signal while keeping its coordinat
 physical reference-plane change must instead obtain related input and output gauges from a stated
 propagation convention.
 
-## iii. Main definitions
-
-- `ModePhaseGauge`: a unit-complex phase for each mode.
-- `ModeAmplitude.rephase`: the isometric phase change of modal amplitudes.
-- `ModeTransform.rephase`: the covariant phase change of a transform.
-- `ScatteringMatrix.rephase`: independently rephasing its incident and outgoing coordinates.
-
 -/
 
 @[expose] public section
@@ -49,7 +57,9 @@ namespace Optics
 
 noncomputable section
 
-/-! ## A. Phase gauges and mode amplitudes -/
+/-!
+## A. Phase gauges and mode amplitudes
+-/
 
 /-- A choice of unit complex coordinate phase for every mode indexed by `ι`. -/
 abbrev ModePhaseGauge (ι : Type*) := ι → Circle
@@ -143,7 +153,9 @@ lemma ModeAmplitude.rephase_directSum {ι κ : Type*} [Fintype ι] [Fintype κ]
   funext i
   rcases i with i | i <;> rfl
 
-/-! ## B. Covariant mode transforms -/
+/-!
+## B. Covariant mode transforms
+-/
 
 /-- Change the input and output phase coordinates of a mode transform.
 
@@ -202,7 +214,9 @@ lemma ModeTransform.toLinearMap_rephase_eq {ι κ : Type*}
   simpa only [ModeAmplitude.rephase_rephase_inv] using
     ModeTransform.toLinearMap_rephase_apply gIn gOut T (ModeAmplitude.rephase gIn⁻¹ a)
 
-/-! ## C. Invariance of modal predicates -/
+/-!
+## C. Invariance of modal predicates
+-/
 
 /-- Unit-phase changes of input and output coordinates preserve and reflect power preservation. -/
 lemma ModeTransform.isPowerPreserving_rephase_iff {ι κ : Type*}
@@ -234,7 +248,9 @@ lemma ModeTransform.isPassive_rephase_iff {ι κ : Type*}
     rw [ModeTransform.toLinearMap_rephase_apply]
     simpa only [ModeAmplitude.power_rephase] using hT a
 
-/-! ## D. Compatibility with transform composition -/
+/-!
+## D. Compatibility with transform composition
+-/
 
 /-- Rephasing a cascade cancels the shared intermediate coordinate gauge. -/
 lemma ModeTransform.rephase_mul {ι κ μ : Type*} [Fintype κ] (gIn : ModePhaseGauge ι)
@@ -268,7 +284,9 @@ lemma ModeTransform.reindex_rephase {ι ι' κ κ' : Type*} (eIn : ι ≃ ι')
   ext o i
   rfl
 
-/-! ## E. Scattering-coordinate changes -/
+/-!
+## E. Scattering-coordinate changes
+-/
 
 /-- Independently change the incident and outgoing phase coordinates of a scattering matrix. -/
 def ScatteringMatrix.rephase {ι : Type*} (gIn gOut : ModePhaseGauge ι)

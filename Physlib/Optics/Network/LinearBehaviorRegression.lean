@@ -21,16 +21,18 @@ The parallel example uses gain two, gain three, and complex branch amplitudes. I
 parallel composition leaves the two branches independent: it does not duplicate or sum an input,
 and it does not swap the branches.
 
-## ii. Scope
-
-These are algebraic, fixed-frequency regressions. Their amplitudes are not electromagnetic field
-solutions, and no passivity, losslessness, causality, or physical realization is stated.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. A nonsymmetric series cascade
 - B. Singular and multivalued behaviors
 - C. Independent parallel branches
+
+## iv. References
+
+These are algebraic, fixed-frequency regressions. Their amplitudes are not electromagnetic field
+solutions, and no passivity, losslessness, causality, or physical realization is stated.
 
 -/
 

@@ -29,15 +29,7 @@ pair is admitted exactly when its restriction to every component belongs to that
 oriented scattering graph. This componentwise relation is proved equal to the graph of the
 assembled transform.
 
-## ii. Scope
-
-This file assembles only component boundary laws. It does not select internal connections, expose
-external channels, solve feedback equations, or assert passivity, losslessness, reciprocity,
-causality, bandwidth, or electromagnetic power normalization. Finiteness is absent from the stored
-family data. It enters only when finite-dimensional matrix actions or local graph behaviors are
-formed; the boundary-restriction map itself is dimension-independent.
-
-## iii. Key results
+## ii. Key results
 
 - `ScatteringComponentFamily.aggregatePortModeFamily`: the physical ports of every component,
   retaining component ownership.
@@ -56,12 +48,20 @@ formed; the boundary-restriction map itself is dimension-independent.
 - `ScatteringComponentFamily.componentwiseBehavior_eq_assembledScatteringMatrix_toBehavior`: the
   componentwise relation is exactly the assembled block-diagonal graph.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Component families and aggregate channels
 - B. Dependent block-diagonal scattering
 - C. Componentwise amplitude action
 - D. Dependent component behavior
+
+## iv. References
+
+This file assembles only component boundary laws. It does not select internal connections, expose
+external channels, solve feedback equations, or assert passivity, losslessness, reciprocity,
+causality, bandwidth, or electromagnetic power normalization. Finiteness is absent from the stored
+family data. It enters only when finite-dimensional matrix actions or local graph behaviors are
+formed; the boundary-restriction map itself is dimension-independent.
 
 -/
 

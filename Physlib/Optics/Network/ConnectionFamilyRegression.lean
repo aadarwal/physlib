@@ -22,10 +22,7 @@ mode fiber is empty: its aggregate channel map is vacuously injective even thoug
 endpoint map is not. The latter prevents replacing port-level uniqueness with the weaker
 channel-level condition.
 
-## ii. Scope
-
-These are connected-channel algebra regressions. They do not define external channels, global
-partial routing, components, netlists, feedback, reciprocity, or electromagnetic power.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -34,6 +31,11 @@ partial routing, components, netlists, feedback, reciprocity, or electromagnetic
 - C. Exact blockwise routing
 - D. Reused endpoints
 - E. Empty-mode counterexample
+
+## iv. References
+
+These are connected-channel algebra regressions. They do not define external channels, global
+partial routing, components, netlists, feedback, reciprocity, or electromagnetic power.
 
 -/
 

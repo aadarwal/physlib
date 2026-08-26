@@ -21,16 +21,18 @@ path numerator is `I`, its loop-family determinant is `2`, and its Mason gain is
 the direct path, input/output coupling, and the independently computed Mason gain gives the same
 value without using either general agreement theorem.
 
-## ii. Scope
+## ii. Key results
+
+## iii. Table of contents
+
+- A. An extracted nonreal feedback loop
+
+## iv. References
 
 These are hostile algebraic fixtures, not passive or physically normalized optical systems. The
 loop calculation uses the S6 forward-path and loop-family enumeration lemmas, while the N5 value
 uses the separately established exact elimination matrix. It does not provide a ring, DCDR,
 edge-identity, frequency-domain, or Z-transform cross-semantics result.
-
-## iii. Table of contents
-
-- A. An extracted nonreal feedback loop
 
 -/
 

@@ -35,11 +35,12 @@ explicit bridge, not a coercion between raw Jones coordinates and power-normaliz
 - A. Singleton material-Jones mode data
 - B. Exact carrier compatibility
 
-## iv. Scope
+## iv. References
 
 The family is not asserted to be flux normalized or complete. Interpreting its coordinate power
 as electromagnetic aperture power still requires an `IsApertureFluxOrthonormal` proof for a
 declared measured profile and incident or outgoing role.
+
 -/
 
 @[expose] public section

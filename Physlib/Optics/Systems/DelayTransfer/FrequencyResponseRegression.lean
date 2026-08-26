@@ -36,7 +36,7 @@ changed.
 - A. Convention anchors
 - B. Compiled proof-gated response anchors
 
-## iv. References and non-claims
+## iv. References
 
 The rational all-pass fixture and its direct compiled channel-equation solve are in
 `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:150-298` and `845-912`. The
@@ -47,6 +47,7 @@ formal-delay, Laplace, or reciprocal-Z response-value anchors.
 The fixture checks one declared constant delay. It proves no rational dependence on physical
 frequency, dispersion model, group-delay theorem, passivity result, or response outside the N5F
 domain.
+
 -/
 
 @[expose] public section

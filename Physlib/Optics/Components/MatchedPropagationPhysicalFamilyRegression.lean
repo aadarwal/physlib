@@ -39,7 +39,9 @@ This is a source-neutral network-integration regression.
 namespace Optics
 noncomputable section
 namespace MatchedPropagation
-/-! ## A. One-component family and aggregate states -/
+/-!
+## A. One-component family and aggregate states
+-/
 
 /-- A one-component family using the public physical ports and scattering law directly. -/
 abbrev matchedPropagationPhysicalRegressionComponentFamily : ScatteringComponentFamily where
@@ -86,7 +88,9 @@ lemma matchedPropagationPhysicalFamilyRegression_embedding_left :
     matchedPropagationPhysicalRegressionComponentFamily.componentChannelEmbedding ()
         ⟨Port.left, (0 : Fin 2)⟩ =
       ⟨⟨(), Port.left⟩, (0 : Fin 2)⟩ := rfl
-/-! ## B. Component restrictions and assembled action -/
+/-!
+## B. Component restrictions and assembled action
+-/
 
 /-- Restricting the aggregate incident state recovers the local physical incident fixture. -/
 lemma matchedPropagationPhysicalFamilyRegression_incident_restrict :
@@ -141,7 +145,9 @@ lemma matchedPropagationPhysicalFamilyRegression_assembled_action :
     matchedPropagationPhysicalRegression_scattering_action] at hLocal
   exact hLocal
 
-/-! ## C. Relational membership and hostile rejection -/
+/-!
+## C. Relational membership and hostile rejection
+-/
 
 /-- The exact aggregate state satisfies the order-free local component relation. -/
 lemma matchedPropagationPhysicalFamilyRegression_componentwise_mem :

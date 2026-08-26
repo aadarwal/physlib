@@ -46,10 +46,11 @@ so both sides are zero even though the dummy carrier and propagation frame remai
 - C. Connected mean flux
 - D. Guarded actual fields and mean flux
 
-## iv. Scope
+## iv. References
 
 These are local flux-density identities at the stored plane point. They do not state an aperture
 integral, assign an interface role to either side, or state a Fresnel power balance.
+
 -/
 
 @[expose] public section

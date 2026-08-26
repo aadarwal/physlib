@@ -86,7 +86,9 @@ noncomputable section
 
 namespace AddDrop
 
-/-! ## A. Closed-form through and drop powers -/
+/-!
+## A. Closed-form through and drop powers
+-/
 
 /-- The unit-modulus round-trip phase factor selected by the real phase lift. -/
 def Parameters.phaseFactor (p : Parameters) : ℂ :=
@@ -235,7 +237,9 @@ theorem dropPower_eq_closedForm (p : Parameters)
     Complex.normSq_div, p.normSq_dropNumerator hAttenuation,
     p.normSq_denominator hAttenuation]
 
-/-! ## B. Named phase conditions and critical coupling -/
+/-!
+## B. Named phase conditions and critical coupling
+-/
 
 /-- The named resonance condition: the complete round-trip phase factor is one. -/
 def Parameters.IsResonant (p : Parameters) : Prop :=
@@ -408,7 +412,9 @@ lemma criticalCoupling_of_extinction (p : Parameters)
     simpa only [Complex.ofReal_mul, mul_one] using hNumerator
   exact_mod_cast sub_eq_zero.mp hNumerator'
 
-/-! ## C. Positive-power rejection ratio and parameter recovery -/
+/-!
+## C. Positive-power rejection ratio and parameter recovery
+-/
 
 /-- Power-ratio decibels, using the convention `10 * logb 10 (numerator / denominator)`.
 
@@ -688,7 +694,9 @@ lemma inputCrossAmplitude_eq_sqrt_of_resonant_extinction (p : Parameters)
   exact criticalCoupling_of_extinction p hInputUnitary hAttenuation hDenominator
     hResonant hExtinction
 
-/-! ## D. N6 losslessness and coherency -/
+/-!
+## D. N6 losslessness and coherency
+-/
 
 /-- Every N7 component of the ring preserves normalized modal power. -/
 def Parameters.IsLossless (p : Parameters) : Prop :=

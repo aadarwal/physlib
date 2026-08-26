@@ -65,13 +65,14 @@ incident-reflected normal interference term is a separate result.
 - F. Material irradiance and signed normal flux
 - G. Connected separate-wave mean-flux balance
 
-## iv. Scope
+## iv. References
 
 All coefficient parameters are real; their physical propagating interpretation uses the stated
 normal-sign hypotheses. The results do not cover complex total-internal-reflection amplitudes,
 lossy media, aperture-integrated power, or power-normalized scattering ports. The core connected
 theorem accepts an explicit reflected guard, while its canonical-incidence wrapper derives that
 guard from explicit direction selection.
+
 -/
 
 @[expose] public section

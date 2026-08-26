@@ -33,15 +33,7 @@ Matrix self-composition therefore adds this retarder parameter. It represents tw
 reflections only after a caller externally identifies the intermediate output and input `s`/`p`
 coordinates.
 
-## ii. Scope
-
-The self-composition results below are component-level Jones statements, not typed frame maps.
-They omit the geometry and coordinate transport between two distinct reflecting faces, the common
-propagation phase between the faces, and the entrance and exit interfaces of a prism. They
-therefore do not yet define or claim a complete Fresnel-rhomb model. The coefficients remain raw
-electric-field amplitudes, not power-normalized modal amplitudes.
-
-## iii. Key results
+## ii. Key results
 
 - `PlanarDielectricInterface.totalInternalReflectionJonesMatrix`: the diagonal reflected Jones
   transform in abstract `s`/`p` coordinates.
@@ -56,17 +48,24 @@ electric-field amplitudes, not power-normalized modal amplitudes.
 - `PlanarDielectricWaveConfiguration.reflectedJones_eq_totalInternalReflectionJonesMatrix_act`:
   connection to the boundary-selected reflected Jones data.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. The total-internal-reflection Jones transform
 - B. Retarder factorization
 - C. Matrix self-composition
 - D. Boundary-selected reflected wave
 
-## v. References
+## iv. References
+
+The self-composition results below are component-level Jones statements, not typed frame maps.
+They omit the geometry and coordinate transport between two distinct reflecting faces, the common
+propagation phase between the faces, and the entrance and exit interfaces of a prism. They
+therefore do not yet define or claim a complete Fresnel-rhomb model. The coefficients remain raw
+electric-field amplitudes, not power-normalized modal amplitudes.
 
 The result is derived from Physlib's complex Fresnel boundary solution and its existing retarder
 phase convention. No external formal-development source is copied or translated here.
+
 -/
 
 @[expose] public section

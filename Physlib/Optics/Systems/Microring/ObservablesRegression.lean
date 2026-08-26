@@ -57,7 +57,9 @@ noncomputable section
 
 namespace AddDrop
 
-/-! ## A. Hand-expanded named-phase powers -/
+/-!
+## A. Hand-expanded named-phase powers
+-/
 
 /-- The exact zero-phase fixture satisfies the named resonance condition. -/
 lemma observablesRegression_resonance_isResonant :
@@ -175,7 +177,9 @@ lemma observablesRegression_antiresonance_dropPower_eq_closedForm :
     observablesRegression_antiresonance_powerDenominator]
   norm_num
 
-/-! ## B. Positive-power rejection ratio -/
+/-!
+## B. Positive-power rejection ratio
+-/
 
 /-- Phase specialization of the zero-phase fixture is definitionally unchanged. -/
 lemma observablesRegression_atResonance :
@@ -250,7 +254,9 @@ lemma observablesRegression_dropRejectionRatioDB_eq_logb_sub :
     Real.logb_div (by norm_num : (11881 : ℝ) ≠ 0)
       (by norm_num : (8281 : ℝ) ≠ 0)]
 
-/-! ## C. Critical coupling, losslessness, and recovery -/
+/-!
+## C. Critical coupling, losslessness, and recovery
+-/
 
 /-- A unit-retention, zero-phase `3-4-5` ring used for critical-coupling regression. -/
 def observablesRegressionCriticalParameters : Parameters where
@@ -375,7 +381,9 @@ lemma observablesRegression_antiresonance_recovers_attenuation :
     all_goals norm_num
   · norm_num [addDropRegressionAntiresonanceParameters]
 
-/-! ## D. Nondispersive free spectral range -/
+/-!
+## D. Nondispersive free spectral range
+-/
 
 /-- A rational nondispersive model with group delay `6 / 5`. -/
 def observablesRegressionNondispersiveModel : NondispersiveGroupIndexModel where

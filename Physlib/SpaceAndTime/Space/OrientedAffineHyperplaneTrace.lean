@@ -62,7 +62,9 @@ noncomputable section
 
 variable {d : ℕ}
 
-/-! ## A. Half-space neighborhood filters -/
+/-!
+## A. Half-space neighborhood filters
+-/
 
 /-- A parameterized field whose spatial domain is one selected open half-space. -/
 abbrev SideField (plane : OrientedAffineHyperplane d) (side : Side)
@@ -103,7 +105,9 @@ lemma tendsto_sideApproach_oneSidedNhds (plane : OrientedAffineHyperplane d)
   change Tendsto (plane.sideApproachPoint side x) atTop (nhds (x : Space d))
   exact plane.tendsto_sideApproachPoint_atTop side x
 
-/-! ## B. One-sided traces -/
+/-!
+## B. One-sided traces
+-/
 
 /-- A local side field converges through the full selected-half-space neighborhood filter to a
 supplied boundary field. -/
@@ -135,7 +139,9 @@ lemma tendsto_sideApproach (h : plane.HasOneSidedTrace field first)
 
 end HasOneSidedTrace
 
-/-! ## C. Restrictions of ambient fields -/
+/-!
+## C. Restrictions of ambient fields
+-/
 
 /-- Restrict an ambient parameterized field to one selected open half-space. -/
 def restrictFieldToSide {P V : Type*} (plane : OrientedAffineHyperplane d)
@@ -158,7 +164,9 @@ lemma hasOneSidedTrace_restrict {P V : Type*} [TopologicalSpace V]
   intro p x
   exact (hContinuous p x).tendsto.comp Filter.tendsto_comap
 
-/-! ## D. Two-sided fields -/
+/-!
+## D. Two-sided fields
+-/
 
 /-- Independent parameterized fields on the two open half-spaces of an oriented hyperplane. -/
 structure TwoSidedField (plane : OrientedAffineHyperplane d) (P V : Type*) where

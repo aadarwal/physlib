@@ -45,7 +45,9 @@ noncomputable section
 
 namespace DirectionalCoupler
 
-/-! ## A. Physical behavior power -/
+/-!
+## A. Physical behavior power
+-/
 
 /-- Every physical behavior state obeys the same exact power-factor law as the raw component. -/
 lemma physicalBehavior_output_power [Fintype ι] [DecidableEq ι] (p : Parameters)
@@ -57,7 +59,9 @@ lemma physicalBehavior_output_power [Fintype ι] [DecidableEq ι] (p : Parameter
   have hPower := behavior_output_power p hRaw
   simpa only [ModeAmplitude.power_reindex] using hPower
 
-/-! ## B. Physical scattering classification -/
+/-!
+## B. Physical scattering classification
+-/
 
 /-- Power-bounded parameters make the four-port physical scattering law passive. -/
 lemma physicalScattering_isPassive [Fintype ι] [DecidableEq ι] (p : Parameters)

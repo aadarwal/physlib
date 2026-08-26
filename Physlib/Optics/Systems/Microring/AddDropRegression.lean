@@ -57,7 +57,9 @@ noncomputable section
 
 namespace AddDrop
 
-/-! ## A. Exact zero-phase fixture -/
+/-!
+## A. Exact zero-phase fixture
+-/
 
 /-- Two `3-4-5` couplers, quarter round-trip field retention, and zero phase. -/
 def addDropRegressionResonanceParameters : Parameters where
@@ -184,7 +186,9 @@ lemma addDropRegression_resonance_isWellPosed :
   rw [Parameters.HasNonzeroDenominator, addDropRegression_resonance_denominator]
   norm_num
 
-/-! ## B. Direct N5 response and convergent-series anchors -/
+/-!
+## B. Direct N5 response and convergent-series anchors
+-/
 
 /-- Direct N5 channel elimination gives the zero-phase input-to-through entry `45 / 91`. -/
 lemma addDropRegression_resonance_responseTransform_entry_through :
@@ -397,7 +401,9 @@ lemma addDropRegression_resonance_response_drop_eq_series :
   rw [addDropRegression_resonance_responseTransform_entry_drop,
     addDropRegression_resonance_dropTransferSeries]
 
-/-! ## C. Exact half-turn fixture -/
+/-!
+## C. Exact half-turn fixture
+-/
 
 /-- The same exact add-drop fixture with a half-turn round-trip phase. -/
 def addDropRegressionAntiresonanceParameters : Parameters where

@@ -21,15 +21,17 @@ functional scattering behavior need not have a left-to-right chain view.
 Two nonsymmetric chain transforms then check series order. The later transform appears on the left
 of the matrix product, and the reverse product is independently rejected at an exact entry.
 
-## ii. Scope
-
-These are algebraic fixed-frequency fixtures. Their scalar coordinates do not carry a field,
-power, passivity, reciprocity, propagation-phase, termination, or physical-realization claim.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Positive and negative chain extraction
 - B. Nonsymmetric chain-series order
+
+## iv. References
+
+These are algebraic fixed-frequency fixtures. Their scalar coordinates do not carry a field,
+power, passivity, reciprocity, propagation-phase, termination, or physical-realization claim.
 
 -/
 

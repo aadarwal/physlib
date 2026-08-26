@@ -22,15 +22,7 @@ The ambient transform is globally passive and preserves power exactly on amplitu
 connected outgoing channels. The exact power-equality characterization records this support
 condition rather than describing the transform as globally lossless.
 
-## ii. Scope
-
-An outside-range coordinate is algebraically outside the selected connection subspace. Zero action
-on that coordinate does not model a matched termination, absorption, radiation, or any physical
-boundary condition. This file does not construct a complementary external-channel type, add an
-external excitation, connect components, or solve a feedback equation. Its power statements use
-only the finite power-normalized modal convention.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `PortConnectionFamily.incidentChannelEmbedding` and
   `PortConnectionFamily.outgoingChannelEmbedding`: lift the connected-channel embedding to the
@@ -47,12 +39,20 @@ only the finite power-normalized modal convention.
   complement outgoing coordinates vanish.
 - `PortConnectionFamily.partialRouting_isPassive`: ambient partial routing is globally passive.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Directed connected-channel embeddings
 - B. Ambient partial routing entries
 - C. Exact amplitude action
 - D. Partial-isometry projectors, power, and passivity
+
+## iv. References
+
+An outside-range coordinate is algebraically outside the selected connection subspace. Zero action
+on that coordinate does not model a matched termination, absorption, radiation, or any physical
+boundary condition. This file does not construct a complementary external-channel type, add an
+external excitation, connect components, or solve a feedback equation. Its power statements use
+only the finite power-normalized modal convention.
 
 -/
 

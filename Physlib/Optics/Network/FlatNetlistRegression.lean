@@ -21,11 +21,7 @@ At zero external input the netlist admits a one-parameter family of complete sta
 external outputs. A second external input has no solution. These witnesses ensure that flat-netlist
 semantics remains a linear relation and does not silently invert the feedback operator.
 
-## ii. Scope
-
-The coefficients are algebraic sentinels. Component invertibility is used only to show that it is
-not sufficient for network well-posedness. No passivity, losslessness, reciprocity, causality,
-electromagnetic normalization, or executable solver is claimed.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -33,6 +29,12 @@ electromagnetic normalization, or executable solver is claimed.
 - B. Exact component and boundary equations
 - C. A singular family of solutions
 - D. An external input with no solution
+
+## iv. References
+
+The coefficients are algebraic sentinels. Component invertibility is used only to show that it is
+not sufficient for network well-posedness. No passivity, losslessness, reciprocity, causality,
+electromagnetic normalization, or executable solver is claimed.
 
 -/
 

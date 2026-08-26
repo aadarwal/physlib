@@ -56,7 +56,9 @@ noncomputable section
 
 namespace MachZehnder
 
-/-! ## A. Hand-expanded component values -/
+/-!
+## A. Hand-expanded component values
+-/
 
 /-- The balanced through coefficient times the pinned N7 cross coefficient is exactly
 `-I / 2`. -/
@@ -82,7 +84,9 @@ lemma machZehnderRegression_carrierPhaseFactor_points :
       Real.Angle.coe_toCircle]
     simp
 
-/-! ## B. Exact balanced phase points -/
+/-!
+## B. Exact balanced phase points
+-/
 
 /-- The actual N5 response exposes incident and outgoing states satisfying the raw N4 channel
 equations. This helper contains no Mach--Zehnder transfer formula. -/
@@ -376,7 +380,9 @@ lemma machZehnderRegression_phase_pi_dark_port (input : ℂ) :
           (externalOutgoingEquiv balancedPhasePi .outputSecond) = 0 :=
   (machZehnderRegression_phase_pi_output_amplitudes input).2
 
-/-! ## C. N6 power balance and phase-ratio identifiability -/
+/-!
+## C. N6 power balance and phase-ratio identifiability
+-/
 
 /-- Row `S-01`: an N6 API fixture specializes network conservation to every balanced arm-phase
 pair. It is not convention-sensitive evidence for the explicit wiring. -/

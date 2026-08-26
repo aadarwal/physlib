@@ -45,7 +45,9 @@ noncomputable section
 
 namespace DirectionalCoupler
 
-/-! ## A. Unitary `3–4–5` fixture -/
+/-!
+## A. Unitary `3–4–5` fixture
+-/
 
 /-- The exact coupler parameters satisfy the canonical ideal-coupler predicate. -/
 lemma directionalCouplerPowerRegression_isValid :
@@ -103,7 +105,9 @@ lemma directionalCouplerPowerRegression_isLossless :
   scattering_isLossless directionalCouplerRegressionParameters
     directionalCouplerPowerRegression_isValid.isUnitary
 
-/-! ## B. Power-gain hostile fixture -/
+/-!
+## B. Power-gain hostile fixture
+-/
 
 /-- Through and cross amplitudes both one give power factor two. -/
 def directionalCouplerPowerRegressionGain : Parameters where

@@ -51,7 +51,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. Exact resonant chain matrix -/
+/-!
+## A. Exact resonant chain matrix
+-/
 
 /-- The resonant fixture satisfies the exact scalar feedback-denominator gate. -/
 lemma allPassChainRegression_resonance_hasNonzeroDenominator :
@@ -166,7 +168,9 @@ lemma allPassChainRegression_resonance_chain_inr_inr :
     packagedTwoPortScattering_rightReflection_eq_zero,
     allPassRegression_resonance_throughTransfer]
 
-/-! ## B. Well-posed extinction without the chosen chain view -/
+/-!
+## B. Well-posed extinction without the chosen chain view
+-/
 
 /-- A unitary `3-4-5` coupler whose retained field amplitude equals its through amplitude. -/
 def allPassChainRegressionCriticalParameters : Parameters where

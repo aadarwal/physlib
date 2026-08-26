@@ -21,11 +21,7 @@ A nonsymmetric two-mode transform and an independent complex input amplitude che
 column, multiplication-order, conjugation, and zero-padding conventions of
 `ModeTransform.zeroExtend`.
 
-## ii. Scope
-
-These are finite-dimensional algebraic regressions for power-normalized modal coordinates. The
-strict loss shown by restriction means only that an external coordinate is discarded; it does
-not model physical absorption or prove electromagnetic energy-flux conservation.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -33,6 +29,12 @@ not model physical absorption or prove electromagnetic energy-flux conservation.
 - B. Exact restriction, extension, and projection
 - C. Power and contraction laws
 - D. Zero-extending a nonsymmetric transform
+
+## iv. References
+
+These are finite-dimensional algebraic regressions for power-normalized modal coordinates. The
+strict loss shown by restriction means only that an external coordinate is discarded; it does
+not model physical absorption or prove electromagnetic energy-flux conservation.
 
 -/
 

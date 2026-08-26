@@ -50,10 +50,11 @@ using its coefficient-value lemma.
 - B. Quadrature Jones normal flux
 - C. Connected actual-wave normal flux
 
-## iv. Scope
+## iv. References
 
 These regressions concern separate real propagating wave fluxes. They do not test negative-side
 superposition interference, total internal reflection, or power-normalized scattering ports.
+
 -/
 
 @[expose] public section

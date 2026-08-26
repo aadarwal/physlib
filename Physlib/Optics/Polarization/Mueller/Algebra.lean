@@ -10,9 +10,20 @@ public import Physlib.Optics.Polarization.Mueller.Basic
 /-!
 # Algebra of Jones-induced Mueller matrices
 
+## i. Overview
+
 This file proves that the transported Stokes action respects the identity, Jones cascades, and
 common complex scaling. Scalar covariance is stated first for arbitrary scalars; global phase
 invariance is its unit-modulus corollary.
+
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Identity, cascades, and common scalar phase
+
+## iv. References
+
 -/
 
 @[expose] public section

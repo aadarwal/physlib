@@ -43,39 +43,7 @@ explicit, with `FlatNetlist.behavior` exhibited as an instance of it; the flatte
 assembly is then read off stage by stage on inner-connected, outer-connected, and fully external
 coordinates.
 
-## ii. Scope
-
-This file supplies the wiring layer of hierarchical composition together with the relational
-closure operation and the proof-gated packaging of one child.
-
-Of the results the `N5H` contract asks for, two are proved here and two are deliberately withheld.
-
-Proved:
-
-* Equality of hierarchical relational semantics with flattened-netlist semantics (goal.md row
-  `N-08`), as `PortConnectionFamily.closeBehavior_append` and, at the level of netlists,
-  `HierarchicalNetlist.flatten_behavior_eq`. Neither carries a well-posedness hypothesis.
-* Congruence under a **fixed inner wiring**, as
-  `PortConnectionFamily.closeBehavior_append_congr`: with both stages' connection families held
-  fixed, the flattened relation depends on the inner components only through the inner stage's
-  closed relation.
-
-Withheld:
-
-* The stronger reuse statement -- that the inner connection *family* may be replaced by a
-  different family with the same boundary relation -- is **not** proved. It needs transport of a
-  `PortConnectionFamily` along an equivalence of port families, which this file does not have.
-* Literal three-stage associativity of `append` is **not** proved, for the same missing machinery:
-  regrouping changes the port family the third stage is indexed by, from
-  `(inner.append middle).externalPortModeFamily` to `middle.externalPortModeFamily`.
-
-Beyond that, nothing here assumes, implies, or requires that any child subsystem is well posed,
-passive, lossless, reciprocal, or causal, except in `packagedScattering` and its consequences,
-which take well-posedness as an explicit hypothesis and still assert none of the other four. No
-reference plane, phase gauge, or port-direction convention is changed: the lifted outer connections
-carry the ambient ports and the outer mode equivalences verbatim.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `PortConnectionFamily.externalPortModeFamily`: the typed boundary port family exposed by a
   connection family.
@@ -113,7 +81,7 @@ carry the ambient ports and the outer mode equivalences verbatim.
   relation.
 - `HierarchicalNetlist.flatten_behavior_eq`: the same equality stated for netlists.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. The boundary port family of a connection family
 - B. Lifting outer connections to ambient ports
@@ -124,6 +92,38 @@ carry the ambient ports and the outer mode equivalences verbatim.
 - G. Relational closure of an abstract boundary behavior
 - H. The flattened incident assembly, stage by stage
 - I. Hierarchical semantics of a two-stage netlist
+
+## iv. References
+
+This file supplies the wiring layer of hierarchical composition together with the relational
+closure operation and the proof-gated packaging of one child.
+
+Of the results the `N5H` contract asks for, two are proved here and two are deliberately withheld.
+
+Proved:
+
+* Equality of hierarchical relational semantics with flattened-netlist semantics (goal.md row
+  `N-08`), as `PortConnectionFamily.closeBehavior_append` and, at the level of netlists,
+  `HierarchicalNetlist.flatten_behavior_eq`. Neither carries a well-posedness hypothesis.
+* Congruence under a **fixed inner wiring**, as
+  `PortConnectionFamily.closeBehavior_append_congr`: with both stages' connection families held
+  fixed, the flattened relation depends on the inner components only through the inner stage's
+  closed relation.
+
+Withheld:
+
+* The stronger reuse statement -- that the inner connection *family* may be replaced by a
+  different family with the same boundary relation -- is **not** proved. It needs transport of a
+  `PortConnectionFamily` along an equivalence of port families, which this file does not have.
+* Literal three-stage associativity of `append` is **not** proved, for the same missing machinery:
+  regrouping changes the port family the third stage is indexed by, from
+  `(inner.append middle).externalPortModeFamily` to `middle.externalPortModeFamily`.
+
+Beyond that, nothing here assumes, implies, or requires that any child subsystem is well posed,
+passive, lossless, reciprocal, or causal, except in `packagedScattering` and its consequences,
+which take well-posedness as an explicit hypothesis and still assert none of the other four. No
+reference plane, phase gauge, or port-direction convention is changed: the lifted outer connections
+carry the ambient ports and the outer mode equivalences verbatim.
 
 -/
 

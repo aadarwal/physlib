@@ -51,7 +51,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Uniform bounds for normalized averages -/
+/-!
+## A. Uniform bounds for normalized averages
+-/
 
 /-- A pointwise error bound on a nondegenerate interval bounds the error of its normalized
 average. -/
@@ -103,7 +105,9 @@ lemma abs_normalizedSquareAverage_sub_le {radius error limit : ℝ}
   exact abs_normalizedIntervalAverage_sub_le hRadius (hIntegrable.1 u)
     (hBound u hu)
 
-/-! ## B. Convergence from eventual uniform control -/
+/-!
+## B. Convergence from eventual uniform control
+-/
 
 /-- Normalized averages over positive shrinking intervals converge when their integrands are
 eventually uniformly close to the proposed limit. -/
@@ -141,7 +145,9 @@ lemma tendsto_normalizedSquareAverage {radius : ℕ → ℝ}
     (abs_normalizedSquareAverage_sub_le (hRadius scale) (hIntegrable scale) hScale)
     (half_lt_self hε)
 
-/-! ## C. Shrinking planar sample geometry -/
+/-!
+## C. Shrinking planar sample geometry
+-/
 
 namespace OrientedAffineHyperplane
 
@@ -178,7 +184,9 @@ lemma dist_tangentPoint {d : ℕ} (plane : OrientedAffineHyperplane d)
 
 end OrientedAffineHyperplane
 
-/-! ## D. Trace and carrier-source averages -/
+/-!
+## D. Trace and carrier-source averages
+-/
 
 /-- A convergent function is uniformly close to its limit on any family of samples whose
 ambient distance from the convergence point has a common envelope tending to zero. -/

@@ -22,14 +22,7 @@ well-posedness means uniqueness of every unknown wave, including the internal wa
 device-load interface. Left reflection and forward transmission to the right termination plane
 are derived as relational projections of that complete solution.
 
-## ii. Scope
-
-These are fixed-frequency complex-linear semantics. A zero-reflection load is only the algebraic
-relation `aR = 0`; no impedance matching, absorption, passivity, causality, or electromagnetic
-realization is inferred. The projected forward wave `bR` is transmission to the declared right
-termination plane, not transmission through the load.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `RightLoadBehavior`: a relation from the wave arriving at a right load to the returning wave.
 - `BackwardFirstTwoPortBehavior.terminateRight`: the complete relational terminated solution.
@@ -39,11 +32,18 @@ termination plane, not transmission through the load.
 - `BackwardFirstTwoPortBehavior.rightTerminatedReflectionTransform` and
   `BackwardFirstTwoPortBehavior.rightTerminatedTransmissionTransform`: proof-gated matrices.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Right-load and complete-solution behaviors
 - B. Reflection and transmission projections
 - C. Proof-gated response transforms
+
+## iv. References
+
+These are fixed-frequency complex-linear semantics. A zero-reflection load is only the algebraic
+relation `aR = 0`; no impedance matching, absorption, passivity, causality, or electromagnetic
+realization is inferred. The projected forward wave `bR` is transmission to the declared right
+termination plane, not transmission through the load.
 
 -/
 

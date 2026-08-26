@@ -38,13 +38,14 @@ recorded but provenance-uncertain Thm. 6 denominator differs from the norm-squar
 - C. Provenance-uncertain power-denominator candidate
 - D. SFG-TR transfer formula
 
-## iv. References and non-claims
+## iv. References
 
 The source statements are transcribed at `HOL-CORPUS.md:194-198`, `HOL-CORPUS.md:244-249`, and
 `HOL-CORPUS.md:345-346`. The disputed power denominator is not in that corpus entry; it is a
 previously recorded transcription of uncertain provenance. These fixtures do not classify the
 discrepancy as a source error. They make no response-extremum, reciprocity, causality, omitted-loss,
 bandwidth, dispersion, or measurement-validation claim.
+
 -/
 
 @[expose] public section
@@ -57,7 +58,9 @@ open scoped ComplexOrder
 
 namespace MicroringSourceBridge
 
-/-! ## A. DATE two-port and four-port formulas -/
+/-!
+## A. DATE two-port and four-port formulas
+-/
 
 /-- Exact DATE data with a half-turn circulation phase and no attenuation. -/
 def sourceBridgeRegressionDateParameters : DateParameters where
@@ -187,7 +190,9 @@ lemma sourceBridgeRegression_dateFourPortChain_entries :
         rw [Complex.I_sq]
         ring
 
-/-! ## B. SysCon amplitude, power, and series -/
+/-!
+## B. SysCon amplitude, power, and series
+-/
 
 /-- Exact SysCon 3-4-5 data at zero phase and source scalar `x_r=1/4`. -/
 def sourceBridgeRegressionSysConParameters : SysConParameters where
@@ -304,7 +309,9 @@ lemma sourceBridgeRegression_sysCon_rejection_closedForm :
       10 * Real.logb 10 (11881 / 8281) := by
   norm_num [sysConRejectionClosedForm, sourceBridgeRegressionSysConParameters]
 
-/-! ## C. Provenance-uncertain power-denominator candidate -/
+/-!
+## C. Provenance-uncertain power-denominator candidate
+-/
 
 /-- A valid rational 3-4-5 coupler point where the two candidate denominators differ. -/
 def sourceBridgeRegressionDisputedPowerParameters : SysConParameters where
@@ -343,7 +350,9 @@ lemma sourceBridgeRegression_disputedDenominator_ne_amplitudeDenominator :
   apply hExp
   linarith
 
-/-! ## D. SFG-TR transfer formula -/
+/-!
+## D. SFG-TR transfer formula
+-/
 
 /-- Exact SFG-TR coefficients matching the zero-phase SysCon 3-4-5 point. -/
 def sourceBridgeRegressionSfgParameters : SfgParameters where

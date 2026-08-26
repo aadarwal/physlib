@@ -55,7 +55,9 @@ noncomputable section
 
 namespace PlanarDielectricWaveConfiguration
 
-/-! ## A. One-sided field packages -/
+/-!
+## A. One-sided field packages
+-/
 
 /-- The incident-plus-reflected fields restricted to the interface's negative open half-space,
 with their genuine one-sided traces. -/
@@ -139,7 +141,9 @@ def twoSidedFields (configuration : PlanarDielectricWaveConfiguration) :
   negative := configuration.negativeSideFields
   positive := configuration.positiveSideFields
 
-/-! ## B. Integral Maxwell boundary realization -/
+/-!
+## B. Integral Maxwell boundary realization
+-/
 
 /-- Literal integral Maxwell laws for the explicit three-wave side fields imply the optical local
 boundary predicate under the corresponding thin-cell regularity hypotheses.

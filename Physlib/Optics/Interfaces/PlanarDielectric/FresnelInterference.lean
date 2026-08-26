@@ -54,13 +54,14 @@ balance for the actual superposed negative-side field.
 - B. Common-interval normal-flux averages
 - C. Superposed-wave Fresnel balance
 
-## iv. Scope
+## iv. References
 
 The cancellation and common-interval identities require no Fresnel coefficient formula,
 denominator, nonzero incident field, common frequency, phase matching, or transmitted wave. The
 final balance additionally uses the existing lossless Fresnel result and fixed-frequency electric
 boundary. None of the results states a whole-plane, aperture-power, modal-power, TIR, lossy-medium,
 or scattering law.
+
 -/
 
 @[expose] public section

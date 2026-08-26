@@ -56,7 +56,9 @@ universe u
 
 namespace DirectionalCoupler
 
-/-! ## A. Parameters and two-arm mixing -/
+/-!
+## A. Parameters and two-arm mixing
+-/
 
 /-- Real through/cross modal-amplitude parameters of the algebraic coupler. -/
 structure Parameters where
@@ -99,7 +101,9 @@ lemma mixing_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
   simp only [ModeTransform.toLinearMap, Matrix.toEuclideanLin, map_smul,
     Matrix.toLpLin_one, LinearMap.smul_apply, LinearMap.id_apply]
 
-/-! ## B. Independent behavior and scattering realization -/
+/-!
+## B. Independent behavior and scattering realization
+-/
 
 /-- The independent reflectionless bidirectional coupler behavior. -/
 def behavior [Fintype ι] [DecidableEq ι] (p : Parameters) :

@@ -50,7 +50,9 @@ open Filter
 
 namespace Space
 
-/-! ## A. Normalized finite-cell balances -/
+/-!
+## A. Normalized finite-cell balances
+-/
 
 /-- Five normalized scalar terms satisfying one signed finite-cell balance at every scale.
 
@@ -74,7 +76,9 @@ structure NormalizedThinCellBalance where
 
 namespace NormalizedThinCellBalance
 
-/-! ## B. Boundary-limit extraction -/
+/-!
+## B. Boundary-limit extraction
+-/
 
 /-- The five independently stated convergence conditions needed to extract a boundary jump from a
 normalized finite-cell balance. -/

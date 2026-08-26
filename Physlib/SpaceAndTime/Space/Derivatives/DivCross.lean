@@ -42,7 +42,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Divergence in an oriented frame -/
+/-!
+## A. Divergence in an oriented frame
+-/
 
 /-- Divergence times the oriented volume of an ordered frame equals the sum of the field's
 directional derivatives paired with the three oriented cofactors. -/

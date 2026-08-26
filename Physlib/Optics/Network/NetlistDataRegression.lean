@@ -17,14 +17,7 @@ data. The positive fixture is accepted by the Boolean checker and compiles to ty
 and connection data. Hostile fixtures separately reject self-wiring, endpoint fan-out, port reuse,
 and a non-bijective mode table between unequal finite mode fibers.
 
-## ii. Scope
-
-The tests exercise structural certification and the proof-carrying compiler boundary. They do not
-yet test generic executable assembly of `S`, `C`, `E_in`, or `E_out`; those matrices belong to the
-next compiler layer. The coefficients are exact integers evaluated in `ℂ`, and no inverse or
-feedback-solvability assumption is used.
-
-## iii. Key results
+## ii. Key results
 
 - `netlistDataRegression_wellFormed`: the valid finite fixture passes the reflected checker.
 - `netlistDataRegression_compile?_isSome`: successful checking reaches the typed compiler.
@@ -38,11 +31,18 @@ feedback-solvability assumption is used.
 - `netlistDataRegression_nonInverseModeTable_rejected`: equal mode counts alone do not suffice.
 - `netlistDataRegression_swapModeTable_wellFormed`: a genuine two-mode permutation is accepted.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. A certified two-component fixture
 - B. Exact compiled data
 - C. Malformed construction tests
+
+## iv. References
+
+The tests exercise structural certification and the proof-carrying compiler boundary. They do not
+yet test generic executable assembly of `S`, `C`, `E_in`, or `E_out`; those matrices belong to the
+next compiler layer. The coefficients are exact integers evaluated in `ℂ`, and no inverse or
+feedback-solvability assumption is used.
 
 -/
 
@@ -334,8 +334,9 @@ def netlistDataRegressionTargetReuseConnection :
 /-- The repeated-second-endpoint hostile fixture. -/
 def netlistDataRegressionTargetReuse : FiniteNetlistData ℤ :=
   { netlistDataRegression with
-    connections :=
-      #[netlistDataRegressionConnection, netlistDataRegressionTargetReuseConnection] }
+    connections := #[
+      netlistDataRegressionConnection,
+      netlistDataRegressionTargetReuseConnection] }
 
 /-- The executable checker rejects reuse of an already connected physical port. -/
 lemma netlistDataRegression_targetReuse_rejected :
@@ -357,8 +358,9 @@ def netlistDataRegressionCrossEndReuseConnection :
 /-- The mixed first-versus-second endpoint-reuse hostile fixture. -/
 def netlistDataRegressionCrossEndReuse : FiniteNetlistData ℤ :=
   { netlistDataRegression with
-    connections :=
-      #[netlistDataRegressionConnection, netlistDataRegressionCrossEndReuseConnection] }
+    connections := #[
+      netlistDataRegressionConnection,
+      netlistDataRegressionCrossEndReuseConnection] }
 
 /-- Endpoint uniqueness rejects reuse across the two endpoint presentations. -/
 lemma netlistDataRegression_crossEndReuse_rejected :

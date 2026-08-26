@@ -34,35 +34,7 @@ value of the response at a parameter is the response transform of the netlist co
 parameter, which is in turn the exact four-factor block formula
 `E_outᴴ * S * (1 - C * S)⁻¹ * E_in` at that parameter.
 
-## ii. Scope
-
-This file supplies the parameterized layer only. It does not name a physical frequency variable, a
-delay variable, a Laplace variable, or a `Z`-transform variable, and it asserts no relationship
-between them; `Param` is an arbitrary index type. It does not assume that the stored component
-laws are causal, passive, lossless, reciprocal, dispersive, or rational in any variable, and it
-does not claim that the parameter-validity predicate is nonempty, open, connected, or physically
-correct: validity is data supplied with the components, not a theorem.
-
-No resonance condition, free-spectral-range statement, or spectral observable is derived here.
-Those belong to the system milestone and must be derived from this response, not from an
-independently postulated formula.
-
-`unguardedResponse` is written with Mathlib's total matrix inverse purely to obtain a function of
-the parameter with no proof argument, so that regularity can be stated. Its meaning differs across
-three regions of the parameter space, and the difference is deliberate.
-
-* Outside `solveDomain` the middle factor is Mathlib's junk value for the inverse of a singular
-  matrix, and the whole expression means nothing at all.
-* On `solveDomain \ validityDomain` the middle factor is a genuine algebraic inverse and the
-  expression is the exact `N5` block formula, but not every component model is claimed valid
-  there -- at least one component lacks a validity claim, while others may well have one -- so it
-  is not a physical response. The regression exhibits such a parameter.
-* On `responseDomain` it agrees with the proof-gated `response`.
-
-Accordingly the algebraic statements about it carry a `solveDomain` hypothesis and the physical
-ones a `responseDomain` hypothesis; the words *physical response* are reserved for the latter.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `ParameterizedComponentFamily`: parameter-independent component geometry with parameter-dependent
   scattering laws and a stored per-component validity predicate.
@@ -92,7 +64,7 @@ ones a `responseDomain` hypothesis; the words *physical response* are reserved f
   total-inverse formula on the algebraic solve domain, from analyticity of the stored component
   entries. This is not a claim that a physical response is analytic.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Parameterized component families
 - B. Parameterized netlists, pointwise compilation, and reparameterization
@@ -100,6 +72,34 @@ ones a `responseDomain` hypothesis; the words *physical response* are reserved f
 - D. The response function and evaluation commutation
 - E. Reparameterization of the response domains
 - F. Regularity under hypotheses on component data
+
+## iv. References
+
+This file supplies the parameterized layer only. It does not name a physical frequency variable, a
+delay variable, a Laplace variable, or a `Z`-transform variable, and it asserts no relationship
+between them; `Param` is an arbitrary index type. It does not assume that the stored component
+laws are causal, passive, lossless, reciprocal, dispersive, or rational in any variable, and it
+does not claim that the parameter-validity predicate is nonempty, open, connected, or physically
+correct: validity is data supplied with the components, not a theorem.
+
+No resonance condition, free-spectral-range statement, or spectral observable is derived here.
+Those belong to the system milestone and must be derived from this response, not from an
+independently postulated formula.
+
+`unguardedResponse` is written with Mathlib's total matrix inverse purely to obtain a function of
+the parameter with no proof argument, so that regularity can be stated. Its meaning differs across
+three regions of the parameter space, and the difference is deliberate.
+
+* Outside `solveDomain` the middle factor is Mathlib's junk value for the inverse of a singular
+  matrix, and the whole expression means nothing at all.
+* On `solveDomain \ validityDomain` the middle factor is a genuine algebraic inverse and the
+  expression is the exact `N5` block formula, but not every component model is claimed valid
+  there -- at least one component lacks a validity claim, while others may well have one -- so it
+  is not a physical response. The regression exhibits such a parameter.
+* On `responseDomain` it agrees with the proof-gated `response`.
+
+Accordingly the algebraic statements about it carry a `solveDomain` hypothesis and the physical
+ones a `responseDomain` hypothesis; the words *physical response* are reserved for the latter.
 
 -/
 

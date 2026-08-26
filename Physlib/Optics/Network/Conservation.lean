@@ -32,7 +32,39 @@ incident-side ranges are orthogonal. Adding a component power inequality `‖b�
 equality `‖b‖ = ‖a‖` to that balance immediately gives `‖y‖ ≤ ‖u‖` or
 `‖y‖ = ‖u‖`.
 
-## ii. Scope and non-claims
+## ii. Key results
+
+- `ScatteringComponentFamily.power_eq_sum_component`: aggregate modal power is the sum of the
+  component-restricted powers.
+- `ScatteringComponentFamily.assembledScatteringMatrix_isPassive` and
+  `ScatteringComponentFamily.assembledScatteringMatrix_isPowerPreserving`: componentwise
+  classification closes under block-diagonal assembly.
+- `PortConnectionFamily.power_restrictEmbedding_connected_add_external`: connected and external
+  outgoing coordinates split ambient outgoing power exactly once.
+- `FlatNetlist.power_balance`: the internal connection power balance.
+- `FlatNetlist.power_le_of_isPassive` and `FlatNetlist.responseTransform_isPassive`: passivity
+  closure.
+- `FlatNetlist.power_eq_of_isPowerPreserving` and
+  `FlatNetlist.responseTransform_isPowerPreserving`: losslessness of the complete external
+  response.
+- `FlatNetlist.externalScatteringMatrix` and
+  `FlatNetlist.externalScatteringMatrix_isLossless_of_components_isLossless`: the external
+  response packaged as a scattering matrix, proved lossless from component unitarity.
+- `FlatNetlist.responseTransform_isPowerPreserving_withConnections_iff` and
+  `ModeTransform.isPowerPreserving_rephase_iff`-based corollaries: physical predicates are
+  invariant under relabelling and rephasing.
+
+## iii. Table of contents
+
+- A. Componentwise power decomposition
+- B. Passivity and losslessness of the assembled component boundary
+- C. Exact wiring power bookkeeping
+- D. Passivity and losslessness closure
+  - D.1. Closure directly from component classifications
+- E. The external scattering matrix
+- F. Relabelling and rephasing invariance
+
+## iv. References
 
 Every power here is `ModeAmplitude.power`, the normalized modal power of
 `Physlib/Optics/Mode/Basic.lean`, whose defining convention is quoted at
@@ -57,37 +89,6 @@ Rephasing results are stated as gauge invariance of the physical predicates of a
 transform. A covariance theorem transporting a whole netlist along an arbitrary channel-end phase
 gauge is not available, because matched-gauge covariance of connection routing is still an open
 N2a item; nothing here assumes it.
-
-## iii. Key definitions and results
-
-- `ScatteringComponentFamily.power_eq_sum_component`: aggregate modal power is the sum of the
-  component-restricted powers.
-- `ScatteringComponentFamily.assembledScatteringMatrix_isPassive` and
-  `ScatteringComponentFamily.assembledScatteringMatrix_isPowerPreserving`: componentwise
-  classification closes under block-diagonal assembly.
-- `PortConnectionFamily.power_restrictEmbedding_connected_add_external`: connected and external
-  outgoing coordinates split ambient outgoing power exactly once.
-- `FlatNetlist.power_balance`: the internal connection power balance.
-- `FlatNetlist.power_le_of_isPassive` and `FlatNetlist.responseTransform_isPassive`: passivity
-  closure.
-- `FlatNetlist.power_eq_of_isPowerPreserving` and
-  `FlatNetlist.responseTransform_isPowerPreserving`: losslessness of the complete external
-  response.
-- `FlatNetlist.externalScatteringMatrix` and
-  `FlatNetlist.externalScatteringMatrix_isLossless_of_components_isLossless`: the external
-  response packaged as a scattering matrix, proved lossless from component unitarity.
-- `FlatNetlist.responseTransform_isPowerPreserving_withConnections_iff` and
-  `ModeTransform.isPowerPreserving_rephase_iff`-based corollaries: physical predicates are
-  invariant under relabelling and rephasing.
-
-## iv. Table of contents
-
-- A. Componentwise power decomposition
-- B. Passivity and losslessness of the assembled component boundary
-- C. Exact wiring power bookkeeping
-- D. Passivity and losslessness closure
-- E. The external scattering matrix
-- F. Relabelling and rephasing invariance
 
 -/
 

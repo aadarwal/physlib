@@ -29,15 +29,7 @@ The second path reuses the existing unequal-admittance three-wave boundary fixtu
 its stored reflected Jones data is exactly the action of the new diagonal transform. This catches
 coefficient ordering or normalization errors independently of the quarter-wave design.
 
-## ii. Scope
-
-The design fixture proves the incident-normal bounds and the normalized negative-radicand shell
-identity, but does not construct a complete three-wave boundary configuration or a two-face prism
-geometry. Interpreting matrix self-composition as two bounces requires the caller to identify the
-intermediate `s`/`p` coordinates externally and to handle inter-bounce path phase. The regression
-assigns no circular-polarization handedness name and makes no modal-power claim.
-
-## iii. Key results
+## ii. Key results
 
 - `totalInternalReflectionRetarderRegression_hasCriticalAngleContrast`: the design has the strict
   material contrast required for a critical angle.
@@ -55,12 +47,20 @@ assigns no circular-polarization handedness name and makes no modal-power claim.
 - `supercriticalFresnelRegression_reflectedJones_eq_totalInternalReflectionJonesMatrix_act`:
   an independent coefficient-action check on the unequal-admittance boundary fixture.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Exact admittance design
 - B. Exact phases and retardance
 - C. Matrix self-composition
 - D. Unequal-admittance coefficient-action fixture
+
+## iv. References
+
+The design fixture proves the incident-normal bounds and the normalized negative-radicand shell
+identity, but does not construct a complete three-wave boundary configuration or a two-face prism
+geometry. Interpreting matrix self-composition as two bounces requires the caller to identify the
+intermediate `s`/`p` coordinates externally and to handle inter-bounce path phase. The regression
+assigns no circular-polarization handedness name and makes no modal-power claim.
 
 -/
 

@@ -18,10 +18,7 @@ the pivot, signs, state order, and all four block placements. A two-mode fixture
 the noncommuting product `Rr * Rl` from its reversal. Zero scattering supplies the exact negative
 chain-view case.
 
-## ii. Scope
-
-These are algebraic fixed-frequency orientation sentinels. Their coefficients make no
-losslessness, passivity, reciprocity, causality, or physical-realization claim.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -29,6 +26,11 @@ losslessness, passivity, reciprocity, causality, or physical-realization claim.
 - B. Exact derived chain matrix
 - C. Noncommuting block order
 - D. Zero-pivot negative case
+
+## iv. References
+
+These are algebraic fixed-frequency orientation sentinels. Their coefficients make no
+losslessness, passivity, reciprocity, causality, or physical-realization claim.
 
 -/
 

@@ -48,7 +48,9 @@ namespace Space
 
 noncomputable section
 
-/-! ## A. Coordinate fixture -/
+/-!
+## A. Coordinate fixture
+-/
 
 /-- The origin used as the center of the regression rectangle. -/
 def planarThinCellStokesRegressionCenter : Space :=
@@ -130,7 +132,9 @@ def planarThinCellStokesRegressionCirculation : ℝ :=
           planarThinCellStokesRegressionNormal 1 v))
       (basis.repr planarThinCellStokesRegressionNormal))
 
-/-! ## B. Orientation and integral sentinels -/
+/-!
+## B. Orientation and integral sentinels
+-/
 
 /-- The curl density is `+1` when the surface orientation is normal cross tangent. -/
 lemma planarThinCellStokesRegression_density (x : Space) :

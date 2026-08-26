@@ -61,7 +61,9 @@ open Space Time
 
 noncomputable section
 
-/-! ## A. Sources and thin-cell geometry -/
+/-!
+## A. Sources and thin-cell geometry
+-/
 
 /-- Bulk free electric charge and current on the two open half-spaces.
 
@@ -81,7 +83,9 @@ structure PlanarMaxwellThinCells (plane : OrientedAffineHyperplane 3) where
   loop : (x : plane.carrier) → (tangent : plane.tangentSubmodule) →
     PlanarThinLoopFamily plane tangent
 
-/-! ## B. Witnessed flux derivatives -/
+/-!
+## B. Witnessed flux derivatives
+-/
 
 /-- Derivatives in time of the actual normalized magnetic and electric flux integrals through
 every thin loop. -/
@@ -107,7 +111,9 @@ structure PlanarMaxwellThinCellFluxRates {plane : OrientedAffineHyperplane 3}
         fields.electricDisplacementFamily (Time.toRealCLE.symm s) x scale)
       (electricFluxRate t x tangent scale) (Time.toRealCLE t)
 
-/-! ## C. Integrability of the displayed terms -/
+/-!
+## C. Integrability of the displayed terms
+-/
 
 /-- Integrability of every path, face, and volume pullback occurring in the planar integral
 Maxwell laws.
@@ -171,7 +177,9 @@ structure ArePlanarMaxwellThinCellTermsIntegrable {plane : OrientedAffineHyperpl
   ampereSheet : ∀ t x tangent scale,
     (cells.loop x tangent).SurfaceLineIntegrable surfaceCurrent t x scale
 
-/-! ## D. Integral Maxwell laws -/
+/-!
+## D. Integral Maxwell laws
+-/
 
 /-- The four finite integral macroscopic Maxwell laws on every shrinking planar cell.
 
@@ -227,7 +235,9 @@ structure IsPlanarIntegralMacroscopicMaxwell {plane : OrientedAffineHyperplane 3
         rates.electricFluxRate t x tangent scale +
         (cells.loop x tangent).surfaceLineAverage surfaceCurrent t x scale
 
-/-! ## E. Neutral normalized balances -/
+/-!
+## E. Neutral normalized balances
+-/
 
 /-- The four normalized finite-cell balances extracted from literal integral Maxwell laws. -/
 structure PlanarMaxwellThinCellBalances (plane : OrientedAffineHyperplane 3) where

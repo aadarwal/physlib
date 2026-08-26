@@ -29,7 +29,7 @@ Finally, `recurrenceDenominator` makes the existing
 `Physlib/Mathematics/ZTransform/Stability.lean:226` the scalar one-delay special case, with the
 required reciprocal-coordinate convention `q = z⁻¹`.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `InternalDeterminantPolynomial`: a certified polynomial internal determinant.
 - `InternalDeterminantPolynomial.candidateSingularities`: its root set in formal `q`.
@@ -47,7 +47,7 @@ required reciprocal-coordinate convention `q = z⁻¹`.
 - C. Abstract denominator-root criteria
 - D. Bridge to finite difference equations
 
-## iv. References and non-claims
+## iv. References
 
 No theorem here relates a `ReducedRationalResponse` quotient to a selected network response entry.
 Consequently, no reduced denominator root is identified as an actual pole of an N5F network.
@@ -59,6 +59,7 @@ resonance, and the source term “resonance condition” for all numerator zeros
 is deliberately not adopted. The quotient is rational only in formal `q`, not necessarily in
 physical frequency. No degree or finiteness bound, stability, BIBO, causality, passivity, or
 frequency-response claim is made in this module.
+
 -/
 
 @[expose] public section

@@ -5,44 +5,33 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Polarization.HarmonicWave
-public import Physlib.Optics.Polarization.MaterialWave
+public import Physlib.Optics.Polarization.HarmonicMaterialWave
 
 /-!
 # Fixed-vacuum regression for framed material waves
 
 ## i. Overview
 
-This file verifies that the general oriented Jones-to-material-wave construction recovers the
-existing potential-derived free-space harmonic wave. The regression uses positive wave number,
-angular frequency `k * c`, propagation along the first coordinate, and ordered polarization axes
-along the second and third coordinates.
-
-The new and old constructions agree on carrier wave number and phase, the complete electric
-field, and the complete magnetic induction. The comparison is deliberately between fields: a
-Jones vector does not determine an electromagnetic potential without additional gauge data.
+This file checks the production bridge from the potential-derived `harmonicWaveX` solution to the
+oriented material-wave construction on an exact horizontal fixture. At the spacetime origin, the
+electric field points along coordinate one and the constitutive magnetic field strength points
+along coordinate two with the inverse wave-speed factor.
 
 ## ii. Key results
 
-- `harmonicWaveXPolarizationFrame`: the proof-bearing fixed coordinate frame.
-- `harmonicWaveXPolarizationFrame_realizeJones`: agreement of the two Jones realizations.
-- `harmonicWaveX_materialWave_waveNumber`: recovery of the positive vacuum wave number.
-- `harmonicWaveX_materialWave_carrierPhase`: agreement of carrier phases.
-- `harmonicWaveX_materialWave_electricField`: complete electric-field agreement.
-- `harmonicWaveX_materialWave_magneticInduction`: complete magnetic-induction agreement.
+- `materialWaveRegression_jones`: the amplitude-phase data is the horizontal Jones state.
+- `materialWaveRegression_electricField_origin`: the exact electric-field orientation.
+- `materialWaveRegression_magneticFieldStrength_origin`: the exact magnetic-field orientation.
 
 ## iii. Table of contents
 
-- A. Fixed oriented frame
-- B. Carrier regression
-- C. Electric- and magnetic-field regression
+- A. Exact vacuum and Jones data
+- B. Exact field values
 
 ## iv. References
 
-The regression is derived from the two imported Physlib constructions. It does not identify
-squared Jones intensity with irradiance or power, reconstruct a gauge potential, introduce
-circular-handedness names, or extend either construction to static backgrounds, lossy media, or
-evanescent waves.
+The fixture checks field orientation and the constitutive `B`-to-`H` bridge. It makes no
+irradiance, aperture-power, gauge-potential, handedness, lossy-medium, or evanescent-wave claim.
 -/
 
 @[expose] public section
@@ -50,125 +39,92 @@ evanescent waves.
 namespace Optics
 
 open Electromagnetism Electromagnetism.ElectromagneticPotential
-  Electromagnetism.ThreeDimension Space Time Matrix InnerProductSpace
-open MonochromaticPlaneWave
+  Electromagnetism.ThreeDimension Space Time Matrix
 
 noncomputable section
 
 /-!
 
-## A. Fixed oriented frame
+## A. Exact vacuum and Jones data
 
 -/
 
-/-- The oriented coordinate polarization frame used by the existing `harmonicWaveX` bridge.
+/-- The exact free-space data used by the material-wave regression. -/
+def materialWaveRegressionFreeSpace : FreeSpace where
+  ε₀ := 4
+  μ₀ := 1
+  ε₀_pos := by norm_num
+  μ₀_pos := by norm_num
 
-Propagation is along coordinate zero, and the ordered Jones axes are coordinates one and two. -/
-def harmonicWaveXPolarizationFrame : PolarizationFrame harmonicWaveXDirection where
-  axis := fun i ↦ EuclideanSpace.single i.succ 1
-  orthonormal_axis :=
-    EuclideanSpace.orthonormal_single.comp Fin.succ (Fin.succ_injective 2)
-  orientation := by
-    ext i
-    fin_cases i <;>
-      simp [crossProduct, harmonicWaveXDirection]
+/-- The horizontal unit electric-amplitude data. -/
+def materialWaveRegressionAmplitude : Fin 2 → ℝ := ![1, 0]
 
-/-- General oriented-frame Jones realization specializes to the existing fixed-coordinate
-realization. -/
-lemma harmonicWaveXPolarizationFrame_realizeJones
-    (J : JonesVector) (carrierPhase : ℝ) :
-    harmonicWaveXPolarizationFrame.realizeJones J carrierPhase =
-      J.realizeHarmonicWaveXFrame carrierPhase := by
-  ext k
-  fin_cases k <;>
-    simp [PolarizationFrame.realizeJones, PolarizationFrame.embedJones,
-      PolarizationFrame.complexAxis, harmonicWaveXPolarizationFrame,
-      JonesVector.realizeHarmonicWaveXFrame, Phasor.realize]
+/-- Both transverse component phase offsets vanish. -/
+def materialWaveRegressionPhaseOffset : Fin 2 → ℝ := 0
+
+/-- The exact amplitude-phase data is the horizontal Jones state. -/
+lemma materialWaveRegression_jones :
+    JonesVector.ofAmplitudePhase materialWaveRegressionAmplitude
+      materialWaveRegressionPhaseOffset = JonesVector.horizontal := by
+  ext i
+  fin_cases i <;>
+    norm_num [JonesVector.ofAmplitudePhase, materialWaveRegressionAmplitude,
+      materialWaveRegressionPhaseOffset, JonesVector.horizontal, JonesVector.ofComponents,
+      Phasor.ofAmplitudePhase]
 
 /-!
 
-## B. Carrier regression
+## B. Exact field values
 
 -/
 
-/-- The free-space material-wave specialization recovers the supplied positive wave number. -/
-lemma harmonicWaveX_materialWave_waveNumber
-    (F : FreeSpace) {waveNumber : ℝ} (hκ : 0 < waveNumber)
-    (amplitude phaseOffset : Fin 2 → ℝ) :
-    ((JonesVector.ofAmplitudePhase amplitude phaseOffset).toMaterialPlaneWave
-      F.toHomogeneousIsotropicMedium harmonicWaveXPolarizationFrame
-      (harmonicWaveXAngularFrequency F waveNumber)
-      (harmonicWaveXAngularFrequency_pos F hκ)).waveNumber = waveNumber := by
-  rw [JonesVector.toMaterialPlaneWave_waveNumber]
-  simp only [harmonicWaveXAngularFrequency, F.toHomogeneousIsotropicMedium_waveSpeed]
-  field_simp [SpeedOfLight.val_ne_zero]
+/-- The potential-derived fixture has the expected horizontal electric field at the spacetime
+origin. -/
+lemma materialWaveRegression_harmonicWaveX_electricField_origin :
+    (harmonicWaveX materialWaveRegressionFreeSpace 2 materialWaveRegressionAmplitude
+      materialWaveRegressionPhaseOffset).electricField
+        materialWaveRegressionFreeSpace.c 0 0 = EuclideanSpace.single 1 1 := by
+  rw [harmonicWaveX_electricField_eq_realize
+    materialWaveRegressionFreeSpace (by norm_num), materialWaveRegression_jones]
+  ext i
+  fin_cases i <;>
+    simp [JonesVector.realizeHarmonicWaveXFrame, harmonicWaveXCarrierPhase,
+      JonesVector.horizontal, JonesVector.ofComponents, Phasor.realize,
+      materialWaveRegressionFreeSpace]
 
-/-- The free-space material-wave specialization has the existing `harmonicWaveX` carrier phase. -/
-lemma harmonicWaveX_materialWave_carrierPhase
-    (F : FreeSpace) {waveNumber : ℝ} (hκ : 0 < waveNumber)
-    (amplitude phaseOffset : Fin 2 → ℝ) (t : Time) (x : Space) :
-    ((JonesVector.ofAmplitudePhase amplitude phaseOffset).toMaterialPlaneWave
-      F.toHomogeneousIsotropicMedium harmonicWaveXPolarizationFrame
-      (harmonicWaveXAngularFrequency F waveNumber)
-      (harmonicWaveXAngularFrequency_pos F hκ)).carrierPhase t x =
-        harmonicWaveXCarrierPhase F waveNumber t x := by
-  simp [MonochromaticPlaneWave.carrierPhase, JonesVector.toMaterialPlaneWave,
-    MonochromaticPlaneWave.inMedium, harmonicWaveXCarrierPhase,
-    harmonicWaveXAngularFrequency, harmonicWaveXDirection]
-  left
-  field_simp [SpeedOfLight.val_ne_zero]
-  exact F.toHomogeneousIsotropicMedium_waveSpeed.symm
+/-- At the spacetime origin, the horizontal fixture's electric field is coordinate one. -/
+lemma materialWaveRegression_electricField_origin :
+    (((JonesVector.ofAmplitudePhase materialWaveRegressionAmplitude
+      materialWaveRegressionPhaseOffset).toMaterialPlaneWave
+        materialWaveRegressionFreeSpace.toHomogeneousIsotropicMedium
+        harmonicWaveXPolarizationFrame
+        (harmonicWaveXAngularFrequency materialWaveRegressionFreeSpace 2)
+        (harmonicWaveXAngularFrequency_pos materialWaveRegressionFreeSpace
+          (by norm_num))).electricField 0 0) = EuclideanSpace.single 1 1 := by
+  rw [harmonicWaveX_materialWave_electricField
+    materialWaveRegressionFreeSpace (by norm_num)]
+  exact materialWaveRegression_harmonicWaveX_electricField_origin
 
-/-!
-
-## C. Electric- and magnetic-field regression
-
--/
-
-/-- The oriented material connector specializes in free space to the complete electric field of
-the existing potential-derived harmonic wave. -/
-lemma harmonicWaveX_materialWave_electricField
-    (F : FreeSpace) {waveNumber : ℝ} (hκ : 0 < waveNumber)
-    (amplitude phaseOffset : Fin 2 → ℝ) (t : Time) (x : Space) :
-    ((JonesVector.ofAmplitudePhase amplitude phaseOffset).toMaterialPlaneWave
-      F.toHomogeneousIsotropicMedium harmonicWaveXPolarizationFrame
-      (harmonicWaveXAngularFrequency F waveNumber)
-      (harmonicWaveXAngularFrequency_pos F hκ)).electricField t x =
-        (harmonicWaveX F waveNumber amplitude phaseOffset).electricField F.c t x := by
-  rw [JonesVector.toMaterialPlaneWave_electricField,
-    harmonicWaveXPolarizationFrame_realizeJones,
-    harmonicWaveX_electricField_eq_realize F hκ,
-    harmonicWaveX_materialWave_carrierPhase F hκ]
-
-/-- The oriented material connector specializes in free space to the complete magnetic induction
-of the existing potential-derived harmonic wave. -/
-lemma harmonicWaveX_materialWave_magneticInduction
-    (F : FreeSpace) {waveNumber : ℝ} (hκ : 0 < waveNumber)
-    (amplitude phaseOffset : Fin 2 → ℝ) (t : Time) (x : Space) :
-    ((JonesVector.ofAmplitudePhase amplitude phaseOffset).toMaterialPlaneWave
-      F.toHomogeneousIsotropicMedium harmonicWaveXPolarizationFrame
-      (harmonicWaveXAngularFrequency F waveNumber)
-      (harmonicWaveXAngularFrequency_pos F hκ)).magneticInduction t x =
-        (harmonicWaveX F waveNumber amplitude phaseOffset).magneticField F.c t x := by
-  let J := JonesVector.ofAmplitudePhase amplitude phaseOffset
-  let wave := J.toMaterialPlaneWave F.toHomogeneousIsotropicMedium
-    harmonicWaveXPolarizationFrame (harmonicWaveXAngularFrequency F waveNumber)
-    (harmonicWaveXAngularFrequency_pos F hκ)
-  have hdisp : wave.IsDispersionMatched F.toHomogeneousIsotropicMedium :=
-    MonochromaticPlaneWave.inMedium_isDispersionMatched F.toHomogeneousIsotropicMedium
-      harmonicWaveXDirection (harmonicWaveXAngularFrequency F waveNumber)
-      (harmonicWaveXAngularFrequency_pos F hκ)
-      (harmonicWaveXPolarizationFrame.electricReal J)
-      (harmonicWaveXPolarizationFrame.electricImag J)
-  have hB :=
-    IsDispersionMatched.magneticInduction_eq_waveSpeed_inv_smul_cross_electricField
-      hdisp t x
-  change wave.magneticInduction t x = _
-  rw [hB, harmonicWaveX_magneticField_eq_cross_electricField F hκ,
-    harmonicWaveX_materialWave_electricField F hκ]
-  simp [wave, J, MonochromaticPlaneWave.propagationVector,
-    JonesVector.toMaterialPlaneWave, MonochromaticPlaneWave.inMedium,
-    harmonicWaveXPolarizationFrame, F.toHomogeneousIsotropicMedium_waveSpeed, one_div]
+/-- At the spacetime origin, the fixture's magnetic field strength is coordinate two with the
+inverse wave-speed factor. -/
+lemma materialWaveRegression_magneticFieldStrength_origin :
+    (((JonesVector.ofAmplitudePhase materialWaveRegressionAmplitude
+      materialWaveRegressionPhaseOffset).toMaterialPlaneWave
+        materialWaveRegressionFreeSpace.toHomogeneousIsotropicMedium
+        harmonicWaveXPolarizationFrame
+        (harmonicWaveXAngularFrequency materialWaveRegressionFreeSpace 2)
+        (harmonicWaveXAngularFrequency_pos materialWaveRegressionFreeSpace
+          (by norm_num))).magneticFieldStrength
+            materialWaveRegressionFreeSpace.toHomogeneousIsotropicMedium 0 0) =
+        materialWaveRegressionFreeSpace.c.val⁻¹ • EuclideanSpace.single 2 1 := by
+  rw [harmonicWaveX_materialWave_magneticFieldStrength
+    materialWaveRegressionFreeSpace (by norm_num)]
+  rw [harmonicWaveX_magneticField_eq_cross_electricField
+    materialWaveRegressionFreeSpace (by norm_num)]
+  rw [materialWaveRegression_harmonicWaveX_electricField_origin]
+  simp [harmonicWaveXDirection, crossProduct, materialWaveRegressionFreeSpace, one_div]
+  ext i
+  fin_cases i <;> simp
 
 end
 

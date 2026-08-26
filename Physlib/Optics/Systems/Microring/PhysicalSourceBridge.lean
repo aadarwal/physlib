@@ -94,7 +94,9 @@ namespace MicroringSourceBridge
 
 open Microring
 
-/-! ## A. Existing DATE parameters mapped to physical data -/
+/-!
+## A. Existing DATE parameters mapped to physical data
+-/
 
 /-- The DATE amplitudes at
 `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:64-118` as physical N7 fields. -/
@@ -156,7 +158,9 @@ lemma DateParameters.toPhysicalAddDrop_hasNonzeroDenominator (p : DateParameters
   rw [p.toPhysicalAddDrop_toParameters]
   exact (p.hasNonzeroDenominator_iff).mp hDenominator
 
-/-! ## B. DATE two-port matrix from the physical N7 coupler -/
+/-!
+## B. DATE two-port matrix from the physical N7 coupler
+-/
 
 /-- The DATE N7 arm mixer is definitionally the physical coupling arm mixer. -/
 lemma DateParameters.toPhysicalCoupling_toTwoPortScattering (p : DateParameters) :
@@ -200,7 +204,9 @@ lemma dateTwoPortChainMatrix_eq_gauged_physicalCouplerChain (p : DateParameters)
         dateChainGauge := by
       rw [hTransport _ _ p.toPhysicalCoupling_toTwoPortScattering _ _]
 
-/-! ## C. DATE four-port scattering from the physical N5 ring -/
+/-!
+## C. DATE four-port scattering from the physical N5 ring
+-/
 
 /-- The DATE-ordered, gauge-adapted two-sided scattering view of the physical N5 ring response.
 
@@ -292,7 +298,9 @@ lemma datePhysicalN5FourPortScattering_hasBijectiveRightToLeftTransmission
   rw [datePhysicalN5FourPortScattering_eq_source p hUnitary hDenominator]
   exact dateSourceFourPortScattering_hasBijectiveRightToLeftTransmission p hForward
 
-/-! ## D. DATE transfer and chain consequences -/
+/-!
+## D. DATE transfer and chain consequences
+-/
 
 /-- DATE's forward field is the sign-gauged through entry of the physical N5 ring response. -/
 lemma dateForwardTransfer_eq_physicalResponse (p : DateParameters)
@@ -359,7 +367,9 @@ lemma dateFourPortChainMatrix_eq_reindexed_physicalResponse (p : DateParameters)
   rw [datePhysicalFourPortChainTransform_eq p hUnitary hDenominator hForward]
   exact (dateFourPortBackwardFirstChainMatrix_reindex p).symm
 
-/-! ## E. Physical data in the existing SysCon dictionary -/
+/-!
+## E. Physical data in the existing SysCon dictionary
+-/
 
 /-- Physical add-drop data expressed in the existing SysCon'15 parameter record.
 
@@ -450,7 +460,9 @@ lemma sysConDropPower_eq_physicalResponsePower (p : AddDropPhysicalParameters)
         (Incident.mk (addDropInputChannel p))) := by
   rw [sysConDropPower, sysConDropTransfer_eq_physicalResponse p hDenominator]
 
-/-! ## F. SFG-TR transfer from the physical N5 ring -/
+/-!
+## F. SFG-TR transfer from the physical N5 ring
+-/
 
 /-- SFG-TR Thm. 7 at `HOL-CORPUS.md:346` is the physical response under its branch gate. -/
 lemma sfgAddDropTransfer_eq_physicalResponse (p : AddDropPhysicalParameters)

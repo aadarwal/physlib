@@ -22,10 +22,7 @@ bridge, proving that executable compilation retains multivalued relational behav
 member sends nonzero input `(1, -1)` to `(0, 2)`, exercising external injection, while a three-mode
 cycle distinguishes the stored forward and inverse mode tables in the routing matrix.
 
-## ii. Scope
-
-These are exact algebraic compiler sentinels. They make no passivity, losslessness, reciprocity,
-causality, inverse, determinant, or unique-solvability claim.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -33,6 +30,11 @@ causality, inverse, determinant, or unique-solvability claim.
 - B. Executable scattering, routing, and exposure entries
 - C. Singular feedback and relational soundness
 - D. Non-self-inverse mode-map routing
+
+## iv. References
+
+These are exact algebraic compiler sentinels. They make no passivity, losslessness, reciprocity,
+causality, inverse, determinant, or unique-solvability claim.
 
 -/
 

@@ -22,11 +22,7 @@ complete relational semantics.
 The pre-existing singular shared-link fixture remains a negative control: it has a nonzero
 homogeneous feedback state and an external input with no solution, so it is not well posed.
 
-## ii. Scope
-
-The coefficients are hostile algebraic sentinels, not passive or physically normalized optical
-components. Invertibility is proved without a contraction hypothesis. The regression does not
-claim losslessness, reciprocity, causality, or frequency-domain realizability.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -35,6 +31,12 @@ claim losslessness, reciprocity, causality, or frequency-domain realizability.
 - C. Complete solution and external response
 - D. Singular negative control
 - E. Wiring-presentation invariance
+
+## iv. References
+
+The coefficients are hostile algebraic sentinels, not passive or physically normalized optical
+components. Invertibility is proved without a contraction hypothesis. The regression does not
+claim losslessness, reciprocity, causality, or frequency-domain realizability.
 
 -/
 

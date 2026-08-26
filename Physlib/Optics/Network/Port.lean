@@ -27,15 +27,7 @@ involution, and has no fixed point. Ideal unit-gain routing is the identity mode
 along that mate equivalence, so its exact endpoint action and modal-power preservation follow from
 the existing convention-free reindexing API.
 
-## ii. Scope
-
-This file models one local bidirectional connection. It does not yet assemble finite connection
-families, enforce global endpoint uniqueness, expose external channels, or solve feedback
-equations. It adds no path phase, delay, attenuation, non-unit gain, reference-plane transport,
-reciprocity data, time-reversal pairing, fan-out, termination, or physical Poynting-flux
-interpretation. Splitters and combiners are components rather than one-to-many connections.
-
-## iii. Key results
+## ii. Key results
 
 - `Incident.splitSumEquiv` and `Outgoing.splitSumEquiv`: distribute directed endpoint wrappers over
   a binary sum of channel families.
@@ -59,12 +51,20 @@ interpretation. Splitters and combiners are components rather than one-to-many c
 - `PortConnection.idealRouting_mul_toOrientedModeTransform_apply`: the local `C * S` product has
   the intended incident-space action order.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Port families and directed channel ends
 - B. Local bidirectional connections
 - C. Typed scattering boundary
 - D. Ideal unit-gain routing
+
+## iv. References
+
+This file models one local bidirectional connection. It does not yet assemble finite connection
+families, enforce global endpoint uniqueness, expose external channels, or solve feedback
+equations. It adds no path phase, delay, attenuation, non-unit gain, reference-plane transport,
+reciprocity data, time-reversal pairing, fan-out, termination, or physical Poynting-flux
+interpretation. Splitters and combiners are components rather than one-to-many connections.
 
 -/
 

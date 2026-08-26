@@ -27,7 +27,7 @@ bridge consequently states their equality as an explicit hypothesis.
 
 - E. SFG-TR'14 parameter, port, and square-root dictionary
 
-## iv. References and non-claims
+## iv. References
 
 SFG-TR Def. 35 and Thm. 7 are summarized at `HOL-CORPUS.md:345-346`.
 
@@ -38,6 +38,7 @@ validity. No reciprocity, omitted-loss completeness, time-domain causality, band
 dispersion, or measurement-validation claim is made. The SFG transfer quotient is totalized at
 zero denominator; its algebraic identity remains meaningful there, but an N5 response claim
 requires the displayed nonzero-denominator gate.
+
 -/
 @[expose] public section
 
@@ -46,7 +47,9 @@ namespace Optics
 noncomputable section
 
 namespace MicroringSourceBridge
-/-! ## E. SFG-TR'14 parameter, port, and square-root dictionary -/
+/-!
+## E. SFG-TR'14 parameter, port, and square-root dictionary
+-/
 
 /-- The five complex SFG-TR add-drop coefficients from `HOL-CORPUS.md:345-346`. -/
 structure SfgParameters where

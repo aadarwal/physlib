@@ -49,7 +49,9 @@ noncomputable section
 
 namespace DirectionalCoupler
 
-/-! ## A. Power constraints and the two-coordinate identity -/
+/-!
+## A. Power constraints and the two-coordinate identity
+-/
 
 /-- The common normalized-modal-power factor `t² + k²` of the two-arm mixer. -/
 def Parameters.powerFactor (p : Parameters) : ℝ :=
@@ -85,7 +87,9 @@ lemma normSq_mixing_pair (p : Parameters) (first second : ℂ) :
   simp [crossCoefficient, Parameters.powerFactor, Complex.normSq_apply]
   ring
 
-/-! ## B. Mixer and component power classification -/
+/-!
+## B. Mixer and component power classification
+-/
 
 /-- The two-arm mixer scales total normalized modal power by exactly `t² + k²`. -/
 lemma power_mixing_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)

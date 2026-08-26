@@ -51,7 +51,9 @@ universe u
 
 namespace DirectionalCoupler
 
-/-! ## A. Physical ports and channel coordinates -/
+/-!
+## A. Physical ports and channel coordinates
+-/
 
 /-- The four independently wireable ports of a co-directional two-arm coupler. -/
 inductive Port
@@ -139,7 +141,9 @@ def outgoingChannelEquiv (mode : Type u) :
         Outgoing (mode ⊕ mode) ⊕ Outgoing (mode ⊕ mode)).symm).trans
     (Outgoing.relabelEquiv (channelEquiv mode))
 
-/-! ## B. Transported behavior and scattering realization -/
+/-!
+## B. Transported behavior and scattering realization
+-/
 
 /-- The independent directional-coupler behavior in owned physical endpoint labels. -/
 def physicalBehavior [Fintype ι] [DecidableEq ι] (p : Parameters) :

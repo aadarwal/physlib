@@ -22,14 +22,7 @@ channel types are different subtypes of the same ambient channel family, so thei
 behaviors are instead transported along a canonical equivalence that preserves the underlying
 ambient channel.
 
-## ii. Scope
-
-This file fixes the ambient port family. Reordering components changes that family and requires a
-separate covariance theorem. A mode phase gauge changes transform entries and is also covariance,
-not wiring invariance. No inverse, determinant, functionality, existence, or uniqueness hypothesis
-is used: the results apply unchanged to partial and multivalued network behaviors.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `PortConnectionFamily.WiringEquiv`: equivalence of connected labels preserving physical wiring.
 - `PortConnectionFamily.WiringEquiv.ofReindex`: index relabelling preserves wiring.
@@ -37,12 +30,19 @@ is used: the results apply unchanged to partial and multivalued network behavior
 - `PortConnectionFamily.WiringEquiv.partialRouting_eq`: ambient routing is literally invariant.
 - `FlatNetlist.behavior_withConnections`: external behavior changes only by canonical relabelling.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Wiring-preserving connected-channel equivalences
 - B. Connected and external channel invariance
 - C. Derived boundary-map invariance
 - D. Flat-netlist invariance
+
+## iv. References
+
+This file fixes the ambient port family. Reordering components changes that family and requires a
+separate covariance theorem. A mode phase gauge changes transform entries and is also covariance,
+not wiring invariance. No inverse, determinant, functionality, existence, or uniqueness hypothesis
+is used: the results apply unchanged to partial and multivalued network behaviors.
 
 -/
 

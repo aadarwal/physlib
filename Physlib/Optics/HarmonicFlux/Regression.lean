@@ -26,10 +26,11 @@ cross product.
 
 - A. Exact phasor regressions
 
-## iv. Scope
+## iv. References
 
 These results test only the local peak-phasor formula. They assign no polarization handedness,
 Maxwell, propagation, irradiance, or modal-power meaning to the selected coordinate arrays.
+
 -/
 
 @[expose] public section

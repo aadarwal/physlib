@@ -32,11 +32,7 @@ no interference term, and shows the same two contributions taken coherently diff
 amount, so the vanishing of the cross terms is a consequence of the decorrelation hypothesis
 rather than of the fixture being degenerate.
 
-## ii. Scope
-
-These are exact algebraic fixtures at one frequency. Nothing here claims that the components are
-physically realizable devices, that the modal power convention has been normalized to
-electromagnetic flux, or that the fixture is reciprocal.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -47,6 +43,14 @@ electromagnetic flux, or that the fixture is reciprocal.
 - E. The hand-computed external response
 - F. Coherent and decorrelated two-input power
 - G. A mixing, asymmetric coherency-transport fixture
+  - G.1. Independent anchors
+  - G.2. Observables derived from the anchors
+
+## iv. References
+
+These are exact algebraic fixtures at one frequency. Nothing here claims that the components are
+physically realizable devices, that the modal power convention has been normalized to
+electromagnetic flux, or that the fixture is reciprocal.
 
 -/
 

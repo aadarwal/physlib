@@ -52,7 +52,9 @@ namespace AffineBoxDivergenceRegression
 
 noncomputable section
 
-/-! ## A. Skew polynomial fixture -/
+/-!
+## A. Skew polynomial fixture
+-/
 
 /-- The origin used as the affine-box center. -/
 def center : Space :=
@@ -158,7 +160,9 @@ def thirdFacePair : ℝ :=
 def boundaryFlux : ℝ :=
   firstFacePair + secondFacePair + thirdFacePair
 
-/-! ## B. Independent volume and face computations -/
+/-!
+## B. Independent volume and face computations
+-/
 
 /-- The field pairs with the first cofactor as `(2u)²`. -/
 lemma firstFaceDensity (u v w : ℝ) :
@@ -260,7 +264,9 @@ lemma boundaryFlux_exact : boundaryFlux = 8 := by
 lemma independent_balance : volumeIntegral = boundaryFlux := by
   rw [volumeIntegral_exact, boundaryFlux_exact]
 
-/-! ## C. Production-theorem sentinel -/
+/-!
+## C. Production-theorem sentinel
+-/
 
 /-- The production divergence theorem agrees with both independent exact evaluations on the skew
 fixture. -/

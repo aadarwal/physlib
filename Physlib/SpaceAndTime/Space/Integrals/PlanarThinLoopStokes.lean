@@ -27,8 +27,8 @@ time-differentiation interchange, or shrinking-loop limit.
 
 ## ii. Key results
 
-- `PlanarThinLoopFamily.AmbientHalfSpanningIntegrable`: outer integrability of one ambient
-  half-surface flux.
+- `PlanarThinLoopFamily.AmbientHalfSpanningIntegrable`: both iterated integrability levels for one
+  ambient half-surface flux.
 - `PlanarThinLoopFamily.circulation_eq_normalized_curlFlux_add_carrierJump`: the normalized
   split-loop Stokes identity.
 - `PlanarThinLoopFamily.spanningSurfaceAverage_ofFields_eq_normalized_affineSplitIntegral`:
@@ -57,7 +57,9 @@ noncomputable section
 
 namespace PlanarThinLoopFamily
 
-/-! ## A. Thin-loop frame geometry -/
+/-!
+## A. Thin-loop frame geometry
+-/
 
 /-- The loop tangent, regarded as a direction in the affine-rectangle parameterization. -/
 def tangentDirection {plane : OrientedAffineHyperplane 3}
@@ -91,7 +93,9 @@ lemma spanningSurfaceNormal
       plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3)) := by
   rfl
 
-/-! ## B. Ambient half-surface integrability -/
+/-!
+## B. Ambient half-surface integrability
+-/
 
 /-- Both levels of integrability of one ambient half-surface flux in a thin loop.
 
@@ -156,7 +160,9 @@ lemma planarSplitRectangleFluxIntegrable
     rw [loop.planarRectanglePoint_eq_normalOffsetPoint]
     rfl
 
-/-! ## C. Open-side integral bridges -/
+/-!
+## C. Open-side integral bridges
+-/
 
 private lemma negativeSideSample_integral_eq_ambient
     {plane : OrientedAffineHyperplane 3}
@@ -316,7 +322,9 @@ private lemma shortEdgeAverage_eq
     dsimp only <;>
     rw [loop.planarRectanglePoint_eq_normalOffsetPoint]
 
-/-! ## D. Normalized split-loop Stokes identity -/
+/-!
+## D. Normalized split-loop Stokes identity
+-/
 
 /-- The normalized principal-plus-short-edge circulation equals the normalized sum of the two
 bulk curl-flux integrals and the retained positive-minus-negative carrier-line integral. -/

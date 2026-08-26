@@ -54,7 +54,9 @@ noncomputable section
 
 namespace AllPass
 
-/-! ## A. Direct path-and-loop expansion -/
+/-!
+## A. Direct path-and-loop expansion
+-/
 
 /-- The fixture's reduced circulation model has unequal edge gains `1 / 2` and `3 / 5`. -/
 lemma allPassMasonRegression_loopSignalFlowGraph :
@@ -106,7 +108,9 @@ lemma allPassMasonRegression_loopMasonThroughTransfer :
   rw [mul_pow, Complex.I_sq]
   norm_num
 
-/-! ## B. Independent N5 agreement -/
+/-!
+## B. Independent N5 agreement
+-/
 
 /-- The raw N5 channel solution and the independently enumerated reduced circulation model agree.
 Neither general Mason/N5 bridge theorem is used. -/

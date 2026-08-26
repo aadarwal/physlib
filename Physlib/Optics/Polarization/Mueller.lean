@@ -12,11 +12,23 @@ public import Physlib.Optics.Polarization.Mueller.Unitary
 /-!
 # Deterministic Jones-induced Mueller transformations
 
+## i. Overview
+
 This module exports the raw Mueller carrier, the Jones-induced Stokes action and commuting-square
 theorems, its Pauli trace formula, identity/cascade/scalar laws, unitary Poincare consequences, and
 sign-sensitive convention regressions.
 
+## ii. Key results
+
+## iii. Table of contents
+
+- A. Module contents
+
+## iv. References
+
 The exported construction is deterministic and nondepolarizing. An arbitrary raw `MuellerMatrix`
 is not thereby physically admissible or Jones-induced, and general depolarizing transformations
 require a later positive-map layer on coherency data.
+
+## A. Module contents
 -/

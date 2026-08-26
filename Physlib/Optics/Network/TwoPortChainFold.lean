@@ -37,12 +37,13 @@ transmission.
 - A. Relational and matrix folds
 - B. Certified scattering folds
 
-## iv. References and non-claims
+## iv. References
 
 The fold is neutral N3T machinery and is Physlib-original. It introduces no ring, propagation,
 source-parity, termination, passivity, reciprocity, causality, or electromagnetic claim. The
 bijective transmission certificate is only a coordinate-solvability gate; it is not inferred from
 any physical condition.
+
 -/
 
 @[expose] public section

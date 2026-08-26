@@ -18,15 +18,17 @@ incident `(aL, aR)` and outgoing `(bL, bR)` become left state `(bL, aL)` and rig
 scattering map then shows that scattering functionality need not survive this regrouping: the right
 incident wave remains unconstrained when both outgoing waves vanish.
 
-## ii. Scope
-
-These are algebraic fixed-frequency fixtures. Their scalar coordinates do not carry a field,
-power, passivity, reciprocity, propagation-phase, termination, or physical-realization claim.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Backward-first scattering regrouping
 - B. Scattering functionality under regrouping
+
+## iv. References
+
+These are algebraic fixed-frequency fixtures. Their scalar coordinates do not carry a field,
+power, passivity, reciprocity, propagation-phase, termination, or physical-realization claim.
 
 -/
 

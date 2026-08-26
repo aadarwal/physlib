@@ -20,7 +20,7 @@ weakened non-strict unit-disk test.
 The stable fixture also computes its numerator and denominator root sets and exact degrees. These
 are abstract quotient checks: no N5F response-entry certificate is inferred.
 
-## ii. Key definitions and results
+## ii. Key results
 
 - `stableOnePole_formalPoles`: the exact formal root `{2}`.
 - `stableOnePole_zPoles`: the exact reciprocal-coordinate root `{1/2}`.
@@ -35,7 +35,7 @@ are abstract quotient checks: no N5F response-entry certificate is inferred.
 - A. Stable root and degree anchors
 - B. Stable and unstable criterion anchors
 
-## iv. References and non-claims
+## iv. References
 
 The production one-pole candidate characterization and unit-circle ROC bridge are in
 `Physlib/Mathematics/ZTransform/OnePole.lean:73-116`. The generic candidate-pole definition and
@@ -50,6 +50,7 @@ specializes the neutral explicit self-convolution growth witness from `OnePoleBI
 
 No physical resonance, network transfer-pole, DCDR topology, or general proper-rational BIBO
 equivalence is asserted.
+
 -/
 
 @[expose] public section

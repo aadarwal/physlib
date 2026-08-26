@@ -22,16 +22,7 @@ Under that exact block hypothesis, the public chain transform is extracted from 
 behavior. Its four-block formula is then proved as a derived representation. No inverse of the
 full scattering matrix is used.
 
-## ii. Scope and convention
-
-Rows of the scattering transform are `(bL, bR)` and columns are `(aL, aR)`. Backward-first chain
-states satisfy `(aR, bR) = K (bL, aL)`. Therefore the pivot is scattering block `₁₂`, and the
-bottom-right chain block is `Tlr - Rr * Trl⁻¹ * Rl` in precisely that order.
-
-These are fixed-frequency complex-linear semantics. No losslessness, passivity, reciprocity,
-causality, reference-plane transport, termination, or electromagnetic realization is inferred.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `TwoPortScatteringTransform.toTravellingWaveCoordinates`: direction-typed scattering
   coordinates.
@@ -44,13 +35,22 @@ causality, reference-plane transport, termination, or electromagnetic realizatio
 - `TwoPortScatteringTransform.toBackwardFirstChainTransform_eq_blockFormula`: the exact block
   formula.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Direction-typed scattering blocks
 - B. Backward-first block equations
 - C. Exact chain-view criterion
 - D. Pivot inverse and block formula
 - E. Behavior-derived chain conversion
+
+## iv. References
+
+Rows of the scattering transform are `(bL, bR)` and columns are `(aL, aR)`. Backward-first chain
+states satisfy `(aR, bR) = K (bL, aL)`. Therefore the pivot is scattering block `₁₂`, and the
+bottom-right chain block is `Tlr - Rr * Trl⁻¹ * Rl` in precisely that order.
+
+These are fixed-frequency complex-linear semantics. No losslessness, passivity, reciprocity,
+causality, reference-plane transport, termination, or electromagnetic realization is inferred.
 
 -/
 

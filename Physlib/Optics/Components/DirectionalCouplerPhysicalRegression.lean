@@ -44,7 +44,9 @@ noncomputable section
 
 namespace DirectionalCoupler
 
-/-! ## A. Physical-coordinate fixture -/
+/-!
+## A. Physical-coordinate fixture
+-/
 
 /-- The exact incident fixture transported to the four owned physical ports. -/
 def directionalCouplerPhysicalRegressionIncident :
@@ -135,7 +137,9 @@ lemma directionalCouplerPhysicalRegression_sameSide_pullback :
     norm_num [ModeAmplitude.reindex_apply, outgoingChannelEquiv, channelEquiv,
       directionalCouplerPhysicalRegressionSameSide, directionalCouplerRegressionSameSide]
 
-/-! ## B. Physical behavior and scattering -/
+/-!
+## B. Physical behavior and scattering
+-/
 
 /-- The exact state satisfies the independently transported physical behavior. -/
 lemma directionalCouplerPhysicalRegression_mem :

@@ -62,7 +62,9 @@ noncomputable section
 
 namespace MachZehnder
 
-/-! ## A. Output powers and balanced phase specializations -/
+/-!
+## A. Output powers and balanced phase specializations
+-/
 
 /-- The two right-output normalized modal powers are the squared moduli of the amplitudes
 extracted by N5. -/
@@ -356,7 +358,9 @@ lemma balanced_phase_pi_dark_port (input : ℂ) :
           (externalOutgoingEquiv balancedPhasePi .outputSecond) = 0 :=
   (balanced_phase_pi_output_amplitudes input).2
 
-/-! ## B. N6 conservation, identifiability, and coherency -/
+/-!
+## B. N6 conservation, identifiability, and coherency
+-/
 
 /-- The N7 losslessness hypotheses on the four parameters classify every netlist component as
 lossless. -/

@@ -52,7 +52,9 @@ open Space Time
 
 noncomputable section
 
-/-! ## A. Oriented approach fixture -/
+/-!
+## A. Oriented approach fixture
+-/
 
 /-- The positive third-coordinate direction used by the one-sided trace fixture. -/
 def oneSidedTraceRegressionNormal : Direction 3 where
@@ -93,7 +95,9 @@ lemma oneSidedTraceRegression_negativeApproach :
       OrientedAffineHyperplane.normalVector, oneSidedTraceRegressionPlane,
       oneSidedTraceRegressionNormal, oneSidedTraceRegressionBoundaryPoint]
 
-/-! ## B. Independent side traces -/
+/-!
+## B. Independent side traces
+-/
 
 /-- A spatially and temporally constant vector field used by the independent-side regression. -/
 def oneSidedTraceRegressionConstantVectorField (v : EuclideanSpace ℝ (Fin 3)) :

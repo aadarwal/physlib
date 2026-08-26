@@ -18,15 +18,20 @@ real-part operation used by complex wave carriers. It records the positive-expon
 and scalar-action order explicitly, so later field bridges can reuse the convention without
 adding wave-equation dependencies to the Jones foundations.
 
-## ii. Key result
+## ii. Key results
 
 - `Phasor.realizeEuclidean_eq_realPart_exp_smul`: Euclidean phasor realization as the real part
   of a positive-exponential carrier scaling.
 
-## iii. Scope
+## iii. Table of contents
+
+- A. Positive-exponential carrier realization
+
+## iv. References
 
 The result is a pointwise representation identity. It introduces no wave vector,
 electromagnetic-field, harmonic-average, irradiance, power, or evanescence claim.
+
 -/
 
 @[expose] public section

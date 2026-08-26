@@ -33,10 +33,11 @@ used by the analyzer regression.
 - B. Signed unit-flux computations
 - C. Incident and outgoing normalization
 
-## iv. Scope
+## iv. References
 
 Counting measure gives one discrete profile weight; it is not claimed to be geometric aperture
 area. The singleton normalization supplies no modal completeness or physical polarizer model.
+
 -/
 
 @[expose] public section

@@ -48,7 +48,9 @@ open Filter Matrix Space Time
 
 noncomputable section
 
-/-! ## A. Coordinate geometry and shrinking cells -/
+/-!
+## A. Coordinate geometry and shrinking cells
+-/
 
 /-- The positive third-coordinate unit normal. -/
 def planarThinCellRegressionNormal : Direction 3 where
@@ -179,7 +181,9 @@ def planarThinCellRegressionCells : PlanarMaxwellThinCells planarThinCellRegress
   pillbox := fun _ ↦ planarThinCellRegressionPillbox
   loop := fun _ tangent ↦ planarThinCellRegressionLoop tangent
 
-/-! ## B. Constant fields and sources -/
+/-!
+## B. Constant fields and sources
+-/
 
 /-- A spatially and temporally constant vector field. -/
 def planarThinCellRegressionConstantVectorField (v : EuclideanSpace ℝ (Fin 3)) :
@@ -300,7 +304,9 @@ lemma planarThinCellRegressionSurfaceCurrent_continuousAt
       planarThinCellRegressionSurfaceCurrentVector) x
   fun_prop
 
-/-! ## C. Literal integral laws -/
+/-!
+## C. Literal integral laws
+-/
 
 /-- A normalized average of a constant over a positive symmetric interval is that constant. -/
 lemma planarThinCellRegression_normalizedIntervalAverage_const
@@ -1110,7 +1116,9 @@ lemma planarThinCellRegression_isIntegralMaxwell :
     change _ = 0 + 0 + _
     simpa using planarThinCellRegression_magneticJump_pairing tangent
 
-/-! ## D. Derived boundary laws -/
+/-!
+## D. Derived boundary laws
+-/
 
 /-- The coordinate fixture satisfies the reduced regularity contract. Principal and sheet limits
 are deliberately absent here: the production theorem derives them from the stored traces and

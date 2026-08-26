@@ -56,7 +56,9 @@ open Space Time
 
 noncomputable section
 
-/-! ## A. Macroscopic side data -/
+/-!
+## A. Macroscopic side data
+-/
 
 /-- The four macroscopic fields on one open half-space together with their one-sided trace. -/
 structure PlanarMacroscopicSideFields (plane : OrientedAffineHyperplane 3)
@@ -146,7 +148,9 @@ def magneticFieldStrengthFamily {plane : OrientedAffineHyperplane 3}
 
 end PlanarMacroscopicTwoSidedFields
 
-/-! ## B. Differential Maxwell trace data -/
+/-!
+## B. Differential Maxwell trace data
+-/
 
 namespace IsMacroscopicMaxwell
 

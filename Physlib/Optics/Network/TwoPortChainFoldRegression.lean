@@ -27,10 +27,11 @@ for the reversed product, so the fixture would fail if the list orientation were
 
 - A. Asymmetric two-element fold
 
-## iv. References and non-claims
+## iv. References
 
 This is a Physlib-original algebraic fixture. It makes no ring, propagation, termination,
 passivity, reciprocity, causality, source-parity, or electromagnetic claim.
+
 -/
 
 @[expose] public section

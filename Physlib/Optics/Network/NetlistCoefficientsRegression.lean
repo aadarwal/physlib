@@ -22,16 +22,18 @@ boundary matrices, and the implicit feedback matrix `1 - C * S`.
 The evaluated feedback matrix remains singular. This is an intentional sentinel that the
 coefficient backend adds no inverse, determinant, or well-posedness hypothesis.
 
-## ii. Scope
-
-The formal variable is algebraic. The fixture assigns it no frequency units, delay convention,
-causal domain, or physical response interpretation.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Rational-gain fixture
 - B. Guarded point evaluation
 - C. Matrix commutation and singular feedback
+
+## iv. References
+
+The formal variable is algebraic. The fixture assigns it no frequency units, delay convention,
+causal domain, or physical response interpretation.
 
 -/
 

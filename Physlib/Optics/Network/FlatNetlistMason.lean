@@ -26,7 +26,22 @@ to relational well-posedness. Mason's gain formula then reconstructs the proof-g
 inverse entry by entry. Substitution into the external readout proves that the Mason response and
 the behavior-derived N5 response are the same transform.
 
-## ii. Scope
+## ii. Key results
+
+- `FlatNetlist.feedbackSignalFlowGraph`: the scalar graph with gain matrix `C * S`.
+- `FlatNetlist.isWellPosed_iff_feedbackSignalFlowGraph_graphDet_ne_zero`: the exact common gate.
+- `FlatNetlist.feedbackMasonTransform`: the matrix of internal Mason gains.
+- `FlatNetlist.feedbackMasonTransform_eq_feedbackInverse`: agreement with N5 feedback elimination.
+- `FlatNetlist.masonResponseTransform`: the external response assembled from Mason gains.
+- `FlatNetlist.responseTransform_eq_masonResponseTransform`: equality with the N5 response.
+
+## iii. Table of contents
+
+- A. Extracting the feedback graph
+- B. Internal Mason gains
+- C. External response agreement
+
+## iv. References
 
 The construction expands the finite modal coordinates into scalar graph nodes. It is exact on the
 same domain as N5 elimination and assumes no contraction or infinite-series convergence. The gain
@@ -38,21 +53,6 @@ The external response is assembled from the internal Mason gains by the existing
 component-scattering, and readout matrices. It is not presented as one distinguished-terminal
 Mason graph. No causality, frequency dependence, passivity, losslessness, reciprocity, or physical
 realization is asserted.
-
-## iii. Key definitions and results
-
-- `FlatNetlist.feedbackSignalFlowGraph`: the scalar graph with gain matrix `C * S`.
-- `FlatNetlist.isWellPosed_iff_feedbackSignalFlowGraph_graphDet_ne_zero`: the exact common gate.
-- `FlatNetlist.feedbackMasonTransform`: the matrix of internal Mason gains.
-- `FlatNetlist.feedbackMasonTransform_eq_feedbackInverse`: agreement with N5 feedback elimination.
-- `FlatNetlist.masonResponseTransform`: the external response assembled from Mason gains.
-- `FlatNetlist.responseTransform_eq_masonResponseTransform`: equality with the N5 response.
-
-## iv. Table of contents
-
-- A. Extracting the feedback graph
-- B. Internal Mason gains
-- C. External response agreement
 
 -/
 

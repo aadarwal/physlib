@@ -16,14 +16,16 @@ A raw two-port scattering matrix with four distinct nonreal entries is carried t
 `ScatteringMatrix` adapter. Exact block checks catch left/right reversal, incident/outgoing
 reversal, row/column transposition, conjugation, and an incorrectly oriented reindexing.
 
-## ii. Scope
-
-The fixture is an algebraic orientation sentinel. Its coefficients make no losslessness,
-passivity, reciprocity, or physical-realization claim.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. Four-block adapter sentinel
+
+## iv. References
+
+The fixture is an algebraic orientation sentinel. Its coefficients make no losslessness,
+passivity, reciprocity, or physical-realization claim.
 
 -/
 

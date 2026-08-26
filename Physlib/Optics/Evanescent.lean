@@ -27,15 +27,7 @@ local electric and magnetic phasor, and ordinary electric and magnetic-induction
 of the local electric phasor to zero at increasing side depth; the source-free Maxwell equations;
 and zero one-period mean Poynting component along the decay direction.
 
-## ii. Scope
-
-The predicate classifies an existing globally defined carrier relative to a selected half-space.
-It does not replace the field by zero outside that half-space: the same carrier grows under
-displacement in the opposite direction. It asserts no interface boundary condition, transmitted
-or total-internal-reflection role, outgoing or causal condition, pointwise zero normal flux, zero
-tangential flux, aperture power, or evanescent positive-power port.
-
-## iii. Key results
+## ii. Key results
 
 - `IsHalfSpaceEvanescent.attenuationVector_eq_halfSpaceDecayRate_smul_sideNormalVector`:
   attenuation is exactly positive and side normal.
@@ -51,11 +43,19 @@ tangential flux, aperture power, or evanescent positive-power port.
 - `IsHalfSpaceEvanescent.inner_sideNormalVector_intervalAverage_poyntingVector_eq_zero`: zero
   actual one-period mean flux along the decay direction.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Half-space evanescence
 - B. Positive-normal-decay representation
 - C. Field and flux consequences
+
+## iv. References
+
+The predicate classifies an existing globally defined carrier relative to a selected half-space.
+It does not replace the field by zero outside that half-space: the same carrier grows under
+displacement in the opposite direction. It asserts no interface boundary condition, transmitted
+or total-internal-reflection role, outgoing or causal condition, pointwise zero normal flux, zero
+tangential flux, aperture power, or evanescent positive-power port.
 
 -/
 

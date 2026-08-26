@@ -37,7 +37,7 @@ the separate Maxwell result.
 - A. Positive-medium Maxwell result
 - B. Stored-normal harmonic flux
 
-## iv. Scope
+## iv. References
 
 The transmitted name records the configuration slot and the selected positive-normal-decay
 branch. These results do not prove any interface boundary-amplitude law, Fresnel coefficient,
@@ -45,6 +45,7 @@ reflected-wave balance, outgoing radiation condition, or total internal reflecti
 normal flux does not mean zero field, zero stored energy, zero tangential flux, or pointwise zero
 normal Poynting vector. The statement is local flux density, not aperture-integrated or modal
 power, and the globally defined carrier still grows on the opposite side of the interface.
+
 -/
 
 @[expose] public section

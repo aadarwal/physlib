@@ -22,10 +22,7 @@ A second valid three-port family gives its unconnected third port an empty mode 
 channel embedding is surjective even though the third physical port is unused. This fixes the
 channel-versus-port distinction: an unconnected empty port contributes no external channel.
 
-## ii. Scope
-
-These are finite normalized-coordinate regressions. The external endpoint transforms supply no
-source, termination, detector, electromagnetic normalization, or feedback solution.
+## ii. Key results
 
 ## iii. Table of contents
 
@@ -34,6 +31,11 @@ source, termination, detector, electromagnetic normalization, or feedback soluti
 - C. Exact outgoing exposure and readout
 - D. The assembled `C b + E_in u` incident amplitude
 - E. An unconnected port with an empty mode fiber
+
+## iv. References
+
+These are finite normalized-coordinate regressions. The external endpoint transforms supply no
+source, termination, detector, electromagnetic normalization, or feedback solution.
 
 -/
 

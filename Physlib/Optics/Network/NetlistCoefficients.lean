@@ -24,15 +24,7 @@ a target field. When every stored denominator is nonzero at the selected point, 
 evaluation commutes not only with component assembly, but also with the multiplication and
 subtraction forming `1 - C * S`.
 
-## ii. Scope
-
-The denominator guard concerns component gains only. It neither asserts nor decides invertibility
-of the feedback matrix, unique solvability, a determinant condition, or a physical response domain.
-The symbolic backend is univariate in one formal variable. A stored canceled factor is still a
-required denominator and therefore conservatively excludes its zero from the guarded commutation
-theorems until an executable reduction algorithm is supplied.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `FiniteNetlistData.mapGains`: coefficient-only mapping, defined in `NetlistData`.
 - `FiniteNetlistData.feedbackMatrix_mapGains`: compiler naturality for `1 - C * S`.
@@ -41,11 +33,19 @@ theorems until an executable reduction algorithm is supplied.
 - `FiniteNetlistData.evaluateAt`: direct executable evaluation of every gain.
 - `FiniteNetlistData.feedbackMatrix_evalAt`: guarded evaluation commutes with `1 - C * S`.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Naturality of executable netlist matrices
 - B. Rational-function and point-evaluated netlist data
 - C. Guarded compilation commutation
+
+## iv. References
+
+The denominator guard concerns component gains only. It neither asserts nor decides invertibility
+of the feedback matrix, unique solvability, a determinant condition, or a physical response domain.
+The symbolic backend is univariate in one formal variable. A stored canceled factor is still a
+required denominator and therefore conservatively excludes its zero from the guarded commutation
+theorems until an executable reduction algorithm is supplied.
 
 -/
 

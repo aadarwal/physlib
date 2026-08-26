@@ -58,7 +58,9 @@ open Filter Space Time Matrix
 
 noncomputable section
 
-/-! ## A. Thin-cell regularity -/
+/-!
+## A. Thin-cell regularity
+-/
 
 /-- Limit hypotheses for the fixed terms of a planar integral Maxwell law.
 
@@ -228,7 +230,9 @@ lemma ampereMaxwell_hasBoundaryLimits
       surfaceCurrent t x (regularity.surfaceCurrent_continuousAt t x)
       (maxwell.integrable.ampereSheet t x tangent)
 
-/-! ## B. Derived planar boundary laws -/
+/-!
+## B. Derived planar boundary laws
+-/
 
 /-- Faraday thin-loop balances give equality of the two tangential electric-field traces. -/
 lemma tangentialElectricField

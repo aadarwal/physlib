@@ -512,9 +512,6 @@ Ownership rules:
 ### D.3. Not yet present
 
 - [ ] outgoing/limiting-absorption semantics, kept separate from positive-side decay;
-- [ ] the normalized-mode Malus power bridge and the polarization chain's remaining physical
-  observables; the propagating material-wave irradiance and actual mean-flux Malus laws are
-  complete;
 - [ ] Maxwell-derived complex boundary laws, outgoing semantics, and admittance-normalized
   scattering;
 - [ ] a physical time-reversed external-port pairing and convention-aware reciprocity. The local
@@ -1290,17 +1287,21 @@ quadrature output remains algebraically named, without electromagnetic-power or 
 
 ##### P6b-3. Physical polarization observables
 
-Status: unblocked by the completed P5b/E3b bridge; implementation remains.
+Status: complete on the fork. Export locations:
+`Optics/Polarization/HarmonicMaterialWave.lean` and
+`Optics/Systems/PolarizerRetarderPhysical*.lean`.
 
 Deliverables:
 
-- a connected example starting at P1b's `harmonicWaveX` bridge and passing through a P5a polarizer
-  and P6a wave plate; and
-- field realization, irradiance, and normalized-power observables, using P5b/E3b before any
+- [x] a connected example starting at P1b's `harmonicWaveX` bridge and passing through a P5a
+  polarizer and P6a wave plate; and
+- [x] field realization, irradiance, and normalized-power observables, using P5b/E3b before any
   physical-power claim.
 
-Exit: the reduced connected chain is realized as electromagnetic fields and its physical
-observables agree through named normalization bridge theorems.
+Exit achieved: the reduced connected chain is realized as electromagnetic fields and its
+irradiance, modal-coordinate power, and signed actual aperture flux agree through named P5b/E3b
+normalization bridge theorems. This coherent singleton result is not a complete-device power
+balance and makes no partially polarized or coherency-mixture claim.
 
 ### H.2. Electromagnetic-interface milestone
 
@@ -1582,23 +1583,25 @@ Owner: SpaceAndTime and Electromagnetism.
 - [x] local open-half-space domains, genuine one-sided traces, and the continuous-restriction
   constructor;
 - [x] the thin-cell regularity and limit-interchange hypotheses needed beyond pointwise traces;
-- [ ] integral curl and divergence laws with orientation and boundary hypotheses;
+- [x] integral curl and divergence laws under the explicit finite-sheet carrier and
+  witnessed-interchange premise;
 - [x] literal integral Maxwell equations with volume and surface sources, including explicit
   integrability witnesses for every displayed path, face, and volume pullback; and
 - [x] derivation that E4a's tangential and normal boundary predicates hold under the corresponding
   thin-loop and pillbox limits.
 
-The finite-balance-to-boundary slice is complete: the sourceful four-law predicate and reduced
-thin-cell regularity imply all four local jump laws, and the explicit three-wave optical fields
-inherit that conditional theorem through genuine open-side traces. Static and affine-time
-coordinate fixtures independently pin the jump orientation and make the Faraday minus and
-Ampere--Maxwell displacement-current plus signs load-bearing. The remaining unchecked item is the
-construction of the literal integral premise from differential or weak Maxwell equations through
-oriented Stokes/divergence machinery.
+The local-calculus chain is complete. `PlanarRectangleLocalStokes.lean` and
+`AffineBoxLocalDivergence.lean` prove oriented Stokes and divergence identities for independent
+half-cell fields without cross-carrier continuity. `FiniteSheetPremise.lean` then names the
+explicit carrier-source identifications and witnessed time/integral interchanges, and
+`FiniteSheetIntegralMaxwell.lean` derives the four literal finite Maxwell laws and all four local
+jump laws. Positive and hostile regressions make the premise load-bearing and independently pin
+the carrier signs. The remaining stronger step is deriving `HasPlanarFiniteSheetMaxwellPremise`
+itself from weak or measure-valued Maxwell equations.
 
-Exit: once that remaining construction is supplied, the local laws used by E5a/E5b/E6 become
-physical theorems from Maxwell equations. Physical Optics v0.1 requires this stronger exit;
-integrated-photonics work does not.
+Exit: once that premise derivation is supplied, the local laws used by E5a/E5b/E6 become physical
+theorems from Maxwell equations without a separately supplied finite-sheet model. Physical Optics
+v0.1 requires this stronger exit; integrated-photonics work does not.
 
 This exit is intentionally stronger than SPIE'14: its boundary predicate is stated (Def. 4.2,
 p. 6), justified only by a prose citation from Maxwell theory, and combined with additional
@@ -2383,8 +2386,12 @@ is claimed. Direct path/loop enumeration and raw channel elimination meet indepe
 exact `1 / 7` fixture. Its exhaustive bus boundary and complete reflectionless typed scattering
 law are also identified on the same solve gate. On the additional exact gate `throughTransfer ≠
 0`, its backward-first chain matrix is `diag(throughTransfer⁻¹, throughTransfer)` and converts
-back to the packaged typed scattering law. The causal Z-transform leg remains separate, so X-01
-is not yet complete.
+back to the packaged typed scattering law. The causal recurrence is now derived through the same
+rational N7/N5F netlist, with its absolute ROC, algebraic solve gate, contraction/Schur condition,
+and chain pivot kept distinct. On their explicit intersection, one theorem identifies the causal
+transform, rational response, circulation series, fixed N5 response, complete Mason response,
+typed scattering, backward-first chain, and original relational behavior. This completes the ring
+instance of X-01; the DCDR half remains separate, so X-01 as a two-system regression is still open.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2783,7 +2790,7 @@ current integration base; a designed package whose prerequisite is merely active
 | P6a retarder core | complete | P1a | unitary Jones action and canonical-state suite |
 | P6b-1 retarder representations | complete | P2b, P3b-2, P4, P6a | relative-phase Stokes bridge, exact coherency outputs, arbitrary Mueller block/action, and sign regressions |
 | P6b-2 reduced polarization chain | complete | P5a, P6b-1 | ordered polarizer--retarder exact Jones/coherency outputs, arbitrary raw-Stokes action, and connected QWP regression |
-| P6b-3 physical observables | unblocked | P1b, P5b, P6b-2, E3b | field realization, irradiance, and normalized-power agreement remain to implement |
+| P6b-3 physical observables | done | P1b, P5b, P6b-2, E3b | potential-derived input bridge, ordered material carrier, irradiance, modal power, separately normalized signed actual flux, and hostile phase/axis/sign regressions |
 | E0 Maxwell public API | complete | existing three-dimensional Maxwell module | exported free-space-constant declarations and downstream build |
 | E1 media/macroscopic Maxwell | complete | E0 | medium data, differentiability-aware field predicate, source-free/superposition API, and one-way vacuum bridge |
 | E2 material plane waves | in progress | E1, plane-wave vector calculus | real carrier/dispersion/Maxwell/converse, oriented Jones/phasor frame, incidence frames, neutral complex-wavevector decay geometry, off-shell complex carrier, exact real-wave bridge, complex calculus, bilinear complex dispersion, forward/converse complex-carrier Maxwell, exact algebraic and ordinary-field falsification regressions, interface-oriented side-decaying carrier geometry, its complex-bilinear s/p frame, transverse positive-medium Maxwell qualification, and named nonzero half-space evanescence are complete; separate outgoing semantics remain |
@@ -2791,7 +2798,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
 | E3b Optics normalization | complete on finite synthesis image | O1, P1a, E2, E3a | common-positive-frequency propagating Maxwell families, finite complex synthesis, actual one-period integrated Poynting flux, restricted two-dimensional Hausdorff aperture area, and signed modal-power identification are complete; no modal completeness claim |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; genuine propagation roles remain E5b |
-| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces, literal sourceful finite-cell Maxwell balances, explicit thin-cell regularity, conditional derivation of all four jump laws, sign-sensitive regressions, and the explicit-wave optical bridge are complete; constructing the integral premise from differential/weak Maxwell through oriented Stokes/divergence remains |
+| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces, local oriented Stokes/divergence for independent half-cell fields, an explicit finite-sheet carrier/interchange premise, its derivation of the literal sourceful finite-cell Maxwell balances and all four jump laws, sign-sensitive regressions, and the explicit-wave optical bridge are complete; deriving that finite-sheet premise from weak or measure-valued Maxwell remains |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection, angular reflection, the guarded phase-vector law of the plane of incidence, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, and the connected complex-TIR reflected/separate/superposed actual-flux endpoint are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and admittance-normalized scattering remain |
@@ -2803,7 +2810,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
 | N5 elimination | done | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, proof-gated Redheffer realization, and canonical FlatNetlist/N5H/common-domain response agreement are complete |
-| N5F parameterized compilation | in progress | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
+| N5F parameterized compilation | done | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
 | N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening, well-posed subsystem packaging, close behavior, append assembly, unconditional hierarchical/flattened semantic equality, N-08 evidence, and fixed-inner-wiring congruence are complete; one port-family transport construction remains for both inner-family replacement and literal three-stage associativity |
 | N6a conservation | done | N2a, N5; E3b for physical meaning | exact wiring power balance, componentwise passive/lossless closure, and lossless external scattering matrix |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
@@ -2811,22 +2818,22 @@ current integration base; a designed package whose prerequisite is merely active
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
 | S0 physical microrings | done | completed N3T core plus the N7 directional coupler and matched propagation | independent all-pass/add-drop field relations (`PhysicalRealization.lean:123-180`), N7 primitive realization and N5 response identification (`PhysicalRealization.lean:186-492`), and DATE/SysCon/SFG source-specific chain and response views (`PhysicalSourceBridge.lean:275-360,407-465`), with hostile fixtures in `PhysicalRegression.lean`; IP-66--IP-69 |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
-| S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, and the gated source bridge are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, and DATE/SysCon/SFG response identifications are complete under their stated gates; IP-06/IP-07 source questions and the remaining S0/S4+ integrations stay open |
+| S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, the gated source bridge, and the all-pass X-01 ring instance are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, DATE/SysCon/SFG response identifications, and common-domain causal-Z/N5F/N5/Mason/scattering/chain/relational agreement are complete under their stated gates; IP-06/IP-07 source questions and the remaining physical/source extensions stay open |
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
 | S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; network reachability/no-cancellation and broader rational BIBO remain |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: generic core, exact N5 agreement, and the all-pass relational/N5/chain/reduced-Mason value instance are complete; Z and DCDR X-01 legs remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, and independently enumerated ring regressions |
+| S6 Mason | done | N5, finite graph audit | neutral node- and edge-indexed Mason theory, `C * S` extraction, exact determinant gate, Mason feedback inverse, and typed external-response equality are complete; ring and DCDR instantiations belong to the S7 system suite |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | in progress | N4C, N5H, N6c, S4P--S6 | controller-managed worker is formalizing the audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | in progress | N3T, N5H, S0, S4P | controller-managed worker is formalizing source-backed cascades plus the Physlib-original full lattice |
-| R1--R5 ray/beam foundations | in progress: the R1--R5 foundational slices are integrated, including proved paraxial approximation error, component-derived ABCD systems, cardinal-point specifications, physical-domain Gaussian transport, matrix-level bounded-ray stability, two-mirror boundary fixtures, and a proof-gated fixed Gaussian beam; the E5b bridge, an R3 representative subsystem, source-style resonator unfolding, ring and phase-conjugate resonators, and selected source case studies remain open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
+| R1--R5 ray/beam foundations | in progress: the R1--R5 foundational slices and exact E5b bridge are integrated, including proved paraxial approximation error, component-derived ABCD systems, cardinal-point specifications, physical-domain Gaussian transport, matrix-level bounded-ray stability, two-mirror boundary fixtures, and a proof-gated fixed Gaussian beam; an R3 representative subsystem, source-style resonator unfolding, ring and phase-conjugate resonators, and selected source case studies remain open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 
 ## O. Overall completion checklist
 
 The long-running goal is complete only when:
 
-- [ ] the polarization milestone P1a--P6b, including every lettered subpackage, is complete;
+- [x] the polarization milestone P1a--P6b, including every lettered subpackage, is complete;
 - [ ] the electromagnetic-interface milestone E0--E6, including E3s/E3a/E3b and E4a/E4b, is
   complete;
 - [ ] the typed finite-network milestone N1--N7, including N3T, N4C, N5F/N5H, and N6a/N6b/N6c,

@@ -26,14 +26,7 @@ this relational condition is equivalent to injectivity, surjectivity, bijectivit
 invertibility, and a nonzero determinant. Under that condition the complete solution and external
 response are the graphs of the expected block formulas.
 
-## ii. Scope
-
-Well-posedness here concerns the complete internal state, not merely a unique externally observed
-output. The inverse is constructed only from a proof of bijectivity; Mathlib's total matrix inverse
-is not used as an ungated network solver. No contraction, passivity, losslessness, reciprocity,
-causality, frequency dependence, or physical scattering specialization is asserted.
-
-## iii. Key definitions and results
+## ii. Key results
 
 - `FlatNetlist.IsWellPosed`: every external input has one complete solution state.
 - `FlatNetlist.HasBijectiveFeedbackOperator`: the proof gate on `1 - C * S`.
@@ -49,13 +42,20 @@ causality, frequency dependence, or physical scattering specialization is assert
 - `FlatNetlist.responseTransform_withConnections`: the response changes only by the canonical
   external relabelling.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Exact well-posedness criteria
 - B. Proof-gated feedback inverse
 - C. Complete and external block formulas
 - D. Behavior-derived transforms and agreement
 - E. Wiring-presentation invariance
+
+## iv. References
+
+Well-posedness here concerns the complete internal state, not merely a unique externally observed
+output. The inverse is constructed only from a proof of bijectivity; Mathlib's total matrix inverse
+is not used as an ungated network solver. No contraction, passivity, losslessness, reciprocity,
+causality, frequency dependence, or physical scattering specialization is asserted.
 
 -/
 

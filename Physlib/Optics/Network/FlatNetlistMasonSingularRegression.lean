@@ -17,14 +17,16 @@ The pre-existing singular shared-link fixture is the negative control for the N5
 Its extracted graph determinant is proved zero directly from its known noninjective feedback
 operator, without appealing to the well-posedness/graph-determinant equivalence.
 
-## ii. Scope
-
-The result gives no solved-response meaning to the totalized inverse or Mason quotient at the zero
-denominator. It is an algebraic failure sentinel, not a physical optical model.
+## ii. Key results
 
 ## iii. Table of contents
 
 - A. The singular determinant
+
+## iv. References
+
+The result gives no solved-response meaning to the totalized inverse or Mason quotient at the zero
+denominator. It is an algebraic failure sentinel, not a physical optical model.
 
 -/
 
