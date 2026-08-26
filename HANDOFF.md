@@ -228,4 +228,36 @@ is now one code span.
 
 ## Gate record
 
-The exact-source cutoff gate record will be inserted after the temporary-registry full gate.
+The exact post-sync source head gated for slice 2 is
+`7c6a7bd2d2fc34415bef6dca3d58f4a74ebd4b8f`. It contains every Lean and substantive handoff
+change in this cutoff and has `aff2484e` as an ancestor. With all six cumulative S7C modules
+temporarily registered in sorted order, this single locked command exited successfully:
+
+```text
+lake-lock env bash -c 'set -euo pipefail && lake exe cache get &&
+  lake --wfail build Physlib.Optics.Network.TwoPortChainFold
+    Physlib.Optics.Network.TwoPortChainFoldRegression
+    Physlib.Optics.Systems.Cascade.Heterogeneous
+    Physlib.Optics.Systems.Cascade.HeterogeneousRegression
+    Physlib.Optics.Systems.Cascade.Identical
+    Physlib.Optics.Systems.Cascade.IdenticalRegression &&
+  lake exe runPhyslibLinters && lake exe lint_all'
+```
+
+- Cache retrieval downloaded no files.
+- All six modules built with warnings as errors; Lake completed 2,761 jobs successfully.
+- `runPhyslibLinters` passed for Physlib and QuantumInfo.
+- `lint_all` completed all seven stages and exited zero.
+- Its build, illegal-import, PhyslibAlpha-import, duplicate-tag, sorry/pseudo, and declaration
+  linter stages passed.
+- The file-import inventory named only five pre-existing unregistered files: two under
+  `Physlib/Electromagnetism/**` and three under `Physlib/SpaceAndTime/**`. It named no S7C file.
+- The advisory style and transitive-import inventories contain only repository-baseline files and
+  no S7C file. The initially detected redundant direct Charpoly import was removed before this
+  recorded rerun.
+- The committed-state `./scripts/lint-style.sh` check passed at the exact source head.
+- The temporary registry edit was restored byte-identically. Pre-edit and post-edit SHA-256 were
+  both `9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
+
+The final cutoff-record commit changes only this gate record; no Lean source differs from the
+exact gated source head above.
