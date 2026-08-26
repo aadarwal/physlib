@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.SpecialFunctions.NonIntegrable
 public import Physlib.Electromagnetism.ThreeDimension.BoundaryConditions.PlanarThinCell
 
 /-!
