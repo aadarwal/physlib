@@ -763,6 +763,22 @@ lemma multipleDelayRationalEliminationResponse_eq_responseModel
 
 -/
 
+/-- At exponent one, the complex-gain path evaluation agrees with the earlier real-gain path
+evaluation after casting the gain to `ℂ`. -/
+lemma multipleDelayEvaluatedPathScattering_one_eq_evaluatedPathScattering
+    (gain : ℝ) (q : ℂ) :
+    multipleDelayEvaluatedPathScattering (gain : ℂ) 1 q =
+      evaluatedPathScattering gain q := by
+  change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
+  congr 1
+  funext output input
+  rw [multipleDelayRationalPathEntryModel_eval,
+    rationalPathEntryModel_eval]
+  rcases output with ⟨outputPort, outputMode⟩
+  rcases input with ⟨inputPort, inputMode⟩
+  cases outputPort <;> cases inputPort <;> cases outputMode <;> cases inputMode <;>
+    simp
+
 /-- At unit exponents, the embedded and earlier rational components have the same pointwise
 scattering laws. Their separately stored validity predicates are not identified here. -/
 lemma UnitDelayParameters.toMultipleDelayParameters_rationalComponents_scattering_eq
@@ -776,28 +792,16 @@ lemma UnitDelayParameters.toMultipleDelayParameters_rationalComponents_scatterin
   · rfl
   · change multipleDelayEvaluatedPathScattering (p.upperGain : ℂ) 1 q =
       evaluatedPathScattering p.upperGain q
-    change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
-    congr 1
-    funext output input
-    rw [multipleDelayRationalPathEntryModel_eval,
-      rationalPathEntryModel_eval]
-    simp
+    exact multipleDelayEvaluatedPathScattering_one_eq_evaluatedPathScattering
+      p.upperGain q
   · change multipleDelayEvaluatedPathScattering (p.lowerGain : ℂ) 1 q =
       evaluatedPathScattering p.lowerGain q
-    change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
-    congr 1
-    funext output input
-    rw [multipleDelayRationalPathEntryModel_eval,
-      rationalPathEntryModel_eval]
-    simp
+    exact multipleDelayEvaluatedPathScattering_one_eq_evaluatedPathScattering
+      p.lowerGain q
   · change multipleDelayEvaluatedPathScattering (p.feedbackGain : ℂ) 1 q =
       evaluatedPathScattering p.feedbackGain q
-    change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
-    congr 1
-    funext output input
-    rw [multipleDelayRationalPathEntryModel_eval,
-      rationalPathEntryModel_eval]
-    simp
+    exact multipleDelayEvaluatedPathScattering_one_eq_evaluatedPathScattering
+      p.feedbackGain q
 
 /-- The unit-exponent embedding and the earlier rational family compile to the same coherent N7
 flat netlist at every formal-`q` value, independently of their stored validity predicates. -/
