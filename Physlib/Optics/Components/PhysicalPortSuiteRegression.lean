@@ -235,20 +235,6 @@ local instance physicalPortSuite9aLocalChannelDecidableEq
   · change DecidableEq (Mirror.portFamily Unit).Channel
     infer_instance
 
-/-- The indexed mixed family has exactly its two beam channels and one mirror channel. -/
-local instance physicalPortSuite9aIndexedChannelFintype :
-    Fintype physicalPortSuite9aFamily.IndexedChannel where
-  elems := {⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩,
-    ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩,
-    ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩}
-  complete channel := by
-    rcases channel with ⟨component, ⟨port, mode⟩⟩
-    cases component
-    · cases port <;> cases mode <;> simp
-    · cases port
-      cases mode
-      simp
-
 /-- The indexed Phase 9a channels have decidable equality. -/
 local instance physicalPortSuite9aIndexedChannelDecidableEq :
     DecidableEq physicalPortSuite9aFamily.IndexedChannel :=
@@ -291,6 +277,30 @@ abbrev physicalPortSuite9aBeamSecondIndexed : physicalPortSuite9aFamily.IndexedC
 /-- The mirror channel in indexed component coordinates. -/
 abbrev physicalPortSuite9aMirrorIndexed : physicalPortSuite9aFamily.IndexedChannel :=
   ⟨.mirror, physicalPortSuite9aMirrorLocal⟩
+
+/-- A finite sum over the indexed suite is the sum of its three displayed coordinates. -/
+lemma physicalPortSuite9a_sum_indexed
+    (value : physicalPortSuite9aFamily.IndexedChannel → ℂ) :
+    (∑ channel, value channel) =
+      value physicalPortSuite9aBeamFirstIndexed +
+        value physicalPortSuite9aBeamSecondIndexed +
+          value physicalPortSuite9aMirrorIndexed := by
+  classical
+  have hUniv :
+      (Finset.univ : Finset physicalPortSuite9aFamily.IndexedChannel) =
+        {physicalPortSuite9aBeamFirstIndexed,
+          physicalPortSuite9aBeamSecondIndexed,
+          physicalPortSuite9aMirrorIndexed} := by
+    ext channel
+    rcases channel with ⟨component, ⟨port, mode⟩⟩
+    cases component
+    · cases port <;> cases mode <;> simp
+    · cases port
+      cases mode
+      simp
+  rw [hUniv]
+  simp [physicalPortSuite9aBeamFirstIndexed,
+    physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed]
 
 /-!
 ## C. Raw indexed and aggregate action
@@ -392,14 +402,14 @@ lemma physicalPortSuite9a_indexed_action :
       simp [physicalPortSuite9aExplicitIndexedTransform,
         physicalPortSuite9aIndexedInput, physicalPortSuite9aIndexedOutput,
         ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-        dotProduct, physicalPortSuite9aIndexedChannelFintype]
+        dotProduct, physicalPortSuite9a_sum_indexed]
     all_goals ring_nf
   · cases port
     cases mode
     simp [physicalPortSuite9aExplicitIndexedTransform,
       physicalPortSuite9aIndexedInput, physicalPortSuite9aIndexedOutput,
       ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-      dotProduct, physicalPortSuite9aIndexedChannelFintype]
+      dotProduct, physicalPortSuite9a_sum_indexed]
 
 /-- The mixed input in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aAggregateInput :
