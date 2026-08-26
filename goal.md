@@ -2319,13 +2319,17 @@ is deliberately not claimed and remains recorded in `tbd.md`.
 - equality with the corresponding entry of `(I - A)⁻¹`; and
 - extraction from suitable scalar network models.
 
-Current fork status: the neutral matrix layer now supplies node equations, unique-solvability
-equivalence, node-list path and permutation-family enumerations, the graph-determinant/system-
-determinant identity, a routed-loop-family/cofactor quotient, linear-system extraction, and an
-edge-indexed multigraph-to-matrix map. S6 remains incomplete: distinguished terminals,
-edge-indexed path/cycle enumeration with parallel branches, the general equality between the
-forward-path and routed-loop-family numerators, independent definition-level G-01/G-03 audits,
-and agreement with the N5 typed-netlist semantics are still open.
+Current fork status: the neutral mathematics layer supplies node equations, exact unique-
+solvability, node- and edge-indexed path/loop enumeration, distinguished terminals, the graph-
+determinant/system-determinant identity, classical forward-path Mason gain, linear-system
+extraction, and independent definition-level regressions. `FlatNetlist.feedbackSignalFlowGraph`
+now extracts the scalar graph `C * S` from the N5 feedback operator `1 - C * S`; its graph-
+determinant gate is exactly relational well-posedness. Entrywise Mason gains reconstruct the
+proof-gated feedback inverse, and `FlatNetlist.responseTransform_eq_masonResponseTransform`
+proves equality with the typed external N5 response. A nonsymmetric fixture pins internal gain
+`3 / 2`, external gains `6` and `2`, and a singular zero-determinant negative control. The generic
+S6/N5 bridge is therefore complete. Ring- and DCDR-specific G-04/X-01 instantiations remain in the
+S7 system suite rather than being inferred from this generic theorem.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2756,7 +2760,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S4 delay transfer | blocked | N5F, N7 | rational-delay evaluation and pole-domain suite |
 | S4P poles/zeros/stability | blocked | S4, N5F | reduced response, cancellation, and stability suite |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: neutral matrix/cofactor, classical forward-path formula, edge enumeration, distinguished terminals, and definition-level regressions integrated; N5 agreement remains | N5, finite graph audit | combinatorial/matrix equivalence |
+| S6 Mason | in progress: generic core and exact N5 agreement complete; ring/DCDR G-04 and broad X-01 instances remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric and singular regressions |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
