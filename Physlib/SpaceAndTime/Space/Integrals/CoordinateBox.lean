@@ -31,6 +31,7 @@ All interval endpoints are explicitly ordered; no orientation sign is hidden in 
 - `finThree_faceZero_setIntegral_Icc_eq_iterated`,
   `finThree_faceOne_setIntegral_Icc_eq_iterated`, and
   `finThree_faceTwo_setIntegral_Icc_eq_iterated`: the three ordered face conversions.
+- Their `_of_integrable` variants require integrability only on the retained face.
 
 ## iii. Table of contents
 
@@ -249,6 +250,90 @@ lemma finThree_setIntegral_Icc_eq_iterated
       (isCompact_Icc.prod isCompact_Icc)
 
 /-! ## B. Coordinate face integrals -/
+
+/-- Fixing coordinate zero of an integrable `Fin 3` box density leaves coordinates one and two
+in that order. -/
+lemma finThree_faceZero_setIntegral_Icc_eq_iterated_of_integrable
+    (f : (Fin 3 → ℝ) → ℝ) (t : ℝ)
+    (a₀ a₁ a₂ b₀ b₁ b₂ : ℝ) (h₁ : a₁ ≤ b₁) (h₂ : a₂ ≤ b₂)
+    (hf : IntegrableOn
+      (fun x ↦ f ((0 : Fin 3).insertNth t x))
+      (Set.Icc (![a₀, a₁, a₂] ∘ (0 : Fin 3).succAbove)
+        (![b₀, b₁, b₂] ∘ (0 : Fin 3).succAbove))) :
+    (∫ x in Set.Icc (![a₀, a₁, a₂] ∘ (0 : Fin 3).succAbove)
+        (![b₀, b₁, b₂] ∘ (0 : Fin 3).succAbove),
+      f ((0 : Fin 3).insertNth t x)) =
+      ∫ u in a₁..b₁, ∫ v in a₂..b₂, f ![t, u, v] := by
+  have hLower : ![a₀, a₁, a₂] ∘ (0 : Fin 3).succAbove = ![a₁, a₂] := by
+    funext i
+    fin_cases i <;> rfl
+  have hUpper : ![b₀, b₁, b₂] ∘ (0 : Fin 3).succAbove = ![b₁, b₂] := by
+    funext i
+    fin_cases i <;> rfl
+  have hInsert (x : Fin 2 → ℝ) :
+      (0 : Fin 3).insertNth t x = ![t, x 0, x 1] := by
+    ext i
+    fin_cases i <;> rfl
+  rw [hLower, hUpper] at hf ⊢
+  simp_rw [hInsert] at hf ⊢
+  exact finTwo_setIntegral_Icc_eq_iterated_of_integrable
+    (fun x ↦ f ![t, x 0, x 1]) a₁ a₂ b₁ b₂ h₁ h₂ hf
+
+/-- Fixing coordinate one of an integrable `Fin 3` box density leaves coordinates zero and two
+in that order. -/
+lemma finThree_faceOne_setIntegral_Icc_eq_iterated_of_integrable
+    (f : (Fin 3 → ℝ) → ℝ) (t : ℝ)
+    (a₀ a₁ a₂ b₀ b₁ b₂ : ℝ) (h₀ : a₀ ≤ b₀) (h₂ : a₂ ≤ b₂)
+    (hf : IntegrableOn
+      (fun x ↦ f ((1 : Fin 3).insertNth t x))
+      (Set.Icc (![a₀, a₁, a₂] ∘ (1 : Fin 3).succAbove)
+        (![b₀, b₁, b₂] ∘ (1 : Fin 3).succAbove))) :
+    (∫ x in Set.Icc (![a₀, a₁, a₂] ∘ (1 : Fin 3).succAbove)
+        (![b₀, b₁, b₂] ∘ (1 : Fin 3).succAbove),
+      f ((1 : Fin 3).insertNth t x)) =
+      ∫ u in a₀..b₀, ∫ v in a₂..b₂, f ![u, t, v] := by
+  have hLower : ![a₀, a₁, a₂] ∘ (1 : Fin 3).succAbove = ![a₀, a₂] := by
+    funext i
+    fin_cases i <;> rfl
+  have hUpper : ![b₀, b₁, b₂] ∘ (1 : Fin 3).succAbove = ![b₀, b₂] := by
+    funext i
+    fin_cases i <;> rfl
+  have hInsert (x : Fin 2 → ℝ) :
+      (1 : Fin 3).insertNth t x = ![x 0, t, x 1] := by
+    ext i
+    fin_cases i <;> rfl
+  rw [hLower, hUpper] at hf ⊢
+  simp_rw [hInsert] at hf ⊢
+  exact finTwo_setIntegral_Icc_eq_iterated_of_integrable
+    (fun x ↦ f ![x 0, t, x 1]) a₀ a₂ b₀ b₂ h₀ h₂ hf
+
+/-- Fixing coordinate two of an integrable `Fin 3` box density leaves coordinates zero and one
+in that order. -/
+lemma finThree_faceTwo_setIntegral_Icc_eq_iterated_of_integrable
+    (f : (Fin 3 → ℝ) → ℝ) (t : ℝ)
+    (a₀ a₁ a₂ b₀ b₁ b₂ : ℝ) (h₀ : a₀ ≤ b₀) (h₁ : a₁ ≤ b₁)
+    (hf : IntegrableOn
+      (fun x ↦ f ((2 : Fin 3).insertNth t x))
+      (Set.Icc (![a₀, a₁, a₂] ∘ (2 : Fin 3).succAbove)
+        (![b₀, b₁, b₂] ∘ (2 : Fin 3).succAbove))) :
+    (∫ x in Set.Icc (![a₀, a₁, a₂] ∘ (2 : Fin 3).succAbove)
+        (![b₀, b₁, b₂] ∘ (2 : Fin 3).succAbove),
+      f ((2 : Fin 3).insertNth t x)) =
+      ∫ u in a₀..b₀, ∫ v in a₁..b₁, f ![u, v, t] := by
+  have hLower : ![a₀, a₁, a₂] ∘ (2 : Fin 3).succAbove = ![a₀, a₁] := by
+    funext i
+    fin_cases i <;> rfl
+  have hUpper : ![b₀, b₁, b₂] ∘ (2 : Fin 3).succAbove = ![b₀, b₁] := by
+    funext i
+    fin_cases i <;> rfl
+  have hInsert (x : Fin 2 → ℝ) :
+      (2 : Fin 3).insertNth t x = ![x 0, x 1, t] := by
+    ext i
+    fin_cases i <;> rfl
+  rw [hLower, hUpper] at hf ⊢
+  simp_rw [hInsert] at hf ⊢
+  exact finTwo_setIntegral_Icc_eq_iterated_of_integrable
+    (fun x ↦ f ![x 0, x 1, t]) a₀ a₁ b₀ b₁ h₀ h₁ hf
 
 /-- Fixing coordinate zero of a `Fin 3` box leaves coordinates one and two in that order. -/
 lemma finThree_faceZero_setIntegral_Icc_eq_iterated
