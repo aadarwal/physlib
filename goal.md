@@ -2408,7 +2408,11 @@ rational N7/N5F netlist, with its absolute ROC, algebraic solve gate, contractio
 and chain pivot kept distinct. On their explicit intersection, one theorem identifies the causal
 transform, rational response, circulation series, fixed N5 response, complete Mason response,
 typed scattering, backward-first chain, and original relational behavior. This completes the ring
-instance of X-01; the DCDR half remains separate, so X-01 as a two-system regression is still open.
+instance of X-01. The DCDR instance now adds its independently gated nominal backward-first chain
+to the same causal-Z, rational, feedback, N5, Mason, scattering, and relational agreement. The
+two-system regression packages those two agreements as a conjunction on their respective common
+domains and proves their fixture values differ; it does not equate the ring and DCDR responses.
+Thus X-01 is complete only in this systemwise sense.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2427,9 +2431,10 @@ not claim the scalar formula for them.
 - transfer amplitude, spectral power, resonance, and rejection-ratio results;
 - at least one difference-equation/Z-transform derivation; and
 - at least one signal-flow/Mason derivation proved equal to network elimination; and
-- for an eligible ring and the DCDR case, a cross-semantics theorem equating relational behavior,
-  compiled elimination, chain response, feedback algebra, Mason gain, and recurrence/Z response on
-  the intersection of their domains.
+- [x] for an eligible ring and the DCDR case, a systemwise cross-semantics theorem equating
+  relational behavior, compiled elimination, chain response, feedback algebra, Mason gain, and
+  recurrence/Z response for each system on its own common domain. The joint theorem is a
+  conjunction and does not assert equality of the two devices' response values.
 
 The cross-semantics theorem keeps three conditions distinct: algebraic feedback requires an
 invertible internal operator; an infinite round-trip series requires contraction or summability;

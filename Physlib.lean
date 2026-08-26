@@ -514,6 +514,8 @@ public import Physlib.Optics.Systems.DCDR.MultipleDelayPolynomial
 public import Physlib.Optics.Systems.DCDR.MultipleDelayRegression
 public import Physlib.Optics.Systems.DCDR.MultipleDelaySource
 public import Physlib.Optics.Systems.DCDR.Netlist
+public import Physlib.Optics.Systems.DCDR.NominalChain
+public import Physlib.Optics.Systems.DCDR.NominalChainRegression
 public import Physlib.Optics.Systems.DCDR.Observables
 public import Physlib.Optics.Systems.DCDR.ObservablesRegression
 public import Physlib.Optics.Systems.DCDR.PassiveCaseRegression
@@ -549,6 +551,7 @@ public import Physlib.Optics.Systems.Microring.AddDropRegression
 public import Physlib.Optics.Systems.Microring.AllPass
 public import Physlib.Optics.Systems.Microring.AllPassChain
 public import Physlib.Optics.Systems.Microring.AllPassChainRegression
+public import Physlib.Optics.Systems.Microring.AllPassDCDRX01Regression
 public import Physlib.Optics.Systems.Microring.AllPassDelayTransfer
 public import Physlib.Optics.Systems.Microring.AllPassMason
 public import Physlib.Optics.Systems.Microring.AllPassMasonRegression
