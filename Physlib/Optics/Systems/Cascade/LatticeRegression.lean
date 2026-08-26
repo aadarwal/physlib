@@ -431,36 +431,29 @@ lemma latticeRegression_mem_componentBehavior :
     latticeRegressionParameters).mem_componentBehavior_iff_forall_component
       latticeRegressionIncident latticeRegressionOutgoing).2
   intro component
-  change RectangularLatticeComponent 2 2 at component
-  change
-    (latticeRegressionIncident.restrictEmbedding
-        (Incident.relabelEmbedding
-          ((rectangularLatticeComponents
-            latticeRegressionParameters).componentChannelEmbedding component)),
-      latticeRegressionOutgoing.restrictEmbedding
-        (Outgoing.relabelEmbedding
-          ((rectangularLatticeComponents
-            latticeRegressionParameters).componentChannelEmbedding component))) ∈
-      ((rectangularLatticeComponents latticeRegressionParameters).scattering
-        component).toOrientedModeTransform.toBehavior
-  rw [ModeTransform.mem_toBehavior_iff_toLinearMap,
-    ScatteringMatrix.toLinearMap_toOrientedModeTransform]
-  apply WithLp.ofLp_injective 2
-  funext localChannel
-  change Outgoing (rectangularLatticeComponentPortFamily component).Channel at localChannel
-  rcases localChannel with ⟨port, mode⟩
-  rw [ModeAmplitude.reindex_apply]
-  simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply,
-    ModeAmplitude.restrictEmbedding_apply]
-  rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
-  change latticeRegressionOutgoingValue component ⟨port, mode⟩ =
-    ∑ input,
+  letI : Fintype
+      ((rectangularLatticeNetlist
+        latticeRegressionParameters).components.portFamily component).Channel := by
+    change Fintype
       ((rectangularLatticeComponents
-        latticeRegressionParameters).scattering component).toModeTransform ⟨port, mode⟩
-          input * latticeRegressionIncidentValue component input
-  revert mode port
+        latticeRegressionParameters).portFamily component).Channel
+    exact rectangularLatticeLocalChannelFintype latticeRegressionParameters component
   rcases component with ⟨row, column⟩ | (horizontal | vertical)
-  · intro port mode
+  all_goals
+    rw [ModeTransform.mem_toBehavior_iff_toLinearMap,
+      ScatteringMatrix.toLinearMap_toOrientedModeTransform]
+    apply WithLp.ofLp_injective 2
+    funext localChannel
+    rcases localChannel with ⟨port, mode⟩
+    rw [ModeAmplitude.reindex_apply]
+    simp only [Equiv.symm_symm, Outgoing.channelEquiv_apply,
+      ModeAmplitude.restrictEmbedding_apply]
+    rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
+  · change latticeRegressionOutgoingValue (Sum.inl (row, column)) ⟨port, mode⟩ =
+      ∑ input,
+        ((rectangularLatticeComponents latticeRegressionParameters).scattering
+            (Sum.inl (row, column))).toModeTransform ⟨port, mode⟩ input *
+          latticeRegressionIncidentValue (Sum.inl (row, column)) input
     rw [Fintype.sum_equiv latticeSiteChannelEquiv _ _ (by intro input; rfl)]
     fin_cases row <;> fin_cases column <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
@@ -469,13 +462,17 @@ lemma latticeRegression_mem_componentBehavior :
         ModeAmplitude.restrictEmbedding_apply, latticeRegressionSiteScattering,
         latticeRegressionIncident, latticeRegressionOutgoing, latticeRegressionIncidentValue,
         latticeRegressionOutgoingValue] <;> norm_num
-  · rcases horizontal with ⟨row, edge⟩
+  · change latticeRegressionOutgoingValue (Sum.inr (Sum.inl horizontal)) ⟨port, mode⟩ =
+      ∑ input,
+        ((rectangularLatticeComponents latticeRegressionParameters).scattering
+            (Sum.inr (Sum.inl horizontal))).toModeTransform ⟨port, mode⟩ input *
+          latticeRegressionIncidentValue (Sum.inr (Sum.inl horizontal)) input
+    rcases horizontal with ⟨row, edge⟩
     rcases edge with ⟨column, hColumn⟩
     have hColumnZero : column = 0 := by
       apply Fin.ext
       omega
     subst column
-    intro port mode
     rw [latticeRegression_twoPort_sum]
     fin_cases row <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
@@ -486,13 +483,17 @@ lemma latticeRegression_mem_componentBehavior :
         latticeRegressionIncident, latticeRegressionOutgoing,
         latticeRegressionIncidentValue, latticeRegressionOutgoingValue] <;>
       norm_num <;> ring_nf
-  · rcases vertical with ⟨edge, column⟩
+  · change latticeRegressionOutgoingValue (Sum.inr (Sum.inr vertical)) ⟨port, mode⟩ =
+      ∑ input,
+        ((rectangularLatticeComponents latticeRegressionParameters).scattering
+            (Sum.inr (Sum.inr vertical))).toModeTransform ⟨port, mode⟩ input *
+          latticeRegressionIncidentValue (Sum.inr (Sum.inr vertical)) input
+    rcases vertical with ⟨edge, column⟩
     rcases edge with ⟨row, hRow⟩
     have hRowZero : row = 0 := by
       apply Fin.ext
       omega
     subst row
-    intro port mode
     rw [latticeRegression_twoPort_sum]
     fin_cases column <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
