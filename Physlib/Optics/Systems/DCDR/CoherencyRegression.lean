@@ -162,7 +162,8 @@ lemma coherencyRegression_decorrelated_channelPower :
   simp only [CoherencyMatrix.ofAmplitude_toMatrix, Matrix.mul_apply, Fin.sum_univ_two]
   norm_num [coherencyRegressionTransform, coherencyRegressionFirst,
     coherencyRegressionSecond, Matrix.vecMulVec, Matrix.conjTranspose,
-    Matrix.transpose, Matrix.map, Matrix.of_apply, Complex.ext_iff]
+    Matrix.transpose, Matrix.map, Matrix.of_apply, Complex.ext_iff,
+    map_div₀, map_ofNat]
 
 /-- Primitive amplitude action gives the exact retained cross term `-49/32`. -/
 lemma coherencyRegression_crossTerm :
@@ -217,7 +218,7 @@ lemma coherencyRegression_nonreal_offDiagonal :
   simp only [Matrix.mul_apply, Fin.sum_univ_two]
   norm_num [coherencyRegressionTransform, coherencyRegressionNonrealAmplitude,
     Matrix.vecMulVec, Matrix.conjTranspose, Matrix.transpose, Matrix.map,
-    Matrix.of_apply, Complex.ext_iff]
+    Matrix.of_apply, Complex.ext_iff, map_div₀, map_ofNat]
 
 /-- Replacing the conjugate transpose by an ordinary transpose flips the nonreal anchor. -/
 lemma coherencyRegression_unstarred_offDiagonal :
@@ -270,10 +271,12 @@ lemma coherencyRegression_production_agreement :
     2 * ((transfer zChainRegressionParameters * 1) *
       star (transfer zChainRegressionParameters * (-1))).re = -(49 / 32) := by
   refine ⟨coherencyRegression_decorrelated_channelPower, ?_, ?_, ?_⟩
-  · rw [responseCoherency_source_channelPower,
+  · rw [responseCoherency_source_channelPower zChainRegressionParameters
+        zChainRegression_hasNonzeroDenominator,
       zChainRegression_forward_transfer]
     norm_num [Complex.normSq]
-  · rw [responseCoherency_source_trace,
+  · rw [responseCoherency_source_trace zChainRegressionParameters
+        zChainRegression_hasNonzeroDenominator,
       zChainRegression_forward_transfer]
     norm_num [Complex.normSq]
   · rw [zChainRegression_forward_transfer]
