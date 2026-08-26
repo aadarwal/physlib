@@ -57,15 +57,32 @@ namespace Optics
 
 noncomputable section
 
+/-- Raw assembly uses the same ambient equality test as relational closure. -/
+local instance routingRephaseRegressionClosureChannelDecidableEq :
+    DecidableEq ReuseRegressionChannel :=
+  PortConnectionFamily.closureChannelDecidableEq
+
+/-- Right-associated raw assembly uses closure equality on connected channels. -/
+local instance routingRephaseRegressionRightClosureConnectedDecidableEq :
+    DecidableEq reuseRegressionRightFamily.Channel :=
+  reuseRegressionRightFamily.closureConnectedChannelDecidableEq
+
+/-- Left-associated raw assembly uses closure equality on connected channels. -/
+local instance routingRephaseRegressionLeftClosureConnectedDecidableEq :
+    DecidableEq reuseRegressionLeftFamily.Channel :=
+  reuseRegressionLeftFamily.closureConnectedChannelDecidableEq
+
 /-!
 ## A. Distinct non-real channel-end phases
 -/
 
 /-- The positive quadrature phase as an element of the complex unit circle. -/
-def routingRephaseRegressionI : Circle := ⟨Complex.I, by simp⟩
+def routingRephaseRegressionI : Circle :=
+  ⟨Complex.I, by simp [Submonoid.unitSphere]⟩
 
 /-- The negative quadrature phase as an element of the complex unit circle. -/
-def routingRephaseRegressionNegI : Circle := ⟨-Complex.I, by simp⟩
+def routingRephaseRegressionNegI : Circle :=
+  ⟨-Complex.I, by simp [Submonoid.unitSphere]⟩
 
 /-- The matched ambient gauge. Every internal outgoing source and its incident mate use the same
 phase, while opposite directions on each physical connection use the other quadrature phase. -/
@@ -194,6 +211,7 @@ lemma routingRephaseRegression_mem_componentBehavior :
   funext endpoint
   rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
   rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
+  rw [← Incident.channelEquiv.symm.sum_comp]
   cases component <;> cases port <;> cases mode <;>
     simp [routingRephaseRegressionComponentOperator,
       routingRephaseRegressionIncident, routingRephaseRegressionOutgoing,
