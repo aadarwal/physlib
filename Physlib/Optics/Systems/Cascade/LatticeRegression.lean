@@ -172,7 +172,7 @@ lemma latticeRegression_twoPort_sum
     (f : (TwoPortSeriesNetlist.portFamily Unit Unit).Channel → ℂ) :
     (@Finset.univ _ channelFintype).sum f =
       f (latticeRegressionTwoPortChannel .left) + f (latticeRegressionTwoPortChannel .right) := by
-  letI := channelFintype
+  let _ := channelFintype
   rw [← Fintype.sum_equiv (TwoPortSeriesNetlist.channelEquiv Unit Unit)
     (fun input => f (TwoPortSeriesNetlist.channelEquiv Unit Unit input)) f
     (by intro input; rfl)]
