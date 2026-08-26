@@ -51,8 +51,7 @@ variable {left middle right : Type u}
 
 /-- The incident assembly equation fixes the exposed left incident amplitude. -/
 lemma incident_apply_left_of_assembly_eq
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (input : ModeAmplitude (Incident left ⊕ Incident right))
@@ -70,8 +69,7 @@ lemma incident_apply_left_of_assembly_eq
 
 /-- The incident assembly equation fixes the exposed right incident amplitude. -/
 lemma incident_apply_right_of_assembly_eq
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (input : ModeAmplitude (Incident left ⊕ Incident right))
@@ -132,8 +130,7 @@ lemma outgoing_apply_right_of_readout_eq
 /-- Every complete state satisfying the middle-routing and external-readout equations is the
 aggregate state of its outer scattering data and its two internal outgoing amplitudes. -/
 lemma eq_aggregateState_of_boundaryEquations
-    [Fintype left] [DecidableEq left] [Fintype middle] [DecidableEq middle]
-    [Fintype right] [DecidableEq right]
+    [Fintype left] [Fintype middle] [Fintype right]
     (first : ScatteringMatrix (left ⊕ middle))
     (second : ScatteringMatrix (middle ⊕ right))
     (input : ModeAmplitude (Incident left ⊕ Incident right))
