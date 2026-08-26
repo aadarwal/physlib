@@ -332,10 +332,11 @@ lemma toBehavior_rephase_responseTransform
         (netlist.connections.externalGauge gauge).outgoing).toBehavior =
       netlist.rephasedBehavior gauge := by
   classical
-  rw [ModeTransform.toBehavior_rephase]
-  exact (LinearBehavior.rephase_congr _ _
-    (netlist.toBehavior_responseTransform hWellPosed)).trans
-      (netlist.rephasedBehavior_eq gauge hMatched).symm
+  rw [ModeTransform.toBehavior_rephase,
+    netlist.rephasedBehavior_eq gauge hMatched]
+  ext ⟨input, output⟩
+  simp only [LinearBehavior.mem_rephase_iff]
+  rw [netlist.toBehavior_responseTransform hWellPosed]
 
 /-- The response transform extracted from the rephased singular-safe boundary relation.
 
@@ -475,6 +476,7 @@ lemma closeBehavior_append_rephase_eq_staged
         ((inner.append outer).externalGauge gauge).outgoing := by
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched,
     inner.closeBehavior_append outer behavior]
+  rfl
 
 end Finite
 
