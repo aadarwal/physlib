@@ -180,6 +180,7 @@ lemma isAmplitudeCoupling_sqrt_of_isPowerCoupling {coupling : PowerCouplingParam
     IsAmplitudeCoupling (powerToAmplitudeCoupling coupling) := by
   refine ⟨Real.sqrt_nonneg coupling.throughPower,
     Real.sqrt_nonneg coupling.crossPower, ?_⟩
+  change Real.sqrt coupling.throughPower ^ 2 + Real.sqrt coupling.crossPower ^ 2 = 1
   rw [Real.sq_sqrt hCoupling.1, Real.sq_sqrt hCoupling.2.1]
   exact hCoupling.2.2
 
@@ -297,8 +298,9 @@ lemma PhysicalParameters.fieldAttenuation_sq (p : PhysicalParameters) :
 /-- The typed field-to-power conversion recovers the physical power attenuation. -/
 lemma PhysicalParameters.fieldAttenuation_toPower (p : PhysicalParameters) :
     fieldToPowerAttenuation p.fieldAttenuation = p.powerAttenuation := by
-  ext
-  exact p.fieldAttenuation_sq
+  change PowerAttenuation.mk (p.fieldAttenuation.value ^ 2) =
+    PowerAttenuation.mk p.powerAttenuation.value
+  exact congrArg PowerAttenuation.mk p.fieldAttenuation_sq
 
 /-- Valid propagation data produces a valid field attenuation factor. -/
 lemma PhysicalParameters.IsValid.isFieldAttenuation {p : PhysicalParameters}
