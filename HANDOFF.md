@@ -1,180 +1,249 @@
-# S7D slice 8c handoff: DCDR causal-Z common-point fix
+# S7D slice 9 handoff: joint ring and DCDR X-01 boundary/chain regression
 
 ## Cutoff identity
 
-- Exact sync target: `8e48a7d1fa1ef1080bfe75dbfc93c6768ec3bdcb`.
-- Sync merge: `60d7f6ab7ed1a11f2ab23fc3433505aca1fb95bf`.
-- Gated source: `439a36f52ec312dacb28aa3d85b4ca946d930e93`.
-- `Physlib.lean` was not changed. Its restored SHA-256 is
-  `18e578d35df5704c80de0d783d439ba9f3bf02f764549951eac2ae8548e2b85d`.
+- Exact sync target: `cb89d1d2d5ff3459c2cb50f21274713cd00ad62f`.
+- Sync merge: `001977bafa8fcf2c9ee5e47fb0e792cfbd734693`.
+- Gated source: `a99091fcd4a0315f00f85d32b8ff5eb534bc46f6`.
+- `Physlib.lean` is unchanged. Its restored SHA-256 is
+  `85727e4debf1f8ad8c50abe04763611f45131275542b2b6ee18f1e28d5f538d0`.
+- The source merge delta is exactly the three Lean modules listed below. This
+  handoff is the cutoff-only child.
 
-## Goal and scope
+The later development head `110eb5cd` was announced while the gate was running.
+Per controller direction, this cutoff remains based on `cb89d1d2`; no mid-gate
+resync was performed.
 
-This slice addresses the DCDR half of goal.md X-01: one ring and one DCDR should
-exercise relational, compiled, feedback, Mason, and recurrence/Z semantics on a
-common domain. The applicable DCDR views now agree under one explicit domain.
+## Goal resolution
 
-The DCDR API has no chain representation: it has no declared left/right
-traveling-wave boundary partition, reverse-transmission pivot, or chain transform.
-Accordingly, this slice does not discharge the word `chain`, nor does it provide a
-combined ring-and-DCDR aggregate regression. The two-system X-01 row remains open
-for a joint boundary/chain slice; this handoff does not overclaim its closure.
+At this cutoff ref, `goal.md:2430-2432` says verbatim:
+
+> - for an eligible ring and the DCDR case, a cross-semantics theorem equating
+> relational behavior, compiled elimination, chain response, feedback algebra,
+> Mason gain, and recurrence/Z response on the intersection of their domains.
+
+The X-01 row at `goal.md:2646` says verbatim:
+
+> | X-01 | one ring and one DCDR satisfy the full
+> relational/compiled/chain/feedback/Mason/Z cross-semantics equality on the
+> common domain | abstraction layers disagree despite local proofs |
+
+The preceding status at `goal.md:2408-2411` says verbatim:
+
+> On their explicit intersection, one theorem identifies the causal transform,
+> rational response, circulation series, fixed N5 response, complete Mason
+> response, typed scattering, backward-first chain, and original relational
+> behavior. This completes the ring instance of X-01; the DCDR half remains
+> separate, so X-01 as a two-system regression is still open.
+
+This slice supplies the missing DCDR nominal-chain leg and a joint two-system
+predicate/regression. The joint predicate is the conjunction of the already
+accepted ring agreement and the new DCDR agreement on their respective common
+domains. It never states that the two systems have the same response value.
+Thus the two-system X-01 row is closed in exactly that systemwise sense.
 
 ## Files and registration request
 
-- `Physlib/Optics/Systems/DCDR/ZTransform.lean`: causal recurrence, named ROC,
-  reciprocal-Z transfer, and a sufficient Schur gate.
-- `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean`: common-domain bridges and
-  the full-vector relational agreement record.
-- `Physlib/Optics/Systems/DCDR/ZTransformMasonRegression.lean`: independent raw
-  N5 equations and complete eleven-branch Mason enumeration.
-- `Physlib/Optics/Systems/DCDR/ZTransformRegression.lean`: exact positive and
-  negative fixtures, including analytic ROC and causal anchors.
+- `Physlib/Optics/Systems/DCDR/NominalChain.lean`: nominal two-channel boundary,
+  complete N5 response, scalar pivot, N3T chain, and extended DCDR agreement.
+- `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`: independent exact
+  N7, scattering, pivot, chain, common-domain, and hostile-plane fixtures.
+- `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`: joint
+  ring-and-DCDR predicate, unequal anchors, and joint negative sentinel.
 
 Please register these imports in repository-sorted order:
 
 ```lean
-public import Physlib.Optics.Systems.DCDR.ZTransform
-public import Physlib.Optics.Systems.DCDR.ZTransformBridge
-public import Physlib.Optics.Systems.DCDR.ZTransformMasonRegression
-public import Physlib.Optics.Systems.DCDR.ZTransformRegression
+public import Physlib.Optics.Systems.DCDR.NominalChain
+public import Physlib.Optics.Systems.DCDR.NominalChainRegression
+public import Physlib.Optics.Systems.Microring.AllPassDCDRX01Regression
 ```
 
-## Claims delivered
+`ZTransformBridge.lean` received no additive edit. No existing source file was
+changed by this slice.
 
-`ZTransform.lean` constructs the causal recurrence directly from the unit-delay
-response numerator and loop polynomials. Its `zTransferROC` is the generic
-`iirROC`; membership separately yields `z != 0` and the recurrence-denominator
-gate. The new lag-two lemma constructs the causal kernel as the average of two
-geometric sequences and proves `‖r‖ < ‖z‖` implies actual ROC membership when
-the retained feedback coefficient is `r^2`. On that ROC, the causal
-impulse-response transform equals `zTransfer`, and `zTransfer` is the rational
-response at the explicitly stated coordinate `q = z⁻¹`.
-`UnitDelayParameters.IsZContractive` supplies a sufficient Schur result; the ROC
-and Schur conditions remain distinct.
+## Production claims
 
-The GG2 fix applies the lag-two geometric ROC lemma again at the nonreal point
-`z = I`, with `r = I/2` and formal coordinate `q = z⁻¹ = -I`. It then
-assembles every field of
-`IsZCrossSemanticsDomain stableUnitDelayParameters stableResponseReduction I`:
-admissibility, recurrence contraction, reduced Schur stability, local loop
-contraction, actual ROC membership, no cancellation, and reduced evaluation.
-`zRegression_stable_I_commonDomain_independent_anchor` pairs the resulting
-production agreement with the existing four independently expanded values at
-that exact point; the independent conjunct does not use
-`zCrossSemantics_agree`.
+`NominalChain.lean` labels the two existing DCDR external N7 channels in an
+explicit order:
 
-`ZTransformBridge.lean` proves the recurrence denominator is nonzero exactly when
-the fixed N5 denominator gate holds. It identifies `zTransfer` with the compiled
-reciprocal-Z N5F response, the response-indexed reduced quotient under its
-no-cancellation and evaluation gates, the convergent circulation series, the fixed
-N5 response, the complete Mason response, the packaged typed-scattering entry, and
-the original relation. The relational field now stores membership of the complete
-Mason output vector for the unit input, so both DCDR external outgoing coordinates
-are pinned rather than only the selected scalar entry. The common-domain object
-stores admissibility, recurrence contraction, reduced Schur stability, loop
-contraction, ROC membership, no cancellation, and reduced evaluation separately.
-The recurrence and reduced Schur fields are certification-only in
-`zCrossSemantics_agree`; the equality proof does not consume them. Unitarity is not
-assumed because none of these identifications uses it.
+- nominal left is the first coupler's exposed `leftFirst` endpoint;
+- nominal right is the second coupler's exposed `rightFirst` endpoint.
 
-The production fixed N5 leg reuses the accepted raw-equation elimination bridge in
-`Response.lean`, and the production Mason leg reuses the accepted G-04
-instantiation in `Mason.lean`. The nonzero-loop regression separately expands all
-eight N5 equations and the complete eleven-branch graph, so its audit does not
-obtain the tested values through either production equality.
+These are nominal algebraic coordinates only. The endpoint map is proved
+bijective and is used to reindex the complete external relation and N5 response.
 
-## Regression teeth
+`response_nominal_reference_coordinates` at `NominalChain.lean:180` starts from
+the complete forward and reverse N7 equations. It proves the full two-coordinate
+response for arbitrary external incidence. The resulting four N5 blocks are
 
-- The original exact common-domain point has couplers `t = 3/5`, `k = 4/5`,
-  gains `(9/16, 1, 1)`, and `z = 1`. Its cancelling loop polynomial is zero, and
-  the applicable scalar views remain pinned to `-1` without invoking
-  `zCrossSemantics_agree`. Its relational conjunct is now full-vector Mason-output
-  membership, not a selected-coordinate witness.
-- The nonzero-loop point `stableUnitDelayParameters` has loop polynomial
-  `-(1/4) q^2` and denominator `1 + (1/4) q^2`. With `r = I/2`, the strict bound
-  `‖r‖ < ‖1‖` proves `z = 1` belongs to the actual analytic ROC; membership is
-  no longer supplied only as fixture data.
-- At the same nonzero-loop family, the strict bound `‖I/2‖ < ‖I‖` proves that
-  `z = I`, hence `q = -I`, belongs to the actual analytic ROC. All common-domain
-  fields are assembled at this same point. Primitive geometric transforms solve
-  the causal recurrence as `-(7/8) I`; the existing generic S4 reciprocal reindex
-  transports an independently expanded formal-q value to the raw compiled
-  response, without the DCDR response-model bridge.
-- At `q = -I`, the displayed eight-channel N5 state independently satisfies every
-  raw equation and reads `-(7/8) I`. The full eleven-branch Mason audit enumerates
-  upper and lower touching loops with gains `61/100` and `-9/25`, all four
-  supported forward paths, determinant `3/4`, and numerator `-(21/32) I`, hence
-  the same response `-(7/8) I`. A feedback, path, cofactor, or reciprocal-coordinate
-  error changes an exact anchor.
-- The active sentinel expands a nonsummable loop: `zTransfer = -67/20`, while the
-  Mathlib-totalized circulation expression is `1/4`. Reduced Schur stability fails,
-  so the common domain is impossible. The production documentation now states that
-  `circulationSeries` is totalized outside contraction.
+```text
+             incident left       incident right
+outgoing left       0             transfer(p.reverse)
+outgoing right  transfer(p)               0
+```
 
-The main regression declarations are `zRegression_crossSemantics`,
-`zRegression_stable_one_mem_zTransferROC`,
-`zRegression_stable_I_mem_zTransferROC`,
-`zRegression_stable_I_crossSemanticsDomain`,
-`zRegression_stable_I_commonDomain_independent_anchor`,
-`zRegression_stable_independent_nonzeroLoop_I`,
-`zRegression_stable_auditedMasonResponse_neg_I`,
-`zRegression_active_circulation_ne_transfer`, and
-`zRegression_active_not_crossSemanticsDomain`.
+The reflectionless `nominalTwoPortScattering` is independently stated from these
+two scalar transmissions. On the existing solve gate, the packaged N5 transform,
+the reindexed original relation, and that independently stated scattering law are
+identified.
 
-## Reused foundations
+The scalar pivot is the nominal right-to-left transmission
+`transfer p.reverse`. The lemma
+`packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission_iff` at
+`NominalChain.lean:455` proves that the full block is bijective exactly when this
+scalar is nonzero. This pivot is not inferred from well-posedness, ROC membership,
+contraction, Schur certification, no cancellation, or reduced evaluation.
 
-- Ring promoted-rational pattern:
-  `Physlib/Optics/Systems/Microring/AllPassDelayTransfer.lean:127-178`.
-- Ring named-ROC pattern:
-  `Physlib/Optics/Systems/Microring/AllPassZTransform.lean:193-346`.
-- Ring common-domain pattern:
-  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:321-428`.
-- DCDR unit-delay rational compilation:
-  `Physlib/Optics/Systems/DCDR/Poles.lean:82-205,322-426,571-713`.
-- DCDR two-channel external boundary:
-  `Physlib/Optics/Systems/DCDR/Netlist.lean:351-398`.
-- DCDR raw N5 response: `Physlib/Optics/Systems/DCDR/Response.lean:461-555`.
-- DCDR G-04 Mason bridge: `Physlib/Optics/Systems/DCDR/Mason.lean:177-197`.
-- Generic full Mason response equality:
-  `Physlib/Optics/Network/FlatNetlistMason.lean:170-182`.
-- Generic recurrence/ROC:
-  `Physlib/Mathematics/ZTransform/DifferenceEquation.lean:271-295`.
-- Generic Schur layer: `Physlib/Mathematics/ZTransform/Stability.lean:223-289`.
+On the solve and pivot gates, `nominalBackwardFirstChainTransform_eq_matrix` at
+`NominalChain.lean:546` identifies the behavior-derived backward-first chain with
+
+```text
+diag((transfer p.reverse)^-1, transfer p).
+```
+
+`nominalBackwardFirstChainTransform_roundTrip` at `NominalChain.lean:582` uses
+the generic N3T round trip to recover the complete packaged N5 scattering law.
+The underlying generic block formula is in
+`Physlib/Optics/Network/TwoPortScatteringChain.lean:431-553`; the scattering
+round trip is in
+`Physlib/Optics/Network/TwoPortChainScattering.lean:781-795`.
+
+`IsZChainCrossSemanticsDomain` extends the accepted DCDR Z common domain with one
+separate pivot field. `zChainCrossSemantics_agree` at `NominalChain.lean:664`
+collects:
+
+- causal impulse-response Z transform and named ROC;
+- reduced rational and reciprocal-Z compiled response;
+- feedback/circulation response on its contraction gate;
+- fixed N5 elimination and complete Mason response;
+- packaged typed scattering and full-vector relational behavior;
+- nominal backward-first chain and its N3T scattering round trip.
+
+The base DCDR common-domain and agreement records reused here are at
+`DCDR/ZTransformBridge.lean:242-357`.
+
+## Joint two-system closure
+
+`RingDCDRX01Agreement` at `AllPassDCDRX01Regression.lean:64` is deliberately a
+conjunction:
+
+```text
+ring ZCrossSemanticsAgreement AND DCDR ZChainCrossSemanticsAgreement.
+```
+
+There is no field comparing ring and DCDR values. The accepted ring witness is
+reused from `AllPassZTransformBridge.lean:327-424` and its regression witness at
+`AllPassZTransformBridgeRegression.lean:68`.
+
+`ringDCDRX01Regression_hasAgreement` supplies both production agreements.
+`ringDCDRX01Regression_independentAnchors` then pins each system independently:
+
+- ring response `1/7` and chain diagonal `(7, 1/7)`;
+- DCDR response `-(7/8) I` and chain diagonal
+  `((8/7) I, -(7/8) I)`.
+
+It also proves `(1/7 : ℂ) ≠ -(7/8) I`, making the absence of a cross-system
+value equality load-bearing rather than merely documentary.
+
+## Independent regression audit
+
+The DCDR fixture is `stableUnitDelayParameters` at `z = I`, hence formal
+`q = z^-1 = -I`. Its nonzero loop polynomial is `-(1/4) q^2`. Direct parameter
+expansion gives both forward and reverse transmission `-(7/8) I`; the inverse
+pivot is `(8/7) I`.
+
+The independently audited packaged N5 matrix is
+
+```text
+[       0       -(7/8) I ]
+[ -(7/8) I          0    ].
+```
+
+The independently audited backward-first chain is
+
+```text
+[ (8/7) I        0       ]
+[    0       -(7/8) I    ].
+```
+
+The anchor dependency audit is:
+
+- `zChainRegression_forwardEquations_output` expands the raw N7 equations and
+  does not use `ForwardEquations.output_eq_transfer`.
+- `zChainRegression_independent_packaged_blocks` at
+  `NominalChainRegression.lean:356` derives all four blocks through those raw
+  equations and direct readout unfolding. It does not use the production response
+  entry or packaged-entry lemmas.
+- `zChainRegression_hasBijectiveRightToLeftTransmission` at line 458 constructs
+  the pivot inverse from the exact scalar product. It does not use the production
+  pivot iff, pivot action, or entry lemmas.
+- The four `zChainRegression_chain_*` values unfold the generic N3T block
+  construction. They do not use
+  `nominalBackwardFirstChainTransform_eq_matrix` or any production reflection or
+  transmission value lemma.
+- `zChainRegression_productionChain_with_independent_entries` at line 579 keeps
+  the production equality and all independently computed entries in separate
+  conjuncts.
+- `zChainRegression_independent_common_point` at line 618 reuses the accepted
+  primitive causal, reciprocal-Z, raw-N5, and eleven-branch Mason audit at
+  `ZTransformRegression.lean:563`, then joins it to the independently unfolded
+  chain. It does not use `zChainCrossSemantics_agree`.
+- `zChainRegression_productionAgreement_with_independent_anchor` at line 641
+  pairs the production agreement with the independent values only after those
+  values have been established.
+- The joint anchors use the accepted independent ring recurrence, raw N5, Mason,
+  and chain fixtures plus the independent DCDR conjunction. They do not derive a
+  value through `RingDCDRX01Agreement`.
+
+A feedback sign, reverse reindex, pivot, or N3T block-order error changes one of
+these exact values.
+
+## Fail-capable sentinel
+
+`zChainRegressionWrongReferencePlaneMatrix` swaps the two correct DCDR diagonal
+entries. At the same fixture, the correct leading entry is `(8/7) I`, while the
+wrong leading entry is `-(7/8) I`.
+
+`zChainRegression_chain_ne_wrongReferencePlaneMatrix` at
+`NominalChainRegression.lean:672` rejects this matrix by an independently pinned
+entry inequality. The joint
+`ringDCDRX01Regression_wrongReferencePlane_rejected` at
+`AllPassDCDRX01Regression.lean:145` retains the ring leading value `7` and DCDR
+leading value `(8/7) I` while rejecting the same wrong nominal order.
 
 ## Gate record
 
-Targeted builds of all four new modules passed under `lake-lock`. With temporary
-root registration of the accepted slice-7 modules and these four modules, cache
-retrieval, `lake --wfail build Physlib`, `check_file_imports`, `sorry_lint`,
-`runPhyslibLinters`, and `api_map_index` passed. `lint_all` exited successfully;
-its lane-local double-blank and redundant-import findings were fixed, after which
-the full root rebuild and the redundant-import scan were rerun. The latter now
-reports no DCDR finding; its remaining findings are pre-existing modules outside
-this lane.
+All Lean jobs ran through the machine-wide `lake-lock`.
 
-Direct `lint-style.py` runs are clean for every DCDR file. The four new modules
-have the literal module-doc headings and TOCs matching their numbered sections.
-The shipped repository-wide style and module-doc tools still display legacy
-findings outside these files.
-
-For the scoped GG3 delta, the targeted
-`Physlib.Optics.Systems.DCDR.ZTransformRegression` build passed under
-`lake-lock`. With the four Z modules temporarily registered in the conductor's
-requested order, the `Physlib` root rebuilt and `runPhyslibLinters` passed.
-`lint-style.sh` passed on `ZTransformRegression.lean`; `Physlib.lean` was then
-restored to the SHA recorded above.
-
-The source has zero banned declarations, zero `theorem` declarations, maximum line
-length 100 codepoints, and every DCDR file is below 1500 lines. `Physlib.lean` was
-restored byte-for-byte after the temporary gate registration.
+- Targeted builds of `NominalChainRegression` and
+  `AllPassDCDRX01Regression` passed: 2,818 jobs.
+- With the three modules temporarily registered, cache retrieval and
+  `lake --wfail build Physlib` passed: 5,002 jobs.
+- `check_file_imports`, `sorry_lint`, `runPhyslibLinters`, and `api_map_index`
+  passed.
+- `lint_all` exited successfully. Its displayed style and redundant-import
+  findings are pre-existing files outside this three-file slice; it reported no
+  new module and its build/import/declaration stages passed.
+- `scripts/lint-style.sh` passed repository-wide. Direct `lint-style.py` checks
+  also passed on all three new files.
+- The repository-wide `module_doc_lint` still exits on legacy modules outside
+  this lane. A captured scoped audit contains no `NominalChain` or
+  `AllPassDCDRX01Regression` finding. Each new module has the four literal
+  headings and a TOC exactly matching its numbered sections.
+- There are zero banned declarations, zero `theorem` declarations, and no line
+  over 100 codepoints. The files have 681, 685, and 158 lines respectively.
+- `Physlib.lean` was restored byte-for-byte after temporary registration.
 
 ## Non-claims and human audit
 
-This slice makes no claim of physical resonance, coherent-incoherent equivalence,
-BIBO stability beyond the S4P gate, normalized-modal or electromagnetic power,
-Maxwell time-domain meaning, reciprocity, physical-frequency meaning, or HOL-script
-semantics. It also makes no DCDR chain claim.
+The DCDR chain is a nominal algebraic two-port. This slice makes no claim of a
+physical reference plane, reciprocity, physical time reversal, physical
+resonance, coherent-incoherent equivalence, BIBO stability beyond S4P's gate,
+normalized-modal or electromagnetic power, Maxwell time-domain meaning,
+physical-frequency meaning, HOL-script semantics, or a shared ring/DCDR response
+value.
 
-Per `AI-POLICY.md`, a human author must independently certify the mathematical
-statements, proofs, source mappings, and the stated X-01 boundary before merge.
+Per `AI-POLICY.md`, a human author must independently certify the boundary labels,
+the reverse-transmission pivot, the chain convention, the exact regression
+values, and the stated X-01 closure before merge.
