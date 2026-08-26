@@ -59,7 +59,7 @@ flux-orthogonal, unit-normalized bridge at
 ## iii. Table of contents
 
 - A. Exact attenuation and coupling data
-- B. Exact zero- and half-turn physical phase points
+- B. Exact zero-, quarter-, and half-turn physical phase points
 - C. Maps to the named S2 parameters
 - D. Direct internal-field anchors
 - E. Independent N5 response anchors
@@ -167,7 +167,7 @@ lemma physicalRegression_quarterAttenuation :
     Real.exp_neg, Real.exp_add, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
   norm_num
 
-/-! ## B. Exact zero- and half-turn physical phase points -/
+/-! ## B. Exact zero-, quarter-, and half-turn physical phase points -/
 
 /-- A rational zero-optical-depth, zero-phase physical propagation point. -/
 def physicalRegressionRationalZeroPhase : PhysicalParameters where
@@ -256,7 +256,10 @@ lemma physicalRegression_quarterTurn_carrierPhaseFactor :
   rw [PhysicalParameters.roundTripPhase, physicalRegression_quarterTurn_lift]
   change ((-(((Real.pi / 2 : ℝ) : Real.Angle))).toCircle : ℂ) = -Complex.I
   rw [← Real.Angle.coe_neg, Real.Angle.toCircle_coe, Circle.coe_exp]
-  exact Complex.exp_neg_pi_div_two_mul_I
+  convert Complex.exp_neg_pi_div_two_mul_I using 1
+  congr 1
+  push_cast
+  ring
 
 /-! ## C. Maps to the named S2 parameters -/
 

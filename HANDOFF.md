@@ -7,6 +7,7 @@
 - Development head merged at cutoff: `9f23e522`.
 - Post-sync merge commit: `32514e95`.
 - Crash-safe implementation commits: `5cac7028` and `96367bf0`.
+- Slice 1b crash-safe commits begin at `c0014de3`.
 - The four recovered files were substantive but ungated drafts. They are now complete for the
   stated S0 contract and pass the post-sync build and declaration-linter gates.
 - No existing production module, registry, API map, `goal.md`, or `tbd.md` is changed by the lane
@@ -65,6 +66,17 @@ The exact named regression row is:
 
 > S-04: **met:** the physical add-drop realization yields both exact transfer responses
 
+### Slice 1b formal role design
+
+Slice 1b chooses distinct role-indexed wrappers. `FieldAttenuation` and `PowerAttenuation` are
+different Lean types, as are amplitude-role `CouplingParameters` and
+`PowerCouplingParameters`. Their unit-interval or normalization conditions remain typed
+predicates rather than proof fields so the singular-safe algebraic parameter layer stays total.
+A power-role value therefore cannot be passed to a field predicate or physical field map without
+an explicit, visible reconstruction. `PhysicalParameters.fieldAttenuation` and
+`.powerAttenuation` return the distinct wrappers, the typed conversion proves their square
+relation, and both S2 parameter maps project only the field wrapper's value.
+
 ## N7 and network declarations used
 
 The physical maps and certificates build on these registered N7 declarations. Line references
@@ -103,6 +115,8 @@ Unless stated otherwise, names in the first three inventories are in `Optics.Mic
 
 ### Physical parameters
 
+- `FieldAttenuation`
+- `PowerAttenuation`
 - `IsFieldAttenuation`
 - `IsPowerAttenuation`
 - `fieldToPowerAttenuation`
@@ -110,12 +124,15 @@ Unless stated otherwise, names in the first three inventories are in `Optics.Mic
 - `isPowerAttenuation_fieldToPower`
 - `powerToFieldAttenuation_sq`
 - `isFieldAttenuation_powerToField`
+- `CouplingParameters`
+- `PowerCouplingParameters`
 - `IsAmplitudeCoupling`
 - `IsPowerCoupling`
+- `amplitudeToPowerCoupling`
+- `powerToAmplitudeCoupling`
 - `isPowerCoupling_sq_of_isAmplitudeCoupling`
 - `isAmplitudeCoupling_sqrt_of_isPowerCoupling`
 - `sqrt_coupling_squares`
-- `CouplingParameters`
 - `CouplingParameters.toDirectionalCoupler`
 - `CouplingParameters.IsValid`
 - `CouplingParameters.IsValid.toDirectionalCoupler`
@@ -134,6 +151,7 @@ Unless stated otherwise, names in the first three inventories are in `Optics.Mic
 - `PhysicalParameters.fieldAttenuation_pos`
 - `PhysicalParameters.powerAttenuation_pos`
 - `PhysicalParameters.fieldAttenuation_sq`
+- `PhysicalParameters.fieldAttenuation_toPower`
 - `PhysicalParameters.IsValid.isFieldAttenuation`
 - `PhysicalParameters.IsValid.isPowerAttenuation`
 - `AllPassPhysicalParameters`
@@ -214,10 +232,13 @@ These names are in `Optics.Microring`:
 - `physicalRegressionCoupling`
 - `physicalRegression_coupling_isValid`
 - `physicalRegression_coupling_powers`
+- `physicalRegression_powerFractions_not_amplitudeCoupling`
+- `physicalRegression_amplitudes_not_powerCoupling`
 - `physicalRegressionHalfAttenuation`
 - `physicalRegression_halfAttenuation`
 - `physicalRegression_halfPowerAttenuation`
 - `physicalRegression_halfAttenuation_sq`
+- `physicalRegression_attenuation_roleSwap_rejected`
 - `physicalRegressionQuarterAttenuation`
 - `physicalRegression_quarterAttenuation`
 - `physicalRegressionRationalZeroPhase`
@@ -228,6 +249,11 @@ These names are in `Optics.Microring`:
 - `physicalRegression_halfTurn_opticalDepth`
 - `physicalRegression_halfTurn_normalizedOpticalPath`
 - `physicalRegression_halfTurn_lift`
+- `physicalRegressionRationalQuarterTurn`
+- `physicalRegression_quarterTurn_opticalDepth`
+- `physicalRegression_quarterTurn_normalizedOpticalPath`
+- `physicalRegression_quarterTurn_lift`
+- `physicalRegression_quarterTurn_carrierPhaseFactor`
 - `physicalRegressionAllPass`
 - `physicalRegression_allPass_toParameters`
 - `physicalRegressionAddDrop`
@@ -264,8 +290,13 @@ These names are in `Optics.Microring`:
 The validation lane should bind at least these fully qualified names:
 
 - `Optics.Microring.PhysicalParameters.fieldAttenuation_sq`
+- `Optics.Microring.PhysicalParameters.fieldAttenuation_toPower`
 - `Optics.Microring.PhysicalParameters.roundTripPhaseLift_eq_opticalPathLength`
 - `Optics.Microring.isPowerCoupling_sq_of_isAmplitudeCoupling`
+- `Optics.Microring.physicalRegression_powerFractions_not_amplitudeCoupling`
+- `Optics.Microring.physicalRegression_amplitudes_not_powerCoupling`
+- `Optics.Microring.physicalRegression_attenuation_roleSwap_rejected`
+- `Optics.Microring.physicalRegression_quarterTurn_carrierPhaseFactor`
 - `Optics.Microring.AllPassPhysicalParameters.IsValid.toParameters`
 - `Optics.Microring.AddDropPhysicalParameters.IsValid.toParameters`
 - `Optics.Microring.AllPassFieldRelation`
@@ -317,7 +348,10 @@ The validation lane should bind at least these fully qualified names:
 ## Independent regression certificates
 
 - The attenuation anchors expand `exp (-alpha * L / 2)` by hand to `1 / 2` and `1 / 4`.
-- Rational normalized optical paths give phase lifts `0` and `Real.pi` exactly.
+- Rational normalized optical paths give phase lifts `0`, `Real.pi / 2`, and `Real.pi` exactly.
+- The quarter-turn carrier factor expands directly to `-Complex.I`, pinning the exponent sign.
+- Negative controls reject squared powers as amplitudes, amplitudes as power fractions, and a
+  swapped field/power attenuation pair through the typed conversion.
 - The field-relation fixtures substitute all internal fields directly.
 - The N5 response fixtures transport the independently eliminated S2 named values; they do not
   use the new physical-response theorems.
