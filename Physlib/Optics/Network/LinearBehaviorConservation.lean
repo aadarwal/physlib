@@ -28,7 +28,7 @@ transform is compared with that behavior only under the existing named `FlatNetl
 gate. Matched-gauge covariance uses `PortConnectionFamily.IsMatchedGauge` from
 `ConnectionRoutingRephase.lean`; independent endpoint phases are not treated as a unit wire.
 
-This discharges the `goal.md:1939-1940` item:
+This discharges the `goal.md:1942-1943` item:
 "convention-free port/network power, passivity, and losslessness predicates that do not require
 time-reversal data;". Here the convention-free losslessness classification is called power
 preservation, matching the rectangular transform API.
