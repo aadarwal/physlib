@@ -2169,6 +2169,10 @@ Exit: every core component has orientation, an independent behavioral specificat
 lemma, parameter validity, and intensity/power classification suitable for automatic system
 proofs. Reciprocity extensions are added only after N2b/N6b conventions are available.
 
+The shipped S0 propagation parameters remain fixed-carrier and nondispersive. S4's local group
+delay applies to selected proof-gated network response entries, so it does not by itself discharge
+the open component-level frequency-family and physical time-delay item above.
+
 ### H.4. Integrated-photonic system milestone
 
 #### S0. Physical microring realization
@@ -2267,8 +2271,9 @@ quality factor, response-derived group delay, reciprocity, or material realizati
   rational in the declared finite family of delay variables;
 - [x] proof that evaluating `q = exp (-s*τ)` agrees with the direct frequency response on the
   pointwise well-posed domain;
-- [ ] singular internal operators as candidate poles, with actual poles identified only after ruling
-  out input/output cancellation or hidden unreachable/unobservable singular modes; and
+- [x] at the abstract reduction layer, singular internal operators as candidate poles and reduced
+  response poles identified under the explicit pointwise `NoPoleCancellation` gate; the stronger
+  network reachability/observability criterion remains the open S4P item below; and
 - [x] no claim of rational dependence on physical frequency without the required model.
 
 The shipped component-entry layer retains numerator/denominator representatives and evaluation
@@ -2276,7 +2281,8 @@ domains, then compiles them through N5F and reparameterizes the proof-gated resp
 and reciprocal-Z maps. Symbolic rational elimination of the external response is still required
 before the third item can be checked. The internal-determinant/reduced-response API proves the
 candidate-to-actual inclusion and its converse under an explicit no-cancellation predicate, but a
-network-level reachability/observability or no-cancellation theorem remains open.
+network-level reachability/observability or no-cancellation theorem remains open
+(`Physlib/Optics/Systems/DelayTransfer/Poles.lean:187-236`).
 
 #### S4P. Poles, zeros, stability, and frequency response
 
@@ -2289,16 +2295,19 @@ network-level reachability/observability or no-cancellation theorem remains open
 - [x] discrete-time Schur stability and BIBO equivalence only for a stated proper causal rational
   class;
 - [x] frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention; and
-- [ ] **Physlib extension (source claim unverified):** group delay and dispersion through a local
+- [x] **Physlib extension (source claim unverified):** group delay and dispersion through a local
   logarithmic derivative or another branch-audited construction, not an unqualified global
-  complex argument.
+  complex argument, implemented for selected N5F network-response entries on explicit interior,
+  differentiability, and nonzero-response domains.
 
 Names must state literal mathematical content. In particular, source terminology that calls all
 zeros inside the unit disk a “resonance condition” is not adopted without a separate physical
 resonance theorem. The audited source definition is
 `is_resonant_psp system ↔ ∀ z ∈ zeros system, ‖z‖ < 1` (FMICS'15 Def. 7, p. 170), with
 `zeros` defined by nonzero numerator roots (Def. 6); that paper proves no separate physical
-resonance theorem.
+resonance theorem. The implemented local domains and formulas are at
+`Physlib/Optics/Systems/DelayTransfer/GroupDelay.lean:79-186`, and their proof-gated N5F
+network-entry lift is at `GroupDelay.lean:237-391`.
 
 #### S5. Difference equations and Z-transform
 
@@ -2790,16 +2799,16 @@ current integration base; a designed package whose prerequisite is merely active
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
 | N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |
 | N7 components | in progress | N2a, O2; E6 only for interface specialization | reflectionless substrate, physically packaged fixed-carrier propagation, and ideal four-port directional coupler complete; beam splitter, mirror, polarization, and interface suite open |
-| S0 physical microrings | unblocked | completed N3T core plus the N7 directional coupler and matched propagation | independent ring behavior, primitive realization, and source-specific chain views |
+| S0 physical microrings | done | completed N3T core plus the N7 directional coupler and matched propagation | independent all-pass/add-drop field relations (`PhysicalRealization.lean:123-180`), N7 primitive realization and N5 response identification (`PhysicalRealization.lean:186-492`), and DATE/SysCon/SFG source-specific chain and response views (`PhysicalSourceBridge.lean:275-360,407-465`), with hostile fixtures in `PhysicalRegression.lean`; IP-66--IP-69 |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
 | S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, and the gated source bridge are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, and DATE/SysCon/SFG response identifications are complete under their stated gates; IP-06/IP-07 source questions and the remaining S0/S4+ integrations stay open |
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
-| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, and a stated one-pole Schur/BIBO equivalence are complete; network reachability/no-cancellation, broader rational BIBO, and group delay remain |
+| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; network reachability/no-cancellation and broader rational BIBO remain |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
 | S6 Mason | in progress: generic core, exact N5 agreement, and the all-pass relational/N5/chain/reduced-Mason value instance are complete; Z and DCDR X-01 legs remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, and independently enumerated ring regressions |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
-| S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
-| S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
+| S7D DCDR parity | in progress | N4C, N5H, N6c, S4P--S6 | controller-managed worker is formalizing the audited DCDR topology and observable suite |
+| S7C cascade/lattice suite | in progress | N3T, N5H, S0, S4P | controller-managed worker is formalizing source-backed cascades plus the Physlib-original full lattice |
 | R1--R5 ray/beam foundations | in progress: the R1--R5 foundational slices are integrated, including proved paraxial approximation error, component-derived ABCD systems, cardinal-point specifications, physical-domain Gaussian transport, matrix-level bounded-ray stability, two-mirror boundary fixtures, and a proof-gated fixed Gaussian beam; the E5b bridge, an R3 representative subsystem, source-style resonator unfolding, ring and phase-conjugate resonators, and selected source case studies remain open | E1/E5b plus focused ray API map | ray, imaging, ABCD, resonator suite |
 | Fourier/quantum extensions | future | relevant classical layers | separate API maps and bridges |
 

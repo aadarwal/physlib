@@ -175,8 +175,10 @@ structure ArePlanarMaxwellThinCellTermsIntegrable {plane : OrientedAffineHyperpl
 
 /-- The four finite integral macroscopic Maxwell laws on every shrinking planar cell.
 
-The equations are normalized by the principal face area or long-edge length. This common nonzero
-factor does not alter the integral law and makes the subsequent thin-cell limits finite. -/
+The equations are normalized by the principal face area or the long-edge parameter length. For a
+nonunit loop tangent, physical arclength includes its norm; retaining the parameter normalization
+leaves the desired linear tangent pairing in the limit. The common nonzero factor does not alter
+the integral law. -/
 structure IsPlanarIntegralMacroscopicMaxwell {plane : OrientedAffineHyperplane 3}
     (fields : PlanarMacroscopicTwoSidedFields plane)
     (sources : PlanarMaxwellBulkSources plane)
