@@ -213,7 +213,8 @@ lemma scattering_realizes_behavior [Fintype ι] [DecidableEq ι] (p : Parameters
     (scattering p ι).toOrientedModeTransform.toBehavior = behavior p := by
   ext ⟨incident, outgoing⟩
   rw [ModeTransform.mem_toBehavior_iff_toLinearMap, mem_behavior_iff,
-    ScatteringMatrix.toLinearMap_toOrientedModeTransform, outputMap_apply]
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform,
+    scattering_toLinearMap_apply, crossCoefficient]
   rfl
 
 /-- The quadrature cross terms cancel in the squared moduli of the two mixed coordinates. -/

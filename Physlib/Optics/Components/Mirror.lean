@@ -88,12 +88,17 @@ lemma reflection_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters
 ## B. Independent behavioral specification
 -/
 
-/-- The independently specified incident-to-outgoing map of the one-port mirror. -/
+/-- The independently specified incident-to-outgoing map of the one-port mirror.
+
+This definition states coefficient-times-corresponding-mode directly. It does not use the matrix
+`reflection` or the scattering realization.
+-/
 def outputMap [Fintype ι] [DecidableEq ι] (p : Parameters) :
     ModeAmplitude (Incident ι) →ₗ[ℂ] ModeAmplitude (Outgoing ι) :=
   (ModeAmplitude.reindex
       (Outgoing.channelEquiv.symm : ι ≃ Outgoing ι)).toLinearEquiv.toLinearMap.comp
-    ((reflection p ι).toLinearMap.comp
+    ((p.reflectionCoefficient •
+        (LinearMap.id : ModeAmplitude ι →ₗ[ℂ] ModeAmplitude ι)).comp
       (ModeAmplitude.reindex
         (Incident.channelEquiv : Incident ι ≃ ι)).toLinearEquiv.toLinearMap)
 
@@ -104,10 +109,7 @@ lemma outputMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
       ModeAmplitude.reindex Outgoing.channelEquiv.symm
         (p.reflectionCoefficient •
           ModeAmplitude.reindex Incident.channelEquiv incident) := by
-  change ModeAmplitude.reindex Outgoing.channelEquiv.symm
-      ((reflection p ι).toLinearMap
-        (ModeAmplitude.reindex Incident.channelEquiv incident)) = _
-  rw [reflection_toLinearMap_apply]
+  rfl
 
 /-- The independent one-port mirror behavior. -/
 def behavior [Fintype ι] [DecidableEq ι] (p : Parameters) :
@@ -119,8 +121,11 @@ def behavior [Fintype ι] [DecidableEq ι] (p : Parameters) :
 lemma mem_behavior_iff [Fintype ι] [DecidableEq ι] (p : Parameters)
     (incident : ModeAmplitude (Incident ι))
     (outgoing : ModeAmplitude (Outgoing ι)) :
-    (incident, outgoing) ∈ behavior p ↔ outgoing = outputMap p incident := by
-  rw [behavior, LinearBehavior.mem_ofLinearMap_iff]
+    (incident, outgoing) ∈ behavior p ↔
+      outgoing = ModeAmplitude.reindex Outgoing.channelEquiv.symm
+        (p.reflectionCoefficient •
+          ModeAmplitude.reindex Incident.channelEquiv incident) := by
+  rw [behavior, LinearBehavior.mem_ofLinearMap_iff, outputMap_apply]
 
 /-!
 ## C. Scattering realization and unit-phase classification
@@ -142,7 +147,7 @@ lemma scattering_realizes_behavior [Fintype ι] [DecidableEq ι] (p : Parameters
     (scattering p ι).toOrientedModeTransform.toBehavior = behavior p := by
   ext ⟨incident, outgoing⟩
   rw [ModeTransform.mem_toBehavior_iff_toLinearMap, mem_behavior_iff,
-    ScatteringMatrix.toLinearMap_toOrientedModeTransform, outputMap_apply]
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform]
   rw [scattering_toLinearMap_apply]
 
 /-- A unit-phase reflection coefficient makes the one-port scattering matrix lossless. -/
