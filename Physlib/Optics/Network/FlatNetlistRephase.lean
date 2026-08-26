@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Network.ConnectionRoutingRephase
-public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.HierarchicalReuse
 
 /-!
