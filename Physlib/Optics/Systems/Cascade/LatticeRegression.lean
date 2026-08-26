@@ -200,8 +200,8 @@ def latticeRegressionVerticalCouplerChannel
     (rectangularVerticalCouplerComponent latticeRegressionForwardIndex column)
     (latticeRegressionTwoPortChannel port)
 
-@[simp]
 /-- Aggregate incident evaluation reduces to its componentwise table. -/
+@[simp]
 lemma latticeRegressionIncident_component
     (component : RectangularLatticeComponent 2 2)
     (channel : (rectangularLatticeComponentPortFamily component).Channel) :
@@ -212,8 +212,8 @@ lemma latticeRegressionIncident_component
       latticeRegressionIncidentValue component channel := by
   rfl
 
-@[simp]
 /-- Aggregate outgoing evaluation reduces to its componentwise table. -/
+@[simp]
 lemma latticeRegressionOutgoing_component
     (component : RectangularLatticeComponent 2 2)
     (channel : (rectangularLatticeComponentPortFamily component).Channel) :
@@ -265,6 +265,20 @@ def latticeRegressionSitePortLabel :
       Option LatticeSitePort
   | ⟨Sum.inl _, port⟩ => some port
   | ⟨Sum.inr _, _⟩ => none
+
+/--
+Classify site sides and coupler components by the horizontal or vertical connection family that
+owns them.
+-/
+def latticeRegressionPortIsHorizontal :
+    (rectangularLatticeComponents
+      latticeRegressionParameters).aggregatePortModeFamily.Port → Bool
+  | ⟨Sum.inl _, .west⟩ => true
+  | ⟨Sum.inl _, .east⟩ => true
+  | ⟨Sum.inl _, .north⟩ => false
+  | ⟨Sum.inl _, .south⟩ => false
+  | ⟨Sum.inr (Sum.inl _), _⟩ => true
+  | ⟨Sum.inr (Sum.inr _), _⟩ => false
 
 /-!
 ## B. Canonical flat equations
@@ -442,8 +456,10 @@ lemma latticeRegression_mem_componentBehavior :
       ((rectangularLatticeComponents
         latticeRegressionParameters).scattering component).toModeTransform ⟨port, mode⟩
           input * latticeRegressionIncidentValue component input
+  revert mode port
   rcases component with ⟨row, column⟩ | (horizontal | vertical)
-  · rw [Fintype.sum_equiv latticeSiteChannelEquiv _ _ (by intro input; rfl)]
+  · intro port mode
+    rw [Fintype.sum_equiv latticeSiteChannelEquiv _ _ (by intro input; rfl)]
     fin_cases row <;> fin_cases column <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
         rectangularLatticeComponentScattering, latticeSitePhysicalScattering,
@@ -457,6 +473,7 @@ lemma latticeRegression_mem_componentBehavior :
       apply Fin.ext
       omega
     subst column
+    intro port mode
     rw [latticeRegression_twoPort_sum]
     fin_cases row <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
@@ -473,6 +490,7 @@ lemma latticeRegression_mem_componentBehavior :
       apply Fin.ext
       omega
     subst row
+    intro port mode
     rw [latticeRegression_twoPort_sum]
     fin_cases column <;> cases port <;> cases mode <;>
       simp [Matrix.mulVec, dotProduct, Fintype.sum_sigma, latticeRegressionParameters,
@@ -512,7 +530,7 @@ lemma latticeRegression_connectedEquation (connected : latticeRegressionConnecti
     fin_cases row <;> cases half <;>
       rcases localChannel with mode | mode <;> cases mode <;>
       simp [latticeRegressionConnections, rectangularLatticeNetlist,
-        rectangularHorizontalConnections,
+        rectangularHorizontalConnections, rectangularHorizontalConnection,
         PortConnectionFamily.append, ScatteringComponentFamily.componentChannelEmbedding,
         ScatteringComponentFamily.channelEquiv, latticeRegressionIncident,
         latticeRegressionOutgoing, latticeRegressionIncidentValue,
@@ -811,11 +829,8 @@ lemma latticeRegressionMiswired_endpointDisjoint :
       latticeRegressionMiswiredVerticalConnections, latticeRegressionMiswiredVerticalConnection,
       PortConnection.endpointPort] at hPort
   all_goals
-    have hLabel := congrArg latticeRegressionSitePortLabel hPort
-    simp [latticeRegressionSitePortLabel] at hLabel
-  all_goals
-    have hComponent := congrArg Sigma.fst hPort
-    cases hComponent
+    have hAxis := congrArg latticeRegressionPortIsHorizontal hPort
+    simp [latticeRegressionPortIsHorizontal] at hAxis
 
 /-- The hostile vertical family lifted to the horizontal stage's remaining boundary. -/
 def latticeRegressionMiswiredVerticalBoundaryConnections :=
