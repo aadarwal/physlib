@@ -29,6 +29,10 @@ kept distinct from both compiled well-posedness and Schur stability.
 No physical resonance, coherent--incoherent equivalence, BIBO conclusion, modal or
 electromagnetic power statement, Maxwell time-domain interpretation, reciprocity, physical
 frequency interpretation, or claim about the unavailable HOL script is made.
+Power would mean normalized modal power, not electromagnetic power before the finite,
+common-frequency, Maxwell-qualified, pairwise-integrable, mutually flux-orthogonal,
+unit-normalized bridge at
+`Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`.
 
 ## ii. Key results
 

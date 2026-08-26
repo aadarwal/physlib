@@ -27,6 +27,10 @@ circulation expression `1/4`. Thus the contraction/Schur gates can detect a real
 These are algebraic discrete-time fixtures, not physical resonance claims. No coherent--incoherent
 equivalence, BIBO conclusion, modal or electromagnetic power statement, Maxwell time-domain
 interpretation, reciprocity, physical-frequency interpretation, or HOL-script claim is made.
+Power would mean normalized modal power, not electromagnetic power before the finite,
+common-frequency, Maxwell-qualified, pairwise-integrable, mutually flux-orthogonal,
+unit-normalized bridge at
+`Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`.
 
 ## ii. Key results
 
