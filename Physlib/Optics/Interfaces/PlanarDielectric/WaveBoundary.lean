@@ -42,8 +42,10 @@ candidate retains unconstrained frequency and wave-vector data. Incident and ref
 values may also cancel, so a local boundary hypothesis alone gives no labelwise conservation law.
 
 The traces below are pointwise restrictions of globally defined explicit plane-wave fields. They
-are not analytic one-sided traces of fields defined only on open half-spaces, and the local
-boundary predicates are stipulated rather than derived from integral Maxwell equations.
+are not by themselves analytic one-sided traces of fields defined only on open half-spaces. This
+module treats the local boundary predicates as supplied; `IntegralBoundary` later packages the
+genuine open-side traces and derives the predicate conditionally from literal integral Maxwell
+laws and the thin-cell regularity contract.
 
 ## ii. Key results
 
