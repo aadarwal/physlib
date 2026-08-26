@@ -2344,7 +2344,13 @@ derived N5 elimination gives `1 + 4 * I`, which equals the direct path plus the 
 without either agreement theorem. A singular determinant is obtained directly from a known
 noninjective feedback operator. The generic S6/N5 bridge is therefore complete. Ring- and DCDR-
 specific G-04/X-01 instantiations remain in the S7 system suite rather than being inferred from
-this generic theorem.
+this generic theorem. The all-pass ring now supplies the first system instance: on
+`HasNonzeroDenominator`, its relational behavior is identified with the complete N5-extracted
+Mason response, and an independently defined two-node circulation model has determinant
+`1 - t * gamma` and reconstructs the same through response. No reduction from the complete graph
+is claimed. Direct path/loop enumeration and raw channel elimination meet independently at the
+exact `1 / 7` fixture. The chain and causal Z-transform legs remain separate gates, so X-01 is not
+yet complete.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2775,7 +2781,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
 | S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, and a stated one-pole Schur/BIBO equivalence are complete; network reachability/no-cancellation, broader rational BIBO, and group delay remain |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
-| S6 Mason | in progress: generic core and exact N5 agreement complete; ring/DCDR G-04 and broad X-01 instances remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric and singular regressions |
+| S6 Mason | in progress: generic core, exact N5 agreement, and the all-pass relational/N5/reduced-Mason value instance are complete; chain/Z and DCDR X-01 legs remain | N5, finite graph audit | `C * S` extraction, exact determinant gate, Mason feedback inverse and typed external-response equality, plus asymmetric, singular, and independently enumerated ring regressions |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
 | S7D DCDR parity | blocked | N4C, N5H, N6c, S4P--S6 | audited DCDR topology and observable suite |
 | S7C cascade/lattice suite | blocked | N3T, N5H, S0, S4P | source-backed cascades plus Physlib-original full lattice |
