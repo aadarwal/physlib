@@ -36,6 +36,10 @@ realization, reciprocity statement, or electromagnetic power normalization is cl
 - A. Independent cross-semantics agreement
 - B. Fixed-carrier phase-sign sentinel
 - C. Load-bearing unitary-coupler gate
+
+## iv. References
+
+These cross-semantics fixtures are Physlib-original and make no external source-parity claim.
 -/
 
 @[expose] public section

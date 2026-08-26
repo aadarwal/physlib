@@ -23,13 +23,11 @@ H(1) = 1/7,    H(I) = 75/109 + (32/109) I.
 The nonreal sample pins the reciprocal-variable convention: at `z = I`, its inverse is `-I`.
 The separate bridge regression compares these values with the optical ring semantics.
 
-## ii. Scope
+These are algebraic, discrete-time regression fixtures. The sample calculations do not by
+themselves establish a region of convergence, material delay law, continuous-time realization,
+or electromagnetic power normalization.
 
-These are algebraic, discrete-time regression fixtures. They do not establish a region of
-convergence, a material delay law, a continuous-time realization, or electromagnetic power
-normalization.
-
-## iii. Key results
+## ii. Key results
 
 - `allPassZRegression_output_zero`: the undelayed impulse response sample.
 - `allPassZRegression_output_one`: the first feedback sample and feedforward sign.
@@ -37,10 +35,15 @@ normalization.
 - `allPassZRegression_transfer_one`: direct reciprocal-variable evaluation at resonance.
 - `allPassZRegression_transfer_I`: the nonreal reciprocal-variable convention sentinel.
 
-## iv. Table of contents
+## iii. Table of contents
 
 - A. Causal recurrence samples
 - B. Reciprocal-variable transfer values
+
+## iv. References
+
+These adversarial fixtures are Physlib-original. Source comparisons for the neutral Z-transform
+API live in its production modules; this file makes no additional source-parity claim.
 -/
 
 @[expose] public section
