@@ -483,6 +483,10 @@ public import Physlib.Optics.Systems.Microring.Observables
 public import Physlib.Optics.Systems.Microring.ObservablesFrequency
 public import Physlib.Optics.Systems.Microring.ObservablesPower
 public import Physlib.Optics.Systems.Microring.ObservablesRegression
+public import Physlib.Optics.Systems.Microring.PhysicalParameters
+public import Physlib.Optics.Systems.Microring.PhysicalRealization
+public import Physlib.Optics.Systems.Microring.PhysicalRegression
+public import Physlib.Optics.Systems.Microring.PhysicalSourceBridge
 public import Physlib.Optics.Systems.Microring.SourceBridge
 public import Physlib.Optics.Systems.Microring.SourceBridgeDate
 public import Physlib.Optics.Systems.Microring.SourceBridgeRegression
