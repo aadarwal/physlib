@@ -575,5 +575,43 @@ files.
 
 ## Slice 2b gate record
 
-Pending at the committed repair source head. The final record will name the exact chained gate,
-style result, registry restore hash, and HANDOFF-only cutoff child.
+The exact controller sync target was `329d5a59`, merged at `fcfd057b`. The Lean repair is
+`393be55e`; the committed head gated after its pre-gate handoff update was `706a99e1`. A final
+HANDOFF-only child records this result; no Lean source changed after the gate.
+
+Reviewer option 1(b) was used. At the concrete point where both couplers have through and cross
+amplitudes `1`, the upper and lower transmissions are `1` and `2`, the feedback transmission is
+`1`, and every phase is zero, the two loop gains are `-1` and `2`. Their signed edge determinant
+and the raw N5 denominator are both `1 - (-1) - 2 = 0`. The explicit nonzero homogeneous state
+is `[0, 1, -I, 1, 2, -I, 1, -3I]`.
+
+After committing all source and pre-gate handoff changes, `./scripts/lint-style.sh` exited zero.
+Every DCDR Lean file is below 1500 lines; `ResponseRegression.lean` is 1396 lines. The advisory
+style inventory inside `lint_all` still printed repository formatting notices, including the
+pre-existing split-file blank-line notices, but it is non-gating and the committed-state style
+script above passed.
+
+With the six split modules inserted temporarily beside the two registered compatibility imports,
+this single locked command exited zero:
+
+```text
+lake-lock env bash -c 'lake exe cache get &&
+  lake --wfail build Physlib.Optics.Systems.DCDR.Netlist
+    Physlib.Optics.Systems.DCDR.Graph
+    Physlib.Optics.Systems.DCDR.Bridge
+    Physlib.Optics.Systems.DCDR.Topology
+    Physlib.Optics.Systems.DCDR.TopologyRegression
+    Physlib.Optics.Systems.DCDR.Response
+    Physlib.Optics.Systems.DCDR.Mason
+    Physlib.Optics.Systems.DCDR.ResponseRegression &&
+  lake exe runPhyslibLinters && lake exe lint_all'
+```
+
+The cache was current. The warnings-as-errors build completed successfully with 2761 jobs.
+`runPhyslibLinters` passed for Physlib and QuantumInfo. `lint_all` exited zero: its build,
+illegal-import, PhyslibAlpha-registration, duplicate-tag, sorry/pseudo-attribution, declaration,
+and transitive-import checks passed. Its file-registration advisory named only four unrelated
+Microring modules, and its transitive-import advisory named no DCDR file.
+
+`Physlib.lean` was restored byte-identically to SHA-256
+`d6279000556c059e0a352aac530487e353adc7e5fa1f7c05b2bce229ec34f510` and has no diff.
