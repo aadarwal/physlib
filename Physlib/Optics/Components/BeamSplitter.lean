@@ -130,7 +130,7 @@ lemma mixing_toLinearMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
 This definition states the two through/cross equations directly. It does not use the matrix
 `mixing` or the scattering realization.
 -/
-def outputMap [Fintype ι] [DecidableEq ι] (p : Parameters) :
+def outputMap [Fintype ι] (p : Parameters) :
     ModeAmplitude (Incident (ι ⊕ ι)) →ₗ[ℂ]
       ModeAmplitude (Outgoing (ι ⊕ ι)) :=
   let rawIncident :=
@@ -155,7 +155,7 @@ def outputMap [Fintype ι] [DecidableEq ι] (p : Parameters) :
       (firstOutgoing.prod secondOutgoing))
 
 /-- The independent output map removes endpoint wrappers, mixes, and restores them. -/
-lemma outputMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
+lemma outputMap_apply [Fintype ι] (p : Parameters)
     (incident : ModeAmplitude (Incident (ι ⊕ ι))) :
     outputMap p incident =
       ModeAmplitude.reindex Outgoing.channelEquiv.symm
@@ -170,13 +170,13 @@ lemma outputMap_apply [Fintype ι] [DecidableEq ι] (p : Parameters)
   rfl
 
 /-- The independent beam-splitter behavior, defined before its scattering realization. -/
-def behavior [Fintype ι] [DecidableEq ι] (p : Parameters) :
+def behavior [Fintype ι] (p : Parameters) :
     LinearBehavior (Incident (ι ⊕ ι)) (Outgoing (ι ⊕ ι)) :=
   LinearBehavior.ofLinearMap (outputMap p)
 
 /-- Behavior membership is exactly the independently declared output equation. -/
 @[simp]
-lemma mem_behavior_iff [Fintype ι] [DecidableEq ι] (p : Parameters)
+lemma mem_behavior_iff [Fintype ι] (p : Parameters)
     (incident : ModeAmplitude (Incident (ι ⊕ ι)))
     (outgoing : ModeAmplitude (Outgoing (ι ⊕ ι))) :
     (incident, outgoing) ∈ behavior p ↔
