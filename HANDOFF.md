@@ -1,10 +1,10 @@
-# S7D slice 8b handoff: DCDR causal-Z cross-semantics leg
+# S7D slice 8c handoff: DCDR causal-Z common-point fix
 
 ## Cutoff identity
 
 - Exact sync target: `8e48a7d1fa1ef1080bfe75dbfc93c6768ec3bdcb`.
 - Sync merge: `60d7f6ab7ed1a11f2ab23fc3433505aca1fb95bf`.
-- Gated source: `b9074b9c6fa82750e22bc67c92acda34d50985b6`.
+- Gated source: `439a36f52ec312dacb28aa3d85b4ca946d930e93`.
 - `Physlib.lean` was not changed. Its restored SHA-256 is
   `18e578d35df5704c80de0d783d439ba9f3bf02f764549951eac2ae8548e2b85d`.
 
@@ -53,6 +53,17 @@ response at the explicitly stated coordinate `q = z⁻¹`.
 `UnitDelayParameters.IsZContractive` supplies a sufficient Schur result; the ROC
 and Schur conditions remain distinct.
 
+The GG2 fix applies the lag-two geometric ROC lemma again at the nonreal point
+`z = I`, with `r = I/2` and formal coordinate `q = z⁻¹ = -I`. It then
+assembles every field of
+`IsZCrossSemanticsDomain stableUnitDelayParameters stableResponseReduction I`:
+admissibility, recurrence contraction, reduced Schur stability, local loop
+contraction, actual ROC membership, no cancellation, and reduced evaluation.
+`zRegression_stable_I_commonDomain_independent_anchor` pairs the resulting
+production agreement with the existing four independently expanded values at
+that exact point; the independent conjunct does not use
+`zCrossSemantics_agree`.
+
 `ZTransformBridge.lean` proves the recurrence denominator is nonzero exactly when
 the fixed N5 denominator gate holds. It identifies `zTransfer` with the compiled
 reciprocal-Z N5F response, the response-indexed reduced quotient under its
@@ -84,10 +95,12 @@ obtain the tested values through either production equality.
   `-(1/4) q^2` and denominator `1 + (1/4) q^2`. With `r = I/2`, the strict bound
   `‖r‖ < ‖1‖` proves `z = 1` belongs to the actual analytic ROC; membership is
   no longer supplied only as fixture data.
-- At the same nonzero-loop family and `z = I`, hence `q = -I`, primitive geometric
-  transforms solve the causal recurrence as `-(7/8) I`. The existing generic S4
-  reciprocal reindex transports an independently expanded formal-q value to the
-  raw compiled response, without the DCDR response-model bridge.
+- At the same nonzero-loop family, the strict bound `‖I/2‖ < ‖I‖` proves that
+  `z = I`, hence `q = -I`, belongs to the actual analytic ROC. All common-domain
+  fields are assembled at this same point. Primitive geometric transforms solve
+  the causal recurrence as `-(7/8) I`; the existing generic S4 reciprocal reindex
+  transports an independently expanded formal-q value to the raw compiled
+  response, without the DCDR response-model bridge.
 - At `q = -I`, the displayed eight-channel N5 state independently satisfies every
   raw equation and reads `-(7/8) I`. The full eleven-branch Mason audit enumerates
   upper and lower touching loops with gains `61/100` and `-9/25`, all four
@@ -101,6 +114,9 @@ obtain the tested values through either production equality.
 
 The main regression declarations are `zRegression_crossSemantics`,
 `zRegression_stable_one_mem_zTransferROC`,
+`zRegression_stable_I_mem_zTransferROC`,
+`zRegression_stable_I_crossSemanticsDomain`,
+`zRegression_stable_I_commonDomain_independent_anchor`,
 `zRegression_stable_independent_nonzeroLoop_I`,
 `zRegression_stable_auditedMasonResponse_neg_I`,
 `zRegression_active_circulation_ne_transfer`, and
@@ -141,6 +157,13 @@ Direct `lint-style.py` runs are clean for every DCDR file. The four new modules
 have the literal module-doc headings and TOCs matching their numbered sections.
 The shipped repository-wide style and module-doc tools still display legacy
 findings outside these files.
+
+For the scoped GG3 delta, the targeted
+`Physlib.Optics.Systems.DCDR.ZTransformRegression` build passed under
+`lake-lock`. With the four Z modules temporarily registered in the conductor's
+requested order, the `Physlib` root rebuilt and `runPhyslibLinters` passed.
+`lint-style.sh` passed on `ZTransformRegression.lean`; `Physlib.lean` was then
+restored to the SHA recorded above.
 
 The source has zero banned declarations, zero `theorem` declarations, maximum line
 length 100 codepoints, and every DCDR file is below 1500 lines. `Physlib.lean` was
