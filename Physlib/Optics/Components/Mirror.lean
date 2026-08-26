@@ -39,8 +39,10 @@ time reversal, reciprocity, bandwidth, causality, dispersion, or omitted-channel
 
 ## iv. References
 
-This reduced one-port mirror is Physlib-original and source-neutral. Its modal-power statement is
-squared-amplitude bookkeeping, not an electromagnetic-power or physical-realization claim.
+This reduced one-port mirror is Physlib-original and source-neutral. Its modal-power result is
+squared-amplitude bookkeeping, not electromagnetic power. No reciprocity, time reversal,
+reverse-incidence Maxwell law, modal completeness, propagation, causality, dispersion, or
+physical realization is asserted.
 -/
 
 @[expose] public section

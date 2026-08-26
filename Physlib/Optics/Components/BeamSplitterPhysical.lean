@@ -43,7 +43,10 @@ realization claim.
 
 ## iv. References
 
-This physical-port presentation is Physlib-original and source-neutral.
+This physical-port presentation is Physlib-original and source-neutral. Its losslessness result is
+only squared-amplitude modal bookkeeping, not electromagnetic power. No reciprocity, time
+reversal, reverse-incidence Maxwell law, modal completeness, propagation, causality, dispersion,
+or physical realization is asserted.
 -/
 
 @[expose] public section

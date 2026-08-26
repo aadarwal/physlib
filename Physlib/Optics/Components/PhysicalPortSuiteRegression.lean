@@ -48,8 +48,9 @@ sentinels without altering it.
 
 ## iv. References
 
-All coefficients are algebraic sentinels. No reciprocity, time reversal, propagation, causality,
-dispersion, material, electromagnetic-power, coating, or physical-realization claim is made.
+All coefficients are algebraic sentinels and modal-amplitude bookkeeping, not electromagnetic
+power. No reciprocity, time reversal, reverse-incidence Maxwell law, modal completeness,
+propagation, causality, dispersion, material, coating, or physical realization is asserted.
 -/
 
 @[expose] public section

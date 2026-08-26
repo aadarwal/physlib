@@ -45,7 +45,9 @@ bandwidth, causality, electromagnetic normalization, or physical realization.
 ## iv. References
 
 This reusable component law is Physlib-original and source-neutral. `ModeAmplitude.power` is
-squared-amplitude bookkeeping; its use here is not an electromagnetic-power claim.
+squared-amplitude bookkeeping, not electromagnetic power. No reciprocity, time reversal,
+reverse-incidence Maxwell law, modal completeness, propagation, causality, dispersion, or
+physical realization is asserted.
 -/
 
 @[expose] public section
