@@ -947,6 +947,337 @@ lemma physicalPortSuite9b_interface_raw_action :
       Fin.sum_univ_two]
   <;> ring
 
+/-!
+## G. Phase 9b mixed component family
+-/
+
+/-- The Jones input transported to its owned aperture channels. -/
+def physicalPortSuite9bPolarizationLocalInput :
+    ModeAmplitude JonesMatrix.portFamily.Channel :=
+  ModeAmplitude.reindex JonesMatrix.channelEquiv
+    physicalPortSuite9bPolarizationRawInput
+
+/-- The Jones output transported to its owned aperture channels. -/
+def physicalPortSuite9bPolarizationLocalOutput :
+    ModeAmplitude JonesMatrix.portFamily.Channel :=
+  ModeAmplitude.reindex JonesMatrix.channelEquiv
+    physicalPortSuite9bPolarizationRawOutput
+
+/-- The physical Jones adapter has the independently expanded primitive action. -/
+lemma physicalPortSuite9b_polarization_local_action :
+    (JonesMatrix.physicalScattering
+      (JonesMatrix.quarterWavePlate 0)).toModeTransform.toLinearMap
+        physicalPortSuite9bPolarizationLocalInput =
+      physicalPortSuite9bPolarizationLocalOutput := by
+  rw [JonesMatrix.physicalScattering, ScatteringMatrix.toModeTransform_reindex,
+    ModeTransform.toLinearMap_reindex_eq, physicalPortSuite9bPolarizationLocalInput,
+    ModeAmplitude.reindex_symm_reindex]
+  change ModeAmplitude.reindex JonesMatrix.channelEquiv
+      ((JonesMatrix.quarterWavePlate 0).entries.toEuclideanLin
+        physicalPortSuite9bPolarizationRawInput) = _
+  rw [physicalPortSuite9b_polarization_raw_action]
+  rfl
+
+/-- The interface input transported to its owned side/polarization channels. -/
+def physicalPortSuite9bInterfaceLocalInput :
+    ModeAmplitude PlanarDielectricInterface.portFamily.Channel :=
+  ModeAmplitude.reindex PlanarDielectricInterface.channelEquiv
+    physicalPortSuite9bInterfaceRawInput
+
+/-- The interface output transported to its owned side/polarization channels. -/
+def physicalPortSuite9bInterfaceLocalOutput :
+    ModeAmplitude PlanarDielectricInterface.portFamily.Channel :=
+  ModeAmplitude.reindex PlanarDielectricInterface.channelEquiv
+    physicalPortSuite9bInterfaceRawOutput
+
+/-- The physical interface adapter has the independently expanded primitive action. -/
+lemma physicalPortSuite9b_interface_local_action :
+    (physicalPortSuite9bInterface.physicalScattering 1 1).toModeTransform.toLinearMap
+        physicalPortSuite9bInterfaceLocalInput =
+      physicalPortSuite9bInterfaceLocalOutput := by
+  rw [PlanarDielectricInterface.physicalScattering,
+    ScatteringMatrix.toModeTransform_reindex, ModeTransform.toLinearMap_reindex_eq,
+    physicalPortSuite9bInterfaceLocalInput, ModeAmplitude.reindex_symm_reindex]
+  change ModeAmplitude.reindex PlanarDielectricInterface.channelEquiv
+      (((physicalPortSuite9bInterface.sFresnelScatteringKernel 1 1).toModeTransform.directSum
+        (physicalPortSuite9bInterface.pFresnelScatteringKernel 1 1).toModeTransform).toLinearMap
+          physicalPortSuite9bInterfaceRawInput) = _
+  rw [physicalPortSuite9b_interface_raw_action]
+  rfl
+
+/-- The separate Phase 9b component labels. -/
+inductive PhysicalPortSuite9bComponent
+  | polarization
+  | interface
+  deriving DecidableEq
+
+/-- The two Phase 9b component labels form a finite family. -/
+instance : Fintype PhysicalPortSuite9bComponent where
+  elems := {PhysicalPortSuite9bComponent.polarization,
+    PhysicalPortSuite9bComponent.interface}
+  complete component := by
+    cases component <;> simp
+
+/-- The owned port family selected by each Phase 9b component. -/
+def physicalPortSuite9bPortFamily : PhysicalPortSuite9bComponent → PortModeFamily
+  | .polarization => JonesMatrix.portFamily
+  | .interface => PlanarDielectricInterface.portFamily
+
+/-- The owned scattering law selected by each Phase 9b component. -/
+def physicalPortSuite9bScattering :
+    (component : PhysicalPortSuite9bComponent) →
+      ScatteringMatrix (physicalPortSuite9bPortFamily component).Channel
+  | .polarization => JonesMatrix.physicalScattering (JonesMatrix.quarterWavePlate 0)
+  | .interface => physicalPortSuite9bInterface.physicalScattering 1 1
+
+/-- The mixed Phase 9b polarization/interface component family. -/
+abbrev physicalPortSuite9bFamily : ScatteringComponentFamily where
+  Component := PhysicalPortSuite9bComponent
+  portFamily := physicalPortSuite9bPortFamily
+  scattering := physicalPortSuite9bScattering
+
+/-- Every Phase 9b local channel family is finite. -/
+local instance physicalPortSuite9bLocalChannelFintype
+    (component : PhysicalPortSuite9bComponent) :
+    Fintype (physicalPortSuite9bFamily.portFamily component).Channel := by
+  cases component
+  · change Fintype JonesMatrix.portFamily.Channel
+    infer_instance
+  · change Fintype PlanarDielectricInterface.portFamily.Channel
+    infer_instance
+
+/-- Every Phase 9b local channel family has decidable equality. -/
+local instance physicalPortSuite9bLocalChannelDecidableEq
+    (component : PhysicalPortSuite9bComponent) :
+    DecidableEq (physicalPortSuite9bFamily.portFamily component).Channel := by
+  cases component
+  · change DecidableEq JonesMatrix.portFamily.Channel
+    infer_instance
+  · change DecidableEq PlanarDielectricInterface.portFamily.Channel
+    infer_instance
+
+/-- The indexed Phase 9b channels have decidable equality. -/
+local instance physicalPortSuite9bIndexedChannelDecidableEq :
+    DecidableEq physicalPortSuite9bFamily.IndexedChannel :=
+  Classical.decEq _
+
+/-- The aggregate Phase 9b channels are finite by indexed reassociation. -/
+local instance physicalPortSuite9bAggregateChannelFintype :
+    Fintype physicalPortSuite9bFamily.aggregatePortModeFamily.Channel :=
+  Fintype.ofEquiv physicalPortSuite9bFamily.IndexedChannel
+    physicalPortSuite9bFamily.channelEquiv
+
+/-- The aggregate Phase 9b channels have decidable equality in indexed coordinates. -/
+local instance physicalPortSuite9bAggregateChannelDecidableEq :
+    DecidableEq physicalPortSuite9bFamily.aggregatePortModeFamily.Channel :=
+  physicalPortSuite9bFamily.channelEquiv.symm.decidableEq
+
+/-- The nonzero mixed input in component-indexed owned-channel coordinates. -/
+def physicalPortSuite9bIndexedInput :
+    ModeAmplitude physicalPortSuite9bFamily.IndexedChannel :=
+  WithLp.toLp 2 fun
+    | ⟨.polarization, ⟨JonesMatrix.Port.aperture, coordinate⟩⟩ =>
+        physicalPortSuite9bPolarizationRawInput coordinate
+    | ⟨.interface, ⟨port, mode⟩⟩ =>
+        physicalPortSuite9bInterfaceRawInput
+          (PlanarDielectricInterface.channelEquiv.symm ⟨port, mode⟩)
+
+/-- The exact mixed output in component-indexed owned-channel coordinates. -/
+def physicalPortSuite9bIndexedOutput :
+    ModeAmplitude physicalPortSuite9bFamily.IndexedChannel :=
+  WithLp.toLp 2 fun
+    | ⟨.polarization, ⟨JonesMatrix.Port.aperture, coordinate⟩⟩ =>
+        physicalPortSuite9bPolarizationRawOutput coordinate
+    | ⟨.interface, ⟨port, mode⟩⟩ =>
+        physicalPortSuite9bInterfaceRawOutput
+          (PlanarDielectricInterface.channelEquiv.symm ⟨port, mode⟩)
+
+/-- Restricting the mixed input recovers the owned Jones local input. -/
+lemma physicalPortSuite9bIndexedInput_restrict_polarization :
+    physicalPortSuite9bIndexedInput.restrictEmbedding
+        (Function.Embedding.sigmaMk PhysicalPortSuite9bComponent.polarization) =
+      physicalPortSuite9bPolarizationLocalInput := by
+  apply WithLp.ofLp_injective 2
+  funext channel
+  rcases channel with ⟨port, coordinate⟩
+  cases port
+  rfl
+
+/-- Restricting the mixed input recovers the owned interface local input. -/
+lemma physicalPortSuite9bIndexedInput_restrict_interface :
+    physicalPortSuite9bIndexedInput.restrictEmbedding
+        (Function.Embedding.sigmaMk PhysicalPortSuite9bComponent.interface) =
+      physicalPortSuite9bInterfaceLocalInput := by
+  apply WithLp.ofLp_injective 2
+  funext channel
+  rcases channel with ⟨port, mode⟩
+  cases port <;> cases mode <;> rfl
+
+/-- Primitive local actions give the exact mixed dependent block-diagonal output. -/
+lemma physicalPortSuite9b_indexed_action :
+    physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
+        physicalPortSuite9bIndexedInput =
+      physicalPortSuite9bIndexedOutput := by
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨component, channel⟩
+  cases component
+  · rw [ScatteringComponentFamily.indexedScatteringMatrix,
+      ModeTransform.blockDiagonal'_apply,
+      physicalPortSuite9bIndexedInput_restrict_polarization,
+      physicalPortSuite9b_polarization_local_action]
+    rcases channel with ⟨port, coordinate⟩
+    cases port
+    rfl
+  · rw [ScatteringComponentFamily.indexedScatteringMatrix,
+      ModeTransform.blockDiagonal'_apply,
+      physicalPortSuite9bIndexedInput_restrict_interface,
+      physicalPortSuite9b_interface_local_action]
+    rcases channel with ⟨port, mode⟩
+    cases port <;> cases mode <;> rfl
+
+/-- The mixed input in aggregate component-owned physical-channel coordinates. -/
+def physicalPortSuite9bAggregateInput :
+    ModeAmplitude physicalPortSuite9bFamily.aggregatePortModeFamily.Channel :=
+  ModeAmplitude.reindex physicalPortSuite9bFamily.channelEquiv
+    physicalPortSuite9bIndexedInput
+
+/-- The exact mixed output in aggregate component-owned physical-channel coordinates. -/
+def physicalPortSuite9bAggregateOutput :
+    ModeAmplitude physicalPortSuite9bFamily.aggregatePortModeFamily.Channel :=
+  ModeAmplitude.reindex physicalPortSuite9bFamily.channelEquiv
+    physicalPortSuite9bIndexedOutput
+
+/-- The mixed family's aggregate action is the independently expanded six-channel output. -/
+lemma physicalPortSuite9b_aggregate_action :
+    physicalPortSuite9bFamily.assembledScatteringMatrix.toModeTransform.toLinearMap
+        physicalPortSuite9bAggregateInput =
+      physicalPortSuite9bAggregateOutput := by
+  rw [ScatteringComponentFamily.assembledScatteringMatrix,
+    ScatteringMatrix.toModeTransform_reindex, ModeTransform.toLinearMap_reindex_eq,
+    physicalPortSuite9bAggregateInput, ModeAmplitude.reindex_symm_reindex,
+    physicalPortSuite9b_indexed_action]
+  rfl
+
+/-!
+## H. Phase 9b hostile polarization-fiber swap
+-/
+
+/-- Swap only the s/p mode fiber at the negative-side interface port. -/
+def physicalPortSuite9bInterfaceNegativePolarizationSwap :
+    PlanarDielectricInterface.portFamily.Channel ≃
+      PlanarDielectricInterface.portFamily.Channel where
+  toFun
+    | ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩ =>
+      ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩
+    | ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩ =>
+      ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩
+    | ⟨PlanarDielectricInterface.Port.positiveSide, mode⟩ =>
+      ⟨PlanarDielectricInterface.Port.positiveSide, mode⟩
+  invFun
+    | ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩ =>
+      ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩
+    | ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩ =>
+      ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩
+    | ⟨PlanarDielectricInterface.Port.positiveSide, mode⟩ =>
+      ⟨PlanarDielectricInterface.Port.positiveSide, mode⟩
+  left_inv := by
+    rintro ⟨port, mode⟩
+    cases port <;> cases mode <;> rfl
+  right_inv := by
+    rintro ⟨port, mode⟩
+    cases port <;> cases mode <;> rfl
+
+/-- The hostile interface law swaps only physical output rows at the negative side. -/
+def physicalPortSuite9bHostileInterfaceScattering :
+    ScatteringMatrix PlanarDielectricInterface.portFamily.Channel where
+  toModeTransform :=
+    ModeTransform.reindex (Equiv.refl _)
+      physicalPortSuite9bInterfaceNegativePolarizationSwap
+      (physicalPortSuite9bInterface.physicalScattering 1 1).toModeTransform
+
+/-- The hostile interface output is the positive output with one side's s/p fiber swapped. -/
+def physicalPortSuite9bHostileInterfaceLocalOutput :
+    ModeAmplitude PlanarDielectricInterface.portFamily.Channel :=
+  ModeAmplitude.reindex physicalPortSuite9bInterfaceNegativePolarizationSwap
+    physicalPortSuite9bInterfaceLocalOutput
+
+/-- Direct row relabeling forces the hostile fiber-swapped local output. -/
+lemma physicalPortSuite9b_hostile_interface_local_action :
+    physicalPortSuite9bHostileInterfaceScattering.toModeTransform.toLinearMap
+        physicalPortSuite9bInterfaceLocalInput =
+      physicalPortSuite9bHostileInterfaceLocalOutput := by
+  rw [physicalPortSuite9bHostileInterfaceScattering,
+    ModeTransform.toLinearMap_reindex_eq]
+  have hInput :
+      ModeAmplitude.reindex (Equiv.refl _).symm
+          physicalPortSuite9bInterfaceLocalInput =
+        physicalPortSuite9bInterfaceLocalInput := by
+    apply WithLp.ofLp_injective 2
+    funext channel
+    rfl
+  rw [hInput, physicalPortSuite9b_interface_local_action]
+  rfl
+
+/-- The hostile mixed family changes only the interface output fiber assignment. -/
+def physicalPortSuite9bHostileScattering :
+    (component : PhysicalPortSuite9bComponent) →
+      ScatteringMatrix (physicalPortSuite9bPortFamily component).Channel
+  | .polarization => JonesMatrix.physicalScattering (JonesMatrix.quarterWavePlate 0)
+  | .interface => physicalPortSuite9bHostileInterfaceScattering
+
+/-- The hostile Phase 9b family has the same owned ports and one swapped output fiber. -/
+abbrev physicalPortSuite9bHostileFamily : ScatteringComponentFamily where
+  Component := PhysicalPortSuite9bComponent
+  portFamily := physicalPortSuite9bPortFamily
+  scattering := physicalPortSuite9bHostileScattering
+
+/-- The negative-side s channel in indexed component coordinates. -/
+abbrev physicalPortSuite9bInterfaceNegativeSIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.interface,
+    ⟨PlanarDielectricInterface.Port.negativeSide,
+      PlanarDielectricInterface.PolarizationMode.s⟩⟩
+
+/-- The correct indexed action gives `11/5` at negative-side s. -/
+lemma physicalPortSuite9b_indexed_negative_s_value :
+    physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
+        physicalPortSuite9bIndexedInput
+        physicalPortSuite9bInterfaceNegativeSIndexed = 11 / 5 := by
+  rw [physicalPortSuite9b_indexed_action]
+  rfl
+
+/-- The hostile family instead gives the p value `7/5` at negative-side s. -/
+lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
+    physicalPortSuite9bHostileFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
+        physicalPortSuite9bIndexedInput
+        physicalPortSuite9bInterfaceNegativeSIndexed = 7 / 5 := by
+  rw [ScatteringComponentFamily.indexedScatteringMatrix,
+    ModeTransform.blockDiagonal'_apply,
+    physicalPortSuite9bIndexedInput_restrict_interface,
+    physicalPortSuite9b_hostile_interface_local_action]
+  rfl
+
+/-- Swapping one owned side's polarization fiber changes the mixed-family output. -/
+lemma physicalPortSuite9b_hostile_action_ne :
+    physicalPortSuite9bHostileFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
+        physicalPortSuite9bIndexedInput
+        physicalPortSuite9bInterfaceNegativeSIndexed ≠
+      physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
+        physicalPortSuite9bIndexedInput
+        physicalPortSuite9bInterfaceNegativeSIndexed := by
+  rw [physicalPortSuite9b_hostile_indexed_negative_s_value,
+    physicalPortSuite9b_indexed_negative_s_value]
+  norm_num
+
 end
 
 end Optics
