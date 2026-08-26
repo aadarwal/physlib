@@ -4,7 +4,8 @@
 
 - Branch: `optics/s4-delay-transfer`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s4-delay-transfer`
-- Pre-cutoff synchronization onto the registered `optics/development` head is pending.
+- Slice 4b is synchronized through registered `optics/development` head `9f23e522` by merge
+  commit `84c14b65`; the exact final post-sync gate head is recorded below.
 - Slice 4 adds only the two new group-delay modules and refreshes this handoff note.
 
 ## Files and registrations requested
@@ -85,6 +86,30 @@ In `Optics.DelayTransfer`:
 - `chirpedDelay_dispersion_two_fifths`
 - `zeroCrossingResponse`
 - `zeroCrossing_not_mem_localLogDerivativeDomain`
+- `groupDelayAllPassFrequencyParameters`
+- `groupDelayAllPassFrequencyDelay`
+- `groupDelayAllPassExtension`
+- `groupDelayAllPassFrequencyDelay_norm`
+- `groupDelayAllPassFrequencyParameters_isValid`
+- `groupDelayAllPass_compiled_eq`
+- `groupDelayAllPass_loopCoefficient`
+- `groupDelayAllPass_denominator`
+- `groupDelayAllPass_hasNonzeroDenominator`
+- `groupDelayAllPass_throughTransfer_eq_extension`
+- `groupDelayAllPass_frequencyDelayEvaluation`
+- `groupDelayAllPassFormalDomain`
+- `groupDelayAllPassFrequencyDomain`
+- `groupDelayAllPassFrequencyInterior`
+- `groupDelayAllPass_compiledResponse_eq_extension`
+- `groupDelayAllPass_frequencyResponse_eq_extension`
+- `hasDerivAt_groupDelayAllPassFrequencyDelay`
+- `groupDelayAllPassFrequencyDelay_quadrature`
+- `groupDelayAllPassExtension_quadrature`
+- `groupDelayAllPassExtensionDerivative`
+- `hasDerivAt_groupDelayAllPassExtension`
+- `hasDerivAt_groupDelayAllPassExtension_quadrature`
+- `groupDelayAllPassExtension_quadrature_ne_zero`
+- `allPassRationalNetlist_frequencyGroupDelay_quadrature`
 
 ## Exact validation bindings
 
@@ -103,6 +128,16 @@ The validation lane should bind at least these public names:
 - `Optics.DelayTransfer.pureDelay_groupDelay_three`
 - `Optics.DelayTransfer.chirpedDelay_dispersion_two_fifths`
 - `Optics.DelayTransfer.zeroCrossing_not_mem_localLogDerivativeDomain`
+- `Optics.DelayTransfer.groupDelayAllPassFrequencyInterior`
+- `Optics.DelayTransfer.groupDelayAllPass_compiledResponse_eq_extension`
+- `Optics.DelayTransfer.groupDelayAllPass_frequencyResponse_eq_extension`
+- `Optics.DelayTransfer.hasDerivAt_groupDelayAllPassExtension_quadrature`
+- `Optics.DelayTransfer.allPassRationalNetlist_frequencyGroupDelay_quadrature`
+
+The compiled anchor fixes `t = 3/5`, `κ = 4/5`, `a = 1/2`, unit delay, and
+`ω₀ = π/2`. Its independently derived response and derivative are
+`75/109 + (32/109) I` and `2912/11881 - (1920/11881) I`; its exact network group delay is
+`2176/6649`.
 
 ## Cross-module conventions and reused results
 
@@ -123,6 +158,10 @@ The validation lane should bind at least these public names:
   `.lake/packages/mathlib/Mathlib/Topology/Separation/Basic.lean:706-712`.
 - The regression differentiates the displayed complex exponential with `HasDerivAt.cexp` from
   `.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/ExpDeriv.lean:127-136`.
+- The compiled regression fixture is defined in
+  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:220-280`. Its solve helper at
+  lines 845-912 expands `FlatNetlist.mem_behavior_iff_equations`, whose exact three equations are
+  stated in `Physlib/Optics/Network/FlatNetlist.lean:487-503`.
 
 ## Totalized-versus-gated split
 
@@ -134,6 +173,10 @@ The validation lane should bind at least these public names:
   is locally irrelevant.
 - Network group delay additionally requires differentiability and a nonzero selected response
   entry. Network dispersion additionally requires differentiability of local group delay.
+- General N5F interior differentiability is withheld. Both network formulas are conditional on
+  user-supplied local regularity: an agreeing extension with `HasDerivAt` for the displayed
+  derivative or derivatives. The all-pass regression supplies that regularity independently for
+  its fixture.
 
 ## Non-claims
 
@@ -145,9 +188,11 @@ The validation lane should bind at least these public names:
   claimed.
 - The quantity named dispersion is literally the angular-frequency derivative of local group
   delay, not a constitutive material dispersion law.
-- The scalar regression is not an N5F network realization.
+- The network regression covers only the displayed compiled all-pass fixture; it is not a general
+  regularity theorem for rational N5F networks.
 
 ## Gate record
 
-The final post-sync chained build/lint gate and byte-identical `Physlib.lean` restoration are
-pending the registered `optics/development` synchronization.
+The original slice-4 cutoff `37600731`, descending from sync merge `62790fe8`, passed its chained
+build/lint gate with byte-identical `Physlib.lean` restoration. The slice-4b post-sync gate at the
+exact final cutoff head is pending and will replace this sentence before handoff.

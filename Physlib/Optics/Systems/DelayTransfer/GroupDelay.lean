@@ -53,7 +53,10 @@ in `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:16-24`; neither gate is
 This is the Physlib-original extension requested by `goal.md:2269-2271`; the source claim is
 unverified. Mathlib defines `deriv` to be zero when a derivative does not exist in
 `Mathlib/Analysis/Calculus/Deriv/Basic.lean:148-154`. The definitions here are total functions,
-but no group-delay or dispersion interpretation is asserted outside the named domains. There is
+but no group-delay or dispersion interpretation is asserted outside the named domains. General
+N5F interior differentiability is withheld. Both network formulas are conditional on
+user-supplied local regularity: an agreeing extension with `HasDerivAt` for the displayed
+derivative or derivatives. There is
 no global `Complex.arg`, phase-unwrapping, continuity-across-zeros,
 rational-in-physical-frequency, time-domain causality, passivity, material-dispersion, or units
 claim. In particular, the quantity named dispersion below is literally the angular-frequency
