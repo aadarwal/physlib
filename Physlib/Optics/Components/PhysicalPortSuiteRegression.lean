@@ -235,6 +235,20 @@ local instance physicalPortSuite9aLocalChannelDecidableEq
   · change DecidableEq (Mirror.portFamily Unit).Channel
     infer_instance
 
+/-- The indexed mixed family has exactly its two beam channels and one mirror channel. -/
+local instance physicalPortSuite9aIndexedChannelFintype :
+    Fintype physicalPortSuite9aFamily.IndexedChannel where
+  elems := {⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩,
+    ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩,
+    ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩}
+  complete channel := by
+    rcases channel with ⟨component, ⟨port, mode⟩⟩
+    cases component
+    · cases port <;> cases mode <;> simp
+    · cases port
+      cases mode
+      simp
+
 /-- The indexed Phase 9a channels have decidable equality. -/
 local instance physicalPortSuite9aIndexedChannelDecidableEq :
     DecidableEq physicalPortSuite9aFamily.IndexedChannel :=
@@ -337,7 +351,8 @@ lemma physicalPortSuite9a_indexedScatteringMatrix_eq_explicit :
       BeamSplitter.physicalScattering, Mirror.physicalScattering,
       ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
       BeamSplitter.scattering, BeamSplitter.mixing, BeamSplitter.crossCoefficient,
-      Mirror.scattering, Mirror.reflection, physicalPortSuite9aBeamParameters,
+      BeamSplitter.channelEquiv, Mirror.scattering, Mirror.reflection,
+      physicalPortSuite9aBeamParameters,
       physicalPortSuite9aMirrorParameters, Matrix.blockDiagonal'_apply]
 
 /-- Restricting the indexed input to the beam component gives the raw owned-port fixture. -/
@@ -377,14 +392,14 @@ lemma physicalPortSuite9a_indexed_action :
       simp [physicalPortSuite9aExplicitIndexedTransform,
         physicalPortSuite9aIndexedInput, physicalPortSuite9aIndexedOutput,
         ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-        dotProduct, Fintype.sum_sigma, physicalPortSuite9aPortFamily]
+        dotProduct, physicalPortSuite9aIndexedChannelFintype]
     all_goals ring_nf
   · cases port
     cases mode
     simp [physicalPortSuite9aExplicitIndexedTransform,
       physicalPortSuite9aIndexedInput, physicalPortSuite9aIndexedOutput,
       ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-      dotProduct, Fintype.sum_sigma, physicalPortSuite9aPortFamily]
+      dotProduct, physicalPortSuite9aIndexedChannelFintype]
 
 /-- The mixed input in aggregate component-owned physical-port coordinates. -/
 def physicalPortSuite9aAggregateInput :
