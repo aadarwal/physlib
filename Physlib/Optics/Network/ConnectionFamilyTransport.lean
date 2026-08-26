@@ -421,8 +421,8 @@ lemma incidentAssembly_transport
                 ((Incident.relabelEquiv equiv.channelEquiv).symm_apply_apply
                   (Incident.mk channel)).symm
 
-/-- External readout commutes with simultaneous transport of ambient and boundary labels. -/
 omit [Fintype family.Channel] [Fintype (family.transport equiv).Channel] in
+/-- External readout commutes with simultaneous transport of ambient and boundary labels. -/
 lemma externalOutgoingReadout_transport
     (outgoing : ModeAmplitude (Outgoing P.Channel)) :
     (family.transport equiv).externalOutgoingReadout.toLinearMap
