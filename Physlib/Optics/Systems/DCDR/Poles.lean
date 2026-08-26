@@ -5,10 +5,8 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Algebra.MvPolynomial.Equiv
 public import Physlib.Optics.Network.FlatNetlistMason
 public import Physlib.Optics.Systems.DCDR.Response
-public import Physlib.Optics.Systems.DelayTransfer.Poles
 public import Physlib.Optics.Systems.DelayTransfer.Stability
 
 /-!
