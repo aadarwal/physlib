@@ -83,6 +83,48 @@ def dynOutgoing : ModeAmplitude (Outgoing DynChannel) :=
     match endpoint.channel with
     | ⟨⟨component, port⟩, mode⟩ => dynOutgoingValue component ⟨port, mode⟩
 
+def dynForwardIndex : LatticeForwardIndex 2 :=
+  ⟨0, by omega⟩
+
+def dynTwoPortChannel :
+    TwoPortSeriesNetlist.Port → (TwoPortSeriesNetlist.portFamily Unit Unit).Channel
+  | .left => ⟨.left, ()⟩
+  | .right => ⟨.right, ()⟩
+
+def dynRingChannel (row column : Fin 2) (port : LatticeSitePort) : DynChannel :=
+  (rectangularLatticeComponents dynParameters).componentChannelEmbedding
+    (rectangularRingComponent row column) (latticeSiteChannelEquiv port)
+
+def dynHorizontalCouplerChannel (row : Fin 2) (port : TwoPortSeriesNetlist.Port) :
+    DynChannel :=
+  (rectangularLatticeComponents dynParameters).componentChannelEmbedding
+    (rectangularHorizontalCouplerComponent row dynForwardIndex) (dynTwoPortChannel port)
+
+def dynVerticalCouplerChannel (column : Fin 2) (port : TwoPortSeriesNetlist.Port) :
+    DynChannel :=
+  (rectangularLatticeComponents dynParameters).componentChannelEmbedding
+    (rectangularVerticalCouplerComponent dynForwardIndex column) (dynTwoPortChannel port)
+
+@[simp]
+lemma dynIncident_component
+    (component : RectangularLatticeComponent 2 2)
+    (channel : (rectangularLatticeComponentPortFamily component).Channel) :
+    dynIncident
+        (Incident.mk ((rectangularLatticeComponents dynParameters).componentChannelEmbedding
+          component channel)) =
+      dynIncidentValue component channel := by
+  rfl
+
+@[simp]
+lemma dynOutgoing_component
+    (component : RectangularLatticeComponent 2 2)
+    (channel : (rectangularLatticeComponentPortFamily component).Channel) :
+    dynOutgoing
+        (Outgoing.mk ((rectangularLatticeComponents dynParameters).componentChannelEmbedding
+          component channel)) =
+      dynOutgoingValue component channel := by
+  rfl
+
 abbrev dynConnections := (rectangularLatticeNetlist dynParameters).connections
 
 noncomputable instance dynConnectedChannelDecidableEq :
@@ -162,6 +204,15 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
       dynOutgoing
         (Outgoing.mk (dynConnections.channelEmbedding (dynConnections.mateEquiv connected))) := by
   rcases connected with ⟨connection, localChannel⟩
+  change dynIncident
+      (Incident.mk (dynConnections.channelEmbedding
+        (dynConnections.connectionChannelEmbedding connection localChannel))) =
+    dynOutgoing
+      (Outgoing.mk (dynConnections.channelEmbedding
+        (dynConnections.mateEquiv
+          (dynConnections.connectionChannelEmbedding connection localChannel))))
+  rw [dynConnections.channelEmbedding_connectionChannelEmbedding,
+    dynConnections.channelEmbedding_mateEquiv_connectionChannelEmbedding]
   rcases connection with horizontal | vertical
   · rcases horizontal with ⟨⟨row, edge⟩, half⟩
     rcases edge with ⟨column, hColumn⟩
@@ -171,10 +222,10 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
     subst column
     fin_cases row <;> cases half <;>
       rcases localChannel with mode | mode <;> cases mode <;>
-      simp [dynConnections, rectangularLatticeNetlist, rectangularLatticeRowHierarchy,
-        rectangularHorizontalConnections, rectangularHorizontalConnection,
-        PortConnectionFamily.mateEquiv, dynIncident, dynOutgoing, dynIncidentValue,
-        dynOutgoingValue]
+      simp [dynConnections, rectangularLatticeNetlist, rectangularHorizontalConnections,
+        rectangularHorizontalConnection, PortConnection.mateEquiv,
+        PortConnection.channelEmbedding, dynIncident, dynOutgoing, dynIncidentValue,
+        dynOutgoingValue, dynHorizontalIncidentValue, dynHorizontalOutgoingValue]
   · rcases vertical with ⟨⟨edge, column⟩, half⟩
     rcases edge with ⟨row, hRow⟩
     have hRowZero : row = 0 := by
@@ -183,11 +234,12 @@ lemma dyn_connectedEquation (connected : dynConnections.Channel) :
     subst row
     fin_cases column <;> cases half <;>
       rcases localChannel with mode | mode <;> cases mode <;>
-      simp [dynConnections, rectangularLatticeNetlist, rectangularLatticeRowHierarchy,
+      simp [dynConnections, rectangularLatticeNetlist,
         rectangularVerticalBoundaryConnections, LatticeConnectionFamilies.onBoundary,
         LatticeConnectionFamilies.connectionOnBoundary, rectangularVerticalConnections,
-        rectangularVerticalConnection, PortConnectionFamily.mateEquiv, dynIncident,
-        dynOutgoing, dynIncidentValue, dynOutgoingValue]
+        rectangularVerticalConnection, PortConnection.mateEquiv,
+        PortConnection.channelEmbedding, dynIncident, dynOutgoing, dynIncidentValue,
+        dynOutgoingValue, dynVerticalIncidentValue, dynVerticalOutgoingValue]
 
 lemma dyn_incidentAssembly :
     dynIncident = dynConnections.incidentAssembly dynOutgoing dynInput := by
@@ -287,6 +339,143 @@ lemma dyn_mem_rowDecomposition :
   unfold rectangularRowDecompositionBehavior
   rw [LinearBehavior.mem_reindex_iff, Equiv.symm_symm, Equiv.symm_symm]
   simpa [dynOuterInput, dynOuterOutput] using dyn_mem_outerClosure
+
+lemma dyn_horizontalWire_nonzero :
+    dynIncident (Incident.mk (dynRingChannel 0 1 .west)) =
+        dynOutgoing (Outgoing.mk (dynHorizontalCouplerChannel 0 .right)) ∧
+      dynOutgoing (Outgoing.mk (dynHorizontalCouplerChannel 0 .right)) ≠ 0 := by
+  constructor
+  · rfl
+  · norm_num [dynOutgoing, dynHorizontalCouplerChannel, dynTwoPortChannel,
+      dynOutgoingValue, dynHorizontalOutgoingValue]
+
+lemma dyn_verticalWire_nonzero :
+    dynIncident (Incident.mk (dynRingChannel 1 1 .north)) =
+        dynOutgoing (Outgoing.mk (dynVerticalCouplerChannel 1 .right)) ∧
+      dynOutgoing (Outgoing.mk (dynVerticalCouplerChannel 1 .right)) ≠ 0 := by
+  constructor
+  · rfl
+  · norm_num [dynOutgoing, dynVerticalCouplerChannel, dynTwoPortChannel,
+      dynOutgoingValue, dynVerticalOutgoingValue]
+
+lemma dyn_crossParameters :
+    (dynParameters.horizontalCoupler 0 dynForwardIndex).crossAmplitude = 3 ∧
+      (dynParameters.verticalCoupler dynForwardIndex 1).crossAmplitude = 7 ∧
+      (dynParameters.horizontalCoupler 0 dynForwardIndex).throughAmplitude = 2 ∧
+      (dynParameters.verticalCoupler dynForwardIndex 1).throughAmplitude = 5 := by
+  norm_num [dynParameters, dynForwardIndex, dynCoupler]
+
+lemma dyn_outputPathValue :
+    dynOutgoing (Outgoing.mk (dynRingChannel 1 1 .east)) = -630 := by
+  rfl
+
+lemma dyn_flat_and_rowDecomposition :
+    (dynInput, dynOutput) ∈ (rectangularLatticeNetlist dynParameters).behavior ∧
+      (dynInput, dynOutput) ∈ rectangularRowDecompositionBehavior dynParameters :=
+  ⟨dyn_mem_flatBehavior, dyn_mem_rowDecomposition⟩
+
+def dynMiswiredVerticalConnection
+    (index : RectangularVerticalConnection 2 2) :
+    PortConnection (rectangularLatticeComponents dynParameters).aggregatePortModeFamily :=
+  match index with
+  | ((row, column), false) =>
+      { left := ⟨rectangularRingComponent row.1 column, LatticeSitePort.south⟩
+        right :=
+          ⟨rectangularVerticalCouplerComponent row column,
+            TwoPortSeriesNetlist.Port.left⟩
+        left_ne_right := by intro h; cases h
+        modeEquiv := Equiv.refl Unit }
+  | ((row, column), true) =>
+      { left :=
+          ⟨rectangularVerticalCouplerComponent row column,
+            TwoPortSeriesNetlist.Port.right⟩
+        right :=
+          ⟨rectangularRingComponent row.succ ((Equiv.swap (0 : Fin 2) 1) column),
+            LatticeSitePort.north⟩
+        left_ne_right := by intro h; cases h
+        modeEquiv := Equiv.refl Unit }
+
+def dynMiswiredVerticalConnections :
+    PortConnectionFamily
+      (rectangularLatticeComponents dynParameters).aggregatePortModeFamily
+      (RectangularVerticalConnection 2 2) where
+  connection := dynMiswiredVerticalConnection
+  endpointPort_injective := by
+    rintro ⟨⟨⟨firstRow, firstColumn⟩, firstHalf⟩, firstEnd⟩
+      ⟨⟨⟨secondRow, secondColumn⟩, secondHalf⟩, secondEnd⟩ hPort
+    cases firstHalf <;> cases secondHalf <;> cases firstEnd <;> cases secondEnd <;>
+      simp only [dynMiswiredVerticalConnection, PortConnection.endpointPort] at hPort
+    all_goals
+      injection hPort
+      simp_all [rectangularRingComponent, rectangularVerticalCouplerComponent]
+
+lemma dynMiswired_endpointDisjoint :
+    LatticeConnectionFamilies.EndpointDisjoint
+      (rectangularHorizontalConnections dynParameters)
+      dynMiswiredVerticalConnections := by
+  rintro ⟨⟨rowHorizontal, columnHorizontal⟩, halfHorizontal⟩ endHorizontal
+    ⟨⟨rowVertical, columnVertical⟩, halfVertical⟩ endVertical hPort
+  cases halfHorizontal <;> cases halfVertical <;>
+    cases endHorizontal <;> cases endVertical <;>
+    simp only [rectangularHorizontalConnections, rectangularHorizontalConnection,
+      dynMiswiredVerticalConnections, dynMiswiredVerticalConnection,
+      PortConnection.endpointPort] at hPort
+  all_goals cases hPort
+
+def dynMiswiredVerticalBoundaryConnections :=
+  LatticeConnectionFamilies.onBoundary
+    (rectangularHorizontalConnections dynParameters) dynMiswiredVerticalConnections
+    dynMiswired_endpointDisjoint
+
+abbrev dynMiswiredConnections :=
+  (rectangularHorizontalConnections dynParameters).append
+    dynMiswiredVerticalBoundaryConnections
+
+noncomputable instance dynMiswiredBoundaryLocalChannelFintype
+    (index : RectangularVerticalConnection 2 2) :
+    Fintype (dynMiswiredVerticalBoundaryConnections.connection index).LocalChannel := by
+  rcases index with ⟨edge, half⟩
+  cases half <;> change Fintype (Unit ⊕ Unit) <;> infer_instance
+
+noncomputable instance dynMiswiredLocalChannelFintype
+    (index : RectangularHorizontalConnection 2 2 ⊕ RectangularVerticalConnection 2 2) :
+    Fintype (dynMiswiredConnections.connection index).LocalChannel := by
+  rcases index with index | index
+  · exact rectangularHorizontalLocalChannelFintype dynParameters index
+  · change Fintype (dynMiswiredVerticalBoundaryConnections.connection index).LocalChannel
+    infer_instance
+
+noncomputable instance dynMiswiredConnectedChannelFintype :
+    Fintype dynMiswiredConnections.Channel :=
+  Fintype.ofFinite _
+
+noncomputable instance dynMiswiredConnectedChannelDecidableEq :
+    DecidableEq dynMiswiredConnections.Channel :=
+  Classical.decEq _
+
+lemma dynMiswired_incidentAssembly_ring11North
+    (input : ModeAmplitude (Incident dynMiswiredConnections.ExternalChannel)) :
+    dynMiswiredConnections.incidentAssembly dynOutgoing input
+        (Incident.mk (dynRingChannel 1 1 .north)) =
+      dynOutgoing (Outgoing.mk (dynVerticalCouplerChannel 0 .right)) := by
+  change dynMiswiredConnections.incidentAssembly dynOutgoing input
+      (Incident.mk (dynMiswiredConnections.channelEmbedding
+        ⟨Sum.inr ((dynForwardIndex, (0 : Fin 2)), true), Sum.inr ()⟩)) = _
+  rw [dynMiswiredConnections.incidentAssembly_apply_connected_channel]
+  rfl
+
+lemma dynMiswired_incidentAssembly_rejected
+    (input : ModeAmplitude (Incident dynMiswiredConnections.ExternalChannel)) :
+    dynIncident ≠ dynMiswiredConnections.incidentAssembly dynOutgoing input := by
+  intro hAssembly
+  have hCoordinate := congrArg
+    (fun amplitude => amplitude (Incident.mk (dynRingChannel 1 1 .north))) hAssembly
+  rw [dynMiswired_incidentAssembly_ring11North] at hCoordinate
+  have hImpossible : (-126 : ℂ) = 0 := by
+    simpa [dynIncident, dynOutgoing, dynRingChannel, dynVerticalCouplerChannel,
+      dynTwoPortChannel, dynIncidentValue, dynOutgoingValue,
+      dynVerticalOutgoingValue] using hCoordinate
+  norm_num at hImpossible
 
 end
 
