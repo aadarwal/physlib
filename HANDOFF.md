@@ -4,15 +4,16 @@
 
 - Exact sync target: `cb89d1d2d5ff3459c2cb50f21274713cd00ad62f`.
 - Sync merge: `001977bafa8fcf2c9ee5e47fb0e792cfbd734693`.
-- Gated source: `a99091fcd4a0315f00f85d32b8ff5eb534bc46f6`.
+- Gated source: `7e6698bc29aa020dbb70372e616adf414466004a`.
 - `Physlib.lean` is unchanged. Its restored SHA-256 is
   `85727e4debf1f8ad8c50abe04763611f45131275542b2b6ee18f1e28d5f538d0`.
 - The source merge delta is exactly the three Lean modules listed below. This
   handoff is the cutoff-only child.
 
-The later development head `110eb5cd` was announced while the gate was running.
-Per controller direction, this cutoff remains based on `cb89d1d2`; no mid-gate
-resync was performed.
+Development advanced through `d61fa1d4` while the scoped JJ fix was in flight.
+Per controller direction, this recut remains based on `cb89d1d2`; no mid-fix
+resync was performed. The regression-only fix commits are `48a8fc7a` and
+`7e6698bc`.
 
 ## Goal resolution
 
@@ -47,7 +48,7 @@ Thus the two-system X-01 row is closed in exactly that systemwise sense.
 - `Physlib/Optics/Systems/DCDR/NominalChain.lean`: nominal two-channel boundary,
   complete N5 response, scalar pivot, N3T chain, and extended DCDR agreement.
 - `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`: independent exact
-  N7, scattering, pivot, chain, common-domain, and hostile-plane fixtures.
+  N7, scattering, pivot, chain, common-domain, and N3T-order fixtures.
 - `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`: joint
   ring-and-DCDR predicate, unequal anchors, and joint negative sentinel.
 
@@ -61,6 +62,46 @@ public import Physlib.Optics.Systems.Microring.AllPassDCDRX01Regression
 
 `ZTransformBridge.lean` received no additive edit. No existing source file was
 changed by this slice.
+
+The JJ fallback delta changes only the two regression modules. No production
+module changed between the first cutoff and this recut.
+
+## Validation names
+
+- `nominalTwoPortExternalChannelEquiv` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `response_nominal_reference_coordinates` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `packagedNominalTwoPortScattering_eq_nominalTwoPortScatteringTransform` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `packagedNominalTwoPortScattering_hasBijectiveRightToLeftTransmission_iff` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `nominalBackwardFirstChainTransform_eq_matrix` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `nominalBackwardFirstChainTransform_roundTrip` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `zChainCrossSemantics_agree` —
+  `Physlib/Optics/Systems/DCDR/NominalChain.lean`.
+- `zChainRegression_transfer_reverse_eq` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`.
+- `zChainRegression_independent_packaged_blocks` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`.
+- `zChainRegression_pivotInverse_entry` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`.
+- `zChainRegression_independent_common_point` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`.
+- `zChainRegressionWrongDiagonalOrderMatrix` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`.
+- `zChainRegression_chain_ne_wrongDiagonalOrderMatrix` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`.
+- `RingDCDRX01Agreement` —
+  `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`.
+- `ringDCDRX01Regression_hasAgreement` —
+  `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`.
+- `ringDCDRX01Regression_independentAnchors` —
+  `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`.
+- `ringDCDRX01Regression_wrongDiagonalOrder_rejected` —
+  `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`.
 
 ## Production claims
 
@@ -148,6 +189,14 @@ value equality load-bearing rather than merely documentary.
 
 ## Independent regression audit
 
+`zChainRegression_transfer_reverse_eq` at
+`NominalChainRegression.lean:112` is universally quantified over `p`. Its proof
+expands `transfer`, numerator, denominator, loop, direct, drive, readout, reverse,
+and path-coefficient definitions, then closes in the commutative field. It does
+not use the fixture equality, the fixture reverse-transfer lemma, or a production
+chain result. Thus `transfer p.reverse = transfer p` is an algebraic property of
+this component model. It is not a physical reciprocity claim.
+
 The DCDR fixture is `stableUnitDelayParameters` at `z = I`, hence formal
 `q = z^-1 = -I`. Its nonzero loop polynomial is `-(1/4) q^2`. Direct parameter
 expansion gives both forward and reverse transmission `-(7/8) I`; the inverse
@@ -172,45 +221,47 @@ The anchor dependency audit is:
 - `zChainRegression_forwardEquations_output` expands the raw N7 equations and
   does not use `ForwardEquations.output_eq_transfer`.
 - `zChainRegression_independent_packaged_blocks` at
-  `NominalChainRegression.lean:356` derives all four blocks through those raw
+  `NominalChainRegression.lean:370` derives all four blocks through those raw
   equations and direct readout unfolding. It does not use the production response
   entry or packaged-entry lemmas.
-- `zChainRegression_hasBijectiveRightToLeftTransmission` at line 458 constructs
+- `zChainRegression_hasBijectiveRightToLeftTransmission` at line 472 constructs
   the pivot inverse from the exact scalar product. It does not use the production
   pivot iff, pivot action, or entry lemmas.
 - The four `zChainRegression_chain_*` values unfold the generic N3T block
   construction. They do not use
   `nominalBackwardFirstChainTransform_eq_matrix` or any production reflection or
   transmission value lemma.
-- `zChainRegression_productionChain_with_independent_entries` at line 579 keeps
+- `zChainRegression_productionChain_with_independent_entries` at line 593 keeps
   the production equality and all independently computed entries in separate
   conjuncts.
-- `zChainRegression_independent_common_point` at line 618 reuses the accepted
+- `zChainRegression_independent_common_point` at line 632 reuses the accepted
   primitive causal, reciprocal-Z, raw-N5, and eleven-branch Mason audit at
   `ZTransformRegression.lean:563`, then joins it to the independently unfolded
   chain. It does not use `zChainCrossSemantics_agree`.
-- `zChainRegression_productionAgreement_with_independent_anchor` at line 641
+- `zChainRegression_productionAgreement_with_independent_anchor` at line 655
   pairs the production agreement with the independent values only after those
   values have been established.
 - The joint anchors use the accepted independent ring recurrence, raw N5, Mason,
   and chain fixtures plus the independent DCDR conjunction. They do not derive a
   value through `RingDCDRX01Agreement`.
 
-A feedback sign, reverse reindex, pivot, or N3T block-order error changes one of
-these exact values.
+A feedback sign, pivot inversion, or N3T block-order error changes one of these
+exact values. The former directional-relabeling coverage claim is withdrawn: the
+generic scalar invariance makes that proposed asymmetric sentinel impossible in
+this model.
 
 ## Fail-capable sentinel
 
-`zChainRegressionWrongReferencePlaneMatrix` swaps the two correct DCDR diagonal
-entries. At the same fixture, the correct leading entry is `(8/7) I`, while the
-wrong leading entry is `-(7/8) I`.
+`zChainRegressionWrongDiagonalOrderMatrix` synthetically swaps the two correct
+DCDR N3T diagonal entries. At the same fixture, the correct leading entry is
+`(8/7) I`, while the wrong leading entry is `-(7/8) I`.
 
-`zChainRegression_chain_ne_wrongReferencePlaneMatrix` at
-`NominalChainRegression.lean:672` rejects this matrix by an independently pinned
-entry inequality. The joint
-`ringDCDRX01Regression_wrongReferencePlane_rejected` at
+`zChainRegression_chain_ne_wrongDiagonalOrderMatrix` at
+`NominalChainRegression.lean:686` rejects this matrix by an independently pinned
+entry inequality. It guards N3T diagonal order only. The joint
+`ringDCDRX01Regression_wrongDiagonalOrder_rejected` at
 `AllPassDCDRX01Regression.lean:145` retains the ring leading value `7` and DCDR
-leading value `(8/7) I` while rejecting the same wrong nominal order.
+leading value `(8/7) I` while rejecting the same wrong N3T order.
 
 ## Gate record
 
@@ -228,11 +279,11 @@ All Lean jobs ran through the machine-wide `lake-lock`.
 - `scripts/lint-style.sh` passed repository-wide. Direct `lint-style.py` checks
   also passed on all three new files.
 - The repository-wide `module_doc_lint` still exits on legacy modules outside
-  this lane. A captured scoped audit contains no `NominalChain` or
+  this lane. A filtered scoped audit contains no `NominalChain` or
   `AllPassDCDRX01Regression` finding. Each new module has the four literal
   headings and a TOC exactly matching its numbered sections.
 - There are zero banned declarations, zero `theorem` declarations, and no line
-  over 100 codepoints. The files have 681, 685, and 158 lines respectively.
+  over 100 codepoints. The files have 681, 699, and 158 lines respectively.
 - `Physlib.lean` was restored byte-for-byte after temporary registration.
 
 ## Non-claims and human audit
