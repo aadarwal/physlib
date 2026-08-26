@@ -305,6 +305,7 @@ lemma rephasedBehavior_eq (gauge : ChannelEndGauge netlist.Channel)
       netlist.componentBehavior gauge hMatched]
   simp only [LinearBehavior.mem_rephase_iff]
   rw [← netlist.behavior_eq_closeBehavior]
+  exact Iff.rfl
 
 /-!
 ## D. Well-posed response covariance
@@ -468,6 +469,7 @@ private lemma mem_closeBehavior_append_rephase_eq_staged
   rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
   simp only [LinearBehavior.mem_rephase_iff]
   rw [inner.closeBehavior_append outer behavior]
+  exact Iff.rfl
 
 /-- Rephasing before flattened closure agrees with first using the established staged closure
 identity and then rephasing the final external boundary.
