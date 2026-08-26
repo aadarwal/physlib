@@ -551,7 +551,6 @@ lemma observablesRegression_n5f_oneFSR_throughPower_eq_zero :
   rw [observablesRegression_n5f_oneFSR_throughPower,
     observablesRegressionN5FThroughPowerAt_zero]
 
-
 end AddDrop
 
 end

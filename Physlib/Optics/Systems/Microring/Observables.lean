@@ -6,7 +6,6 @@ Authors: Aadarsh Agarwal
 module
 
 public import Physlib.Optics.Systems.Microring.ObservablesFrequency
-public import Physlib.Optics.Systems.Microring.ObservablesPower
 
 /-!
 # Microring observables

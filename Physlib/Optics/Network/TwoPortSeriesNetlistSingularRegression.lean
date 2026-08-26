@@ -5,10 +5,8 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.TwoPortRedhefferRegression
 public import Physlib.Optics.Network.TwoPortSeriesNetlistBehavior
-public import Physlib.Optics.Network.TwoPortSeriesRegression
 
 /-!
 # Singular regression for the chosen canonical two-port series netlist
