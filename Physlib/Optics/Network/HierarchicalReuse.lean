@@ -395,10 +395,11 @@ lemma replaceInnerFamily
                     (outer.transport boundary))).symm)
               (outer.closeBehavior_transport boundary
                 (inner.innerBoundaryBehavior behavior))
-    _ = _ := replacementExternal_reindex
-      (inner := inner) (replacement := replacement)
-      (boundary := boundary) (outer := outer)
-      (outer.closeBehavior (inner.innerBoundaryBehavior behavior))
+    _ = _ := by
+      convert replacementExternal_reindex
+        (inner := inner) (replacement := replacement)
+        (boundary := boundary) (outer := outer)
+        (outer.closeBehavior (inner.innerBoundaryBehavior behavior)) using 1 <;> rfl
 
 end PortConnectionFamily
 
