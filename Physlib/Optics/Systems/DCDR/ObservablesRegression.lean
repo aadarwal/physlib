@@ -21,7 +21,7 @@ the finite zero `z = 1` and fails the strict all-zeros condition.
 
 Every response polynomial, Bezout identity, reciprocal root, and norm bound is expanded directly
 from the rational data. The positive and negative conclusions do not use
-`printedIncoherent_allZerosInsideUnitDisk_of_strict` or any other observable theorem. Thus the
+`printedIncoherent_allZerosInsideUnitDisk_of_strict` or any other observable result. Thus the
 negative fixture can fail if the coefficients or strictness change.
 
 The separately printed incoherent FMICS'15 Theorem 5 assumptions are also checked at a boundary
@@ -52,8 +52,10 @@ with the coherent fixtures.
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definition 7 and Theorem 5.
 
-No statement calls the zero-location condition "resonance". No physical-frequency, power,
-passivity, BIBO, coherent/incoherent equivalence, or material-model claim is made.
+No statement calls the zero-location condition "resonance". This file introduces neither
+normalized-modal power nor electromagnetic power; no E3b power bridge is used. It supplies no
+physical-frequency, passivity, BIBO, coherent/incoherent equivalence, or material-model claim and
+gives no causality or time-domain interpretation.
 -/
 
 @[expose] public section
@@ -323,7 +325,7 @@ lemma insideZerosResponseReduction_half_mem_zZeros :
 /-- Direct rational-data expansion puts every finite zero of the positive fixture inside the
 unit disk.
 
-This proof does not use the production observable theorem.
+This proof does not use the production strict-result lemma.
 -/
 lemma insideZerosResponseReduction_allZerosInsideUnitDisk :
     insideZerosResponseReduction.allZerosInsideUnitDisk := by

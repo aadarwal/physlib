@@ -25,10 +25,11 @@ complex-square-root bound and two nonzero conditions. The paper itself says that
 conditions are absent from Binh [5]'s paper-and-pencil derivation and are necessary for the formal
 proof. They are therefore FMICS'15's discoveries, not Physlib corrections.
 
-The printed bound is non-strict although Definition 7's conclusion is strict. Physlib keeps the
-printed audit predicate and the strict sufficient predicate separate. The proved adaptation of
-Theorem 5 strengthens only that first bound to `< 1`; a regression records that the printed
-boundary assumptions do not imply the strict conclusion.
+The printed bound is non-strict although Definition 7's conclusion is strict. This is the same
+defect class as FMICS'15 Theorem 4: a non-strict hypothesis cannot establish Definition 7's strict
+conclusion. The literal printed Theorem 5 implication is false at the norm-one boundary. Physlib
+therefore keeps the printed audit predicate separate from a strict sufficient predicate; the
+proved lemma strengthens the first bound to `< 1`.
 
 Coherent N7 `t`/`-I * k` is the FMICS'15 source's own unprinted coherent branch. The printed
 incoherent `1 - k`/`k` numerator below is a different case. No theorem identifies it with the
@@ -53,9 +54,10 @@ coherent response certificate.
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definitions 6-8 and Theorem 5.
 
-This file proves no physical resonance, spectral-power, frequency-response, passivity, or BIBO
-theorem. Formal `q` and reciprocal `z` are algebraic coordinates. The printed incoherent result is
-not a parity bridge to the coherent N7 netlist.
+This file proves no physical resonance, frequency-response, passivity, or BIBO theorem. It
+introduces neither normalized-modal power nor electromagnetic power; no E3b power bridge is used.
+It gives no causality or time-domain interpretation. Formal `q` and reciprocal `z` are algebraic
+coordinates. The printed incoherent result is not a parity bridge to the coherent N7 netlist.
 -/
 
 @[expose] public section
@@ -180,7 +182,7 @@ strict so that its conclusion matches the paper's own strict Definition 7 predic
 
 The two nonzero hypotheses are retained exactly. No coherent/incoherent identification is used.
 -/
-theorem printedIncoherent_allZerosInsideUnitDisk_of_strict
+lemma printedIncoherent_allZerosInsideUnitDisk_of_strict
     (G1 G2 G3 k1 k2 : ℂ)
     (hConditions : PrintedIncoherentStrictAllZerosConditions G1 G2 G3 k1 k2) :
     PrintedIncoherentAllZerosInsideUnitDisk G1 G2 G3 k1 k2 := by
