@@ -31,8 +31,11 @@ Maxwell realization. The parameter `a` is a field-amplitude coefficient, not a p
 ## ii. Key results
 
 - `AllPass.causalOutput`: the constructed causal recurrence solution.
+- `AllPass.zTransferROC`: the absolute ROC of the impulse-response transfer relation.
 - `AllPass.transform_causalOutput_cleared`: the division-free Z-transform law.
 - `AllPass.zTransfer_eq`: the exact reciprocal-variable transfer.
+- `AllPass.transform_causalImpulseResponse_eq_zTransfer`: the transfer is the transform of the
+  causal impulse response on its ROC.
 
 ## iii. Table of contents
 
@@ -118,6 +121,26 @@ def zTransfer (through attenuation z : ℂ) : ℂ :=
     (zFeedbackCoefficients through attenuation)
     (zFeedforwardCoefficients through attenuation) z
 
+/-- The absolute region of convergence of the all-pass impulse-response transfer relation.
+
+This is the intersection of the input and output ROCs with the recurrence denominator zeros
+removed. It is an analytic condition, not a fixed-frequency network solve predicate.
+-/
+def zTransferROC (through attenuation : ℂ) : Set ℂ :=
+  iirROC zFeedbackLags (zFeedbackCoefficients through attenuation) unitImpulse
+    (causalOutput through attenuation unitImpulse)
+
+/-- Membership in the all-pass transfer ROC includes a nonzero evaluation point. -/
+lemma ne_zero_of_mem_zTransferROC {through attenuation z : ℂ}
+    (hz : z ∈ zTransferROC through attenuation) : z ≠ 0 :=
+  hz.1.1.1
+
+/-- Membership in the all-pass transfer ROC removes the recurrence-denominator zeros. -/
+lemma recurrenceDenominator_ne_zero_of_mem_zTransferROC {through attenuation z : ℂ}
+    (hz : z ∈ zTransferROC through attenuation) :
+    1 - through * attenuation * z⁻¹ ≠ 0 := by
+  simpa [zTransferROC, iirROC, delaySymbol_zFeedbackCoefficients] using hz.2
+
 /-- The causal all-pass recurrence has the division-free transform identity. -/
 lemma transform_causalOutput_cleared {through attenuation z : ℂ} {input : ℤ → ℂ}
     (hInput : IsCausal input) (hInputSummable : Summable (seriesTerm input z))
@@ -156,6 +179,17 @@ lemma transform_causalOutput {through attenuation z : ℂ} {input : ℤ → ℂ}
     simpa [delaySymbol_zFeedbackCoefficients] using hDenominator
   exact transform_recurrenceSolution zero_notMem_zFeedbackLags hInput
     hInputSummable hOutputSummable hDenominator'
+
+/-- On its named ROC, the transfer is exactly the Z-transform of the causal impulse response. -/
+lemma transform_causalImpulseResponse_eq_zTransfer {through attenuation z : ℂ}
+    (hz : z ∈ zTransferROC through attenuation) :
+    transform (causalOutput through attenuation unitImpulse) z =
+      zTransfer through attenuation z := by
+  rw [zTransfer]
+  rw [transform_eq_transferFunction_mul_of_mem_iirROC unitImpulse_isCausal
+    (causalOutput_isCausal through attenuation unitImpulse) hz
+    (causalOutput_isRecurrenceSolution through attenuation unitImpulse_isCausal),
+    transform_unitImpulse, mul_one]
 
 end AllPass
 
