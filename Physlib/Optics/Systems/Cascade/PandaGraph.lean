@@ -19,10 +19,10 @@ not an independently parameterized edge table. `PandaBridge` supplies the corres
 and zero-reverse relational certificate.
 
 The source calls the PANDA graph undirected and singles out the branch between nodes 10 and 5
-(NSV'16, text preceding Section 5). Physlib does not silently identify that object with the matrix
-below. This `Multigraph` retains the arrow orientation printed in Definition 11 and Figure 6, so it
-contains `10 → 5` but not a second `5 → 10` edge. Bidirectionality remains present in the complete
-N7 netlist through separate reverse-going amplitudes. Later source comparisons are consequently
+(NSV'16, text preceding Section 5). Physlib does not silently identify that object with the matrix.
+This `Multigraph` retains the arrow orientation printed in Definition 11 and Figure 6.
+It contains `10 → 5` but not a second `5 → 10` edge; the complete N7 netlist retains
+bidirectionality through separate reverse-going amplitudes. Later comparisons are consequently
 forward, zero-reverse formula comparisons, not equality with an undirected-edge closure.
 
 ## ii. Key results
@@ -38,14 +38,14 @@ forward, zero-reverse formula comparisons, not equality with an undirected-edge 
 - C. N7 edge ownership
 - D. Coefficient-matrix graph
 
-## iv. References and non-claims
-
-S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
-Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Figure 6, pp. 42-43.
+## iv. References
 
 No claim equates this directed projection with the paper's undirected graph object. No source
 transfer formula, passivity, losslessness, reciprocity, causality, stability, resonance, bandwidth,
 dispersion, or material realization is asserted here.
+
+S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
+Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Figure 6, pp. 42-43.
 -/
 
 @[expose] public section
@@ -55,9 +55,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Fixed-carrier coefficients -/
-
+/-!
+## A. Fixed-carrier coefficients
+-/
 /-- The selected coefficient of the first main-ring quarter section. -/
 def Parameters.mainQuarterOneCoefficient (p : Parameters) : ℂ :=
   MatchedPropagation.transmissionCoefficient p.mainQuarterOne
@@ -102,9 +102,9 @@ def Parameters.rightRoundTripCoefficient (p : Parameters) : ℂ :=
 /-- The product of the two selected left-ring half coefficients. -/
 def Parameters.leftRoundTripCoefficient (p : Parameters) : ℂ :=
   p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient
-
-/-! ## B. Source node and edge indices -/
-
+/-!
+## B. Source node and edge indices
+-/
 /-- The 18 source-numbered PANDA coordinates, represented with zero-based `Fin` indices. -/
 abbrev Node := Fin 18
 
@@ -153,9 +153,9 @@ def edgeGain (p : Parameters) : Edge → ℂ :=
     (p.leftCoupler.throughAmplitude : ℂ),
     DirectionalCoupler.crossCoefficient p.leftCoupler,
     p.mainQuarterFourCoefficient]
-
-/-! ## C. N7 edge ownership -/
-
+/-!
+## C. N7 edge ownership
+-/
 /-- The physical N7 incident channel supplying each retained forward edge. -/
 def edgeN7InputChannel (p : Parameters) : Edge → (netlist p).Channel :=
   ![componentChannel p .inputCoupler ⟨DirectionalCoupler.Port.leftFirst, ()⟩,
@@ -293,9 +293,9 @@ lemma edgeGain_eq_n7ScatteringEntry (p : Parameters) (edge : Edge) :
   · exact (directionalCoupler_forwardScatteringEntries p.leftCoupler).2.2.2.symm
   · exact (directionalCoupler_forwardScatteringEntries p.leftCoupler).2.2.1.symm
   · exact (matchedPropagation_forwardScatteringEntry p.mainQuarterFour).symm
-
-/-! ## D. Coefficient-matrix graph -/
-
+/-!
+## D. Coefficient-matrix graph
+-/
 /-- The 18-node, 24-edge forward projection owned by the PANDA N7 netlist. -/
 def signalMultigraph (p : Parameters) :
     Physlib.SignalFlowGraph.Multigraph Node Edge where

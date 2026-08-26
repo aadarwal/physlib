@@ -148,6 +148,12 @@ public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
 public import Physlib.Mathematics.Distribution.Basic
+public import Physlib.Mathematics.Distribution.CoordinateHyperplane
+public import Physlib.Mathematics.Distribution.CoordinateHyperplaneDelta
+public import Physlib.Mathematics.Distribution.CoordinateHyperplaneDeltaRegression
+public import Physlib.Mathematics.Distribution.CoordinateSplit
+public import Physlib.Mathematics.Distribution.Heaviside
+public import Physlib.Mathematics.Distribution.HeavisideRegression
 public import Physlib.Mathematics.Distribution.PowMul
 public import Physlib.Mathematics.FDerivCurry
 public import Physlib.Mathematics.Fin
@@ -361,6 +367,7 @@ public import Physlib.Optics.Mode.Rephase
 public import Physlib.Optics.Network.Coherency
 public import Physlib.Optics.Network.ConnectionFamily
 public import Physlib.Optics.Network.ConnectionFamilyRegression
+public import Physlib.Optics.Network.ConnectionFamilyTransport
 public import Physlib.Optics.Network.Conservation
 public import Physlib.Optics.Network.ConservationRegression
 public import Physlib.Optics.Network.ExternalChannel
@@ -374,9 +381,12 @@ public import Physlib.Optics.Network.FlatNetlistMasonSingularRegression
 public import Physlib.Optics.Network.FlatNetlistRegression
 public import Physlib.Optics.Network.Hierarchical
 public import Physlib.Optics.Network.HierarchicalRegression
+public import Physlib.Optics.Network.HierarchicalReuse
+public import Physlib.Optics.Network.HierarchicalReuseRegression
 public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
+public import Physlib.Optics.Network.LinearBehaviorReindex
 public import Physlib.Optics.Network.NetlistCoefficients
 public import Physlib.Optics.Network.NetlistCoefficientsRegression
 public import Physlib.Optics.Network.NetlistData
@@ -476,6 +486,8 @@ public import Physlib.Optics.Systems.Cascade.Heterogeneous
 public import Physlib.Optics.Systems.Cascade.HeterogeneousRegression
 public import Physlib.Optics.Systems.Cascade.Identical
 public import Physlib.Optics.Systems.Cascade.IdenticalRegression
+public import Physlib.Optics.Systems.Cascade.Lattice
+public import Physlib.Optics.Systems.Cascade.LatticeRegression
 public import Physlib.Optics.Systems.Cascade.PandaBridge
 public import Physlib.Optics.Systems.Cascade.PandaGraph
 public import Physlib.Optics.Systems.Cascade.PandaMason
@@ -492,6 +504,10 @@ public import Physlib.Optics.Systems.Cascade.TerminationRegression
 public import Physlib.Optics.Systems.DCDR.Bridge
 public import Physlib.Optics.Systems.DCDR.Graph
 public import Physlib.Optics.Systems.DCDR.Mason
+public import Physlib.Optics.Systems.DCDR.MultipleDelay
+public import Physlib.Optics.Systems.DCDR.MultipleDelayPolynomial
+public import Physlib.Optics.Systems.DCDR.MultipleDelayRegression
+public import Physlib.Optics.Systems.DCDR.MultipleDelaySource
 public import Physlib.Optics.Systems.DCDR.Netlist
 public import Physlib.Optics.Systems.DCDR.Observables
 public import Physlib.Optics.Systems.DCDR.ObservablesRegression
@@ -504,6 +520,10 @@ public import Physlib.Optics.Systems.DCDR.SourceBridge
 public import Physlib.Optics.Systems.DCDR.SourceBridgeRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
+public import Physlib.Optics.Systems.DCDR.ZTransform
+public import Physlib.Optics.Systems.DCDR.ZTransformBridge
+public import Physlib.Optics.Systems.DCDR.ZTransformMasonRegression
+public import Physlib.Optics.Systems.DCDR.ZTransformRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression

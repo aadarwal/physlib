@@ -256,7 +256,11 @@ PR unless maintainers explicitly ask to retain it.
   identifications, local half-cell regularity, and witnessed time/integral interchanges;
   `FiniteSheetIntegralMaxwell` derives the four literal finite-cell laws from the sidewise
   differential Maxwell equations and that premise. No theorem yet derives the premise itself from
-  weak or measure-valued Maxwell equations.
+  weak or measure-valued Maxwell equations. The neutral coordinate-Heaviside foundation takes
+  `{x_last > 0}` as its positive half-space, so `+e_last` points inward and its distributional
+  derivative is the positive boundary delta. Its regression is intentionally one-dimensional and
+  checks normalization and normal reversal only; it does not test a coordinate permutation,
+  represent arbitrary sidewise Maxwell fields as tempered distributions, or close E4b.
 - [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
   complex-carrier candidates are off shell and retain independent positive frequencies and complex
   wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined

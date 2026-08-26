@@ -38,13 +38,13 @@ the second stage on the left. The separate asymmetric neutral regression in
 - A. Hand-expanded two-ring product
 - B. Signed-phase sentinel
 
-## iv. References and non-claims
+## iv. References
+This algebraic fixture makes no quadruple-ring, lattice, termination, Sylvester, Chebyshev,
+resonance, dispersion, bending-loss, causality, passivity, reciprocity, or electromagnetic-power
+claim. It exercises the totalized matrices and therefore needs no pivot hypothesis; relational
+meaning remains gated by the production theorem.
 
-DATE'14 Defs. 6--7 and Thm. 3 are summarized at `HOL-CORPUS.md:201-203`. This algebraic fixture
-makes no quadruple-ring, lattice, termination, Sylvester, Chebyshev, resonance, dispersion,
-bending-loss, causality, passivity, reciprocity, or electromagnetic-power claim. It exercises the
-totalized matrices and therefore needs no pivot hypothesis; relational meaning remains gated by
-the production theorem.
+DATE'14 Defs. 6--7 and Thm. 3 are summarized at `HOL-CORPUS.md:201-203`.
 -/
 
 @[expose] public section

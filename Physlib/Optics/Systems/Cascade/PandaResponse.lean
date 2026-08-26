@@ -48,7 +48,11 @@ certified in `PandaBridge`; they do not identify that directed matrix with an un
 - C. Explicit forward solution
 - D. NSV'16 comparisons
 
-## iv. References, corrections, and non-claims
+## iv. References
+
+The totalized quotients below have response meaning only under `HasNonzeroSourceDenominator`.
+No passivity, losslessness, reciprocity, causality, convergence, stability, resonance, bandwidth,
+dispersion, pole/zero location, insertion-loss model, or material realization is asserted.
 
 S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
 Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-44.
@@ -75,9 +79,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Source dictionary and hypotheses -/
-
+/-!
+## A. Source dictionary and hypotheses
+-/
 /-- The NSV'16 PANDA symbols after collecting each printed field propagation factor. -/
 structure SourceParameters where
   /-- Printed main-ring round-trip factor `e^n`. -/
@@ -170,9 +174,9 @@ structure HasSourceCouplerNormalization (s : SourceParameters) : Prop where
   right : s.cr ^ 2 + s.sr ^ 2 = 1
   /-- Printed left-coupler hypothesis `cl^2 + sl^2 = 1`. -/
   left : s.cl ^ 2 + s.sl ^ 2 = 1
-
-/-! ## B. Printed source expressions -/
-
+/-!
+## B. Printed source expressions
+-/
 /-- The common denominator printed in NSV'16 Theorems 5 and 6. -/
 def sourceDenominator (s : SourceParameters) : ℂ :=
   1 - s.cl * s.leftRoundTrip - s.cr * s.rightRoundTrip -
@@ -247,9 +251,9 @@ lemma sourceDropNumerator_eq_factorized (s : SourceParameters) :
         (s.rightRoundTrip - s.cr) * (1 - s.cl * s.leftRoundTrip) := by
   rw [sourceDropNumerator]
   ring
-
-/-! ## C. Explicit forward solution -/
-
+/-!
+## C. Explicit forward solution
+-/
 /-- The negative-quadrature coefficient associated with a printed cross amplitude. -/
 def sourceCrossCoefficient (crossAmplitude : ℂ) : ℂ :=
   -Complex.I * crossAmplitude
@@ -597,9 +601,9 @@ lemma closedState_forwardEquations (p : Parameters) (s : SourceParameters) (inpu
       closedState_nodeSeventeen p s input hDictionary hRoot hNormalization hDenominator
     nodeEighteen :=
       closedState_nodeEighteen p s input hDictionary hRoot hNormalization hDenominator }
-
-/-! ## D. NSV'16 comparisons -/
-
+/-!
+## D. NSV'16 comparisons
+-/
 /-- Unit source injection is the singleton vector at printed node one. -/
 lemma signalInput_one_eq_single : signalInput 1 = Pi.single (0 : Node) 1 := by
   funext node

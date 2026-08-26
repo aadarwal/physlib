@@ -47,14 +47,9 @@ backward factor `exp (+I*phi)`. It also prints a distinct `Re(cos⁻¹(...))` an
 
 - A. Determinants and the scalar termination pivot
 - B. Relational zero-return responses
-- C. Identical-cascade closed form
+- C. Corrected identical-cascade Sylvester form
 
-## iv. References and non-claims
-
-DATE'14 Def. 8 and Thms. 5--6 are summarized at `HOL-CORPUS.md:205-208`. The source omits the
-required `M11 != 0` condition; this module states it explicitly. Exact parity with printed Thm. 6
-is withheld for the forward-factor and angle mismatches above. The reflectivity and
-transmissivity names denote complex field-amplitude ratios, not power fractions.
+## iv. References
 
 The zero-return relation is only `aR = 0`. It makes no impedance-matching, absorption, radiation,
 passivity, reciprocity, losslessness, causality, bandwidth, or material-realization claim. The
@@ -65,6 +60,11 @@ SFG-TR'14 or NSV'16 comparison; any such bridge must retain IP-12's explicit
 principal-root/selected-half-arc equality. Effective index is constant at the selected carrier,
 and no dispersion model is inferred. In particular, the corrected identical-cascade lemmas do
 not discharge the bundled IP-18 row containing printed DATE'14 Thm. 6.
+
+DATE'14 Def. 8 and Thms. 5--6 are summarized at `HOL-CORPUS.md:205-208`. The source omits the
+required `M11 != 0` condition; this module states it explicitly. Exact parity with printed Thm. 6
+is withheld for the forward-factor and angle mismatches above. The reflectivity and
+transmissivity names denote complex field-amplitude ratios, not power fractions.
 -/
 
 @[expose] public section
