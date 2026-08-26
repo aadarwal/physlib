@@ -520,6 +520,10 @@ public import Physlib.Optics.Systems.DCDR.SourceBridge
 public import Physlib.Optics.Systems.DCDR.SourceBridgeRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
+public import Physlib.Optics.Systems.DCDR.ZTransform
+public import Physlib.Optics.Systems.DCDR.ZTransformBridge
+public import Physlib.Optics.Systems.DCDR.ZTransformMasonRegression
+public import Physlib.Optics.Systems.DCDR.ZTransformRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
