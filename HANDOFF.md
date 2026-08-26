@@ -1,14 +1,15 @@
-# S7C slice 2 handoff
+# S7C slice 2b handoff
 
 ## Cutoff
 
 - Branch: `optics/s7c-cascade`
-- Required sync target: `aff2484ecc7fd14f456b0c85a71d282c6b4f4052`
-- Target merge already present: `cf0061a59fdfe47db06e1b6628ea3ba8b4bad867`
-- Prior slice-1 U2-ready cutoff: `74ceb587ae085fe891b0f093390202e43d3ed592`
-- Slice: identical DATE cascades and Sylvester/Chebyshev form (IP-16/IP-17, H-04/H-05)
+- Required sync target: `476405cee7a80be6357f4f739dc2d4bb5e6d2171`
+- Target merge: `d2c2a58ff100cbb4ef6279cd29aaa6debadd60b7`
+- Prior slice-2 V cutoff: `e5c8840851a3d0866152a05a7999eff92a978384`
+- Slice: V rework for the joined concrete-stage anchor and declaration classification
 
-`aff2484e` is an ancestor of this cutoff. No later development head was selected.
+`476405ce` is an ancestor of this cutoff. The merge retained the lane-local `HANDOFF.md`; the
+target's code and registry changes were accepted unchanged.
 
 ## Files and registrations
 
@@ -17,8 +18,8 @@ Slice 2 adds these modules, in sorted registry order:
 - `Physlib.Optics.Systems.Cascade.Identical`
 - `Physlib.Optics.Systems.Cascade.IdenticalRegression`
 
-This branch still contains the four U2-ready slice-1 modules. Because the required sync target's
-registry predates their conductor merge, the exact cutoff gate temporarily registered all six:
+The required sync target already registers the four U2-ready slice-1 modules. The exact cutoff
+gate temporarily adds the two slice-2 imports, yielding these six cumulative S7C registrations:
 
 - `Physlib.Optics.Network.TwoPortChainFold`
 - `Physlib.Optics.Network.TwoPortChainFoldRegression`
@@ -27,8 +28,8 @@ registry predates their conductor merge, the exact cutoff gate temporarily regis
 - `Physlib.Optics.Systems.Cascade.Identical`
 - `Physlib.Optics.Systems.Cascade.IdenticalRegression`
 
-If slice 1 has already been registered when this cutoff is merged, only the two slice-2 imports
-remain to add. No `Physlib.lean` edit is committed on this branch.
+Only the two slice-2 imports remain for the conductor to add. No `Physlib.lean` edit is committed
+for slice 2b on this branch.
 
 ## Declarations
 
@@ -76,6 +77,42 @@ remain to add. No `Physlib.lean` edit is committed on this branch.
 - `MicroringCascade.dateSylvesterRegression_identity_exact_failure`
 - `MicroringCascade.dateSylvesterRegression_identity_not_hypotheses`
 - `MicroringCascade.dateSylvesterRegression_identity_closedForm_false`
+- `MicroringCascade.dateJoinedSylvesterRegressionRing`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_busPhase`
+- `MicroringCascade.dateJoinedSylvesterRegressionRing_fieldAttenuation`
+- `MicroringCascade.dateJoinedSylvesterRegressionRing_phaseFactor`
+- `MicroringCascade.dateJoinedSylvesterRegressionRing_denominator`
+- `MicroringCascade.dateJoinedSylvesterRegressionRing_forwardTransfer`
+- `MicroringCascade.dateJoinedSylvesterRegressionRing_backwardTransfer`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_signedContinuity`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix_entries`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_hypotheses`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_two`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_three`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_angle`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_two`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_three`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_two_by_hand`
+- `MicroringCascade.dateJoinedSylvesterRegressionStage_three_by_hand`
+
+## V rework disposition
+
+The production corollary
+`dateIdenticalCascadeComposition_eq_sylvesterClosedForm` is now a `lemma`. Its statement and
+proof are unchanged. DATE'14 Thm. 4 and the source's unnumbered Sylvester matrix result remain
+the only two `theorem` declarations in `Identical.lean`.
+
+The joined fixture uses these exact rational DATE values:
+
+```text
+r = -1, t = 0, L_c = 1, alpha = 0, lambda = 4, n_eff = 1, L_b = 1
+```
+
+Its ring and bus phases are `pi/2`, its forward and backward transfers are `1` and `0`, and its
+stage composition is displayed in all four source coordinates as `diag(I, -I)`. The determinant,
+strict bounds, and both conjugacies are then reconstructed for that stage matrix.
 
 ## Exact source domain
 
@@ -155,6 +192,25 @@ matrix ^ 3 = -matrix
 The two source sine candidates are evaluated independently to those same values. Neither proof
 calls Cayley--Hamilton, the Chebyshev power lemma, or either Sylvester headline theorem.
 
+The joined regression closes the construction gap with one concrete `DateCascadeStage`. The
+stage's rational ring data and bus length are expanded through the production continuity and
+ring matrices, proving its composition entry by entry as `diag(I, -I)`. The source structure is
+then proved directly for `stage.compositionMatrix`.
+
+At `N = 2` and `N = 3`, the initial `change` steps definitionally reduce `List.replicate`,
+`List.map`, and `BackwardFirstChainTransform.fold`. The resulting matrix products are expanded
+entry by entry, giving
+
+```text
+raw fold N = 2 = -1
+raw fold N = 3 = -stage.compositionMatrix
+```
+
+The sine coefficients for that same stage are separately evaluated at `theta = pi/2`, giving the
+same two values. The joined equality lemmas use only these independent raw-fold and sine-value
+calculations. They do not call `fold_replicate`, either power theorem, Cayley--Hamilton, the
+Chebyshev recurrence, or either Sylvester result.
+
 The negative control is the identity matrix. It satisfies determinant one, the lower bound, and
 both conjugacy equations, but fails only `Re(m11) < 1`. At this excluded boundary,
 `theta = 0`, totalized `sin(theta) / sin(theta) = 0`, and the following is proved:
@@ -185,6 +241,15 @@ The validation lane should bind these exact public names:
 - `Optics.MicroringCascade.dateSylvesterRegressionMatrix_closedForm_three`
 - `Optics.MicroringCascade.dateSylvesterRegression_identity_exact_failure`
 - `Optics.MicroringCascade.dateSylvesterRegression_identity_closedForm_false`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix_entries`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_hypotheses`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_two`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_three`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_two`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_three`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_two_by_hand`
+- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_three_by_hand`
 
 The prior U2 Markdown nit is fixed here: the full name
 `Optics.MicroringCascade.DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
