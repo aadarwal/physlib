@@ -211,6 +211,8 @@ public import Physlib.Mathematics.ZTransform.Existence
 public import Physlib.Mathematics.ZTransform.ExistenceRegression
 public import Physlib.Mathematics.ZTransform.Inverse
 public import Physlib.Mathematics.ZTransform.InverseRegression
+public import Physlib.Mathematics.ZTransform.OnePole
+public import Physlib.Mathematics.ZTransform.OnePoleBIBO
 public import Physlib.Mathematics.ZTransform.Stability
 public import Physlib.Mathematics.ZTransform.StabilityRegression
 public import Physlib.Meta.AllFilePaths
@@ -455,8 +457,12 @@ public import Physlib.Optics.Rays.TransferRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
 public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 public import Physlib.Optics.Systems.DelayTransfer.EvaluationRegression
+public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponse
+public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponseRegression
 public import Physlib.Optics.Systems.DelayTransfer.Poles
 public import Physlib.Optics.Systems.DelayTransfer.PolesRegression
+public import Physlib.Optics.Systems.DelayTransfer.Stability
+public import Physlib.Optics.Systems.DelayTransfer.StabilityRegression
 public import Physlib.Optics.Systems.MachZehnder.Basic
 public import Physlib.Optics.Systems.MachZehnder.Construction
 public import Physlib.Optics.Systems.MachZehnder.Regression
