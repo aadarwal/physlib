@@ -216,7 +216,8 @@ lemma routingRephaseRegression_mem_componentBehavior :
     simp [routingRephaseRegressionComponentOperator,
       routingRephaseRegressionIncident, routingRephaseRegressionOutgoing,
       Fintype.sum_sigma, Fintype.sum_prod_type, reuseRegression_sum_component] <;>
-    norm_num
+    norm_num <;>
+    ring
 
 /-- The three forward cross-component amplitudes are nonzero and carry the exact distinct values
 `2I`, `-6I`, and `30I`. -/
@@ -461,8 +462,8 @@ lemma routingRephaseRegression_hostile_not_matched :
   have hFirst := hMatched ⟨Sum.inl (), Sum.inl ()⟩
   change (1 : Circle) = routingRephaseRegressionI at hFirst
   have hCoe := congrArg (fun phase : Circle => (phase : ℂ)) hFirst
-  norm_num [routingRephaseRegressionHostileGauge,
-    routingRephaseRegressionGauge, routingRephaseRegressionI] at hCoe
+  have hImag := congrArg Complex.im hCoe
+  norm_num at hImag
 
 /-- The hostile incident state differs from the matched state only at second-west, where it has
 the exact value `2` rather than `2I`. -/
