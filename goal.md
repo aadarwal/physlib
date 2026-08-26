@@ -1937,9 +1937,9 @@ changes, and sparse restriction/zero-extension maps required by the network laye
   preservation proved;
 - [x] covariance of ideal routing under input and output channel relabeling, including the exact
   exchanged-presentation routing law;
-- [ ] matched-gauge covariance of connection routing under channel-end rephasing; arbitrary
+- [x] matched-gauge covariance of connection routing under channel-end rephasing; arbitrary
   independent endpoint rephasings do not leave a unit-gain wire unchanged;
-- [ ] convention-free port/network power, passivity, and losslessness predicates that do not
+- [x] convention-free port/network power, passivity, and losslessness predicates that do not
   require time-reversal data;
 - [x] the dependent connected-channel embedding, blockwise mate, and exact unit routing on every
   connected channel, including cross-connection zeros and normalized modal-power preservation;
@@ -2115,7 +2115,7 @@ from the same network semantics at every frequency where the response is defined
   forcing, and a mis-lifted-port negative control;
 - [x] functional packaging of a child as a scattering/response component only after that child's
   well-posedness and external-channel pairing have been proved; and
-- [ ] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
+- [x] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
   port families. This single construction is needed both to replace an inner family by another
   with the same boundary relation and to state literal three-stage append associativity. The
   fixed-inner-wiring congruence is already complete. All current N-08 hypotheses are structural
@@ -2181,8 +2181,9 @@ larger formulas and proves no independently reusable component law for them.
   normalized-modal-power factor, passive/unitary parameter predicates, and losslessness;
 - [x] its four independently wireable physical-port presentation, pinned nested channel order,
   exact behavior and scattering transport, and direct `ScatteringComponentFamily` consumption;
-- [ ] component-owned physical-port packaging for the remaining beam-splitter, mirror,
-  polarization, and interface primitives consumed by `ScatteringComponentFamily`;
+- [ ] component-owned physical-port packaging consumed by `ScatteringComponentFamily`: the
+  beam-splitter and mirror packages are complete, while polarization and interface primitives
+  remain;
 - [ ] frequency-parameterized propagation and actual time/group-delay statements under N5F, with
   their frequency-domain, causality, and dispersion hypotheses explicit;
 - mirror and termination;
@@ -2408,7 +2409,11 @@ rational N7/N5F netlist, with its absolute ROC, algebraic solve gate, contractio
 and chain pivot kept distinct. On their explicit intersection, one theorem identifies the causal
 transform, rational response, circulation series, fixed N5 response, complete Mason response,
 typed scattering, backward-first chain, and original relational behavior. This completes the ring
-instance of X-01; the DCDR half remains separate, so X-01 as a two-system regression is still open.
+instance of X-01. The DCDR instance now adds its independently gated nominal backward-first chain
+to the same causal-Z, rational, feedback, N5, Mason, scattering, and relational agreement. The
+two-system regression packages those two agreements as a conjunction on their respective common
+domains and proves their fixture values differ; it does not equate the ring and DCDR responses.
+Thus X-01 is complete only in this systemwise sense.
 
 The graph representation must support executable and proved-correct enumeration of simple forward
 paths, elementary directed cycles modulo cyclic rotation, touching and pairwise non-touching loop
@@ -2427,9 +2432,10 @@ not claim the scalar formula for them.
 - transfer amplitude, spectral power, resonance, and rejection-ratio results;
 - at least one difference-equation/Z-transform derivation; and
 - at least one signal-flow/Mason derivation proved equal to network elimination; and
-- for an eligible ring and the DCDR case, a cross-semantics theorem equating relational behavior,
-  compiled elimination, chain response, feedback algebra, Mason gain, and recurrence/Z response on
-  the intersection of their domains.
+- [x] for an eligible ring and the DCDR case, a systemwise cross-semantics theorem equating
+  relational behavior, compiled elimination, chain response, feedback algebra, Mason gain, and
+  recurrence/Z response for each system on its own common domain. The joint theorem is a
+  conjunction and does not assert equality of the two devices' response values.
 
 The cross-semantics theorem keeps three conditions distinct: algebraic feedback requires an
 invertible internal operator; an infinite round-trip series requires contraction or summability;
@@ -2714,18 +2720,18 @@ upstream ownership decision, record the exact decision needed and work on an ind
 
 ## L. Decision gates requiring explicit human confirmation
 
-- [ ] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
+- [x] Confirm the phasor time convention, positive-frequency convention, and resulting right/left
   circular and `S₃` sign, including whether the observer looks along propagation or into the beam.
-- [ ] Confirm whether the first material-medium API should use current raw real field values or wait
+- [x] Confirm whether the first material-medium API should use current raw real field values or wait
   for a stronger dimensional-units refactor.
-- [ ] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
-- [ ] Confirm whether the initial planar-interface PR may state local boundary laws as named
+- [x] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
+- [x] Confirm whether the initial planar-interface PR may state local boundary laws as named
   hypotheses while their Maxwell-integral derivation is developed in a stacked Electromagnetism PR.
 - [ ] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
   coefficients scale full electric-vector amplitudes or tangential components.
 - [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
-- [ ] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
+- [x] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
   corroborating the four-wave arrows and behavior: states are backward-first, scattering
   `(aL, aR; bL, bR)` regroups as `((bL, aL), (aR, bR))`, and the left-to-right scattering
   conversion inverts the right-incident to left-outgoing block. The fork uses only
@@ -2734,14 +2740,16 @@ upstream ownership decision, record the exact decision needed and work on an ind
   power coupling coefficients.
 - [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
   startup term before S4/S5 identities are named.
-- [ ] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
+- [x] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
 - [ ] Confirm whether each stability condition is strict or non-strict and whether it concerns
   poles, zeros, an internal operator, BIBO behavior, or a source-specific named condition.
 - [ ] Replace source decimal examples by human-audited exact data or certified intervals and record
   every source assumption that the Lean statement strengthens, corrects, or rejects.
-- [ ] Confirm the exact HOL source licenses before adapting any source implementation.
+- [x] Confirm the exact HOL source licenses before adapting any source implementation.
 - [ ] Independently verify every bibliography item, URL, page range, and physics claim used in a PR.
-- [ ] Conduct all maintainer/reviewer communication and certify every contributed line.
+- [ ] Conduct all maintainer/reviewer communication and certify every contributed line. Deferred
+  HUMAN-ONLY; residual act: at the trigger, personally certify the exact chosen PR diff and conduct
+  every maintainer/reviewer communication.
 
 ## M. Risk register
 
@@ -2820,7 +2828,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection, angular reflection, the guarded phase-vector law of the plane of incidence, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, the connected complex-TIR reflected/separate/superposed actual-flux endpoint, and a lossless algebraic square-root-normalized completion of each real left-incident s/p column are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and a Maxwell-derived bidirectional power-normalized interface scattering matrix remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
-| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, `E_in`, `E_out`, adjoint readout, and both boundary projector decompositions are complete; matched-gauge covariance and convention-free network predicates remain |
+| N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, `E_in`, `E_out`, adjoint readout, both boundary projector decompositions, and convention-free network predicates are complete; matched-gauge covariance remains |
 | N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | done | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, relational right-load termination, and canonical two-device FlatNetlist/Redheffer agreement; source-specific matrix specializations are S0/S7C consumers |

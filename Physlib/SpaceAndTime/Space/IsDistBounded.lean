@@ -34,6 +34,8 @@ of the space.
   `η : 𝓢(Time × Space d, ℝ)`.
 - `IsDistBounded.mono` : If `f₁` satisfies `IsDistBounded f₁` and
   `‖f₂ x‖ ≤ ‖f₁ x‖` for all `x`, then `f₂` satisfies `IsDistBounded f₂`.
+- `IsDistBounded.indicator` : Restricting a distribution-bounded function to a measurable set
+  preserves distribution boundedness.
 
 ## iii. Table of contents
 
@@ -54,6 +56,7 @@ of the space.
   - D.7. Monotonicity with respect to the norm
   - D.8. Inner products
   - D.9. Scalar multiplication with constant
+  - D.10. Measurable-set restriction
 - E. Specific functions that are `IsDistBounded`
   - E.1. Constant functions
   - E.2. Powers of norms
@@ -676,6 +679,24 @@ lemma inner_left {d n : ℕ}
 lemma smul_const {d : ℕ} [NormedSpace ℝ F] {c : Space d → ℝ}
     (hc : IsDistBounded c) (f : F) : IsDistBounded (fun x => c x • f) :=
   (hc.mul_const_fun ‖f‖).congr (by fun_prop) fun x => by simp [norm_smul]
+
+/-!
+
+### D.10. Measurable-set restriction
+
+-/
+
+/-- Restricting a distribution-bounded function to a measurable set preserves distribution
+boundedness. -/
+lemma indicator {d : ℕ} {f : Space d → F} (hf : IsDistBounded f)
+    {s : Set (Space d)} (hs : MeasurableSet s) :
+    IsDistBounded (s.indicator f) := by
+  refine hf.mono (hf.aestronglyMeasurable.indicator hs) ?_
+  intro x
+  by_cases hx : x ∈ s
+  · simp [Set.indicator_of_mem hx]
+  · simp [Set.indicator_of_notMem hx]
+
 /-!
 
 ## E. Specific functions that are `IsDistBounded`
