@@ -8,20 +8,22 @@ module
 public import Physlib.Optics.Network.LinearBehavior
 
 /-!
-# Inverse relabelling of linear optical behaviors
+# Compositional relabelling of linear optical behaviors
 
 ## i. Overview
 
-This file records that transporting a finite linear behavior along index equivalences and then
-transporting it back along their inverses recovers the original relation.
+This file records inverse cancellation and functorial composition for transporting a finite
+linear behavior along index equivalences.
 
 ## ii. Key results
 
 - `LinearBehavior.reindex_symm_reindex`: inverse relabelling cancels behavior relabelling.
+- `LinearBehavior.reindex_trans`: successive relabellings equal one composite relabelling.
 
 ## iii. Table of contents
 
 - A. Inverse behavior relabelling
+- B. Composite behavior relabelling
 
 ## iv. References
 
@@ -58,6 +60,27 @@ lemma reindex_symm_reindex
       behavior := by
   ext ⟨inputAmplitude, outputAmplitude⟩
   simp
+
+/-!
+
+## B. Composite behavior relabelling
+
+-/
+
+/-- Two successive relabellings of a finite behavior equal relabelling along the composite
+equivalences. -/
+lemma reindex_trans
+    {input : Type u} {output : Type v} {middleInput : Type w}
+    {middleOutput : Type x} {finalInput finalOutput : Type*}
+    [Fintype input] [Fintype output] [Fintype middleInput] [Fintype middleOutput]
+    [Fintype finalInput] [Fintype finalOutput]
+    (firstInput : input ≃ middleInput) (firstOutput : output ≃ middleOutput)
+    (secondInput : middleInput ≃ finalInput)
+    (secondOutput : middleOutput ≃ finalOutput) (behavior : LinearBehavior input output) :
+    (behavior.reindex firstInput firstOutput).reindex secondInput secondOutput =
+      behavior.reindex (firstInput.trans secondInput) (firstOutput.trans secondOutput) := by
+  ext ⟨inputAmplitude, outputAmplitude⟩
+  simp [LinearBehavior.mem_reindex_iff, ModeAmplitude.reindex_apply]
 
 end LinearBehavior
 
