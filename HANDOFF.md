@@ -6,7 +6,7 @@
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s7d-dcdr`
 - This slice adds the explicit N7 DCDR netlist, the edge-indexed eight-node graph, the derivation of
   its forward equations from raw component and routing equations, and hostile topology regressions.
-- The final synchronized development head and post-sync cutoff commit are recorded in the gate
+- The final synchronized development head and post-sync gate source head are recorded in the gate
   section below.
 - `Physlib.lean` is not committed by this lane. The two modules were registered temporarily for
   the shipped registry linters and the file was restored byte-identically.
@@ -25,7 +25,7 @@ Files:
 
 ## Goal text and row status
 
-This slice implements the literal first S7D bullet at `goal.md:2397-2400`:
+This slice implements the literal first S7D bullet at `goal.md:2399-2402`:
 
 > the human-audited eight-node, eleven-edge topology with parallel edges retained;
 
@@ -37,9 +37,9 @@ is IP-08 at
 `/Users/aadarwal/src/aadarwal/physlib-parity/PARITY-LEDGER.md:115`.
 
 This topology foundation contributes to, but does not satisfy, S-06 or G-04. Those rows require
-independently compiled elimination and Mason responses (`goal.md:2589` and `:2600`). It does not
+independently compiled elimination and Mason responses (`goal.md:2591` and `:2602`). It does not
 satisfy S-07, which requires pole/zero/stability results including the unstable case
-(`goal.md:2590`), or X-01, which requires all six semantics on a common domain (`goal.md:2601`).
+(`goal.md:2592`), or X-01, which requires all six semantics on a common domain (`goal.md:2603`).
 No parity-ledger status is changed by this slice.
 
 ## Production declaration inventory
@@ -245,7 +245,21 @@ The validation lane should bind at least these public names:
 
 ## Gate record
 
-Pre-cutoff, both modules built with warnings as errors and the registered
-`lake exe runPhyslibLinters` pass reported no findings for either Physlib or QuantumInfo. The final
-post-sync `lint_all`, style, registry-restoration hash, development head, and cutoff commit will be
-recorded here before reporting the slice.
+The slice is synchronized through development head `d5d404d3` by merge head `4cf6b530`. At that
+post-sync source head, this single locked command exited successfully with temporary sorted
+registrations:
+
+```text
+lake-lock env bash -c 'lake exe cache get &&
+  lake --wfail build Physlib.Optics.Systems.DCDR.Topology
+    Physlib.Optics.Systems.DCDR.TopologyRegression &&
+  lake exe runPhyslibLinters && lake exe lint_all'
+```
+
+Both DCDR modules built with warnings as errors. `runPhyslibLinters` passed for Physlib and
+QuantumInfo. `lint_all` exited zero after its build, registry, legal-import, duplicate-tag,
+sorry/pseudo-attribution, declaration-linter, and transitive-import checks. Its advisory style and
+transitive-import inventories named only pre-existing files, with neither DCDR module present.
+The file-import inventory named four unregistered development-side thin-cell modules and neither
+DCDR module. `Physlib.lean` was then restored byte-identically to SHA-256
+`9b7092d5e30e9c9c618e07892d20d2f45535c4d259f5280946bad68234aba787`.
