@@ -791,16 +791,23 @@ lemma zRegression_stable_edgeGraphDetOn (nodes : Finset Node) :
               (if selected = zRegressionStableLowerLoopNodes then 9 / 25 else 0) := by
         by_cases hEmpty : selected = ∅
         · subst selected
-          simp [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+          simp [show (∅ : Finset Node) ≠ zRegressionStableUpperLoopNodes by decide,
+            show (∅ : Finset Node) ≠ zRegressionStableLowerLoopNodes by decide]
         · by_cases hUpper : selected = zRegressionStableUpperLoopNodes
           · subst selected
-            simp [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+            simp [hEmpty, show zRegressionStableUpperLoopNodes ≠
+              zRegressionStableLowerLoopNodes by decide]
           · by_cases hLower : selected = zRegressionStableLowerLoopNodes
             · subst selected
-              simp [zRegressionStableUpperLoopNodes, zRegressionStableLowerLoopNodes]
+              simp [hEmpty, hUpper, show zRegressionStableLowerLoopNodes ≠
+                zRegressionStableUpperLoopNodes by decide]
             · simp [hEmpty, hUpper, hLower]
       simp_rw [hSplit, Finset.sum_add_distrib]
-      simp [Finset.mem_powerset]
+      simp only [Finset.sum_ite_eq', Finset.mem_powerset, Finset.empty_subset,
+        if_pos]
+      by_cases hUpper : zRegressionStableUpperLoopNodes ⊆ nodes <;>
+        by_cases hLower : zRegressionStableLowerLoopNodes ⊆ nodes <;>
+        simp [hUpper, hLower] <;> ring
 
 /-- Edge refinements depend only on the retained topology, not on the branch gains. -/
 private lemma zRegression_stable_refiningEdgeLists_eq (path : List Node) :
@@ -816,7 +823,11 @@ private lemma zRegression_stable_refiningEdgeLists_eq (path : List Node) :
       cases rest with
       | nil => rfl
       | cons second tail =>
-          simp only [refiningEdgeLists, Multigraph.setGain_edgesBetween, ih]
+          simp only [refiningEdgeLists]
+          apply Finset.biUnion_congr
+          · exact Multigraph.setGain_edgesBetween _ _ first second
+          · intro edge _
+            rw [ih]
 
 /-- Supported stable paths use the same four node lists as the topology audit. -/
 def zRegressionStableSupportedForwardPaths : Finset (List Node) :=
