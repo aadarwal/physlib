@@ -234,10 +234,19 @@ variable (outer : PortConnectionFamily inner.externalPortModeFamily middleIndex)
 variable [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel]
 variable [Fintype outer.ExternalChannel]
 variable [Fintype (outer.transport boundary).ExternalChannel]
-variable [Fintype (inner.append outer).Channel]
-variable [Fintype (replacement.append (outer.transport boundary)).Channel]
 variable [Fintype (inner.append outer).ExternalChannel]
 variable [Fintype (replacement.append (outer.transport boundary)).ExternalChannel]
+
+/-- The left flattened connected channels inherit the two finite stage enumerations. -/
+local instance replacementSourceAppendChannelFintype :
+    Fintype (inner.append outer).Channel :=
+  Fintype.ofEquiv _ (inner.appendChannelEquiv outer).symm
+
+/-- The replacement flattened channels inherit the two finite stage enumerations. -/
+local instance replacementTargetAppendChannelFintype :
+    Fintype (replacement.append (outer.transport boundary)).Channel :=
+  Fintype.ofEquiv _
+    (replacement.appendChannelEquiv (outer.transport boundary)).symm
 
 /-- An inner connection family may be replaced behind an outer stage when its closed relation is
 the same after the supplied boundary transport. -/
