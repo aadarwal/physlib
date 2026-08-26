@@ -12,23 +12,22 @@ public import Physlib.Optics.Systems.DelayTransfer.Stability
 
 ## i. Overview
 
-Two instances of the stated proper causal one-pole class pin both sides of the strict Schur/BIBO
-criterion. The coefficient `1/2` has formal denominator root `q = 2`, reciprocal-coordinate root
-`z = 1/2`, and is stable. The coefficient `2` has reciprocal-coordinate root `z = 2` and is not
-stable. The pair therefore detects a reversed `q = z⁻¹` convention and a weakened non-strict
-unit-disk test.
+Three instances pin the strict Schur/BIBO criterion. Coefficient `1/2` has roots `q = 2` and
+`z = 1/2` and is stable; the boundary coefficient `1` and exterior coefficient `2` have roots
+`z = 1` and `z = 2` and are unstable. Together they detect a reversed `q = z⁻¹` convention and a
+weakened non-strict unit-disk test.
 
 The stable fixture also computes its numerator and denominator root sets and exact degrees. These
 are abstract quotient checks: no N5F response-entry certificate is inferred.
 
 ## ii. Key definitions and results
 
-- `stableOnePole`: the coefficient-`1/2` proper causal class member.
-- `unstableOnePole`: the audited coefficient-`2` class member.
 - `stableOnePole_formalPoles`: the exact formal root `{2}`.
 - `stableOnePole_zPoles`: the exact reciprocal-coordinate root `{1/2}`.
 - `stableOnePole_transform_one`: the exact response/impulse transform anchor.
 - `stableOnePole_isBIBOStable`: the positive stability anchor.
+- `boundaryOnePole_not_isSchurStable`: the strict-boundary anchor.
+- `boundaryOnePole_not_isBIBOStable`: the boundary BIBO witness.
 - `unstableOnePole_not_isBIBOStable`: the strict unstable anchor.
 
 ## iii. Table of contents
@@ -39,14 +38,15 @@ are abstract quotient checks: no N5F response-entry certificate is inferred.
 ## iv. References and non-claims
 
 The production one-pole candidate characterization and unit-circle ROC bridge are in
-`Physlib/Mathematics/ZTransform/OnePole.lean:72-108`. The generic candidate-pole definition and
+`Physlib/Mathematics/ZTransform/OnePole.lean:73-116`. The generic candidate-pole definition and
 BIBO sufficiency result are in `Physlib/Mathematics/ZTransform/Stability.lean:202-236`.
-Regression row S-07 requests an audited unstable parameter case at `goal.md:2556`; the DCDR
+Regression row S-07 requests an audited unstable parameter case at `goal.md:2571`; the DCDR
 instance remains the responsibility of the S7D lane.
 
 The BIBO anchors below do not call this delay-transfer module's Schur/BIBO equivalence. The
 stable anchor uses the production unit-circle ROC route directly; the unstable anchor supplies
-the bounded unit impulse and exhibits unbounded powers of two in the output.
+the bounded unit impulse and exhibits unbounded powers of two in the output. The boundary anchor
+specializes the neutral explicit self-convolution growth witness from `OnePoleBIBO`.
 
 No physical resonance, network transfer-pole, DCDR topology, or general proper-rational BIBO
 equivalence is asserted.
@@ -93,7 +93,7 @@ lemma stableOnePole_formalPoles : stableOnePole.response.poles = {(2 : ℂ)} := 
 /-- The stable fixture's reciprocal-coordinate denominator root is exactly `{1/2}`. -/
 lemma stableOnePole_zPoles : stableOnePole.response.zPoles = {(1 / 2 : ℂ)} := by
   rw [stableOnePole.response_zPoles_eq_candidatePoles,
-    candidatePoles_onePoleFeedbackCoefficients stableOnePole.coefficient_ne_zero]
+    candidatePoles_onePole stableOnePole.coefficient_ne_zero]
   rfl
 
 /-- The stable fixture has numerator degree zero. -/
@@ -149,7 +149,30 @@ lemma stableOnePole_isSchurStable : stableOnePole.response.IsSchurStable := by
 lemma stableOnePole_isBIBOStable : IsBIBOStable stableOnePole.impulseResponse := by
   apply isBIBOStable_of_sphere_subset_ROC
   change Metric.sphere (0 : ℂ) 1 ⊆ ROC (geometricSeq (1 / 2))
-  exact sphere_subset_ROC_geometricSeq_of_norm_lt_one (by norm_num) (by norm_num)
+  exact sphere_subset_ROC_geometricSeq (by norm_num) (by norm_num)
+
+/-- The unit-circle boundary fixture with coefficient `1`. -/
+def boundaryOnePole : ProperCausalOnePole where
+  coefficient := 1
+  coefficient_ne_zero := one_ne_zero
+
+/-- The boundary fixture's reciprocal-coordinate denominator root is exactly `{1}`. -/
+lemma boundaryOnePole_zPoles : boundaryOnePole.response.zPoles = {(1 : ℂ)} := by
+  rw [boundaryOnePole.response_zPoles_eq_candidatePoles,
+    candidatePoles_onePole boundaryOnePole.coefficient_ne_zero]
+  rfl
+
+/-- The unit-circle boundary is excluded by the strict Schur predicate. -/
+lemma boundaryOnePole_not_isSchurStable : ¬ boundaryOnePole.response.IsSchurStable := by
+  intro hSchur
+  rw [ReducedRationalResponse.IsSchurStable] at hSchur
+  have hAtOne := hSchur 1 (by rw [boundaryOnePole_zPoles]; rfl)
+  norm_num at hAtOne
+
+/-- The unit-circle boundary impulse response is not BIBO stable. -/
+lemma boundaryOnePole_not_isBIBOStable :
+    ¬ IsBIBOStable boundaryOnePole.impulseResponse := by
+  exact not_isBIBOStable_geometricSeq_of_norm_eq_one (by norm_num [boundaryOnePole])
 
 /-- The audited unstable one-pole fixture with coefficient `2`. -/
 def unstableOnePole : ProperCausalOnePole where
@@ -159,7 +182,7 @@ def unstableOnePole : ProperCausalOnePole where
 /-- The unstable fixture's reciprocal-coordinate denominator root is exactly `{2}`. -/
 lemma unstableOnePole_zPoles : unstableOnePole.response.zPoles = {(2 : ℂ)} := by
   rw [unstableOnePole.response_zPoles_eq_candidatePoles,
-    candidatePoles_onePoleFeedbackCoefficients unstableOnePole.coefficient_ne_zero]
+    candidatePoles_onePole unstableOnePole.coefficient_ne_zero]
   rfl
 
 /-- The audited coefficient-`2` fixture is not Schur stable. -/

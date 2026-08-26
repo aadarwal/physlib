@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Mathematics.ZTransform.DifferenceEquation
+public import Physlib.Mathematics.ZTransform.OnePole
 
 /-!
 # Regression tests for difference equations and transfer functions
@@ -84,12 +84,6 @@ noncomputable section
 ## A. A solved one-pole recurrence
 
 -/
-
-/-- The feedback coefficients of the one-pole recurrence `y n = a * y (n - 1) + x n`. -/
-def onePoleFeedback (a : ℂ) : ℕ → ℂ := fun k => if k = 1 then a else 0
-
-/-- The only feedback coefficient of the one-pole recurrence is at lag one. -/
-lemma onePoleFeedback_one (a : ℂ) : onePoleFeedback a 1 = a := if_pos rfl
 
 /-- The feedforward coefficients of the one-pole recurrence: the input enters undelayed. -/
 def onePoleFeedforward : ℕ → ℂ := fun _ => 1
