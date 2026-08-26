@@ -44,13 +44,7 @@ quotients. This yields the source display
 - B. Chebyshev matrix-power core
 - C. Source hypotheses and Sylvester sine form
 
-## iv. References and non-claims
-
-DATE'14 Thm. 4 and the unnumbered Sylvester result are summarized at
-`HOL-CORPUS.md:204-207`. The sine formula is asserted only under `DateSylvesterHypotheses`; no
-claim is made at a zero sine denominator or outside the strict trace interval. The polynomial
-core has the weaker determinant-one domain stated on its declaration. The matrices and sine
-quotients remain totalized outside those gates, but no source identity is inferred there.
+## iv. References
 
 This module makes no quadruple-ring, coupled-lattice, full `M x N` lattice, termination, or
 resonance claim. Effective index is constant at the selected carrier; no dispersion, bending
@@ -62,6 +56,12 @@ Power means normalized modal power, not electromagnetic power before the bridge 
 `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`. That bridge requires finite,
 common-frequency Maxwell profiles which are pairwise integrable, mutually flux-orthogonal, and
 unit normalized on the measured domain. None of those hypotheses is inferred here.
+
+DATE'14 Thm. 4 and the unnumbered Sylvester result are summarized at
+`HOL-CORPUS.md:204-207`. The sine formula is asserted only under `DateSylvesterHypotheses`; no
+claim is made at a zero sine denominator or outside the strict trace interval. The polynomial
+core has the weaker determinant-one domain stated on its declaration. The matrices and sine
+quotients remain totalized outside those gates, but no source identity is inferred there.
 -/
 
 @[expose] public section

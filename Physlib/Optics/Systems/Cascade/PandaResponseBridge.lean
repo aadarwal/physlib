@@ -32,7 +32,7 @@ undirected SFG.
 - A. External N5 readouts
 - B. Directed transfer comparison
 
-## iv. Non-claims
+## iv. References
 
 The equalities are response statements only under N5 well-posedness and invertibility of the
 directed graph. No equivalence between those two gates is claimed. No passivity, losslessness,

@@ -36,15 +36,15 @@ netlist by a hand-drawn graph.
 - C. Finite channel instances
 - D. External channels
 
-## iv. References and non-claims
-
-S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
-Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-43.
+## iv. References
 
 The paper describes four couplers and three rings. Its printed graph is compared only in later
 modules. This file asserts no source-formula identity, insertion-loss model, passivity,
 losslessness, reciprocity, causality, bandwidth, dispersion, resonance, stability, material
 realization, or electromagnetic power normalization.
+
+S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
+Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-43.
 -/
 
 @[expose] public section

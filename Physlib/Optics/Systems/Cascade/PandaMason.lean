@@ -36,16 +36,16 @@ oriented equations under the explicit principal-root and source-normalization ga
 - B. Exact common-domain gate
 - C. Generic N5/Mason instantiations
 
-## iv. References and non-claims
-
-The extraction and agreement theorem are Physlib-original generic network results. The PANDA
-topology and source formulas are compared with NSV'16 Definition 11 and Theorems 5-6 in the
-adjacent modules.
+## iv. References
 
 The Mason quotients are totalized definitions. Their response interpretation below is proof-gated
 by `FlatNetlist.IsWellPosed`. No convergence, causality, passivity, losslessness, reciprocity,
 stability, resonance, bandwidth, dispersion, pole/zero location, insertion-loss model, or material
 realization is asserted.
+
+The extraction and agreement theorem are Physlib-original generic network results. The PANDA
+topology and source formulas are compared with NSV'16 Definition 11 and Theorems 5-6 in the
+adjacent modules.
 -/
 
 @[expose] public section

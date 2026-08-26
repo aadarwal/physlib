@@ -19,10 +19,10 @@ not an independently parameterized edge table. `PandaBridge` supplies the corres
 and zero-reverse relational certificate.
 
 The source calls the PANDA graph undirected and singles out the branch between nodes 10 and 5
-(NSV'16, text preceding Section 5). Physlib does not silently identify that object with the matrix
-below. This `Multigraph` retains the arrow orientation printed in Definition 11 and Figure 6, so it
-contains `10 → 5` but not a second `5 → 10` edge. Bidirectionality remains present in the complete
-N7 netlist through separate reverse-going amplitudes. Later source comparisons are consequently
+(NSV'16, text preceding Section 5). Physlib does not silently identify that object with the matrix.
+This `Multigraph` retains the arrow orientation printed in Definition 11 and Figure 6.
+It contains `10 → 5` but not a second `5 → 10` edge; the complete N7 netlist retains
+bidirectionality through separate reverse-going amplitudes. Later comparisons are consequently
 forward, zero-reverse formula comparisons, not equality with an undirected-edge closure.
 
 ## ii. Key results
@@ -38,14 +38,14 @@ forward, zero-reverse formula comparisons, not equality with an undirected-edge 
 - C. N7 edge ownership
 - D. Coefficient-matrix graph
 
-## iv. References and non-claims
-
-S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
-Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Figure 6, pp. 42-43.
+## iv. References
 
 No claim equates this directed projection with the paper's undirected graph object. No source
 transfer formula, passivity, losslessness, reciprocity, causality, stability, resonance, bandwidth,
 dispersion, or material realization is asserted here.
+
+S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
+Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Figure 6, pp. 42-43.
 -/
 
 @[expose] public section

@@ -44,7 +44,7 @@ hide.
 - D. Edge-refinement teeth
 - E. Asymmetric mis-wiring sentinel
 
-## iv. Scope
+## iv. References
 
 This is an edge-topology audit of the directed Definition-11 projection. It neither identifies
 that projection with NSV'16's undirected graph nor asserts passivity, reciprocity, losslessness,

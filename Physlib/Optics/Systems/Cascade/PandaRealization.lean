@@ -37,7 +37,7 @@ branch cannot pass merely by retaining valid individual edge gains.
 - C. Physical routing
 - D. Projection and relational equivalence
 
-## iv. Non-claims
+## iv. References
 
 The complete N7 netlist is bidirectional. This file identifies only its zero-reverse forward
 sector with the directed Definition-11 projection; it does not identify that projection with the

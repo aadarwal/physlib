@@ -44,7 +44,7 @@ the totalized source quotients are not assigned response meaning at that point.
 - D. Hand-expanded matrix and N5 anchors
 - E. Singular determinant fixture
 
-## iv. Scope
+## iv. References
 
 These fixtures audit coherent complex amplitudes. They assert no passivity, reciprocity,
 losslessness, causality, convergence, stability, resonance, bandwidth, dispersion, power

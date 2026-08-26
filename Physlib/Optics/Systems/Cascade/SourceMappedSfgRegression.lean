@@ -38,13 +38,13 @@ quotients remain totalized while the raw N5 feedback operator has a displayed no
 - D. Branch-gate negative control
 - E. Denominator-zero control
 
-## iv. References and non-claims
+## iv. References
+They test branch sensitivity, not a physically connected two-stage cascade. No power or
+source-parity claim beyond the already audited SFG-TR bridge is made. The singular parameters are
+not asserted valid, passive, lossless, or reciprocal.
 
-The fixtures come from `Physlib/Optics/Systems/Microring/AddDropRegression.lean:62-69,402-409`.
-The anchors unfold the composed dictionary and source quotient; they do not invoke either
-comparison lemma in `SourceMappedSfg`. They test branch sensitivity, not a physically connected
-two-stage cascade. No power or source-parity claim beyond the already audited SFG-TR bridge is
-made. The singular parameters are not asserted valid, passive, lossless, or reciprocal.
+Fixtures from `Physlib/Optics/Systems/Microring/AddDropRegression.lean:62-69,402-409` directly
+unfold the dictionary and quotient, not the `SourceMappedSfg` comparison lemmas.
 -/
 
 @[expose] public section

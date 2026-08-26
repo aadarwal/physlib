@@ -48,7 +48,11 @@ certified in `PandaBridge`; they do not identify that directed matrix with an un
 - C. Explicit forward solution
 - D. NSV'16 comparisons
 
-## iv. References, corrections, and non-claims
+## iv. References
+
+The totalized quotients below have response meaning only under `HasNonzeroSourceDenominator`.
+No passivity, losslessness, reciprocity, causality, convergence, stability, resonance, bandwidth,
+dispersion, pole/zero location, insertion-loss model, or material realization is asserted.
 
 S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
 Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-44.
@@ -60,10 +64,6 @@ therefore reproduces those two printed expressions without a forced correction. 
 four complex square-sum hypotheses are exactly `HasSourceCouplerNormalization`; no real-valued or
 passivity premise is silently substituted. The only bridge qualification is the explicit
 directed/projection and principal-root dictionary above.
-
-The totalized quotients below have response meaning only under `HasNonzeroSourceDenominator`.
-No passivity, losslessness, reciprocity, causality, convergence, stability, resonance, bandwidth,
-dispersion, pole/zero location, insertion-loss model, or material realization is asserted.
 -/
 
 @[expose] public section

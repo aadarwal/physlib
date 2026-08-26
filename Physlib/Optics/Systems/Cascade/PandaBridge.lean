@@ -39,14 +39,14 @@ that the directed 18-node matrix equals an undirected-edge closure.
 - B. Sparse coefficient action
 - C. Explicit forward equations
 
-## iv. References and non-claims
-
-S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
-Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11, pp. 42-43.
+## iv. References
 
 This module asserts no undirected-graph equality, transfer-function formula, passivity,
 losslessness, reciprocity, causality, bandwidth, dispersion, stability, resonance, or material
 realization.
+
+S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
+Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11, pp. 42-43.
 -/
 
 @[expose] public section

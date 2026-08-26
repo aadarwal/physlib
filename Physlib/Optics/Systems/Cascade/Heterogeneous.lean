@@ -46,13 +46,13 @@ relational cascade with the folded chain graph.
 - A. DATE stage and continuity convention
 - B. Heterogeneous cascade behavior and composition
 
-## iv. References and non-claims
+## iv. References
+This module makes no quadruple-ring, coupled-lattice, full `M x N` lattice, termination,
+Sylvester, Chebyshev, or resonance claim. It also makes no SFG-TR'14 or NSV'16 comparison;
+any later such comparison must retain the explicit principal-root/selected-half-arc branch gate.
 
 DATE'14 Defs. 4--7 and Thm. 3 are summarized at `HOL-CORPUS.md:199-203`; the source proves the
-uncoupled row sublattice only, as recorded at `HOL-CORPUS.md:210-216`. This module makes no
-quadruple-ring, coupled-lattice, full `M x N` lattice, termination, Sylvester, Chebyshev, or
-resonance claim. It also makes no SFG-TR'14 or NSV'16 comparison; any later such comparison must
-retain the explicit principal-root/selected-half-arc branch gate.
+uncoupled row sublattice only, as recorded at `HOL-CORPUS.md:210-216`.
 
 Effective index is constant at the selected carrier. No dispersion, bending loss, bandwidth,
 causality, or material realization is modeled. Power means normalized modal power, not
