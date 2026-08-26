@@ -55,11 +55,13 @@ Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6,
 
 The audit recorded in `HOL-CORPUS.md` section 6.2 and parity rows IP-13/IP-14 is carried literally:
 the final paragraph on p. 44 says the authors found missing parts in reference [10] and a sign
-mismatch in reference [1]. It does not identify an error in their own Theorem 5 or 6; Physlib
-therefore reproduces those two printed expressions without a forced correction. IP-13/IP-14's
-four complex square-sum hypotheses are exactly `HasSourceCouplerNormalization`; no real-valued or
-passivity premise is silently substituted. The only bridge qualification is the explicit
-directed/projection and principal-root dictionary above.
+mismatch in reference [1]. Separately, the second group in the printed Theorem 5 numerator writes
+`e^{n_l}`; Physlib reads that token as `e_l^{n_l}`, as justified by
+`sourceThroughNumerator_eq_factorized` and the denominator's two-ring shape. Parity records this as
+a one-token defect in the printed NSV'16 theorem, not as a Physlib correction; Theorem 6 needs no
+such normalization. IP-13/IP-14's four complex square-sum hypotheses are exactly
+`HasSourceCouplerNormalization`; no real-valued or passivity premise is silently substituted. The
+only bridge qualification is the explicit directed/projection and principal-root dictionary above.
 
 The totalized quotients below have response meaning only under `HasNonzeroSourceDenominator`.
 No passivity, losslessness, reciprocity, causality, convergence, stability, resonance, bandwidth,
