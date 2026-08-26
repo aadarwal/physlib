@@ -21,25 +21,37 @@ The unit-delay parameters and fixed-carrier path realization being extended are 
 `Physlib/Optics/Systems/DCDR/Poles.lean:82-110`; its rational N7 path family starts at
 `Physlib/Optics/Systems/DCDR/Poles.lean:274-324`.
 
-The one-delay family is the literal specialization `(m1, m2, m3) = (1, 1, 1)`. Pointwise
-compilation evaluates each retained polynomial path and produces the coherent N7 flat netlist.
-Polynomial degree and reduction results live in `DCDR/MultipleDelayPolynomial.lean`;
-the separate printed-source dictionary lives in `DCDR/MultipleDelaySource.lean`.
+The one-delay polynomial data is obtained by setting `(m1, m2, m3) = (1, 1, 1)`. The two
+rational component families then compile pointwise to the same coherent N7 flat netlist. Their
+response domains and selected responses agree when the earlier one-delay admissibility predicate
+holds. Outside that gate the compilations still agree, but the stored validity semantics need not:
+the multiple-delay predicate checks positive exponents, while the earlier predicate also checks
+nonnegative real gains.
+
+Polynomial degree and reduction results live in `DCDR/MultipleDelayPolynomial.lean`; the
+separate printed-source dictionary lives in `DCDR/MultipleDelaySource.lean`.
 
 ## ii. Key results
 
 - `DCDR.MultipleDelayParameters`: coherent gains and three natural delay exponents.
-- `DCDR.UnitDelayParameters.toMultipleDelayParameters`: the literal unit-delay specialization.
+- `DCDR.UnitDelayParameters.toMultipleDelayParameters`: the unit-exponent data embedding.
 - `DCDR.multipleDelayRationalNetlist`: the complete rational N7 family.
 - `DCDR.multipleDelayRationalNetlist_compile_eq`: pointwise compilation into the N7 netlist.
 - `DCDR.multipleDelayRationalEliminationResponse_eq_responseModel`: selected N5 response.
+- `DCDR.UnitDelayParameters.toMultipleDelayParameters_rationalNetlist_compile_eq`: equality of
+  the old and embedded pointwise compilations.
+- `DCDR.UnitDelayParameters.mem_rationalNetlist_responseDomain_iff_toMultipleDelayParameters`:
+  equality of the two response domains under the old admissibility gate.
+- `DCDR.UnitDelayParameters.rationalEliminationResponse_eq_toMultipleDelayParameters`: equality
+  of the two selected responses on that common domain.
 
 ## iii. Table of contents
 
 - A. Coherent multiple-delay parameters and polynomial data
-- B. Literal unit-delay specialization
+- B. Unit-delay polynomial specialization
 - C. Rational component family and complete N7 netlist
 - D. Selected compiled response
+- E. Admissibility-gated unit-delay rational bridge
 
 ## iv. References
 
@@ -320,12 +332,12 @@ lemma MultipleDelayParameters.responseModel_eval
 
 /-!
 
-## B. Literal unit-delay specialization
+## B. Unit-delay polynomial specialization
 
 -/
 
-/-- Embed the one-delay family from
-`Physlib/Optics/Systems/DCDR/Poles.lean:82-100` by setting every exponent to one. -/
+/-- Embed the one-delay data from `Physlib/Optics/Systems/DCDR/Poles.lean:82-100` by setting every
+exponent to one. The rational families specialize only under the old admissibility gate. -/
 def UnitDelayParameters.toMultipleDelayParameters
     (p : UnitDelayParameters) : MultipleDelayParameters where
   firstCoupler := p.firstCoupler
@@ -744,6 +756,117 @@ lemma multipleDelayRationalEliminationResponse_eq_responseModel
     rfl
   rw [hEntry, eliminationResponse_eq_transfer (p.at q) hDenominator]
   exact (p.responseModel_eval hp q).symm
+
+/-!
+
+## E. Admissibility-gated unit-delay rational bridge
+
+-/
+
+/-- At unit exponents, the embedded and earlier rational components have the same pointwise
+scattering laws. Their separately stored validity predicates are not identified here. -/
+lemma UnitDelayParameters.toMultipleDelayParameters_rationalComponents_scattering_eq
+    (p : UnitDelayParameters) (q : ℂ) :
+    (multipleDelayRationalComponents p.toMultipleDelayParameters).scattering
+        (fun _ => q) =
+      (rationalComponents p).scattering (fun _ => q) := by
+  funext component
+  cases component
+  · rfl
+  · rfl
+  · change multipleDelayEvaluatedPathScattering (p.upperGain : ℂ) 1 q =
+      evaluatedPathScattering p.upperGain q
+    change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
+    congr 1
+    funext output input
+    rw [multipleDelayRationalPathEntryModel_eval,
+      rationalPathEntryModel_eval]
+    simp
+  · change multipleDelayEvaluatedPathScattering (p.lowerGain : ℂ) 1 q =
+      evaluatedPathScattering p.lowerGain q
+    change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
+    congr 1
+    funext output input
+    rw [multipleDelayRationalPathEntryModel_eval,
+      rationalPathEntryModel_eval]
+    simp
+  · change multipleDelayEvaluatedPathScattering (p.feedbackGain : ℂ) 1 q =
+      evaluatedPathScattering p.feedbackGain q
+    change ScatteringMatrix.mk _ = ScatteringMatrix.mk _
+    congr 1
+    funext output input
+    rw [multipleDelayRationalPathEntryModel_eval,
+      rationalPathEntryModel_eval]
+    simp
+
+/-- The unit-exponent embedding and the earlier rational family compile to the same coherent N7
+flat netlist at every formal-`q` value, independently of their stored validity predicates. -/
+lemma UnitDelayParameters.toMultipleDelayParameters_rationalNetlist_compile_eq
+    (p : UnitDelayParameters) (q : ℂ) :
+    (multipleDelayRationalNetlist p.toMultipleDelayParameters).compile
+        (fun _ => q) =
+      (rationalNetlist p).compile (fun _ => q) := by
+  have hScattering :=
+    p.toMultipleDelayParameters_rationalComponents_scattering_eq q
+  change FlatNetlist.mk
+      { Component := Component
+        portFamily := componentPortFamily
+        scattering :=
+          (multipleDelayRationalComponents p.toMultipleDelayParameters).scattering
+            (fun _ => q) }
+      Connection (connections (p.toMultipleDelayParameters.at 0)) =
+    FlatNetlist.mk
+      { Component := Component
+        portFamily := componentPortFamily
+        scattering := (rationalComponents p).scattering (fun _ => q) }
+      Connection (connections (p.at 0))
+  rw [hScattering]
+  rfl
+
+/-- The embedded and earlier retained quotients have the same evaluation at every formal-`q`
+value. This algebraic equality does not identify their response domains. -/
+lemma UnitDelayParameters.toMultipleDelayParameters_responseModel_eval_eq
+    (p : UnitDelayParameters) (q : ℂ) :
+    (p.toMultipleDelayParameters.responseModel
+        p.toMultipleDelayParameters_isAdmissible).eval (fun _ => q) =
+      (responseModel p).eval (fun _ => q) := by
+  simp only [DelayTransfer.RationalModel.eval_eq,
+    MultipleDelayParameters.responseModel, responseModel,
+    MvPolynomial.eval_toMvPolynomial]
+  rw [p.toMultipleDelayParameters_responseNumeratorPolynomial,
+    p.toMultipleDelayParameters_denominatorPolynomial]
+
+/-- Under the earlier nonnegative-real-gain predicate, a formal-`q` point belongs to the old
+one-delay response domain exactly when it belongs to the embedded multiple-delay domain. -/
+lemma UnitDelayParameters.mem_rationalNetlist_responseDomain_iff_toMultipleDelayParameters
+    (p : UnitDelayParameters) (hp : p.IsAdmissible) (q : ℂ) :
+    (fun _ : Fin 1 => q) ∈ (rationalNetlist p).responseDomain ↔
+      (fun _ : Fin 1 => q) ∈
+        (multipleDelayRationalNetlist p.toMultipleDelayParameters).responseDomain := by
+  constructor
+  · intro hOld
+    apply multipleDelayRationalNetlist_mem_responseDomain
+    · exact p.toMultipleDelayParameters_isAdmissible
+    · rw [p.toMultipleDelayParameters_denominatorPolynomial]
+      exact (rationalNetlist_isWellPosed_iff p q).1 hOld.1
+  · intro hEmbedded
+    apply rationalNetlist_mem_responseDomain p q hp
+    rw [← p.toMultipleDelayParameters_denominatorPolynomial]
+    exact
+      (multipleDelayRationalNetlist_isWellPosed_iff
+        p.toMultipleDelayParameters q).1 hEmbedded.1
+
+/-- On the admissible common domain, the selected old one-delay N5 response is exactly the
+selected response of its unit-exponent multiple-delay embedding. -/
+lemma UnitDelayParameters.rationalEliminationResponse_eq_toMultipleDelayParameters
+    (p : UnitDelayParameters) (hp : p.IsAdmissible) (q : ℂ)
+    (hOld : (fun _ : Fin 1 => q) ∈ (rationalNetlist p).responseDomain) :
+    rationalEliminationResponse p q hOld =
+      multipleDelayRationalEliminationResponse p.toMultipleDelayParameters q
+        ((p.mem_rationalNetlist_responseDomain_iff_toMultipleDelayParameters hp q).1 hOld) := by
+  rw [rationalEliminationResponse_eq_responseModel,
+    multipleDelayRationalEliminationResponse_eq_responseModel]
+  exact p.toMultipleDelayParameters_responseModel_eval_eq q |>.symm
 
 end DCDR
 

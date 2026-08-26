@@ -29,6 +29,12 @@ unfold the fixture data and use polynomial or complex-field primitives. They do 
 production degree bounds or pole-cardinality lemmas, so a wrong gain, exponent, coordinate, or
 coupler coefficient can make them fail.
 
+The unit-delay bridge is exercised at gains `(2, 3/2, 1/2)` and `q = 1/2`, so its feedback gain
+is nonzero and two gains have non-unit magnitude. Both rational families independently produce
+the selected response `1`. A separate negative-upper-gain fixture has empty old response domain
+and nonempty embedded response domain. It makes the old admissibility hypothesis on the production
+domain bridge visibly load-bearing.
+
 ## ii. Key results
 
 - `DCDRSourceBridge.tableActiveUnitDelay_printedPolynomials`: the active unit-delay row.
@@ -39,12 +45,15 @@ coupler coefficient can make them fail.
 - `DCDR.tightMultipleDelay_responseNumeratorPolynomial_expansion`: exact noncancelled numerator.
 - `DCDR.tightMultipleDelay_zPoles_eq_four`: direct reciprocal-coordinate pole enumeration.
 - `DCDR.tightMultipleDelay_ncard_actualPoles_eq_natDegree`: tight cardinality bound.
+- `DCDR.unitDelayBridge_both_responses_eq_one`: both rational families at a nontrivial point.
+- `DCDR.unitDelayValidityGate_is_loadBearing`: the negative-gain validity counterexample.
 
 ## iii. Table of contents
 
 - A. FMICS'15 Table 1 source-data fixtures
 - B. Coherent distinct-delay tight pole fixture
 - C. Primitive reciprocal-coordinate pole enumeration
+- D. Admissibility-gated unit-delay bridge sentinels
 
 ## iv. References
 
@@ -429,6 +438,184 @@ lemma tightMultipleDelay_ncard_actualPoles_eq_natDegree :
       tightMultipleDelayParameters.denominatorPolynomial.natDegree := by
   rw [tightMultipleDelay_ncard_actualPoles_eq_four,
     tightMultipleDelay_denominatorPolynomial_natDegree_eq_four]
+
+/-!
+
+## D. Admissibility-gated unit-delay bridge sentinels
+
+-/
+
+/-- A normalized zero-cross coherent coupler used to expose the retained feedback algebra. -/
+def unitDelayBridgeCoupler : DirectionalCoupler.Parameters where
+  throughAmplitude := 1
+  crossAmplitude := 0
+
+/-- A nontrivial admissible unit-delay point with nonzero, non-unit feedback gain. -/
+def unitDelayBridgeParameters : UnitDelayParameters where
+  firstCoupler := unitDelayBridgeCoupler
+  secondCoupler := unitDelayBridgeCoupler
+  upperGain := 2
+  lowerGain := 3 / 2
+  feedbackGain := 1 / 2
+
+/-- The nonzero formal-delay value used by the shared-response bridge fixture. -/
+def unitDelayBridgeQ : ℂ := 1 / 2
+
+/-- The bridge fixture satisfies the earlier nonnegative-real-gain predicate. -/
+lemma unitDelayBridgeParameters_isAdmissible :
+    unitDelayBridgeParameters.IsAdmissible := by
+  norm_num [UnitDelayParameters.IsAdmissible, unitDelayBridgeParameters]
+
+/-- Primitive one-delay expansion gives equal numerator and denominator values `13/16`. -/
+lemma unitDelayBridge_old_polynomial_evaluations :
+    unitDelayBridgeParameters.responseNumeratorPolynomial.eval unitDelayBridgeQ = 13 / 16 ∧
+      unitDelayBridgeParameters.denominatorPolynomial.eval unitDelayBridgeQ = 13 / 16 := by
+  constructor <;>
+    norm_num [UnitDelayParameters.responseNumeratorPolynomial,
+      UnitDelayParameters.directPolynomial,
+      UnitDelayParameters.denominatorPolynomial,
+      UnitDelayParameters.loopPolynomial,
+      UnitDelayParameters.feedbackReadoutPolynomial,
+      UnitDelayParameters.feedbackDrivePolynomial,
+      UnitDelayParameters.upperPolynomial,
+      UnitDelayParameters.lowerPolynomial,
+      UnitDelayParameters.feedbackPolynomial,
+      unitDelayBridgeParameters, unitDelayBridgeCoupler,
+      unitDelayBridgeQ, DirectionalCoupler.crossCoefficient]
+
+/-- Independent multiple-delay expansion gives the same two values at the embedded point. -/
+lemma unitDelayBridge_embedded_polynomial_evaluations :
+    unitDelayBridgeParameters.toMultipleDelayParameters.responseNumeratorPolynomial.eval
+        unitDelayBridgeQ = 13 / 16 ∧
+      unitDelayBridgeParameters.toMultipleDelayParameters.denominatorPolynomial.eval
+        unitDelayBridgeQ = 13 / 16 := by
+  constructor <;>
+    norm_num [MultipleDelayParameters.responseNumeratorPolynomial,
+      MultipleDelayParameters.directPolynomial,
+      MultipleDelayParameters.denominatorPolynomial,
+      MultipleDelayParameters.loopPolynomial,
+      MultipleDelayParameters.feedbackReadoutPolynomial,
+      MultipleDelayParameters.feedbackDrivePolynomial,
+      MultipleDelayParameters.upperPolynomial,
+      MultipleDelayParameters.lowerPolynomial,
+      MultipleDelayParameters.feedbackPolynomial,
+      UnitDelayParameters.toMultipleDelayParameters,
+      unitDelayBridgeParameters, unitDelayBridgeCoupler,
+      unitDelayBridgeQ, DirectionalCoupler.crossCoefficient]
+
+/-- Direct nonvanishing and validity place the bridge point in the old response domain. -/
+def unitDelayBridgeOldDomainProof :
+    (fun _ : Fin 1 => unitDelayBridgeQ) ∈
+      (rationalNetlist unitDelayBridgeParameters).responseDomain :=
+  rationalNetlist_mem_responseDomain unitDelayBridgeParameters unitDelayBridgeQ
+    unitDelayBridgeParameters_isAdmissible (by
+      rw [unitDelayBridge_old_polynomial_evaluations.2]
+      norm_num)
+
+/-- Direct nonvanishing and positive exponents place the point in the embedded response domain. -/
+def unitDelayBridgeEmbeddedDomainProof :
+    (fun _ : Fin 1 => unitDelayBridgeQ) ∈
+      (multipleDelayRationalNetlist
+        unitDelayBridgeParameters.toMultipleDelayParameters).responseDomain :=
+  multipleDelayRationalNetlist_mem_responseDomain
+    unitDelayBridgeParameters.toMultipleDelayParameters unitDelayBridgeQ
+    unitDelayBridgeParameters.toMultipleDelayParameters_isAdmissible (by
+      rw [unitDelayBridge_embedded_polynomial_evaluations.2]
+      norm_num)
+
+/-- The earlier rational family independently evaluates to the exact selected response `1`. -/
+lemma unitDelayBridge_old_response_eq_one :
+    rationalEliminationResponse unitDelayBridgeParameters unitDelayBridgeQ
+      unitDelayBridgeOldDomainProof = 1 := by
+  rw [rationalEliminationResponse_eq_responseModel]
+  change
+    unitDelayBridgeParameters.responseNumeratorPolynomial.eval unitDelayBridgeQ /
+        unitDelayBridgeParameters.denominatorPolynomial.eval unitDelayBridgeQ = 1
+  rw [unitDelayBridge_old_polynomial_evaluations.1,
+    unitDelayBridge_old_polynomial_evaluations.2]
+  norm_num
+
+/-- The embedded multiple-delay family independently evaluates to the same response `1`. -/
+lemma unitDelayBridge_embedded_response_eq_one :
+    multipleDelayRationalEliminationResponse
+        unitDelayBridgeParameters.toMultipleDelayParameters unitDelayBridgeQ
+        unitDelayBridgeEmbeddedDomainProof = 1 := by
+  rw [multipleDelayRationalEliminationResponse_eq_responseModel]
+  change
+    unitDelayBridgeParameters.toMultipleDelayParameters.responseNumeratorPolynomial.eval
+          unitDelayBridgeQ /
+        unitDelayBridgeParameters.toMultipleDelayParameters.denominatorPolynomial.eval
+          unitDelayBridgeQ = 1
+  rw [unitDelayBridge_embedded_polynomial_evaluations.1,
+    unitDelayBridge_embedded_polynomial_evaluations.2]
+  norm_num
+
+/-- At a nontrivial common point, both selected N5 response entries are pinned to `1`. -/
+lemma unitDelayBridge_both_responses_eq_one :
+    rationalEliminationResponse unitDelayBridgeParameters unitDelayBridgeQ
+          unitDelayBridgeOldDomainProof = 1 ∧
+      multipleDelayRationalEliminationResponse
+          unitDelayBridgeParameters.toMultipleDelayParameters unitDelayBridgeQ
+          unitDelayBridgeEmbeddedDomainProof = 1 :=
+  ⟨unitDelayBridge_old_response_eq_one,
+    unitDelayBridge_embedded_response_eq_one⟩
+
+/-- The reviewer's validity counterexample: negative upper gain and zero feedback gain. -/
+def unitDelayValidityCounterexample : UnitDelayParameters where
+  firstCoupler := unitDelayBridgeCoupler
+  secondCoupler := unitDelayBridgeCoupler
+  upperGain := -1
+  lowerGain := 1
+  feedbackGain := 0
+
+/-- The counterexample fails the old gain gate but passes the embedded exponent gate. -/
+lemma unitDelayValidityCounterexample_predicates :
+    ¬ unitDelayValidityCounterexample.IsAdmissible ∧
+      unitDelayValidityCounterexample.toMultipleDelayParameters.IsAdmissible := by
+  norm_num [UnitDelayParameters.IsAdmissible,
+    MultipleDelayParameters.IsAdmissible,
+    UnitDelayParameters.toMultipleDelayParameters,
+    unitDelayValidityCounterexample]
+
+/-- The old family has no physical response-domain point when its negative gain gate fails. -/
+lemma unitDelayValidityCounterexample_old_responseDomain_eq_empty :
+    (rationalNetlist unitDelayValidityCounterexample).responseDomain = ∅ := by
+  refine eq_empty_iff_forall_notMem.mpr ?_
+  intro value hValue
+  have hAdmissible : unitDelayValidityCounterexample.IsAdmissible :=
+    (hValue.2 Component.upperPath).1
+  exact unitDelayValidityCounterexample_predicates.1 hAdmissible
+
+/-- Primitive expansion gives embedded denominator value one at formal `q = 0`. -/
+lemma unitDelayValidityCounterexample_embedded_denominator_at_zero :
+    unitDelayValidityCounterexample.toMultipleDelayParameters.denominatorPolynomial.eval 0 =
+      1 := by
+  norm_num [MultipleDelayParameters.denominatorPolynomial,
+    MultipleDelayParameters.loopPolynomial,
+    MultipleDelayParameters.upperPolynomial,
+    MultipleDelayParameters.lowerPolynomial,
+    MultipleDelayParameters.feedbackPolynomial,
+    UnitDelayParameters.toMultipleDelayParameters,
+    unitDelayValidityCounterexample, unitDelayBridgeCoupler,
+    DirectionalCoupler.crossCoefficient]
+
+/-- The embedded family nevertheless contains formal `q = 0` in its response domain. -/
+lemma unitDelayValidityCounterexample_embedded_responseDomain_nonempty :
+    (multipleDelayRationalNetlist
+      unitDelayValidityCounterexample.toMultipleDelayParameters).responseDomain.Nonempty := by
+  refine ⟨fun _ : Fin 1 => 0, ?_⟩
+  apply multipleDelayRationalNetlist_mem_responseDomain
+  · exact unitDelayValidityCounterexample_predicates.2
+  · rw [unitDelayValidityCounterexample_embedded_denominator_at_zero]
+    norm_num
+
+/-- The old admissibility gate is load-bearing: without it, the two response domains differ. -/
+lemma unitDelayValidityGate_is_loadBearing :
+    (rationalNetlist unitDelayValidityCounterexample).responseDomain = ∅ ∧
+      (multipleDelayRationalNetlist
+        unitDelayValidityCounterexample.toMultipleDelayParameters).responseDomain.Nonempty :=
+  ⟨unitDelayValidityCounterexample_old_responseDomain_eq_empty,
+    unitDelayValidityCounterexample_embedded_responseDomain_nonempty⟩
 
 end DCDR
 
