@@ -26,15 +26,22 @@ well-posedness is therefore equivalent to the missing source condition `M11 != 0
 The response coefficients below are extracted from the terminated relational cascade, not
 defined by quotient formulas. DATE'14 Thm. 5 is then recovered as
 `reflect = -M12/M11` and `transm = 1/M11`. The latter uses the determinant-one property derived
-from the per-ring chain gates. DATE'14 Thm. 6 follows by substituting the proved Sylvester form.
+from the per-ring chain gates.
+
+The identical-cascade results instead substitute Physlib's proved real-angle Sylvester form into
+those relational responses. They do not formalize printed DATE'14 Thm. 6. That display uses the
+forward factor `exp (-I*phi)`, whereas the relevant backward-first chain entries contain the
+backward factor `exp (+I*phi)`. It also prints a distinct `Re(cos⁻¹(...))` angle, while
+`dateSylvesterAngle` is `Real.arccos (Re(m11))`. No bridge between those expressions is assumed.
 
 ## ii. Key results
 
 - `DateCascadeTerminationHypotheses`: the per-ring chain gates and nonzero termination pivot.
 - `dateTerminatedCascade_reflectivity_eq_neg_entry12_div_entry11`: DATE'14 Thm. 5 reflection.
 - `dateTerminatedCascade_transmissivity_eq_one_div_entry11`: DATE'14 Thm. 5 transmission.
-- `dateIdenticalTerminatedCascade_reflectivity_eq_closedForm`: DATE'14 Thm. 6 reflection.
-- `dateIdenticalTerminatedCascade_transmissivity_eq_closedForm`: DATE'14 Thm. 6 transmission.
+- `dateIdenticalTerminatedCascade_reflectivity_eq_relationalSylvesterForm`: corrected reflection.
+- `dateIdenticalTerminatedCascade_transmissivity_eq_relationalSylvesterForm`: corrected forward
+  response.
 
 ## iii. Table of contents
 
@@ -45,12 +52,19 @@ from the per-ring chain gates. DATE'14 Thm. 6 follows by substituting the proved
 ## iv. References and non-claims
 
 DATE'14 Def. 8 and Thms. 5--6 are summarized at `HOL-CORPUS.md:205-208`. The source omits the
-required `M11 != 0` condition; this module states it explicitly. Its reflectivity and
-transmissivity names denote the source's complex field-amplitude ratios, not power fractions.
+required `M11 != 0` condition; this module states it explicitly. Exact parity with printed Thm. 6
+is withheld for the forward-factor and angle mismatches above. The reflectivity and
+transmissivity names denote complex field-amplitude ratios, not power fractions.
 
 The zero-return relation is only `aR = 0`. It makes no impedance-matching, absorption, radiation,
 passivity, reciprocity, losslessness, causality, bandwidth, or material-realization claim. The
 reported transmitted field is the forward wave at the declared right termination plane.
+
+This module makes no quadruple-ring, coupled-lattice, or full `M x N` lattice claim. It makes no
+SFG-TR'14 or NSV'16 comparison; any such bridge must retain IP-12's explicit
+principal-root/selected-half-arc equality. Effective index is constant at the selected carrier,
+and no dispersion model is inferred. In particular, the corrected identical-cascade lemmas do
+not discharge the bundled IP-18 row containing printed DATE'14 Thm. 6.
 -/
 
 @[expose] public section
@@ -434,11 +448,11 @@ theorem dateTerminatedCascade_transmissivity_eq_one_div_entry11
 
 /-!
 
-## C. Identical-cascade closed form
+## C. Corrected identical-cascade Sylvester form
 
 -/
 
-/-- The exact joint domain for DATE'14 Thm. 6.
+/-- The exact joint domain for the corrected relational/Sylvester specialization.
 
 It retains the ring chain pivot, all Sylvester hypotheses, and the distinct `M11 != 0`
 termination pivot for the selected count.
@@ -517,47 +531,47 @@ lemma DateCascadeStage.compositionMatrix_entry12 (stage : DateCascadeStage) :
     ← ForwardWave.channelEquiv.symm.sum_comp]
   ring
 
-/-- DATE'14 Thm. 6's common identical-cascade denominator. -/
-def dateIdenticalTerminationDenominator
+/-- The common denominator obtained from the proved backward-first Sylvester entries. -/
+def dateIdenticalSylvesterTerminationDenominator
     (stage : DateCascadeStage) (count : ℕ) : ℂ :=
   stage.backwardContinuityFactor *
       dateSylvesterSineCoefficient stage.compositionMatrix count -
     dateForwardTransfer stage.ring *
       dateSylvesterSineCoefficient stage.compositionMatrix ((count : ℤ) - 1)
 
-/-- On the source domain, the repeated `M11` is the Thm. 6 denominator divided by `R`. -/
-lemma dateIdenticalCascadeComposition_entry11_eq_denominator_div_forwardTransfer
+/-- On the Sylvester domain, repeated `M11` is the corrected denominator divided by `R`. -/
+lemma dateIdenticalCascadeComposition_entry11_eq_sylvesterDenominator_div_forwardTransfer
     (stage : DateCascadeStage) (count : ℕ)
     (h : DateIdenticalTerminationHypotheses stage count) :
     dateChainEntry (dateIdenticalCascadeComposition stage count) 0 0 =
-      dateIdenticalTerminationDenominator stage count /
+      dateIdenticalSylvesterTerminationDenominator stage count /
         dateForwardTransfer stage.ring := by
   rw [dateIdenticalCascadeComposition_eq_sylvesterClosedForm stage count h.sylvester,
     dateSylvesterClosedForm_entry11, stage.compositionMatrix_entry11]
   have hForward :=
     (stage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero).mp
       h.ringTransmission
-  rw [dateIdenticalTerminationDenominator]
+  rw [dateIdenticalSylvesterTerminationDenominator]
   field_simp [hForward]
 
-/-- The selected identical-cascade denominator is nonzero on the termination domain. -/
-lemma DateIdenticalTerminationHypotheses.denominator_ne_zero
+/-- The selected corrected denominator is nonzero on the termination domain. -/
+lemma DateIdenticalTerminationHypotheses.sylvesterDenominator_ne_zero
     {stage : DateCascadeStage} {count : ℕ}
     (h : DateIdenticalTerminationHypotheses stage count) :
-    dateIdenticalTerminationDenominator stage count ≠ 0 := by
+    dateIdenticalSylvesterTerminationDenominator stage count ≠ 0 := by
   have hEntry := h.entry11_ne_zero
-  rw [dateIdenticalCascadeComposition_entry11_eq_denominator_div_forwardTransfer
+  rw [dateIdenticalCascadeComposition_entry11_eq_sylvesterDenominator_div_forwardTransfer
     stage count h] at hEntry
   exact (div_ne_zero_iff.mp hEntry).1
 
-/-- DATE'14 Thm. 6: closed reflection of an identical terminated cascade. -/
-theorem dateIdenticalTerminatedCascade_reflectivity_eq_closedForm
+/-- Corrected relational/Sylvester reflection; this is not printed DATE'14 Thm. 6. -/
+lemma dateIdenticalTerminatedCascade_reflectivity_eq_relationalSylvesterForm
     (stage : DateCascadeStage) (count : ℕ)
     (h : DateIdenticalTerminationHypotheses stage count) :
     dateIdenticalTerminatedCascadeReflectivity stage count h =
       dateBackwardTransfer stage.ring * stage.backwardContinuityFactor *
           dateSylvesterSineCoefficient stage.compositionMatrix count /
-        dateIdenticalTerminationDenominator stage count := by
+        dateIdenticalSylvesterTerminationDenominator stage count := by
   rw [dateIdenticalTerminatedCascadeReflectivity,
     dateTerminatedCascade_reflectivity_eq_neg_entry12_div_entry11]
   change -dateChainEntry (dateIdenticalCascadeComposition stage count) 0 1 /
@@ -568,26 +582,26 @@ theorem dateIdenticalTerminatedCascade_reflectivity_eq_closedForm
   have hForward :=
     (stage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero).mp
       h.ringTransmission
-  have hDenominator := h.denominator_ne_zero
-  rw [dateIdenticalTerminationDenominator] at hDenominator ⊢
+  have hDenominator := h.sylvesterDenominator_ne_zero
+  rw [dateIdenticalSylvesterTerminationDenominator] at hDenominator ⊢
   field_simp [hForward, hDenominator]
 
-/-- DATE'14 Thm. 6: closed forward response of an identical terminated cascade. -/
-theorem dateIdenticalTerminatedCascade_transmissivity_eq_closedForm
+/-- Corrected relational/Sylvester forward response; this is not printed DATE'14 Thm. 6. -/
+lemma dateIdenticalTerminatedCascade_transmissivity_eq_relationalSylvesterForm
     (stage : DateCascadeStage) (count : ℕ)
     (h : DateIdenticalTerminationHypotheses stage count) :
     dateIdenticalTerminatedCascadeTransmissivity stage count h =
       dateForwardTransfer stage.ring /
-        dateIdenticalTerminationDenominator stage count := by
+        dateIdenticalSylvesterTerminationDenominator stage count := by
   rw [dateIdenticalTerminatedCascadeTransmissivity,
     dateTerminatedCascade_transmissivity_eq_one_div_entry11]
   change 1 / dateChainEntry (dateIdenticalCascadeComposition stage count) 0 0 = _
-  rw [dateIdenticalCascadeComposition_entry11_eq_denominator_div_forwardTransfer
+  rw [dateIdenticalCascadeComposition_entry11_eq_sylvesterDenominator_div_forwardTransfer
     stage count h]
   have hForward :=
     (stage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero).mp
       h.ringTransmission
-  field_simp [hForward, h.denominator_ne_zero]
+  field_simp [hForward, h.sylvesterDenominator_ne_zero]
 
 end MicroringCascade
 

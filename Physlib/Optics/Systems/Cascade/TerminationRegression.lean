@@ -17,8 +17,9 @@ phase, and a quarter-turn following bus. Its one-stage matrix has nonzero off-di
 so the three-stage response detects the reflection sign, coordinate order, load orientation, and
 transmission denominator. The two- and three-stage folds are expanded directly from the matrices.
 
-The negative fixture has `R = M11 = 0`. Its totalized chain termination is proved not well posed,
-and the production hypothesis structure is uninhabited. Thus the pivot gate can genuinely fail.
+The negative fixture keeps the ring pivot `R = -24/25 != 0`, while its two-stage product has
+`M11 = 0`. An explicit nonzero vector in the raw termination-pivot kernel proves that the chain
+termination is not well posed. Thus the complete-cascade pivot gate can genuinely fail.
 
 ## ii. Key checks
 
@@ -38,8 +39,8 @@ and the production hypothesis structure is uninhabited. Thus the pivot gate can 
 ## iv. Independence
 
 The response anchors use the graph of the behavior-derived transforms and the raw termination
-equations. They do not invoke either DATE'14 Thm. 5 quotient theorem or either Thm. 6 closed-form
-theorem from `Termination.lean`.
+equations. They do not invoke either DATE'14 Thm. 5 quotient theorem or either corrected
+identical-cascade Sylvester lemma from `Termination.lean`.
 -/
 
 @[expose] public section
@@ -833,14 +834,56 @@ lemma dateTerminationRegressionSingular_rawFold_entry11 :
   rw [Complex.I_sq]
   norm_num
 
-/-- The `M11 = 0` chain termination is not well posed. -/
+/-- A nonzero singleton amplitude used to expose the raw two-stage pivot kernel. -/
+def dateTerminationRegressionSingularKernel : ModeAmplitude (BackwardWave Unit) :=
+  sourceScalarAmplitude 1
+
+/-- The singleton kernel witness is nonzero. -/
+lemma dateTerminationRegressionSingularKernel_ne_zero :
+    dateTerminationRegressionSingularKernel ≠ 0 := by
+  intro hZero
+  have hCoordinate := congrArg
+    (fun amplitude : ModeAmplitude (BackwardWave Unit) =>
+      amplitude (BackwardWave.mk ())) hZero
+  norm_num [dateTerminationRegressionSingularKernel, sourceScalarAmplitude] at hCoordinate
+
+/-- Direct expansion sends the nonzero singleton witness to zero through the raw pivot. -/
+lemma dateTerminationRegressionSingular_pivot_kernel :
+    ((dateIdenticalCascadeComposition
+      dateTerminationRegressionSingularStage 2).rightTerminationPivot 0).toLinearMap
+        dateTerminationRegressionSingularKernel = 0 := by
+  rw [BackwardFirstChainTransform.rightTerminationPivot_zero]
+  apply WithLp.ofLp_injective 2
+  funext output
+  rcases output with ⟨⟨⟩⟩
+  simp only [BackwardFirstChainTransform.leadingBlock, Matrix.toBlocks₁₁,
+    ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
+    dateTerminationRegressionSingularKernel, sourceScalarAmplitude]
+  rw [← BackwardWave.channelEquiv.symm.sum_comp]
+  simpa [dateChainEntry, dateBackwardFirstFinEquiv] using
+    dateTerminationRegressionSingular_rawFold_entry11
+
+/-- The raw zero-return pivot is not injective, witnessed independently of production gates. -/
+lemma dateTerminationRegressionSingular_pivot_not_injective :
+    ¬Function.Injective
+      ((dateIdenticalCascadeComposition
+        dateTerminationRegressionSingularStage 2).rightTerminationPivot 0).toLinearMap := by
+  intro hInjective
+  apply dateTerminationRegressionSingularKernel_ne_zero
+  apply hInjective
+  rw [dateTerminationRegressionSingular_pivot_kernel, map_zero]
+
+/-- The `M11 = 0` chain termination fails the generic N3T well-posedness criterion. -/
 lemma dateTerminationRegressionSingular_chain_not_wellPosed :
     ¬(dateIdenticalCascadeComposition
       dateTerminationRegressionSingularStage 2).HasWellPosedRightTermination
         (0 : RightLoadTransform Unit) := by
-  rw [dateChain_hasWellPosedZeroReturn_iff_entry11_ne_zero,
-    dateTerminationRegressionSingular_rawFold_entry11]
-  simp
+  intro hWellPosed
+  have hGeneric :=
+    (BackwardFirstChainTransform.hasWellPosedRightTermination_iff_pivot_injective_and_solvable
+      (dateIdenticalCascadeComposition dateTerminationRegressionSingularStage 2)
+      (0 : RightLoadTransform Unit)).mp hWellPosed
+  exact dateTerminationRegressionSingular_pivot_not_injective hGeneric.1
 
 /-- The same concrete parameter cascade has no well-posed relational zero-return termination. -/
 lemma dateTerminationRegressionSingular_not_wellPosed :
