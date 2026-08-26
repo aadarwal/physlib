@@ -32,7 +32,9 @@ theorem. Necessity is proved for this class with explicit bounded inputs.
 - `ReducedRationalResponse.zeroFinset`, `poleFinset`: finite distinct polynomial roots.
 - `ReducedRationalResponse.card_zeroFinset_le_natDegree`: the zero degree bound.
 - `ReducedRationalResponse.card_poleFinset_le_natDegree`: the pole degree bound.
+- `ReducedRationalResponse.ncard_poles_le_natDegree`: the formal-`q` set-cardinality bound.
 - `ReducedRationalResponse.zZeroFinset`, `zPoleFinset`: reciprocal-coordinate roots.
+- `ReducedRationalResponse.ncard_zPoles_le_natDegree`: the reciprocal-`z` set-cardinality bound.
 - `ReducedRationalResponse.IsSchurStable`: every reciprocal-coordinate pole is inside the disk.
 - `ReducedRationalResponse.AllZerosInsideUnitDisk`: literal numerator-root condition.
 - `ProperCausalOnePole`: the stated nonzero proper causal rational class.
@@ -132,6 +134,12 @@ lemma card_poleFinset_le_natDegree (response : ReducedRationalResponse) :
   (Multiset.toFinset_card_le response.denominator.roots).trans
     (Polynomial.card_roots' response.denominator)
 
+/-- The cardinality of the formal-`q` pole set is at most the reduced denominator degree. -/
+lemma ncard_poles_le_natDegree (response : ReducedRationalResponse) :
+    response.poles.ncard ≤ response.denominator.natDegree := by
+  rw [response.poles_eq_coe_poleFinset, Set.ncard_coe_finset]
+  exact response.card_poleFinset_le_natDegree
+
 /-!
 
 ## B. Reciprocal-coordinate poles and literal disk conditions
@@ -225,6 +233,51 @@ lemma card_zPoleFinset_le_natDegree (response : ReducedRationalResponse) :
         (response.poleFinset.filter fun q => q ≠ 0).card := Finset.card_image_le
     _ ≤ response.poleFinset.card := Finset.card_filter_le _ _
     _ ≤ response.denominator.natDegree := response.card_poleFinset_le_natDegree
+
+/-- The cardinality of the finite reciprocal-`z` pole set is at most the reduced denominator
+degree. The omitted formal root `q = 0` cannot increase this cardinality. -/
+lemma ncard_zPoles_le_natDegree (response : ReducedRationalResponse) :
+    response.zPoles.ncard ≤ response.denominator.natDegree := by
+  rw [response.zPoles_eq_coe_zPoleFinset, Set.ncard_coe_finset]
+  exact response.card_zPoleFinset_le_natDegree
+
+/-- FMICS'15 Theorem 2's coefficient-list premise, adapted to a reduced formal-`q` denominator.
+
+`Finset.range (n + 1)` is the printed index set `{0, ..., n}`. The nonzero-coefficient premise is
+retained literally even though `ReducedRationalResponse.denominator_ne_zero` already guarantees
+that the denominator is nonzero.
+-/
+lemma finite_poles_and_ncard_le_of_denominator_eq_coefficients
+    (response : ReducedRationalResponse) (n : ℕ) (c : ℕ → ℂ)
+    (_hCoefficient : ∃ i ∈ Finset.range (n + 1), c i ≠ 0)
+    (hDenominator : response.denominator =
+      ∑ i ∈ Finset.range (n + 1), C (c i) * X ^ i) :
+    response.poles.Finite ∧ response.poles.ncard ≤ n := by
+  refine ⟨response.finite_poles, response.ncard_poles_le_natDegree.trans ?_⟩
+  rw [hDenominator]
+  apply Polynomial.natDegree_sum_le_of_forall_le
+  intro i hi
+  exact (Polynomial.natDegree_C_mul_X_pow_le (c i) i).trans
+    (Nat.le_of_lt_succ (Finset.mem_range.mp hi))
+
+/-- FMICS'15 Theorem 2's finite-pole conclusion in the reciprocal coordinate `q = z⁻¹`.
+
+`zPoles` explicitly requires `z ≠ 0`, matching the source's Definition 6. Its finite presentation
+also removes the formal root `q = 0` before inversion because that root has no finite reciprocal.
+These restrictions and inversion cannot create more distinct poles than the denominator degree.
+-/
+lemma finite_zPoles_and_ncard_le_of_denominator_eq_coefficients
+    (response : ReducedRationalResponse) (n : ℕ) (c : ℕ → ℂ)
+    (_hCoefficient : ∃ i ∈ Finset.range (n + 1), c i ≠ 0)
+    (hDenominator : response.denominator =
+      ∑ i ∈ Finset.range (n + 1), C (c i) * X ^ i) :
+    response.zPoles.Finite ∧ response.zPoles.ncard ≤ n := by
+  refine ⟨response.finite_zPoles, response.ncard_zPoles_le_natDegree.trans ?_⟩
+  rw [hDenominator]
+  apply Polynomial.natDegree_sum_le_of_forall_le
+  intro i hi
+  exact (Polynomial.natDegree_C_mul_X_pow_le (c i) i).trans
+    (Nat.le_of_lt_succ (Finset.mem_range.mp hi))
 
 /-- An abstract reduced quotient is Schur stable when each `z`-denominator root is inside the
 unit disk. -/

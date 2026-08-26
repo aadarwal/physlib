@@ -175,6 +175,13 @@ def ofField {P V : Type*} (plane : OrientedAffineHyperplane d)
   negative := plane.restrictFieldToSide .negative field
   positive := plane.restrictFieldToSide .positive field
 
+/-- Restrict two independently supplied ambient fields to the negative and positive open
+half-spaces. Values of either ambient field outside its selected side are discarded. -/
+def ofFields {P V : Type*} (plane : OrientedAffineHyperplane d)
+    (negativeField positiveField : P → Space d → V) : plane.TwoSidedField P V where
+  negative := plane.restrictFieldToSide .negative negativeField
+  positive := plane.restrictFieldToSide .positive positiveField
+
 end TwoSidedField
 
 end

@@ -1,0 +1,318 @@
+/-
+Copyright (c) 2026 Aadarsh Agarwal. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Aadarsh Agarwal
+-/
+module
+
+public import Physlib.Optics.Systems.DCDR.PolesRegression
+
+/-!
+# Exact source-dictionary and pole-cardinality regressions for the DCDR
+
+## i. Overview
+
+This file gives the IP-22 pole bound two independent teeth. The active coherent fixture's reduced
+denominator is expanded directly as `1 + 4*q²`; its reciprocal pole set is proved to be exactly
+`{2*I, -2*I}`, so the bound two is attained. A separate coherent fixture has zero feedback gain;
+its raw denominator expands to one, its selected quotient has no poles, and the degree genuinely
+drops below two.
+
+Neither cardinality result invokes `ResponseReduction.ncard_actualPoles_le_two` or either generic
+cardinality lemma. The proofs unfold the exact polynomial data and use elementary complex-field
+algebra, so they can fail if the coefficients, reciprocal coordinate, or selected reduction
+changes.
+
+An additional source-dictionary fixture has all five printed parameters equal to one. Its printed
+incoherent loop coefficient is one, while the mapped coherent N7 coefficient is minus one because
+two cross edges each carry `-I`. This is evidence of model divergence, not an equivalence claim.
+Another exact source fixture satisfies the strict version of printed Theorem 4's expression while
+the reciprocal pole of Theorem 3's differently indexed denominator has norm two. It makes the
+withholding of a forced strict Theorem 4 bridge executable.
+
+## ii. Key declarations
+
+- `unstableReducedResponse_zPoles_eq_pair`: exact two-element reciprocal pole set.
+- `unstableResponseReduction_ncard_actualPoles_eq_two`: tight DCDR pole count.
+- `degreeDropResponseReduction_ncard_actualPoles_eq_zero`: degenerate denominator fixture.
+- `sourceDictionaryDivergence_loopCoefficients_ne`: incoherent/coherent divergence witness.
+- `sourceThmFourMismatch_not_isSchurStable`: executable Theorem 3/4 mismatch witness.
+
+## iii. Table of contents
+
+- A. Tight two-pole fixture
+- B. Degree-drop fixture
+- C. Source-dictionary divergence fixture
+
+## iv. Non-claims
+
+These exact algebraic fixtures do not claim physical resonance, coherent--incoherent equivalence,
+BIBO stability, normalized-modal or electromagnetic power, causality or time-domain behavior, or
+a physical-frequency interpretation.
+-/
+
+@[expose] public section
+
+namespace Optics.DCDR
+
+noncomputable section
+
+open Polynomial
+open scoped ComplexOrder
+
+/-!
+
+## A. Tight two-pole fixture
+
+-/
+
+/-- Direct quadratic solving gives both and only the active fixture's reciprocal poles. -/
+lemma unstableReducedResponse_zPoles_eq_pair :
+    unstableReducedResponse.zPoles =
+      {(2 : ℂ) * Complex.I, -((2 : ℂ) * Complex.I)} := by
+  ext z
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hz, hRoot⟩
+    change unstableDenominator.eval z⁻¹ = 0 at hRoot
+    have hEquation : 1 + 4 * z⁻¹ ^ 2 = 0 := by
+      simpa [unstableDenominator] using hRoot
+    have hSquare : z ^ 2 = -4 := by
+      field_simp [hz] at hEquation
+      linear_combination hEquation
+    have hFactor :
+        (z - 2 * Complex.I) * (z + 2 * Complex.I) = 0 := by
+      calc
+        (z - 2 * Complex.I) * (z + 2 * Complex.I) =
+            z ^ 2 - (2 * Complex.I) ^ 2 := by ring
+        _ = z ^ 2 + 4 := by
+          ring_nf
+          rw [Complex.I_sq]
+          ring
+        _ = 0 := by linear_combination hSquare
+    rcases mul_eq_zero.mp hFactor with hFirst | hSecond
+    · left
+      linear_combination hFirst
+    · right
+      linear_combination hSecond
+  · rintro (rfl | rfl)
+    · constructor
+      · exact mul_ne_zero (by norm_num) Complex.I_ne_zero
+      · change unstableDenominator.eval (((2 : ℂ) * Complex.I)⁻¹) = 0
+        rw [mul_inv_rev, Complex.inv_I]
+        norm_num [unstableDenominator, Complex.I_mul_I]
+        ring_nf
+        simp
+    · constructor
+      · exact neg_ne_zero.mpr (mul_ne_zero (by norm_num) Complex.I_ne_zero)
+      · change unstableDenominator.eval (-((2 : ℂ) * Complex.I))⁻¹ = 0
+        rw [inv_neg, mul_inv_rev, Complex.inv_I]
+        norm_num [unstableDenominator, Complex.I_mul_I]
+        ring_nf
+        simp
+
+/-- The active selected DCDR quotient attains the general upper bound of two actual poles. -/
+lemma unstableResponseReduction_ncard_actualPoles_eq_two :
+    unstableResponseReduction.actualPoles.ncard = 2 := by
+  change unstableReducedResponse.zPoles.ncard = 2
+  rw [unstableReducedResponse_zPoles_eq_pair]
+  have hDistinct : (2 : ℂ) * Complex.I ≠ -((2 : ℂ) * Complex.I) := by
+    intro hEqual
+    have hImaginary := congrArg Complex.im hEqual
+    norm_num at hImaginary
+  rw [Set.ncard_insert_of_notMem (by simpa using hDistinct)]
+  simp
+
+/-!
+
+## B. Degree-drop fixture
+
+-/
+
+/-- A unit-through coherent coupler used by the zero-feedback degree-drop fixture. -/
+def degreeDropCoupler : DirectionalCoupler.Parameters where
+  throughAmplitude := 1
+  crossAmplitude := 0
+
+/-- Zero feedback makes the raw quadratic denominator degenerate to the constant one. -/
+def degreeDropParameters : UnitDelayParameters where
+  firstCoupler := degreeDropCoupler
+  secondCoupler := degreeDropCoupler
+  upperGain := 1
+  lowerGain := 0
+  feedbackGain := 0
+
+/-- Direct expansion gives the constant raw denominator one. -/
+lemma degreeDrop_denominatorPolynomial_expansion :
+    degreeDropParameters.denominatorPolynomial = 1 := by
+  simp [UnitDelayParameters.denominatorPolynomial, UnitDelayParameters.loopPolynomial,
+    UnitDelayParameters.upperPolynomial, UnitDelayParameters.lowerPolynomial,
+    UnitDelayParameters.feedbackPolynomial, degreeDropParameters, degreeDropCoupler,
+    DirectionalCoupler.crossCoefficient]
+
+/-- Direct expansion gives the nonzero raw numerator `q`. -/
+lemma degreeDrop_responseNumeratorPolynomial_expansion :
+    degreeDropParameters.responseNumeratorPolynomial = X := by
+  simp [UnitDelayParameters.responseNumeratorPolynomial,
+    UnitDelayParameters.directPolynomial, UnitDelayParameters.denominatorPolynomial,
+    UnitDelayParameters.loopPolynomial, UnitDelayParameters.feedbackReadoutPolynomial,
+    UnitDelayParameters.feedbackDrivePolynomial, UnitDelayParameters.upperPolynomial,
+    UnitDelayParameters.lowerPolynomial, UnitDelayParameters.feedbackPolynomial,
+    degreeDropParameters, degreeDropCoupler, DirectionalCoupler.crossCoefficient]
+
+/-- The exact reduced quotient `q / 1` for the degree-drop fixture. -/
+def degreeDropReducedResponse : DelayTransfer.ReducedRationalResponse where
+  numerator := X
+  denominator := 1
+  numerator_ne_zero := Polynomial.X_ne_zero
+  denominator_ne_zero := one_ne_zero
+  isCoprime := isCoprime_one_right
+
+/-- The degree-drop fixture removes only the unit polynomial. -/
+def degreeDropRationalReduction : DelayTransfer.RationalReduction where
+  rawNumerator := degreeDropParameters.responseNumeratorPolynomial
+  rawDenominator := degreeDropParameters.denominatorPolynomial
+  cancelledFactor := 1
+  reduced := degreeDropReducedResponse
+  cancelledFactor_ne_zero := one_ne_zero
+  rawNumerator_eq := by
+    rw [degreeDrop_responseNumeratorPolynomial_expansion]
+    simp [degreeDropReducedResponse]
+  rawDenominator_eq := by
+    rw [degreeDrop_denominatorPolynomial_expansion]
+    simp [degreeDropReducedResponse]
+
+/-- The exact reduction is tied to the selected degree-drop DCDR response. -/
+def degreeDropResponseReduction : ResponseReduction degreeDropParameters where
+  reduction := degreeDropRationalReduction
+  rawNumerator_eq := rfl
+  rawDenominator_eq := rfl
+
+/-- Direct unfolding shows that the degree-drop selected quotient has no actual poles. -/
+lemma degreeDropResponseReduction_actualPoles_eq_empty :
+    degreeDropResponseReduction.actualPoles = ∅ := by
+  ext z
+  simp [ResponseReduction.actualPoles, degreeDropResponseReduction,
+    degreeDropRationalReduction, degreeDropReducedResponse,
+    DelayTransfer.ReducedRationalResponse.zPoles,
+    DelayTransfer.ReducedRationalResponse.poles]
+
+/-- The degenerate denominator fixture has exactly zero actual reciprocal poles. -/
+lemma degreeDropResponseReduction_ncard_actualPoles_eq_zero :
+    degreeDropResponseReduction.actualPoles.ncard = 0 := by
+  rw [degreeDropResponseReduction_actualPoles_eq_empty]
+  simp
+
+/-!
+
+## C. Source-dictionary divergence and printed-form mismatch fixtures
+
+-/
+
+/-- All-one printed symbols expose the incoherent/coherent loop-coefficient difference. -/
+def sourceDictionaryDivergenceParameters : DCDRSourceBridge.SourceParameters where
+  G1 := 1
+  G2 := 1
+  G3 := 1
+  k1 := 1
+  k2 := 1
+
+/-- Direct printed-intensity expansion gives loop coefficient one. -/
+lemma sourceDictionaryDivergence_printedLoopCoefficient :
+    sourceDictionaryDivergenceParameters.printedLoopCoefficient = 1 := by
+  norm_num [DCDRSourceBridge.SourceParameters.printedLoopCoefficient,
+    sourceDictionaryDivergenceParameters]
+
+/-- Direct N7 amplitude expansion gives coherent loop coefficient minus one. -/
+lemma sourceDictionaryDivergence_coherentLoopCoefficient :
+    sourceDictionaryDivergenceParameters.toUnitDelayParameters.loopCoefficient = -1 := by
+  norm_num [DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
+    UnitDelayParameters.loopCoefficient, sourceDictionaryDivergenceParameters,
+    DirectionalCoupler.crossCoefficient, Complex.I_mul_I]
+
+/-- The source dictionary does not identify the printed and coherent loop coefficients. -/
+lemma sourceDictionaryDivergence_loopCoefficients_ne :
+    (sourceDictionaryDivergenceParameters.printedLoopCoefficient : ℂ) ≠
+      sourceDictionaryDivergenceParameters.toUnitDelayParameters.loopCoefficient := by
+  rw [sourceDictionaryDivergence_printedLoopCoefficient,
+    sourceDictionaryDivergence_coherentLoopCoefficient]
+  norm_num
+
+/-- A printed source point separating Theorem 4's `G1*G2` from Theorem 3's `G1*G3`. -/
+def sourceThmFourMismatchParameters : DCDRSourceBridge.SourceParameters where
+  G1 := 1
+  G2 := 1 / 4
+  G3 := 4
+  k1 := 1
+  k2 := 1
+
+/-- The mismatch fixture satisfies the strict square-root bound and the printed nonzero gate. -/
+lemma sourceThmFourMismatch_strictConditions :
+    ‖Complex.sqrt (printedIncoherentStabilityExpression
+      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+      sourceThmFourMismatchParameters.k2)‖ < 1 ∧
+    printedIncoherentStabilityExpression
+      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+      sourceThmFourMismatchParameters.k2 ≠ 0 := by
+  have hExpression : printedIncoherentStabilityExpression
+      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+      sourceThmFourMismatchParameters.k2 = (1 / 4 : ℂ) := by
+    norm_num [printedIncoherentStabilityExpression, sourceThmFourMismatchParameters]
+  rw [hExpression]
+  constructor
+  · have hNonneg : (0 : ℂ) ≤ 1 / 4 :=
+      (RCLike.nonneg_iff).2 ⟨by norm_num, by norm_num⟩
+    have hRealSqrt : Real.sqrt (1 / 4 : ℝ) = 1 / 2 := by
+      rw [Real.sqrt_eq_iff_mul_self_eq (by norm_num) (by norm_num)]
+      norm_num
+    rw [Complex.sqrt_of_nonneg hNonneg]
+    norm_num [hRealSqrt]
+  · norm_num
+
+/-- The same fixture's printed Theorem 3 denominator has quadratic coefficient four. -/
+lemma sourceThmFourMismatch_denominatorPolynomial_expansion :
+    sourceThmFourMismatchParameters.printedDenominatorPolynomial =
+      1 - C 4 * X ^ 2 := by
+  norm_num [DCDRSourceBridge.SourceParameters.printedDenominatorPolynomial,
+    DCDRSourceBridge.SourceParameters.printedLoopCoefficient,
+    sourceThmFourMismatchParameters]
+
+/-- A coprime quotient carrying the mismatch fixture's printed denominator. -/
+def sourceThmFourMismatchReducedResponse : DelayTransfer.ReducedRationalResponse where
+  numerator := 1
+  denominator := sourceThmFourMismatchParameters.printedDenominatorPolynomial
+  numerator_ne_zero := one_ne_zero
+  denominator_ne_zero := by
+    intro hZero
+    have hEvaluation := congrArg (Polynomial.eval 0) hZero
+    rw [sourceThmFourMismatch_denominatorPolynomial_expansion] at hEvaluation
+    norm_num at hEvaluation
+  isCoprime := isCoprime_one_left
+
+/-- Direct substitution makes `z = 2` a pole of the printed Theorem 3 denominator. -/
+lemma sourceThmFourMismatch_two_mem_zPoles :
+    (2 : ℂ) ∈ sourceThmFourMismatchReducedResponse.zPoles := by
+  constructor
+  · norm_num
+  · change sourceThmFourMismatchParameters.printedDenominatorPolynomial.eval
+      ((2 : ℂ)⁻¹) = 0
+    rw [sourceThmFourMismatch_denominatorPolynomial_expansion]
+    norm_num
+
+/-- The strict printed Theorem 4 expression does not control Theorem 3's mismatched denominator.
+
+This is why `SourceBridge.lean` withholds, rather than forces, a corrected strict stability lemma.
+-/
+lemma sourceThmFourMismatch_not_isSchurStable :
+    ¬sourceThmFourMismatchReducedResponse.IsSchurStable := by
+  intro hStable
+  have hInside := hStable 2 sourceThmFourMismatch_two_mem_zPoles
+  norm_num at hInside
+
+end
+
+
+end Optics.DCDR

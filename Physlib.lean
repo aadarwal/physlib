@@ -475,8 +475,14 @@ public import Physlib.Optics.Systems.DCDR.Bridge
 public import Physlib.Optics.Systems.DCDR.Graph
 public import Physlib.Optics.Systems.DCDR.Mason
 public import Physlib.Optics.Systems.DCDR.Netlist
+public import Physlib.Optics.Systems.DCDR.Observables
+public import Physlib.Optics.Systems.DCDR.ObservablesRegression
+public import Physlib.Optics.Systems.DCDR.Poles
+public import Physlib.Optics.Systems.DCDR.PolesRegression
 public import Physlib.Optics.Systems.DCDR.Response
 public import Physlib.Optics.Systems.DCDR.ResponseRegression
+public import Physlib.Optics.Systems.DCDR.SourceBridge
+public import Physlib.Optics.Systems.DCDR.SourceBridgeRegression
 public import Physlib.Optics.Systems.DCDR.Topology
 public import Physlib.Optics.Systems.DCDR.TopologyRegression
 public import Physlib.Optics.Systems.DelayTransfer.Basic
