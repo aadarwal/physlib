@@ -382,6 +382,7 @@ public import Physlib.Optics.Network.HierarchicalRegression
 public import Physlib.Optics.Network.LinearBehavior
 public import Physlib.Optics.Network.LinearBehaviorFunctionalRegression
 public import Physlib.Optics.Network.LinearBehaviorRegression
+public import Physlib.Optics.Network.LinearBehaviorReindex
 public import Physlib.Optics.Network.NetlistCoefficients
 public import Physlib.Optics.Network.NetlistCoefficientsRegression
 public import Physlib.Optics.Network.NetlistData
@@ -481,6 +482,8 @@ public import Physlib.Optics.Systems.Cascade.Heterogeneous
 public import Physlib.Optics.Systems.Cascade.HeterogeneousRegression
 public import Physlib.Optics.Systems.Cascade.Identical
 public import Physlib.Optics.Systems.Cascade.IdenticalRegression
+public import Physlib.Optics.Systems.Cascade.Lattice
+public import Physlib.Optics.Systems.Cascade.LatticeRegression
 public import Physlib.Optics.Systems.Cascade.PandaBridge
 public import Physlib.Optics.Systems.Cascade.PandaGraph
 public import Physlib.Optics.Systems.Cascade.PandaMason
