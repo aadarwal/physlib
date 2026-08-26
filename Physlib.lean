@@ -148,6 +148,11 @@ public import Physlib.Mathematics.DataStructures.FourTree.Basic
 public import Physlib.Mathematics.DataStructures.FourTree.UniqueMap
 public import Physlib.Mathematics.DataStructures.Matrix.LieTrace
 public import Physlib.Mathematics.Distribution.Basic
+public import Physlib.Mathematics.Distribution.CoordinateHyperplane
+public import Physlib.Mathematics.Distribution.CoordinateHyperplaneDelta
+public import Physlib.Mathematics.Distribution.CoordinateSplit
+public import Physlib.Mathematics.Distribution.Heaviside
+public import Physlib.Mathematics.Distribution.HeavisideRegression
 public import Physlib.Mathematics.Distribution.PowMul
 public import Physlib.Mathematics.FDerivCurry
 public import Physlib.Mathematics.Fin
