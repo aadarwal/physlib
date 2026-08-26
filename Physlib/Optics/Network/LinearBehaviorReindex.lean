@@ -18,10 +18,12 @@ transporting it back along their inverses recovers the original relation.
 ## ii. Key results
 
 - `LinearBehavior.reindex_symm_reindex`: inverse relabelling cancels behavior relabelling.
+- `LinearBehavior.reindex_trans`: successive relabellings equal one composite relabelling.
 
 ## iii. Table of contents
 
 - A. Inverse behavior relabelling
+- B. Composite behavior relabelling
 
 ## iv. References
 
@@ -58,6 +60,40 @@ lemma reindex_symm_reindex
       behavior := by
   ext ⟨inputAmplitude, outputAmplitude⟩
   simp
+
+/-!
+
+## B. Composite behavior relabelling
+
+-/
+
+/-- Two successive relabellings of a finite behavior equal relabelling along the composite
+equivalences. -/
+lemma reindex_trans
+    {input : Type u} {output : Type v} {middleInput : Type w}
+    {middleOutput : Type x} {finalInput finalOutput : Type*}
+    [Fintype input] [Fintype output] [Fintype middleInput] [Fintype middleOutput]
+    [Fintype finalInput] [Fintype finalOutput]
+    (firstInput : input ≃ middleInput) (firstOutput : output ≃ middleOutput)
+    (secondInput : middleInput ≃ finalInput)
+    (secondOutput : middleOutput ≃ finalOutput) (behavior : LinearBehavior input output) :
+    (behavior.reindex firstInput firstOutput).reindex secondInput secondOutput =
+      behavior.reindex (firstInput.trans secondInput) (firstOutput.trans secondOutput) := by
+  ext ⟨inputAmplitude, outputAmplitude⟩
+  simp only [LinearBehavior.mem_reindex_iff]
+  have hInput :
+      ModeAmplitude.reindex firstInput.symm
+          (ModeAmplitude.reindex secondInput.symm inputAmplitude) =
+        ModeAmplitude.reindex (firstInput.trans secondInput).symm inputAmplitude := by
+    ext input
+    rfl
+  have hOutput :
+      ModeAmplitude.reindex firstOutput.symm
+          (ModeAmplitude.reindex secondOutput.symm outputAmplitude) =
+        ModeAmplitude.reindex (firstOutput.trans secondOutput).symm outputAmplitude := by
+    ext output
+    rfl
+  rw [hInput, hOutput]
 
 end LinearBehavior
 
