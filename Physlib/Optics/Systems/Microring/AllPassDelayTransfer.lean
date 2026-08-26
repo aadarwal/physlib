@@ -876,7 +876,6 @@ lemma allPassRationalNetlist_response_cleared (p : AllPass.Parameters) (q : ℂ)
     ring
   rw [hFactor, mul_comm, div_mul_cancel₀ _ hDenominator, hLoop]
 
-
 end
 
 end Optics.DelayTransfer

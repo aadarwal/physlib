@@ -16,8 +16,8 @@ This file checks the causal recurrence independently of its quotient transfer. T
 coefficient `3 / 5` and one-pass coefficient `1 / 2` give
 
 ```text
-y[0] = 3/5,    y[1] = -8/25,
-H(1) = 1/7,    H(I) = 75/109 + (32/109) I.
+y[0] = 3/5, y[1] = -8/25,
+H(1) = 1/7, H(I) = 75/109 + (32/109) I.
 ```
 
 The nonreal sample pins the reciprocal-variable convention: at `z = I`, its inverse is `-I`.
