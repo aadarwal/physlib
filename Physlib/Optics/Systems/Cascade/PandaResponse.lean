@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Tactic.Polyrith
 public import Physlib.Optics.Systems.Cascade.PandaBridge
 
 /-!
@@ -299,6 +298,275 @@ lemma sourceCrossCoefficient_sq (c s : ℂ) (h : c ^ 2 + s ^ 2 = 1) :
       simp
     _ = c ^ 2 - 1 := by linear_combination -h
 
+private lemma mainReturn_of_principal (p : Parameters) (s : SourceParameters)
+    (hRoot : HasPrincipalRootSelection p s) :
+    p.mainQuarterFourCoefficient * p.mainQuarterThreeCoefficient *
+        Complex.sqrt s.mainRoundTrip = s.mainRoundTrip := by
+  have hProduct := hRoot.mainProduct
+  simp only [Parameters.mainRoundTripCoefficient] at hProduct
+  calc
+    p.mainQuarterFourCoefficient * p.mainQuarterThreeCoefficient *
+          Complex.sqrt s.mainRoundTrip =
+        Complex.sqrt s.mainRoundTrip * p.mainQuarterThreeCoefficient *
+          p.mainQuarterFourCoefficient := by ring
+    _ = (p.mainQuarterOneCoefficient * p.mainQuarterTwoCoefficient) *
+        p.mainQuarterThreeCoefficient * p.mainQuarterFourCoefficient := by
+      rw [hRoot.mainFirstHalf]
+    _ = s.mainRoundTrip := hProduct
+
+private lemma mainForward_of_principal (p : Parameters) (s : SourceParameters)
+    (hRoot : HasPrincipalRootSelection p s) :
+    p.mainQuarterTwoCoefficient * p.mainQuarterOneCoefficient =
+      Complex.sqrt s.mainRoundTrip := by
+  calc
+    p.mainQuarterTwoCoefficient * p.mainQuarterOneCoefficient =
+        p.mainQuarterOneCoefficient * p.mainQuarterTwoCoefficient := by ring
+    _ = Complex.sqrt s.mainRoundTrip := hRoot.mainFirstHalf
+
+private lemma rightReturn_of_principal (p : Parameters) (s : SourceParameters)
+    (hRoot : HasPrincipalRootSelection p s) :
+    p.rightHalfTwoCoefficient * p.rightHalfOneCoefficient = s.rightRoundTrip := by
+  have hProduct := hRoot.rightProduct
+  simp only [Parameters.rightRoundTripCoefficient] at hProduct
+  calc
+    p.rightHalfTwoCoefficient * p.rightHalfOneCoefficient =
+        p.rightHalfOneCoefficient * p.rightHalfTwoCoefficient := by ring
+    _ = s.rightRoundTrip := hProduct
+
+private lemma leftReturn_of_principal (p : Parameters) (s : SourceParameters)
+    (hRoot : HasPrincipalRootSelection p s) :
+    p.leftHalfTwoCoefficient * p.leftHalfOneCoefficient = s.leftRoundTrip := by
+  have hProduct := hRoot.leftProduct
+  simp only [Parameters.leftRoundTripCoefficient] at hProduct
+  calc
+    p.leftHalfTwoCoefficient * p.leftHalfOneCoefficient =
+        p.leftHalfOneCoefficient * p.leftHalfTwoCoefficient := by ring
+    _ = s.leftRoundTrip := hProduct
+
+local macro "solve_closed_state_equation " p:ident s:ident hDictionary:ident hRoot:ident
+    hNormalization:ident hDenominator:ident : tactic =>
+  `(tactic|
+    focus
+      have hs1Sq : ($s).s1 ^ 2 = 1 - ($s).c1 ^ 2 := by
+        linear_combination ($hNormalization).input
+      have hs2Sq : ($s).s2 ^ 2 = 1 - ($s).c2 ^ 2 := by
+        linear_combination ($hNormalization).output
+      have hsrSq : ($s).sr ^ 2 = 1 - ($s).cr ^ 2 := by
+        linear_combination ($hNormalization).right
+      have hslSq : ($s).sl ^ 2 = 1 - ($s).cl ^ 2 := by
+        linear_combination ($hNormalization).left
+      have hISq : Complex.I ^ 2 = (-1 : ℂ) := by
+        rw [pow_two, Complex.I_mul_I]
+      have hMainReturn := mainReturn_of_principal $p $s $hRoot
+      have hMainForward := mainForward_of_principal $p $s $hRoot
+      have hRightReturn := rightReturn_of_principal $p $s $hRoot
+      have hLeftReturn := leftReturn_of_principal $p $s $hRoot
+      have hc1 := ($hDictionary).c1
+      have hs1 := ($hDictionary).s1
+      have hc2 := ($hDictionary).c2
+      have hs2 := ($hDictionary).s2
+      have hcr := ($hDictionary).cr
+      have hsr := ($hDictionary).sr
+      have hcl := ($hDictionary).cl
+      have hsl := ($hDictionary).sl
+      have hDenominatorNe : sourceDenominator $s ≠ 0 := $hDenominator
+      ring_nf at hs1Sq hs2Sq hsrSq hslSq hMainReturn
+      ring_nf at hMainForward hRightReturn hLeftReturn
+      all_goals simp [closedState]
+      all_goals try simp only [DirectionalCoupler.crossCoefficient, sourceCrossCoefficient]
+      all_goals
+        try simp only [← hc1, ← hs1, ← hc2, ← hs2, ← hcr, ← hsr, ← hcl, ← hsl]
+      all_goals try field_simp [hDenominatorNe]
+      all_goals
+        try simp only [sourceDenominator_eq_factorized, sourceThroughNumerator_eq_factorized]
+      all_goals try ring_nf
+      all_goals try rw [hISq]
+      all_goals try rw [hs1Sq]
+      all_goals try rw [hs2Sq]
+      all_goals try rw [hsrSq]
+      all_goals try rw [hslSq]
+      all_goals try rw [hMainReturn]
+      all_goals try rw [hMainForward]
+      all_goals try rw [hRightReturn]
+      all_goals try rw [hLeftReturn]
+      all_goals try ring_nf)
+
+private lemma closedState_nodeOne (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 0 = input := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeTwo (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 1 = p.mainQuarterFourCoefficient * closedState p s input 14 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+  have hMainReturn := mainReturn_of_principal p s hRoot
+  linear_combination
+    (s.c2 * s.s1 * input * (s.cr - s.rightRoundTrip) *
+      (s.cl - s.leftRoundTrip)) * hMainReturn
+
+private lemma closedState_nodeThree (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 2 =
+      (p.inputCoupler.throughAmplitude : ℂ) * closedState p s input 0 +
+        DirectionalCoupler.crossCoefficient p.inputCoupler * closedState p s input 1 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeFour (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 3 =
+      DirectionalCoupler.crossCoefficient p.inputCoupler * closedState p s input 0 +
+        (p.inputCoupler.throughAmplitude : ℂ) * closedState p s input 1 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeFive (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 4 = p.mainQuarterTwoCoefficient * closedState p s input 9 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+  have hMainForward := mainForward_of_principal p s hRoot
+  linear_combination
+    (s.s1 * input * (s.cr - s.rightRoundTrip) *
+      (1 - s.cl * s.leftRoundTrip)) * hMainForward
+
+private lemma closedState_nodeSix (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 5 = 0 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeSeven (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 6 =
+      (p.outputCoupler.throughAmplitude : ℂ) * closedState p s input 4 +
+        DirectionalCoupler.crossCoefficient p.outputCoupler * closedState p s input 5 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeEight (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 7 =
+      DirectionalCoupler.crossCoefficient p.outputCoupler * closedState p s input 4 +
+        (p.outputCoupler.throughAmplitude : ℂ) * closedState p s input 5 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeNine (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 8 = p.mainQuarterOneCoefficient * closedState p s input 3 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeTen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 9 =
+      (p.rightCoupler.throughAmplitude : ℂ) * closedState p s input 8 +
+        DirectionalCoupler.crossCoefficient p.rightCoupler * closedState p s input 10 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeEleven (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 10 = p.rightHalfTwoCoefficient * closedState p s input 12 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+  have hRightReturn := rightReturn_of_principal p s hRoot
+  linear_combination
+    -(s.sr * p.mainQuarterOneCoefficient * s.s1 * input *
+      (1 - s.cl * s.leftRoundTrip)) * hRightReturn
+
+private lemma closedState_nodeTwelve (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 11 =
+      DirectionalCoupler.crossCoefficient p.rightCoupler * closedState p s input 8 +
+        (p.rightCoupler.throughAmplitude : ℂ) * closedState p s input 10 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeThirteen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 12 = p.rightHalfOneCoefficient * closedState p s input 11 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeFourteen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 13 = p.mainQuarterThreeCoefficient * closedState p s input 6 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeFifteen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 14 =
+      (p.leftCoupler.throughAmplitude : ℂ) * closedState p s input 13 +
+        DirectionalCoupler.crossCoefficient p.leftCoupler * closedState p s input 15 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeSixteen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 15 = p.leftHalfTwoCoefficient * closedState p s input 17 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+  have hLeftReturn := leftReturn_of_principal p s hRoot
+  linear_combination
+    -(s.sl * p.mainQuarterThreeCoefficient * s.c2 * Complex.sqrt s.mainRoundTrip *
+      s.s1 * input * (s.cr - s.rightRoundTrip)) * hLeftReturn
+
+private lemma closedState_nodeSeventeen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 16 =
+      DirectionalCoupler.crossCoefficient p.leftCoupler * closedState p s input 13 +
+        (p.leftCoupler.throughAmplitude : ℂ) * closedState p s input 15 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
+private lemma closedState_nodeEighteen (p : Parameters) (s : SourceParameters) (input : ℂ)
+    (hDictionary : HasSourceCouplerDictionary p s)
+    (hRoot : HasPrincipalRootSelection p s)
+    (hNormalization : HasSourceCouplerNormalization s)
+    (hDenominator : HasNonzeroSourceDenominator s) :
+    closedState p s input 17 = p.leftHalfOneCoefficient * closedState p s input 16 := by
+  solve_closed_state_equation p s hDictionary hRoot hNormalization hDenominator
+
 /-- The explicit state satisfies all eighteen retained equations under the exact source gates. -/
 lemma closedState_forwardEquations (p : Parameters) (s : SourceParameters) (input : ℂ)
     (hDictionary : HasSourceCouplerDictionary p s)
@@ -306,41 +574,27 @@ lemma closedState_forwardEquations (p : Parameters) (s : SourceParameters) (inpu
     (hNormalization : HasSourceCouplerNormalization s)
     (hDenominator : HasNonzeroSourceDenominator s) :
     ForwardEquations p input (closedState p s input) := by
-  have hx1 := sourceCrossCoefficient_sq s.c1 s.s1 hNormalization.input
-  have hx2 := sourceCrossCoefficient_sq s.c2 s.s2 hNormalization.output
-  have hxr := sourceCrossCoefficient_sq s.cr s.sr hNormalization.right
-  have hxl := sourceCrossCoefficient_sq s.cl s.sl hNormalization.left
-  rcases hDictionary with ⟨hc1, hs1, hc2, hs2, hcr, hsr, hcl, hsl⟩
-  constructor
-  all_goals
-    simp only [closedState]
-  all_goals
-    simp only [DirectionalCoupler.crossCoefficient, sourceCrossCoefficient] at *
-  all_goals
-    simp only [← hc1, ← hs1, ← hc2, ← hs2, ← hcr, ← hsr, ← hcl, ← hsl]
-  all_goals
-    try rw [← hRoot.mainFirstHalf]
-  all_goals
-    try rw [← hRoot.mainSecondHalf]
-  all_goals
-    try rw [← hRoot.mainProduct]
-  all_goals
-    try rw [← hRoot.rightProduct]
-  all_goals
-    try rw [← hRoot.leftProduct]
-  all_goals
-    simp only [Parameters.mainRoundTripCoefficient, Parameters.rightRoundTripCoefficient,
-      Parameters.leftRoundTripCoefficient] at *
-  all_goals
-    field_simp [hDenominator]
-  all_goals
-    simp only [sourceDenominator_eq_factorized, sourceThroughNumerator_eq_factorized]
-  all_goals
-    ring_nf at hx1 hx2 hxr hxl ⊢
-  all_goals
-    simp only [Complex.I_mul_I] at hx1 hx2 hxr hxl ⊢
-  all_goals
-    polyrith only [hx1, hx2, hxr, hxl]
+  exact {
+    nodeOne := closedState_nodeOne p s input hDictionary hRoot hNormalization hDenominator
+    nodeTwo := closedState_nodeTwo p s input hDictionary hRoot hNormalization hDenominator
+    nodeThree := closedState_nodeThree p s input hDictionary hRoot hNormalization hDenominator
+    nodeFour := closedState_nodeFour p s input hDictionary hRoot hNormalization hDenominator
+    nodeFive := closedState_nodeFive p s input hDictionary hRoot hNormalization hDenominator
+    nodeSix := closedState_nodeSix p s input hDictionary hRoot hNormalization hDenominator
+    nodeSeven := closedState_nodeSeven p s input hDictionary hRoot hNormalization hDenominator
+    nodeEight := closedState_nodeEight p s input hDictionary hRoot hNormalization hDenominator
+    nodeNine := closedState_nodeNine p s input hDictionary hRoot hNormalization hDenominator
+    nodeTen := closedState_nodeTen p s input hDictionary hRoot hNormalization hDenominator
+    nodeEleven := closedState_nodeEleven p s input hDictionary hRoot hNormalization hDenominator
+    nodeTwelve := closedState_nodeTwelve p s input hDictionary hRoot hNormalization hDenominator
+    nodeThirteen := closedState_nodeThirteen p s input hDictionary hRoot hNormalization hDenominator
+    nodeFourteen := closedState_nodeFourteen p s input hDictionary hRoot hNormalization hDenominator
+    nodeFifteen := closedState_nodeFifteen p s input hDictionary hRoot hNormalization hDenominator
+    nodeSixteen := closedState_nodeSixteen p s input hDictionary hRoot hNormalization hDenominator
+    nodeSeventeen :=
+      closedState_nodeSeventeen p s input hDictionary hRoot hNormalization hDenominator
+    nodeEighteen :=
+      closedState_nodeEighteen p s input hDictionary hRoot hNormalization hDenominator }
 
 /-! ## D. NSV'16 comparisons -/
 
@@ -404,7 +658,13 @@ theorem nsv16_dropTransfer (p : Parameters) (s : SourceParameters)
         (dropTerminatedMultigraph p) hUnit hState
     _ = sourceDropTransfer s := by
       rw [sourceDropTransfer, sourceDropNumerator_eq_factorized]
-      simp [closedState, sourceCrossCoefficient, Complex.I_sq]
+      simp [closedState, sourceCrossCoefficient]
+      have hQuadrature : Complex.I * s.s1 * (Complex.I * s.s2) = -(s.s1 * s.s2) := by
+        calc
+          Complex.I * s.s1 * (Complex.I * s.s2) =
+              (Complex.I * Complex.I) * (s.s1 * s.s2) := by ring
+          _ = -(s.s1 * s.s2) := by rw [Complex.I_mul_I]; ring
+      rw [hQuadrature]
       ring
 
 /-- The edge-level Mason quotient of the directed projection is the printed through expression on

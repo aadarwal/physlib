@@ -67,6 +67,12 @@ open Physlib.SignalFlowGraph
 def TopologyAdjacent (first second : Node) : Prop :=
   ∃ edge : Edge, edgeSource edge = first ∧ edgeTarget edge = second
 
+/-- Retained adjacency has a computable decision procedure by enumerating the 24 edge labels. -/
+instance topologyAdjacentDecidable (first second : Node) :
+    Decidable (TopologyAdjacent first second) := by
+  unfold TopologyAdjacent
+  infer_instance
+
 /-- Retained adjacency is equivalently the existence of an indexed source/target branch. -/
 lemma topologyAdjacent_iff (first second : Node) :
     TopologyAdjacent first second ↔
@@ -183,7 +189,11 @@ lemma topology_path_refinements (p : Parameters) :
         { [1, 4, 5, 11, 12, 16, 18, 19, 20, 22, 23, 3] } ∧
       refiningEdgeLists (signalMultigraph p) topologyThroughBothCirculations =
         { [1, 4, 6, 7, 8, 9, 11, 12, 16, 18, 19, 20, 22, 23, 3] } := by
-  decide
+  simp [refiningEdgeLists, Physlib.SignalFlowGraph.Multigraph.edgesBetween,
+    signalMultigraph, edgeSource, edgeTarget, topologyThroughDirect,
+    topologyThroughMainDirect, topologyThroughRightCirculation,
+    topologyThroughLeftCirculation, topologyThroughBothCirculations]
+  all_goals decide
 
 /-- Both drop paths have exactly the displayed edge refinements. -/
 lemma topology_drop_path_refinements (p : Parameters) :
@@ -191,7 +201,10 @@ lemma topology_drop_path_refinements (p : Parameters) :
         { [1, 4, 5, 11, 13] } ∧
       refiningEdgeLists (signalMultigraph p) topologyDropRightCirculation =
         { [1, 4, 6, 7, 8, 9, 11, 13] } := by
-  decide
+  simp [refiningEdgeLists, Physlib.SignalFlowGraph.Multigraph.edgesBetween,
+    signalMultigraph, edgeSource, edgeTarget, topologyDropDirect,
+    topologyDropRightCirculation]
+  all_goals decide
 
 /-- All six canonical loops have exactly the displayed edge refinements. -/
 lemma topology_loop_refinements (p : Parameters) :
@@ -205,21 +218,23 @@ lemma topology_loop_refinements (p : Parameters) :
         { [2, 4, 5, 11, 12, 16, 18, 19, 20, 22, 23] } ∧
       refiningEdgeLists (signalMultigraph p) topologyMainBothLoop =
         { [2, 4, 6, 7, 8, 9, 11, 12, 16, 18, 19, 20, 22, 23] } := by
-  decide
+  simp [refiningEdgeLists, Physlib.SignalFlowGraph.Multigraph.edgesBetween,
+    signalMultigraph, edgeSource, edgeTarget, topologyRightLoop, topologyLeftLoop,
+    topologyMainDirectLoop, topologyMainRightLoop, topologyMainLeftLoop,
+    topologyMainBothLoop]
+  all_goals decide
 
 /-- The right side-loop edge list has gain `cr * r1 * r2`. -/
 lemma topology_rightLoop_gain (p : Parameters) :
     edgeListGain (signalMultigraph p) [10, 7, 8] =
       (p.rightCoupler.throughAmplitude : ℂ) * p.rightRoundTripCoefficient := by
   simp [edgeListGain, signalMultigraph, edgeGain, Parameters.rightRoundTripCoefficient]
-  ring
 
 /-- The left side-loop edge list has gain `cl * l1 * l2`. -/
 lemma topology_leftLoop_gain (p : Parameters) :
     edgeListGain (signalMultigraph p) [21, 19, 20] =
       (p.leftCoupler.throughAmplitude : ℂ) * p.leftRoundTripCoefficient := by
   simp [edgeListGain, signalMultigraph, edgeGain, Parameters.leftRoundTripCoefficient]
-  ring
 
 /-- The five through-path edge products retain every coupler and propagation choice. -/
 lemma topology_throughPath_gains (p : Parameters) :
@@ -352,6 +367,12 @@ def topologyMiswiredMultigraph (p : Parameters) :
   target := topologyMiswiredEdgeTarget
   gain := edgeGain p
 
+/-- The gain-free topology of the cross-wired negative control. -/
+def topologyMiswiredSkeleton : Physlib.SignalFlowGraph.Multigraph Node Edge where
+  source := edgeSource
+  target := topologyMiswiredEdgeTarget
+  gain := fun _ ↦ 0
+
 /-- The cross-wire changes the right half join from node thirteen to node eighteen. -/
 lemma topology_miswired_join_sentinel :
     topologyMiswiredEdgeTarget 7 = 17 ∧ edgeTarget 7 = 12 := by decide
@@ -364,11 +385,18 @@ lemma topologyMiswiredMultigraph_ne (p : Parameters) :
   simp [topologyMiswiredMultigraph, topologyMiswiredEdgeTarget,
     signalMultigraph, edgeTarget] at hTarget
 
+private lemma topology_miswired_skeleton_rightDetour_not_refined :
+    [1, 4, 6, 7, 8, 9, 11, 13] ∉
+      refiningEdgeLists topologyMiswiredSkeleton topologyDropRightCirculation := by
+  decide
+
 /-- The expected right-circulation refinement disappears after the asymmetric join cross-wire. -/
 lemma topology_miswired_rightDetour_not_refined (p : Parameters) :
     [1, 4, 6, 7, 8, 9, 11, 13] ∉
       refiningEdgeLists (topologyMiswiredMultigraph p) topologyDropRightCirculation := by
-  decide
+  change [1, 4, 6, 7, 8, 9, 11, 13] ∉
+    refiningEdgeLists topologyMiswiredSkeleton topologyDropRightCirculation
+  exact topology_miswired_skeleton_rightDetour_not_refined
 
 end Panda
 

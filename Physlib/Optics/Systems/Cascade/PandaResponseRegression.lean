@@ -153,8 +153,12 @@ lemma responseRegression_rawNodeEquation :
       Parameters.rightHalfTwoCoefficient, Parameters.leftHalfOneCoefficient,
       Parameters.leftHalfTwoCoefficient, DirectionalCoupler.crossCoefficient,
       MatchedPropagation.transmissionCoefficient, MatchedPropagation.carrierPhaseFactor,
-      Fin.sum_univ_succ, Complex.I_sq] <;>
-    ring
+      Fin.sum_univ_succ]
+  all_goals ring_nf
+  all_goals
+    rw [show Complex.I ^ 2 = (-1 : ℂ) by
+      rw [pow_two, Complex.I_mul_I]]
+  all_goals ring
 
 /-- The positive vector solves the retained graph directly from the raw matrix equation. -/
 lemma responseRegression_isNodeSolution :
@@ -165,11 +169,11 @@ lemma responseRegression_isNodeSolution :
 
 /-- The hand-expanded through coordinate is `7/25`. -/
 lemma responseRegression_through : responseRegressionState 2 = 7 / 25 := by
-  norm_num [responseRegressionState]
+  simp [responseRegressionState]
 
 /-- The hand-expanded drop coordinate is `-24/25`. -/
 lemma responseRegression_drop : responseRegressionState 7 = -(24 / 25) := by
-  norm_num [responseRegressionState]
+  simp [responseRegressionState]
 
 /-- Independent expansion of the printed through quotient gives the same `7/25`. -/
 lemma responseRegression_sourceThrough :
