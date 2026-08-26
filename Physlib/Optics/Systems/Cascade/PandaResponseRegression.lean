@@ -44,7 +44,7 @@ the totalized source quotients are not assigned response meaning at that point.
 - D. Hand-expanded matrix and N5 anchors
 - E. Singular determinant fixture
 
-## iv. Scope
+## iv. References
 
 These fixtures audit coherent complex amplitudes. They assert no passivity, reciprocity,
 losslessness, causality, convergence, stability, resonance, bandwidth, dispersion, power
@@ -60,9 +60,9 @@ noncomputable section
 namespace Panda
 
 open Physlib.SignalFlowGraph
-
-/-! ## A. Positive normalized fixture -/
-
+/-!
+## A. Positive normalized fixture
+-/
 /-- A zero-phase propagation section with the selected real amplitude. -/
 def responseRegressionPropagation (amplitude : ℝ) : MatchedPropagation.Parameters where
   amplitudeTransmission := amplitude
@@ -130,9 +130,9 @@ lemma responseRegression_hasNonzeroSourceDenominator :
     HasNonzeroSourceDenominator responseRegressionSource := by
   rw [HasNonzeroSourceDenominator, responseRegression_sourceDenominator]
   norm_num
-
-/-! ## B. Direct loop-family determinant expansion -/
-
+/-!
+## B. Direct loop-family determinant expansion
+-/
 /-- A topological rank that increases on every retained edge except the two zero-gain side-ring
 returns and the main-ring feedback edge. -/
 def responseRegressionNodeRank : Node → ℕ :=
@@ -702,9 +702,9 @@ lemma responseRegression_edgeGraphDet :
   rw [edgeGraphDet]
   rw [responseRegression_edgeGraphDetOn]
   simp
-
-/-! ## C. Direct supported-path numerator expansion -/
-
+/-!
+## C. Direct supported-path numerator expansion
+-/
 /-- The sixteen retained edges whose gains are nonzero at the positive fixture. -/
 def responseRegressionSupportedEdges : Finset Edge :=
   {0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16, 17, 21, 23}
@@ -1143,9 +1143,9 @@ lemma responseRegression_edgeMasonNumerator_drop :
     responseRegression_edgeListGain_dropDirect,
     responseRegression_dropDirectCofactor]
   norm_num
-
-/-! ## D. Hand-expanded matrix and N5 anchors -/
-
+/-!
+## D. Hand-expanded matrix and N5 anchors
+-/
 /-- The eighteen hand-expanded node values for the positive fixture. -/
 def responseRegressionState : Node → ℂ :=
   ![1, -(2 / 5) * Complex.I, 7 / 25, -(26 / 25) * Complex.I,
@@ -1309,9 +1309,9 @@ lemma responseRegression_sourceDrop :
     sourceDropTransfer responseRegressionSource = -(24 / 25) := by
   norm_num [sourceDropTransfer, sourceDropNumerator, sourceDenominator,
     responseRegressionSource]
-
-/-! ## E. Singular determinant fixture -/
-
+/-!
+## E. Singular determinant fixture
+-/
 /-- The determinant-zero fixture, with identity through-coupling on all four couplers. -/
 def responseRegressionSingularParameters : Parameters where
   inputCoupler := ⟨1, 0⟩

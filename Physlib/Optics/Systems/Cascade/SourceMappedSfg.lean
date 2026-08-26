@@ -32,11 +32,7 @@ for every listed stage.
 - A. Composed stage dictionary
 - B. Stagewise list comparison
 
-## iv. References and non-claims
-
-SFG-TR'14 Def. 35 gives an eight-node add-drop signal-flow graph and Thm. 7 gives
-`-S1*S2*sqrt(xi)/(1-C1*C2*xi)`; the audited mapping is already recorded in
-`SourceBridgeSfg.lean:51-105`. No part of that source statement is reproved here.
+## iv. References
 
 The list below is bookkeeping for a cascade development, not a scalar cascade law. No PANDA,
 NSV'16, DATE lattice, quadruple-ring, coupled-lattice, full `M x N` lattice, dispersion, bending
@@ -45,6 +41,10 @@ measurement-validation claim is made. Power, if later introduced, means normaliz
 its electromagnetic interpretation requires the finite common-frequency Maxwell and
 aperture-flux hypotheses at
 `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:60-90`.
+
+SFG-TR'14 Def. 35 gives an eight-node add-drop signal-flow graph and Thm. 7 gives
+`-S1*S2*sqrt(xi)/(1-C1*C2*xi)`; the audited mapping is already recorded in
+`SourceBridgeSfg.lean:51-105`. No part of that source statement is reproved here.
 -/
 
 @[expose] public section
@@ -56,9 +56,9 @@ noncomputable section
 namespace MicroringCascade
 
 open MicroringSourceBridge
-
-/-! ## A. Composed stage dictionary -/
-
+/-!
+## A. Composed stage dictionary
+-/
 /-- SFG-TR'14's add-drop transfer after the existing Physlib-to-source parameter map.
 
 This is function composition only; it introduces no new source graph or cascade interconnection.
@@ -72,9 +72,9 @@ lemma sfgAddDropStageTransfer_eq_dropTransfer (p : AddDrop.Parameters)
     (hSqrt : Complex.sqrt p.roundTripCoefficient = p.firstArcCoefficient) :
     sfgAddDropStageTransfer p = AddDrop.dropTransfer p :=
   sfgAddDropTransfer_eq_dropTransfer p hSqrt
-
-/-! ## B. Stagewise list comparison -/
-
+/-!
+## B. Stagewise list comparison
+-/
 /-- The source-mapped transfer attached independently to every listed add-drop stage. -/
 def sfgAddDropStageTransfers (stages : List AddDrop.Parameters) : List ℂ :=
   stages.map sfgAddDropStageTransfer

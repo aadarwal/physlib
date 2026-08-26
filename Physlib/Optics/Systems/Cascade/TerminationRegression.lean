@@ -21,7 +21,7 @@ The negative fixture keeps the ring pivot `R = -24/25 != 0`, while its two-stage
 `M11 = 0`. An explicit nonzero vector in the raw termination-pivot kernel proves that the chain
 termination is not well posed. Thus the complete-cascade pivot gate can genuinely fail.
 
-## ii. Key checks
+## ii. Key results
 
 - `dateTerminationRegression_rawFold_two` and `_three`: joined raw DATE-stage folds.
 - `dateTerminationRegression_two_responses_by_hand`: reflection `0`, transmission `-1`.
@@ -36,7 +36,7 @@ termination is not well posed. Thus the complete-cascade pivot gate can genuinel
 - C. Terminated responses from the behavior
 - D. Singular parameter control
 
-## iv. Independence
+## iv. References
 
 The response anchors use the graph of the behavior-derived transforms and the raw termination
 equations. They do not invoke either DATE'14 Thm. 5 quotient theorem or either corrected

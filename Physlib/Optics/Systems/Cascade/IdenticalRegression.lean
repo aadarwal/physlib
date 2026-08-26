@@ -45,12 +45,12 @@ expressions for that same stage are then calculated independently at `N = 2` and
 - C. Strict-trace negative control
 - D. Joined concrete-stage anchor
 
-## iv. References and non-claims
+## iv. References
+These fixtures make no quadruple-ring, lattice, termination, resonance, dispersion, bending-loss,
+causality, passivity, reciprocity, or electromagnetic-power claim. They test totalized matrices;
+relational meaning remains gated by the production pivot theorem.
 
-DATE'14 Thm. 4 and the unnumbered Sylvester result are summarized at
-`HOL-CORPUS.md:204-207`. These fixtures make no quadruple-ring, lattice, termination, resonance,
-dispersion, bending-loss, causality, passivity, reciprocity, or electromagnetic-power claim.
-They test totalized matrices; relational meaning remains gated by the production pivot theorem.
+DATE'14 Thm. 4 and the Sylvester result are summarized at `HOL-CORPUS.md:204-207`.
 -/
 
 @[expose] public section

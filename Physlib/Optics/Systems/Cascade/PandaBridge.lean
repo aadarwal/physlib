@@ -39,14 +39,14 @@ that the directed 18-node matrix equals an undirected-edge closure.
 - B. Sparse coefficient action
 - C. Explicit forward equations
 
-## iv. References and non-claims
-
-S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
-Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11, pp. 42-43.
+## iv. References
 
 This module asserts no undirected-graph equality, transfer-function formula, passivity,
 losslessness, reciprocity, causality, bandwidth, dispersion, stability, resonance, or material
 realization.
+
+S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
+Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11, pp. 42-43.
 -/
 
 @[expose] public section
@@ -56,9 +56,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Routing certificate -/
-
+/-!
+## A. Routing certificate
+-/
 /-- The graph node identified by each physical wire in the printed forward orientation. -/
 def connectionNode : Connection → Node
   | .inputToQuarterOne => 3
@@ -276,9 +276,9 @@ lemma edge_routedN7Certificate (p : Parameters) (edge : Edge) :
         (edgeN7OutputChannel p edge) := by
   exact ⟨edgeInput_routedBoundary p edge, edgeGain_eq_n7ScatteringEntry p edge,
     edgeOutput_routedBoundary p edge⟩
-
-/-! ## B. Sparse coefficient action -/
-
+/-!
+## B. Sparse coefficient action
+-/
 /-- The sparse action of the retained edges in printed node order. -/
 def displayedAction (p : Parameters) (state : Node → ℂ) : Node → ℂ :=
   ![0,
@@ -475,9 +475,9 @@ lemma coefficientMatrix_mulVec_eq_displayedAction (p : Parameters) (state : Node
   · exact coefficientMatrix_mulVec_apply_fifteen p state
   · exact coefficientMatrix_mulVec_apply_sixteen p state
   · exact coefficientMatrix_mulVec_apply_seventeen p state
-
-/-! ## C. Explicit forward equations -/
-
+/-!
+## C. Explicit forward equations
+-/
 /-- Source-only injection at printed node one. -/
 def signalInput (amplitude : ℂ) : Node → ℂ :=
   ![amplitude, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

@@ -33,7 +33,7 @@ undirected SFG.
 - A. External N5 readouts
 - B. Directed transfer comparison
 
-## iv. Non-claims
+## iv. References
 
 The equalities are response statements only under N5 well-posedness and invertibility of the
 directed graph. No equivalence between those two gates is claimed. No passivity, losslessness,
@@ -55,9 +55,9 @@ open Physlib.SignalFlowGraph
 local instance responseBridgeExternalChannelFintype (p : Parameters) :
     Fintype (netlist p).ExternalChannel :=
   (netlist p).eliminationExternalChannelFintype
-
-/-! ## A. External N5 readouts -/
-
+/-!
+## A. External N5 readouts
+-/
 /-- External readout returns the input coupler's declared through coordinate. -/
 lemma outputReadout_apply_through (p : Parameters)
     (outgoing : ModeAmplitude (netlist p).OutgoingIndex) :
@@ -99,9 +99,9 @@ lemma responseTransform_apply_inputAmplitude_drop (p : Parameters)
           (Outgoing.mk (dropChannel p)) (Incident.mk (inputChannel p)) * amplitude := by
   simp [inputAmplitude, Matrix.toLpLin_apply]
   ring
-
-/-! ## B. Directed transfer comparison -/
-
+/-!
+## B. Directed transfer comparison
+-/
 /-- The directed through transfer equals the actual N5 input-to-through entry under both solve
 gates. -/
 lemma throughTransfer_eq_responseTransform (p : Parameters)

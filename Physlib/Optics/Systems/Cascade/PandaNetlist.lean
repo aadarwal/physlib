@@ -36,15 +36,15 @@ netlist by a hand-drawn graph.
 - C. Finite channel instances
 - D. External channels
 
-## iv. References and non-claims
-
-S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
-Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-43.
+## iv. References
 
 The paper describes four couplers and three rings. Its printed graph is compared only in later
 modules. This file asserts no source-formula identity, insertion-loss model, passivity,
 losslessness, reciprocity, causality, bandwidth, dispersion, resonance, stability, material
 realization, or electromagnetic power normalization.
+
+S. M. Beillahi, U. Siddique, and S. Tahar, "Formal Analysis of Engineering Systems Based on
+Signal-Flow-Graph Theory", NSV 2016, LNCS 10152, Definition 11 and Theorems 5-6, pp. 42-43.
 -/
 
 @[expose] public section
@@ -54,9 +54,9 @@ namespace Optics
 noncomputable section
 
 namespace Panda
-
-/-! ## A. Components and parameters -/
-
+/-!
+## A. Components and parameters
+-/
 /-- N7 component parameters for the four couplers and eight propagation sections of PANDA. -/
 structure Parameters where
   /-- Input/through directional coupler. -/
@@ -143,9 +143,9 @@ def components (p : Parameters) : ScatteringComponentFamily where
   Component := Component
   portFamily := componentPortFamily
   scattering := componentScattering p
-
-/-! ## B. Physical wiring -/
-
+/-!
+## B. Physical wiring
+-/
 /-- The fourteen wires closing the three rings while leaving four bus ports external. -/
 inductive Connection
   | inputToQuarterOne
@@ -257,9 +257,9 @@ def netlist (p : Parameters) : FlatNetlist where
   components := components p
   Connection := Connection
   connections := connections p
-
-/-! ## C. Finite channel instances -/
-
+/-!
+## C. Finite channel instances
+-/
 /-- Every local PANDA component channel family is finite. -/
 noncomputable instance localChannelFintype (component : Component) :
     Fintype (componentPortFamily component).Channel := by
@@ -346,9 +346,9 @@ noncomputable instance connectedChannelDecidableEq (p : Parameters) :
 /-- External PANDA channels are finite. -/
 noncomputable instance externalChannelFintype (p : Parameters) :
     Fintype (netlist p).ExternalChannel := Fintype.ofFinite _
-
-/-! ## D. External channels -/
-
+/-!
+## D. External channels
+-/
 /-- The aggregate channel owned by a selected component port. -/
 def componentChannel (p : Parameters) (component : Component)
     (channel : (componentPortFamily component).Channel) : (netlist p).Channel :=
