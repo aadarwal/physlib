@@ -86,26 +86,6 @@ lemma affineBoxPoint_eq_normalOffsetPoint {plane : OrientedAffineHyperplane 3}
     OrientedAffineHyperplane.normalOffsetPoint, basis_repr_symm_apply]
   ring
 
-/-- The positive selected-side point is the positive signed normal-offset point. -/
-lemma positiveSidePoint_eq_normalOffsetPoint {plane : OrientedAffineHyperplane 3}
-    (x : plane.carrier) (offset : plane.tangentSubmodule) (height : ℝ)
-    (hheight : 0 < height) :
-    (plane.sidePoint .positive x offset height hheight : Space) =
-      plane.normalOffsetPoint x offset height := by
-  ext i
-  simp [OrientedAffineHyperplane.sidePoint,
-    OrientedAffineHyperplane.normalOffsetPoint]
-
-/-- The negative selected-side point is the negative signed normal-offset point. -/
-lemma negativeSidePoint_eq_normalOffsetPoint {plane : OrientedAffineHyperplane 3}
-    (x : plane.carrier) (offset : plane.tangentSubmodule) (height : ℝ)
-    (hheight : 0 < height) :
-    (plane.sidePoint .negative x offset height hheight : Space) =
-      plane.normalOffsetPoint x offset (-height) := by
-  ext i
-  simp [OrientedAffineHyperplane.sidePoint,
-    OrientedAffineHyperplane.normalOffsetPoint]
-
 /-- The quarter-turn crossed with the normal recovers the original tangent. -/
 lemma quarterTurnTangent_cross_normalVector {plane : OrientedAffineHyperplane 3}
     (tangent : plane.tangentSubmodule) :
@@ -456,7 +436,7 @@ private lemma positiveSideFaceAverage_eq
         pillbox.quarterTurnDirection pillbox.normalDirection u v
         (pillbox.halfThickness scale))) plane.normalVector
   rw [real_inner_comm, pillbox.affineBoxPoint_eq_normalOffsetPoint,
-    positiveSidePoint_eq_normalOffsetPoint]
+    plane.positiveSidePoint_eq_normalOffsetPoint]
 
 private lemma negativeSideFaceAverage_eq
     {plane : OrientedAffineHyperplane 3} (pillbox : PlanarPillboxFamily plane)
@@ -487,7 +467,7 @@ private lemma negativeSideFaceAverage_eq
         pillbox.quarterTurnDirection pillbox.normalDirection u v
         (-(pillbox.halfThickness scale)))) plane.normalVector
   rw [real_inner_comm, pillbox.affineBoxPoint_eq_normalOffsetPoint,
-    negativeSidePoint_eq_normalOffsetPoint]
+    plane.negativeSidePoint_eq_normalOffsetPoint]
 
 private lemma lateralFaceAverage_eq_normalized_affineSplitBoxLateralFlux
     {plane : OrientedAffineHyperplane 3} (pillbox : PlanarPillboxFamily plane)

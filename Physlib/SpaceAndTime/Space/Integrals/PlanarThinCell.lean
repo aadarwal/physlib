@@ -230,6 +230,24 @@ lemma signedNormalCoordinate_sidePoint {d : ℕ}
   rw [plane.normalComponent_sideNormalVector]
   ring
 
+/-- The positive selected-side point is the positive signed normal-offset point. -/
+lemma positiveSidePoint_eq_normalOffsetPoint {d : ℕ}
+    (plane : OrientedAffineHyperplane d) (x : plane.carrier)
+    (offset : plane.tangentSubmodule) (height : ℝ) (hheight : 0 < height) :
+    (plane.sidePoint .positive x offset height hheight : Space d) =
+      plane.normalOffsetPoint x offset height := by
+  ext i
+  simp [sidePoint, normalOffsetPoint]
+
+/-- The negative selected-side point is the negative signed normal-offset point. -/
+lemma negativeSidePoint_eq_normalOffsetPoint {d : ℕ}
+    (plane : OrientedAffineHyperplane d) (x : plane.carrier)
+    (offset : plane.tangentSubmodule) (height : ℝ) (hheight : 0 < height) :
+    (plane.sidePoint .negative x offset height hheight : Space d) =
+      plane.normalOffsetPoint x offset (-height) := by
+  ext i
+  simp [sidePoint, normalOffsetPoint]
+
 /-- The oriented in-plane quarter-turn of a bundled tangent vector. -/
 def quarterTurnTangent (plane : OrientedAffineHyperplane 3)
     (tangent : plane.tangentSubmodule) : plane.tangentSubmodule :=
