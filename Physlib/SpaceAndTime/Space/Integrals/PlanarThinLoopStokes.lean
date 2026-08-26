@@ -93,21 +93,26 @@ lemma spanningSurfaceNormal
 
 /-! ## B. Ambient half-surface integrability -/
 
-/-- Outer-variable integrability of one ambient half-surface flux in a thin loop.
+/-- Both levels of integrability of one ambient half-surface flux in a thin loop.
 
-This is the exact hypothesis needed to distribute the outer integral over the negative-plus-
-positive split. -/
+These are the exact hypotheses needed to distribute sums at both levels of an iterated
+half-surface integral. -/
 def AmbientHalfSpanningIntegrable
     {plane : OrientedAffineHyperplane 3} {tangent : plane.tangentSubmodule}
     (loop : PlanarThinLoopFamily plane tangent) {P : Type*}
     (density : P → Space → EuclideanSpace ℝ (Fin 3))
     (parameter : P) (x : plane.carrier) (scale : ℕ)
     (lower upper : ℝ) : Prop :=
-  IntervalIntegrable
-    (fun u ↦ ∫ v in lower..upper,
-      inner ℝ (density parameter (plane.normalOffsetPoint x (u • tangent) v))
+  (∀ u : ℝ, IntervalIntegrable
+      (fun v ↦ inner ℝ (density parameter
+        (plane.normalOffsetPoint x (u • tangent) v))
         (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))))
-    volume (-loop.radius scale) (loop.radius scale)
+      volume lower upper) ∧
+    IntervalIntegrable
+      (fun u ↦ ∫ v in lower..upper,
+        inner ℝ (density parameter (plane.normalOffsetPoint x (u • tangent) v))
+          (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))))
+      volume (-loop.radius scale) (loop.radius scale)
 
 /-! ## C. Open-side integral bridges -/
 
@@ -387,7 +392,7 @@ lemma spanningSurfaceAverage_ofFields_eq_normalized_affineSplitIntegral
         ∫ u in -radius..radius, ∫ v in 0..thickness,
           inner ℝ (positiveDensity parameter
             (plane.normalOffsetPoint x (u • tangent) v)) normal :=
-      intervalIntegral.integral_add negativeIntegrable positiveIntegrable
+      intervalIntegral.integral_add negativeIntegrable.2 positiveIntegrable.2
     _ = _ := by
       congr 1
       · apply intervalIntegral.integral_congr
