@@ -70,6 +70,11 @@ noncomputable section
 open DelayTransfer
 open Physlib.ZTransform
 
+/-- The bridge uses the same finite external-channel instance as N5 elimination. -/
+local instance zBridgeExternalChannelFintype (p : Parameters) :
+    Fintype (netlist p).ExternalChannel :=
+  (netlist p).eliminationExternalChannelFintype
+
 /-!
 
 ## A. Reciprocal-Z compiled response
@@ -197,33 +202,34 @@ lemma zTransfer_eq_packagedScattering_entry (p : UnitDelayParameters) (z : ℂ)
 
 ## C. Original relational behavior
 
+-/
+
 /-- The selected scalar value occurs in the original singular-safe external relation. -/
 def HasSelectedRelationalResponse (p : Parameters) (value : ℂ) : Prop :=
   ∃ output : ModeAmplitude (netlist p).ExternalOutgoing,
     (inputAmplitude p 1, output) ∈ (netlist p).behavior ∧
       output (Outgoing.mk (outputChannel p)) = value
 
+/-- The selected response-transform entry has a witness in the original relation. -/
+lemma eliminationResponse_hasSelectedRelationalResponse (p : Parameters)
+    (hWellPosed : (netlist p).IsWellPosed) :
+    HasSelectedRelationalResponse p (eliminationResponse p hWellPosed) := by
+  let output := ((netlist p).responseTransform hWellPosed).toLinearMap
+    (inputAmplitude p 1)
+  refine ⟨output, ?_, ?_⟩
+  · rw [← (netlist p).toBehavior_responseTransform hWellPosed,
+      ModeTransform.mem_toBehavior_iff_toLinearMap]
+  · simpa [output] using responseTransform_apply_inputAmplitude p hWellPosed 1
+
 /-- On the solve gate, the recurrence value occurs in the original fixed-carrier relation. -/
 lemma zTransfer_hasSelectedRelationalResponse (p : UnitDelayParameters) (z : ℂ)
     (hDenominator : (p.at z⁻¹).HasNonzeroDenominator) :
     HasSelectedRelationalResponse (p.at z⁻¹) (zTransfer p z) := by
-  let fixed := p.at z⁻¹
-  let hWellPosed := isWellPosed_of_hasNonzeroDenominator fixed hDenominator
-  let output := (netlist fixed).responseTransform hWellPosed |>.toLinearMap
-    (inputAmplitude fixed 1)
-  refine ⟨output, ?_, ?_⟩
-  · exact ((netlist fixed).mem_behavior_iff_eq_responseTransform
-      hWellPosed _ _).2 rfl
-  · have hEntry := responseTransform_apply_inputAmplitude fixed hWellPosed 1
-    calc
-      output (Outgoing.mk (outputChannel fixed)) =
-          eliminationResponse fixed hWellPosed * 1 := by
-        simpa [output] using hEntry
-      _ = eliminationResponse fixed hWellPosed := by ring
-      _ = zTransfer p z :=
-        (zTransfer_eq_eliminationResponse p z hDenominator).symm
-
--/
+  let hWellPosed := isWellPosed_of_hasNonzeroDenominator (p.at z⁻¹) hDenominator
+  rcases eliminationResponse_hasSelectedRelationalResponse (p.at z⁻¹) hWellPosed with
+    ⟨output, hBehavior, hValue⟩
+  refine ⟨output, hBehavior, hValue.trans ?_⟩
+  exact (zTransfer_eq_eliminationResponse p z hDenominator).symm
 
 /-!
 

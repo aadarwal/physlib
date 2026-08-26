@@ -229,16 +229,11 @@ lemma zRegression_crossSemanticsDomain :
   isAdmissible := zRegressionParameters_isAdmissible
   recurrenceIsContractive := zRegressionParameters_isZContractive
   reducedIsSchurStable := zRegressionReducedResponse_isSchurStable
-  loopIsContractive := by
-    norm_num
-    exact zRegression_fixed_loopIsContractive
+  loopIsContractive := by simpa using zRegression_fixed_loopIsContractive
   mem_zTransferROC := zRegression_one_mem_zTransferROC
-  noPoleCancellation := by
-    norm_num
-    exact zRegression_noPoleCancellation
+  noPoleCancellation := by simpa using zRegression_noPoleCancellation
   mem_reducedEvaluationDomain := by
-    norm_num
-    exact zRegression_one_mem_reducedEvaluationDomain
+    simpa using zRegression_one_mem_reducedEvaluationDomain
 
 /-!
 
