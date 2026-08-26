@@ -210,13 +210,12 @@ lemma routingRephaseRegression_mem_componentBehavior :
   apply WithLp.ofLp_injective 2
   funext endpoint
   rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
-  rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply]
+  rw [Matrix.ofLp_toLpLin, Matrix.toLin'_apply, Matrix.mulVec, dotProduct]
   rw [← Incident.channelEquiv.symm.sum_comp]
   cases component <;> cases port <;> cases mode <;>
     simp [routingRephaseRegressionComponentOperator,
       routingRephaseRegressionIncident, routingRephaseRegressionOutgoing,
-      Matrix.mulVec, dotProduct, Fintype.sum_sigma, Fintype.sum_prod_type,
-      reuseRegression_sum_component] <;>
+      Fintype.sum_sigma, Fintype.sum_prod_type, reuseRegression_sum_component] <;>
     norm_num
 
 /-- The three forward cross-component amplitudes are nonzero and carry the exact distinct values
@@ -460,6 +459,7 @@ lemma routingRephaseRegression_hostile_not_matched :
     ¬reuseRegressionRightFamily.IsMatchedGauge routingRephaseRegressionHostileGauge := by
   intro hMatched
   have hFirst := hMatched ⟨Sum.inl (), Sum.inl ()⟩
+  change (1 : Circle) = routingRephaseRegressionI at hFirst
   have hCoe := congrArg (fun phase : Circle => (phase : ℂ)) hFirst
   norm_num [routingRephaseRegressionHostileGauge,
     routingRephaseRegressionGauge, routingRephaseRegressionI] at hCoe
