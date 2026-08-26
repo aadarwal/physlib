@@ -47,6 +47,8 @@ unit-normalized bridge at
 - `DCDR.zTransfer_eq_reducedResponse`: the response-indexed S4 reduction on its cancellation
   gates.
 - `DCDR.zTransfer_eq_circulationSeries`: the convergent coherent feedback expansion.
+- `DCDR.mem_behavior_iff_eq_masonResponseTransform`: the complete Mason output vector is the
+  original relational output.
 - `DCDR.IsZCrossSemanticsDomain`: the explicit common domain.
 - `DCDR.zCrossSemantics_agree`: agreement of causal Z, reduced and compiled rational response,
   circulation, fixed N5, complete Mason, typed scattering, and relational behavior.
@@ -132,7 +134,11 @@ lemma zTransfer_eq_reducedResponse {p : UnitDelayParameters}
 
 -/
 
-/-- The coherent DCDR circulation expansion at the reciprocal point `q = z⁻¹`. -/
+/-- The coherent DCDR circulation expansion at the reciprocal point `q = z⁻¹`.
+
+Mathlib's `tsum` makes this expression totalized outside contraction. Its response meaning is
+asserted only under the local contraction gate.
+-/
 def circulationSeries (p : UnitDelayParameters) (z : ℂ) : ℂ :=
   let fixed := p.at z⁻¹
   fixed.directGain + fixed.feedbackReadoutGain * fixed.feedbackDrive *
@@ -229,16 +235,18 @@ lemma mem_behavior_iff_eq_masonResponseTransform (p : Parameters)
 
 The response-reduction certificate is an explicit parameter. Its pointwise cancellation and
 evaluation gates, reduced Schur predicate, recurrence contraction, local circulation contraction,
-and analytic ROC membership are separate fields. Coupler unitarity is absent because none of the
-coherent DCDR response identifications uses it.
+and analytic ROC membership are separate fields. The two Schur fields are certification-only for
+the agreement below; `zCrossSemantics_agree` does not consume them. Coupler unitarity is absent
+because none of the coherent DCDR response identifications uses it.
 -/
 structure IsZCrossSemanticsDomain (p : UnitDelayParameters)
     (certificate : ResponseReduction p) (z : ℂ) : Prop where
   /-- The real path gains lie in the rational component family's algebraic validity domain. -/
   isAdmissible : p.IsAdmissible
-  /-- The recurrence coefficients satisfy the neutral strict Schur criterion. -/
+  /-- Certification-only: the recurrence coefficients satisfy the neutral strict Schur
+  criterion. -/
   recurrenceIsContractive : p.IsZContractive
-  /-- The response-indexed reduced quotient satisfies S4P's strict Schur predicate. -/
+  /-- Certification-only: the reduced quotient satisfies S4P's strict Schur predicate. -/
   reducedIsSchurStable : certificate.reduction.reduced.IsSchurStable
   /-- The evaluated coherent feedback loop has a convergent geometric circulation series. -/
   loopIsContractive : ‖(p.at z⁻¹).loopGain‖ < 1
@@ -322,7 +330,8 @@ structure ZCrossSemanticsAgreement (p : UnitDelayParameters)
 
 The applicable views are causal impulse Z, reduced response, compiled reciprocal-Z N5F,
 circulation, fixed N5, complete Mason, typed packaged scattering, and the original relation. The
-chain view is omitted for the boundary-and-pivot reason documented in the module overview.
+chain view is omitted for the boundary-and-pivot reason documented in the module overview. The
+two stored Schur fields certify stability facts but are not consumed by these equalities.
 -/
 lemma zCrossSemantics_agree (p : UnitDelayParameters)
     (certificate : ResponseReduction p) (z : ℂ)
