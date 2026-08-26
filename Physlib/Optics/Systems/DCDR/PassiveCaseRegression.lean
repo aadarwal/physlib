@@ -648,7 +648,8 @@ lemma passiveCoherentReducedResponse_zPoles :
         simp only [passiveCoherentDenominator, eval_add, eval_one, eval_mul, eval_C,
           eval_pow, eval_X]
         field_simp [hNonzero]
-        rw [← mul_pow, hMagnitudeSquare]
+        rw [Complex.I_sq, ← Complex.ofReal_pow,
+          passiveCoherentReciprocalPoleMagnitude_sq]
         norm_num
     · have hPositive : 0 < passiveCoherentReciprocalPoleMagnitude :=
         Real.sqrt_pos.2 (by norm_num)
@@ -663,7 +664,8 @@ lemma passiveCoherentReducedResponse_zPoles :
         simp only [passiveCoherentDenominator, eval_add, eval_one, eval_mul, eval_C,
           eval_pow, eval_X]
         field_simp [hNonzero]
-        rw [← mul_pow, hMagnitudeSquare]
+        rw [Complex.I_sq, ← Complex.ofReal_pow,
+          passiveCoherentReciprocalPoleMagnitude_sq]
         norm_num
 
 /-- Every coherent formal-`q` root has squared modulus `5/4`, strictly above one. -/
@@ -814,7 +816,7 @@ lemma passiveReportedNegativePole_absoluteError :
           (-passivePrintedReciprocalPoleMagnitude)| ∧
       |(-passiveReportedPoleMagnitude) -
           (-passivePrintedReciprocalPoleMagnitude)| < 5 / 10000000 := by
-  simpa only [neg_sub_neg, abs_neg] using passiveReportedPole_absoluteError
+  simpa only [neg_sub_neg, abs_sub_comm] using passiveReportedPole_absoluteError
 
 /-!
 
@@ -853,7 +855,9 @@ lemma passivePrintedTheoremFourConditions :
     have hBound : Real.sqrt (41 / 50) ≤ 1 := by
       nlinarith
     rw [Complex.sqrt_of_nonneg hNonnegative, Complex.norm_real,
-      Real.norm_eq_abs, abs_of_nonneg hSqrtNonnegative]
+      Real.norm_eq_abs]
+    change |Real.sqrt (41 / 50)| ≤ 1
+    rw [abs_of_nonneg hSqrtNonnegative]
     exact hBound
   · norm_num
 
