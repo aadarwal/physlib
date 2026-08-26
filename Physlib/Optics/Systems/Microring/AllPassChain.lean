@@ -65,7 +65,6 @@ private def backwardAmplitude (value : ℂ) : ModeAmplitude (BackwardWave Unit) 
   WithLp.toLp 2 fun _ => value
 
 /-- The packaged right-to-left pivot has the all-pass scalar entry. -/
-@[simp]
 lemma packagedTwoPortScattering_rightToLeftTransmission_entry (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :
     (packagedTwoPortScattering p hDenominator).rightToLeftTransmission
@@ -75,7 +74,6 @@ lemma packagedTwoPortScattering_rightToLeftTransmission_entry (p : Parameters)
   rfl
 
 /-- The packaged left reflection has its declared zero entry. -/
-@[simp]
 lemma packagedTwoPortScattering_leftReflection_entry (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :
     (packagedTwoPortScattering p hDenominator).leftReflection
@@ -85,7 +83,6 @@ lemma packagedTwoPortScattering_leftReflection_entry (p : Parameters)
   rfl
 
 /-- The packaged left-to-right transmission has the all-pass scalar entry. -/
-@[simp]
 lemma packagedTwoPortScattering_leftToRightTransmission_entry (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :
     (packagedTwoPortScattering p hDenominator).leftToRightTransmission
@@ -95,7 +92,6 @@ lemma packagedTwoPortScattering_leftToRightTransmission_entry (p : Parameters)
   rfl
 
 /-- The packaged right reflection has its declared zero entry. -/
-@[simp]
 lemma packagedTwoPortScattering_rightReflection_entry (p : Parameters)
     (hDenominator : p.HasNonzeroDenominator) :
     (packagedTwoPortScattering p hDenominator).rightReflection
