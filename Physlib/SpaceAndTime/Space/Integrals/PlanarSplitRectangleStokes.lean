@@ -25,6 +25,7 @@ field. Those are explicit downstream electromagnetic premises.
 - `PlanarSplitRectangleStokesRegularity`: local regularity on both closed half-rectangles.
 - `planarSplitRectangleFlux`: the oriented flux of independent vector densities over the two
   half-rectangles.
+- `planarSplitRectangleFlux_add`: additivity under explicit iterated integrability.
 - `planarSplitRectangleOuterCirculation_eq_curlFlux_add_carrierJump`: the outer circulation is
   the sum of the two bulk curl fluxes and the retained carrier jump.
 
@@ -62,6 +63,29 @@ structure PlanarSplitRectangleStokesRegularity
   positive : PlanarRectangleStokesRegularity positiveField center first second
     (-radius) 0 radius halfThickness
 
+/-- Integrability at both iterated levels of the two half-rectangle vector-density fluxes. -/
+structure PlanarSplitRectangleFluxIntegrable
+    (negativeDensity positiveDensity : Space → EuclideanSpace ℝ (Fin 3))
+    (center first second : Space) (radius halfThickness : ℝ) : Prop where
+  /-- Inner-coordinate integrability on every negative-side slice. -/
+  negativeInner : ∀ u : ℝ, IntervalIntegrable
+    (fun v ↦ inner ℝ (negativeDensity (planarRectanglePoint center first second u v))
+      (basis.repr second ⨯ₑ₃ basis.repr first)) volume (-halfThickness) 0
+  /-- Inner-coordinate integrability on every positive-side slice. -/
+  positiveInner : ∀ u : ℝ, IntervalIntegrable
+    (fun v ↦ inner ℝ (positiveDensity (planarRectanglePoint center first second u v))
+      (basis.repr second ⨯ₑ₃ basis.repr first)) volume 0 halfThickness
+  /-- Outer-coordinate integrability of the negative half-surface integral. -/
+  negativeOuter : IntervalIntegrable
+    (fun u ↦ ∫ v in -halfThickness..0,
+      inner ℝ (negativeDensity (planarRectanglePoint center first second u v))
+        (basis.repr second ⨯ₑ₃ basis.repr first)) volume (-radius) radius
+  /-- Outer-coordinate integrability of the positive half-surface integral. -/
+  positiveOuter : IntervalIntegrable
+    (fun u ↦ ∫ v in 0..halfThickness,
+      inner ℝ (positiveDensity (planarRectanglePoint center first second u v))
+        (basis.repr second ⨯ₑ₃ basis.repr first)) volume (-radius) radius
+
 /-- The sum of the two oriented vector-density flux integrals on a split rectangle. -/
 def planarSplitRectangleFlux
     (negativeDensity positiveDensity : Space → EuclideanSpace ℝ (Fin 3))
@@ -72,6 +96,34 @@ def planarSplitRectangleFlux
     ∫ u in -radius..radius, ∫ v in 0..halfThickness,
       inner ℝ (positiveDensity (planarRectanglePoint center first second u v))
         (basis.repr second ⨯ₑ₃ basis.repr first)
+
+/-- The split-rectangle flux of pointwise sums is the sum of the two split-rectangle fluxes when
+all four iterated half-surface integrals are explicit. -/
+lemma planarSplitRectangleFlux_add
+    (negativeFirst positiveFirst negativeSecond positiveSecond :
+      Space → EuclideanSpace ℝ (Fin 3))
+    (center first second : Space) (radius halfThickness : ℝ)
+    (firstIntegrable : PlanarSplitRectangleFluxIntegrable negativeFirst positiveFirst
+      center first second radius halfThickness)
+    (secondIntegrable : PlanarSplitRectangleFluxIntegrable negativeSecond positiveSecond
+      center first second radius halfThickness) :
+    planarSplitRectangleFlux (negativeFirst + negativeSecond) (positiveFirst + positiveSecond)
+        center first second radius halfThickness =
+      planarSplitRectangleFlux negativeFirst positiveFirst center first second radius
+          halfThickness +
+        planarSplitRectangleFlux negativeSecond positiveSecond center first second radius
+          halfThickness := by
+  unfold planarSplitRectangleFlux
+  simp_rw [Pi.add_apply, inner_add_left]
+  simp_rw [intervalIntegral.integral_add (firstIntegrable.negativeInner _)
+    (secondIntegrable.negativeInner _)]
+  simp_rw [intervalIntegral.integral_add (firstIntegrable.positiveInner _)
+    (secondIntegrable.positiveInner _)]
+  rw [intervalIntegral.integral_add firstIntegrable.negativeOuter
+      secondIntegrable.negativeOuter,
+    intervalIntegral.integral_add firstIntegrable.positiveOuter
+      secondIntegrable.positiveOuter]
+  ring
 
 /-- The sum of the two oriented curl-flux integrals on the split rectangle. -/
 def planarSplitRectangleCurlFlux

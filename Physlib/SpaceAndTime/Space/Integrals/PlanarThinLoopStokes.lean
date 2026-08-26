@@ -114,6 +114,48 @@ def AmbientHalfSpanningIntegrable
           (plane.normalVector ⨯ₑ₃ (tangent : EuclideanSpace ℝ (Fin 3))))
       volume (-loop.radius scale) (loop.radius scale)
 
+/-- Ambient half-surface integrability transports to the affine split-rectangle coordinates of
+the thin loop. -/
+lemma planarSplitRectangleFluxIntegrable
+    {plane : OrientedAffineHyperplane 3} {tangent : plane.tangentSubmodule}
+    (loop : PlanarThinLoopFamily plane tangent) {P : Type*}
+    (negativeDensity positiveDensity : P → Space → EuclideanSpace ℝ (Fin 3))
+    (parameter : P) (x : plane.carrier) (scale : ℕ)
+    (negativeIntegrable : AmbientHalfSpanningIntegrable loop negativeDensity parameter x scale
+      (-(loop.halfThickness scale)) 0)
+    (positiveIntegrable : AmbientHalfSpanningIntegrable loop positiveDensity parameter x scale
+      0 (loop.halfThickness scale)) :
+    PlanarSplitRectangleFluxIntegrable (negativeDensity parameter)
+      (positiveDensity parameter) (x : Space) loop.tangentDirection loop.normalDirection
+      (loop.radius scale) (loop.halfThickness scale) := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · intro u
+    apply (negativeIntegrable.1 u).congr
+    intro v _
+    dsimp only
+    rw [loop.planarRectanglePoint_eq_normalOffsetPoint]
+    rfl
+  · intro u
+    apply (positiveIntegrable.1 u).congr
+    intro v _
+    dsimp only
+    rw [loop.planarRectanglePoint_eq_normalOffsetPoint]
+    rfl
+  · apply negativeIntegrable.2.congr
+    intro u _
+    apply intervalIntegral.integral_congr
+    intro v _
+    dsimp only
+    rw [loop.planarRectanglePoint_eq_normalOffsetPoint]
+    rfl
+  · apply positiveIntegrable.2.congr
+    intro u _
+    apply intervalIntegral.integral_congr
+    intro v _
+    dsimp only
+    rw [loop.planarRectanglePoint_eq_normalOffsetPoint]
+    rfl
+
 /-! ## C. Open-side integral bridges -/
 
 private lemma negativeSideSample_integral_eq_ambient
