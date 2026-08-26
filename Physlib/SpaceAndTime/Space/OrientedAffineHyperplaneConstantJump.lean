@@ -28,6 +28,8 @@ variable side functions, supply one-sided traces, or assume a physical interface
   transported to `Space`.
 - `Space.distDeriv_coordinateHeavisideDistribution`: its coordinate derivative is the transported
   coordinate-hyperplane delta.
+- `Space.coordinateHyperplaneSheet_eq_pushforward_const`: the constant sheet agrees with the
+  transported generic hyperplane pushforward.
 - `OrientedAffineHyperplane.distOfSidewiseFunction_coordinatePositiveConstant`: the independent
   sidewise realization of a constant positive-side field.
 - `OrientedAffineHyperplane.distDeriv_coordinatePositiveConstant`: its exact sheet derivative.
@@ -83,13 +85,17 @@ lemma coordinateHeavisideDistribution_apply (d : ℕ) (i : Fin d.succ)
   simpa [coordinateHeavisideDistribution,
     Physlib.Distribution.coordinateHeavisideStep_apply, s] using h.symm
 
-/-- The transported coordinate-hyperplane delta evaluates the pulled-back spatial test. -/
+/-- The transported coordinate-hyperplane delta integrates a spatial test over the standard
+coordinate parameterization of the selected hyperplane. -/
 @[simp]
 lemma coordinateHyperplaneDeltaDistribution_apply (d : ℕ) (i : Fin d.succ)
     (η : SchwartzMap (Space d.succ) ℝ) :
     coordinateHyperplaneDeltaDistribution d i η =
-      Physlib.Distribution.coordinateHyperplaneDelta d i
-        (basisCoordinateSchwartz d.succ η) :=
+      ∫ x : EuclideanSpace ℝ (Fin d),
+        η (Space.basis.repr.symm
+          (Physlib.Distribution.coordinateHyperplaneEmbedding d i x)) := by
+  rw [coordinateHyperplaneDeltaDistribution, distributionOfEuclideanCoordinates_apply,
+    Physlib.Distribution.coordinateHyperplaneDelta_apply]
   rfl
 
 /-- A standard spatial basis vector has the selected Euclidean coordinate representation. -/
@@ -124,16 +130,42 @@ def coordinateHyperplaneSheet {F : Type} [NormedAddCommGroup F] [NormedSpace ℝ
     (d : ℕ) (i : Fin d.succ) (c : F) : (Space d.succ) →d[ℝ] F :=
   (coordinateHyperplaneDeltaDistribution d i).smulRight c
 
+/-- A constant-coefficient spatial sheet is the coordinate transport of the generic pushforward
+of the constant tangential distribution. This connects the constant-jump construction to the
+surface-density API used by later nonconstant sheets. -/
+lemma coordinateHyperplaneSheet_eq_pushforward_const {F : Type}
+    [NormedAddCommGroup F] [NormedSpace ℝ F] [CompleteSpace F]
+    (d : ℕ) (i : Fin d.succ) (c : F) :
+    coordinateHyperplaneSheet d i c =
+      distributionOfEuclideanCoordinates d.succ
+        (Physlib.Distribution.coordinateHyperplanePushforward d i
+          (Physlib.Distribution.const ℝ (EuclideanSpace ℝ (Fin d)) c)) := by
+  ext η
+  rw [coordinateHyperplaneSheet, ContinuousLinearMap.smulRight_apply,
+    coordinateHyperplaneDeltaDistribution_apply,
+    distributionOfEuclideanCoordinates_apply,
+    Physlib.Distribution.coordinateHyperplanePushforward_apply,
+    Physlib.Distribution.const_apply, ← integral_smul_const]
+  simp only [Physlib.Distribution.coordinateHyperplaneRestriction_apply,
+    basisCoordinateSchwartz_apply]
+
 /-- Differentiating the `F`-valued positive-coordinate constant distribution gives the selected
 hyperplane sheet with coefficient `c`. -/
 lemma distDeriv_coordinatePositiveConstantDistribution {F : Type}
     [NormedAddCommGroup F] [NormedSpace ℝ F] (d : ℕ) (i : Fin d.succ) (c : F) :
     distDeriv i (coordinatePositiveConstantDistribution d i c) =
       coordinateHyperplaneSheet d i c := by
-  ext η
-  rw [coordinatePositiveConstantDistribution, distDeriv_smulRight_apply,
-    distDeriv_coordinateHeavisideDistribution]
-  rfl
+  calc
+    _ = (distDeriv i (coordinateHeavisideDistribution d i)).smulRight c := by
+      ext η
+      rw [coordinatePositiveConstantDistribution, distDeriv_apply,
+        Physlib.Distribution.fderivD_apply]
+      simp only [ContinuousLinearMap.smulRight_apply]
+      rw [distDeriv_apply, Physlib.Distribution.fderivD_apply]
+      simp
+    _ = _ := by
+      rw [distDeriv_coordinateHeavisideDistribution]
+      rfl
 
 /-!
 ## B. Constant sidewise jump

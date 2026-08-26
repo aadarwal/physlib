@@ -79,50 +79,60 @@ private lemma constantJumpRegression_oneEquiv_symm_one :
   fin_cases i
   simp [constantJumpRegressionIndex, Space.oneEquiv_symm_apply]
 
-/-- Direct change of variables and one-dimensional FTC give the raw positive-half-space normal
-derivative integral. -/
-private lemma constantJumpRegression_raw_halfSpaceDerivative :
+/-- The coordinate isometry sends the positive spatial half-space integral to the real
+positive half-line. -/
+private lemma constantJumpRegression_halfSpace_changeOfVariables :
     ∫ x in {x : Space 1 | 0 < x constantJumpRegressionIndex},
         fderiv ℝ constantJumpRegressionGaussian x
-          (Space.basis constantJumpRegressionIndex) = -1 := by
+          (Space.basis constantJumpRegressionIndex) =
+      ∫ r in Set.Ioi (0 : ℝ),
+        fderiv ℝ constantJumpRegressionGaussian (Space.oneEquiv.symm r)
+          (Space.basis constantJumpRegressionIndex) := by
   let e : ℝ ≃ₗᵢ[ℝ] Space 1 := Space.oneEquiv.symm
   have hePreimage :
       e ⁻¹' {x : Space 1 | 0 < x constantJumpRegressionIndex} = Set.Ioi (0 : ℝ) := by
     ext r
     change 0 < Space.oneEquiv.symm r constantJumpRegressionIndex ↔ 0 < r
     simp [Space.oneEquiv_symm_apply]
-  have hChange :
-      (∫ x in {x : Space 1 | 0 < x constantJumpRegressionIndex},
-          fderiv ℝ constantJumpRegressionGaussian x
-            (Space.basis constantJumpRegressionIndex)) =
-        ∫ r in Set.Ioi (0 : ℝ),
-          fderiv ℝ constantJumpRegressionGaussian (e r)
-            (Space.basis constantJumpRegressionIndex) := by
-    have h := e.measurePreserving.setIntegral_preimage_emb
-      e.toHomeomorph.measurableEmbedding
-      (fun x => fderiv ℝ constantJumpRegressionGaussian x
-        (Space.basis constantJumpRegressionIndex))
-      {x : Space 1 | 0 < x constantJumpRegressionIndex}
-    simpa only [hePreimage] using h.symm
-  rw [hChange]
+  have h := e.measurePreserving.setIntegral_preimage_emb
+    e.toHomeomorph.measurableEmbedding
+    (fun x => fderiv ℝ constantJumpRegressionGaussian x
+      (Space.basis constantJumpRegressionIndex))
+    {x : Space 1 | 0 < x constantJumpRegressionIndex}
+  simpa only [hePreimage] using h.symm
+
+/-- The pulled-back spatial normal derivative is the ordinary derivative of the line fixture. -/
+private lemma constantJumpRegression_normalDerivative_eq_lineDeriv (r : ℝ) :
+    fderiv ℝ constantJumpRegressionGaussian (Space.oneEquiv.symm r)
+        (Space.basis constantJumpRegressionIndex) =
+      _root_.deriv constantJumpRegressionLine r := by
+  change fderiv ℝ constantJumpRegressionGaussian (Space.oneEquiv.symm r)
+      (Space.basis constantJumpRegressionIndex) =
+    _root_.deriv (fun t => constantJumpRegressionGaussian (Space.oneEquiv.symm t)) r
+  rw [← fderiv_apply_one_eq_deriv]
+  conv_rhs =>
+    rw [fderiv_fun_comp _ constantJumpRegressionGaussian.differentiableAt (by fun_prop)]
+  simp only [ContinuousLinearMap.comp_apply]
+  have heFderiv :
+      fderiv ℝ (Space.oneEquiv.symm : ℝ → Space 1) r 1 =
+        Space.basis constantJumpRegressionIndex := by
+    change fderiv ℝ Space.oneEquiv.symm.toContinuousLinearMap r 1 = _
+    rw [ContinuousLinearMap.fderiv]
+    exact constantJumpRegression_oneEquiv_symm_one
+  rw [heFderiv]
+
+/-- Direct change of variables and one-dimensional FTC give the raw positive-half-space normal
+derivative integral. -/
+private lemma constantJumpRegression_raw_halfSpaceDerivative :
+    ∫ x in {x : Space 1 | 0 < x constantJumpRegressionIndex},
+        fderiv ℝ constantJumpRegressionGaussian x
+          (Space.basis constantJumpRegressionIndex) = -1 := by
+  rw [constantJumpRegression_halfSpace_changeOfVariables]
   calc
     _ = ∫ r in Set.Ioi (0 : ℝ), _root_.deriv constantJumpRegressionLine r := by
       congr 1
       funext r
-      change fderiv ℝ constantJumpRegressionGaussian (Space.oneEquiv.symm r)
-          (Space.basis constantJumpRegressionIndex) =
-        _root_.deriv (fun t => constantJumpRegressionGaussian (Space.oneEquiv.symm t)) r
-      rw [← fderiv_apply_one_eq_deriv]
-      conv_rhs =>
-        rw [fderiv_fun_comp _ constantJumpRegressionGaussian.differentiableAt (by fun_prop)]
-      simp only [ContinuousLinearMap.comp_apply]
-      have heFderiv :
-          fderiv ℝ (Space.oneEquiv.symm : ℝ → Space 1) r 1 =
-            Space.basis constantJumpRegressionIndex := by
-        change fderiv ℝ Space.oneEquiv.symm.toContinuousLinearMap r 1 = _
-        rw [ContinuousLinearMap.fderiv]
-        exact constantJumpRegression_oneEquiv_symm_one
-      rw [heFderiv]
+      exact constantJumpRegression_normalDerivative_eq_lineDeriv r
     _ = -constantJumpRegressionLine 0 := by
       rw [MeasureTheory.integral_Ioi_of_hasDerivAt_of_tendsto
         (f := fun r => constantJumpRegressionLine r) (m := 0)]
