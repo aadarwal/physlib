@@ -339,23 +339,12 @@ lemma rephasedResponseTransform_eq
         (netlist.connections.externalGauge gauge).outgoing := by
   classical
   unfold rephasedResponseTransform
-  apply ModeTransform.toBehavior_injective
-  calc
-    ((netlist.rephasedBehavior gauge).toModeTransform
-          (netlist.rephasedBehavior_isFunctional gauge hMatched hWellPosed)).toBehavior =
-        netlist.rephasedBehavior gauge :=
-      LinearBehavior.toBehavior_toModeTransform _ _
-    _ = netlist.behavior.rephase
-        (netlist.connections.externalGauge gauge).incident
-        (netlist.connections.externalGauge gauge).outgoing :=
-      netlist.rephasedBehavior_eq gauge hMatched
-    _ = ((netlist.responseTransform hWellPosed).rephase
-          (netlist.connections.externalGauge gauge).incident
-          (netlist.connections.externalGauge gauge).outgoing).toBehavior := by
-      rw [ModeTransform.toBehavior_rephase]
-      have hResponse := netlist.toBehavior_responseTransform hWellPosed
-      cases hResponse
-      rfl
+  apply LinearBehavior.toModeTransform_unique
+  rw [ModeTransform.toBehavior_rephase,
+    netlist.rephasedBehavior_eq gauge hMatched]
+  ext ⟨input, output⟩
+  simp only [LinearBehavior.mem_rephase_iff]
+  rw [netlist.toBehavior_responseTransform]
 
 end FlatNetlist
 
@@ -460,9 +449,10 @@ lemma closeBehavior_append_rephase_eq_staged
           (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm).rephase
         ((inner.append outer).externalGauge gauge).incident
         ((inner.append outer).externalGauge gauge).outgoing := by
-  rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched,
-    inner.closeBehavior_append outer behavior]
-  rfl
+  rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
+  ext ⟨input, output⟩
+  simp only [LinearBehavior.mem_rephase_iff]
+  rw [inner.closeBehavior_append outer behavior]
 
 end Finite
 
