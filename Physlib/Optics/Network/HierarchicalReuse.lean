@@ -163,8 +163,16 @@ def replacementExternalChannelEquiv
 
 variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
 variable [Fintype inner.ExternalChannel] [Fintype replacement.ExternalChannel]
-variable [Fintype inner.externalPortModeFamily.Channel]
-variable [Fintype replacement.externalPortModeFamily.Channel]
+
+/-- The first inner boundary inherits the external-channel enumeration. -/
+local instance replacementSourceBoundaryChannelFintype :
+    Fintype inner.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ inner.boundaryChannelEquiv.symm
+
+/-- The replacement boundary inherits its external-channel enumeration. -/
+local instance replacementTargetBoundaryChannelFintype :
+    Fintype replacement.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ replacement.boundaryChannelEquiv.symm
 
 /-- Equivalent transported closure relations induce equivalent behaviors on the dependent
 boundaries exposed to the next hierarchy stage. -/
