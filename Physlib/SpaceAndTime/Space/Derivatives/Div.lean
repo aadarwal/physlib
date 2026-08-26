@@ -5,6 +5,7 @@ Authors: Zhi Kai Pong, Joseph Tooby-Smith, Lode Vermeulen
 -/
 module
 
+public import Mathlib.Analysis.InnerProductSpace.Trace
 public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 public import Physlib.SpaceAndTime.Space.DistOfFunction
 /-!
@@ -20,6 +21,8 @@ properties about it.
 ## ii. Key results
 
 - `div` : The divergence operator on functions from `Space d` to `EuclideanSpace ℝ (Fin d)`.
+- `div_eq_sum_inner_fderiv_orthonormalBasis` : divergence is the sum of directional
+  derivatives paired with any orthonormal basis.
 - `distDiv` : The divergence operator on distributions from `Space d` to `EuclideanSpace ℝ (Fin d)`.
 - `distDiv_ofFunction` : The divergence of a distribution from a bounded function.
 
@@ -31,6 +34,7 @@ properties about it.
   - A.3. The divergence distributes over addition
   - A.4. The divergence distributes over scalar multiplication
   - A.5. The divergence of a linear map is a linear map
+  - A.6. Divergence in an orthonormal frame
 - B. Divergence of distributions
   - B.1. Basic equalities
   - B.2. Divergence on distributions from bounded functions
@@ -163,6 +167,44 @@ lemma div_linear_map (f : W → Space 3 → EuclideanSpace ℝ (Fin 3))
     rw [hf'.map_smul]
     rw [div_smul]
     fun_prop
+
+/-!
+
+### A.6. Divergence in an orthonormal frame
+
+-/
+
+/-- Divergence is the trace of the spatial derivative, hence it can be computed in any
+orthonormal basis. -/
+lemma div_eq_sum_inner_fderiv_orthonormalBasis {d : ℕ}
+    (f : Space d → EuclideanSpace ℝ (Fin d)) (x : Space d)
+    (hf : DifferentiableAt ℝ f x) (frame : OrthonormalBasis (Fin d) ℝ (Space d)) :
+    (∇ ⬝ f) x =
+      ∑ i, inner ℝ (fderiv ℝ f x (frame i)) (basis.repr (frame i)) := by
+  let derivative : Space d →ₗ[ℝ] Space d :=
+    basis.repr.symm.toLinearMap.comp (fderiv ℝ f x).toLinearMap
+  have hPairing (direction : Space d) :
+      inner ℝ (fderiv ℝ f x direction) (basis.repr direction) =
+        inner ℝ direction (derivative direction) := by
+    rw [real_inner_comm, basis_repr_inner_eq]
+    rfl
+  have hCoordinate (i : Fin d) :
+      ∂[i] (fun y ↦ (f y) i) x =
+        inner ℝ (fderiv ℝ f x (basis i)) (basis.repr (basis i)) := by
+    rw [deriv_eq_fderiv_basis]
+    rw [show (fun y ↦ (f y) i) =
+        fun y ↦ inner ℝ (f y) (EuclideanSpace.single i 1) by
+      funext y
+      simp [EuclideanSpace.inner_single_right]]
+    rw [fderiv_inner_apply (𝕜 := ℝ) hf
+      (differentiableAt_const (EuclideanSpace.single i 1))]
+    simp
+  have hStandard := LinearMap.trace_eq_sum_inner
+    derivative (basis (d := d))
+  have hFrame := LinearMap.trace_eq_sum_inner derivative frame
+  rw [div]
+  simp_rw [hCoordinate, hPairing]
+  rw [← hStandard, hFrame]
 
 /-!
 

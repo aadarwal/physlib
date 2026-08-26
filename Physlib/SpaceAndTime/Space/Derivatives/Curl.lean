@@ -32,6 +32,8 @@ We also prove some basic vector-identities involving of the curl operator.
 - `distCurl_distGrad_eq_zero` : The curl of the gradient of a distribution is zero.
 - `curl_eq_sum_leviCivitaSymbol` : The components of the curl as a contraction with the
   Levi-Civita symbol.
+- `inner_curl_cross_eq` : the curl paired with a cross product equals an antisymmetrized pair of
+  directional derivatives.
 
 ## iii. Table of contents
 
@@ -48,6 +50,7 @@ We also prove some basic vector-identities involving of the curl operator.
   - A.10. A divergence-free field is a curl
   - A.11. A curl-free field is a gradient
   - A.12. The curl in terms of the Levi-Civita symbol
+  - A.13. Curl paired with an oriented two-frame
 - B. The curl on distributions
   - B.1. The components of the curl
   - B.2. Basic equalities
@@ -718,6 +721,35 @@ lemma curl_eq_sum_leviCivitaSymbol (f : Space → EuclideanSpace ℝ (Fin 3))
       Matrix.tail_cons] <;>
     norm_num <;>
     ring
+
+/-!
+
+### A.13. Curl paired with an oriented two-frame
+
+-/
+
+/-- Pairing curl with `first × second` is the antisymmetric part of the spatial derivative in
+those two directions. This identity fixes the orientation used by rectangular Stokes formulas. -/
+lemma inner_curl_cross_eq (f : Space → EuclideanSpace ℝ (Fin 3)) (x : Space)
+    (first second : Space) (hf : DifferentiableAt ℝ f x) :
+    inner ℝ ((∇ ⨯ f) x) (basis.repr first ⨯ₑ₃ basis.repr second) =
+      inner ℝ (fderiv ℝ f x first) (basis.repr second) -
+        inner ℝ (fderiv ℝ f x second) (basis.repr first) := by
+  have hCoordinate (i j : Fin 3) :
+      ∂[i] (fun y ↦ f y j) x = ∂[i] f x j := by
+    rw [deriv_eq_fderiv_basis, deriv_eq_fderiv_basis]
+    change fderiv ℝ (EuclideanSpace.proj j ∘ f) x (basis i) = _
+    rw [fderiv_comp x (EuclideanSpace.proj j).differentiableAt hf]
+    simp [-EuclideanSpace.coe_proj, ← deriv_eq_fderiv_basis]
+  rw [fderiv_eq_sum_deriv f x first, fderiv_eq_sum_deriv f x second]
+  simp only [curl, PiLp.inner_apply, RCLike.inner_apply, conj_trivial,
+    crossProduct, WithLp.equiv_apply, WithLp.equiv_symm_apply,
+    LinearMap.mk₂_apply, Fin.sum_univ_three, Fin.isValue, Fin.reduceAdd,
+    Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val_two,
+    Matrix.head_cons, Matrix.tail_cons, basis_repr_apply, PiLp.add_apply,
+    PiLp.smul_apply, smul_eq_mul]
+  simp_rw [hCoordinate]
+  ring
 
 /-!
 
