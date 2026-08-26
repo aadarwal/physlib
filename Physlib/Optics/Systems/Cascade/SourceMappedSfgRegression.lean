@@ -45,6 +45,8 @@ namespace Optics
 
 noncomputable section
 
+open scoped ComplexOrder
+
 namespace MicroringCascade
 
 open MicroringSourceBridge
@@ -59,8 +61,11 @@ lemma sourceMappedSfgRegression_sqrt_quarter :
     norm_num
   have hNonnegative : (0 : ℂ) ≤ 1 / 4 := by
     norm_num [Complex.nonneg_iff]
-  rw [Complex.sqrt_of_nonneg hNonnegative, hRealSqrt]
-  norm_num
+  calc
+    Complex.sqrt (1 / 4) = (Real.sqrt (1 / 4 : ℝ) : ℂ) := by
+      rw [Complex.sqrt_of_nonneg hNonnegative]
+      norm_num
+    _ = 1 / 2 := by rw [hRealSqrt]; norm_num
 
 /-- The principal complex square root of the negative quarter is the positive imaginary half. -/
 lemma sourceMappedSfgRegression_sqrt_neg_quarter :

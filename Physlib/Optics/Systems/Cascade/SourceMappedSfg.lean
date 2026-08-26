@@ -84,15 +84,10 @@ lemma sfgAddDropStageTransfers_eq_dropTransfers (stages : List AddDrop.Parameter
     (hSqrt : ∀ p ∈ stages,
       Complex.sqrt p.roundTripCoefficient = p.firstArcCoefficient) :
     sfgAddDropStageTransfers stages = stages.map AddDrop.dropTransfer := by
-  induction stages with
-  | nil => rfl
-  | cons p stages inductionHypothesis =>
-      rw [sfgAddDropStageTransfers, List.map_cons, List.map_cons,
-        sfgAddDropStageTransfer_eq_dropTransfer p (hSqrt p (by simp))]
-      change sfgAddDropStageTransfers stages = stages.map AddDrop.dropTransfer
-      apply inductionHypothesis
-      intro q hq
-      exact hSqrt q (by simp [hq])
+  unfold sfgAddDropStageTransfers
+  apply List.map_congr_left
+  intro p hp
+  exact sfgAddDropStageTransfer_eq_dropTransfer p (hSqrt p hp)
 
 end MicroringCascade
 
