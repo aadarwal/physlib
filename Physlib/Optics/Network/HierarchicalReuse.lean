@@ -162,7 +162,17 @@ def replacementExternalChannelEquiv
       (replacement.appendExternalChannelEquiv (outer.transport boundary)).symm)
 
 variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype replacement.Channel]
-variable [Fintype inner.ExternalChannel] [Fintype replacement.ExternalChannel]
+
+/-- The source external channels use their canonical finite subtype enumeration. -/
+local instance replacementSourceExternalChannelFintype : Fintype inner.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The replacement external channels use their canonical finite subtype enumeration. -/
+local instance replacementTargetExternalChannelFintype :
+    Fintype replacement.ExternalChannel := by
+  classical
+  infer_instance
 
 /-- The first inner boundary inherits the external-channel enumeration. -/
 local instance replacementSourceBoundaryChannelFintype :
@@ -240,10 +250,29 @@ lemma innerBoundaryBehavior_eq_of_boundaryRelation
 
 variable (outer : PortConnectionFamily inner.externalPortModeFamily middleIndex)
 variable [Fintype outer.Channel] [Fintype (outer.transport boundary).Channel]
-variable [Fintype outer.ExternalChannel]
-variable [Fintype (outer.transport boundary).ExternalChannel]
-variable [Fintype (inner.append outer).ExternalChannel]
-variable [Fintype (replacement.append (outer.transport boundary)).ExternalChannel]
+
+/-- The source outer boundary uses its canonical finite subtype enumeration. -/
+local instance replacementSourceOuterExternalChannelFintype : Fintype outer.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The transported outer boundary uses its canonical finite subtype enumeration. -/
+local instance replacementTargetOuterExternalChannelFintype :
+    Fintype (outer.transport boundary).ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The source appended boundary uses its canonical finite subtype enumeration. -/
+local instance replacementSourceAppendExternalChannelFintype :
+    Fintype (inner.append outer).ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The target appended boundary uses its canonical finite subtype enumeration. -/
+local instance replacementTargetAppendExternalChannelFintype :
+    Fintype (replacement.append (outer.transport boundary)).ExternalChannel := by
+  classical
+  infer_instance
 
 /-- The left flattened connected channels inherit the two finite stage enumerations. -/
 local instance replacementSourceAppendChannelFintype :
