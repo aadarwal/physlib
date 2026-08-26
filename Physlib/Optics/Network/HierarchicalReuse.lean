@@ -376,15 +376,26 @@ lemma replaceInnerFamily
   rw [replacement.closeBehavior_append (outer.transport boundary),
     inner.closeBehavior_append outer,
     inner.innerBoundaryBehavior_eq_of_boundaryRelation replacement boundary behavior hBoundary]
-  refine Eq.trans ?_ ?_
-  · exact congrArg
-      (fun relation => relation.reindex
+  calc
+    _ = ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          (Incident.relabelEquiv (outer.transportExternalChannelEquiv boundary))
+          (Outgoing.relabelEquiv
+            (outer.transportExternalChannelEquiv boundary))).reindex
         (Incident.relabelEquiv
           (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm
         (Outgoing.relabelEquiv
-          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm)
-      (outer.closeBehavior_transport boundary (inner.innerBoundaryBehavior behavior))
-  · exact replacementExternal_reindex
+          (replacement.appendExternalChannelEquiv (outer.transport boundary))).symm := by
+            exact congrArg
+              (fun relation => relation.reindex
+                (Incident.relabelEquiv
+                  (replacement.appendExternalChannelEquiv
+                    (outer.transport boundary))).symm
+                (Outgoing.relabelEquiv
+                  (replacement.appendExternalChannelEquiv
+                    (outer.transport boundary))).symm)
+              (outer.closeBehavior_transport boundary
+                (inner.innerBoundaryBehavior behavior))
+    _ = _ := replacementExternal_reindex
       (inner := inner) (replacement := replacement)
       (boundary := boundary) (outer := outer)
       (outer.closeBehavior (inner.innerBoundaryBehavior behavior))
