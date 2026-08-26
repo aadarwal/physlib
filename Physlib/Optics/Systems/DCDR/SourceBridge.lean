@@ -31,6 +31,10 @@ amplitudes `sqrt (1-k)` and `sqrt k`, with N7 cross coefficient `-I * sqrt k`. T
 amplitudes recover the printed intensities on the stated coupling domain, but no transfer,
 denominator, pole, or stability equivalence between these two models is asserted.
 
+`passiveCaseSourceParameters` records FMICS'15 p. 175's passive point exactly, replacing the
+printed decimals by rational data only. `passiveCaseUnitDelayParameters` is its coherent N7 image
+through the same dictionary; it does not identify the coherent and printed incoherent responses.
+
 ## ii. Key definitions and results
 
 - `DCDR.UnitDelayParameters.loopCoefficient`: the coherent quadratic loop coefficient.
@@ -41,6 +45,8 @@ denominator, pole, or stability equivalence between these two models is asserted
 - `DCDRSourceBridge.SourceParameters.printedDenominatorPolynomial`: the printed incoherent data.
 - `DCDRSourceBridge.SourceParameters.printedDenominatorPolynomial_eq_coefficients`: its
   coefficient-list presentation through degree two.
+- `DCDRSourceBridge.passiveCaseSourceParameters`: FMICS'15 p. 175's exact passive symbols.
+- `DCDRSourceBridge.passiveCaseUnitDelayParameters`: their coherent N7 dictionary image.
 
 ## iii. Table of contents
 
@@ -48,11 +54,12 @@ denominator, pole, or stability equivalence between these two models is asserted
 - B. Printed incoherent stability audit predicate
 - C. FMICS'15 unit-delay source dictionary
 - D. Printed incoherent coefficient data
+- E. FMICS'15 passive case data
 
 ## iv. References and non-claims
 
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
-Processing Systems”, FMICS 2015, LNCS 9128, Theorems 1--4, pp. 170--174.
+Processing Systems”, FMICS 2015, LNCS 9128, Theorems 1--4, pp. 170--175.
 
 The source's Theorem 1 is definitional in Physlib: `RationalModel.eval_eq` and
 `ReducedRationalResponse.eval` are the numerator-over-denominator quotient. No duplicate theorem
@@ -369,6 +376,29 @@ lemma SourceParameters.finite_zPoles_and_ncard_le_two
   apply response.finite_zPoles_and_ncard_le_of_denominator_eq_coefficients 2
     p.printedDenominatorCoefficients p.printedDenominatorCoefficients_nonzero
   exact hDenominator.trans p.printedDenominatorPolynomial_eq_coefficients
+
+/-!
+
+## E. FMICS'15 passive case data
+
+-/
+
+/-- FMICS'15 p. 175's passive source point, with both printed decimal couplings stored exactly as
+the rational number `9/10`.
+-/
+def passiveCaseSourceParameters : SourceParameters where
+  G1 := 1
+  G2 := 1
+  G3 := 1
+  k1 := 9 / 10
+  k2 := 9 / 10
+
+/-- The coherent N7 image of FMICS'15 p. 175's passive source point.
+
+This is a dictionary image, not an equality with the printed incoherent response.
+-/
+def passiveCaseUnitDelayParameters : DCDR.UnitDelayParameters :=
+  passiveCaseSourceParameters.toUnitDelayParameters
 
 end DCDRSourceBridge
 
