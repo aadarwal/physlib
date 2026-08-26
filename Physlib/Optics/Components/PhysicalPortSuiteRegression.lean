@@ -298,11 +298,24 @@ lemma physicalPortSuite9a_sum_indexed
     · cases port
       cases mode
       simp
+  have hFirst :
+      physicalPortSuite9aBeamFirstIndexed ∉
+        ({physicalPortSuite9aBeamSecondIndexed,
+          physicalPortSuite9aMirrorIndexed} :
+          Finset physicalPortSuite9aFamily.IndexedChannel) := by
+    simp [physicalPortSuite9aBeamFirstIndexed,
+      physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed,
+      physicalPortSuite9aBeamFirstLocal, physicalPortSuite9aBeamSecondLocal,
+      physicalPortSuite9aMirrorLocal]
+  have hSecond :
+      physicalPortSuite9aBeamSecondIndexed ∉
+        ({physicalPortSuite9aMirrorIndexed} :
+          Finset physicalPortSuite9aFamily.IndexedChannel) := by
+    simp [physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed]
   rw [hUniv]
-  simp [physicalPortSuite9aBeamFirstIndexed,
-    physicalPortSuite9aBeamSecondIndexed, physicalPortSuite9aMirrorIndexed,
-    physicalPortSuite9aBeamFirstLocal, physicalPortSuite9aBeamSecondLocal,
-    physicalPortSuite9aMirrorLocal]
+  rw [Finset.sum_insert hFirst, Finset.sum_insert hSecond,
+    Finset.sum_singleton]
+  ring
 
 /-!
 ## C. Raw indexed and aggregate action
