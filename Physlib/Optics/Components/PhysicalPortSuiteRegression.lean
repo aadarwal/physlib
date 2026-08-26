@@ -111,8 +111,6 @@ lemma physicalPortSuite9a_beam_raw_action :
       ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
       Fintype.sum_sum_type]
   <;> ring_nf
-  <;> rw [Complex.I_sq]
-  <;> ring
 
 /-- The primitive raw mirror input is three. -/
 def physicalPortSuite9aMirrorRawInput : ModeAmplitude Unit :=
@@ -132,7 +130,8 @@ lemma physicalPortSuite9a_mirror_raw_action :
   cases output
   simp [Mirror.scattering, Mirror.reflection, physicalPortSuite9aMirrorParameters,
     physicalPortSuite9aMirrorRawInput, physicalPortSuite9aMirrorRawOutput,
-    ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct]
+    ModeTransform.toLinearMap, Matrix.toLpLin_apply]
+  ring
 
 /-- The beam input transported to the two owned physical ports. -/
 def physicalPortSuite9aBeamLocalInput :
@@ -148,8 +147,9 @@ def physicalPortSuite9aBeamLocalOutput :
 
 /-- Unfolding physical scattering recovers the primitive beam action in owned port labels. -/
 lemma physicalPortSuite9a_beam_local_action :
-    (BeamSplitter.physicalScattering physicalPortSuite9aBeamParameters Unit).toModeTransform
-        .toLinearMap physicalPortSuite9aBeamLocalInput =
+    ModeTransform.toLinearMap
+        (BeamSplitter.physicalScattering physicalPortSuite9aBeamParameters Unit).toModeTransform
+        physicalPortSuite9aBeamLocalInput =
       physicalPortSuite9aBeamLocalOutput := by
   rw [BeamSplitter.physicalScattering, ScatteringMatrix.toModeTransform_reindex,
     ModeTransform.toLinearMap_reindex_eq, physicalPortSuite9aBeamLocalInput,
@@ -170,8 +170,9 @@ def physicalPortSuite9aMirrorLocalOutput :
 
 /-- Unfolding physical scattering recovers the primitive mirror action in owned port labels. -/
 lemma physicalPortSuite9a_mirror_local_action :
-    (Mirror.physicalScattering physicalPortSuite9aMirrorParameters Unit).toModeTransform
-        .toLinearMap physicalPortSuite9aMirrorLocalInput =
+    ModeTransform.toLinearMap
+        (Mirror.physicalScattering physicalPortSuite9aMirrorParameters Unit).toModeTransform
+        physicalPortSuite9aMirrorLocalInput =
       physicalPortSuite9aMirrorLocalOutput := by
   rw [Mirror.physicalScattering, ScatteringMatrix.toModeTransform_reindex,
     ModeTransform.toLinearMap_reindex_eq, physicalPortSuite9aMirrorLocalInput,
@@ -209,7 +210,7 @@ def physicalPortSuite9aScattering :
   | .mirror => Mirror.physicalScattering physicalPortSuite9aMirrorParameters Unit
 
 /-- The mixed Phase 9a scattering-component family. -/
-def physicalPortSuite9aFamily : ScatteringComponentFamily where
+abbrev physicalPortSuite9aFamily : ScatteringComponentFamily where
   Component := PhysicalPortSuite9aComponent
   portFamily := physicalPortSuite9aPortFamily
   scattering := physicalPortSuite9aScattering
@@ -421,8 +422,8 @@ def physicalPortSuite9aBeamChannelSwap :
 def physicalPortSuite9aHostileBeamScattering :
     ScatteringMatrix (BeamSplitter.portFamily Unit).Channel where
   toModeTransform :=
-    (BeamSplitter.physicalScattering physicalPortSuite9aBeamParameters Unit).toModeTransform
-      .reindex (Equiv.refl _) physicalPortSuite9aBeamChannelSwap
+    ModeTransform.reindex (Equiv.refl _) physicalPortSuite9aBeamChannelSwap
+      (BeamSplitter.physicalScattering physicalPortSuite9aBeamParameters Unit).toModeTransform
 
 /-- The hostile beam output is the positive output with its two owned endpoints exchanged. -/
 def physicalPortSuite9aHostileBeamLocalOutput :
@@ -447,7 +448,7 @@ def physicalPortSuite9aHostileScattering :
   | .mirror => Mirror.physicalScattering physicalPortSuite9aMirrorParameters Unit
 
 /-- The hostile mixed family has the same owned ports and a swapped beam output law. -/
-def physicalPortSuite9aHostileFamily : ScatteringComponentFamily where
+abbrev physicalPortSuite9aHostileFamily : ScatteringComponentFamily where
   Component := PhysicalPortSuite9aComponent
   portFamily := physicalPortSuite9aPortFamily
   scattering := physicalPortSuite9aHostileScattering

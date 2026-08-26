@@ -167,8 +167,6 @@ lemma physicalScattering_realizes_physicalBehavior [Fintype ι] [DecidableEq ι]
     (p : Parameters) :
     (physicalScattering p ι).toOrientedModeTransform.toBehavior = physicalBehavior p := by
   rw [physicalScattering_toOrientedModeTransform, ModeTransform.toBehavior_reindex]
-  change LinearBehavior.reindex (incidentChannelEquiv ι) (outgoingChannelEquiv ι)
-      (scattering p ι).toOrientedModeTransform.toBehavior = physicalBehavior p
   rw [scattering_realizes_behavior]
   rfl
 
