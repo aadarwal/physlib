@@ -179,13 +179,13 @@ lemma responseCoherency_diagonal_channelPowers (p : Parameters)
   constructor
   · rw [CoherencyMatrix.channelPower_map_ofChannelPowers,
       sum_externalIncident]
-    rw [responseTransform_entry_nominalLeft_nominalLeft,
-      responseTransform_entry_nominalLeft_nominalRight]
+    rw [responseTransform_entry_nominalLeft_nominalLeft p hDenominator,
+      responseTransform_entry_nominalLeft_nominalRight p hDenominator]
     simp
   · rw [CoherencyMatrix.channelPower_map_ofChannelPowers,
       sum_externalIncident]
-    rw [responseTransform_entry_nominalRight_nominalLeft,
-      responseTransform_entry_nominalRight_nominalRight]
+    rw [responseTransform_entry_nominalRight_nominalLeft p hDenominator,
+      responseTransform_entry_nominalRight_nominalRight p hDenominator]
     simp
 
 /-- Every entry of the proof-gated DCDR output coherency is the explicit N6c double sum. -/
@@ -279,7 +279,21 @@ lemma responseCoherency_source_crossTerm (p : Parameters)
     (inputAmplitude p first)).2
   have hSecond := (response_nominal_reference_coordinates p hDenominator
     (inputAmplitude p second)).2
-  simpa only [FlatNetlist.responseCoherency, hWellPosed, transform, hFirst, hSecond] using hCross
+  have hFirst' :
+      transform.toLinearMap (inputAmplitude p first) (Outgoing.mk (outputChannel p)) =
+        transfer p * first := by
+    simpa [transform, hWellPosed] using hFirst
+  have hSecond' :
+      transform.toLinearMap (inputAmplitude p second) (Outgoing.mk (outputChannel p)) =
+        transfer p * second := by
+    simpa [transform, hWellPosed] using hSecond
+  change ((CoherencyMatrix.ofAmplitude
+      (inputAmplitude p first + inputAmplitude p second)).map transform).channelPower
+        (Outgoing.mk (outputChannel p)) -
+    (((CoherencyMatrix.ofAmplitude (inputAmplitude p first)).incoherentSum
+      (CoherencyMatrix.ofAmplitude (inputAmplitude p second))).map transform).channelPower
+        (Outgoing.mk (outputChannel p)) = _
+  rw [hCross, hFirst', hSecond']
 
 end
 
