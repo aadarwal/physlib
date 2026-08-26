@@ -25,6 +25,9 @@ All interval endpoints are explicitly ordered; no orientation sign is hidden in 
   integrals.
 - `finThree_setIntegral_Icc_eq_iterated`: a three-dimensional box set integral as three interval
   integrals.
+- `finTwo_setIntegral_Icc_eq_iterated_of_integrable` and
+  `finThree_setIntegral_Icc_eq_iterated_of_integrable`: the corresponding conversions under
+  `IntegrableOn` hypotheses.
 - `finThree_faceZero_setIntegral_Icc_eq_iterated`,
   `finThree_faceOne_setIntegral_Icc_eq_iterated`, and
   `finThree_faceTwo_setIntegral_Icc_eq_iterated`: the three ordered face conversions.
@@ -49,6 +52,116 @@ namespace Space
 noncomputable section
 
 /-! ## A. Coordinate box integrals -/
+
+/-- An integrable scalar function on an ordered `Fin 2` box has the corresponding ordered
+iterated interval integral. -/
+lemma finTwo_setIntegral_Icc_eq_iterated_of_integrable
+    (f : (Fin 2 → ℝ) → ℝ)
+    (a₀ a₁ b₀ b₁ : ℝ) (h₀ : a₀ ≤ b₀) (h₁ : a₁ ≤ b₁)
+    (hf : IntegrableOn f (Set.Icc ![a₀, a₁] ![b₀, b₁])) :
+    (∫ x in Set.Icc ![a₀, a₁] ![b₀, b₁], f x) =
+      ∫ u in a₀..b₀, ∫ v in a₁..b₁, f ![u, v] := by
+  let e : (ℝ × ℝ) ≃ᵐ (Fin 2 → ℝ) := MeasurableEquiv.finTwoArrow.symm
+  let eL : (ℝ × ℝ) ≃L[ℝ] (Fin 2 → ℝ) :=
+    (ContinuousLinearEquiv.finTwoArrow ℝ ℝ).symm
+  have hem : MeasurePreserving e (volume.prod volume) volume :=
+    (measurePreserving_finTwoArrow volume).symm
+  have he_apply (p : ℝ × ℝ) : e p = eL p := rfl
+  have he_vec (p : ℝ × ℝ) : eL p = ![p.1, p.2] := rfl
+  have heIcc : e ⁻¹' Set.Icc ![a₀, a₁] ![b₀, b₁] =
+      Set.Icc a₀ b₀ ×ˢ Set.Icc a₁ b₁ :=
+    ((OrderIso.finTwoArrowIso ℝ).symm.preimage_Icc _ _).trans
+      (Set.Icc_prod_eq _ _)
+  have hPullback : IntegrableOn (f ∘ e)
+      (Set.Icc a₀ b₀ ×ˢ Set.Icc a₁ b₁) (volume.prod volume) := by
+    rw [← heIcc]
+    exact (hem.integrableOn_comp_preimage e.measurableEmbedding).2 hf
+  have hPullbackLambda : IntegrableOn (fun p ↦ f (e p))
+      (Set.Icc a₀ b₀ ×ˢ Set.Icc a₁ b₁) (volume.prod volume) := by
+    simpa only [Function.comp_def] using hPullback
+  rw [← hem.map_eq, MeasureTheory.setIntegral_map_equiv, heIcc]
+  rw [MeasureTheory.setIntegral_prod _ hPullbackLambda]
+  simp only [intervalIntegral.integral_of_le, h₀, h₁,
+    MeasureTheory.setIntegral_congr_set
+      (Ioc_ae_eq_Icc (α := ℝ) (μ := volume))]
+  simp only [he_apply, he_vec]
+
+/-- An integrable scalar function on an ordered `Fin 3` box has the corresponding ordered
+triple interval integral. -/
+lemma finThree_setIntegral_Icc_eq_iterated_of_integrable
+    (f : (Fin 3 → ℝ) → ℝ)
+    (a₀ a₁ a₂ b₀ b₁ b₂ : ℝ)
+    (h₀ : a₀ ≤ b₀) (h₁ : a₁ ≤ b₁) (h₂ : a₂ ≤ b₂)
+    (hf : IntegrableOn f (Set.Icc ![a₀, a₁, a₂] ![b₀, b₁, b₂])) :
+    (∫ x in Set.Icc ![a₀, a₁, a₂] ![b₀, b₁, b₂], f x) =
+      ∫ u in a₀..b₀, ∫ v in a₁..b₁, ∫ w in a₂..b₂, f ![u, v, w] := by
+  let e : (ℝ × (Fin 2 → ℝ)) ≃ᵐ (Fin 3 → ℝ) :=
+    (MeasurableEquiv.piFinSuccAbove (fun _ ↦ ℝ) 0).symm
+  have hem : MeasurePreserving e
+      (volume.prod (Measure.pi fun _ : Fin 2 ↦ volume))
+      (Measure.pi fun _ : Fin 3 ↦ volume) :=
+    (measurePreserving_piFinSuccAbove (fun _ : Fin 3 ↦ volume) 0).symm
+  have he_order (p : ℝ × (Fin 2 → ℝ)) :
+      e p = (Fin.insertNthOrderIso (fun _ ↦ ℝ) (0 : Fin 3)) p := rfl
+  have he_cons (p : ℝ × (Fin 2 → ℝ)) : e p = Fin.cons p.1 p.2 := by
+    ext i
+    fin_cases i <;>
+      simp [e, MeasurableEquiv.piFinSuccAbove, Fin.insertNthEquiv]
+  have heIcc : e ⁻¹' Set.Icc ![a₀, a₁, a₂] ![b₀, b₁, b₂] =
+      Set.Icc a₀ b₀ ×ˢ Set.Icc ![a₁, a₂] ![b₁, b₂] := by
+    have hePreimage : e ⁻¹' Set.Icc ![a₀, a₁, a₂] ![b₀, b₁, b₂] =
+        (⇑(Fin.insertNthOrderIso (fun _ ↦ ℝ) (0 : Fin 3))) ⁻¹'
+          Set.Icc ![a₀, a₁, a₂] ![b₀, b₁, b₂] := by
+      ext p
+      simp only [Set.mem_preimage, he_order]
+    rw [hePreimage]
+    rw [(Fin.insertNthOrderIso (fun _ ↦ ℝ) (0 : Fin 3)).preimage_Icc]
+    have ha : (Fin.insertNthOrderIso (fun _ ↦ ℝ) (0 : Fin 3)).symm
+        ![a₀, a₁, a₂] = (a₀, ![a₁, a₂]) := by
+      rfl
+    have hb : (Fin.insertNthOrderIso (fun _ ↦ ℝ) (0 : Fin 3)).symm
+        ![b₀, b₁, b₂] = (b₀, ![b₁, b₂]) := by
+      rfl
+    rw [ha, hb, Set.Icc_prod_eq]
+  have hPullback : IntegrableOn (f ∘ e)
+      (Set.Icc a₀ b₀ ×ˢ Set.Icc ![a₁, a₂] ![b₁, b₂])
+      (volume.prod (Measure.pi fun _ : Fin 2 ↦ volume)) := by
+    rw [← heIcc]
+    exact (hem.integrableOn_comp_preimage e.measurableEmbedding).2 (by
+      simpa only [volume_pi] using hf)
+  have hPullbackProd : Integrable (f ∘ e)
+      ((volume.restrict (Set.Icc a₀ b₀)).prod
+        ((Measure.pi fun _ : Fin 2 ↦ volume).restrict
+          (Set.Icc ![a₁, a₂] ![b₁, b₂]))) := by
+    simpa only [IntegrableOn, Measure.prod_restrict] using hPullback
+  have hPullbackLambda : IntegrableOn (fun p ↦ f (e p))
+      (Set.Icc a₀ b₀ ×ˢ Set.Icc ![a₁, a₂] ![b₁, b₂])
+      (volume.prod (Measure.pi fun _ : Fin 2 ↦ volume)) := by
+    simpa only [Function.comp_def] using hPullback
+  have hSlice : ∀ᵐ u ∂volume.restrict (Set.Icc a₀ b₀),
+      IntegrableOn (fun y ↦ f (e (u, y)))
+        (Set.Icc ![a₁, a₂] ![b₁, b₂]) := by
+    simpa only [IntegrableOn, Function.comp_apply, volume_pi] using
+      hPullbackProd.prod_right_ae
+  have hInner :
+      (fun u ↦ ∫ y in Set.Icc ![a₁, a₂] ![b₁, b₂], f (e (u, y))
+        ∂Measure.pi (fun _ : Fin 2 ↦ volume)) =ᵐ[
+        volume.restrict (Set.Icc a₀ b₀)]
+      (fun u ↦ ∫ v in a₁..b₁, ∫ w in a₂..b₂, f ![u, v, w]) := by
+    filter_upwards [hSlice] with u hu
+    have hCons (v w : ℝ) : Fin.cons u ![v, w] = ![u, v, w] := rfl
+    simpa only [he_cons, hCons, volume_pi] using
+      (finTwo_setIntegral_Icc_eq_iterated_of_integrable
+        (fun y ↦ f (Fin.cons u y)) a₁ a₂ b₁ b₂ h₁ h₂ (by
+          simpa only [he_cons] using hu))
+  rw [show (volume : Measure (Fin 3 → ℝ)) =
+      Measure.pi (fun _ : Fin 3 ↦ volume) from volume_pi]
+  rw [← hem.map_eq, MeasureTheory.setIntegral_map_equiv, heIcc]
+  rw [MeasureTheory.setIntegral_prod _ hPullbackLambda]
+  rw [integral_congr_ae hInner]
+  simp only [intervalIntegral.integral_of_le, h₀,
+    MeasureTheory.setIntegral_congr_set
+      (Ioc_ae_eq_Icc (α := ℝ) (μ := volume))]
 
 /-- A continuous scalar function integrated over an ordered `Fin 2` box is the corresponding
 ordered iterated interval integral. -/
