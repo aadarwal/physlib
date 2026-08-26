@@ -455,11 +455,15 @@ lemma zRegression_stable_lagTwoGeometricImpulse_transform_I :
   rw [transform_add hPositive.2 hNegative.2,
     transform_geometricSeq (by norm_num) (by norm_num),
     transform_geometricSeq (by norm_num) (by norm_num), Complex.inv_I]
-  have hProduct : Complex.I / 2 * Complex.I = -(1 / 2 : ℂ) := by
+  have hPositiveProduct : Complex.I / 2 * -Complex.I = (1 / 2 : ℂ) := by
     ring_nf
     rw [Complex.I_sq]
     norm_num
-  rw [hProduct]
+  have hNegativeProduct : -(Complex.I / 2) * -Complex.I = -(1 / 2 : ℂ) := by
+    ring_nf
+    rw [Complex.I_sq]
+    norm_num
+  rw [hPositiveProduct, hNegativeProduct]
   norm_num
 
 /-- The independently solved nonzero-loop recurrence has transform `-(7/8) I` at `z = I`.
@@ -485,26 +489,43 @@ lemma zRegression_stable_causalTransform_I :
   ring
 
 
-/-- The raw compiled reciprocal-Z response has the same independently expanded nonreal value. -/
+/-- Generic reciprocal reindexing gives the raw compiled response's nonreal value.
+
+The transported formal-coordinate value is expanded independently in `PolesRegression`.
+-/
 lemma zRegression_stable_rawCompiled_I :
     rationalZEliminationResponse stableUnitDelayParameters Complex.I
       stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I := by
-  rw [rationalZEliminationResponse_eq_responseModel,
-    DelayTransfer.RationalModel.eval_eq]
-  simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
-  rw [Complex.inv_I, stable_responseNumeratorPolynomial_expansion,
-    stable_denominatorPolynomial_expansion]
-  norm_num [stableNumerator, stableDenominator, Complex.I_mul_I]
-  rw [show (-Complex.I) ^ 3 = Complex.I by
-    norm_num [pow_succ, Complex.I_mul_I]]
-  ring
+  exact stable_rationalZEliminationResponse_I
 
 /-- The nonreal recurrence and raw compiled anchors agree without the cross-semantics bridge. -/
 lemma zRegression_nonreal_raw_compiled :
-    zTransfer stableUnitDelayParameters Complex.I =
+    transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
       rationalZEliminationResponse stableUnitDelayParameters Complex.I
         stable_I_mem_reciprocalZResponseDomain := by
-  rw [zRegression_stable_zTransfer_I, zRegression_stable_rawCompiled_I]
+  rw [zRegression_stable_causalTransform_I, zRegression_stable_rawCompiled_I]
+
+/-- Four independent expansions meet at the stable nonzero-loop, nonreal point.
+
+The conjuncts respectively use the primitive causal recurrence, generic reciprocal reindexing,
+the eight raw N5 equations, and the complete eleven-branch Mason enumeration.
+-/
+lemma zRegression_stable_independent_nonzeroLoop_I :
+    transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
+        -(7 / 8) * Complex.I ∧
+      rationalZEliminationResponse stableUnitDelayParameters Complex.I
+          stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
+      eliminationResponse (stableUnitDelayParameters.at (-Complex.I))
+          (isWellPosed_of_hasNonzeroDenominator
+            (stableUnitDelayParameters.at (-Complex.I))
+            zRegression_stable_fixed_hasNonzeroDenominator_I) =
+          -(7 / 8) * Complex.I ∧
+      auditedMasonResponse (stableUnitDelayParameters.at (-Complex.I)) =
+          -(7 / 8) * Complex.I := by
+  exact ⟨zRegression_stable_causalTransform_I,
+    zRegression_stable_rawCompiled_I,
+    zRegression_stable_eliminationResponse_neg_I,
+    zRegression_stable_auditedMasonResponse_neg_I⟩
 
 /-!
 
