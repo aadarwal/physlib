@@ -825,6 +825,7 @@ public import Physlib.SpaceAndTime.Space.Derivatives.Basic
 public import Physlib.SpaceAndTime.Space.Derivatives.Curl
 public import Physlib.SpaceAndTime.Space.Derivatives.DerivativeIndex
 public import Physlib.SpaceAndTime.Space.Derivatives.Div
+public import Physlib.SpaceAndTime.Space.Derivatives.DivCross
 public import Physlib.SpaceAndTime.Space.Derivatives.Grad
 public import Physlib.SpaceAndTime.Space.Derivatives.Iterated
 public import Physlib.SpaceAndTime.Space.Derivatives.Laplacian
@@ -835,8 +836,12 @@ public import Physlib.SpaceAndTime.Space.DistOfFunction
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Action
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.AffineGroup
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Basic
+public import Physlib.SpaceAndTime.Space.Integrals.AffineBox
 public import Physlib.SpaceAndTime.Space.Integrals.Basic
+public import Physlib.SpaceAndTime.Space.Integrals.CoordinateBox
 public import Physlib.SpaceAndTime.Space.Integrals.NormPow
+public import Physlib.SpaceAndTime.Space.Integrals.OrientedBox
+public import Physlib.SpaceAndTime.Space.Integrals.OrientedBoxRegression
 public import Physlib.SpaceAndTime.Space.Integrals.OrientedRectangle
 public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCell
 public import Physlib.SpaceAndTime.Space.Integrals.PlanarThinCellConvergence
