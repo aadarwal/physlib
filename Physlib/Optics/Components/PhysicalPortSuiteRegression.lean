@@ -235,20 +235,6 @@ local instance physicalPortSuite9aLocalChannelDecidableEq
   · change DecidableEq (Mirror.portFamily Unit).Channel
     infer_instance
 
-/-- The indexed mixed family has exactly its two beam channels and one mirror channel. -/
-local instance physicalPortSuite9aIndexedChannelFintype :
-    Fintype physicalPortSuite9aFamily.IndexedChannel where
-  elems := {⟨.beamSplitter, ⟨BeamSplitter.Port.first, ()⟩⟩,
-    ⟨.beamSplitter, ⟨BeamSplitter.Port.second, ()⟩⟩,
-    ⟨.mirror, ⟨Mirror.Port.surface, ()⟩⟩}
-  complete channel := by
-    rcases channel with ⟨component, ⟨port, mode⟩⟩
-    cases component
-    · cases port <;> cases mode <;> simp
-    · cases port
-      cases mode
-      simp
-
 /-- The indexed Phase 9a channels have decidable equality. -/
 local instance physicalPortSuite9aIndexedChannelDecidableEq :
     DecidableEq physicalPortSuite9aFamily.IndexedChannel :=
