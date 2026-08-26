@@ -1,25 +1,26 @@
-# S7C slice 2b handoff
+# S7C slice 3 handoff
 
 ## Cutoff
 
 - Branch: `optics/s7c-cascade`
-- Required sync target: `476405cee7a80be6357f4f739dc2d4bb5e6d2171`
-- Target merge: `d2c2a58ff100cbb4ef6279cd29aaa6debadd60b7`
-- Prior slice-2 V cutoff: `e5c8840851a3d0866152a05a7999eff92a978384`
-- Slice: V rework for the joined concrete-stage anchor and declaration classification
+- Required sync target: `6028d2a6858e5c2af4866c944ec13d1c3a255799`
+- Target merge: `ee7f2505b5db997049bfb1eab97b4d79a0297a09`
+- V2-ready slice-2 cutoff: `32f0a2fce921667ccbbc6d79b844de3276c25efa`
+- Exact source-gated head: `9538674a748149da56333898a7a45a2257ed6ff3`
+- Final cutoff: this HANDOFF-only commit
 
-`476405ce` is an ancestor of this cutoff. The merge retained the lane-local `HANDOFF.md`; the
-target's code and registry changes were accepted unchanged.
+The required target is an ancestor of the cutoff. The merge retained the approved lane commits
+and accepted the target's code and registry state unchanged.
 
 ## Files and registrations
 
-Slice 2 adds these modules, in sorted registry order:
+Slice 3 adds:
 
-- `Physlib.Optics.Systems.Cascade.Identical`
-- `Physlib.Optics.Systems.Cascade.IdenticalRegression`
+- `Physlib.Optics.Systems.Cascade.Termination`
+- `Physlib.Optics.Systems.Cascade.TerminationRegression`
 
-The required sync target already registers the four U2-ready slice-1 modules. The exact cutoff
-gate temporarily adds the two slice-2 imports, yielding these six cumulative S7C registrations:
+The target registers the four slice-1 modules. The exact gate temporarily registered the four
+unregistered slice-2 and slice-3 modules, yielding this cumulative S7C battery:
 
 - `Physlib.Optics.Network.TwoPortChainFold`
 - `Physlib.Optics.Network.TwoPortChainFoldRegression`
@@ -27,304 +28,287 @@ gate temporarily adds the two slice-2 imports, yielding these six cumulative S7C
 - `Physlib.Optics.Systems.Cascade.HeterogeneousRegression`
 - `Physlib.Optics.Systems.Cascade.Identical`
 - `Physlib.Optics.Systems.Cascade.IdenticalRegression`
+- `Physlib.Optics.Systems.Cascade.Termination`
+- `Physlib.Optics.Systems.Cascade.TerminationRegression`
 
-Only the two slice-2 imports remain for the conductor to add. No `Physlib.lean` edit is committed
-for slice 2b on this branch.
+No `Physlib.lean` edit is committed. When the approved slices are integrated in order, only the
+two slice-3 imports above are new at this cutoff.
 
-## Declarations
+## Production declaration inventory
 
-### `Physlib/Optics/Systems/Cascade/Identical.lean`
+The names below are in `Optics.MicroringCascade`.
 
-- `MicroringCascade.dateIdenticalCascadeBehavior`
-- `MicroringCascade.dateIdenticalCascadeComposition`
-- `MicroringCascade.dateIdenticalCascadeComposition_eq_pow`
-- `MicroringCascade.dateIdenticalCascadeBehavior_eq_pow_toBehavior`
-- `MicroringCascade.dateChainEntry`
-- `MicroringCascade.dateChainHalfTrace`
-- `MicroringCascade.dateChebyshevCoefficient`
-- `MicroringCascade.dateChebyshevClosedForm`
-- `MicroringCascade.dateChain_trace_eq_entry11_add_entry22`
-- `MicroringCascade.dateChebyshevCoefficient_recurrence`
-- `MicroringCascade.dateChain_sq_eq_trace_smul_sub_one`
-- `MicroringCascade.dateChain_pow_eq_chebyshevClosedForm_of_det_eq_one`
-- `MicroringCascade.DateSylvesterHypotheses`, with fields:
-  - `det_eq_one`
-  - `entry11_re_gt_neg_one`
-  - `entry11_re_lt_one`
-  - `entry22_eq_conj_entry11`
-  - `entry12_eq_conj_entry21`
-- `MicroringCascade.dateSylvesterAngle`
-- `MicroringCascade.dateSylvesterSineCoefficient`
-- `MicroringCascade.dateSylvesterClosedForm`
-- `MicroringCascade.DateSylvesterHypotheses.halfTrace_eq_entry11_re`
-- `MicroringCascade.DateSylvesterHypotheses.sin_angle_ne_zero`
-- `MicroringCascade.DateSylvesterHypotheses.halfTrace_eq_cos_angle`
-- `MicroringCascade.DateSylvesterHypotheses.chebyshevCoefficient_eq_sineCoefficient`
-- `MicroringCascade.dateChain_pow_eq_sylvesterClosedForm`
-- `MicroringCascade.dateIdenticalCascadeComposition_eq_sylvesterClosedForm`
+### Determinants and pivot
 
-### `Physlib/Optics/Systems/Cascade/IdenticalRegression.lean`
+- `DateCascadeStage.continuityChainMatrix_det`
+- `dateFourPortBackwardFirstChainMatrix_det`
+- `DateCascadeStage.compositionMatrix_det`
+- `dateCascadeComposition_det`
+- `dateChain_det_eq_entry11_mul_entry22_sub_entry12_mul_entry21`
+- `dateChain_leadingBlock_action`
+- `dateChain_hasBijectiveLeadingBlock_iff_entry11_ne_zero`
+- `dateChain_hasWellPosedZeroReturn_iff_entry11_ne_zero`
+- `dateChain_leadingBlockInverse_entry`
+- `dateChain_rightTerminatedReflection_entry_zero`
+- `dateChain_rightTerminatedTransmission_entry_zero`
 
-- `MicroringCascade.dateIdenticalCascadeRegression_two_by_hand`
-- `MicroringCascade.dateIdenticalCascadeRegression_three_by_hand`
-- `MicroringCascade.dateSylvesterRegressionMatrix`
-- `MicroringCascade.dateSylvesterRegressionMatrix_det`
-- `MicroringCascade.dateSylvesterRegressionMatrix_hypotheses`
-- `MicroringCascade.dateSylvesterRegressionMatrix_pow_two`
-- `MicroringCascade.dateSylvesterRegressionMatrix_pow_three`
-- `MicroringCascade.dateSylvesterRegressionMatrix_closedForm_two`
-- `MicroringCascade.dateSylvesterRegressionMatrix_closedForm_three`
-- `MicroringCascade.dateSylvesterRegression_identity_exact_failure`
-- `MicroringCascade.dateSylvesterRegression_identity_not_hypotheses`
-- `MicroringCascade.dateSylvesterRegression_identity_closedForm_false`
-- `MicroringCascade.dateJoinedSylvesterRegressionRing`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_busPhase`
-- `MicroringCascade.dateJoinedSylvesterRegressionRing_fieldAttenuation`
-- `MicroringCascade.dateJoinedSylvesterRegressionRing_phaseFactor`
-- `MicroringCascade.dateJoinedSylvesterRegressionRing_denominator`
-- `MicroringCascade.dateJoinedSylvesterRegressionRing_forwardTransfer`
-- `MicroringCascade.dateJoinedSylvesterRegressionRing_backwardTransfer`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_signedContinuity`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix_entries`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_hypotheses`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_two`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_three`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_angle`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_two`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_three`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_two_by_hand`
-- `MicroringCascade.dateJoinedSylvesterRegressionStage_three_by_hand`
+### Behavior-derived DATE'14 Thm. 5 response
 
-## V rework disposition
+- `DateCascadeTerminationHypotheses`
+- `DateCascadeTerminationHypotheses.hasBijectiveLeadingBlock`
+- `DateCascadeTerminationHypotheses.hasBijectiveZeroReturnPivot`
+- `DateCascadeTerminationHypotheses.hasWellPosedZeroReturn`
+- `dateTerminatedCascadeReflectionTransform`
+- `dateTerminatedCascadeTransmissionTransform`
+- `dateTerminatedCascadeReflectivity`
+- `dateTerminatedCascadeTransmissivity`
+- `dateTerminatedCascadeReflectionTransform_eq_chain`
+- `dateTerminatedCascadeTransmissionTransform_eq_chain`
+- `dateTerminatedCascade_reflectivity_eq_neg_entry12_div_entry11`
+- `dateTerminatedCascade_transmissivity_eq_one_div_entry11`
 
-The production corollary
-`dateIdenticalCascadeComposition_eq_sylvesterClosedForm` is now a `lemma`. Its statement and
-proof are unchanged. DATE'14 Thm. 4 and the source's unnumbered Sylvester matrix result remain
-the only two `theorem` declarations in `Identical.lean`.
+### Identical-cascade DATE'14 Thm. 6 response
 
-The joined fixture uses these exact rational DATE values:
+- `DateIdenticalTerminationHypotheses`
+- `DateIdenticalTerminationHypotheses.toCascade`
+- `dateIdenticalTerminatedCascadeReflectivity`
+- `dateIdenticalTerminatedCascadeTransmissivity`
+- `dateSylvesterClosedForm_entry11`
+- `dateSylvesterClosedForm_entry12`
+- `DateCascadeStage.compositionMatrix_entry11`
+- `DateCascadeStage.compositionMatrix_entry12`
+- `dateIdenticalTerminationDenominator`
+- `dateIdenticalCascadeComposition_entry11_eq_denominator_div_forwardTransfer`
+- `DateIdenticalTerminationHypotheses.denominator_ne_zero`
+- `dateIdenticalTerminatedCascade_reflectivity_eq_closedForm`
+- `dateIdenticalTerminatedCascade_transmissivity_eq_closedForm`
+
+Only the four results corresponding directly to DATE'14 Thms. 5--6 are declared as `theorem`.
+All supporting results are `lemma`. The prior U2 Markdown nit is gone; the relevant source gate
+is a single code span here:
+`DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`.
+
+## Pivot and relational derivation
+
+DATE Def. 8's `c_N = 0` is represented by `RightLoadBehavior.zeroReflection`. Its definition and
+membership result at `Physlib/Optics/Network/TwoPortTermination.lean:100-121` say exactly that
+the returning right wave is zero. They make no impedance or absorption claim.
+
+The generic criterion at
+`Physlib/Optics/Network/TwoPortChainTermination.lean:349-389` characterizes well-posed right
+termination by pivot injectivity plus solvability. The zero-return specialization at
+`Physlib/Optics/Network/TwoPortChainTermination.lean:686-710` identifies that pivot with the
+leading chain block. For the singleton DATE channel, production proves the exact equivalence
 
 ```text
-r = -1, t = 0, L_c = 1, alpha = 0, lambda = 4, n_eff = 1, L_b = 1
+HasWellPosedRightTermination 0 <-> M11 != 0.
 ```
 
-Its ring and bus phases are `pi/2`, its forward and backward transfers are `1` and `0`, and its
-stage composition is displayed in all four source coordinates as `diag(I, -I)`. The determinant,
-strict bounds, and both conjugacies are then reconstructed for that stage matrix.
+`DateCascadeTerminationHypotheses` retains both independent gates:
 
-## Exact source domain
+- every ring has the transmission pivot required to construct its chain graph; and
+- the complete selected cascade has `M11 != 0`.
 
-The source hypothesis `|m| = 1` is represented as the actual matrix determinant equation
+The relational cascade is identified with the composition graph through
+`Heterogeneous.lean:227-235`. The reflection and transmission transforms are then extracted from
+the terminated behavior. Their scalar coefficients are not defined as quotients. The two Thm. 5
+results subsequently prove
 
 ```text
-Matrix.det matrix = 1
+reflect = -M12 / M11
+transm = 1 / M11.
 ```
 
-and not as a matrix norm. `DateSylvesterHypotheses` retains all four source conditions:
+The transmission proof first obtains the Schur response from the terminated behavior, then uses
+the cascade determinant-one lemma. That determinant is derived from every ring transmission gate
+and the determinant-one continuity matrices.
+
+## Identical-cascade closed form
+
+`DateIdenticalTerminationHypotheses` retains:
+
+- the repeated ring-to-chain transmission pivot;
+- every field of `DateSylvesterHypotheses`; and
+- the selected count's distinct `M11 != 0` termination pivot.
+
+The production result at `Identical.lean:336-343` supplies the proved source Sylvester matrix.
+With `S_N = sin(N theta) / sin(theta)`, the common denominator is represented exactly as
 
 ```text
-Matrix.det matrix = 1
--1 < Re(m11)
-Re(m11) < 1
-m22 = conj(m11)
-m12 = conj(m21)
+D_N = E * S_N - R * S_(N-1),
 ```
 
-`dateChainEntry` uses the source reindex in which `0` is backward and `1` is forward. Diagonal
-conjugacy proves `trace(matrix)/2 = Re(m11)`. The strict interval puts
-`dateSylvesterAngle matrix = arccos(Re(m11))` in `(0, pi)`, hence its sine is nonzero.
-
-The source sine display is represented exactly as
+where `E` is the backward continuity factor and `R` is `dateForwardTransfer`. Production proves
+`M11 = D_N / R` and derives `D_N != 0` from the selected pivot. DATE'14 Thm. 6 follows as
 
 ```text
-sin(N * theta) / sin(theta) * matrix
-  - sin((N - 1) * theta) / sin(theta) * 1
+reflect_N = T * E * S_N / D_N
+transm_N = R / D_N.
 ```
 
-The definition is totalized, while `dateChain_pow_eq_sylvesterClosedForm` and the identical
-cascade corollary require the complete source structure. The weaker polynomial identity
-`dateChain_pow_eq_chebyshevClosedForm_of_det_eq_one` needs only determinant one; no source sine
-claim is inferred from that weaker fact.
+These remain field-amplitude ratios. No power normalization is inferred.
+
+## Regression declaration inventory
+
+The positive construction and raw folds are:
+
+- `dateTerminationRegressionRing`
+- `dateTerminationRegressionStage`
+- `dateTerminationRegressionRing_roundTripPhase`
+- `dateTerminationRegressionRing_fieldAttenuation`
+- `dateTerminationRegressionRing_phaseFactors`
+- `dateTerminationRegressionRing_denominator`
+- `dateTerminationRegressionRing_transfers`
+- `dateTerminationRegressionStage_hasBijectiveRingTransmission`
+- `dateTerminationRegressionStage_busPhase`
+- `dateTerminationRegressionStage_signedContinuity`
+- `dateTerminationRegressionMatrix`
+- `dateTerminationRegressionStage_compositionMatrix`
+- `dateTerminationRegressionStage_sylvester`
+- `dateTerminationRegression_rawFold_two`
+- `dateTerminationRegression_rawFold_three`
+- `dateTerminationRegression_rawFold_two_entry11`
+- `dateTerminationRegression_rawFold_three_entry11`
+- `dateTerminationRegressionHypotheses_two`
+- `dateTerminationRegressionHypotheses_three`
+
+The direct behavior anchors and their local action facts are:
+
+- `dateTerminationRegression_negativeOne_pivot_action`
+- `dateTerminationRegression_negativeOne_incident_action`
+- `dateTerminationRegression_negativeOne_lowerLeft_action`
+- `dateTerminationRegression_negativeOne_lowerRight_action`
+- `dateTerminationRegression_negativeMatrix_pivot_action`
+- `dateTerminationRegression_negativeMatrix_incident_action`
+- `dateTerminationRegression_negativeMatrix_lowerLeft_action`
+- `dateTerminationRegression_negativeMatrix_lowerRight_action`
+- `dateTerminationRegression_two_reflectivity_by_hand`
+- `dateTerminationRegression_two_transmissivity_by_hand`
+- `dateTerminationRegression_two_responses_by_hand`
+- `dateTerminationRegression_three_reflectivity_by_hand`
+- `dateTerminationRegression_three_transmissivity_by_hand`
+- `dateTerminationRegression_three_responses_by_hand`
+
+The singular construction and failure facts are:
+
+- `dateTerminationRegressionSingularRing`
+- `dateTerminationRegressionSingularStage`
+- `dateTerminationRegressionSingularRing_phaseData`
+- `dateTerminationRegressionSingularRing_transfers`
+- `dateTerminationRegressionSingularStage_hasBijectiveRingTransmission`
+- `dateTerminationRegressionSingularStage_signedContinuity`
+- `dateTerminationRegressionSingularMatrix`
+- `dateTerminationRegressionSingularStage_compositionMatrix`
+- `dateTerminationRegressionSingular_rawFold_entry11`
+- `dateTerminationRegressionSingular_chain_not_wellPosed`
+- `dateTerminationRegressionSingular_not_wellPosed`
+- `dateTerminationRegressionSingular_not_hypotheses`
+
+## Independent positive anchors
+
+The joined DATE fixture uses
+
+```text
+r = 3/5, t = 4/5, L_c = 1, alpha = 0,
+lambda = 2, n_eff = 1, L_b = 1/2.
+```
+
+It has `R = -15/17`, `T = 8 I/17`, and displayed backward-first stage matrix
+
+```text
+[[-17 I/15, -8/15],
+ [    -8/15, 17 I/15]].
+```
+
+The regressions unfold the matrices and neutral fold directly, proving by hand
+
+```text
+N = 2: raw fold = -1,     reflect = 0,      transm = -1
+N = 3: raw fold = -stage, reflect = 8 I/17, transm = -15 I/17.
+```
+
+The response anchors use the graph of each behavior-derived transform, the raw termination
+equations, and locally expanded pivot and block actions. They do not invoke either Thm. 5 quotient
+theorem or either Thm. 6 closed-form theorem. Thus sign, coordinate order, load orientation, and
+the transmission denominator can fail independently of the production formulas.
+
+## Load-bearing negative control
+
+The concrete control uses
+
+```text
+r = 3/4, t = 5/4, L_c = 1, alpha = 0,
+lambda = 2, n_eff = 1, L_b = 1/2.
+```
+
+`DateParameters` does not impose unitarity. This point has `R = -24/25 != 0` and `T = I`, so its
+own ring-to-chain pivot is valid and its relational cascade agrees with the chain graph. Its
+displayed stage matrix is
+
+```text
+[[-25 I/24,       -25/24],
+ [   -25/24, 1201 I/600]].
+```
+
+Direct multiplication proves the two-stage `M11 = 0`. The regression then proves all three
+failure levels:
+
+- the chain zero-return termination is not well posed;
+- the concrete relational cascade with `RightLoadBehavior.zeroReflection` is not well posed; and
+- `DateCascadeTerminationHypotheses` is uninhabited at that parameter point.
+
+This fixture retains the ring pivot and fails at the complete-cascade pivot, so the missing DATE
+source condition is mechanically load-bearing.
 
 ## Milestone and parity disposition
 
-This slice discharges the quoted S7C bullets:
+This slice discharges the S7C bullet "terminated reflection and transmission" at `goal.md:2423`.
+It satisfies H-06, quoted as "terminated-cascade reflection and transmission agree with
+relational termination" at `goal.md:2591`.
 
-- "an identical-`N` cascade as a chain-matrix power" (`goal.md:2421`); and
-- "a Sylvester/Chebyshev closed form with its actual determinant and trace-domain assumptions"
-  (`goal.md:2422`).
+The IP-18 row is DATE'14 Def. 8 plus Thms. 5--6, page 5. It is discharged by the four headline
+theorems listed above, under the corrected `M11 != 0` hypothesis. The source row is recorded at
+`/Users/aadarwal/src/aadarwal/physlib-parity/PARITY-LEDGER.md:125`; changing ledger status remains
+conductor-owned.
 
-It satisfies H-04, quoted as "an identical-`N` cascade equals the corresponding matrix power"
-(`goal.md:2589`), through `dateIdenticalCascadeComposition_eq_pow`. This equality is totalized and
-needs no ring pivot. Its relational graph corollary separately requires
-`stage.HasBijectiveRingTransmission`.
+## Scope and non-claims
 
-It satisfies H-05, quoted as "the Sylvester/Chebyshev cascade form holds with its determinant and
-trace-domain assumptions" (`goal.md:2590`), through
-`dateIdenticalCascadeComposition_eq_sylvesterClosedForm` under the complete structure above.
+- The modeled load is only zero return at the declared right termination plane.
+- Reflectivity and transmissivity are complex field amplitudes, not power fractions.
+- No impedance match, absorption, radiation, passivity, reciprocity, losslessness, causality,
+  bandwidth, or material-realization result is claimed.
+- No lattice/source-parity, quadruple, dispersion, SFG, or NSV comparison is claimed.
+- The closed identical form is restricted to the exact Sylvester and selected-pivot domain.
 
-Thus the declarations identify discharges for:
+## Exact validation record
 
-- IP-16, DATE'14 Thm. 4, through `dateIdenticalCascadeComposition_eq_pow`; and
-- IP-17, DATE'14's unnumbered Sylvester result, through
-  `dateIdenticalCascadeComposition_eq_sylvesterClosedForm`.
+All Lean work and the full battery ran under one held `lake-lock env bash` acquisition. The
+temporary registry was restored byte-identically after the chain. Its SHA-256 before and after
+was `1741548061db23303ec95ebe539feaa278fe777a8a70eb47e151e9171f29f263`.
 
-The source rows are recorded at
-`/Users/aadarwal/src/aadarwal/physlib-parity/PARITY-LEDGER.md:123-124`. A ledger status flip still
-belongs to the conductor/reviewer gate, not this lane.
-
-## Independent regressions
-
-The H-04 regressions unfold `List.replicate`, `dateCascadeComposition`, and the neutral fold
-directly at `N = 2` and `N = 3`. They do not call
-`dateIdenticalCascadeComposition_eq_pow` or `fold_replicate`.
-
-The H-05 positive fixture is `diag(I, -I)`. Its determinant and source structure are computed
-directly. Its powers are independently expanded entry by entry through `Matrix.mul_apply`:
+At exact source head `9538674a748149da56333898a7a45a2257ed6ff3`, the chain was:
 
 ```text
-matrix ^ 2 = -1
-matrix ^ 3 = -matrix
+lake exe cache get &&
+lake --wfail build <the eight cumulative S7C modules listed above> &&
+lake exe runPhyslibLinters &&
+lake exe lint_all
 ```
 
-The two source sine candidates are evaluated independently to those same values. Neither proof
-calls Cayley--Hamilton, the Chebyshev power lemma, or either Sylvester headline theorem.
+Results:
 
-The joined regression closes the construction gap with one concrete `DateCascadeStage`. The
-stage's rational ring data and bus length are expanded through the production continuity and
-ring matrices, proving its composition entry by entry as `diag(I, -I)`. The source structure is
-then proved directly for `stage.compositionMatrix`.
+- cache: no files to download; 8690 already decompressed;
+- targeted `--wfail` build: passed, 2765 jobs;
+- `runPhyslibLinters`: Physlib and QuantumInfo passed;
+- `lint_all`: passed all stages and exited zero;
+- import, alpha-import, TODO-duplicate, and sorry/pseudo checks passed;
+- direct elaboration of both slice-3 modules passed without warnings;
+- `git diff --check`, the 100-codepoint check, and banned-token checks passed;
+- committed-state `./scripts/lint-style.sh` exited zero.
 
-At `N = 2` and `N = 3`, the initial `change` steps definitionally reduce `List.replicate`,
-`List.map`, and `BackwardFirstChainTransform.fold`. The resulting matrix products are expanded
-entry by entry, giving
+The style output contained only the pre-existing S7D-owned
+`Physlib/Optics/Systems/DCDR/Topology.lean` 2200-line inventory entry. No S7C path appeared in any
+baseline inventory. The temporary `Physlib.lean` diff is empty.
 
-```text
-raw fold N = 2 = -1
-raw fold N = 3 = -stage.compositionMatrix
-```
-
-The sine coefficients for that same stage are separately evaluated at `theta = pi/2`, giving the
-same two values. The joined equality lemmas use only these independent raw-fold and sine-value
-calculations. They do not call `fold_replicate`, either power theorem, Cayley--Hamilton, the
-Chebyshev recurrence, or either Sylvester result.
-
-The negative control is the identity matrix. It satisfies determinant one, the lower bound, and
-both conjugacy equations, but fails only `Re(m11) < 1`. At this excluded boundary,
-`theta = 0`, totalized `sin(theta) / sin(theta) = 0`, and the following is proved:
-
-```text
-(1 : BackwardFirstChainTransform Unit Unit) ^ 1 != dateSylvesterClosedForm 1 1
-```
-
-The failed source condition is therefore load-bearing, and the fixture can fail mechanically.
-
-## Validation bindings
-
-The validation lane should bind these exact public names:
-
-- `Optics.MicroringCascade.dateIdenticalCascadeComposition_eq_pow`
-- `Optics.MicroringCascade.dateIdenticalCascadeBehavior_eq_pow_toBehavior`
-- `Optics.MicroringCascade.DateSylvesterHypotheses`
-- `Optics.MicroringCascade.dateChebyshevClosedForm`
-- `Optics.MicroringCascade.dateChain_pow_eq_chebyshevClosedForm_of_det_eq_one`
-- `Optics.MicroringCascade.dateSylvesterClosedForm`
-- `Optics.MicroringCascade.dateChain_pow_eq_sylvesterClosedForm`
-- `Optics.MicroringCascade.dateIdenticalCascadeComposition_eq_sylvesterClosedForm`
-- `Optics.MicroringCascade.dateIdenticalCascadeRegression_two_by_hand`
-- `Optics.MicroringCascade.dateIdenticalCascadeRegression_three_by_hand`
-- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_pow_two`
-- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_pow_three`
-- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_closedForm_two`
-- `Optics.MicroringCascade.dateSylvesterRegressionMatrix_closedForm_three`
-- `Optics.MicroringCascade.dateSylvesterRegression_identity_exact_failure`
-- `Optics.MicroringCascade.dateSylvesterRegression_identity_closedForm_false`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_compositionMatrix_entries`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_hypotheses`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_two`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_rawFold_three`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_two`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_sineForm_three`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_two_by_hand`
-- `Optics.MicroringCascade.dateJoinedSylvesterRegressionStage_three_by_hand`
-
-The prior U2 Markdown nit is fixed here: the full name
-`Optics.MicroringCascade.DateCascadeStage.hasBijectiveRingTransmission_iff_forwardTransfer_ne_zero`
-is now one code span.
-
-## Reused anchors and conventions
-
-- DATE Thm. 4 and the unnumbered Sylvester result are recorded at
-  `/Users/aadarwal/src/aadarwal/physlib-parity/HOL-CORPUS.md:204-207`.
-- The ledger records IP-16/IP-17 and the complete source assumptions at
-  `/Users/aadarwal/src/aadarwal/physlib-parity/PARITY-LEDGER.md:123-124`.
-- The neutral fold and its replicate-to-power result are at
-  `Physlib/Optics/Network/TwoPortChainFold.lean:90-114`.
-- DATE coordinate `0` backward and coordinate `1` forward are fixed at
-  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:990-1022`.
-- The one-stage DATE product `continuity ** ring` is at
-  `Physlib/Optics/Systems/Cascade/Heterogeneous.lean:145-148`.
-- Mathlib's second-kind recurrence and base values are in
-  `Mathlib/RingTheory/Polynomial/Chebyshev.lean:265-304`.
-- Mathlib's real trigonometric characterization is in
-  `Mathlib/Analysis/SpecialFunctions/Trigonometric/Chebyshev/Basic.lean:147-156`.
-- The modal-to-electromagnetic power bridge and its qualifications are at
-  `Physlib/Optics/HarmonicFlux/PropagatingModePower.lean:16-22,60-93`.
-
-## Non-claims
-
-- The source sine form is claimed only under all fields of `DateSylvesterHypotheses`.
-- The determinant-one Chebyshev core does not weaken the source sine theorem's trace domain.
-- The totalized sine quotient is not asserted at a zero denominator or outside the strict bound.
-- "Resonance" terminology is withheld.
-- No quadruple-ring parity row is claimed.
-- No termination, coupled lattice, full `M x N` lattice, or Physlib-original lattice result is
-  claimed in this slice.
-- Effective index is fixed at the selected carrier. There is no dispersion, bending loss,
-  bandwidth, causality, passivity, reciprocity, or material-realization claim.
-- Power remains normalized modal power. Electromagnetic power requires the finite,
-  common-frequency, Maxwell-qualified, pairwise-integrable, mutually flux-orthogonal,
-  unit-normalized measured-profile hypotheses of the cited bridge.
-- Any later SFG-TR'14/NSV'16 comparison must retain IP-12's explicit principal-root versus
-  selected-half-arc equality; this slice makes no such comparison.
-
-## Gate record
-
-The exact post-sync source head gated for slice 2b is
-`21ce2428418193fe95c64dd7ae3f4f9773da7dcf`. It contains every Lean and substantive handoff
-change in this cutoff and has `476405ce` as an ancestor. With all six cumulative S7C modules
-registered in sorted order, this single locked command exited successfully:
-
-```text
-lake-lock env bash -c 'set -euo pipefail && lake exe cache get &&
-  lake --wfail build Physlib.Optics.Network.TwoPortChainFold
-    Physlib.Optics.Network.TwoPortChainFoldRegression
-    Physlib.Optics.Systems.Cascade.Heterogeneous
-    Physlib.Optics.Systems.Cascade.HeterogeneousRegression
-    Physlib.Optics.Systems.Cascade.Identical
-    Physlib.Optics.Systems.Cascade.IdenticalRegression &&
-  lake exe runPhyslibLinters && lake exe lint_all'
-```
-
-- Cache retrieval downloaded no files.
-- All six modules built with warnings as errors; Lake completed 2,761 jobs successfully.
-- `runPhyslibLinters` passed for Physlib and QuantumInfo.
-- `lint_all` completed all seven stages and exited zero.
-- Its build, illegal-import, PhyslibAlpha-import, duplicate-tag, sorry/pseudo, and declaration
-  linter stages passed.
-- The file-import inventory named six target-baseline unregistered files: three under
-  `Physlib/Electromagnetism/**` and three under `Physlib/SpaceAndTime/**`. It named no S7C file.
-- The advisory style and transitive-import inventories contain only repository-baseline files and
-  no S7C file.
-- The committed-state `./scripts/lint-style.sh` check reports only the untouched target file
-  `Physlib/Optics/Systems/DCDR/Topology.lean` at 2,035 lines. Its blob is
-  `5e825661cc6a245fd0e58fc3607db8e5b81725e3` both here and at `476405ce`.
-- Direct `lint-style.py` checks pass on both touched S7C Lean files.
-- The temporary registry edit was restored byte-identically. Pre-edit and post-edit SHA-256 were
-  both `1741548061db23303ec95ebe539feaa278fe777a8a70eb47e151e9171f29f263`.
-
-The final cutoff-record commit changes only this gate record; no Lean source differs from the
-exact gated source head above.
+The source commit contains only the two slice-3 Lean files. This final cutoff commit changes only
+`HANDOFF.md`.
