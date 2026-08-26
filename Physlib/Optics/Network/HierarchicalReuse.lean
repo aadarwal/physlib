@@ -185,6 +185,7 @@ lemma innerBoundaryBehavior_eq_of_boundaryRelation
           (Incident.relabelEquiv replacement.boundaryChannelEquiv.symm) =
         (Incident.relabelEquiv inner.boundaryChannelEquiv.symm).trans
           (Incident.relabelEquiv boundary.channelEquiv) := by
+    apply Equiv.ext
     rintro ⟨channel⟩
     apply Incident.ext
     rfl
@@ -194,6 +195,7 @@ lemma innerBoundaryBehavior_eq_of_boundaryRelation
           (Outgoing.relabelEquiv replacement.boundaryChannelEquiv.symm) =
         (Outgoing.relabelEquiv inner.boundaryChannelEquiv.symm).trans
           (Outgoing.relabelEquiv boundary.channelEquiv) := by
+    apply Equiv.ext
     rintro ⟨channel⟩
     apply Outgoing.ext
     rfl
@@ -207,6 +209,7 @@ lemma innerBoundaryBehavior_eq_of_boundaryRelation
               (Incident.relabelEquiv replacement.boundaryChannelEquiv.symm)
               (Outgoing.relabelEquiv replacement.boundaryChannelEquiv.symm) := by
                 rw [innerBoundaryBehavior, hBoundary]
+                rfl
     _ = (inner.closeBehavior behavior).reindex
           ((Incident.relabelEquiv
             (inner.boundaryExternalChannelEquiv replacement boundary)).trans
