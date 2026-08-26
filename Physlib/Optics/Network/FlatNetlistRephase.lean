@@ -214,31 +214,50 @@ lemma closeBehavior_rephase
     rw [LinearBehavior.mem_rephase_iff] at hBehavior
     let incident := ModeAmplitude.rephase gauge.incident⁻¹ rephasedIncident
     let outgoing := ModeAmplitude.rephase gauge.outgoing⁻¹ rephasedOutgoing
+    have hOutgoingRestore :
+        ModeAmplitude.rephase gauge.outgoing outgoing = rephasedOutgoing := by
+      simp [outgoing]
     refine ⟨incident, outgoing, hBehavior, ?_, ?_⟩
     · change ModeAmplitude.rephase gauge.incident⁻¹ rephasedIncident = _
       rw [hIncident]
       apply (ModeAmplitude.rephase gauge.incident).injective
       rw [ModeAmplitude.rephase_rephase_inv]
-      simpa only [ModeAmplitude.rephase_rephase_inv] using
-        family.incidentAssembly_rephase gauge hMatched outgoing
-          (ModeAmplitude.rephase
-            (family.externalGauge gauge).incident⁻¹ rephasedInput)
+      have hAssembly := family.incidentAssembly_rephase gauge hMatched outgoing
+        (ModeAmplitude.rephase
+          (family.externalGauge gauge).incident⁻¹ rephasedInput)
+      rw [hOutgoingRestore, ModeAmplitude.rephase_rephase_inv] at hAssembly
+      exact hAssembly
     · change ModeAmplitude.rephase
         (family.externalGauge gauge).outgoing⁻¹ rephasedOutput = _
       rw [hOutput]
       apply (ModeAmplitude.rephase (family.externalGauge gauge).outgoing).injective
       rw [ModeAmplitude.rephase_rephase_inv]
-      simpa only [ModeAmplitude.rephase_rephase_inv] using
-        family.externalOutgoingReadout_apply_rephase gauge outgoing
+      have hReadout := family.externalOutgoingReadout_apply_rephase gauge outgoing
+      rw [hOutgoingRestore] at hReadout
+      exact hReadout
   · rintro ⟨incident, outgoing, hBehavior, hIncident, hOutput⟩
     refine ⟨ModeAmplitude.rephase gauge.incident incident,
       ModeAmplitude.rephase gauge.outgoing outgoing, ?_, ?_, ?_⟩
     · rw [LinearBehavior.mem_rephase_iff]
       simpa only [ModeAmplitude.rephase_inv_rephase] using hBehavior
-    · rw [family.incidentAssembly_rephase gauge hMatched, hIncident]
-      simp
-    · rw [family.externalOutgoingReadout_apply_rephase gauge, hOutput]
-      simp
+    · rw [hIncident]
+      have hAssembly := family.incidentAssembly_rephase gauge hMatched outgoing
+        (ModeAmplitude.rephase
+          (family.externalGauge gauge).incident⁻¹ rephasedInput)
+      rw [ModeAmplitude.rephase_rephase_inv] at hAssembly
+      exact hAssembly.symm
+    · calc
+        rephasedOutput = ModeAmplitude.rephase
+            (family.externalGauge gauge).outgoing
+            (ModeAmplitude.rephase
+              (family.externalGauge gauge).outgoing⁻¹ rephasedOutput) := by simp
+        _ = ModeAmplitude.rephase (family.externalGauge gauge).outgoing
+            (family.externalOutgoingReadout.toLinearMap outgoing) :=
+          congrArg (ModeAmplitude.rephase
+            (family.externalGauge gauge).outgoing) hOutput
+        _ = family.externalOutgoingReadout.toLinearMap
+            (ModeAmplitude.rephase gauge.outgoing outgoing) :=
+          (family.externalOutgoingReadout_apply_rephase gauge outgoing).symm
 
 end PortConnectionFamily
 
@@ -323,10 +342,20 @@ lemma rephasedResponseTransform_eq
   classical
   unfold rephasedResponseTransform
   apply ModeTransform.toBehavior_injective
-  rw [LinearBehavior.toBehavior_toModeTransform,
-    ModeTransform.toBehavior_rephase,
-    netlist.toBehavior_responseTransform,
-    netlist.rephasedBehavior_eq gauge hMatched]
+  calc
+    ((netlist.rephasedBehavior gauge).toModeTransform
+          (netlist.rephasedBehavior_isFunctional gauge hMatched hWellPosed)).toBehavior =
+        netlist.rephasedBehavior gauge :=
+      LinearBehavior.toBehavior_toModeTransform _ _
+    _ = netlist.behavior.rephase
+        (netlist.connections.externalGauge gauge).incident
+        (netlist.connections.externalGauge gauge).outgoing :=
+      netlist.rephasedBehavior_eq gauge hMatched
+    _ = ((netlist.responseTransform hWellPosed).rephase
+          (netlist.connections.externalGauge gauge).incident
+          (netlist.connections.externalGauge gauge).outgoing).toBehavior := by
+      rw [ModeTransform.toBehavior_rephase,
+        netlist.toBehavior_responseTransform]
 
 end FlatNetlist
 
@@ -386,6 +415,12 @@ section Finite
 
 variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype outer.Channel]
 
+/-- The inner stage's structurally external channels inherit ambient finiteness. -/
+local instance appendRephaseInnerExternalChannelFintype :
+    Fintype inner.ExternalChannel := by
+  classical
+  infer_instance
+
 /-- The inner boundary channel type inherits finiteness from its external-channel presentation.
 -/
 local instance appendRephaseBoundaryChannelFintype :
@@ -396,6 +431,12 @@ local instance appendRephaseBoundaryChannelFintype :
 local instance appendRephaseConnectedChannelFintype :
     Fintype (inner.append outer).Channel :=
   Fintype.ofEquiv _ (inner.appendChannelEquiv outer).symm
+
+/-- The final outer boundary inherits finiteness from the finite intermediate boundary. -/
+local instance appendRephaseOuterExternalChannelFintype :
+    Fintype outer.ExternalChannel := by
+  classical
+  infer_instance
 
 /-- The flattened external channel family is finite under the two-stage structural hypotheses.
 -/
@@ -419,8 +460,23 @@ lemma closeBehavior_append_rephase_eq_staged
           (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm).rephase
         ((inner.append outer).externalGauge gauge).incident
         ((inner.append outer).externalGauge gauge).outgoing := by
-  rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched,
-    inner.closeBehavior_append outer]
+  calc
+    (inner.append outer).closeBehavior
+          (behavior.rephase gauge.incident gauge.outgoing) =
+        ((inner.append outer).closeBehavior behavior).rephase
+          ((inner.append outer).externalGauge gauge).incident
+          ((inner.append outer).externalGauge gauge).outgoing :=
+      (inner.append outer).closeBehavior_rephase behavior gauge hMatched
+    _ = ((outer.closeBehavior (inner.innerBoundaryBehavior behavior)).reindex
+          (Incident.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm
+          (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm).rephase
+          ((inner.append outer).externalGauge gauge).incident
+          ((inner.append outer).externalGauge gauge).outgoing :=
+      congrArg
+        (fun relation => relation.rephase
+          ((inner.append outer).externalGauge gauge).incident
+          ((inner.append outer).externalGauge gauge).outgoing)
+        (inner.closeBehavior_append outer behavior)
 
 end Finite
 
