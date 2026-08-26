@@ -276,7 +276,9 @@ lemma tightMultipleDelay_responseNumeratorPolynomial_expansion :
     MultipleDelayParameters.feedbackPolynomial,
     tightMultipleDelayParameters, tightMultipleDelayCoupler,
     DirectionalCoupler.crossCoefficient]
-  ring
+  ring_nf
+  rw [← Polynomial.C_pow, Complex.I_sq]
+  simp
 
 /-- The tight raw denominator has degree four, strictly above the unit-delay bound two. -/
 lemma tightMultipleDelay_denominatorPolynomial_natDegree_eq_four :
@@ -286,7 +288,8 @@ lemma tightMultipleDelay_denominatorPolynomial_natDegree_eq_four :
   · exact (Polynomial.natDegree_sub_le _ _).trans
       (max_le (by simp) (by simp))
   · apply Polynomial.le_natDegree_of_ne_zero
-    simp
+    norm_num [Polynomial.coeff_sub, Polynomial.coeff_one,
+      Polynomial.coeff_X_pow]
 
 /-- The directly expanded tight numerator is nonzero. -/
 lemma tightMultipleDelayNumerator_ne_zero : (-X : Polynomial ℂ) ≠ 0 := by
@@ -343,6 +346,14 @@ def tightMultipleDelayResponseReduction :
 lemma tightMultipleDelay_zPoles_eq_four :
     tightMultipleDelayReducedResponse.zPoles =
       {(1 : ℂ), -1, Complex.I, -Complex.I} := by
+  have hIPow : Complex.I ^ 4 = 1 := by
+    calc
+      Complex.I ^ 4 = (Complex.I ^ 2) ^ 2 := by ring
+      _ = 1 := by rw [Complex.I_sq]; norm_num
+  have hNegIPow : (-Complex.I) ^ 4 = 1 := by
+    calc
+      (-Complex.I) ^ 4 = Complex.I ^ 4 := by ring
+      _ = 1 := hIPow
   ext z
   simp only [Set.mem_insert_iff, Set.mem_singleton_iff]
   constructor
@@ -358,7 +369,9 @@ lemma tightMultipleDelay_zPoles_eq_four :
           ((z - Complex.I) * (z + Complex.I)) = 0 := by
       calc
         ((z - 1) * (z + 1)) *
-            ((z - Complex.I) * (z + Complex.I)) = z ^ 4 - 1 := by
+            ((z - Complex.I) * (z + Complex.I)) =
+            (z ^ 2 - 1) * (z ^ 2 - Complex.I ^ 2) := by ring
+        _ = z ^ 4 - 1 := by
           rw [Complex.I_sq]
           ring
         _ = 0 := by linear_combination hPower
@@ -381,20 +394,22 @@ lemma tightMultipleDelay_zPoles_eq_four :
   · rintro (rfl | rfl | rfl | rfl)
     · constructor
       · norm_num
-      · norm_num
+      · change (1 - X ^ 4 : Polynomial ℂ).eval (1 : ℂ)⁻¹ = 0
+        norm_num
     · constructor
       · norm_num
-      · norm_num
+      · change (1 - X ^ 4 : Polynomial ℂ).eval (-1 : ℂ)⁻¹ = 0
+        norm_num
     · constructor
       · exact Complex.I_ne_zero
-      · rw [Complex.inv_I]
-        norm_num [Complex.I_mul_I]
-        ring
+      · change (1 - X ^ 4 : Polynomial ℂ).eval Complex.I⁻¹ = 0
+        rw [Complex.inv_I]
+        simp [hNegIPow]
     · constructor
       · exact neg_ne_zero.mpr Complex.I_ne_zero
-      · rw [inv_neg, Complex.inv_I]
+      · change (1 - X ^ 4 : Polynomial ℂ).eval (-Complex.I)⁻¹ = 0
+        rw [inv_neg, Complex.inv_I]
         norm_num [Complex.I_mul_I]
-        ring
 
 /-- Primitive set cardinality gives exactly four reciprocal-coordinate poles. -/
 lemma tightMultipleDelay_ncard_actualPoles_eq_four :
