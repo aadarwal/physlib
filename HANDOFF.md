@@ -484,5 +484,34 @@ docs do not describe the coherent construction as a departure from the source.
 
 ## Gate record
 
-Pending at the committed source head. The final record will include the exact chained command,
-gated commit, sync target, style results for every DCDR file, and byte-identical registry restore.
+The exact controller sync target was `782ba5c7`, merged at `7d5b0aea`. The gated Lean source head
+was `c6a2377f`. A final HANDOFF-only child records this result; no Lean source changed afterward.
+
+After committing every DCDR source file, `./scripts/lint-style.sh` exited zero. It covered all
+tracked Lean files, including `Netlist`, `Graph`, `Bridge`, `Topology`, `TopologyRegression`,
+`Response`, `Mason`, and `ResponseRegression`. No DCDR file exceeds 1500 lines.
+
+With the eight requested imports inserted temporarily in sorted order, this single locked command
+exited zero:
+
+```text
+lake-lock env bash -c 'lake exe cache get &&
+  lake --wfail build Physlib.Optics.Systems.DCDR.Netlist
+    Physlib.Optics.Systems.DCDR.Graph
+    Physlib.Optics.Systems.DCDR.Bridge
+    Physlib.Optics.Systems.DCDR.Topology
+    Physlib.Optics.Systems.DCDR.TopologyRegression
+    Physlib.Optics.Systems.DCDR.Response
+    Physlib.Optics.Systems.DCDR.Mason
+    Physlib.Optics.Systems.DCDR.ResponseRegression &&
+  lake exe runPhyslibLinters && lake exe lint_all'
+```
+
+The cache was current. The warnings-as-errors build passed. `runPhyslibLinters` passed for Physlib
+and QuantumInfo. `lint_all` passed its build, file-registration, illegal-import, PhyslibAlpha
+registration, duplicate-tag, sorry/pseudo-attribution, declaration-linter, and transitive-import
+checks. Its advisory style and transitive-import inventories named only pre-existing non-DCDR
+files.
+
+`Physlib.lean` was restored byte-identically to SHA-256
+`d6279000556c059e0a352aac530487e353adc7e5fa1f7c05b2bce229ec34f510` and has no diff.
