@@ -27,6 +27,7 @@ adding a physical or solver hypothesis.
 ## ii. Key results
 
 - `LinearBehavior.rephase`: coordinate transport of an arbitrary finite linear relation.
+- `LinearBehavior.rephase_congr`: coordinate transport respects equality of relations.
 - `ModeTransform.toBehavior_rephase`: transform rephasing agrees with graph transport.
 - `PortConnectionFamily.closeBehavior_rephase`: singular-safe connection closure is covariant for
   a matched gauge.
@@ -87,6 +88,13 @@ def rephase [Fintype input] [Fintype output]
       (ModeAmplitude.rephase gaugeOut).toLinearEquiv) :
         (ModeAmplitude input × ModeAmplitude output) ≃ₗ[ℂ]
           (ModeAmplitude input × ModeAmplitude output)).toLinearMap
+
+/-- Rephasing respects equality of the underlying finite linear relations. -/
+lemma rephase_congr [Fintype input] [Fintype output]
+    (gaugeIn : ModePhaseGauge input) (gaugeOut : ModePhaseGauge output)
+    {first second : LinearBehavior input output} (hBehavior : first = second) :
+    first.rephase gaugeIn gaugeOut = second.rephase gaugeIn gaugeOut :=
+  congrArg (rephase gaugeIn gaugeOut) hBehavior
 
 /-- Membership in a rephased behavior is original membership after removing both gauges. -/
 @[simp]
@@ -341,8 +349,9 @@ lemma rephasedResponseTransform_eq
   unfold rephasedResponseTransform
   apply LinearBehavior.toModeTransform_unique
   rw [ModeTransform.toBehavior_rephase,
-    netlist.toBehavior_responseTransform hWellPosed,
     netlist.rephasedBehavior_eq gauge hMatched]
+  exact LinearBehavior.rephase_congr _ _
+    (netlist.toBehavior_responseTransform hWellPosed)
 
 end FlatNetlist
 
@@ -447,12 +456,11 @@ lemma closeBehavior_append_rephase_eq_staged
           (Outgoing.relabelEquiv (inner.appendExternalChannelEquiv outer)).symm).rephase
         ((inner.append outer).externalGauge gauge).incident
         ((inner.append outer).externalGauge gauge).outgoing := by
-  rw [(inner.append outer).closeBehavior_rephase behavior gauge hMatched]
-  exact congrArg
-    (fun relation => relation.rephase
+  exact ((inner.append outer).closeBehavior_rephase behavior gauge hMatched).trans
+    (LinearBehavior.rephase_congr
       ((inner.append outer).externalGauge gauge).incident
       ((inner.append outer).externalGauge gauge).outgoing)
-    (inner.closeBehavior_append outer behavior)
+      (inner.closeBehavior_append outer behavior))
 
 end Finite
 
