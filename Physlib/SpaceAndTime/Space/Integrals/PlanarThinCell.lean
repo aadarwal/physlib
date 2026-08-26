@@ -211,6 +211,26 @@ def sidePoint {d : ℕ} (plane : OrientedAffineHyperplane d) (side : Side)
     rw [plane.normalComponent_sideNormalVector]
     nlinarith [side.sign_sq]⟩
 
+/-- The signed normal coordinate of a selected-side sample is the selected side sign times its
+positive height. -/
+@[simp]
+lemma signedNormalCoordinate_sidePoint {d : ℕ}
+    (plane : OrientedAffineHyperplane d) (side : Side)
+    (x : plane.carrier) (offset : plane.tangentSubmodule) (height : ℝ)
+    (hHeight : 0 < height) :
+    plane.signedNormalCoordinate (plane.sidePoint side x offset height hHeight) =
+      side.sign * height := by
+  rw [sidePoint, plane.signedNormalCoordinate_vadd,
+    (plane.mem_carrier (x : Space d)).mp x.property, add_zero,
+    normalComponent, inner_add_right, inner_smul_right]
+  have hOffset : inner ℝ plane.normalVector
+      (offset : EuclideanSpace ℝ (Fin d)) = 0 :=
+    (plane.mem_tangentSubmodule offset).mp offset.property
+  rw [hOffset, zero_add]
+  change height * plane.normalComponent (plane.sideNormalVector side) = side.sign * height
+  rw [plane.normalComponent_sideNormalVector]
+  ring
+
 /-- The oriented in-plane quarter-turn of a bundled tangent vector. -/
 def quarterTurnTangent (plane : OrientedAffineHyperplane 3)
     (tangent : plane.tangentSubmodule) : plane.tangentSubmodule :=
