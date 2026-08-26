@@ -109,7 +109,17 @@ lemma mem_rephase_iff [Fintype input] [Fintype output]
     apply (ModeAmplitude.rephase gaugeOut).injective
     simp
   simp only [LinearEquiv.prodCongr_symm, LinearEquiv.prodCongr_apply]
-  rw [hInput, hOutput]
+  have hPair :
+      ((ModeAmplitude.rephase gaugeIn).symm inputAmplitude,
+          (ModeAmplitude.rephase gaugeOut).symm outputAmplitude) =
+        (ModeAmplitude.rephase gaugeIn⁻¹ inputAmplitude,
+          ModeAmplitude.rephase gaugeOut⁻¹ outputAmplitude) :=
+    Prod.ext hInput hOutput
+  constructor
+  · intro hMember
+    exact hPair ▸ hMember
+  · intro hMember
+    exact hPair.symm ▸ hMember
 
 /-- Rephasing a behavior and then removing the same coordinate gauges recovers it. -/
 @[simp]
@@ -197,10 +207,10 @@ lemma closeBehavior_rephase
         (family.externalGauge gauge).incident
         (family.externalGauge gauge).outgoing := by
   ext ⟨rephasedInput, rephasedOutput⟩
-  rw [LinearBehavior.mem_rephase_iff]
+  rw [LinearBehavior.mem_rephase_iff,
+    family.mem_closeBehavior_iff, family.mem_closeBehavior_iff]
   constructor
-  · rw [family.mem_closeBehavior_iff]
-    rintro ⟨rephasedIncident, rephasedOutgoing, hBehavior, hIncident, hOutput⟩
+  · rintro ⟨rephasedIncident, rephasedOutgoing, hBehavior, hIncident, hOutput⟩
     rw [LinearBehavior.mem_rephase_iff] at hBehavior
     let incident := ModeAmplitude.rephase gauge.incident⁻¹ rephasedIncident
     let outgoing := ModeAmplitude.rephase gauge.outgoing⁻¹ rephasedOutgoing
@@ -220,8 +230,7 @@ lemma closeBehavior_rephase
       rw [ModeAmplitude.rephase_rephase_inv]
       simpa only [ModeAmplitude.rephase_rephase_inv] using
         family.externalOutgoingReadout_apply_rephase gauge outgoing
-  · rw [family.mem_closeBehavior_iff]
-    rintro ⟨incident, outgoing, hBehavior, hIncident, hOutput⟩
+  · rintro ⟨incident, outgoing, hBehavior, hIncident, hOutput⟩
     refine ⟨ModeAmplitude.rephase gauge.incident incident,
       ModeAmplitude.rephase gauge.outgoing outgoing, ?_, ?_, ?_⟩
     · rw [LinearBehavior.mem_rephase_iff]
@@ -269,7 +278,8 @@ lemma rephasedBehavior_eq (gauge : ChannelEndGauge netlist.Channel)
         (netlist.connections.externalGauge gauge).outgoing := by
   classical
   rw [rephasedBehavior, rephasedComponentBehavior,
-    netlist.connections.closeBehavior_rephase gauge hMatched,
+    netlist.connections.closeBehavior_rephase
+      netlist.componentBehavior gauge hMatched,
     ← netlist.behavior_eq_closeBehavior]
 
 /-!
@@ -295,8 +305,9 @@ noncomputable def rephasedResponseTransform
     (gauge : ChannelEndGauge netlist.Channel)
     (hMatched : netlist.connections.IsMatchedGauge gauge)
     (hWellPosed : netlist.IsWellPosed) :
-    ModeTransform netlist.ExternalIncident netlist.ExternalOutgoing :=
-  (netlist.rephasedBehavior gauge).toModeTransform
+    ModeTransform netlist.ExternalIncident netlist.ExternalOutgoing := by
+  classical
+  exact (netlist.rephasedBehavior gauge).toModeTransform
     (netlist.rephasedBehavior_isFunctional gauge hMatched hWellPosed)
 
 /-- On the named well-posed domain, the response extracted after component rephasing is exactly
@@ -309,6 +320,8 @@ lemma rephasedResponseTransform_eq
       (netlist.responseTransform hWellPosed).rephase
         (netlist.connections.externalGauge gauge).incident
         (netlist.connections.externalGauge gauge).outgoing := by
+  classical
+  unfold rephasedResponseTransform
   apply ModeTransform.toBehavior_injective
   rw [LinearBehavior.toBehavior_toModeTransform,
     ModeTransform.toBehavior_rephase,
@@ -346,7 +359,10 @@ lemma isMatchedGauge_append_iff (gauge : ChannelEndGauge P.Channel) :
     constructor
     · rintro ⟨index, channel⟩
       have hChannel := hMatched ⟨Sum.inl index, channel⟩
-      simpa [IsMatchedGauge] using hChannel
+      rw [inner.append_mateEquiv_inl outer,
+        inner.append_channelEmbedding_inl outer,
+        inner.append_channelEmbedding_inl outer] at hChannel
+      exact hChannel
     · rintro ⟨index, channel⟩
       have hChannel := hMatched ⟨Sum.inr index, channel⟩
       rw [inner.append_mateEquiv_inr outer,
@@ -355,8 +371,13 @@ lemma isMatchedGauge_append_iff (gauge : ChannelEndGauge P.Channel) :
       exact hChannel
   · rintro ⟨hInner, hOuter⟩ ⟨index, channel⟩
     rcases index with index | index
-    · simpa [IsMatchedGauge] using hInner ⟨index, channel⟩
-    · rw [inner.append_mateEquiv_inr outer,
+    · change (inner.connection index).LocalChannel at channel
+      rw [inner.append_mateEquiv_inl outer,
+        inner.append_channelEmbedding_inl outer,
+        inner.append_channelEmbedding_inl outer]
+      exact hInner ⟨index, channel⟩
+    · change (outer.connection index).LocalChannel at channel
+      rw [inner.append_mateEquiv_inr outer,
         inner.append_channelEmbedding_inr outer,
         inner.append_channelEmbedding_inr outer]
       exact hOuter ⟨index, channel⟩
@@ -364,6 +385,17 @@ lemma isMatchedGauge_append_iff (gauge : ChannelEndGauge P.Channel) :
 section Finite
 
 variable [Fintype P.Channel] [Fintype inner.Channel] [Fintype outer.Channel]
+
+/-- The inner boundary channel type inherits finiteness from its external-channel presentation.
+-/
+local instance appendRephaseBoundaryChannelFintype :
+    Fintype inner.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ inner.boundaryChannelEquiv.symm
+
+/-- The flattened connected channels are the finite sum of both stages' connected channels. -/
+local instance appendRephaseConnectedChannelFintype :
+    Fintype (inner.append outer).Channel :=
+  Fintype.ofEquiv _ (inner.appendChannelEquiv outer).symm
 
 /-- The flattened external channel family is finite under the two-stage structural hypotheses.
 -/
