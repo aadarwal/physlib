@@ -292,6 +292,8 @@ lemma crowRegression_mem_componentBehavior :
         crowRegressionIncidentValue, crowRegressionOutgoingValue,
         crowRegressionParameters, crowRegressionEndCoupler,
         crowRegressionMiddleCoupler, DirectionalCoupler.crossCoefficient,
+        DirectionalCoupler.incidentChannelEquiv,
+        DirectionalCoupler.outgoingChannelEquiv, DirectionalCoupler.channelEquiv,
         ModeAmplitude.directSum, ModeAmplitude.reindex_apply,
         ModeAmplitude.restrictInl, ModeAmplitude.restrictInr] <;>
       apply Complex.ext <;>
@@ -319,7 +321,10 @@ lemma crowRegression_mem_componentBehavior :
         crowRegressionIncidentValue, crowRegressionOutgoingValue,
         crowRegressionParameters, crowRegressionHalfArc,
         MatchedPropagation.transmissionCoefficient,
-        MatchedPropagation.carrierPhaseFactor, ModeAmplitude.directSum,
+        MatchedPropagation.carrierPhaseFactor,
+        MatchedPropagation.incidentChannelEquiv,
+        MatchedPropagation.outgoingChannelEquiv, MatchedPropagation.channelEquiv,
+        ModeAmplitude.directSum,
         ModeAmplitude.reindex_apply] <;>
       apply Complex.ext <;>
       norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
@@ -346,7 +351,10 @@ lemma crowRegression_mem_componentBehavior :
         crowRegressionIncidentValue, crowRegressionOutgoingValue,
         crowRegressionParameters, crowRegressionHalfArc,
         MatchedPropagation.transmissionCoefficient,
-        MatchedPropagation.carrierPhaseFactor, ModeAmplitude.directSum,
+        MatchedPropagation.carrierPhaseFactor,
+        MatchedPropagation.incidentChannelEquiv,
+        MatchedPropagation.outgoingChannelEquiv, MatchedPropagation.channelEquiv,
+        ModeAmplitude.directSum,
         ModeAmplitude.reindex_apply] <;>
       apply Complex.ext <;>
       norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
