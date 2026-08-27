@@ -13,8 +13,9 @@ public import Physlib.Optics.Polarization.Basic
 ## i. Overview
 
 This file defines normalized linear-polarization Jones states using `Real.Angle`. The angle is
-measured from the first declared Jones coordinate toward the second. No observer-dependent
-clockwise, counterclockwise, or handedness convention is imposed.
+measured from the first declared Jones coordinate toward the second. Unguarded convention
+statement (review only): no observer-dependent clockwise, counterclockwise, or handedness name is
+imposed.
 
 The raw Jones representative changes sign after a half-turn, while its squared Jones intensity
 and every projector built from it remain unchanged. The analyzer amplitude is the Hermitian inner

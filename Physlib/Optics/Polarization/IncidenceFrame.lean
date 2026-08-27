@@ -55,8 +55,9 @@ normal admittance separately.
 
 The construction is derived from the imported Physlib polarization-frame and Euclidean
 cross-product APIs. This file does not define an interface point or half-space, classify a direction
-as incident or outgoing, derive reflection or refraction, introduce Fresnel coefficients, or make
-an irradiance or power claim.
+by wave role, derive reflection or refraction, introduce Fresnel coefficients, or make an
+irradiance or power claim. Unguarded convention statement (review only): it assigns no incident or
+outgoing role to a direction.
 -/
 
 @[expose] public section
@@ -76,8 +77,9 @@ noncomputable section
 /-- A propagation direction is non-normal to an oriented interface normal when their coordinate
 vectors have nonzero cross product.
 
-This geometric predicate includes grazing propagation. It supplies no interface point, side, or
-incoming/outgoing interpretation. -/
+This geometric predicate includes grazing propagation. It supplies no interface point or side.
+Unguarded convention statement (review only): it supplies no incoming or outgoing
+interpretation. -/
 def IsNonNormalIncidence (propagationDirection interfaceNormal : Space.Direction 3) : Prop :=
   Space.basis.repr interfaceNormal.unit ⨯ₑ₃
     Space.basis.repr propagationDirection.unit ≠ 0
@@ -134,8 +136,8 @@ def pPolarizationAxis (propagationDirection interfaceNormal : Space.Direction 3)
 /-- The oriented `s`/`p` polarization frame selected by non-normal interface incidence.
 
 Axis zero is `s = normalize (n × k)` and axis one is `p = k × s`. The definition is purely
-geometric and does not assert that the propagation direction is physically incident, reflected,
-or transmitted. -/
+geometric. Unguarded convention statement (review only): it does not assert that the propagation
+direction is physically incident, reflected, or transmitted. -/
 def incidencePolarizationFrame (propagationDirection interfaceNormal : Space.Direction 3)
     (h : IsNonNormalIncidence propagationDirection interfaceNormal) :
     PolarizationFrame propagationDirection :=
@@ -183,9 +185,9 @@ variable {direction interfaceNormal : Space.Direction 3}
 interface normal when it is the corresponding `incidencePolarizationFrame`.
 
 The existential witness hides the proof term for non-normality from downstream APIs. This
-predicate is purely geometric and assigns no incident, reflected, transmitted, or propagation-side
-role. It is deliberately unavailable at normal incidence, where a tangent gauge must be selected
-independently. -/
+predicate is purely geometric. Unguarded convention statement (review only): it assigns no
+incident, reflected, transmitted, or propagation-side role. It is deliberately unavailable at
+normal incidence, where a tangent gauge must be selected independently. -/
 def IsCanonicalNonNormalIncidenceFrame (frame : PolarizationFrame direction)
     (interfaceNormal : Space.Direction 3) : Prop :=
   ∃ h : IsNonNormalIncidence direction interfaceNormal,
@@ -252,7 +254,8 @@ lemma incidencePolarizationFrame_axis_zero_eq_incidencePlaneFrame
 `s` axis.
 
 This is the geometric transport law used when phase matching equates positive scalar multiples of
-two propagation directions. It assigns no incident, reflected, transmitted, or material meaning. -/
+two propagation directions. Unguarded convention statement (review only): it assigns no incident,
+reflected, or transmitted role. It assigns no material meaning. -/
 lemma incidencePolarizationFrame_axis_zero_eq_of_pos_smul_tangentialProjection_eq
     (plane : OrientedAffineHyperplane 3)
     (firstDirection secondDirection : Space.Direction 3)

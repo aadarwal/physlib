@@ -16,6 +16,11 @@ This file transports the physical polarizer-retarder carrier through the E3b ape
 normalization theorem. The ideal retarder changes the output Jones state but leaves the analyzer's
 singleton modal coordinate unchanged. Under separate incident and outgoing normalization proofs,
 the actual integrated one-period Poynting flux therefore obeys the analyzer's cosine-squared law.
+The role signs are pinned by
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`, together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`.
 
 ## ii. Key results
 
@@ -53,7 +58,11 @@ namespace JonesMatrix
 /-- Under separate incident and outgoing flux-normalization proofs, the actual output flux of the
 polarizer-retarder chain is the negative input normal flux times the squared analyzer cosine.
 
-The sign converts the incident plane's outward-normal flux to positive incident power. -/
+The sign converting the incident plane's outward-normal flux to positive incident power is pinned
+by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`, together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`. -/
 lemma linearRetarder_comp_linearPolarizer_malus_integratedActualMeanNormalFlux
     {Ain Aout : Type*} [MeasurableSpace Ain] [MeasurableSpace Aout]
     (z : ℂ) (retarderAxis retardance analyzer input : Real.Angle)

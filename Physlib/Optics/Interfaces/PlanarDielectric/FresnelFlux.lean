@@ -15,7 +15,8 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelAmplitude
 
 This file turns the real propagating full-vector Fresnel amplitudes into lossless normal-flux
 identities. Write `Y_j = Z_j⁻¹`, and let `chi_i > 0` and `chi_t >= 0` be the signed incident and
-transmitted normal propagation components. The transmission flux factor is
+transmitted normal propagation components; this sign use is pinned by
+`fresnelFluxRegression_quadrature_normalFlux_values`. The transmission flux factor is
 
 ```text
 (Y₂ chi_t) / (Y₁ chi_i).
@@ -358,7 +359,8 @@ lemma jonesIntensity_normalFlux_balance_of_fresnel_components
 /-- Fresnel component formulas satisfy an incident-normal-weighted material-irradiance identity.
 
 This algebraic form becomes the positive outgoing-flux balance when `0 < chi_i` and
-`0 ≤ chi_t`. -/
+`0 ≤ chi_t`, with the sign assignment pinned by
+`fresnelFluxRegression_quadrature_normalFlux_values`. -/
 lemma materialPlaneWaveIrradiance_normalFlux_balance_of_fresnel_components
     (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
     (incidentJones reflectedJones transmittedJones : JonesVector)
@@ -391,7 +393,8 @@ lemma materialPlaneWaveIrradiance_normalFlux_balance_of_fresnel_components
 material irradiance.
 
 If the reflected Jones data vanishes, its normal component remains arbitrary and contributes no
-flux. Otherwise its signed normal is the negative of the incident normal. -/
+flux. Otherwise its signed normal is the negative of the incident normal; the active sign is
+pinned by `fresnelFluxRegression_quadrature_normalFlux_values`. -/
 lemma materialPlaneWaveIrradiance_signedNormalFlux_balance_of_fresnel_components
     (interface : PlanarDielectricInterface) (chi_i chi_r chi_t : ℝ)
     (incidentJones reflectedJones transmittedJones : JonesVector)

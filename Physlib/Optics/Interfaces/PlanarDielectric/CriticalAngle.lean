@@ -34,8 +34,9 @@ identify that expression with the normal square of an actual transmitted-labelle
 
 The results here remain label-level identities when electric amplitudes vanish. A positive
 radicand constructs no transmitted wave and selects no real root; a negative radicand selects
-neither imaginary root and is not by itself total internal reflection. No ray, group-velocity,
-outgoing, evanescent, Fresnel, irradiance, or power conclusion is made.
+neither imaginary root and is not by itself total internal reflection. Unguarded convention
+statement (review only): no outgoing role follows. No ray, group-velocity, evanescent, Fresnel,
+irradiance, or power conclusion is made.
 
 ## ii. Key results
 
@@ -496,8 +497,9 @@ phase normal component.
 
 Here critical incidence is the unconditional sine-threshold equality: it permits equal-speed
 grazing and, without an incident-angle range, need not be the interior incoming critical angle.
-This result does not construct the transmitted candidate or assert nonzero amplitude, outgoing
-behavior, evanescence, total internal reflection, irradiance, or power. -/
+This result does not construct the transmitted candidate or assert nonzero amplitude. Unguarded
+convention statement (review only): it asserts no outgoing behavior. It asserts no evanescence,
+total internal reflection, irradiance, or power either. -/
 lemma transmitted_normalRoot_data_of_isCriticalPhaseIncidence
     (h : configuration.IsElectricPhaseMatched)
     (hIncidentDispersion : configuration.incident.IsDispersionMatched
@@ -526,8 +528,8 @@ lemma transmitted_normalRoot_data_of_isCriticalPhaseIncidence
 incident phase data force the transmitted phase vector to be tangent to the interface.
 
 Transmitted dispersion and the derived zero attenuation exclude a zero transmitted phase vector,
-so this is genuine tangency. The result still asserts no nonzero electric amplitude, outgoing
-behavior, irradiance, or power. -/
+so this is genuine tangency. The result still asserts no nonzero electric amplitude. Unguarded
+convention statement (review only): it asserts no outgoing behavior, irradiance, or power. -/
 lemma transmittedPhaseAngle_eq_pi_div_two_of_isCriticalPhaseIncidence
     (h : configuration.IsElectricPhaseMatched)
     (hIncidentDispersion : configuration.incident.IsDispersionMatched

@@ -35,7 +35,8 @@ incident factor, makes both denominators nonzero without a separate assumption.
 The later sections connect this algebra to the canonical positive-normal-decay transmitted Jones
 carrier. Because boundary amplitudes are referenced to the affine plane's stored point, the
 connected transmitted Jones data includes the carrier's exact spatial factor there. No decay
-geometry is silently treated as an outgoing-wave or power-flow condition.
+geometry is silently treated as an outgoing-wave or power-flow condition; this is an unguarded
+convention statement (review only).
 
 ## ii. Key results
 
@@ -1326,7 +1327,8 @@ lemma complexFresnel_tangential_p_components_of_referenced_balances
 propagating reflected wave.
 
 This is an incident-versus-reflected statement in the common negative medium. It does not treat
-the transmitted decay-frame Jones intensity as electromagnetic power. -/
+the transmitted decay-frame Jones intensity as electromagnetic power; this is an unguarded
+convention statement (review only). -/
 lemma complexFresnel_reflectedJones_intensity_eq_of_referenced_balances
     (hElectric : configuration.HasReferencedJointElectricBalance)
     (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)

@@ -22,9 +22,9 @@ measure; restriction localizes it to the supplied measurable aperture region. A 
 connector may integrate directly on ambient `Space`; points outside the aperture have zero
 measure. No parameterized-surface pullback or Jacobian theorem is asserted here.
 
-This file does not select an incident or outgoing role, orient the scalar area measure, or assert
-regularity of the region boundary. Orientation enters only when a flux integrand pairs with the
-plane's stored normal.
+Unguarded convention statement (review only): this file does not select an incident or outgoing
+role. It does not orient the scalar area measure or assert regularity of the region boundary.
+Orientation enters only when a flux integrand pairs with the plane's stored normal.
 
 ## ii. Key results
 

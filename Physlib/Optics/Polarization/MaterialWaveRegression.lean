@@ -31,7 +31,8 @@ along coordinate two with the inverse wave-speed factor.
 ## iv. References
 
 The fixture checks field orientation and the constitutive `B`-to-`H` bridge. It makes no
-irradiance, aperture-power, gauge-potential, handedness, lossy-medium, or evanescent-wave claim.
+irradiance, aperture-power, gauge-potential, lossy-medium, or evanescent-wave claim. Unguarded
+convention statement (review only): it assigns no handedness name.
 -/
 
 @[expose] public section

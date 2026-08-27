@@ -40,7 +40,8 @@ does not encode a carrier frequency or Maxwell qualification.
 
 This is Physlib-original infrastructure around the existing peak-phasor Poynting convention. It
 does not formalize a result from the audited HOL optics corpus. The profiles are supplied data:
-this file proves no Maxwell qualification, modal completeness, wave role, or power conservation.
+this file proves no Maxwell qualification, modal completeness, or power conservation. Unguarded
+convention statement (review only): it assigns the profiles no wave role.
 -/
 
 @[expose] public section

@@ -18,9 +18,13 @@ The medium has relative parameters `ε = 4` and `μ = 1`, hence wave impedance `
 linear-polarization state therefore has unit irradiance. Its carrier propagates along coordinate
 zero through oppositely oriented input and output planes.
 
-Direct actual-field integration gives signed normal fluxes `-1` and `1`. Those computations, not a
-modal-power assumption, establish the incident and outgoing `IsApertureFluxOrthonormal` witnesses
-used by the analyzer regression.
+Direct actual-field integration gives signed normal fluxes `-1` and `1`, pinned by
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`. The incident and outgoing
+role assignments are pinned by
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`, whose proofs use those
+computations rather than a modal-power assumption.
 
 ## ii. Key results
 
@@ -84,12 +88,16 @@ def polarizerModeNormalizationRegressionFrame :
     ext i
     fin_cases i <;> simp [crossProduct, polarizerModeNormalizationRegressionDirection]
 
-/-- The output plane has outward normal along propagation. -/
+/-- The output plane has outward normal along propagation, with its outgoing flux sign pinned by
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux` and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`. -/
 def polarizerModeNormalizationRegressionOutputPlane : OrientedAffineHyperplane 3 where
   point := 0
   normal := polarizerModeNormalizationRegressionDirection
 
-/-- The input plane has outward normal opposite propagation. -/
+/-- The input plane has outward normal opposite propagation, with its incident flux sign pinned by
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`. -/
 def polarizerModeNormalizationRegressionInputPlane : OrientedAffineHyperplane 3 where
   point := 0
   normal := ⟨-Space.basis 0, by simp⟩
@@ -103,7 +111,9 @@ def polarizerModeNormalizationRegressionPoint : Unit → Space := fun _ => 0
 
 -/
 
-/-- Every linear axis has directly computed outgoing integrated normal flux one. -/
+/-- Every linear axis has directly computed outgoing integrated normal flux one, pinned by
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux` and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`. -/
 lemma polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux
     (axis : Real.Angle) :
     HarmonicFieldProfile.integratedMeanNormalFlux Measure.count
@@ -130,7 +140,9 @@ lemma polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux
     OrientedAffineHyperplane.normalComponent, OrientedAffineHyperplane.normalVector,
     PiLp.inner_apply, RCLike.inner_apply, Fin.sum_univ_three]
 
-/-- Every linear axis has directly computed incident integrated normal flux minus one. -/
+/-- Every linear axis has directly computed incident integrated normal flux minus one, pinned by
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`. -/
 lemma polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux
     (axis : Real.Angle) :
     HarmonicFieldProfile.integratedMeanNormalFlux Measure.count
@@ -163,7 +175,8 @@ lemma polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux
 
 -/
 
-/-- Every linear axis in the fixture is outgoing flux normalized at the output plane. -/
+/-- Every linear axis in the fixture is outgoing flux normalized at the output plane (sentinel:
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`). -/
 lemma polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal
     (axis : Real.Angle) :
     HarmonicFieldProfile.IsApertureFluxOrthonormal Measure.count
@@ -179,7 +192,8 @@ lemma polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal
   · intro i j hij
     exact (hij (Subsingleton.elim i j)).elim
 
-/-- Every linear axis in the fixture is incident flux normalized at the input plane. -/
+/-- Every linear axis in the fixture is incident flux normalized at the input plane (sentinel:
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`). -/
 lemma polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal
     (axis : Real.Angle) :
     HarmonicFieldProfile.IsApertureFluxOrthonormal Measure.count

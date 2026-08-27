@@ -44,7 +44,8 @@ The unit-Jones quotient description of the sphere is developed in a later part o
 ## iv. References
 
 The normalization is fixed internally by the already-proved identity between Stokes intensity and
-coherency trace. Circular-polarization handedness plays no role in this ball-level classification.
+coherency trace. Unguarded convention statement (review only): no circular-polarization
+handedness name participates in this ball-level classification.
 -/
 
 @[expose] public section

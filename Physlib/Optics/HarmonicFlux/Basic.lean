@@ -57,9 +57,10 @@ stored reference amplitudes would not preserve spatial decay.
 
 This Physlib-original derivation fixes the repository's peak-phasor convention. These are local
 kinematic averaging identities. They require no Maxwell, transversality,
-dispersion, nonzero-amplitude, propagation-direction, or outgoing-wave hypothesis. This file does
-not define irradiance, interface-normal flux, aperture-integrated power, modal normalization,
-passivity, or evanescence.
+dispersion, nonzero-amplitude, or propagation-direction hypothesis. Unguarded convention statement
+(review only): they require no outgoing-wave role or condition. This file does not define
+irradiance, interface-normal flux, aperture-integrated power, modal normalization, passivity, or
+evanescence.
 -/
 
 @[expose] public section

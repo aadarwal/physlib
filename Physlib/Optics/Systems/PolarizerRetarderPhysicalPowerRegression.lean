@@ -14,7 +14,9 @@ public import Physlib.Optics.Systems.PolarizerRetarderPhysicalRegression
 ## i. Overview
 
 This regression completes the connected P6b-3 fixture by proving the E3b outgoing normalization
-of the retarded carrier directly from its actual one-period Poynting flux. Together with the
+of the retarded carrier directly from its actual one-period Poynting flux, pinned by
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux` and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`. Together with the
 independently normalized incident carrier, the production transport theorem gives signed aperture
 fluxes `-1` and `1 / 2` for a horizontal input, a `pi / 4` analyzer, and a positive zero-axis
 quarter-wave plate.
@@ -56,7 +58,9 @@ noncomputable section
 
 -/
 
-/-- The retarded unit Jones carrier has directly computed outgoing integrated normal flux one. -/
+/-- The retarded unit Jones carrier has directly computed outgoing integrated normal flux one,
+pinned by `polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux` and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`. -/
 lemma polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux :
     HarmonicFieldProfile.integratedMeanNormalFlux Measure.count
       polarizerModeNormalizationRegressionOutputPlane
@@ -85,7 +89,8 @@ lemma polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux :
     OrientedAffineHyperplane.normalComponent, OrientedAffineHyperplane.normalVector,
     PiLp.inner_apply, RCLike.inner_apply, Fin.sum_univ_three]
 
-/-- The retarded carrier satisfies the outgoing E3b aperture-flux normalization predicate. -/
+/-- The retarded carrier satisfies the outgoing E3b aperture-flux normalization predicate
+(sentinel: `polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`). -/
 lemma polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal :
     HarmonicFieldProfile.IsApertureFluxOrthonormal Measure.count
       polarizerModeNormalizationRegressionOutputPlane .outgoing
@@ -107,7 +112,11 @@ lemma polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal 
 
 -/
 
-/-- The connected fixture has incident flux `-1` and retarded output flux `1 / 2`. -/
+/-- The connected fixture has incident flux `-1` and retarded output flux `1 / 2`; its role signs
+are pinned by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`, together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`. -/
 lemma polarizerRetarderPhysicalPowerRegression_actualFluxes (startTime : Time) :
     (MaterialJonesMode.linearPolarizationFamily 0
       polarizerModeNormalizationRegressionMedium polarizerModeNormalizationRegressionFrame 1
@@ -170,7 +179,8 @@ lemma polarizerRetarderPhysicalPowerRegression_malus (startTime : Time) :
 
 -/
 
-/-- The outgoing signed flux is positive, so it cannot be the incident-oriented value `-1 / 2`. -/
+/-- The outgoing signed flux is positive, so it cannot be the incident-oriented value `-1 / 2`
+(sentinel: `polarizerRetarderPhysicalPowerRegression_outputFlux_ne_negative`). -/
 lemma polarizerRetarderPhysicalPowerRegression_outputFlux_ne_negative (startTime : Time) :
     (MaterialJonesMode.polarizerRetarderOutputFamily 0
       ((Real.pi / 2 : ℝ) : Real.Angle) ((Real.pi / 4 : ℝ) : Real.Angle)

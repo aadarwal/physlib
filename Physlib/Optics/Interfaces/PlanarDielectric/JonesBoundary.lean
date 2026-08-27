@@ -32,8 +32,8 @@ Y₂ T₁ = Y₁ I₁ + Y₁ R₁.
 ```
 
 The signs are carried by `chi`; in particular a direction into the negative side has negative
-`chi` relative to the stored normal, while the reflected label alone proves no such direction.
-Axis zero becomes the usual `s` axis and axis one the
+`chi` relative to the stored normal. Unguarded convention statement (review only): the reflected
+label alone proves no such direction. Axis zero becomes the usual `s` axis and axis one the
 full-vector `p` axis when the frames come from non-normal incidence geometry, but the results also
 retain caller-selected frames at normal incidence and the grazing case `chi = 0`.
 

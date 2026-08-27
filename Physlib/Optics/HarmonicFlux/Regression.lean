@@ -28,8 +28,9 @@ cross product.
 
 ## iv. References
 
-These results test only the local peak-phasor formula. They assign no polarization handedness,
-Maxwell, propagation, irradiance, or modal-power meaning to the selected coordinate arrays.
+These results test only the local peak-phasor formula. Unguarded convention statement (review
+only): they assign no polarization-handedness name to the selected coordinate arrays. They assign
+no Maxwell, propagation, irradiance, or modal-power meaning either.
 
 -/
 

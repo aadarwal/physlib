@@ -39,8 +39,9 @@ transport.
 ## iv. References
 
 The fixture is the existing independently solved `3-4-5` planar-boundary regression. No external
-scattering implementation is copied or translated here. No outgoing, reciprocity, reverse-
-incidence, modal-completeness, grazing, TIR-port, or lossy-medium claim is made.
+scattering implementation is copied or translated here. Unguarded convention statement (review
+only): no outgoing role is assigned. No reciprocity, reverse-incidence, modal-completeness,
+grazing, TIR-port, or lossy-medium claim is made.
 -/
 
 @[expose] public section

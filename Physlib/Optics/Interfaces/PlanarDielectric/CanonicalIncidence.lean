@@ -28,14 +28,16 @@ incidence plane. The reflected-frame hypothesis remains conditional on nonzero e
 A zero reflected field therefore keeps arbitrary dummy carrier, direction, frame, and frequency
 data.
 
-`HasCanonicalNonNormalIncidenceFrames` packages the three role-indexed basis conventions without
-assigning propagation signs from those roles. Incident and transmitted canonicality are
-unconditional; reflected canonicality is required only for an electrically active reflected wave.
+Unguarded convention statement (review only): `HasCanonicalNonNormalIncidenceFrames` packages the
+three role-indexed basis conventions without assigning propagation signs from those roles.
+Incident and transmitted canonicality are unconditional; reflected canonicality is required only
+for an electrically active reflected wave.
 
-The selected normal signs are explicit geometric branch hypotheses. They do not follow from the
-incident or reflected labels and are not identified here with group velocity, energy flux, or an
-outgoing radiation condition. At normal incidence this convention selects no unique incidence
-plane or `s` axis; an independently selected tangent frame is required.
+The selected normal signs are explicit geometric branch hypotheses. Unguarded convention
+statement (review only): they do not follow from the incident or reflected labels and are not
+identified here with group velocity, energy flux, or an outgoing radiation condition. At normal
+incidence these hypotheses select no unique incidence plane or `s` axis; an independently selected
+tangent frame is required.
 
 ## ii. Key results
 
@@ -82,10 +84,10 @@ namespace PlanarDielectricWaveConfiguration
 /-- The incident, transmitted, and electrically active reflected propagation frames use the
 canonical non-normal incidence `s`/`p` convention of an interface.
 
-This bundle records basis conventions only. Its role names do not imply propagation signs, phase
-directions, reflection, material-wave connectivity, boundary balance, or power flow. The reflected
-condition is guarded so an electrically zero reflected wave retains arbitrary dummy carrier,
-direction, frame, and frequency data. -/
+This bundle records basis conventions only. Unguarded convention statement (review only): its role
+names do not imply propagation signs, phase directions, reflection, material-wave connectivity,
+boundary balance, or power flow. The reflected condition is guarded so an electrically zero
+reflected wave retains arbitrary dummy carrier, direction, frame, and frequency data. -/
 structure HasCanonicalNonNormalIncidenceFrames
     (configuration : PlanarDielectricWaveConfiguration)
     {incidentDirection reflectedDirection transmittedDirection : Space.Direction 3}

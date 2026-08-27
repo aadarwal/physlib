@@ -40,9 +40,10 @@ constant-depth planes. Positive third-coordinate displacement by `u` scales the 
 ## iv. References
 
 These are exact regressions for Physlib's own complex-carrier, medium, and harmonic-flux APIs. The
-fixtures already satisfy the source-free macroscopic Maxwell equations, but this file assigns them
-no interface, transmitted, outgoing, evanescent-field, Fresnel, total internal reflection,
-aperture-power, or modal-power role.
+fixtures already satisfy the source-free macroscopic Maxwell equations. Unguarded convention
+statement (review only): this file assigns them no transmitted or outgoing wave role. It also
+assigns no interface, evanescent-field, Fresnel, total-internal-reflection, aperture-power, or
+modal-power interpretation.
 
 -/
 

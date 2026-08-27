@@ -13,9 +13,12 @@ public import Physlib.Optics.HarmonicFlux.ModePower
 
 ## i. Overview
 
-This file packages the exact negative-flux two-cell profile as a singleton incident family. The
-amplitude `1 + I` has modal power two, while its synthesized signed normal flux is minus two. Thus
-negating the flux recovers the positive incident-power convention.
+This file packages the exact negative-flux two-cell profile as a singleton incident family, pinned
+by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`. The amplitude `1 + I` has modal
+power two, while its synthesized signed normal flux is minus two. The independent sentinel
+`apertureFluxRegressionIncidentSynthesis_flux`, together with
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`, pins the positive incident-power
+sign after negation.
 
 These statements concern only the declared synthesis image. They make no modal-completeness,
 Maxwell-propagation, or whole-device conservation claim.
@@ -54,11 +57,13 @@ open HarmonicFieldProfile
 
 -/
 
-/-- The negative-flux profile as a singleton incident family. -/
+/-- The negative-flux profile as a singleton incident family, pinned by
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`. -/
 def apertureFluxRegressionNegativeMode : Unit → HarmonicFieldProfile (Fin 2) :=
   fun _ ↦ apertureFluxRegressionNegative
 
-/-- The singleton negative profile is an incident unit-flux family. -/
+/-- The singleton negative profile is an incident unit-flux family (sentinel:
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`). -/
 lemma apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal :
     IsApertureFluxOrthonormal Measure.count apertureFluxRegressionPlane .incident
       apertureFluxRegressionNegativeMode := by
@@ -76,17 +81,19 @@ lemma apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal :
 
 -/
 
-/-- The exact singleton incident amplitude `1 + I`. -/
+/-- The exact singleton modal amplitude `1 + I`. -/
 def apertureFluxRegressionIncidentAmplitude : ModeAmplitude Unit :=
   WithLp.toLp 2 fun _ ↦ 1 + Complex.I
 
-/-- The singleton incident coordinate has exact normalized modal power two. -/
+/-- The singleton modal coordinate has exact normalized modal power two. -/
 lemma apertureFluxRegressionIncidentAmplitude_power :
     apertureFluxRegressionIncidentAmplitude.power = 2 := by
   rw [ModeAmplitude.power_eq_sum_normSq]
   norm_num [apertureFluxRegressionIncidentAmplitude, Complex.normSq_apply]
 
-/-- Expanding the singleton synthesis gives exact signed incident field pairing minus two. -/
+/-- Expanding the singleton synthesis gives exact signed incident field pairing minus two
+(sentinels: `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` and
+`apertureFluxRegressionIncidentSynthesis_pairing`). -/
 lemma apertureFluxRegressionIncidentSynthesis_pairing :
     signedNormalFluxPairing Measure.count apertureFluxRegressionPlane
         (modeSynthesis apertureFluxRegressionNegativeMode
@@ -101,7 +108,9 @@ lemma apertureFluxRegressionIncidentSynthesis_pairing :
   rw [Complex.I_sq]
   norm_num
 
-/-- The negative of the independently computed synthesized incident flux is exactly two. -/
+/-- The negative of the independently computed synthesized incident flux is exactly two
+(sentinels: `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` and
+`apertureFluxRegressionIncidentSynthesis_flux`). -/
 lemma apertureFluxRegressionIncidentSynthesis_flux :
     -integratedMeanNormalFlux Measure.count apertureFluxRegressionPlane
         (modeSynthesis apertureFluxRegressionNegativeMode

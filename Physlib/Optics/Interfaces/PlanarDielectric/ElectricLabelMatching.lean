@@ -34,10 +34,11 @@ transmitted key. A zero reflected amplitude leaves its exponent as unconstrained
 is why the theorem preserves the zero-reflection branch.
 
 The resulting exponent equalities can be decoded by `boundaryExponent_eq_iff` into frequency and
-tangent-pairing equalities. They do not give full wave-vector equality. This file assigns no
-propagation direction or one-sided-illumination semantics and proves no Maxwell/on-shell condition,
-material dispersion, branch choice, Fresnel coefficient, irradiance, or power result. Its
-coefficient balance is not an equality of raw electric phasors or full electromagnetic amplitudes.
+tangent-pairing equalities. They do not give full wave-vector equality. Unguarded convention
+statement (review only): this file assigns no propagation direction or one-sided-illumination
+semantics and selects no branch. It proves no Maxwell/on-shell condition, material dispersion,
+Fresnel coefficient, irradiance, or power result. Its coefficient balance is not an equality of
+raw electric phasors or full electromagnetic amplitudes.
 
 ## ii. Key results
 

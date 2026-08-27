@@ -22,9 +22,9 @@ Snell's law.
 
 No phase-direction hypothesis is needed for these algebraic identities. The separately proved
 acute-angle results supply the usual optical angle range when the phase vectors point into
-their selected sides. These results neither construct nor select a transmitted branch and assert
-no ray, group-velocity, outgoing, critical-angle, evanescent, Fresnel, irradiance, or power
-meaning.
+their selected sides. These results neither construct nor select a transmitted branch. Unguarded
+convention statement (review only): they assert no outgoing role. They assert no ray,
+group-velocity, critical-angle, evanescent, Fresnel, irradiance, or power meaning either.
 
 All results are label-level identities and remain valid when either electric amplitude vanishes;
 they therefore do not assert an active optical field. The phase identity also permits zero phase

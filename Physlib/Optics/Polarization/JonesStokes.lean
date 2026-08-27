@@ -41,8 +41,8 @@ already fixed reconstruction identity `C₀₁ = (S₂ - I S₃) / 2`.
 
 The normalized horizontal, vertical, diagonal, antidiagonal, and positive- or negative-`I`
 quadrature states have named full-vector checks below. The quadrature names specify only the
-relative component factor. No right- or left-circular handedness name is assigned here; that
-translation remains subject to the human-checked convention item in `tbd.md`.
+relative component factor. Unguarded convention statement (review only): no right- or
+left-circular handedness name is assigned here, and any such translation remains human-controlled.
 -/
 
 @[expose] public section

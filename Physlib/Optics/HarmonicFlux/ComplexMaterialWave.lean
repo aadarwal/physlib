@@ -49,9 +49,10 @@ The carrier type still supplies its built-in Faraday-compatible magnetic amplitu
 `B₀ = omega⁻¹ (K cross E₀)`; “off shell” means that no full material-dispersion or Maxwell predicate
 is assumed here.
 
-The results are flux-density identities, not aperture-integrated or modal power. They introduce
-no interface side, incident, reflected, transmitted, outgoing, evanescent, Fresnel, total internal
-reflection, or half-space-support claim; the ordinary-real fields remain globally defined.
+The results are flux-density identities, not aperture-integrated or modal power. Unguarded
+convention statement (review only): they assign no incident, reflected, transmitted, or outgoing
+wave role. They introduce no interface-side, evanescent, Fresnel, total-internal-reflection, or
+half-space-support claim; the ordinary-real fields remain globally defined.
 
 -/
 

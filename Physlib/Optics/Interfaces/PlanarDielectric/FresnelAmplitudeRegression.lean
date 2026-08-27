@@ -41,8 +41,8 @@ a different-medium homogeneous system with zero incident amplitude is proved to 
 reflected and transmitted amplitudes.
 
 Apart from the explicit normal complex-vector balance and the connected zero-field fixture, the
-boundary-case checks are scalar-system regressions. They do not select physical propagation
-branches or assert irradiance or power laws.
+boundary-case checks are scalar-system regressions. Unguarded convention statement (review only):
+they do not select physical propagation branches. They do not assert irradiance or power laws.
 
 ## ii. Key results
 
@@ -378,7 +378,8 @@ fixed-plane tangential coefficients are `(1, 2)`. The normal-ratio quotient conv
 intentionally unavailable because `chi_i = 0`; the total coefficient definitions and the
 cross-multiplied conversion remain meaningful without division by `chi_i`.
 
-This is an algebraic boundary check, not an assertion that a grazing wave crosses the interface. -/
+Unguarded convention statement (review only): this algebraic boundary check does not assert that a
+grazing wave crosses the interface. -/
 lemma fresnelAmplitudeRegression_incidentGrazing_tangentialP :
     jonesBoundaryRegressionInterface.pFresnelReflectionCoefficient 0 1 = -1 ∧
       jonesBoundaryRegressionInterface.pFresnelTransmissionCoefficient 0 1 = 0 ∧

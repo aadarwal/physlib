@@ -41,7 +41,8 @@ dielectric-interface scattering component required by E6.
 The coefficient and flux identities are derived in `FresnelAmplitude` and `FresnelFlux`. This
 Physlib-original completion does not assert reverse-incidence physics, reciprocity, outgoing
 semantics, reference-plane or polarization-frame transport, typed physical ports, modal
-completeness, or electromagnetic mode normalization. Strictly positive incident and transmitted
+completeness, or electromagnetic mode normalization. Its lack of outgoing semantics is an
+unguarded convention statement checked only by review. Strictly positive incident and transmitted
 normal components exclude grazing and critical channels. TIR evanescent transmission and lossy
 media are outside this ordinary positive-power kernel.
 -/

@@ -17,8 +17,8 @@ profile and a profile obtained by reversing only the original magnetic phasor. T
 positive-normal profiles have unit self-flux and zero cross-pairing. Magnetic reversal gives
 signed self-flux minus one and remains orthogonal to the original profile.
 
-The profile signs are computed relative to the stored normal. Incident and outgoing roles are
-assigned only in the later finite-mode normalization layer.
+The profile signs are computed relative to the stored normal. This regression layer does not
+assign incident or outgoing roles to them.
 
 ## ii. Key results
 

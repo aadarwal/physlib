@@ -47,8 +47,8 @@ magnetic equalities and their aligned Jones-wave data. They retain a zero-reflec
 with arbitrary reflected carrier data and require no nonzero incident amplitude. The core result
 takes the guarded reflected normal relation explicitly. Its canonical non-normal-incidence wrapper
 derives the active relation from phase matching, referenced material data, and explicitly selected
-opposite normal signs; no direction follows merely from a wave label. This file states no
-irradiance or power law.
+opposite normal signs. Unguarded convention statement (review only): no direction follows merely
+from a wave label. This file states no irradiance or power law.
 
 ## ii. Key results
 

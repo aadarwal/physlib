@@ -18,9 +18,9 @@ and unitarity laws, equal-amplitude relative-phase action, pure-coherency output
 Mueller block and action, quarter-wave and half-wave specializations, and sign-sensitive canonical
 regressions.
 
-Jones and Stokes intensity statements remain reduced amplitude coordinates. The export surface
-assigns neither circular-polarization handedness nor electromagnetic irradiance or power
-interpretations.
+Jones and Stokes intensity statements remain reduced amplitude coordinates. Unguarded convention
+statement (review only): the export surface assigns no circular-polarization handedness name.
+It assigns no electromagnetic irradiance or power interpretation either.
 
 ## ii. Key results
 

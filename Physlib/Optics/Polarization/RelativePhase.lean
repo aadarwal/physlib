@@ -15,8 +15,9 @@ public import Physlib.Optics.Polarization.Basic
 
 This file defines a normalized one-parameter family of Jones states whose two coordinate
 amplitudes have equal magnitude and whose second coordinate has a declared relative phase. The
-family includes diagonal, antidiagonal, and the two algebraic quadrature states, while assigning
-no observer-dependent circular-polarization handedness.
+family includes diagonal, antidiagonal, and the two algebraic quadrature states. Unguarded
+convention statement (review only): it assigns no observer-dependent circular-polarization
+handedness name.
 
 Generic phases in this family provide selected elliptical states for exact retarder calculations.
 The definition concerns raw Jones amplitudes, not electromagnetic irradiance or modal power.

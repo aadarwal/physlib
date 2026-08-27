@@ -16,7 +16,9 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.SupercriticalFresnelReg
 This file connects the exact unequal-admittance complex Fresnel fixture to actual Poynting flux.
 Its negative-side admittance is `2/3`, its incident and reflected signed normal factors are `4/5`
 and `-4/5`, and both propagating Jones intensities are two. Their one-period normal mean fluxes
-are therefore exactly `8/15` and `-8/15`.
+are therefore exactly `8/15` and `-8/15`, pinned by
+`supercriticalFresnelFluxRegression_incident_normalFlux` and
+`supercriticalFresnelFluxRegression_reflected_normalFlux`.
 
 The stored transmitted wave is the canonical positive-normal-decay carrier. Its actual normal
 mean flux is zero at every point. Exact phase matching then lets the connected interference API
@@ -49,8 +51,9 @@ zero normal Poynting flux.
 ## iv. References
 
 All propagating fluxes are evaluated at the stored interface point and averaged over the carrier's
-own period. The transmitted zero-flux regression holds at every spatial point. No aperture,
-whole-plane, outgoing-wave, causal, or modal-power claim is made.
+own period. The transmitted zero-flux regression holds at every spatial point. Unguarded
+convention statement (review only): no outgoing-wave role is assigned. No aperture, whole-plane,
+causal, or modal-power claim is made.
 
 -/
 
@@ -142,7 +145,7 @@ private lemma supercriticalFresnelFluxRegression_negativeMedium_waveImpedance_in
   supercriticalFresnelRegression_negativeMedium_waveImpedance_inv
 
 /-- The exact incident carrier has actual one-period mean normal flux `8/15` at the stored
-interface point. -/
+interface point (sentinel: `supercriticalFresnelFluxRegression_incident_normalFlux`). -/
 lemma supercriticalFresnelFluxRegression_incident_normalFlux (startTime : Time) :
     supercriticalFresnelRegressionConfiguration.interface.plane.normalComponent
       (⨍ time in startTime.val..startTime.val +
@@ -161,7 +164,7 @@ lemma supercriticalFresnelFluxRegression_incident_normalFlux (startTime : Time) 
   norm_num
 
 /-- The exact reflected carrier has actual one-period mean signed normal flux `-8/15` at the
-stored interface point. -/
+stored interface point (sentinel: `supercriticalFresnelFluxRegression_reflected_normalFlux`). -/
 lemma supercriticalFresnelFluxRegression_reflected_normalFlux (startTime : Time) :
     supercriticalFresnelRegressionConfiguration.interface.plane.normalComponent
       (⨍ time in startTime.val..startTime.val +
@@ -180,7 +183,7 @@ lemma supercriticalFresnelFluxRegression_reflected_normalFlux (startTime : Time)
   norm_num
 
 /-- The exact canonical transmitted decay carrier has zero actual one-period mean normal flux at
-every spatial point. -/
+every spatial point (sentinel: `supercriticalFresnelFluxRegression_transmitted_normalFlux`). -/
 lemma supercriticalFresnelFluxRegression_transmitted_normalFlux
     (startTime : Time) (x : Space) :
     supercriticalFresnelRegressionConfiguration.interface.plane.normalComponent

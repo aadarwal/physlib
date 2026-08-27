@@ -39,7 +39,9 @@ explicit bridge, not a coercion between raw Jones coordinates and power-normaliz
 
 The family is not asserted to be flux normalized or complete. Interpreting its coordinate power
 as electromagnetic aperture power still requires an `IsApertureFluxOrthonormal` proof for a
-declared measured profile and incident or outgoing role.
+declared measured profile and incident or outgoing role; the two role signs are pinned by
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`.
 
 -/
 

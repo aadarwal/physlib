@@ -28,9 +28,10 @@ reconstructs the primitive electric boundary without a nonzero guard. Thus the g
 matching only in the primitive-to-reduced direction; it is not hidden inside the reduced problem.
 
 This equivalence concerns only tangential `E` and normal `D`. It reconstructs neither magnetic
-boundary law and gives no equivalence with a full local boundary. It assigns no propagation
-direction, on-shell or Maxwell condition, material dispersion, normal wave-vector branch, Snell or
-Fresnel law, observable, irradiance, or power result.
+boundary law and gives no equivalence with a full local boundary. Unguarded convention statement
+(review only): it assigns no propagation direction and selects no normal wave-vector branch. It
+assigns no on-shell or Maxwell condition, material dispersion, Snell or Fresnel law, observable,
+irradiance, or power result.
 
 ## ii. Key results
 

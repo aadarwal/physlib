@@ -126,7 +126,8 @@ lemma linearRetarderPhase_coe (retardance : ℝ) :
 
 /-- Multiplication by a retarder phase shifts the realized carrier by the signed retardance.
 
-This equation fixes the sign convention independently of circular-polarization handedness. -/
+This equation fixes the algebraic sign convention. Unguarded convention statement (review only):
+it assigns no circular-polarization handedness name. -/
 lemma linearRetarderPhase_realize_mul (z : Phasor) (retardance carrierPhase : ℝ) :
     Phasor.realize
         (linearRetarderPhase (retardance : Real.Angle) * z) carrierPhase =
@@ -530,7 +531,8 @@ lemma linearRetarder_zero_axis_act (retardance : Real.Angle) (J : JonesVector) :
 /-- A zero-axis retarder subtracts its retardance from an equal-amplitude state's relative phase.
 
 This exact family includes diagonal, antidiagonal, quadrature, and selected elliptical Jones
-states without assigning circular-polarization handedness. -/
+states. Unguarded convention statement (review only): it assigns no circular-polarization
+handedness name. -/
 lemma linearRetarder_zero_axis_act_equalAmplitudeRelativePhase
     (retardance relativePhase : Real.Angle) :
     (linearRetarder 0 retardance).act

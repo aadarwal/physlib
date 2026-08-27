@@ -38,8 +38,9 @@ positive-side exponential factor for the complete transmitted carrier and its or
 electric and magnetic-induction fields. These are global field identities based at an arbitrary
 point, not one-sided support conditions. None of these results derives a direction from a trace
 label, identifies phase direction with group velocity or power flow, defines a propagation angle,
-proves Snell's law, or classifies an evanescent or outgoing branch or its power. In particular, the
-phase-matching predicate is used without its separate electric amplitude-balance predicate.
+or proves Snell's law. Unguarded convention statement (review only): they classify no evanescent or
+outgoing branch or its power. In particular, the phase-matching predicate is used without its
+separate electric amplitude-balance predicate.
 
 ## ii. Key results
 
@@ -102,8 +103,8 @@ namespace PlanarDielectricWaveConfiguration
 /-- The real candidate for the squared transmitted normal component when the incident complex
 tangential projection has zero attenuation.
 
-This expression alone has no propagation, critical-angle, evanescence, transmitted-root,
-side-decay, outgoing, or power meaning. -/
+Unguarded convention statement (review only): this expression alone has no propagation,
+critical-angle, evanescence, transmitted-root, side-decay, outgoing, or power meaning. -/
 def transmittedNormalRadicand (configuration : PlanarDielectricWaveConfiguration) : ℝ :=
   configuration.interface.positiveMedium.ε *
       configuration.interface.positiveMedium.μ *
@@ -206,8 +207,9 @@ lemma transmitted_hyperplaneNormalComponent_sq
 /-- If the incident attenuation has zero tangential projection, the squared transmitted normal
 component equals the explicitly real transmitted radicand.
 
-The premise does not require zero incident normal attenuation. This result selects no root and
-assigns no propagation, critical-angle, evanescence, side-decay, outgoing, or power meaning. -/
+The premise does not require zero incident normal attenuation. Unguarded convention statement
+(review only): this result selects no root and assigns no propagation, critical-angle,
+evanescence, side-decay, outgoing, or power meaning. -/
 lemma transmitted_hyperplaneNormalComponent_sq_eq_transmittedNormalRadicand
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
@@ -270,8 +272,9 @@ lemma transmitted_tangentialProjection_attenuationVector_eq_zero
 normal radicand is positive, its whole attenuation vector vanishes, and its normal component is
 the positive real square root.
 
-The direction premise is supplied rather than derived from the transmitted label. This is an
-algebraic phase-root selection, not a group-velocity, outgoing, irradiance, or power statement. -/
+Unguarded convention statement (review only): the direction premise is supplied rather than
+derived from the transmitted label, and this algebraic phase-root selection is not a
+group-velocity, outgoing, irradiance, or power statement. -/
 lemma transmitted_normalRoot_data_of_isPhaseDirectedInto
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
@@ -311,8 +314,8 @@ lemma transmitted_normalRoot_data_of_isPhaseDirectedInto
 same zero-tangential-attenuation premise, the transmitted attenuation vector also vanishes and
 the transmitted phase vector has zero normal component.
 
-This is an algebraic threshold result. It does not by itself define a critical angle, a grazing
-role, an outgoing condition, irradiance, or power. -/
+This is an algebraic threshold result. Unguarded convention statement (review only): it does not
+by itself define a critical angle, a grazing role, an outgoing condition, irradiance, or power. -/
 lemma transmitted_normalRoot_data_of_transmittedNormalRadicand_eq_zero
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
@@ -360,8 +363,9 @@ real normal radicand is negative, its phase normal component vanishes, and its c
 component is the negative-imaginary square root.
 
 For `K = q - I a`, this is the root whose normal attenuation points into the positive side. The
-direction premise is supplied rather than derived from the transmitted label, and the result does
-not yet assert spatial decay, evanescence, an outgoing condition, irradiance, or power. -/
+direction premise is supplied rather than derived from the transmitted label. Unguarded convention
+statement (review only): the result does not yet assert spatial decay, evanescence, an outgoing
+condition, irradiance, or power. -/
 lemma transmitted_normalRoot_data_of_isAttenuationDirectedInto
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
@@ -388,8 +392,9 @@ lemma transmitted_normalRoot_data_of_isAttenuationDirectedInto
 positive-side exponential scaling at the square-root rate.
 
 The base point is arbitrary, the carrier remains globally defined, and negative displacement gives
-the inverse growth direction. This result is neither a half-space support condition nor an
-outgoing, total-internal-reflection, irradiance, or power statement. -/
+the inverse growth direction. Unguarded convention statement (review only): this result is neither
+a half-space-support condition nor an outgoing, total-internal-reflection, irradiance, or power
+statement. -/
 lemma transmitted_carrier_vadd_normalVector_of_isAttenuationDirectedInto
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
@@ -465,8 +470,8 @@ lemma transmitted_magneticInduction_vadd_normalVector_of_isAttenuationDirectedIn
 vector, or has its hyperplane reflection.
 
 The reflected dispersion premise is conditional so a zero-amplitude candidate retains arbitrary
-dummy labels. The same-vector root remains possible until a side or outgoing condition excludes
-it. -/
+dummy labels. Unguarded convention statement (review only): the same-vector root remains possible
+until a separately supplied side or outgoing condition excludes it. -/
 lemma reflected_electricAmplitude_eq_zero_or_waveVector_eq_or_eq_hyperplaneReflection
     (h : configuration.IsElectricPhaseMatched)
     (hIncidentDispersion : configuration.incident.IsDispersionMatched
@@ -493,8 +498,9 @@ the same-vector reflected root.
 The incident phase vector is required to point into the positive side, and the active reflected
 phase vector into the negative side. The reflected direction and dispersion hypotheses remain
 conditional so a zero-amplitude candidate retains arbitrary dummy labels. This selects only the
-algebraic hyperplane-reflection branch; it does not derive either phase direction from the trace
-labels or identify phase direction with group velocity, energy flux, or outgoing power. -/
+algebraic hyperplane-reflection branch. Unguarded convention statement (review only): it does not
+derive either phase direction from the trace labels or identify phase direction with group
+velocity, energy flux, or outgoing power. -/
 lemma reflected_electricAmplitude_eq_zero_or_waveVector_eq_hyperplaneReflection_of_phaseDirections
     (h : configuration.IsElectricPhaseMatched)
     (hIncidentDispersion : configuration.incident.IsDispersionMatched

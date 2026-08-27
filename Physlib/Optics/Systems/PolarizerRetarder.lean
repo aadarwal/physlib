@@ -25,8 +25,9 @@ applies the retarder polarization block. A canonical `pi / 4` analyzer followed 
 zero-axis quarter-wave plate pins both the order and the phase sign.
 
 All intensity language refers only to squared raw Jones amplitude or the corresponding raw Stokes
-coordinate. No electromagnetic irradiance, Poynting flux, modal power, passivity, or
-circular-polarization handedness is assigned here.
+coordinate. No electromagnetic irradiance, Poynting flux, modal power, or passivity is assigned
+here. Unguarded convention statement (review only): no circular-polarization handedness name is
+assigned here.
 
 ## ii. Key results
 

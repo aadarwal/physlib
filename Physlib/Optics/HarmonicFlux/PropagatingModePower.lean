@@ -16,7 +16,10 @@ This file composes the physical propagating-mode connector with the abstract mea
 normalization theorem. If the profiles of a finite common-frequency Maxwell family are pairwise
 integrable, mutually flux-orthogonal, and unit normalized for a declared incident or outgoing
 role, then the actual integrated one-period normal Poynting flux of the synthesized fields is
-exactly the corresponding signed `ModeAmplitude.power`.
+exactly the corresponding signed `ModeAmplitude.power`. The role assignments are pinned by
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`; the synthesized signs are pinned by
+`apertureFluxRegressionSynthesis_flux` and `apertureFluxRegressionIncidentSynthesis_flux`.
 
 The conclusion is electromagnetic for the stored Maxwell fields and the supplied measure. It is
 restricted to the finite synthesis image and does not assert modal completeness. The measure is
@@ -24,9 +27,14 @@ not called geometric area without a separate parameterization-and-Jacobian theor
 
 ## ii. Key results
 
-- `outgoing_integratedActualMeanNormalFlux_eq_power`: actual outgoing flux equals modal power.
+- `outgoing_integratedActualMeanNormalFlux_eq_power`: actual outgoing flux equals modal power,
+  with its role sign pinned by
+  `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
+  `apertureFluxRegressionSynthesis_flux`.
 - `incident_integratedActualMeanNormalFlux_eq_neg_power`: actual incident flux has the opposite
-  stored-normal sign.
+  stored-normal sign, pinned by
+  `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` and
+  `apertureFluxRegressionIncidentSynthesis_flux`.
 
 ## iii. Table of contents
 
@@ -58,7 +66,9 @@ variable {ι A : Type*} [Fintype ι] (family : PropagatingHarmonicModeFamily ι)
 -/
 
 /-- For a Maxwell-qualified family declared outgoing and normalized by the supplied measured
-profile, the actual integrated one-period normal Poynting flux equals modal coordinate power. -/
+profile, the actual integrated one-period normal Poynting flux equals modal coordinate power; the
+role sign is pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
+`apertureFluxRegressionSynthesis_flux`. -/
 lemma outgoing_integratedActualMeanNormalFlux_eq_power
     [MeasurableSpace A] {measure : Measure A} {plane : OrientedAffineHyperplane 3}
     {point : A → Space}
@@ -77,7 +87,9 @@ lemma outgoing_integratedActualMeanNormalFlux_eq_power
 -/
 
 /-- For a Maxwell-qualified family declared incident and normalized by the supplied measured
-profile, the negative actual integrated normal flux equals modal coordinate power. -/
+profile, the negative actual integrated normal flux equals modal coordinate power; the role sign
+is pinned by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` and
+`apertureFluxRegressionIncidentSynthesis_flux`. -/
 lemma incident_integratedActualMeanNormalFlux_eq_neg_power
     [MeasurableSpace A] {measure : Measure A} {plane : OrientedAffineHyperplane 3}
     {point : A → Space}

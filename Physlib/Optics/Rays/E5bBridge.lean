@@ -52,9 +52,10 @@ Separately, and independently of that: nothing here says ray refraction is deriv
 The paraxial law being bounded remains a model law, and a phase direction remains a phase
 direction.
 
-Explicit non-claims. A phase direction is not a ray: the interface theory is careful that its
-phase angles assert nothing about group velocity, energy flux, or outgoing behaviour, and nothing
-here upgrades them. The correspondence is geometric only. Nothing here derives the *paraxial*
+Explicit non-claims. A phase direction is not a ray. Unguarded convention statement (review only):
+the interface phase angles assert nothing about group velocity, energy flux, or outgoing
+behaviour, and nothing here upgrades them. The correspondence is geometric only. Nothing here
+derives the *paraxial*
 interface laws for curved surfaces, which remain model laws, and nothing here assigns a field,
 power, or polarization to a ray.
 
@@ -71,8 +72,8 @@ statement.
 Section G shows the same canonical tangent serves the transmitted and, away from the interface
 theory's zero-amplitude alternative, the reflected phase vectors, via the plane-of-incidence
 results of `Physlib.Optics.Interfaces.PlanarDielectric.AngularGeometry`. That is a statement about
-spans of phase vectors; it assigns no ray, direction of travel, or outgoing role to the transmitted
-or reflected labels.
+spans of phase vectors. Unguarded convention statement (review only): it assigns no ray, direction
+of travel, or outgoing role to the transmitted or reflected labels.
 
 ## ii. Key results
 

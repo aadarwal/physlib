@@ -32,8 +32,8 @@ r_p = (-19 + 180 I)/181, t_p = (108 + 120 I)/181.
 ```
 
 Both reflection coefficients have squared modulus one. Thus the reflected Jones vector has the
-same intensity two as the incident Jones vector, while the complex transmitted coefficients are
-not interpreted as a propagating power ratio.
+same intensity two as the incident Jones vector. Unguarded convention statement (review only): the
+complex transmitted coefficients are not interpreted as a propagating power ratio.
 
 ## ii. Key results
 
