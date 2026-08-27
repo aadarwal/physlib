@@ -925,7 +925,14 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
       incident (Incident.mk (crowRegressionExternalAmbientChannel port)) = 0 := by
     have hCoordinate := congrArg (fun amplitude =>
       amplitude (Incident.mk (crowRegressionExternalAmbientChannel port))) hAssembly
-    simpa [crowRegressionExternalChannel] using hCoordinate
+    calc
+      incident (Incident.mk (crowRegressionExternalAmbientChannel port)) =
+          crowRegressionConnections.incidentAssembly outgoing 0
+            (Incident.mk (crowRegressionExternalAmbientChannel port)) := hCoordinate
+      _ = 0 := by
+        simpa [crowRegressionExternalChannel] using
+          crowRegressionConnections.incidentAssembly_apply_external outgoing 0
+            (crowRegressionExternalChannel port)
   have hForwardLaunchRoute (ring : Fin 2) :
       incident (Incident.mk (crowRegressionForwardArcChannel ring .left)) =
         outgoing (Outgoing.mk
@@ -996,8 +1003,8 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
   norm_num [crowRegressionParameters, crowRegressionEndCoupler,
     crowRegressionMiddleCoupler, crowRegressionHalfArc,
     DirectionalCoupler.crossCoefficient, MatchedPropagation.transmissionCoefficient,
-    MatchedPropagation.carrierPhaseFactor] at hCoupler0 hCoupler1 hCoupler2
-      hForward0 hForward1 hReturn0 hReturn1
+    MatchedPropagation.carrierPhaseFactor] at
+      hCoupler0 hCoupler1 hCoupler2 hForward0 hForward1 hReturn0 hReturn1
   have hLeftInputZero := hExternal .leftInput
   have hLeftOutputZero := hExternal .leftOutput
   have hRightInputZero := hExternal .rightInput
