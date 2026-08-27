@@ -225,6 +225,8 @@ public import Physlib.Mathematics.ZTransform.DifferenceEquation
 public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
 public import Physlib.Mathematics.ZTransform.Existence
 public import Physlib.Mathematics.ZTransform.ExistenceRegression
+public import Physlib.Mathematics.ZTransform.FrequencyResponse
+public import Physlib.Mathematics.ZTransform.FrequencyResponseRegression
 public import Physlib.Mathematics.ZTransform.Inverse
 public import Physlib.Mathematics.ZTransform.InverseRegression
 public import Physlib.Mathematics.ZTransform.OnePole
@@ -272,6 +274,8 @@ public import Physlib.Optics.Components.MatchedPropagationRegression
 public import Physlib.Optics.Components.Mirror
 public import Physlib.Optics.Components.MirrorPhysical
 public import Physlib.Optics.Components.PhysicalPortSuiteRegression
+public import Physlib.Optics.Components.PolarizationPortSuiteRegression
+public import Physlib.Optics.Components.PolarizationScatteringPhysical
 public import Physlib.Optics.Components.Polarizer
 public import Physlib.Optics.Components.Polarizer.Basic
 public import Physlib.Optics.Components.Polarizer.Coherency
@@ -344,6 +348,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFluxRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterference
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterferenceRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScattering
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringPhysical
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.IntegralBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
@@ -512,6 +517,8 @@ public import Physlib.Optics.Systems.Cascade.SourceMappedSfgRegression
 public import Physlib.Optics.Systems.Cascade.Termination
 public import Physlib.Optics.Systems.Cascade.TerminationRegression
 public import Physlib.Optics.Systems.DCDR.Bridge
+public import Physlib.Optics.Systems.DCDR.Coherency
+public import Physlib.Optics.Systems.DCDR.CoherencyRegression
 public import Physlib.Optics.Systems.DCDR.Graph
 public import Physlib.Optics.Systems.DCDR.Mason
 public import Physlib.Optics.Systems.DCDR.MultipleDelay
@@ -900,6 +907,7 @@ public import Physlib.SpaceAndTime.Space.Derivatives.MatrixDiv
 public import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
 public import Physlib.SpaceAndTime.Space.DistConst
 public import Physlib.SpaceAndTime.Space.DistOfFunction
+public import Physlib.SpaceAndTime.Space.DistributionCoordinates
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Action
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.AffineGroup
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Basic
@@ -930,6 +938,8 @@ public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneConstantJump
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneConstantJumpRegression
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistribution
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistributionRegression

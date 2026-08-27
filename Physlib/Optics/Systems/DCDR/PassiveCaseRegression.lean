@@ -135,7 +135,8 @@ lemma passiveCaseUnitDelayParameters_data :
       DCDRSourceBridge.passiveCaseUnitDelayParameters.lowerGain = 1 ∧
       DCDRSourceBridge.passiveCaseUnitDelayParameters.feedbackGain = 1 := by
   norm_num [DCDRSourceBridge.passiveCaseUnitDelayParameters,
-    DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
+    DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain,
     DCDRSourceBridge.passiveCaseSourceParameters]
 
 /-- Primitive substitution separates the two printed Theorem 3 loop terms. -/
@@ -185,7 +186,8 @@ lemma passiveCase_coherentLoopCoefficient :
       Real.sq_sqrt (by norm_num : (0 : ℝ) ≤ 9 / 10)]
     norm_num
   simp only [DCDRSourceBridge.passiveCaseUnitDelayParameters,
-    DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
+    DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain,
     DCDRSourceBridge.passiveCaseSourceParameters, UnitDelayParameters.loopCoefficient,
     DirectionalCoupler.crossCoefficient]
   ring_nf
@@ -239,11 +241,12 @@ lemma passiveCase_coherentNumeratorPolynomial_expansion :
     UnitDelayParameters.feedbackDrivePolynomial, UnitDelayParameters.upperPolynomial,
     UnitDelayParameters.lowerPolynomial, UnitDelayParameters.feedbackPolynomial,
     DCDRSourceBridge.passiveCaseUnitDelayParameters,
-    DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
+    DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain,
     DCDRSourceBridge.passiveCaseSourceParameters, DirectionalCoupler.crossCoefficient,
     passiveCoherentNumerator]
   simp only [Nat.ofNat_nonneg, Real.sqrt_div, Complex.ofReal_div, neg_mul, map_neg,
-    map_mul, Complex.ofReal_one, map_one, one_mul, mul_neg, neg_neg, eval_add,
+    map_mul, mul_neg, neg_neg, eval_add,
     eval_mul, eval_C, eval_X, eval_sub, eval_one, eval_neg, eval_pow]
   ring_nf
   rw [hThrough, hThroughFour, hNine, hNineFour, hTenInvTwo, hTenInvFour,

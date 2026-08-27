@@ -170,7 +170,7 @@ def dateCascadeRegressionQuarterTurnRing : DateParameters where
   reflectivity := -1
   transmissivity := 0
   couplingLength := 1
-  powerAttenuation := 0
+  powerAttenuationCoefficient := 0
   wavelength := 4
   effectiveIndex := 1
 

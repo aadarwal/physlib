@@ -177,6 +177,43 @@ Requirements:
     done: true
     location: "Physlib/Optics/Network/Conservation.lean (Optics.FlatNetlist.externalScatteringMatrix, Optics.FlatNetlist.externalScatteringMatrix_apply, Optics.FlatNetlist.externalScatteringMatrix_isPassive, Optics.FlatNetlist.externalScatteringMatrix_isLossless, Optics.FlatNetlist.externalScatteringMatrix_isLossless_of_components_isLossless); Physlib/Optics/Network/Hierarchical.lean (Optics.FlatNetlist.packagedScattering, Optics.FlatNetlist.toOrientedModeTransform_packagedScattering, Optics.FlatNetlist.packagedScattering_toModeTransform_apply, Optics.FlatNetlist.toBehavior_toOrientedModeTransform_packagedScattering, Optics.FlatNetlist.mem_behavior_iff_packagedScattering)"
 
+  - description: "The hierarchical network API appends connection families, closes an arbitrary component behavior relationally, and proves without a solve hypothesis that staged closure equals the fully flattened netlist behavior. A port-family equivalence transports connections, connection families, incident assembly, external readout, and closure. This transport proves replacement of an inner family by an equivalent boundary relation and literal three-stage append associativity after the canonical port-family identification. Independent N-08 fixtures cross the raw flattened and staged equations, force a nonzero forward value, and reject mis-lifted or hostile transported ports. Apart from structural finite channel-index assumptions, no well-posedness or physical hypothesis enters these relational reuse results; only functional subsystem packaging requires well-posedness."
+    done: true
+    location: >-
+      Physlib/Optics/Network/Hierarchical.lean
+      (Optics.PortConnectionFamily.externalPortModeFamily,
+      Optics.PortConnectionFamily.append,
+      Optics.HierarchicalNetlist,
+      Optics.HierarchicalNetlist.innerNetlist,
+      Optics.HierarchicalNetlist.flatten,
+      Optics.FlatNetlist.packagedScattering,
+      Optics.PortConnectionFamily.closeBehavior,
+      Optics.PortConnectionFamily.closeBehavior_append,
+      Optics.PortConnectionFamily.closeBehavior_append_congr,
+      Optics.FlatNetlist.behavior_eq_closeBehavior,
+      Optics.HierarchicalNetlist.flatten_behavior_eq);
+      Physlib/Optics/Network/ConnectionFamilyTransport.lean
+      (Optics.PortModeFamily.Equiv,
+      Optics.PortConnection.transport,
+      Optics.PortConnectionFamily.transport,
+      Optics.PortConnectionFamily.incidentAssembly_transport,
+      Optics.PortConnectionFamily.externalOutgoingReadout_transport,
+      Optics.PortConnectionFamily.closeBehavior_transport);
+      Physlib/Optics/Network/HierarchicalReuse.lean
+      (Optics.PortConnectionFamily.appendThreeLeft,
+      Optics.PortConnectionFamily.appendThreeRight,
+      Optics.PortConnectionFamily.append_assoc_transport,
+      Optics.PortConnectionFamily.innerBoundaryBehavior_eq_of_boundaryRelation,
+      Optics.PortConnectionFamily.replaceInnerFamily);
+      Physlib/Optics/Network/HierarchicalRegression.lean
+      (Optics.hierarchicalRegression_mem_flatten_behavior,
+      Optics.hierarchicalRegression_mem_outerClosure,
+      Optics.hierarchicalRegression_flatten_output_forced,
+      Optics.hierarchicalRegression_misLifted_not_mem_flatten_behavior);
+      Physlib/Optics/Network/HierarchicalReuseRegression.lean
+      (Optics.reuseRegression_mem_both_parenthesizations,
+      Optics.reuseRegression_hostile_incidentAssembly_ne)
+
   - description: "The foundational two-port series operation is the singular-safe relational composition of complete backward-first middle states. A canonical two-device FlatNetlist realizes exactly this relation, unconditionally and up to the stated external-channel equivalence; the same result is packaged through N5H closeBehavior. On the common domain where both the flat netlist and the typed feedback pivot are well posed, the reindexed N5 response transform equals the behavior-derived Redheffer star transform, which in turn equals the exact noncommutative four-block formula. Independent reflectionless and singular fixtures cross the FlatNetlist equations, and a separate reflective anchor reaches a star entry through relational membership rather than the block-formula theorem. This discharges the local two-device X-01 agreement at the relational, N5H-composition, and N5-elimination layers. It does not prove converse minimality of the pivot gate, associativity, an identity element, the broader Mason/system-level X-01 comparisons, contraction, reciprocity, passivity, losslessness, or a physical realization."
     done: true
     location: >-
@@ -957,6 +994,10 @@ Requirements:
   - description: "Mathematics supplies measure-preserving selected-coordinate splitting, tangential and normal coordinate embeddings, pushforward of tangential tempered distributions onto a selected ambient coordinate hyperplane, the coordinate-hyperplane delta distribution, and the selected-coordinate Heaviside distribution. Differentiating that Heaviside distribution in the inward `+e_i` direction gives the positive boundary delta. A Fin 2 Gaussian regression independently expands the raw half-space derivative and boundary evaluation to distinguish selected and swapped coordinate hyperplanes. The retained one-dimensional Gaussian regression separately pins normalization and the value `-1` under normal reversal. A separate anisotropic Fin 2 point-source regression directly expands both selected and swapped pushforwards, retaining coefficient 7 only on the selected embedded center. This is neutral tempered-distribution calculus: it supplies no weak or measure-valued Maxwell equation, coercion of arbitrary sidewise fields, finite sheet source, interface jump, or outward-boundary-normal convention."
     done: true
     location: "Physlib/Mathematics/Distribution/CoordinateSplit.lean (Physlib.Distribution.coordinateSplit, Physlib.Distribution.coordinateSplit_measurePreserving); Physlib/Mathematics/Distribution/CoordinateHyperplane.lean (Physlib.Distribution.coordinateHyperplaneEmbedding, Physlib.Distribution.coordinateNormalEmbedding, Physlib.Distribution.coordinateNormalLine); Physlib/Mathematics/Distribution/CoordinateHyperplaneDelta.lean (Physlib.Distribution.coordinateHyperplanePushforward, Physlib.Distribution.coordinateHyperplanePushforward_diracDelta', Physlib.Distribution.coordinateHyperplanePushforward_const_one, Physlib.Distribution.coordinateHyperplaneDelta, Physlib.Distribution.coordinateHyperplaneDelta_apply, Physlib.Distribution.integral_Ioi_fderiv_coordinateNormalLine); Physlib/Mathematics/Distribution/CoordinateHyperplaneDeltaRegression.lean (Physlib.Distribution.coordinateHyperplanePushforwardRegression_selected_apply, Physlib.Distribution.coordinateHyperplanePushforwardRegression_other_apply_ne, Physlib.Distribution.coordinateHyperplanePushforwardRegression_wrongCoordinate_ne); Physlib/Mathematics/Distribution/Heaviside.lean (Physlib.Distribution.fderivD_coordinateHeavisideStep_apply, Physlib.Distribution.coordinateHeavisideNormalDerivative, Physlib.Distribution.coordinateHeavisideNormalDerivative_eq_coordinateHyperplaneDelta, Physlib.Distribution.fderivD_heavisideStep_last_apply, Physlib.Distribution.heavisideNormalDerivative, Physlib.Distribution.heavisideNormalDerivative_eq_coordinateHyperplaneDelta); Physlib/Mathematics/Distribution/HeavisideRegression.lean (Physlib.Distribution.coordinateHeavisideRegression_derivative_eq_boundary, Physlib.Distribution.coordinateHeavisideRegression_wrongCoordinate_ne, Physlib.Distribution.heavisideRegression_hyperplaneDelta, Physlib.Distribution.heavisideRegression_positiveNormal, Physlib.Distribution.heavisideRegression_negativeNormal)"
+
+  - description: "SpaceAndTime represents two distribution-bounded ambient extensions across an oriented affine hyperplane by integrating each only on its selected strict side; carrier and off-side values are ignored, and sidewise equality gives equality of distributions. It transports Euclidean-coordinate distributions into Space through the standard orthonormal basis and intertwines coordinate derivatives. For the field that is zero on the negative side and constant on the positive side of an origin coordinate hyperplane, the inward `+e_i` derivative is exactly the constant-coefficient sheet, which agrees with the transported generic coordinate-hyperplane pushforward. Independent Gaussian regressions compute the derivative and sheet as 7, the reversed derivative as -7, and reject a swapped coordinate sheet. This is neutral constant-jump distribution theory, not a variable-trace formula on arbitrary oriented planes, a weak Maxwell equation, or a derivation of the finite-sheet premise."
+    done: true
+    location: "Physlib/SpaceAndTime/Space/OrientedAffineHyperplaneDistribution.lean (Space.OrientedAffineHyperplane.distOfSidewiseFunction, Space.OrientedAffineHyperplane.distOfSidewiseFunction_apply, Space.OrientedAffineHyperplane.distOfSidewiseFunction_congr); Physlib/SpaceAndTime/Space/DistributionCoordinates.lean (Space.basisCoordinateSchwartz, Space.distributionOfEuclideanCoordinates, Space.distDeriv_distributionOfEuclideanCoordinates_apply); Physlib/SpaceAndTime/Space/OrientedAffineHyperplane.lean (Space.OrientedAffineHyperplane.coordinateDirection, Space.OrientedAffineHyperplane.coordinateHyperplane, Space.OrientedAffineHyperplane.signedNormalCoordinate_coordinateHyperplane); Physlib/SpaceAndTime/Space/OrientedAffineHyperplaneConstantJump.lean (Space.coordinateHeavisideDistribution, Space.coordinateHyperplaneDeltaDistribution, Space.distDeriv_coordinateHeavisideDistribution, Space.coordinatePositiveConstantDistribution, Space.coordinateHyperplaneSheet, Space.coordinateHyperplaneSheet_eq_pushforward_const, Space.OrientedAffineHyperplane.coordinatePositiveConstantField, Space.OrientedAffineHyperplane.distOfSidewiseFunction_coordinatePositiveConstant, Space.OrientedAffineHyperplane.distDeriv_coordinatePositiveConstant); Physlib/SpaceAndTime/Space/OrientedAffineHyperplaneConstantJumpRegression.lean (Space.constantJumpRegression_raw_positiveDerivative, Space.constantJumpRegression_raw_sheet, Space.constantJumpRegression_raw_agreement, Space.constantJumpRegression_raw_negativeDerivative, Space.constantJumpRegression_wrongCoordinate_ne)"
 
   - description: "SpaceAndTime supplies neutral smooth-bulk divergence calculus for ordered affine boxes: the pulled-back divergence is expressed through the signed frame determinant, the six face fluxes use the three ordered cofactors, and a skew polynomial regression independently pins the Jacobian, every face pair, and the sign reversal under a coordinate swap. This row records the global-C1 identity; the separately mapped local split-box calculus weakens the regularity assumptions for the E4b construction."
     done: true

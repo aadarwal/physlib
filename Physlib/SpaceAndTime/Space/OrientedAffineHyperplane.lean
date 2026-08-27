@@ -175,6 +175,21 @@ variable {d : ℕ}
 def normalVector (plane : OrientedAffineHyperplane d) : EuclideanSpace ℝ (Fin d) :=
   Space.basis.repr plane.normal.unit
 
+/-- The standard positive coordinate direction in `Space d`. -/
+def coordinateDirection (i : Fin d) : Direction d where
+  unit := Space.basis i
+  norm := by simp
+
+/-- The oriented coordinate hyperplane through the origin whose positive side is selected by
+coordinate `i`. -/
+def coordinateHyperplane (i : Fin d) : OrientedAffineHyperplane d where
+  point := 0
+  normal := coordinateDirection i
+
+@[simp]
+lemma coordinateDirection_unit (i : Fin d) : (coordinateDirection i).unit = Space.basis i :=
+  rfl
+
 /-- The coordinate normal of an oriented hyperplane has unit norm. -/
 lemma normalVector_norm (plane : OrientedAffineHyperplane d) :
     ‖plane.normalVector‖ = 1 := by
@@ -198,6 +213,14 @@ lemma inner_normalVector_self (plane : OrientedAffineHyperplane d) :
 It is zero on the carrier, positive on the positive side, and negative on the negative side. -/
 def signedNormalCoordinate (plane : OrientedAffineHyperplane d) (x : Space d) : ℝ :=
   inner ℝ plane.normalVector (x -ᵥ plane.point)
+
+/-- The signed normal coordinate of the standard coordinate hyperplane is the selected spatial
+coordinate. -/
+@[simp]
+lemma signedNormalCoordinate_coordinateHyperplane (i : Fin d) (x : Space d) :
+    (coordinateHyperplane i).signedNormalCoordinate x = x i := by
+  simp [signedNormalCoordinate, normalVector, coordinateHyperplane, coordinateDirection,
+    PiLp.inner_apply, RCLike.inner_apply]
 
 /-- The signed normal coordinate varies continuously with the ambient point. -/
 @[fun_prop]

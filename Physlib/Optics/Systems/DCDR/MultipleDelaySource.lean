@@ -26,9 +26,10 @@ FMICS'15 Table 1 prints these four configurations:
 - “DCDR with Multiple Delay” — `m_i` can have different combinations.
 
 For `T_i = G_i*q^m_i`, the printed Theorem 3 numerator and denominator retain the source's
-`1-k` and `k` coefficients. The map to the coherent N7 family instead uses square-root
-amplitudes and the pinned `-I` cross gauge. No response, pole, or stability identity between
-those two polynomial models is asserted.
+intensity gains `G_i` and the source's `1-k` and `k` coefficients. The map to the coherent N7
+family instead uses square-root field gains, square-root coupler amplitudes, and the pinned `-I`
+cross gauge. No response, pole, or stability identity between those two polynomial models is
+asserted.
 
 The real unit-delay source dictionary being extended is at
 `Physlib/Optics/Systems/DCDR/SourceBridge.lean:197-237`; the pinned cross gauge is declared at
@@ -37,7 +38,8 @@ The real unit-delay source dictionary being extended is at
 ## ii. Key results
 
 - `DCDRSourceBridge.MultipleDelaySourceParameters`: the eight-symbol source dictionary.
-- `MultipleDelaySourceParameters.toMultipleDelayParameters`: the coherent symbol map.
+- `MultipleDelaySourceParameters.HasNonnegativeGains`: the coherent-map source domain.
+- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters`: the coherent symbol map.
 - `MultipleDelaySourceParameters.printedNumeratorPolynomial`: printed Theorem 3 numerator.
 - `MultipleDelaySourceParameters.printedDenominatorPolynomial`: printed Theorem 3 denominator.
 - `MultipleDelaySourceParameters.printedDenominatorPolynomial_natDegree_le`: degree bound.
@@ -125,11 +127,18 @@ def SourceParameters.toMultipleDelaySourceParameters
   m2 := 1
   m3 := 1
 
-/-- Map printed intensities to coherent amplitudes while preserving all three exponents.
+/-- The source domain on which all three printed intensity gains admit faithful square roots. -/
+def MultipleDelaySourceParameters.HasNonnegativeGains
+    (p : MultipleDelaySourceParameters) : Prop :=
+  p.toSourceParameters.HasNonnegativeGains
 
-This is a symbol dictionary, not a coherent--incoherent response identity.
+/-- Map printed intensities to coherent amplitudes and field gains while preserving exponents.
+
+Its source interpretation is restricted to `HasNonnegativeGains`, where the mapped field gains
+square back to the printed intensities. This is a symbol dictionary, not a
+coherent--incoherent response identity.
 -/
-def MultipleDelaySourceParameters.toMultipleDelayParameters
+def MultipleDelaySourceParameters.toCoherentMultipleDelayParameters
     (p : MultipleDelaySourceParameters) : DCDR.MultipleDelayParameters where
   firstCoupler :=
     { throughAmplitude := Real.sqrt (1 - p.k1)
@@ -137,35 +146,63 @@ def MultipleDelaySourceParameters.toMultipleDelayParameters
   secondCoupler :=
     { throughAmplitude := Real.sqrt (1 - p.k2)
       crossAmplitude := Real.sqrt p.k2 }
-  upperGain := p.G1
-  lowerGain := p.G2
-  feedbackGain := p.G3
+  upperGain := intensityGainToFieldAmplitudeGain p.G1
+  lowerGain := intensityGainToFieldAmplitudeGain p.G2
+  feedbackGain := intensityGainToFieldAmplitudeGain p.G3
   m1 := p.m1
   m2 := p.m2
   m3 := p.m3
 
-/-- The multiple-delay source map preserves every printed symbol and exponent. -/
-lemma MultipleDelaySourceParameters.toMultipleDelayParameters_data
+/-- The multiple-delay source map exposes converted field gains and preserves every exponent. -/
+lemma MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_data
     (p : MultipleDelaySourceParameters) :
-    p.toMultipleDelayParameters.firstCoupler.throughAmplitude =
+    p.toCoherentMultipleDelayParameters.firstCoupler.throughAmplitude =
         Real.sqrt (1 - p.k1) ∧
-      p.toMultipleDelayParameters.firstCoupler.crossAmplitude = Real.sqrt p.k1 ∧
-        p.toMultipleDelayParameters.secondCoupler.throughAmplitude =
+      p.toCoherentMultipleDelayParameters.firstCoupler.crossAmplitude = Real.sqrt p.k1 ∧
+        p.toCoherentMultipleDelayParameters.secondCoupler.throughAmplitude =
             Real.sqrt (1 - p.k2) ∧
-          p.toMultipleDelayParameters.secondCoupler.crossAmplitude = Real.sqrt p.k2 ∧
-            p.toMultipleDelayParameters.upperGain = p.G1 ∧
-              p.toMultipleDelayParameters.lowerGain = p.G2 ∧
-                p.toMultipleDelayParameters.feedbackGain = p.G3 ∧
-                  p.toMultipleDelayParameters.m1 = p.m1 ∧
-                    p.toMultipleDelayParameters.m2 = p.m2 ∧
-                      p.toMultipleDelayParameters.m3 = p.m3 :=
+          p.toCoherentMultipleDelayParameters.secondCoupler.crossAmplitude =
+              Real.sqrt p.k2 ∧
+            p.toCoherentMultipleDelayParameters.upperGain =
+                intensityGainToFieldAmplitudeGain p.G1 ∧
+              p.toCoherentMultipleDelayParameters.lowerGain =
+                  intensityGainToFieldAmplitudeGain p.G2 ∧
+                p.toCoherentMultipleDelayParameters.feedbackGain =
+                    intensityGainToFieldAmplitudeGain p.G3 ∧
+                  p.toCoherentMultipleDelayParameters.m1 = p.m1 ∧
+                    p.toCoherentMultipleDelayParameters.m2 = p.m2 ∧
+                      p.toCoherentMultipleDelayParameters.m3 = p.m3 :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+
+/-- The mapped upper complex field gain squares back to its printed intensity gain. -/
+lemma MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_upperGain_sq
+    {p : MultipleDelaySourceParameters} (hp : p.HasNonnegativeGains) :
+    p.toCoherentMultipleDelayParameters.upperGain ^ 2 = (p.G1 : ℂ) := by
+  change 0 ≤ p.G1 ∧ 0 ≤ p.G2 ∧ 0 ≤ p.G3 at hp
+  change (Real.sqrt p.G1 : ℂ) ^ 2 = (p.G1 : ℂ)
+  exact_mod_cast Real.sq_sqrt hp.1
+
+/-- The mapped lower complex field gain squares back to its printed intensity gain. -/
+lemma MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_lowerGain_sq
+    {p : MultipleDelaySourceParameters} (hp : p.HasNonnegativeGains) :
+    p.toCoherentMultipleDelayParameters.lowerGain ^ 2 = (p.G2 : ℂ) := by
+  change 0 ≤ p.G1 ∧ 0 ≤ p.G2 ∧ 0 ≤ p.G3 at hp
+  change (Real.sqrt p.G2 : ℂ) ^ 2 = (p.G2 : ℂ)
+  exact_mod_cast Real.sq_sqrt hp.2.1
+
+/-- The mapped feedback complex field gain squares back to its printed intensity gain. -/
+lemma MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_feedbackGain_sq
+    {p : MultipleDelaySourceParameters} (hp : p.HasNonnegativeGains) :
+    p.toCoherentMultipleDelayParameters.feedbackGain ^ 2 = (p.G3 : ℂ) := by
+  change 0 ≤ p.G1 ∧ 0 ≤ p.G2 ∧ 0 ≤ p.G3 at hp
+  change (Real.sqrt p.G3 : ℂ) ^ 2 = (p.G3 : ℂ)
+  exact_mod_cast Real.sq_sqrt hp.2.2
 
 /-- Extending and mapping a unit-delay dictionary agrees with the literal coherent embedding. -/
 lemma SourceParameters.toMultipleDelaySourceParameters_coherent
     (p : SourceParameters) :
-    p.toMultipleDelaySourceParameters.toMultipleDelayParameters =
-      p.toUnitDelayParameters.toMultipleDelayParameters := by
+    p.toMultipleDelaySourceParameters.toCoherentMultipleDelayParameters =
+      p.toCoherentUnitDelayParameters.toMultipleDelayParameters := by
   rfl
 
 /-- The coefficient of `q^m1` in the printed Theorem 3 numerator. -/

@@ -30,11 +30,18 @@ Another exact source fixture satisfies the strict version of printed Theorem 4's
 the reciprocal pole of Theorem 3's differently indexed denominator has norm two. It makes the
 withholding of a forced strict Theorem 4 bridge executable.
 
+The gain-role fixture uses printed intensities `(1/4, 1/9, 4/25)`. Primitive square-root
+expansion gives coherent field gains `(1/2, 1/3, 2/5)`, while an independent printed-polynomial
+expansion retains the literal intensity values. Thus replacing the coherent map cannot silently
+replace `G_i` by `sqrt G_i` in the source transcription.
+
 ## ii. Key results
 
 - `unstableReducedResponse_zPoles_eq_pair`: exact two-element reciprocal pole set.
 - `unstableResponseReduction_ncard_actualPoles_eq_two`: tight DCDR pole count.
 - `degreeDropResponseReduction_ncard_actualPoles_eq_zero`: degenerate denominator fixture.
+- `sourceGainConversion_coherentGains`: exact intensity-to-field conversion anchor.
+- `sourceGainConversion_printedPolynomials`: literal printed-source noninterference anchor.
 - `sourceDictionaryDivergence_loopCoefficients_ne`: incoherent/coherent divergence witness.
 - `sourceThmFourMismatch_not_isSchurStable`: executable Theorem 3/4 mismatch witness.
 
@@ -42,7 +49,7 @@ withholding of a forced strict Theorem 4 bridge executable.
 
 - A. Tight two-pole fixture
 - B. Degree-drop fixture
-- C. Source-dictionary divergence and printed-form mismatch fixtures
+- C. Source-dictionary gain conversion, divergence, and printed-form mismatch fixtures
 
 ## iv. References
 
@@ -205,9 +212,71 @@ lemma degreeDropResponseReduction_ncard_actualPoles_eq_zero :
 
 /-!
 
-## C. Source-dictionary divergence and printed-form mismatch fixtures
+## C. Source-dictionary gain conversion, divergence, and printed-form mismatch fixtures
 
 -/
+
+/-- Exact source intensities whose canonical field gains are rational square roots. -/
+def sourceGainConversionParameters : DCDRSourceBridge.SourceParameters where
+  G1 := 1 / 4
+  G2 := 1 / 9
+  G3 := 4 / 25
+  k1 := 1
+  k2 := 1
+
+/-- The exact gain-role fixture lies in the faithful square-root source domain. -/
+lemma sourceGainConversion_hasNonnegativeGains :
+    sourceGainConversionParameters.HasNonnegativeGains := by
+  norm_num [DCDRSourceBridge.SourceParameters.HasNonnegativeGains,
+    sourceGainConversionParameters]
+
+/-- Primitive square-root expansion gives the three canonical coherent field gains. -/
+lemma sourceGainConversion_coherentGains :
+    sourceGainConversionParameters.toCoherentUnitDelayParameters.upperGain = 1 / 2 ∧
+      sourceGainConversionParameters.toCoherentUnitDelayParameters.lowerGain = 1 / 3 ∧
+      sourceGainConversionParameters.toCoherentUnitDelayParameters.feedbackGain = 2 / 5 := by
+  have hFour : Real.sqrt (4 : ℝ) = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hNine : Real.sqrt (9 : ℝ) = 3 := by
+    rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hTwentyFive : Real.sqrt (25 : ℝ) = 5 := by
+    rw [show (25 : ℝ) = 5 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  norm_num [DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain, sourceGainConversionParameters,
+    hFour, hNine, hTwentyFive]
+
+/-- Squaring the independently expanded field gains recovers all three source intensities. -/
+lemma sourceGainConversion_squaredGains :
+    DCDRSourceBridge.fieldAmplitudeGainToIntensityGain
+        sourceGainConversionParameters.toCoherentUnitDelayParameters.upperGain = 1 / 4 ∧
+      DCDRSourceBridge.fieldAmplitudeGainToIntensityGain
+          sourceGainConversionParameters.toCoherentUnitDelayParameters.lowerGain = 1 / 9 ∧
+      DCDRSourceBridge.fieldAmplitudeGainToIntensityGain
+          sourceGainConversionParameters.toCoherentUnitDelayParameters.feedbackGain = 4 / 25 := by
+  have hFour : Real.sqrt (4 : ℝ) = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hNine : Real.sqrt (9 : ℝ) = 3 := by
+    rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hTwentyFive : Real.sqrt (25 : ℝ) = 5 := by
+    rw [show (25 : ℝ) = 5 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  norm_num [DCDRSourceBridge.fieldAmplitudeGainToIntensityGain,
+    DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain, sourceGainConversionParameters,
+    hFour, hNine, hTwentyFive]
+
+/-- The literal printed polynomials retain source intensities, not mapped field amplitudes. -/
+lemma sourceGainConversion_printedPolynomials :
+    sourceGainConversionParameters.printedNumeratorPolynomial =
+        C (1 / 9) * X - C (1 / 225) * X ^ 3 ∧
+      sourceGainConversionParameters.printedDenominatorPolynomial =
+        1 - C (1 / 25) * X ^ 2 := by
+  constructor <;>
+    norm_num [DCDRSourceBridge.SourceParameters.printedNumeratorPolynomial,
+      DCDRSourceBridge.SourceParameters.printedDenominatorPolynomial,
+      DCDRSourceBridge.SourceParameters.printedLinearCoefficient,
+      DCDRSourceBridge.SourceParameters.printedCubicCoefficient,
+      DCDRSourceBridge.SourceParameters.printedLoopCoefficient,
+      sourceGainConversionParameters]
 
 /-- All-one printed symbols expose the incoherent/coherent loop-coefficient difference. -/
 def sourceDictionaryDivergenceParameters : DCDRSourceBridge.SourceParameters where
@@ -225,15 +294,16 @@ lemma sourceDictionaryDivergence_printedLoopCoefficient :
 
 /-- Direct N7 amplitude expansion gives coherent loop coefficient minus one. -/
 lemma sourceDictionaryDivergence_coherentLoopCoefficient :
-    sourceDictionaryDivergenceParameters.toUnitDelayParameters.loopCoefficient = -1 := by
-  norm_num [DCDRSourceBridge.SourceParameters.toUnitDelayParameters,
+    sourceDictionaryDivergenceParameters.toCoherentUnitDelayParameters.loopCoefficient = -1 := by
+  norm_num [DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain,
     UnitDelayParameters.loopCoefficient, sourceDictionaryDivergenceParameters,
     DirectionalCoupler.crossCoefficient, Complex.I_mul_I]
 
 /-- The source dictionary does not identify the printed and coherent loop coefficients. -/
 lemma sourceDictionaryDivergence_loopCoefficients_ne :
     (sourceDictionaryDivergenceParameters.printedLoopCoefficient : ℂ) ≠
-      sourceDictionaryDivergenceParameters.toUnitDelayParameters.loopCoefficient := by
+      sourceDictionaryDivergenceParameters.toCoherentUnitDelayParameters.loopCoefficient := by
   rw [sourceDictionaryDivergence_printedLoopCoefficient,
     sourceDictionaryDivergence_coherentLoopCoefficient]
   norm_num
@@ -313,6 +383,5 @@ lemma sourceThmFourMismatch_not_isSchurStable :
   norm_num at hInside
 
 end
-
 
 end Optics.DCDR

@@ -1598,9 +1598,15 @@ selected positive-coordinate Heaviside distribution in the inward `+e_i` directi
 corresponding boundary delta. An independent `Fin 2` Gaussian regression distinguishes selected
 and swapped coordinate hyperplanes, while the retained one-dimensional Gaussian regression pins
 normalization and the sign under normal reversal. An anisotropic `Fin 2` point-source fixture also
-pins generic pushforward coefficient preservation and coordinate placement. None of these neutral
-tempered-distribution results represents arbitrary sidewise Maxwell fields or derives the
-finite-sheet premise.
+pins generic pushforward coefficient preservation and coordinate placement. The Space-side bridge
+transports these coordinate distributions through the standard orthonormal basis and represents
+distribution-bounded ambient extensions only on their selected strict half-spaces. For the field
+which is zero on the negative side and constant on the positive side of an origin coordinate
+hyperplane, it proves that the inward coordinate derivative is the constant-coefficient sheet and
+that this sheet is the transported generic coordinate-hyperplane pushforward. Direct `7`, `-7`, and
+swapped-coordinate regressions pin the coefficient, orientation, and selected sheet independently.
+This does not prove a variable-trace derivative formula on an arbitrary oriented plane, derive a
+weak or measure-valued Maxwell equation, or derive the finite-sheet premise.
 
 The local-calculus chain is complete. `PlanarRectangleLocalStokes.lean` and
 `AffineBoxLocalDivergence.lean` prove oriented Stokes and divergence identities for independent
@@ -2115,11 +2121,12 @@ from the same network semantics at every frequency where the response is defined
   forcing, and a mis-lifted-port negative control;
 - [x] functional packaging of a child as a scattering/response component only after that child's
   well-posedness and external-channel pairing have been proved; and
-- [x] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
-  port families. This single construction is needed both to replace an inner family by another
-  with the same boundary relation and to state literal three-stage append associativity. The
-  fixed-inner-wiring congruence is already complete. All current N-08 hypotheses are structural
-  `Fintype` assumptions on channel indices, not physical assumptions.
+- [x] transport of a `PortConnectionFamily` along an equivalence of port families, with covariance
+  of incident assembly, external readout, and relational closure. This supports replacement of an
+  inner family by another with the same boundary relation and literal three-stage append
+  associativity after the canonical port-family transport. The fixed-inner-wiring congruence is
+  also complete. All N-08 reuse hypotheses are structural `Fintype` assumptions on channel
+  indices, not physical assumptions.
 
 Exit: proofs scale by verified subsystem boundaries without changing the result obtained from the
 fully flattened channel equations.
@@ -2181,9 +2188,8 @@ larger formulas and proves no independently reusable component law for them.
   normalized-modal-power factor, passive/unitary parameter predicates, and losslessness;
 - [x] its four independently wireable physical-port presentation, pinned nested channel order,
   exact behavior and scattering transport, and direct `ScatteringComponentFamily` consumption;
-- [ ] component-owned physical-port packaging consumed by `ScatteringComponentFamily`: the
-  beam-splitter and mirror packages are complete, while polarization and interface primitives
-  remain;
+- [x] component-owned physical-port packaging consumed by `ScatteringComponentFamily`, with
+  complete beam-splitter, mirror, polarization, and interface packages;
 - [ ] frequency-parameterized propagation and actual time/group-delay statements under N5F, with
   their frequency-domain, causality, and dispersion hypotheses explicit;
 - mirror and termination;
@@ -2450,7 +2456,9 @@ the PANDA through/drop pair.
 - the human-audited eight-node, eleven-edge topology with parallel edges retained;
 - the transfer result by N5 elimination and independently by S6 Mason gain;
 - active/passive, unit-delay, and multiple-delay specializations;
-- coherent and incoherent interpretations through N6c;
+- [x] coherent and incoherent interpretations through N6c, where `incoherent` means diagonal or
+  mutually decorrelated second-order coherency data only; this does not identify the coherent N7
+  DCDR with FMICS'15's separately printed incoherent coefficient model;
 - poles, zeros, and stability results; and
 - an exact or interval-certified, human-audited version of the source's reported unstable passive
   parameter case.
@@ -2513,8 +2521,12 @@ topologies remain open, so this milestone is still in progress.
 
 - round-trip system and fixed-ray/fixed-beam predicates;
 - determinant-one trace criterion and its exact hypotheses;
-- Fabry-Perot, ring, and selected phase-conjugate resonators; and
+- Fabry-Perot and ring resonators; and
 - agreement between ray-stability and Gaussian fixed-point views where applicable.
+
+Phase-conjugated ring resonators and the associated Thesis'15 chaos definitions and theorems
+(Defs. 5.6--5.9/5.12 and Thms. 5.9--5.10/5.19--5.20) are outside this foundation milestone. They
+remain deferred to the separate RS-07 scope and physics review named by this section's exit.
 
 Exit for H.5: the principal reusable ray-, Gaussian-, and resonator-optics foundations and their
 representative system analyses are available through Physlib definitions. This is not by itself a
@@ -2727,9 +2739,9 @@ upstream ownership decision, record the exact decision needed and work on an ind
 - [x] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
 - [x] Confirm whether the initial planar-interface PR may state local boundary laws as named
   hypotheses while their Maxwell-integral derivation is developed in a stacked Electromagnetism PR.
-- [ ] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
+- [x] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
   coefficients scale full electric-vector amplitudes or tangential components.
-- [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
+- [x] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
 - [x] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
   corroborating the four-wave arrows and behavior: states are backward-first, scattering
@@ -2746,7 +2758,11 @@ upstream ownership decision, record the exact decision needed and work on an ind
 - [ ] Replace source decimal examples by human-audited exact data or certified intervals and record
   every source assumption that the Lean statement strengthens, corrects, or rejects.
 - [x] Confirm the exact HOL source licenses before adapting any source implementation.
-- [ ] Independently verify every bibliography item, URL, page range, and physics claim used in a PR.
+- [x] discharged as the three-way record of `decision-L14.md` Rev. 5 — Class A (18 sources)
+  body-verified; Class B (Gu 2017, Reshef 2017, de Bernardis 2025) consumed-but-body-unverified —
+  de Bernardis body-read with a documented abstract/body discrepancy — each with integrity notes
+  at every consumer; Class C open and non-load-bearing with evidence; standing promotion rule in
+  force.
 - [ ] Conduct all maintainer/reviewer communication and certify every contributed line. Deferred
   HUMAN-ONLY; residual act: at the trigger, personally certify the exact chosen PR diff and conduct
   every maintainer/reviewer communication.
@@ -2823,7 +2839,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
 | E3b Optics normalization | complete on finite synthesis image | O1, P1a, E2, E3a | common-positive-frequency propagating Maxwell families, finite complex synthesis, actual one-period integrated Poynting flux, restricted two-dimensional Hausdorff aperture area, and signed modal-power identification are complete; no modal completeness claim |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; genuine propagation roles remain E5b |
-| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces, local oriented Stokes/divergence for independent half-cell fields, an explicit finite-sheet carrier/interchange premise, its derivation of the literal sourceful finite-cell Maxwell balances and all four jump laws, sign-sensitive regressions, and the explicit-wave optical bridge are complete; deriving that finite-sheet premise from weak or measure-valued Maxwell remains |
+| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces, a coordinate constant-jump distribution bridge, local oriented Stokes/divergence for independent half-cell fields, an explicit finite-sheet carrier/interchange premise, its derivation of the literal sourceful finite-cell Maxwell balances and all four jump laws, sign-sensitive regressions, and the explicit-wave optical bridge are complete; a variable-trace arbitrary-plane weak derivative and derivation of the finite-sheet premise from weak or measure-valued Maxwell remain |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection, angular reflection, the guarded phase-vector law of the plane of incidence, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, the connected complex-TIR reflected/separate/superposed actual-flux endpoint, and a lossless algebraic square-root-normalized completion of each real left-incident s/p column are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and a Maxwell-derived bidirectional power-normalized interface scattering matrix remain |
@@ -2836,7 +2852,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
 | N5 elimination | done | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, proof-gated Redheffer realization, and canonical FlatNetlist/N5H/common-domain response agreement are complete |
 | N5F parameterized compilation | done | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
-| N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening, well-posed subsystem packaging, close behavior, append assembly, unconditional hierarchical/flattened semantic equality, N-08 evidence, and fixed-inner-wiring congruence are complete; one port-family transport construction remains for both inner-family replacement and literal three-stage associativity |
+| N5H hierarchy/flattening | done | N4, N5 | connection append, hierarchy data, flattening, well-posed subsystem packaging, close behavior, append assembly, unconditional hierarchical/flattened semantic equality, N-08 evidence, fixed-inner-wiring congruence, port-family transport, inner-family replacement, and literal three-stage append associativity after canonical transport are complete |
 | N6a conservation | done | N2a, N5; E3b for physical meaning | exact wiring power balance, componentwise passive/lossless closure, and lossless external scattering matrix |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
 | N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |
@@ -2845,7 +2861,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
 | S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, the gated source bridge, and the all-pass X-01 ring instance are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, DATE/SysCon/SFG response identifications, and common-domain causal-Z/N5F/N5/Mason/scattering/chain/relational agreement are complete under their stated gates; IP-06/IP-07 source questions and the remaining physical/source extensions stay open |
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
-| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; network reachability/no-cancellation and broader rational BIBO remain |
+| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; a network reachability/no-cancellation criterion remains |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
 | S6 Mason | done | N5, finite graph audit | neutral node- and edge-indexed Mason theory, `C * S` extraction, exact determinant gate, Mason feedback inverse, and typed external-response equality are complete; ring and DCDR instantiations belong to the S7 system suite |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
@@ -2871,9 +2887,20 @@ The long-running goal is complete only when:
 - [ ] every completed public requirement is accurately reflected in focused API maps;
 - [ ] all builds and linters pass except independently reproduced and documented upstream-baseline
   failures;
-- [ ] external-source licenses and bibliography are independently verified by the human author;
-- [ ] the human author has reviewed and can explain every definition, theorem statement, proof, and
-  physical convention; and
+- [x] external-source licenses and bibliography are verified by `decision-L13.md`,
+  `decision-L14.md`, and `bibliography-table.md` under L14's three-class discipline — Class A
+  items body-verified (URL fetched, page-cited claims checked, sha256 against `PROVENANCE.md` where
+  applicable), Class B consumed with integrity notes, Class C metadata-only and non-load-bearing —
+  hostile-checked by A5/A6;
+- [ ] every fork-delta theorem passes three independent verification channels: (a) the **Lean
+  kernel** — proof correctness, total, with no `sorry`/`axiom`/`native_decide`; (b) an
+  **adversarial statement audit**, exhaustive over the fork-delta theorem inventory per
+  `AUDIT-PACK-SPEC.md` — an agent that did not write the module reads the printed source page and
+  the Lean statement side by side and must try to find a mismatch, recording the page and the
+  quoted text, and a second attacker from a **different model family** attacks each page; and (c) a
+  **simulation binding** — the COMPARISON-CONTRACT row and its numeric referent, or an explicit
+  recorded "no numeric referent exists" with the reason, for structural and distribution-level
+  statements; and
 - [ ] upstream work has been split into reviewable single-concept PRs and discussed by the human
   author with maintainers.
 
@@ -2890,7 +2917,8 @@ The long-running goal is complete only when:
   Optics*](https://hvg.ece.concordia.ca/Publications/Conferences/SPIE14.pdf), *Novel Optical Systems
   Design and Optimization XVII*, Proc. SPIE 9193, 91930A, 2014, for the plane-of-incidence,
   reflection, frequency-conservation, Snell, one-mode Fresnel, and electromagnetic Fabry--Perot
-  results. Its polarization label is internally inconsistent between TE (p. 7) and TM (p. 11).
+  results. Its polarization label is internally inconsistent between TE (PDF p. 7) and TM (PDF
+  p. 12).
 - U. Siddique and S. Tahar, [*Towards the Formal Analysis of Microresonators based Photonic
   Systems*](https://hvg.ece.concordia.ca/Publications/Conferences/DATE14.pdf), IEEE/ACM DATE 2014,
   pp. 1--6, for finite cascades, matrix powers, and terminated formulas whose required `M₁₁ ≠ 0`

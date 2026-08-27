@@ -478,7 +478,7 @@ def physicalRegressionDateParameters : DateParameters where
   reflectivity := 3 / 5
   transmissivity := 4 / 5
   couplingLength := 1
-  powerAttenuation := 4 * Real.log 2
+  powerAttenuationCoefficient := 4 * Real.log 2
   wavelength := 1
   effectiveIndex := 0
 
