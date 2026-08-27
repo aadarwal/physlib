@@ -349,7 +349,7 @@ lemma zRegression_rationalZEliminationResponse_one :
   simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
   rw [zRegression_responseNumeratorPolynomial_expansion,
     zRegression_denominatorPolynomial_expansion]
-  norm_num
+  norm_num [IsZCrossSemanticsDomain.reciprocalZCoordinate]
 
 /-- Direct fixed data show the selected direct gain is `-7/16`. -/
 lemma zRegression_fixed_directGain :
@@ -597,11 +597,9 @@ lemma zRegression_stable_I_commonDomain_independent_anchor :
   let h := zRegression_stable_I_crossSemanticsDomain
   refine ⟨zCrossSemantics_agree stableUnitDelayParameters
     stableResponseReduction Complex.I h, ?_⟩
-  have hCoordinate : h.reciprocalZCoordinate = imaginaryUnitReciprocalZCoordinate := by
-    apply Subtype.ext
-    rfl
-  rw [hCoordinate]
-  exact zRegression_stable_independent_nonzeroLoop_I
+  simpa [IsZCrossSemanticsDomain.reciprocalZCoordinate,
+    imaginaryUnitReciprocalZCoordinate] using
+      zRegression_stable_independent_nonzeroLoop_I
 
 /-!
 
