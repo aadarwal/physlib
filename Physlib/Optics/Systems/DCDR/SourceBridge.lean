@@ -221,8 +221,8 @@ lemma intensityGainToFieldAmplitudeGain_fieldAmplitudeGainToIntensityGain
 /-- The five real parameters of FMICS'15's printed incoherent unit-delay DCDR formulas.
 
 The paper quantifies complex symbols. This structure records the real-valued subfamily that can
-be mapped to Physlib's real N7 amplitudes and real formal path gains without discarding imaginary
-parts.
+be mapped to Physlib's real N7 amplitudes. Its `G_i` fields remain printed intensity gains; the
+coherent map below assigns their canonical field-amplitude square roots.
 -/
 structure SourceParameters where
   /-- Printed upper-path intensity gain `G1`. -/
@@ -240,7 +240,7 @@ structure SourceParameters where
 def SourceParameters.HasAdmissibleCouplings (p : SourceParameters) : Prop :=
   0 ≤ p.k1 ∧ p.k1 ≤ 1 ∧ 0 ≤ p.k2 ∧ p.k2 ≤ 1
 
-/-- The source domain on which the three real path gains are algebraically admissible. -/
+/-- The source domain on which all three printed intensity gains admit faithful square roots. -/
 def SourceParameters.HasNonnegativeGains (p : SourceParameters) : Prop :=
   0 ≤ p.G1 ∧ 0 ≤ p.G2 ∧ 0 ≤ p.G3
 

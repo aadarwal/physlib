@@ -64,7 +64,7 @@ def dateTerminationRegressionRing : DateParameters where
   reflectivity := 3 / 5
   transmissivity := 4 / 5
   couplingLength := 1
-  powerAttenuation := 0
+  powerAttenuationCoefficient := 0
   wavelength := 2
   effectiveIndex := 1
 
@@ -717,7 +717,7 @@ def dateTerminationRegressionSingularRing : DateParameters where
   reflectivity := 3 / 4
   transmissivity := 5 / 4
   couplingLength := 1
-  powerAttenuation := 0
+  powerAttenuationCoefficient := 0
   wavelength := 2
   effectiveIndex := 1
 
