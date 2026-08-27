@@ -2188,9 +2188,8 @@ larger formulas and proves no independently reusable component law for them.
   normalized-modal-power factor, passive/unitary parameter predicates, and losslessness;
 - [x] its four independently wireable physical-port presentation, pinned nested channel order,
   exact behavior and scattering transport, and direct `ScatteringComponentFamily` consumption;
-- [ ] component-owned physical-port packaging consumed by `ScatteringComponentFamily`: the
-  beam-splitter and mirror packages are complete, while polarization and interface primitives
-  remain;
+- [x] component-owned physical-port packaging consumed by `ScatteringComponentFamily`, with
+  complete beam-splitter, mirror, polarization, and interface packages;
 - [ ] frequency-parameterized propagation and actual time/group-delay statements under N5F, with
   their frequency-domain, causality, and dispersion hypotheses explicit;
 - mirror and termination;
