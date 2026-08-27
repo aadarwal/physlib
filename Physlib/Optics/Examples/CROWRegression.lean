@@ -1003,8 +1003,11 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
   norm_num [crowRegressionParameters, crowRegressionEndCoupler,
     crowRegressionMiddleCoupler, crowRegressionHalfArc,
     DirectionalCoupler.crossCoefficient, MatchedPropagation.transmissionCoefficient,
-    MatchedPropagation.carrierPhaseFactor] at
-      hCoupler0 hCoupler1 hCoupler2 hForward0 hForward1 hReturn0 hReturn1
+    MatchedPropagation.carrierPhaseFactor] at hCoupler0 hCoupler1 hCoupler2
+  norm_num [crowRegressionParameters, crowRegressionEndCoupler,
+    crowRegressionMiddleCoupler, crowRegressionHalfArc,
+    DirectionalCoupler.crossCoefficient, MatchedPropagation.transmissionCoefficient,
+    MatchedPropagation.carrierPhaseFactor] at hForward0 hForward1 hReturn0 hReturn1
   have hLeftInputZero := hExternal .leftInput
   have hLeftOutputZero := hExternal .leftOutput
   have hRightInputZero := hExternal .rightInput
