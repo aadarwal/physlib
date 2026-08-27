@@ -61,7 +61,7 @@ the neutral production modules `Physlib/Mathematics/ZTransform/OnePole.lean:73-1
 `Physlib/Mathematics/ZTransform/OnePoleBIBO.lean`.
 
 FMICS'15 Definition 7 calls the condition that every nonzero numerator root lies inside the unit
-disk a “resonance condition”, according to the audited statement in `goal.md:2284-2289`. Here
+disk a “resonance condition”, according to the audited statement in `goal.md:2340-2344`. Here
 `zZeros` are exactly the finite `z`-coordinate images of nonzero formal-`q` numerator roots. This
 module names only the literal predicate `AllZerosInsideUnitDisk`; it proves no physical resonance
 theorem. As stated in `Poles.lean`, no generic `ReducedRationalResponse` is certified to equal a
@@ -70,8 +70,8 @@ quotient results, not network transfer-zero or transfer-pole theorems. This modu
 Schur/BIBO equivalence for arbitrary proper causal rational responses, no reachability or
 observability theorem, and no physical-frequency, passivity, group-delay, or dispersion result.
 
-This module implements the requested “degree and finiteness bounds” at `goal.md:2274` and the
-stated-class Schur/BIBO requirement at `goal.md:2277-2278`.
+This module implements the requested “degree and finiteness bounds” at `goal.md:2329` and the
+stated-class Schur/BIBO requirement at `goal.md:2332-2333`.
 
 -/
 

@@ -21,6 +21,10 @@ negative indices in the domain is what allows the delay and advance laws below t
 without silently discarding startup data: the advance law produces an explicit finite startup
 sum, and the delay law is stated under an explicit causality hypothesis rather than assumed.
 
+The finite startup sum records samples removed by an advance; it is not an initial-state model.
+This file proves no nonzero-state recurrence theorem. Any such extension must expose a separately
+named `initialStateContribution` rather than hide initial data in the transform law.
+
 Two regions of convergence are defined and deliberately kept apart. `ROC f` is the set of nonzero
 `z` at which the term sequence is `Summable`, which for a complex-valued series is absolute
 convergence. `condROC f` is the set of nonzero `z` at which the sequence of partial sums over

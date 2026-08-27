@@ -44,10 +44,10 @@ equals the reciprocal-Z response at `unitCirclePoint`.
 ## iv. References
 
 The substitution `laplaceEvaluation` is defined as `exp (-s * τ_i)` in
-`Physlib/Optics/Systems/DelayTransfer/Basic.lean:225-227`. The exact N5F response-domain
-preimage and response transport are
-`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:326-394`. The reciprocal-Z map and its
-proof-gated transport are in that file at lines 396-495.
+`Physlib/Optics/Systems/DelayTransfer/Basic.lean:231`. The exact N5F response-domain preimage and
+response transport are in `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:326-394`.
+The reciprocal-Z map begins at `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:401`; its
+proof-gated response transports are at lines 510-550.
 
 The response domain includes both retained-entry validity and network well-posedness; those gates
 are independent as documented in
@@ -60,7 +60,7 @@ asserted. In particular, the requested Physlib extension concerning local logari
 derivatives is deferred to the later group-delay slice.
 
 This module implements the requested “frequency response under the chosen
-`q = exp (-s * τ) = z⁻¹` convention” from `goal.md:2279`.
+`q = exp (-s * τ) = z⁻¹` convention” from `goal.md:2334`.
 
 -/
 

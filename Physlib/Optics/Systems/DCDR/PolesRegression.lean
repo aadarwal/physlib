@@ -62,12 +62,12 @@ decimal pole list. The printed incoherent theorem is retained only as a non-stri
 with no implication to or from strict Schur stability. No physical resonance theorem,
 physical-frequency interpretation, material amplifier model, passivity claim, power observable,
 or DCDR BIBO theorem is asserted. S4's BIBO equivalence at
-`Physlib/Optics/Systems/DelayTransfer/Stability.lean:374-403` is only for
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:458` is only for
 `ProperCausalOnePole`; both denominators here have a nonzero quadratic coefficient.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Table 1 and Theorem 4. The corresponding HOL corpus
-audit is recorded at `HOL-CORPUS.md:307-308`.
+inventory is recorded at `HOL-CORPUS.md:316-326`.
 -/
 
 @[expose] public section

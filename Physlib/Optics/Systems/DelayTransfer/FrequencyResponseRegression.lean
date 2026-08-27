@@ -38,10 +38,11 @@ changed.
 
 ## iv. References
 
-The rational all-pass fixture and its direct compiled channel-equation solve are in
-`Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:150-298` and `845-912`. The
-physical all-pass channel equation is proved independently in
-`Physlib/Optics/Systems/Microring/AllPass.lean:1174-1239`. This regression does not use the prior
+The rational all-pass fixture is in
+`Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:150-298`. The direct compiled
+channel-equation solve is declared below at `FrequencyResponseRegression.lean:156`. The physical
+all-pass channel equation is proved in `Physlib/Optics/Systems/Microring/AllPass.lean:1174-1239`.
+This regression does not use the prior
 formal-delay, Laplace, or reciprocal-Z response-value anchors.
 
 The fixture checks one declared constant delay. It proves no rational dependence on physical

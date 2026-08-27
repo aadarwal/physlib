@@ -21,10 +21,11 @@ is proved equal to the complete DCDR flat netlist, and its selected proof-gated 
 proved equal to the retained rational quotient.
 
 The reused S4 interface is `RationalNetlist` at
-`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:150-169`, its proof-gated response domain at
-lines 227-260, the reciprocal substitution at lines 396-399, the abstract reduction and explicit
-`NoPoleCancellation` gate at `Physlib/Optics/Systems/DelayTransfer/Poles.lean:167-236`, and the
-reduced Schur predicate at `Physlib/Optics/Systems/DelayTransfer/Stability.lean:185-232`.
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:150-169`; its response domain is at lines
+227-260. Reciprocal substitution begins at
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:401`. The abstract reduction and explicit
+`NoPoleCancellation` gate are at `Physlib/Optics/Systems/DelayTransfer/Poles.lean:167-236`; the
+reduced Schur predicate is at `Physlib/Optics/Systems/DelayTransfer/Stability.lean:288`.
 
 Candidate singularities come from failure of invertibility of the compiled internal N5 operator. A
 `ResponseReduction` separately certifies that an S4 `RationalReduction` reduces the selected
