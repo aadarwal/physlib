@@ -802,8 +802,8 @@ lemma passiveReportedPoleSet_fmicsscriptClosed :
 lemma passiveReportedPoleSet_not_subset_zPoles :
     ¬passiveReportedPoleSet ⊆ passivePrintedReducedResponse.zPoles := by
   intro hSubset
-  exact passiveReportedPoles_not_mem_zPoles.1
-    (hSubset (passiveReportedPoleMagnitude : ℂ) (by simp [passiveReportedPoleSet]))
+  apply passiveReportedPoles_not_mem_zPoles.1
+  exact hSubset (by simp [passiveReportedPoleSet])
 
 /-- The authors' supplied-list check fails on exact pole validity, not on its closed-disk bound.
 
