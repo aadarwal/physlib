@@ -439,6 +439,54 @@ lemma crowRegressionOutgoing_component (component : Component 2)
       crowRegressionOutgoingValue component channel := by
   rfl
 
+/-- Incident evaluation at a named concrete coupler channel uses the exact table. -/
+@[simp]
+lemma crowRegressionIncident_coupler (interface : Fin 3)
+    (port : DirectionalCoupler.Port) :
+    crowRegressionIncident (Incident.mk (crowRegressionCouplerChannel interface port)) =
+      crowRegressionIncidentValue (.coupler interface) ⟨port, ()⟩ := by
+  rfl
+
+/-- Outgoing evaluation at a named concrete coupler channel uses the exact table. -/
+@[simp]
+lemma crowRegressionOutgoing_coupler (interface : Fin 3)
+    (port : DirectionalCoupler.Port) :
+    crowRegressionOutgoing (Outgoing.mk (crowRegressionCouplerChannel interface port)) =
+      crowRegressionOutgoingValue (.coupler interface) ⟨port, ()⟩ := by
+  rfl
+
+/-- Incident evaluation at a named concrete forward half-arc uses the exact table. -/
+@[simp]
+lemma crowRegressionIncident_forwardArc (ring : Fin 2)
+    (port : MatchedPropagation.Port) :
+    crowRegressionIncident (Incident.mk (crowRegressionForwardArcChannel ring port)) =
+      crowRegressionIncidentValue (.forwardArc ring) ⟨port, ()⟩ := by
+  rfl
+
+/-- Outgoing evaluation at a named concrete forward half-arc uses the exact table. -/
+@[simp]
+lemma crowRegressionOutgoing_forwardArc (ring : Fin 2)
+    (port : MatchedPropagation.Port) :
+    crowRegressionOutgoing (Outgoing.mk (crowRegressionForwardArcChannel ring port)) =
+      crowRegressionOutgoingValue (.forwardArc ring) ⟨port, ()⟩ := by
+  rfl
+
+/-- Incident evaluation at a named concrete return half-arc uses the exact table. -/
+@[simp]
+lemma crowRegressionIncident_returnArc (ring : Fin 2)
+    (port : MatchedPropagation.Port) :
+    crowRegressionIncident (Incident.mk (crowRegressionReturnArcChannel ring port)) =
+      crowRegressionIncidentValue (.returnArc ring) ⟨port, ()⟩ := by
+  rfl
+
+/-- Outgoing evaluation at a named concrete return half-arc uses the exact table. -/
+@[simp]
+lemma crowRegressionOutgoing_returnArc (ring : Fin 2)
+    (port : MatchedPropagation.Port) :
+    crowRegressionOutgoing (Outgoing.mk (crowRegressionReturnArcChannel ring port)) =
+      crowRegressionOutgoingValue (.returnArc ring) ⟨port, ()⟩ := by
+  rfl
+
 /-- The external input induced by the exact aggregate incident state. -/
 def crowRegressionInput : ModeAmplitude (Incident crowRegressionConnections.ExternalChannel) :=
   crowRegressionIncident.restrictEmbedding crowRegressionConnections.externalIncidentEmbedding
@@ -715,8 +763,6 @@ lemma crowRegression_incidentAssembly :
             crowRegressionOutgoing
               (Outgoing.mk (crowRegressionCouplerChannel ring.succ .rightFirst))
       all_goals fin_cases ring
-      all_goals rw [crowRegressionIncident_component,
-        crowRegressionOutgoing_component]
       all_goals norm_num [crowRegressionIncidentValue,
         crowRegressionOutgoingValue]
     · rcases forwardOrReturn with forwardIndex | returnIndex
@@ -734,8 +780,6 @@ lemma crowRegression_incidentAssembly :
                 (Outgoing.mk
                   (crowRegressionCouplerChannel forwardIndex.castSucc .rightSecond))
         all_goals fin_cases forwardIndex
-        all_goals rw [crowRegressionIncident_component,
-          crowRegressionOutgoing_component]
         all_goals norm_num [crowRegressionIncidentValue,
           crowRegressionOutgoingValue]
       · rcases localChannel with mode | mode <;> cases mode
@@ -752,8 +796,6 @@ lemma crowRegression_incidentAssembly :
               crowRegressionOutgoing
                 (Outgoing.mk (crowRegressionReturnArcChannel returnIndex .right))
         all_goals fin_cases returnIndex
-        all_goals rw [crowRegressionIncident_component,
-          crowRegressionOutgoing_component]
         all_goals norm_num [crowRegressionIncidentValue,
           crowRegressionOutgoingValue]
   · rcases external with ⟨channel⟩
