@@ -132,6 +132,12 @@ noncomputable instance cancellationHidingChannelFintype :
 noncomputable instance cancellationHidingChannelDecidableEq :
     DecidableEq cancellationHidingNetlist.Channel := Classical.decEq _
 
+/-- Classical equality in the component-family spelling of the aggregate channel. -/
+noncomputable instance cancellationHidingAggregateChannelDecidableEq :
+    DecidableEq
+      cancellationHidingComponents.toParameterizedComponentFamily.aggregatePortModeFamily.Channel :=
+  Classical.decEq _
+
 /-- The singleton incident index is unique. -/
 instance cancellationHidingIncidentUnique : Unique cancellationHidingNetlist.IncidentIndex where
   default := Incident.mk cancellationHidingChannel
@@ -187,6 +193,14 @@ noncomputable instance cancellationHidingConnectedChannelDecidableEq :
 
 -/
 
+/-- The unique assembled entry selects the fixture's stored rational model. -/
+lemma cancellationHiding_scatteringEntryModel :
+    cancellationHidingNetlist.scatteringEntryModel
+        cancellationHidingChannel cancellationHidingChannel = cancellationHidingEntryModel := by
+  simp [RationalNetlist.scatteringEntryModel, RationalComponentFamily.aggregateEntryModel,
+    RationalComponentFamily.indexedChannelEquiv, cancellationHidingNetlist,
+    cancellationHidingComponents, cancellationHidingChannel]
+
 /-- The fixture's retained common denominator is exactly `1 - q`. -/
 lemma cancellationHiding_commonDenominator :
     cancellationHidingNetlist.commonDenominator = cancellationHidingPolynomial := by
@@ -199,7 +213,7 @@ lemma cancellationHiding_commonDenominator :
     simp only [Finset.mem_univ, Finset.mem_singleton, true_iff]
     exact Subsingleton.elim entry (cancellationHidingChannel, cancellationHidingChannel)
   rw [RationalNetlist.commonDenominator, hUniv, Finset.prod_singleton]
-  change cancellationHidingEntryModel.denominator = cancellationHidingPolynomial
+  rw [cancellationHiding_scatteringEntryModel]
   rfl
 
 /-- The selected cleared scattering entry is the uncancelled numerator `1 - q`. -/
@@ -209,17 +223,22 @@ lemma cancellationHiding_clearedScattering_entry :
         (Incident.mk cancellationHidingChannel) = cancellationHidingPolynomial := by
   classical
   rw [RationalNetlist.clearedScattering]
-  change cancellationHidingEntryModel.numerator *
+  change (cancellationHidingNetlist.scatteringEntryModel
+      cancellationHidingChannel cancellationHidingChannel).numerator *
       cancellationHidingNetlist.denominatorComplement
         cancellationHidingChannel cancellationHidingChannel = _
+  rw [cancellationHiding_scatteringEntryModel]
+  have hUniv :
+      (Finset.univ : Finset
+        (cancellationHidingNetlist.Channel × cancellationHidingNetlist.Channel)) =
+        {(cancellationHidingChannel, cancellationHidingChannel)} := by
+    ext entry
+    simp only [Finset.mem_univ, Finset.mem_singleton, true_iff]
+    exact Subsingleton.elim entry (cancellationHidingChannel, cancellationHidingChannel)
   have hErase :
       (Finset.univ.erase (cancellationHidingChannel, cancellationHidingChannel) :
         Finset (cancellationHidingNetlist.Channel × cancellationHidingNetlist.Channel)) = ∅ := by
-    ext entry
-    simp only [Finset.mem_erase, Finset.mem_univ, Finset.not_mem_empty, iff_false,
-      not_and, not_true_eq_false]
-    exact fun hNe => hNe (Subsingleton.elim entry
-      (cancellationHidingChannel, cancellationHidingChannel))
+    rw [hUniv, Finset.erase_singleton]
   rw [RationalNetlist.denominatorComplement, hErase]
   simp [cancellationHidingEntryModel]
 
@@ -244,32 +263,25 @@ lemma cancellationHiding_clearedFeedback_entry :
   classical
   rw [RationalNetlist.clearedFeedback, Matrix.sub_apply, Matrix.smul_apply,
     Matrix.one_apply, Matrix.mul_apply, Fintype.sum_unique]
-  simp [cancellationHiding_commonDenominator,
-    cancellationHiding_polynomialRouting_entry]
+  rw [Subsingleton.elim (default : cancellationHidingNetlist.OutgoingIndex)
+    (Outgoing.mk cancellationHidingChannel)]
+  simp [cancellationHiding_commonDenominator, cancellationHiding_polynomialRouting_entry]
 
 /-- The selected polynomial external readout entry is one. -/
 lemma cancellationHiding_polynomialOutputReadout_entry :
     cancellationHidingNetlist.polynomialOutputReadout
         (Outgoing.mk cancellationHidingExternalChannel)
         (Outgoing.mk cancellationHidingChannel) = 1 := by
-  change MvPolynomial.C
-    (cancellationHidingConnections.externalOutgoingReadout
-      (Outgoing.mk cancellationHidingExternalChannel)
-      (Outgoing.mk cancellationHidingChannel)) = 1
-  rw [cancellationHidingConnections.externalOutgoingReadout_entry_external]
-  simp
+  simp [RationalNetlist.polynomialOutputReadout, ParameterizedNetlist.outputReadout,
+    PortConnectionFamily.externalOutgoingReadout, cancellationHidingExternalChannel]
 
 /-- The selected polynomial external incident injection entry is one. -/
 lemma cancellationHiding_polynomialInputExposure_entry :
     cancellationHidingNetlist.polynomialInputExposure
         (Incident.mk cancellationHidingChannel)
         (Incident.mk cancellationHidingExternalChannel) = 1 := by
-  change MvPolynomial.C
-    (cancellationHidingConnections.externalIncidentInjection
-      (Incident.mk cancellationHidingChannel)
-      (Incident.mk cancellationHidingExternalChannel)) = 1
-  rw [cancellationHidingConnections.externalIncidentInjection_entry_external]
-  simp
+  simp [RationalNetlist.polynomialInputExposure, ParameterizedNetlist.inputExposure,
+    PortConnectionFamily.externalIncidentInjection, cancellationHidingExternalChannel]
 
 /-- The selected retained external numerator is exactly `1 - q`. -/
 lemma cancellationHiding_responseNumerator :
@@ -281,6 +293,10 @@ lemma cancellationHiding_responseNumerator :
   rw [RationalNetlist.responseNumerator, Matrix.mul_apply, Fintype.sum_unique,
     Matrix.mul_apply, Fintype.sum_unique, Matrix.mul_apply, Fintype.sum_unique,
     Matrix.adjugate_subsingleton]
+  rw [Subsingleton.elim (default : cancellationHidingNetlist.OutgoingIndex)
+      (Outgoing.mk cancellationHidingChannel),
+    Subsingleton.elim (default : cancellationHidingNetlist.IncidentIndex)
+      (Incident.mk cancellationHidingChannel)]
   simp [cancellationHiding_polynomialOutputReadout_entry,
     cancellationHiding_clearedScattering_entry,
     cancellationHiding_polynomialInputExposure_entry]
@@ -307,7 +323,9 @@ lemma cancellationHiding_scattering_at_neg_one :
         (fun _ => (-1 : ℂ))
         (Outgoing.mk cancellationHidingChannel)
         (Incident.mk cancellationHidingChannel) = 1 := by
-  change cancellationHidingEntryModel.eval (fun _ => (-1 : ℂ)) = 1
+  rw [← cancellationHidingNetlist.scatteringEntryModel_eval
+    (fun _ => (-1 : ℂ)) cancellationHidingChannel cancellationHidingChannel]
+  rw [cancellationHiding_scatteringEntryModel]
   norm_num [cancellationHidingEntryModel, cancellationHidingPolynomial, RationalModel.eval]
 
 /-- The unique raw routing entry is zero because the singleton port is external. -/
@@ -329,25 +347,31 @@ lemma cancellationHiding_feedback_at_neg_one :
   rw [cancellationHidingNetlist.toParameterizedNetlist.feedbackOperator_eq,
     Matrix.sub_apply, Matrix.one_apply, Matrix.mul_apply, Fintype.sum_unique]
   rw [Subsingleton.elim incident (Incident.mk cancellationHidingChannel),
-    Subsingleton.elim input (Incident.mk cancellationHidingChannel)]
+    Subsingleton.elim input (Incident.mk cancellationHidingChannel),
+    Subsingleton.elim (default : cancellationHidingNetlist.OutgoingIndex)
+      (Outgoing.mk cancellationHidingChannel)]
   simp [cancellationHiding_routing_entry, cancellationHiding_scattering_at_neg_one]
 
 /-- The raw external readout selects the singleton outgoing channel with coefficient one. -/
 lemma cancellationHiding_outputReadout_entry :
     cancellationHidingNetlist.toParameterizedNetlist.outputReadout
         (Outgoing.mk cancellationHidingExternalChannel)
-        (Outgoing.mk cancellationHidingChannel) = 1 :=
-  cancellationHidingConnections.externalOutgoingReadout_entry_external _
+        (Outgoing.mk cancellationHidingChannel) = 1 := by
+  simp [ParameterizedNetlist.outputReadout, PortConnectionFamily.externalOutgoingReadout,
+    cancellationHidingExternalChannel]
 
 /-- The raw external injection selects the singleton incident channel with coefficient one. -/
 lemma cancellationHiding_inputExposure_entry :
     cancellationHidingNetlist.toParameterizedNetlist.inputExposure
         (Incident.mk cancellationHidingChannel)
-        (Incident.mk cancellationHidingExternalChannel) = 1 :=
-  cancellationHidingConnections.externalIncidentInjection_entry_external _
+        (Incident.mk cancellationHidingExternalChannel) = 1 := by
+  simp [ParameterizedNetlist.inputExposure, PortConnectionFamily.externalIncidentInjection,
+    cancellationHidingExternalChannel]
 
 /-- Direct expansion of the compiled singleton network at `q = -1` gives external response one.
-It does not use the cleared-elimination identification theorem. -/
+
+It does not use the cleared-elimination identification theorem.
+-/
 lemma cancellationHiding_rawN5_at_neg_one :
     cancellationHidingNetlist.toParameterizedNetlist.unguardedResponse (fun _ => (-1 : ℂ))
         (Outgoing.mk cancellationHidingExternalChannel)
@@ -355,7 +379,12 @@ lemma cancellationHiding_rawN5_at_neg_one :
   classical
   rw [ParameterizedNetlist.unguardedResponse, ParameterizedNetlist.totalFeedbackInverse,
     cancellationHiding_feedback_at_neg_one]
-  simp only [Matrix.inv_one, Matrix.mul_one, Matrix.mul_apply, Fintype.sum_unique]
+  rw [inv_one, Matrix.mul_one, Matrix.mul_apply, Fintype.sum_unique,
+    Matrix.mul_apply, Fintype.sum_unique]
+  rw [Subsingleton.elim (default : cancellationHidingNetlist.OutgoingIndex)
+      (Outgoing.mk cancellationHidingChannel),
+    Subsingleton.elim (default : cancellationHidingNetlist.IncidentIndex)
+      (Incident.mk cancellationHidingChannel)]
   simp [cancellationHiding_outputReadout_entry, cancellationHiding_scattering_at_neg_one,
     cancellationHiding_inputExposure_entry]
 
