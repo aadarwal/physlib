@@ -1598,9 +1598,15 @@ selected positive-coordinate Heaviside distribution in the inward `+e_i` directi
 corresponding boundary delta. An independent `Fin 2` Gaussian regression distinguishes selected
 and swapped coordinate hyperplanes, while the retained one-dimensional Gaussian regression pins
 normalization and the sign under normal reversal. An anisotropic `Fin 2` point-source fixture also
-pins generic pushforward coefficient preservation and coordinate placement. None of these neutral
-tempered-distribution results represents arbitrary sidewise Maxwell fields or derives the
-finite-sheet premise.
+pins generic pushforward coefficient preservation and coordinate placement. The Space-side bridge
+transports these coordinate distributions through the standard orthonormal basis and represents
+distribution-bounded ambient extensions only on their selected strict half-spaces. For the field
+which is zero on the negative side and constant on the positive side of an origin coordinate
+hyperplane, it proves that the inward coordinate derivative is the constant-coefficient sheet and
+that this sheet is the transported generic coordinate-hyperplane pushforward. Direct `7`, `-7`, and
+swapped-coordinate regressions pin the coefficient, orientation, and selected sheet independently.
+This does not prove a variable-trace derivative formula on an arbitrary oriented plane, derive a
+weak or measure-valued Maxwell equation, or derive the finite-sheet premise.
 
 The local-calculus chain is complete. `PlanarRectangleLocalStokes.lean` and
 `AffineBoxLocalDivergence.lean` prove oriented Stokes and divergence identities for independent
@@ -2450,7 +2456,9 @@ the PANDA through/drop pair.
 - the human-audited eight-node, eleven-edge topology with parallel edges retained;
 - the transfer result by N5 elimination and independently by S6 Mason gain;
 - active/passive, unit-delay, and multiple-delay specializations;
-- coherent and incoherent interpretations through N6c;
+- [x] coherent and incoherent interpretations through N6c, where `incoherent` means diagonal or
+  mutually decorrelated second-order coherency data only; this does not identify the coherent N7
+  DCDR with FMICS'15's separately printed incoherent coefficient model;
 - poles, zeros, and stability results; and
 - an exact or interval-certified, human-audited version of the source's reported unstable passive
   parameter case.
@@ -2823,7 +2831,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E3a Poynting | done | E1, E3s | sourced local work balance, fixed-medium Poynting theorem, and source-free/explicit vacuum conservation |
 | E3b Optics normalization | complete on finite synthesis image | O1, P1a, E2, E3a | common-positive-frequency propagating Maxwell families, finite complex synthesis, actual one-period integrated Poynting flux, restricted two-dimensional Hausdorff aperture area, and signed modal-power identification are complete; no modal completeness claim |
 | E4a local boundary semantics | complete (pointwise explicit-wave slice) | E1, E2 | oriented geometry, medium assignment, signed boundary laws, an independent off-shell three-label configuration, side-medium pointwise traces, and sourceful/source-free local predicates; genuine propagation roles remain E5b |
-| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces, local oriented Stokes/divergence for independent half-cell fields, an explicit finite-sheet carrier/interchange premise, its derivation of the literal sourceful finite-cell Maxwell balances and all four jump laws, sign-sensitive regressions, and the explicit-wave optical bridge are complete; deriving that finite-sheet premise from weak or measure-valued Maxwell remains |
+| E4b derived boundary laws | in progress | E4a, oriented surfaces/integral Maxwell | genuine full-half-space traces, a coordinate constant-jump distribution bridge, local oriented Stokes/divergence for independent half-cell fields, an explicit finite-sheet carrier/interchange premise, its derivation of the literal sourceful finite-cell Maxwell balances and all four jump laws, sign-sensitive regressions, and the explicit-wave optical bridge are complete; a variable-trace arbitrary-plane weak derivative and derivation of the finite-sheet premise from weak or measure-valued Maxwell remain |
 | E5a conservation/reduction | done | E2, E4a | neutral harmonic uniqueness, real and complex hyperplane projection geometry, primitive independent-frequency electric traces, exact joint-data/character/coefficient equivalences, positive-rate harmonic noncancellation, guarded label matching, explicit frequency/tangential-projection conservation, the fixed-frequency electric reduction, and the zero-current referenced tangential-H reduction |
 | E5b reflection/Snell/TIR | in progress | E2, E5a | neutral reflection/two-root geometry, material normal-shell and direction-selected root APIs, guarded reflected-root selection, angular reflection, the guarded phase-vector law of the plane of incidence, phase Snell laws, critical sine/angle and radicand-sign classification, unique subcritical positive-phase and supercritical positive-normal-decay transmitted constructions with arbitrary-amplitude carrier lifts, complex-bilinear polarization plus transverse positive-medium Maxwell and zero-normal-mean-flux consequences, named nonzero half-space evanescence, boundary-selected unit-modulus complex reflection with explicit phase, connected reflected/separate/superposed actual normal-flux TIR, and the connected TIR Jones-retarder action are complete; separate outgoing semantics remain |
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, the connected complex-TIR reflected/separate/superposed actual-flux endpoint, and a lossless algebraic square-root-normalized completion of each real left-incident s/p column are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and a Maxwell-derived bidirectional power-normalized interface scattering matrix remain |

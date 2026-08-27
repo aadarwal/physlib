@@ -257,10 +257,17 @@ PR unless maintainers explicitly ask to retain it.
   `FiniteSheetIntegralMaxwell` derives the four literal finite-cell laws from the sidewise
   differential Maxwell equations and that premise. No theorem yet derives the premise itself from
   weak or measure-valued Maxwell equations. The neutral coordinate-Heaviside foundation takes
-  `{x_last > 0}` as its positive half-space, so `+e_last` points inward and its distributional
-  derivative is the positive boundary delta. Its regression is intentionally one-dimensional and
-  checks normalization and normal reversal only; it does not test a coordinate permutation,
-  represent arbitrary sidewise Maxwell fields as tempered distributions, or close E4b.
+  `{x | 0 < x i}` as its selected positive half-space, so `+e_i` points inward and its
+  distributional derivative is the positive boundary delta. A `Fin 2` fixture distinguishes the
+  selected and swapped coordinates, while the retained `Fin 1` fixture pins normalization and
+  normal reversal. `distOfSidewiseFunction` represents distribution-bounded ambient extensions on
+  their selected strict sides and ignores their carrier and off-side values. For the zero-negative,
+  constant-positive field on an origin coordinate hyperplane, the Space-side bridge proves that
+  the inward derivative is the constant sheet and identifies that sheet with the transported
+  generic coordinate-hyperplane pushforward; direct `7`, `-7`, and swapped-coordinate anchors are
+  independent of the production identification. No theorem yet gives the variable-trace derivative
+  formula on an arbitrary oriented plane, derives weak or measure-valued Maxwell equations, or
+  derives the finite-sheet premise, so this slice does not close E4b.
 - [ ] Human-check E4a's three-wave boundary assembly before upstreaming. Confirm that the three
   complex-carrier candidates are off shell and retain independent positive frequencies and complex
   wave vectors. `negativeTrace` is the pointwise plane restriction of the globally defined
