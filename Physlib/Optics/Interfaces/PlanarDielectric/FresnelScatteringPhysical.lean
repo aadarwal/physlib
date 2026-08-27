@@ -122,7 +122,7 @@ def channelEquiv : (Fin 2 ⊕ Fin 2) ≃ portFamily.Channel where
     rcases channel with side | side <;> simp
   right_inv := by
     rintro ⟨side, mode⟩
-    cases mode <;> simp
+    cases side <;> cases mode <;> rfl
 
 /-- Owned interface channels are finite through the pinned side/polarization equivalence. -/
 noncomputable instance channelFintype : Fintype portFamily.Channel :=
