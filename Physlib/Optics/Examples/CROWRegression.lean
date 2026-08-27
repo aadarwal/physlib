@@ -235,7 +235,15 @@ lemma crowRegression_mem_componentBehavior :
     crowRegressionIncident crowRegressionOutgoing).2
   intro component
   rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
-  · change (_, _) ∈
+  · change
+      (crowRegressionIncident.restrictEmbedding
+          (Incident.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.coupler interface))),
+        crowRegressionOutgoing.restrictEmbedding
+          (Outgoing.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.coupler interface)))) ∈
       (DirectionalCoupler.physicalScattering
         (crowRegressionParameters.coupler interface) Unit).toOrientedModeTransform.toBehavior
     rw [DirectionalCoupler.physicalScattering_realizes_physicalBehavior,
@@ -252,7 +260,15 @@ lemma crowRegression_mem_componentBehavior :
         crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionEndCoupler,
         crowRegressionMiddleCoupler, DirectionalCoupler.crossCoefficient,
         ScatteringComponentFamily.componentChannelEmbedding]
-  · change (_, _) ∈
+  · change
+      (crowRegressionIncident.restrictEmbedding
+          (Incident.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.forwardArc ring))),
+        crowRegressionOutgoing.restrictEmbedding
+          (Outgoing.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.forwardArc ring)))) ∈
       (MatchedPropagation.physicalScattering
         (crowRegressionParameters.forwardArc ring) Unit).toOrientedModeTransform.toBehavior
     rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior,
@@ -265,7 +281,15 @@ lemma crowRegression_mem_componentBehavior :
         crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
         crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionHalfArc,
         MatchedPropagation.transmissionCoefficient]
-  · change (_, _) ∈
+  · change
+      (crowRegressionIncident.restrictEmbedding
+          (Incident.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.returnArc ring))),
+        crowRegressionOutgoing.restrictEmbedding
+          (Outgoing.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.returnArc ring)))) ∈
       (MatchedPropagation.physicalScattering
         (crowRegressionParameters.returnArc ring) Unit).toOrientedModeTransform.toBehavior
     rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior,
