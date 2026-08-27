@@ -854,7 +854,7 @@ lemma crowRegression_returnArc_equations (ring : Fin 2)
   exact ⟨hRight, hLeft⟩
 
 /-- The eight homogeneous channel equations in either travel direction have only the zero state. -/
-lemma crowRegression_chainCoordinates_eq_zero
+lemma crowRegression_feedbackCoordinates_eq_zero
     (returnEnd launchEnd launchMiddle returnMiddle launchNext outputEnd returnNext returnLink : ℂ)
     (hLaunchEnd : launchEnd = (3 / 5) * returnEnd)
     (hLaunchMiddle : launchMiddle = (1 / 2) * launchEnd)
@@ -1098,7 +1098,7 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
       _ = outgoing (Outgoing.mk (crowRegressionReturnArcChannel 0 .right)) := by
         simpa using hReturnFinishRoute 0
       _ = _ := hReturn0.1
-  have hForwardZero := crowRegression_chainCoordinates_eq_zero
+  have hForwardZero := crowRegression_feedbackCoordinates_eq_zero
     (incident (Incident.mk (crowRegressionCouplerChannel 0 .leftSecond)))
     (incident (Incident.mk (crowRegressionForwardArcChannel 0 .left)))
     (incident (Incident.mk (crowRegressionCouplerChannel 1 .leftFirst)))
@@ -1177,7 +1177,7 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
       _ = outgoing (Outgoing.mk (crowRegressionReturnArcChannel 1 .left)) := by
         simpa using hReverseReturnFinishRoute 1
       _ = _ := hReturn1.2
-  have hReverseZero := crowRegression_chainCoordinates_eq_zero
+  have hReverseZero := crowRegression_feedbackCoordinates_eq_zero
     (incident (Incident.mk (crowRegressionCouplerChannel 2 .rightFirst)))
     (incident (Incident.mk (crowRegressionForwardArcChannel 1 .right)))
     (incident (Incident.mk (crowRegressionCouplerChannel 1 .rightSecond)))
