@@ -264,8 +264,15 @@ lemma multipleDelayGainConversion_coherentGains :
           multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.m1 = 2 ∧
             multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.m2 = 3 ∧
               multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.m3 = 4 := by
+  have hFour : Real.sqrt (4 : ℝ) = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hNine : Real.sqrt (9 : ℝ) = 3 := by
+    rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hTwentyFive : Real.sqrt (25 : ℝ) = 5 := by
+    rw [show (25 : ℝ) = 5 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
   norm_num [MultipleDelaySourceParameters.toCoherentMultipleDelayParameters,
-    intensityGainToFieldAmplitudeGain, multipleDelayGainConversionParameters]
+    intensityGainToFieldAmplitudeGain, multipleDelayGainConversionParameters,
+    hFour, hNine, hTwentyFive]
 
 /-- The independently expanded printed polynomials retain source intensities and delays. -/
 lemma multipleDelayGainConversion_printedPolynomials :

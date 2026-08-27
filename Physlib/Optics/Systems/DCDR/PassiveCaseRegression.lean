@@ -246,7 +246,7 @@ lemma passiveCase_coherentNumeratorPolynomial_expansion :
     DCDRSourceBridge.passiveCaseSourceParameters, DirectionalCoupler.crossCoefficient,
     passiveCoherentNumerator]
   simp only [Nat.ofNat_nonneg, Real.sqrt_div, Complex.ofReal_div, neg_mul, map_neg,
-    map_mul, Complex.ofReal_one, map_one, one_mul, mul_neg, neg_neg, eval_add,
+    map_mul, mul_neg, neg_neg, eval_add,
     eval_mul, eval_C, eval_X, eval_sub, eval_one, eval_neg, eval_pow]
   ring_nf
   rw [hThrough, hThroughFour, hNine, hNineFour, hTenInvTwo, hTenInvFour,

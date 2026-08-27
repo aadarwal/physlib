@@ -235,8 +235,15 @@ lemma sourceGainConversion_coherentGains :
     sourceGainConversionParameters.toCoherentUnitDelayParameters.upperGain = 1 / 2 ∧
       sourceGainConversionParameters.toCoherentUnitDelayParameters.lowerGain = 1 / 3 ∧
       sourceGainConversionParameters.toCoherentUnitDelayParameters.feedbackGain = 2 / 5 := by
+  have hFour : Real.sqrt (4 : ℝ) = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hNine : Real.sqrt (9 : ℝ) = 3 := by
+    rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hTwentyFive : Real.sqrt (25 : ℝ) = 5 := by
+    rw [show (25 : ℝ) = 5 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
   norm_num [DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
-    DCDRSourceBridge.intensityGainToFieldAmplitudeGain, sourceGainConversionParameters]
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain, sourceGainConversionParameters,
+    hFour, hNine, hTwentyFive]
 
 /-- Squaring the independently expanded field gains recovers all three source intensities. -/
 lemma sourceGainConversion_squaredGains :
@@ -246,9 +253,16 @@ lemma sourceGainConversion_squaredGains :
           sourceGainConversionParameters.toCoherentUnitDelayParameters.lowerGain = 1 / 9 ∧
       DCDRSourceBridge.fieldAmplitudeGainToIntensityGain
           sourceGainConversionParameters.toCoherentUnitDelayParameters.feedbackGain = 4 / 25 := by
+  have hFour : Real.sqrt (4 : ℝ) = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hNine : Real.sqrt (9 : ℝ) = 3 := by
+    rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have hTwentyFive : Real.sqrt (25 : ℝ) = 5 := by
+    rw [show (25 : ℝ) = 5 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
   norm_num [DCDRSourceBridge.fieldAmplitudeGainToIntensityGain,
     DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters,
-    DCDRSourceBridge.intensityGainToFieldAmplitudeGain, sourceGainConversionParameters]
+    DCDRSourceBridge.intensityGainToFieldAmplitudeGain, sourceGainConversionParameters,
+    hFour, hNine, hTwentyFive]
 
 /-- The literal printed polynomials retain source intensities, not mapped field amplitudes. -/
 lemma sourceGainConversion_printedPolynomials :
