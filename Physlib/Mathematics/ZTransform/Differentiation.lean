@@ -97,14 +97,14 @@ open Filter Metric
 lemma hasDerivAt_seriesTerm (f : ℤ → ℂ) (n : ℕ) {z : ℂ} (hz : z ≠ 0) :
     HasDerivAt (fun y => seriesTerm f y n)
       (-((n : ℂ) * f n * z⁻¹ ^ (n + 1))) z := by
-  rw [show (fun y => seriesTerm f y n) = fun y => f n * y ^ (-(n : ℤ)) by
-    funext y
-    exact seriesTerm_eq_zpow f y n]
-  convert (hasDerivAt_zpow (-(n : ℤ)) z (Or.inl hz)).const_mul (f n) using 1
-  simp only [Int.cast_neg, Int.cast_natCast]
-  rw [zpow_sub₀ hz, zpow_neg, zpow_natCast]
-  field_simp
-  ring
+  have hpow := (hasDerivAt_zpow (-(n : ℤ)) z (Or.inl hz)).const_mul (f n)
+  refine (hpow.congr_deriv ?_).congr_of_eventuallyEq ?_
+  · simp only [Int.cast_neg, Int.cast_natCast]
+    have hexponent : -(n : ℤ) - 1 = -((n + 1 : ℕ) : ℤ) := by omega
+    rw [hexponent, zpow_neg, zpow_natCast, inv_pow]
+    ring
+  · filter_upwards [] with y
+    exact seriesTerm_eq_zpow f y n
 
 /-!
 
@@ -203,8 +203,8 @@ lemma hasDerivAt_transform {f : ℤ → ℂ} {w z : ℂ}
     summable_norm_iff.mpr (summable_derivativeSeries hw hwv)
   have hzsum : Summable (seriesTerm f z) :=
     summable_seriesTerm_of_norm_le hw.1 hwz.le hw.2
-  simpa only [transform] using
-    hasDerivAt_tsum_of_isPreconnected
+  rw [show transform f = fun y => ∑' n : ℕ, seriesTerm f y n by rfl]
+  exact hasDerivAt_tsum_of_isPreconnected
       (u := fun n : ℕ => ‖-((n : ℂ) * f n * v⁻¹ ^ (n + 1))‖)
       (t := ball z r) (g := fun n y => seriesTerm f y n)
       (g' := fun n y => -((n : ℂ) * f n * y⁻¹ ^ (n + 1)))
