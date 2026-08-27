@@ -1,8 +1,11 @@
 # HANDOFF
 
 - Branch: `optics/s8-tbd`
-- Gated source: `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
-- Source parent: `5ac9c10473b2de1ca8059c9ab5a13d13ada6bf9d` (cleared slice-3 HANDOFF child)
+- Gated source: `7aa85148819e68e855f7c22146353d63cc5a0d33`
+- Repair source parent: `d134a8fcaba6a34ccb6aca590053f67051040294`
+  (the VV-reviewed HANDOFF child for prior source `8e72d04953eed17baa7f6a08f35b8cfee218b31a`)
+- Slice source parent: `5ac9c10473b2de1ca8059c9ab5a13d13ada6bf9d`
+  (cleared slice-3 HANDOFF child)
 - Production file: `Physlib/Mathematics/ZTransform/Differentiation.lean`
 - Regression file: `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean`
 - Parity input: ledger row `ZT-04` read at live parity head `16022cfcfe12c8c93f5b1a15e356d92cfde26f20`.
@@ -24,32 +27,38 @@ and `Physlib.Mathematics.ZTransform.Convergence`; regression is a leaf importing
 ## Production declarations
 
 - `Physlib.ZTransform.hasDerivAt_seriesTerm` —
-  `Physlib/Mathematics/ZTransform/Differentiation.lean:96` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:96` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.summable_derivativeSeries` —
-  `Physlib/Mathematics/ZTransform/Differentiation.lean:120` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:120` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - Private proof helper `norm_derivativeSeriesTerm_le` —
-  `Physlib/Mathematics/ZTransform/Differentiation.lean:151` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:151` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.hasDerivAt_transform` —
-  `Physlib/Mathematics/ZTransform/Differentiation.lean:174` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:174` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.transform_indexMul_eq_neg_z_mul_deriv` —
-  `Physlib/Mathematics/ZTransform/Differentiation.lean:233` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:233` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 
 ## Regression declarations
 
 - `Physlib.ZTransform.differentiationFixture` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:58` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:61` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.seriesTerm_differentiationFixture` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:62` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:65` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.summable_seriesTerm_differentiationFixture` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:72` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:75` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.transform_differentiationFixture` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:85` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:88` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.transform_indexMul_differentiationFixture` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:94` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:97` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.deriv_transform_differentiationFixture_at_two` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:104` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:107` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
+- `Physlib.ZTransform.one_mem_ROC_differentiationFixture` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:123` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
+- `Physlib.ZTransform.norm_one_lt_norm_two` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:128` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
+- `Physlib.ZTransform.transform_indexMul_differentiationFixture_production_agreement` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:133` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 - `Physlib.ZTransform.transform_indexMul_wrongSign_or_missingFactor_ne` —
-  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:121` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:147` @ `7aa85148819e68e855f7c22146353d63cc5a0d33`
 
 ## Source correspondence and analytic anchor
 
@@ -76,6 +85,13 @@ index-multiplied transform are computed directly from finite `tsum`s, while the 
 `z = 2` is computed from Mathlib's derivative of inversion. Thus the regression does not use
 the production differentiation identity as an oracle.
 
+Independently, `one_mem_ROC_differentiationFixture` expands `ROC` into nonzeroness and the existing
+finite-support summability proof, while `norm_one_lt_norm_two` proves the concrete strict radial
+gate. The separately labelled production-agreement lemma instantiates
+`transform_indexMul_eq_neg_z_mul_deriv` with exactly those witnesses and fixes its conclusion at
+`z = 2`. A wrong sign, missing factor, or unusable production gate now makes this regression fail;
+neither numeric side is obtained from the production theorem.
+
 At `z = 2`, the index-multiplied transform is `3 / 2` and the derivative is `-3 / 4`; the
 correct factor `-z` yields `3 / 2`. The hostile sentinel proves both `2 * deriv = -3 / 2`
 (wrong sign) and `-deriv = 3 / 4` (missing factor `z`) differ from the independently computed
@@ -89,6 +105,28 @@ pre-existing production, regression, import, or documentation lines. In particul
 reviewed pre-existing first-difference, z-scaling, ROC, transform, and series-term declarations
 are byte-stable.
 
+The VV repair source commit `d134a8fcaba6a34ccb6aca590053f67051040294` →
+`7aa85148819e68e855f7c22146353d63cc5a0d33` changes only
+`DifferentiationRegression.lean`: 28 insertions and two deletions, bringing it to 158 lines.
+Every changed pre-existing line is documentation structure forced by the new production bridge:
+
+- old key-results lines `:26-31` become cutoff lines `:26-33` by adding the agreement lemma;
+- old table-of-contents lines `:35-37` become cutoff lines `:37-40`, splitting production
+  agreement from the hostile sentinel;
+- old section heading `:115` becomes cutoff headings `:118` and `:141`, with the three new
+  declarations inserted between them.
+
+The production file is byte-stable across `8e72d049` and `7aa85148` (git blob
+`a958844938ea19d98d71a01aac2047e1114c34b9`). The reviewed coefficient `3`, finite-support
+series-term and summability declarations, both primitive transform value lemmas, primitive
+derivative lemma, and hostile sign/factor sentinel are byte-stable; only their declaration-line
+positions after the inserted documentation/code move. `Physlib.lean` is again byte-identical to
+the branch base after temporary registration.
+
+The optional VV proof-length nit was not taken: `hasDerivAt_transform` remains byte-stable so the
+mandatory fail-capable regression repair stays isolated. The duplicated ball-to-norm geometry is
+recorded for a later, separately reviewed cleanup.
+
 For branch-wide root and import gates, the two slice-4 imports and the already stacked slice-3
 production/regression imports were added to `Physlib.lean` temporarily and then all four were
 removed. Byte-identical restoration was checked:
@@ -96,7 +134,7 @@ removed. Byte-identical restoration was checked:
 - SHA-256: `f7486c686c1d5087c1cb8a87f33b3af2dd11cb761b14fa0ebbc0a0e9489d0a20`
 - Git blob: `8d3318db883c44b5d1c55fe28ef599fb1fc10ad5`
 
-The only change in the child after the gated source is this replacement `HANDOFF.md`.
+The only change in the child after gated source `7aa85148` is this replacement `HANDOFF.md`.
 
 ## Gates
 
@@ -110,13 +148,12 @@ The only change in the child after the gated source is this replacement `HANDOFF
 - `lake-lock exe sorry_lint`: pass at the exact cutoff.
 - `lake-lock exe runPhyslibLinters`: pass for Physlib and QuantumInfo after the final source
   edit and root build.
-- `lake-lock exe lint_all`: exit 0 on the preceding cutoff; its only slice-local finding was a
-  redundant production import, removed in `8e72d049`. Exact-cutoff
-  `lake-lock exe redundant_imports` exits 0 and names neither new module.
+- `lake-lock exe lint_all`: exit 0 at the repair cutoff; baseline style/transitive-import findings
+  name neither differentiation module.
 - `lake-lock exe module_doc_lint`: repository baseline remains nonzero; an exact-cutoff filter
   for both new paths exits 0 with no output.
 - `./scripts/lint-style.sh`: pass after committing the exact source cutoff.
-- `git diff --check`: pass; production is 251 lines, regression is 132 lines, and neither file
+- `git diff --check`: pass; production is 251 lines, regression is 158 lines, and neither file
   has a line over 100 codepoints.
 
 ## Milestone
