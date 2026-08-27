@@ -108,7 +108,7 @@ def DateParameters.toPhysicalCoupling (p : DateParameters) : CouplingParameters 
 `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:64-89` as physical propagation data. -/
 def DateParameters.toPhysicalPropagation (p : DateParameters) : PhysicalParameters where
   pathLength := p.couplingLength
-  powerAttenuationCoefficient := p.powerAttenuation
+  powerAttenuationCoefficient := p.powerAttenuationCoefficient
   effectiveIndex := p.effectiveIndex
   wavelength := p.wavelength
 
@@ -145,7 +145,7 @@ lemma DateParameters.toPhysicalAddDrop_toParameters (p : DateParameters) :
 lemma DateParameters.toPhysicalAddDrop_isValid (p : DateParameters)
     (hUnitary : p.IsUnitary) (hReflectivity : 0 ≤ p.reflectivity)
     (hTransmissivity : 0 ≤ p.transmissivity) (hLength : 0 ≤ p.couplingLength)
-    (hAttenuation : 0 ≤ p.powerAttenuation) (hIndex : 0 ≤ p.effectiveIndex)
+    (hAttenuation : 0 ≤ p.powerAttenuationCoefficient) (hIndex : 0 ≤ p.effectiveIndex)
     (hWavelength : 0 < p.wavelength) : p.toPhysicalAddDrop.IsValid := by
   exact ⟨⟨hReflectivity, hTransmissivity, hUnitary⟩,
     ⟨hReflectivity, hTransmissivity, hUnitary⟩,

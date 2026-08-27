@@ -67,7 +67,7 @@ def sourceBridgeRegressionDateParameters : DateParameters where
   reflectivity := 3 / 5
   transmissivity := 4 / 5
   couplingLength := 1
-  powerAttenuation := 0
+  powerAttenuationCoefficient := 0
   wavelength := 2
   effectiveIndex := 1
 
