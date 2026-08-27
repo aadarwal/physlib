@@ -36,11 +36,21 @@ stability equivalence between these two models is asserted.
 printed decimals by rational data only. `passiveCaseUnitDelayParameters` is its coherent N7 image
 through the same dictionary; it does not identify the coherent and printed incoherent responses.
 
+The printed paper and its recovered HOL Light script use different stability conventions. The
+paper's Definition 7 uses a strict open unit disk, while the script defines its unit circle with a
+non-strict bound. The source-specific predicates below retain both conventions under visibly
+different names. They also retain the printed Theorem 4 product `G1*G2` separately from the
+script's `G1*G3`; no result identifies or transports between the two predicates.
+
 ## ii. Key results
 
 - `DCDR.UnitDelayParameters.loopCoefficient`: the coherent quadratic loop coefficient.
 - `DCDR.UnitDelayParameters.denominatorPolynomial_natDegree_le_two`: the raw degree bound.
 - `DCDR.ResponseReduction.ncard_actualPoles_le_two`: the cancellation-aware pole bound.
+- `DCDR.PrintedIncoherentAllPolesInsideOpenUnitDisk`: the printed strict pole-set predicate.
+- `DCDR.FMICSScriptInClosedUnitDisk`: the script's non-strict point predicate.
+- `DCDR.FMICSScriptAllPolesInClosedUnitDisk`: the script's non-strict pole-set predicate.
+- `DCDR.FMICSScriptIncoherentStabilityConditions`: the script's `G1*G3` conditions.
 - `DCDRSourceBridge.intensityGainToFieldAmplitudeGain`: intensity-to-field conversion.
 - `DCDRSourceBridge.fieldAmplitudeGainToIntensityGain`: field-to-intensity conversion.
 - `DCDRSourceBridge.SourceParameters`: the five-symbol FMICS'15 unit-delay dictionary.
@@ -55,7 +65,7 @@ through the same dictionary; it does not identify the coherent and printed incoh
 ## iii. Table of contents
 
 - A. Coherent DCDR denominator degree and actual-pole count
-- B. Printed incoherent stability audit predicate
+- B. Printed and script-specific stability predicates
 - C. FMICS'15 unit-delay source dictionary
 - D. Printed incoherent coefficient data
 - E. FMICS'15 passive case data
@@ -80,6 +90,12 @@ Theorem 4 expression contains `G1*G2`. Both are recorded without silently identi
 Consequently this file does not force a strict corrected Theorem 4 bridge. The coherent N7
 `t`/`-I*k` construction is the source's own unprinted coherent branch; the printed incoherent
 `1-k`/`k` graph is a different case.
+
+The recovered HOL Light script defines `in_unit_circle` by `norm p <= 1` and its stability
+condition uses the Theorem 3 product `G1*G3`; see
+`hol-optics-scripts/extracted/sfg/sfg/Stability_Resonance.ml:71-83` and
+`hol-optics-scripts/extracted/sfg/sfg/Application.ml:269-301`. These script-specific declarations
+are evidence records, not aliases of the printed predicates.
 -/
 
 @[expose] public section
@@ -169,7 +185,7 @@ end ResponseReduction
 
 /-!
 
-## B. Printed incoherent stability audit predicate
+## B. Printed and script-specific stability predicates
 
 -/
 
@@ -187,6 +203,41 @@ def PrintedIncoherentStabilityConditions
     (G1 G2 G3 k1 k2 : ℂ) : Prop :=
   ‖Complex.sqrt (printedIncoherentStabilityExpression G1 G2 G3 k1 k2)‖ ≤ 1 ∧
     printedIncoherentStabilityExpression G1 G2 G3 k1 k2 ≠ 0
+
+/-- Every member of an explicitly supplied printed-paper pole set lies in the open unit disk.
+
+This is FMICS'15 Definition 7's strict pole-location convention. The pole set is an argument so
+the definition does not choose between the paper's differently indexed Theorem 3 and Theorem 4
+expressions.
+-/
+def PrintedIncoherentAllPolesInsideOpenUnitDisk (poles : Set ℂ) : Prop :=
+  ∀ z ∈ poles, ‖z‖ < 1
+
+/-- The recovered FMICS'15 script's non-strict closed-unit-disk point predicate. -/
+def FMICSScriptInClosedUnitDisk (z : ℂ) : Prop :=
+  ‖z‖ ≤ 1
+
+/-- Every member of an explicitly supplied pole set satisfies the recovered script's closed-disk
+predicate.
+
+This records the script's `poles_in_unit_circle` convention without asserting that the supplied
+set is the pole set of a particular system.
+-/
+def FMICSScriptAllPolesInClosedUnitDisk (poles : Set ℂ) : Prop :=
+  ∀ z ∈ poles, FMICSScriptInClosedUnitDisk z
+
+/-- The two incoherent stability hypotheses used by the recovered FMICS'15 HOL Light script.
+
+Unlike the separately printed Theorem 4 transcription, the script uses the Theorem 3 product
+`G1*G3`. Its nonzero gate is stated on the same complex square root as in the script. This is a
+script-specific audit predicate, not generic Schur stability.
+-/
+def FMICSScriptIncoherentStabilityConditions
+    (G1 G2 G3 k1 k2 : ℂ) : Prop :=
+  ‖Complex.sqrt
+      (k1 * k2 * G1 * G3 + (1 - k1) * (1 - k2) * G2 * G3)‖ ≤ 1 ∧
+    Complex.sqrt
+      (k1 * k2 * G1 * G3 + (1 - k1) * (1 - k2) * G2 * G3) ≠ 0
 
 end DCDR
 

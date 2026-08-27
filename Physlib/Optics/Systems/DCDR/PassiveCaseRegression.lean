@@ -8,7 +8,7 @@ module
 public import Physlib.Optics.Systems.DCDR.SourceBridge
 
 /-!
-# Exact audit of FMICS'15's reported passive DCDR instability
+# Exact audit of FMICS'15's reported passive DCDR claim
 
 ## i. Overview
 
@@ -32,6 +32,12 @@ arithmetic proves `905539² ≠ 820000 * 10⁶`, so neither signed decimal is a 
 rational squeeze certifies the positive decimal's absolute error from `sqrt (41/50)` without
 floating-point data.
 
+The recovered HOL Light script proves a supplied-list statement, not actual-system instability.
+Its predicate requires both that the supplied values lie in the script's closed unit disk and that
+they are valid poles. The displayed decimals pass the first check and fail the second. Thus the
+script records failed supplied-decimal validity, while the exact DCDR poles remain strictly inside
+the unit disk. The authors' script is right; the overclaim is in the printed prose.
+
 The mapped coherent N7 model is audited separately. Its denominator is
 `1 + (4/5) * q²`, not the printed incoherent denominator. Its formal roots and reciprocal poles
 are imaginary, and its reciprocal poles are also strictly inside the unit disk. No theorem below
@@ -45,6 +51,8 @@ identifies the two response models.
 - `passiveCoherentReducedResponse_poles`: exact coherent formal-`q` roots.
 - `passiveCoherentReducedResponse_zPoles`: exact coherent reciprocal-`z` poles.
 - `passiveReportedPole_integer_square_ne`: exact mismatch behind both printed decimals.
+- `passiveReportedPoleSet`: the exact two-element supplied decimal set.
+- `passiveReportedPoleSet_failedSuppliedValidity`: the script-side failure classification.
 - `passiveReportedPole_absoluteError`: a rational interval for the positive error.
 - `passivePrintedTheoremFourConditions`: the printed hypotheses hold at this point.
 
@@ -53,7 +61,7 @@ identifies the two response models.
 - A. Exact parameter and polynomial data
 - B. Cancellation-free printed and coherent quotients
 - C. Formal-`q` and reciprocal-`z` roots
-- D. Decimal pole-list audit
+- D. Decimal supplied-pole-list audit
 - E. Printed claim audit
 
 ## iv. References
@@ -65,12 +73,16 @@ or a physical-frequency interpretation of formal `q` or reciprocal `z`.
 U. Siddique, S. M. Beillahi, and S. Tahar, “On the Formal Analysis of Photonic Signal
 Processing Systems”, FMICS 2015, LNCS 9128, Definition 7, Theorems 3--4, pp. 170, 173--175.
 
-The public HOL script deferred to reference [3] is unavailable. This file does not assert whether
-the source's `psp` predicate treats its displayed pole list as supplied data, nor what its script
-proves. It makes no claim about Binh [5]. The checked set-based facts expose a printed-text
-conflict: the p. 175 prose says unstable, while the printed denominator and Definition 7's strict
-pole-location criterion give stability. The alternative reading—that “unstable” rejects the
-rounded supplied pole list rather than locating an actual pole outside the unit disk—remains open.
+The recovered script distinguishes `unstable_psp` from `unstable_psp_given_poles`; see
+`hol-optics-scripts/extracted/sfg/sfg/Stability_Resonance.ml:79-104`. Its passive-case result is
+`fausse_example2` at `hol-optics-scripts/extracted/sfg/sfg/Application.ml:1364-1374` and proves
+only the supplied-list predicate. The exact non-root arithmetic below shows why that predicate
+fails: the displayed decimals are not valid poles. This is failed supplied-decimal validity,
+never actual DCDR instability.
+
+The two-axis source classification is `physlib-parity/PARITY-LEDGER.md:169 @ ccf4104`, D08:
+SUBSTANTIVE x PRINT-ONLY, with the authors' script credited as right. This file adapts no script
+code and makes no claim about Binh [5].
 -/
 
 @[expose] public section
@@ -713,12 +725,16 @@ lemma passiveCoherentReducedResponse_isSchurStable :
 
 /-!
 
-## D. Decimal pole-list audit
+## D. Decimal supplied-pole-list audit
 
 -/
 
 /-- FMICS'15 p. 175's positive displayed pole, retained as an exact rational real. -/
 def passiveReportedPoleMagnitude : ℝ := 905539 / 1000000
+
+/-- FMICS'15 p. 175's two supplied six-digit reciprocal-`z` values as an exact set. -/
+def passiveReportedPoleSet : Set ℂ :=
+  {(passiveReportedPoleMagnitude : ℂ), -(passiveReportedPoleMagnitude : ℂ)}
 
 /-- Multiplication by `z²` turns `D(z⁻¹)` into this finite reciprocal-`z` polynomial. -/
 def passivePrintedZDenominator : Polynomial ℂ :=
@@ -772,6 +788,33 @@ lemma passiveReportedPoles_not_mem_zPoles :
     exact passiveReportedPoles_qForm_nonroots.1 hRoot
   · rintro ⟨_, hRoot⟩
     exact passiveReportedPoles_qForm_nonroots.2 hRoot
+
+/-- Both supplied decimal values satisfy the recovered script's closed-unit-disk test. -/
+lemma passiveReportedPoleSet_fmicsscriptClosed :
+    FMICSScriptAllPolesInClosedUnitDisk passiveReportedPoleSet := by
+  intro z hz
+  simp only [passiveReportedPoleSet, Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+  rcases hz with rfl | rfl <;>
+    norm_num [FMICSScriptInClosedUnitDisk, passiveReportedPoleMagnitude,
+      Complex.norm_real, Real.norm_eq_abs]
+
+/-- The supplied decimal set is not a subset of the exact reciprocal-`z` pole set. -/
+lemma passiveReportedPoleSet_not_subset_zPoles :
+    ¬passiveReportedPoleSet ⊆ passivePrintedReducedResponse.zPoles := by
+  intro hSubset
+  exact passiveReportedPoles_not_mem_zPoles.1
+    (hSubset (passiveReportedPoleMagnitude : ℂ) (by simp [passiveReportedPoleSet]))
+
+/-- The authors' supplied-list check fails on exact pole validity, not on its closed-disk bound.
+
+This packages the two independently checked script-side conjuncts without asserting actual-system
+instability.
+-/
+lemma passiveReportedPoleSet_failedSuppliedValidity :
+    FMICSScriptAllPolesInClosedUnitDisk passiveReportedPoleSet ∧
+      ¬passiveReportedPoleSet ⊆ passivePrintedReducedResponse.zPoles :=
+  ⟨passiveReportedPoleSet_fmicsscriptClosed,
+    passiveReportedPoleSet_not_subset_zPoles⟩
 
 /-- Their reciprocals are equivalently absent from the formal-`q` pole set. -/
 lemma passiveReportedReciprocals_not_mem_poles :

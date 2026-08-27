@@ -29,9 +29,14 @@ FMICS'15 Theorem 4 concerns the separately printed incoherent `1 - k`/`k` respon
 hypotheses are represented by `PrintedIncoherentStabilityConditions`, including the source's
 complex square root, non-strict norm bound, and the source's second, nonzero hypothesis recorded
 by the parity ledger. The non-strict source audit predicate is deliberately separate from S4's
-strict Schur predicate; no implication in either direction is proved while the source strictness
-question remains open. No theorem identifies those printed conditions with the coherent N7
-fixture. The source's own unprinted coherent branch is the one modeled here.
+strict Schur predicate. The recovered script's closed-disk convention is separately named below;
+no implication in either direction is shipped. No theorem identifies those source predicates with
+the coherent N7 fixture. The source's own unprinted coherent branch is the one modeled here.
+
+The printed paper's strict pole-set predicate and the recovered script's non-strict predicate are
+tested independently at the norm-one singleton `{1}`. The printed open-disk condition fails while
+the script closed-disk condition holds. Neither conclusion is obtained from the other, and no
+production result converts between these source conventions.
 
 ## ii. Key results
 
@@ -46,10 +51,12 @@ fixture. The source's own unprinted coherent branch is the one modeled here.
 - `stableReducedResponse_isSchurStable`: direct positive stability anchor.
 - `unstableReducedResponse_two_mul_I_mem_zPoles`: explicit outside pole.
 - `unstableReducedResponse_not_isSchurStable`: direct failure of the Schur premise.
+- `sourcePoleBoundarySet`: the exact norm-one singleton source pole set.
+- `printedOpen_scriptClosed_poleBoundary_disagree`: the open/closed boundary discriminator.
 
 ## iii. Table of contents
 
-- A. Printed incoherent boundary audit
+- A. Printed and script-specific boundary audit
 - B. Exact coherent parameter fixtures
 - C. Hand-expanded rational data and reductions
 - D. Stable and unstable reciprocal-Z anchors
@@ -68,6 +75,10 @@ or DCDR BIBO theorem is asserted. S4's BIBO equivalence at
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Table 1 and Theorem 4. The corresponding HOL corpus
 inventory is recorded at `HOL-CORPUS.md:316-326`.
+
+The recovered script's closed-disk predicate is recorded separately from the printed strict
+Definition 7 reading; see
+`hol-optics-scripts/extracted/sfg/sfg/Stability_Resonance.ml:71-83`.
 -/
 
 @[expose] public section
@@ -80,7 +91,7 @@ open Polynomial
 
 /-!
 
-## A. Printed incoherent boundary audit
+## A. Printed and script-specific boundary audit
 
 -/
 
@@ -95,6 +106,36 @@ lemma printedIncoherentStabilityConditions_boundary :
 lemma printedIncoherentStabilityConditions_boundary_not_strict :
     ¬‖Complex.sqrt (printedIncoherentStabilityExpression 1 1 1 1 1)‖ < 1 := by
   norm_num [printedIncoherentStabilityExpression]
+
+/-- The singleton source pole set whose only member has norm exactly one. -/
+def sourcePoleBoundarySet : Set ℂ :=
+  {(1 : ℂ)}
+
+/-- The printed paper's strict open-disk predicate fails on the norm-one singleton. -/
+lemma printedIncoherentAllPolesInsideOpenUnitDisk_boundary_fails :
+    ¬PrintedIncoherentAllPolesInsideOpenUnitDisk sourcePoleBoundarySet := by
+  intro hOpen
+  have hAtOne := hOpen 1 (by simp [sourcePoleBoundarySet])
+  norm_num at hAtOne
+
+/-- The recovered script's non-strict closed-disk predicate holds on the norm-one singleton. -/
+lemma fmicsscriptAllPolesInClosedUnitDisk_boundary :
+    FMICSScriptAllPolesInClosedUnitDisk sourcePoleBoundarySet := by
+  intro z hz
+  have hzOne : z = 1 := by
+    simpa [sourcePoleBoundarySet] using hz
+  subst z
+  norm_num [FMICSScriptInClosedUnitDisk]
+
+/-- At norm exactly one, the printed open-disk and script closed-disk pole predicates disagree.
+
+Both conjuncts are proved independently from the singleton and the primitive complex norm.
+-/
+lemma printedOpen_scriptClosed_poleBoundary_disagree :
+    (¬PrintedIncoherentAllPolesInsideOpenUnitDisk sourcePoleBoundarySet) ∧
+      FMICSScriptAllPolesInClosedUnitDisk sourcePoleBoundarySet :=
+  ⟨printedIncoherentAllPolesInsideOpenUnitDisk_boundary_fails,
+    fmicsscriptAllPolesInClosedUnitDisk_boundary⟩
 
 /-!
 
