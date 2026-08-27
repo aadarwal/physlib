@@ -270,8 +270,12 @@ instance : Fintype PhysicalPortSuite9bComponent where
 
 /-- The owned port family selected by each Phase 9b component. -/
 abbrev physicalPortSuite9bPortFamily : PhysicalPortSuite9bComponent → PortModeFamily
-  | .polarization => JonesMatrix.portFamily
-  | .interface => PlanarDielectricInterface.portFamily
+  | .polarization =>
+      { Port := JonesMatrix.Port
+        Mode := fun _ => Fin 2 }
+  | .interface =>
+      { Port := PlanarDielectricInterface.Port
+        Mode := fun _ => PlanarDielectricInterface.PolarizationMode }
 
 /-- The owned scattering law selected by each Phase 9b component. -/
 def physicalPortSuite9bScattering :
