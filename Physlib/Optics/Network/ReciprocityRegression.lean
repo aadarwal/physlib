@@ -153,7 +153,8 @@ lemma reciprocityRegression_s15_sameLabel_matrix :
       ModeTransform.rephase, reciprocityRegressionAllOnes,
       reciprocityRegressionSwapPairing, reciprocityRegressionS15Incident,
       reciprocityRegressionS15SameLabelOutgoing, reciprocityRegressionI,
-      reciprocityRegressionNegI, Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionNegI, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Circle.coe_inv, Complex.ext_iff]
 
 /-- S-15 has unequal off-diagonal entries `-1` and `1`. -/
 lemma reciprocityRegression_s15_sameLabel_offDiagonal_ne :
@@ -183,7 +184,8 @@ lemma reciprocityRegression_s15_restoring_inversePaired (label : Fin 2) :
   fin_cases label <;> apply Subtype.ext <;>
     norm_num [reciprocityRegressionS15RestoringOutgoing,
       reciprocityRegressionS15Incident, reciprocityRegressionSwapPairing,
-      reciprocityRegressionI, reciprocityRegressionNegI, Circle.coe_inv,
+      reciprocityRegressionI, reciprocityRegressionNegI,
+      Matrix.cons_val_zero, Matrix.cons_val_one, Circle.coe_inv,
       Complex.ext_iff]
 
 /-- Direct primitive expansion of the S-15 pairing-aware restoring gauge. -/
@@ -198,7 +200,8 @@ lemma reciprocityRegression_s15_restoring_matrix :
       ModeTransform.rephase, reciprocityRegressionAllOnes,
       reciprocityRegressionSwapPairing, reciprocityRegressionS15Incident,
       reciprocityRegressionS15RestoringOutgoing, reciprocityRegressionI,
-      reciprocityRegressionNegI, Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionNegI, Matrix.cons_val_zero, Matrix.cons_val_one,
+      Circle.coe_inv, Complex.ext_iff]
 
 /-- The pairing-aware S-15 gauge restores reciprocity by direct matrix expansion. -/
 lemma reciprocityRegression_s15_restoring_isReciprocal :
@@ -224,7 +227,8 @@ lemma reciprocityRegression_s16_pairingFactor (label : Fin 2) :
         (reciprocityRegressionS16Gauge label : ℂ) = -1 := by
   fin_cases label <;>
     norm_num [reciprocityRegressionS16Gauge, reciprocityRegressionSwapPairing,
-      reciprocityRegressionNegOne, Complex.ext_iff]
+      reciprocityRegressionNegOne, Matrix.cons_val_zero,
+      Matrix.cons_val_one, Complex.ext_iff]
 
 /-- The S-16 same-label gauge is not the designated inverse-paired gauge. -/
 lemma reciprocityRegression_s16_not_inversePaired :
@@ -236,7 +240,8 @@ lemma reciprocityRegression_s16_not_inversePaired :
   have hZero := hInversePaired (0 : Fin 2)
   have hZeroCoe := congrArg (fun phase : Circle => (phase : ℂ)) hZero
   norm_num [reciprocityRegressionS16Gauge, reciprocityRegressionSwapPairing,
-    reciprocityRegressionNegOne, Circle.coe_inv, Complex.ext_iff] at hZeroCoe
+    reciprocityRegressionNegOne, Matrix.cons_val_zero,
+    Matrix.cons_val_one, Circle.coe_inv, Complex.ext_iff] at hZeroCoe
 
 /-- Direct primitive expansion of the S-16 constant-factor rephasing. -/
 lemma reciprocityRegression_s16_matrix :
@@ -248,7 +253,8 @@ lemma reciprocityRegression_s16_matrix :
     norm_num [ScatteringMatrix.pairedMatrix, ScatteringMatrix.rephase,
       ModeTransform.rephase, reciprocityRegressionAllOnes,
       reciprocityRegressionSwapPairing, reciprocityRegressionS16Gauge,
-      reciprocityRegressionNegOne, Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionNegOne, Matrix.cons_val_zero,
+      Matrix.cons_val_one, Circle.coe_inv, Complex.ext_iff]
 
 /-- S-16: the nonidentity-pairing constant-factor gauge preserves reciprocity. -/
 lemma reciprocityRegression_s16_isReciprocal :
