@@ -56,9 +56,10 @@ claim is made.
 
 ## iv. References
 
-The construction is Physlib-original as an API example.
-
-- CROW literature reference: placeholder pending paper-track human verification.
+The construction is Physlib-original as an API example. The directly coupled topology follows
+the meaning of CROW introduced by A. Yariv, Y. Xu, R. K. Lee, and A. Scherer, "Coupled-resonator
+optical waveguide: a proposal and analysis," *Optics Letters* 24(11), 711--713 (1999),
+doi:10.1364/OL.24.000711. The human author must verify this citation before submission.
 -/
 
 @[expose] public section
