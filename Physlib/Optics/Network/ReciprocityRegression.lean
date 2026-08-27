@@ -125,7 +125,8 @@ def reciprocityRegressionAllOnes : ScatteringMatrix (Fin 2) where
 lemma reciprocityRegressionAllOnes_pairedMatrix :
     reciprocityRegressionAllOnes.pairedMatrix reciprocityRegressionSwapPairing =
       !![(1 : ℂ), 1; 1, 1] := by
-  rfl
+  ext output input
+  fin_cases output <;> fin_cases input <;> rfl
 
 /-- The all-ones fixture is symmetric before any rephasing. -/
 lemma reciprocityRegressionAllOnes_isReciprocal :
