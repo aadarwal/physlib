@@ -837,6 +837,149 @@ def visiblePoleCertificate : OneDelayNetworkResponseReduction visiblePoleNetlist
   rawDenominator_eq := by
     simpa [visiblePoleReduction] using visiblePole_responseDenominator.symm
 
+/-- The raw N5 feedback operator displayed at one scalar delay value. -/
+def visiblePoleFeedbackMatrix (q : ℂ) : Matrix (Fin 3) (Fin 3) ℂ :=
+  !![1, 0, 0;
+     0, 1, -(q / 2);
+     4 / 5 * Complex.I, -3 / 5, 1]
+
+/-- Every retained fixture entry is regular because all stored denominators equal one. -/
+lemma visiblePole_componentEntriesRegularAt (q : ℂ) :
+    visiblePoleNetlist.ComponentEntriesRegularAt (fun _ : Fin 1 => q) := by
+  intro component output input
+  change Unit at component
+  cases component
+  change visiblePolePortFamily.Channel at output input
+  change (fun _ : Fin 1 => q) ∈
+    (visiblePoleComponents.entryModel () output input).evaluationDomain
+  simp [visiblePoleComponents, RationalModel.evaluationDomain_ofPolynomial]
+
+/-- The compiled N5 feedback operator has the displayed raw matrix at every delay value. -/
+lemma visiblePole_feedbackOperator_reindex (q : ℂ) :
+    Matrix.reindex visiblePoleIncidentEquiv visiblePoleIncidentEquiv
+        (visiblePoleNetlist.toParameterizedNetlist.feedbackOperator fun _ : Fin 1 => q) =
+      visiblePoleFeedbackMatrix q := by
+  have hEvaluation := visiblePoleNetlist.eval_clearedFeedback
+    (fun _ : Fin 1 => q) (visiblePole_componentEntriesRegularAt q)
+  rw [visiblePole_commonDenominator] at hEvaluation
+  simp only [map_one, one_smul] at hEvaluation
+  rw [← hEvaluation]
+  apply Matrix.ext
+  intro incident input
+  have hEntry := congrArg (fun matrix => matrix incident input)
+    visiblePole_clearedFeedback_reindex
+  change MvPolynomial.eval (fun _ : Fin 1 => q)
+      ((Matrix.reindex visiblePoleIncidentEquiv visiblePoleIncidentEquiv
+        visiblePoleNetlist.clearedFeedback) incident input) = _
+  rw [hEntry]
+  fin_cases incident <;> fin_cases input
+  all_goals simp [visiblePoleClearedFeedbackMatrix, visiblePoleFeedbackMatrix]
+  all_goals ring
+
+/-- The exact noncancelled root of the selected reduced denominator. -/
+def visiblePoleRoot : ℂ := 10 / 3
+
+/-- A nonzero kernel vector of the raw N5 feedback matrix at the visible root. -/
+def visiblePoleKernelVector : Fin 3 → ℂ := ![0, 5, 3]
+
+/-- Reversing the feedback sign gives the hostile control matrix. -/
+def visiblePoleWrongSignFeedbackMatrix : Matrix (Fin 3) (Fin 3) ℂ :=
+  !![1, 0, 0;
+     0, 1, visiblePoleRoot / 2;
+     4 / 5 * Complex.I, -3 / 5, 1]
+
+/-- The reduced denominator vanishes at the exact fixture root. -/
+lemma visiblePole_denominator_at_root :
+    visiblePoleDenominatorPolynomial.eval visiblePoleRoot = 0 := by
+  norm_num [visiblePoleDenominatorPolynomial, visiblePoleRoot]
+
+/-- The selected numerator remains `-16/15` at the denominator root. -/
+lemma visiblePole_numerator_at_root :
+    visiblePoleNumeratorPolynomial.eval visiblePoleRoot = -16 / 15 := by
+  norm_num [visiblePoleNumeratorPolynomial, visiblePoleRoot]
+
+/-- The root belongs to the reduced pole set by direct denominator evaluation. -/
+lemma visiblePole_actualPole : visiblePoleRoot ∈ visiblePoleCertificate.actualPoles := by
+  change visiblePoleDenominatorPolynomial.eval visiblePoleRoot = 0
+  exact visiblePole_denominator_at_root
+
+/-- The displayed raw N5 feedback matrix annihilates the explicit nonzero vector. -/
+lemma visiblePole_feedback_mulVec_kernel :
+    visiblePoleFeedbackMatrix visiblePoleRoot *ᵥ visiblePoleKernelVector = 0 := by
+  funext incident
+  fin_cases incident
+  all_goals simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three,
+    visiblePoleFeedbackMatrix, visiblePoleKernelVector, visiblePoleRoot]
+  all_goals ring
+
+/-- The explicit kernel vector is nonzero at its middle coordinate. -/
+lemma visiblePoleKernelVector_ne_zero : visiblePoleKernelVector ≠ 0 := by
+  intro hZero
+  have hMiddle := congrFun hZero 1
+  norm_num [visiblePoleKernelVector] at hMiddle
+
+/-- The displayed raw N5 feedback determinant vanishes at the visible root. -/
+lemma visiblePole_feedbackMatrix_det_zero :
+    (visiblePoleFeedbackMatrix visiblePoleRoot).det = 0 := by
+  apply Matrix.det_eq_zero_of_mulVec_eq_zero_of_mem_nonZeroDivisors
+    visiblePole_feedback_mulVec_kernel
+      (i := (1 : Fin 3))
+  change (5 : ℂ) ∈ nonZeroDivisors ℂ
+  exact mem_nonZeroDivisors_iff_ne_zero.mpr (by norm_num)
+
+/-- The actual raw N5 feedback determinant vanishes at the visible root. -/
+lemma visiblePole_feedbackOperator_det_zero :
+    (visiblePoleNetlist.toParameterizedNetlist.feedbackOperator
+      (fun _ : Fin 1 => visiblePoleRoot)).det = 0 := by
+  have hReindexed := congrArg Matrix.det
+    (visiblePole_feedbackOperator_reindex visiblePoleRoot)
+  rw [Matrix.det_reindex_self, visiblePole_feedbackMatrix_det_zero] at hReindexed
+  exact hReindexed
+
+/-- The raw N5 solve gate fails at the visible root, independently of the pole certificate. -/
+lemma visiblePole_not_mem_solveDomain :
+    (fun _ : Fin 1 => visiblePoleRoot) ∉
+      visiblePoleNetlist.toParameterizedNetlist.solveDomain := by
+  intro hSolve
+  have hNonzero :=
+    (visiblePoleNetlist.toParameterizedNetlist.mem_solveDomain_iff_det_ne_zero _).mp hSolve
+  exact hNonzero visiblePole_feedbackOperator_det_zero
+
+/-- A wrong feedback sign makes the hostile control determinant nonzero at the same value. -/
+lemma visiblePole_wrongSign_det_ne_zero :
+    visiblePoleWrongSignFeedbackMatrix.det ≠ 0 := by
+  rw [Matrix.det_fin_three]
+  simp [visiblePoleWrongSignFeedbackMatrix, visiblePoleRoot]
+  norm_num
+
+/-- The unit cancelled factor is nonzero at the visible root. -/
+lemma visiblePole_noPoleCancellation :
+    visiblePoleCertificate.reduction.NoPoleCancellation visiblePoleRoot := by
+  norm_num [visiblePoleCertificate, visiblePoleReduction,
+    RationalReduction.NoPoleCancellation]
+
+/-- The production criterion identifies the independently pinned pole and N5 gate failure. -/
+lemma visiblePole_networkCriterion :
+    visiblePoleRoot ∈ visiblePoleCertificate.actualPoles ↔
+      (fun _ : Fin 1 => visiblePoleRoot) ∉
+        visiblePoleNetlist.toParameterizedNetlist.solveDomain :=
+  visiblePoleCertificate.mem_actualPoles_iff_not_mem_solveDomain visiblePoleRoot
+    (visiblePole_componentEntriesRegularAt visiblePoleRoot)
+    visiblePole_noPoleCancellation
+
+/-- Pole membership and N5 singularity agree through independent finite expansions. -/
+lemma visiblePole_independent_anchor :
+    visiblePoleRoot ∈ visiblePoleCertificate.actualPoles ∧
+      (fun _ : Fin 1 => visiblePoleRoot) ∉
+        visiblePoleNetlist.toParameterizedNetlist.solveDomain ∧
+      visiblePoleNumeratorPolynomial.eval visiblePoleRoot = -16 / 15 ∧
+      visiblePoleKernelVector ≠ 0 ∧
+      visiblePoleFeedbackMatrix visiblePoleRoot *ᵥ visiblePoleKernelVector = 0 ∧
+      visiblePoleWrongSignFeedbackMatrix.det ≠ 0 :=
+  ⟨visiblePole_actualPole, visiblePole_not_mem_solveDomain,
+    visiblePole_numerator_at_root, visiblePoleKernelVector_ne_zero,
+    visiblePole_feedback_mulVec_kernel, visiblePole_wrongSign_det_ne_zero⟩
+
 end
 
 end Optics.DelayTransfer
