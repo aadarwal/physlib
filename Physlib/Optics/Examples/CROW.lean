@@ -188,6 +188,42 @@ def returnArcPort {ringCount : ℕ} (p : Parameters ringCount)
     (components p).aggregatePortModeFamily.Port :=
   ⟨Component.returnArc ring, port⟩
 
+/-- A nondependent label for every owned primitive port in the CROW family. -/
+inductive PortLabel (ringCount : ℕ)
+  | coupler (interface : Fin (ringCount + 1)) (port : DirectionalCoupler.Port)
+  | forwardArc (ring : Fin ringCount) (port : MatchedPropagation.Port)
+  | returnArc (ring : Fin ringCount) (port : MatchedPropagation.Port)
+  deriving DecidableEq
+
+/-- The dependent aggregate port family is equivalent to explicit owned-port labels. -/
+def portLabelEquiv {ringCount : ℕ} (p : Parameters ringCount) :
+    (components p).aggregatePortModeFamily.Port ≃ PortLabel ringCount where
+  toFun
+    | ⟨Component.coupler interface, port⟩ => .coupler interface port
+    | ⟨Component.forwardArc ring, port⟩ => .forwardArc ring port
+    | ⟨Component.returnArc ring, port⟩ => .returnArc ring port
+  invFun
+    | .coupler interface port => couplerPort p interface port
+    | .forwardArc ring port => forwardArcPort p ring port
+    | .returnArc ring port => returnArcPort p ring port
+  left_inv := by rintro ⟨component, port⟩; cases component <;> rfl
+  right_inv := by intro port; cases port <;> rfl
+
+@[simp]
+lemma portLabelEquiv_couplerPort {ringCount : ℕ} (p : Parameters ringCount)
+    (interface : Fin (ringCount + 1)) (port : DirectionalCoupler.Port) :
+    portLabelEquiv p (couplerPort p interface port) = .coupler interface port := rfl
+
+@[simp]
+lemma portLabelEquiv_forwardArcPort {ringCount : ℕ} (p : Parameters ringCount)
+    (ring : Fin ringCount) (port : MatchedPropagation.Port) :
+    portLabelEquiv p (forwardArcPort p ring port) = .forwardArc ring port := rfl
+
+@[simp]
+lemma portLabelEquiv_returnArcPort {ringCount : ℕ} (p : Parameters ringCount)
+    (ring : Fin ringCount) (port : MatchedPropagation.Port) :
+    portLabelEquiv p (returnArcPort p ring port) = .returnArc ring port := rfl
+
 /-!
 ## B. Three stages of directly coupled wiring
 -/
@@ -215,7 +251,9 @@ def rightConnections {ringCount : ℕ} (p : Parameters ringCount) :
       ⟨⟨secondRing, secondKind⟩, secondEnd⟩ hPort
     cases firstKind <;> cases firstEnd <;>
       cases secondKind <;> cases secondEnd
-    all_goals first | rfl | cases hPort
+    all_goals
+      have hLabel := congrArg (portLabelEquiv p) hPort
+      simp_all
 
 /-- A coupler's forward ring port is not consumed by the right-interface stage. -/
 lemma coupler_rightSecond_not_rightConnected {ringCount : ℕ}
@@ -223,7 +261,8 @@ lemma coupler_rightSecond_not_rightConnected {ringCount : ℕ}
     couplerPort p ring.castSucc DirectionalCoupler.Port.rightSecond ∉
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
-  cases kind <;> cases endpoint <;> cases hPort
+  cases kind <;> cases endpoint <;>
+    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
 
 /-- A forward half-arc's left port is not consumed by the right-interface stage. -/
 lemma forwardArc_left_not_rightConnected {ringCount : ℕ}
@@ -231,7 +270,8 @@ lemma forwardArc_left_not_rightConnected {ringCount : ℕ}
     forwardArcPort p ring MatchedPropagation.Port.left ∉
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
-  cases kind <;> cases endpoint <;> cases hPort
+  cases kind <;> cases endpoint <;>
+    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
 
 /-- A return half-arc's right port is not consumed by the right-interface stage. -/
 lemma returnArc_right_not_rightConnected {ringCount : ℕ}
@@ -239,7 +279,8 @@ lemma returnArc_right_not_rightConnected {ringCount : ℕ}
     returnArcPort p ring MatchedPropagation.Port.right ∉
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
-  cases kind <;> cases endpoint <;> cases hPort
+  cases kind <;> cases endpoint <;>
+    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
 
 /-- A coupler's return ring port is not consumed by the right-interface stage. -/
 lemma coupler_leftSecond_not_rightConnected {ringCount : ℕ}
@@ -247,7 +288,8 @@ lemma coupler_leftSecond_not_rightConnected {ringCount : ℕ}
     couplerPort p ring.castSucc DirectionalCoupler.Port.leftSecond ∉
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
-  cases kind <;> cases endpoint <;> cases hPort
+  cases kind <;> cases endpoint <;>
+    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
 
 /-- Forward left-interface links, one for each ring. -/
 abbrev ForwardConnection (ringCount : ℕ) := Fin ringCount
@@ -266,7 +308,9 @@ def forwardConnections {ringCount : ℕ} (p : Parameters ringCount) :
   endpointPort_injective := by
     rintro ⟨firstRing, firstEnd⟩ ⟨secondRing, secondEnd⟩ hPort
     cases firstEnd <;> cases secondEnd
-    all_goals first | rfl | cases hPort
+    all_goals
+      have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort
+      simp_all
 
 /-- A return half-arc's right boundary port is not consumed by the forward stage. -/
 lemma returnArc_right_not_forwardConnected {ringCount : ℕ}
@@ -276,7 +320,8 @@ lemma returnArc_right_not_forwardConnected {ringCount : ℕ}
       (rightConnections p).externalPortModeFamily.Port) ∉
       Set.range (forwardConnections p).endpointEmbedding := by
   rintro ⟨⟨otherRing, endpoint⟩, hPort⟩
-  cases endpoint <;> cases hPort
+  cases endpoint <;>
+    have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort <;> simp_all
 
 /-- A coupler's return boundary port is not consumed by the forward stage. -/
 lemma coupler_leftSecond_not_forwardConnected {ringCount : ℕ}
@@ -286,7 +331,8 @@ lemma coupler_leftSecond_not_forwardConnected {ringCount : ℕ}
       (rightConnections p).externalPortModeFamily.Port) ∉
       Set.range (forwardConnections p).endpointEmbedding := by
   rintro ⟨⟨otherRing, endpoint⟩, hPort⟩
-  cases endpoint <;> cases hPort
+  cases endpoint <;>
+    have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort <;> simp_all
 
 /-- Return left-interface links, one for each ring. -/
 abbrev ReturnConnection (ringCount : ℕ) := Fin ringCount
@@ -309,7 +355,9 @@ def returnConnections {ringCount : ℕ} (p : Parameters ringCount) :
   endpointPort_injective := by
     rintro ⟨firstRing, firstEnd⟩ ⟨secondRing, secondEnd⟩ hPort
     cases firstEnd <;> cases secondEnd
-    all_goals first | rfl | cases hPort
+    all_goals
+      have hLabel := congrArg (fun port => portLabelEquiv p port.1.1) hPort
+      simp_all
 
 /-- The right-associated three-stage connection family used by the CROW hierarchy. -/
 def connections {ringCount : ℕ} (p : Parameters ringCount) :
