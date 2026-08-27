@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.LinearAlgebra.Matrix.Symmetric
 public import Physlib.Optics.Mode.Rephase
 public import Physlib.Optics.Network.Port
 
