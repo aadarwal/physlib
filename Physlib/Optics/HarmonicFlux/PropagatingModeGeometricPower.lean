@@ -20,7 +20,15 @@ identity on ambient `Space`, with points outside the aperture ignored by measure
 
 For a common-positive-frequency, zero-attenuation, transverse, dispersion-matched finite carrier
 family that is flux-orthonormal on this area measure, the actual integrated one-period Poynting
-flux of every coherent synthesis equals signed `ModeAmplitude.power`.
+flux of every coherent synthesis equals signed `ModeAmplitude.power`. Its outgoing and incident
+role assignments are pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`); the synthesized signs are
+pinned by `apertureFluxRegressionSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`) and
+`apertureFluxRegressionIncidentSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`).
 
 The result remains restricted to the supplied finite synthesis image. It does not assert modal
 completeness, absence of omitted channels, an interface boundary law, reciprocity, or device
@@ -29,8 +37,16 @@ losslessness.
 ## ii. Key results
 
 - `integratedGeometricApertureFlux`: actual one-period flux through geometric aperture area.
-- `outgoing_integratedGeometricApertureFlux_eq_power`: outgoing flux equals modal power.
-- `incident_integratedGeometricApertureFlux_eq_neg_power`: incident flux has opposite sign.
+- `outgoing_integratedGeometricApertureFlux_eq_power`: outgoing flux equals modal power, with its
+  role sign pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+  (`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+  `apertureFluxRegressionSynthesis_flux`
+  (`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`).
+- `incident_integratedGeometricApertureFlux_eq_neg_power`: incident flux has opposite sign, pinned
+  by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+  (`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`) and
+  `apertureFluxRegressionIncidentSynthesis_flux`
+  (`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`).
 
 ## iii. Table of contents
 
@@ -73,7 +89,11 @@ def integratedGeometricApertureFlux (aperture : GeometricAperture)
 -/
 
 /-- On an outgoing flux-orthonormal Maxwell family, actual geometric-aperture flux equals modal
-coordinate power. -/
+coordinate power; the role sign is pinned by
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`). -/
 lemma outgoing_integratedGeometricApertureFlux_eq_power
     {aperture : GeometricAperture}
     (h : HarmonicFieldProfile.IsApertureFluxOrthonormal aperture.areaMeasure
@@ -84,7 +104,11 @@ lemma outgoing_integratedGeometricApertureFlux_eq_power
     family.outgoing_integratedActualMeanNormalFlux_eq_power h amplitude startTime
 
 /-- On an incident flux-orthonormal Maxwell family, the negative actual geometric-aperture flux
-equals modal coordinate power. -/
+equals modal coordinate power; the role sign is pinned by
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`) and
+`apertureFluxRegressionIncidentSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`). -/
 lemma incident_integratedGeometricApertureFlux_eq_neg_power
     {aperture : GeometricAperture}
     (h : HarmonicFieldProfile.IsApertureFluxOrthonormal aperture.areaMeasure

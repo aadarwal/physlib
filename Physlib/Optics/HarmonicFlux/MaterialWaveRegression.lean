@@ -18,8 +18,9 @@ norm, so its instantaneous Poynting vector always equals the mean-flux vector. B
 horizontal state has zero instantaneous flux at one quarter period at the spatial origin while
 its one-period mean flux is nonzero.
 
-Together these exact results test that harmonic averaging is substantive, while retaining the
-repository's algebraic quadrature name rather than assigning a circular-polarization handedness.
+Together these exact results test that harmonic averaging is substantive. Unguarded convention
+statement (review only): the file retains the repository's algebraic quadrature name and assigns
+no circular-polarization handedness name.
 
 ## ii. Key results
 
@@ -37,8 +38,9 @@ repository's algebraic quadrature name rather than assigning a circular-polariza
 ## iv. References
 
 These regressions use arbitrary oriented polarization frames and homogeneous isotropic media.
-They introduce no observer-dependent handedness, interface normal, aperture power, modal
-normalization, outgoing-wave role, or evanescence claim.
+Unguarded convention statement (review only): they assign no observer-dependent handedness or
+outgoing-wave role. They introduce no interface-normal, aperture-power, modal-normalization, or
+evanescence claim.
 
 -/
 

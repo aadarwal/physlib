@@ -19,8 +19,8 @@ Mueller convention. The negative zero-axis quarter-wave plate is identified exac
 existing algebraic Jones regression `diag(1, I)`. The positive plate and a rotated positive plate
 then provide arbitrary-Stokes coordinate regressions.
 
-These checks use algebraic coordinate names. They make no circular-handedness or electromagnetic
-power claim.
+These checks use algebraic coordinate names. Unguarded convention statement (review only): they
+assign no circular-handedness name. They make no electromagnetic-power claim.
 
 ## ii. Key results
 

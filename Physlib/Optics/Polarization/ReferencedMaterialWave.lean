@@ -32,8 +32,9 @@ the common planar-frame formulas while preserving the affine-point carrier phase
 
 This is a propagating, positive-frequency, homogeneous-isotropic material connector. It permits
 the zero Jones vector and either sign of the propagation direction's plane-normal component. It
-does not cover a complex attenuating propagation vector, assign an incident/reflected/transmitted
-role, impose a boundary law, solve a Fresnel equation, or state an observable or power result.
+does not cover a complex attenuating propagation vector, impose a boundary law, solve a Fresnel
+equation, or state an observable or power result. Unguarded convention statement (review only):
+it assigns no incident, reflected, or transmitted role.
 
 ## ii. Key results
 
@@ -238,8 +239,8 @@ variable {plane : OrientedAffineHyperplane 3} {medium : HomogeneousIsotropicMedi
 /-- A referenced propagating material wave is phase-directed into a geometric side exactly when
 its real frame propagation vector has strictly positive side-signed normal component.
 
-This translates a supplied geometric direction; it does not infer incident, reflected, outgoing,
-group-velocity, or power meaning from a wave label. -/
+This translates a supplied geometric direction. Unguarded convention statement (review only): it
+does not infer incident, reflected, outgoing, group-velocity, or power meaning from a wave label. -/
 lemma isPhaseDirectedInto_iff
     (h : IsReferencedMaterialJonesWave plane medium wave frame J)
     (side : OrientedAffineHyperplane.Side) :

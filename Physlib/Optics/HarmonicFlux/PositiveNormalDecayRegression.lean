@@ -47,8 +47,9 @@ zero mean normal flux.
 ## iv. References
 
 These exact regressions test the selected carrier, transversality, material, and
-Poynting conventions. They assign no interface boundary condition, transmitted or outgoing role,
-Fresnel coefficient, total-internal-reflection balance, aperture power, or modal power.
+Poynting conventions. Unguarded convention statement (review only): they assign no transmitted or
+outgoing wave role. They assign no interface boundary condition, Fresnel coefficient,
+total-internal-reflection balance, aperture power, or modal power either.
 
 -/
 

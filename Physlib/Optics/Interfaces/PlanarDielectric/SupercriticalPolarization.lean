@@ -37,8 +37,9 @@ A raw Jones vector can be embedded as the electric amplitude of the canonical tr
 carrier. The resulting candidate is automatically bilinearly transverse and dispersion matched,
 and its compatible magnetic-induction amplitude obeys the material-wavenumber quarter-turn. When
 the Jones data is nonzero, the candidate satisfies the generic positive-side half-space
-evanescence predicate. No boundary condition chooses the Jones amplitudes here, and no outgoing,
-total-internal-reflection, irradiance, or power claim is made.
+evanescence predicate. No boundary condition chooses the Jones amplitudes here. Unguarded
+convention statement (review only): no outgoing or total-internal-reflection role is assigned.
+No irradiance or power claim is made.
 
 ## ii. Key results
 
@@ -337,8 +338,9 @@ lemma positiveNormalDecayTransmittedJonesCandidate_spec_of_radicand_neg
 /-- Nonzero Jones data makes the canonical negative-radicand transmitted carrier evanescent into
 the positive geometric half-space.
 
-This classification uses only the canonical construction; it does not require boundary matching
-or assign an outgoing, total-internal-reflection, or positive-power-port role. -/
+This classification uses only the canonical construction; it does not require boundary matching.
+Unguarded convention statement (review only): it assigns no outgoing,
+total-internal-reflection, or positive-power-port role. -/
 lemma positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent
     (configuration : PlanarDielectricWaveConfiguration)
     (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector)
@@ -364,8 +366,9 @@ lemma positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent
 /-- The canonical negative-radicand transmitted Jones carrier is half-space evanescent exactly
 when its raw Jones data is nonzero.
 
-This equivalence classifies the canonical carrier but does not add boundary matching, an outgoing
-condition, a total-internal-reflection role, or a power interpretation. -/
+This equivalence classifies the canonical carrier but does not add boundary matching. Unguarded
+convention statement (review only): it adds no outgoing condition or
+total-internal-reflection role. It adds no power interpretation. -/
 lemma positiveNormalDecayTransmittedJonesCandidate_isHalfSpaceEvanescent_iff
     (configuration : PlanarDielectricWaveConfiguration)
     (hRadicand : configuration.transmittedNormalRadicand < 0) (J : JonesVector) :

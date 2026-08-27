@@ -53,9 +53,10 @@ and zero one-period mean Poynting component along the decay direction.
 
 The predicate classifies an existing globally defined carrier relative to a selected half-space.
 It does not replace the field by zero outside that half-space: the same carrier grows under
-displacement in the opposite direction. It asserts no interface boundary condition, transmitted
-or total-internal-reflection role, outgoing or causal condition, pointwise zero normal flux, zero
-tangential flux, aperture power, or evanescent positive-power port.
+displacement in the opposite direction. Unguarded convention statement (review only): it assigns
+no transmitted, total-internal-reflection, or outgoing wave role. It asserts no interface boundary
+condition, causal condition, pointwise zero normal flux, zero tangential flux, aperture power, or
+evanescent positive-power port.
 
 -/
 
@@ -87,7 +88,8 @@ def halfSpaceDecayRate (plane : OrientedAffineHyperplane 3)
 
 The wave is a transverse, dispersion-matched electromagnetic carrier. Its attenuation is purely
 normal to the selected hyperplane and has strictly positive component into `side`. The predicate
-does not construct a half-space-supported field or assert an outgoing condition. -/
+does not construct a half-space-supported field. Unguarded convention statement (review only): it
+does not assert an outgoing condition. -/
 structure IsHalfSpaceEvanescent
     (plane : OrientedAffineHyperplane 3) (side : OrientedAffineHyperplane.Side)
     (medium : HomogeneousIsotropicMedium) (wave : ComplexMonochromaticPlaneWave) : Prop where

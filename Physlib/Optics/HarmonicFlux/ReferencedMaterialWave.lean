@@ -48,8 +48,9 @@ so both sides are zero even though the dummy carrier and propagation frame remai
 
 ## iv. References
 
-These are local flux-density identities at the stored plane point. They do not state an aperture
-integral, assign an interface role to either side, or state a Fresnel power balance.
+These are local flux-density identities at the stored plane point. Unguarded convention statement
+(review only): they assign no interface role to either side. They do not state an aperture integral
+or a Fresnel power balance.
 
 -/
 

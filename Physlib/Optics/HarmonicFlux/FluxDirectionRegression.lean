@@ -38,9 +38,10 @@ of the geometric theorem.
 ## iv. References
 
 These are exact regressions for Physlib's peak-phasor and oriented-hyperplane conventions. Positive
-local mean flux does not assign an incident, transmitted, or outgoing wave role. These regressions
-do not assert an outgoing-wave condition, limiting absorption, radiation, causality, group
-velocity, or evanescent-wave meaning.
+local mean flux does not assign an incident, transmitted, or outgoing wave role; this is an
+unguarded convention statement checked only by review. These regressions do not assert an
+outgoing-wave condition, limiting absorption, radiation, causality, group velocity, or
+evanescent-wave meaning.
 -/
 
 @[expose] public section

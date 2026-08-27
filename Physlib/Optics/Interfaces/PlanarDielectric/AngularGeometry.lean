@@ -28,8 +28,8 @@ For an active reflected wave, common negative-medium dispersion and electric pha
 the incident wave vector or its hyperplane reflection as the algebraic possibilities. Explicit
 strict phase directions into opposite sides select the reflection branch, and neutral vector
 reflection then proves equality of the incident and reflected phase angles. This is a phase-angle
-law. It does not identify phase direction with group velocity, energy flux, a ray, outgoing
-behavior, irradiance, or power.
+law. Unguarded convention statement (review only): it does not identify phase direction with group
+velocity, energy flux, a ray, outgoing behavior, irradiance, or power.
 
 Tangential phase matching also proves the law of the plane of incidence in a basis-free form. The
 transmitted phase vector, and every active reflected phase vector, lie in the real span of the
@@ -83,25 +83,28 @@ namespace PlanarDielectricWaveConfiguration
 /-- The incident phase-vector angle measured from the unit interface normal into the positive
 side.
 
-The choice of side normal is a measurement convention; the incident label alone does not imply
-phase direction into that side. A zero phase vector receives the total angle value `π / 2`. -/
+Unguarded convention statement (review only): the choice of side normal is a measurement
+convention, and the incident label alone does not imply phase direction into that side. A zero
+phase vector receives the total angle value `π / 2`. -/
 noncomputable def incidentPhaseAngle (configuration : PlanarDielectricWaveConfiguration) : ℝ :=
   configuration.incident.waveVector.phaseAngleToSide configuration.interface.plane .positive
 
 /-- The reflected phase-vector angle measured from the unit interface normal into the negative
 side.
 
-The choice of side normal is a measurement convention; the reflected label alone does not imply
-phase direction into that side. A zero phase vector receives the total angle value `π / 2`, while
-a zero-electric-amplitude reflected candidate retains arbitrary dummy wave-vector data. -/
+Unguarded convention statement (review only): the choice of side normal is a measurement
+convention, and the reflected label alone does not imply phase direction into that side. A zero
+phase vector receives the total angle value `π / 2`, while a zero-electric-amplitude reflected
+candidate retains arbitrary dummy wave-vector data. -/
 noncomputable def reflectedPhaseAngle (configuration : PlanarDielectricWaveConfiguration) : ℝ :=
   configuration.reflected.waveVector.phaseAngleToSide configuration.interface.plane .negative
 
 /-- The transmitted phase-vector angle measured from the unit interface normal into the positive
 side.
 
-The choice of side normal is a measurement convention; the transmitted label alone does not imply
-phase direction into that side. A zero phase vector receives the total angle value `π / 2`. -/
+Unguarded convention statement (review only): the choice of side normal is a measurement
+convention, and the transmitted label alone does not imply phase direction into that side. A zero
+phase vector receives the total angle value `π / 2`. -/
 noncomputable def transmittedPhaseAngle (configuration : PlanarDielectricWaveConfiguration) : ℝ :=
   configuration.transmitted.waveVector.phaseAngleToSide configuration.interface.plane .positive
 
@@ -171,8 +174,8 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 active-reflected phase directions imply the phase-angle law of reflection, while preserving the
 zero-electric-amplitude dummy-label branch.
 
-This result derives neither phase direction from the wave-role labels nor a group-velocity,
-energy-flux, outgoing, irradiance, or power statement. -/
+Unguarded convention statement (review only): this result derives neither phase direction from the
+wave-role labels nor a group-velocity, energy-flux, outgoing, irradiance, or power statement. -/
 lemma reflected_electricAmplitude_eq_zero_or_phaseAngles_eq_of_phaseDirections
     (h : configuration.IsElectricPhaseMatched)
     (hIncidentDispersion : configuration.incident.IsDispersionMatched

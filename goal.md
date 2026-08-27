@@ -2304,22 +2304,33 @@ quality factor, response-derived group delay, reciprocity, or material realizati
 
 - [x] build on N5F's parameterized compilation and response domain;
 - [x] formal delay indeterminate `q` and evaluation map;
-- [ ] rational transfer functions for finite-delay linear networks whose component entries are
+- [x] rational transfer functions for finite-delay linear networks whose component entries are
   rational in the declared finite family of delay variables;
 - [x] proof that evaluating `q = exp (-s*τ)` agrees with the direct frequency response on the
   pointwise well-posed domain;
-- [x] at the abstract reduction layer, singular internal operators as candidate poles and reduced
-  response poles identified under the explicit pointwise `NoPoleCancellation` gate; the stronger
-  network reachability/observability criterion remains the open S4P item below; and
+- [x] at the abstract reduction layer and for a certified selected entry of a one-delay rational
+  netlist, singular internal operators as candidate poles and reduced response poles identified
+  under explicit component-regularity and pointwise `NoPoleCancellation` gates; and
 - [x] no claim of rational dependence on physical frequency without the required model.
 
 The shipped component-entry layer retains numerator/denominator representatives and evaluation
 domains, then compiles them through N5F and reparameterizes the proof-gated response along Laplace
-and reciprocal-Z maps. Symbolic rational elimination of the external response is still required
-before the third item can be checked. The internal-determinant/reduced-response API proves the
-candidate-to-actual inclusion and its converse under an explicit no-cancellation predicate, but a
-network-level reachability/observability or no-cancellation theorem remains open
-(`Physlib/Optics/Systems/DelayTransfer/Poles.lean:187-236`).
+and reciprocal-Z maps. The cleared-polynomial eliminator constructs one aggregate component
+denominator, the polynomial internal matrix `B = D * 1 - C * S_clear`, and an adjugate/determinant
+representative for every external response entry. Its evaluation agrees with N5F on the explicit
+component-regular, nonzero-determinant domain
+(`Physlib/Optics/Systems/DelayTransfer/RationalElimination.lean:202-566`). The construction is
+unreduced: its denominator roots are not automatically transfer-function poles. The
+internal-determinant/reduced-response API proves the candidate-to-actual inclusion and its converse
+under an explicit pointwise no-cancellation predicate
+(`Physlib/Optics/Systems/DelayTransfer/Poles.lean:187-236`). For one formal delay, an explicit
+`OneDelayNetworkResponseReduction` certificate identifies those raw polynomials with a selected
+cleared network response. At component-regular delay values, pointwise no cancellation then makes
+actual-pole membership equivalent to failure of the N5F solve gate, while the reduced quotient
+agrees with the proof-gated response on its response domain
+(`Physlib/Optics/Systems/DelayTransfer/NetworkPoleCriterion.lean:93-266`). This does not construct
+a canonical reduction certificate or replace its no-cancellation gate by a general
+reachability/observability or minimal-realization theorem.
 
 #### S4P. Poles, zeros, stability, and frequency response
 
@@ -2327,8 +2338,8 @@ network-level reachability/observability or no-cancellation theorem remains open
 - [x] zeros and transfer-function poles after cancellation, distinct from candidate singularities of
   the internal network operator;
 - [x] degree and finiteness bounds;
-- [ ] a reachability/observability or explicit no-cancellation criterion connecting internal
-  singularities to actual poles;
+- [x] an explicit certificate-based, pointwise no-cancellation criterion connecting selected
+  one-delay network internal singularities to actual poles, with component regularity stated;
 - [x] discrete-time Schur stability and BIBO equivalence only for a stated proper causal rational
   class;
 - [x] frequency response under the chosen `q = exp (-s * τ) = z⁻¹` convention; and
@@ -2750,7 +2761,7 @@ upstream ownership decision, record the exact decision needed and work on an ind
   convention-explicit names while this human verification remains open.
 - [ ] Confirm that every ring model distinguishes field from power attenuation and amplitude from
   power coupling coefficients.
-- [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
+- [x] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
   startup term before S4/S5 identities are named.
 - [x] Confirm the dB/logarithm convention and parentheses of every rejection-ratio formula.
 - [ ] Confirm whether each stability condition is strict or non-strict and whether it concerns
@@ -2845,7 +2856,7 @@ current integration base; a designed package whose prerequisite is merely active
 | E6 Fresnel/flux | in progress | E3b, E5a, E5b | referenced vector balances, aligned Jones scalarization, proof-independent canonical non-normal frame recognition, guarded role-specific incident/reflected/transmitted basis bundles, canonical non-normal and selected-tangent normal-incidence frame specializations with zero-field dummy-label preservation, guarded real propagating s/p amplitudes, the complex positive-normal-decay s/p basis with unique transverse coordinates and fixed-plane conversion, exact affine referencing, its Maxwell/zero-normal-mean-flux carrier, boundary-selected complex s/p coefficients, unit reflected modulus, closed positive-time phase, reflected Jones-intensity preservation, the sign-locked TIR retarder factorization and matrix-self-composition quarter-wave kernel, the common full-vector normal-admittance transmission factor, channel `R + T = 1`, arbitrary-Jones signed irradiance balance, connected separate-wave actual mean normal flux, pointwise incident-reflected normal-interference cancellation, guarded period reconciliation, both explicit-frame and canonical-frame actual superposed-field balances, the connected complex-TIR reflected/separate/superposed actual-flux endpoint, and a lossless algebraic square-root-normalized completion of each real left-incident s/p column are complete; external frame transport is still required before interpreting self-composition as a two-bounce device, while Brewster, full Fresnel-rhomb geometry, outgoing semantics, and a Maxwell-derived bidirectional power-normalized interface scattering matrix remain |
 | N1 modal completion | done | O1 | completed O2 modal predicate, parallel, coordinate-change, restriction, zero-extension, and range-projector API |
 | N2a ports/routing | in progress | O2 reindex/direct-sum/embedding support | typed local connection, proof-carrying indexed families, physical-port endpoint uniqueness, blockwise mate, connected-channel routing, ambient partial-isometry routing, exact external-channel complements, `E_in`, `E_out`, adjoint readout, both boundary projector decompositions, and convention-free network predicates are complete; matched-gauge covariance remains |
-| N2b reciprocity metadata | blocked | human convention decision | time-reversal/reference-plane API |
+| N2b reciprocity metadata | done | human convention decision | time-reversal/reference-plane API |
 | N3 behaviors | done | O1 | relation/graph embedding, proof-gated functional extraction, identity/series/parallel closure, and rectangular junction behaviors |
 | N3T chain semantics | done | N3 + completed N2a typed-endpoint core | backward-first relational states, scattering regrouping, the canonical typed two-port adapter, proof-gated chain extraction, graph uniqueness, series multiplication, both exact behavior-derived matrix conversions and their round trips, relational right-load termination, and canonical two-device FlatNetlist/Redheffer agreement; source-specific matrix specializations are S0/S7C consumers |
 | N4 network equations | done | N1/O2, N2a, N3 | derived maps, the order-free local-component graph bridge, singular-safe complete/external relations, exact shaped and implicit feedback equations, the N-11 singular regression, and wiring-presentation invariance are complete |
@@ -2860,8 +2871,8 @@ current integration base; a designed package whose prerequisite is merely active
 | S0 physical microrings | done | completed N3T core plus the N7 directional coupler and matched propagation | independent all-pass/add-drop field relations (`PhysicalRealization.lean:123-180`), N7 primitive realization and N5 response identification (`PhysicalRealization.lean:186-492`), and DATE/SysCon/SFG source-specific chain and response views (`PhysicalSourceBridge.lean:275-360,407-465`), with hostile fixtures in `PhysicalRegression.lean`; IP-66--IP-69 |
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
 | S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, the gated source bridge, and the all-pass X-01 ring instance are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, DATE/SysCon/SFG response identifications, and common-domain causal-Z/N5F/N5/Mason/scattering/chain/relational agreement are complete under their stated gates; IP-06/IP-07 source questions and the remaining physical/source extensions stay open |
-| S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
-| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; a network reachability/no-cancellation criterion remains |
+| S4 delay transfer | done | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, cleared-polynomial external-response elimination, Laplace/reciprocal-Z/frequency evaluation, the abstract pole-reduction schema, and the certificate-based selected one-delay network pole criterion are complete |
+| S4P poles/zeros/stability | done | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, branch-audited local group delay/dispersion, and the explicit certificate-based selected one-delay network no-cancellation criterion are complete; no general reachability/observability or minimal-realization theorem is claimed |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
 | S6 Mason | done | N5, finite graph audit | neutral node- and edge-indexed Mason theory, `C * S` extraction, exact determinant gate, Mason feedback inverse, and typed external-response equality are complete; ring and DCDR instantiations belong to the S7 system suite |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |

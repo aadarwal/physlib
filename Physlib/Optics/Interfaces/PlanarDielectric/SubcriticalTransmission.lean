@@ -25,9 +25,9 @@ a vector forces strict sine-subcritical incidence under the same incident hypoth
 
 The vector lifts to a plane-wave candidate after an arbitrary electric amplitude is supplied.
 Only its frequency and wave vector are determined: the amplitude can vanish or fail
-transversality, and no Maxwell, boundary-amplitude, reflected-wave, ray, group-velocity, outgoing,
-irradiance, or power statement is made. Positive phase direction is not used as a synonym for any
-of those later notions.
+transversality, and no Maxwell, boundary-amplitude, reflected-wave, ray, or group-velocity
+statement is made. Unguarded convention statement (review only): positive phase direction is not
+an outgoing role and is not used as a synonym for irradiance or power.
 
 ## ii. Key results
 
@@ -76,7 +76,7 @@ namespace PlanarDielectricWaveConfiguration
 /-- The canonical positive-phase transmitted wave vector formed from the incident tangential
 phase vector and the positive square root of the candidate transmitted normal radicand.
 
-This definition is total. Its positive-root, material-shell, and transmitted-role properties are
+This definition is total. Its positive-root, material-shell, and positive-phase specification are
 proved only under the hypotheses of the subsequent lemmas; in particular, `Real.sqrt` alone does
 not prove that the radicand is nonnegative. -/
 noncomputable def positivePhaseTransmittedWaveVector
@@ -168,7 +168,8 @@ the incident complex tangential projection, lies on the positive-medium material
 incident frequency, has zero whole attenuation, and points in phase into the positive side.
 
 The final condition is only a strict phase-normal sign. This predicate assigns no electric
-amplitude, transversality, Maxwell, ray, group-velocity, outgoing, irradiance, or power meaning. -/
+amplitude, transversality, Maxwell, ray, or group-velocity meaning. Unguarded convention statement
+(review only): it assigns no outgoing, irradiance, or power meaning. -/
 def IsPositivePhaseTransmittedWaveVector
     (configuration : PlanarDielectricWaveConfiguration)
     (waveVector : ComplexWaveVector 3) : Prop :=
@@ -472,8 +473,8 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 tangential attenuation and positive-side phase direction satisfies the positive-phase transmitted
 wave-vector specification.
 
-The direction is supplied rather than derived from the transmitted label, and this conclusion
-has no outgoing or power-flow meaning. -/
+Unguarded convention statement (review only): the direction is supplied rather than derived from
+the transmitted label, and this conclusion has no outgoing or power-flow meaning. -/
 lemma transmitted_isPositivePhaseTransmittedWaveVector
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched

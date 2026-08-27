@@ -34,10 +34,10 @@ side-relative angle.
 ## iv. References
 
 The plane and its sides remain purely geometric. Positive stored-normal flux points from the
-negative side toward the positive side, but neither side is assigned an incident, reflected,
-transmitted, or outgoing role. The identities include zero Jones data, negative cosine, and
-grazing incidence. They apply only to the propagating ordinary-real material wave, not to a
-complex attenuating or evanescent carrier.
+negative side toward the positive side. Unguarded convention statement (review only): neither
+side is assigned an incident, reflected, transmitted, or outgoing role. The identities include
+zero Jones data, negative cosine, and grazing incidence. They apply only to the propagating
+ordinary-real material wave, not to a complex attenuating or evanescent carrier.
 
 -/
 
@@ -91,7 +91,8 @@ normal flux density is its irradiance times the cosine of the propagation direct
 side-relative angle.
 
 The cosine retains the sign: obtuse directions give negative flux and grazing directions give
-zero, without assigning a physical wave role to the selected side. -/
+zero. Unguarded convention statement (review only): the selected side is assigned no physical
+wave role. -/
 lemma inner_sideNormalVector_toMaterialPlaneWave_intervalAverage_poyntingVector
     (J : JonesVector) (medium : HomogeneousIsotropicMedium)
     {direction : Space.Direction 3} (frame : PolarizationFrame direction)

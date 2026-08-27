@@ -37,10 +37,10 @@ fields and grazing carriers are not silently assigned a direction.
 ## iv. References
 
 This is a Physlib-original connector between existing field observables and propagation geometry.
-Positive local mean flux and phase direction do not assign an incident, transmitted, or outgoing
-wave role. In particular, this is not an outgoing-wave or Sommerfeld radiation condition,
-limiting-absorption theorem, group-velocity or causality statement, source-selection principle,
-or evanescent-wave direction convention.
+Unguarded convention statement (review only): positive local mean flux and phase direction do not
+assign an incident, transmitted, or outgoing wave role. In particular, this is not an
+outgoing-wave or Sommerfeld radiation condition, limiting-absorption theorem, group-velocity or
+causality statement, source-selection principle, or evanescent-wave direction convention.
 -/
 
 @[expose] public section
@@ -124,7 +124,8 @@ into a geometric side is equivalent to strict phase direction into that side.
 
 This is a propagating positive-medium result. It does not assign an incident, transmitted, or
 outgoing wave role, nor promote either side condition to an outgoing-wave, radiation, or
-limiting-absorption condition. -/
+limiting-absorption condition; this is an unguarded convention statement checked only by
+review. -/
 lemma hasPositiveMeanNormalFluxInto_iff_isPhaseDirectedInto
     (h : IsReferencedMaterialJonesWave plane medium wave frame J)
     (side : OrientedAffineHyperplane.Side)

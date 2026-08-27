@@ -38,7 +38,8 @@ using its coefficient-value lemma.
 - `fresnelFluxRegression_normalIncidence`: equal `s` and `p` power ratios at normal incidence.
 - `fresnelFluxRegression_transmittedGrazing`: unit reflection and zero normal-flux transmittance.
 - `fresnelFluxRegression_matchedInterface`: zero reflection and unit transmission.
-- `fresnelFluxRegression_quadrature_normalFlux_values`: exact quadrature Jones outgoing fluxes.
+- `fresnelFluxRegression_quadrature_normalFlux_values`: sentinel for the exact quadrature Jones
+  outgoing fluxes.
 - `fresnelFluxRegression_zeroReflection_signedNormalFlux`: guarded zero-reflection flux with an
   arbitrary reflected normal.
 - `jonesBoundaryRegression_exact_hasSeparateWaveNormalFluxBalance`: the connected actual-wave
@@ -185,7 +186,8 @@ lemma fresnelFluxRegression_quadrature_jonesIntensity_balance :
       (by norm_num) (by norm_num)
 
 /-- The quadrature input has incident normal flux `2`; the reflected and transmitted outgoing
-normal fluxes are `746/3025` and `5304/3025`, respectively. -/
+normal fluxes are `746/3025` and `5304/3025`, respectively (sentinel:
+`fresnelFluxRegression_quadrature_normalFlux_values`). -/
 lemma fresnelFluxRegression_quadrature_normalFlux_values :
     fresnelFluxRegressionQuadratureIncidentJones.materialPlaneWaveIrradiance
           jonesBoundaryRegressionNegativeMedium * (4 / 5) = 2 ∧

@@ -28,10 +28,11 @@ sine-supercritical existence and uniqueness characterization.
 
 The resulting vector has the interface-local carrier geometry often associated with an evanescent
 branch: its phase vector is tangent, its attenuation vector is a strictly positive multiple of the
-normal, and its spatial factor decays to zero with positive-side depth. The carrier remains global,
-negative depth gives growth, and none of these facts proves one-sided support, Maxwell equations,
-electric transversality, ray or group velocity, an outgoing radiation condition, total internal
-reflection, a Fresnel coefficient, irradiance, or power flow.
+normal, and its spatial factor decays to zero with positive-side depth. Unguarded convention
+statement (review only): the carrier remains global, negative depth gives growth, and none of
+these facts proves one-sided support, Maxwell equations, electric transversality, ray or group
+velocity, an outgoing radiation condition, total internal reflection, a Fresnel coefficient,
+irradiance, or power flow.
 
 ## ii. Key results
 
@@ -310,9 +311,9 @@ preserves the incident complex tangential projection, lies on the positive-mediu
 at the incident frequency, has zero tangential attenuation, and points in attenuation into the
 positive side.
 
-The last condition selects a spatial-decay direction only. This predicate assigns no electric
-amplitude, transversality, Maxwell, ray, group-velocity, outgoing, total-internal-reflection,
-irradiance, or power meaning. -/
+The last condition selects a spatial-decay direction only. Unguarded convention statement (review
+only): this predicate assigns no electric amplitude, transversality, Maxwell, ray, group-velocity,
+outgoing, total-internal-reflection, irradiance, or power meaning. -/
 def IsPositiveNormalDecayTransmittedWaveVector
     (configuration : PlanarDielectricWaveConfiguration)
     (waveVector : ComplexWaveVector 3) : Prop :=
@@ -521,8 +522,8 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 tangential attenuation and positive-side attenuation direction satisfies the positive-normal-
 decay transmitted wave-vector specification.
 
-The direction is supplied rather than derived from the transmitted label and has no outgoing or
-power-flow meaning. -/
+Unguarded convention statement (review only): the direction is supplied rather than derived from
+the transmitted label and has no outgoing or power-flow meaning. -/
 lemma transmitted_isPositiveNormalDecayTransmittedWaveVector
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched

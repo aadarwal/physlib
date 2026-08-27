@@ -26,10 +26,10 @@ amplitude from two carrier quadratures. The convenient wrapper receives the exis
 this stored-point result.
 
 Free surface charge remains arbitrary. No transversality, material dispersion, Maxwell equation,
-electric amplitude balance, noncancellation guard, propagation direction, carrier branch, Fresnel
-coefficient, observable, or power statement is required. A reflected wave with zero electric
-amplitude has zero tangential magnetic amplitude and retains arbitrary dummy frequency and
-wave-vector data.
+electric amplitude balance, or noncancellation guard is required. Unguarded convention statement
+(review only): no propagation direction or carrier branch is assigned. No Fresnel coefficient,
+observable, or power statement is required. A reflected wave with zero electric amplitude has zero
+tangential magnetic amplitude and retains arbitrary dummy frequency and wave-vector data.
 
 ## ii. Key results
 

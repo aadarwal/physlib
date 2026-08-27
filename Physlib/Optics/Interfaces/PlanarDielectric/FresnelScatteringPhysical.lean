@@ -220,7 +220,8 @@ def endpointOutput (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
       (pTransmission : ℂ) * input (Sum.inr 0) -
         (pReflection : ℂ) * input (Sum.inr 1)])
 
-/-- The independent endpoint-equation map with nominal incident and outgoing wrappers. -/
+/-- The independent endpoint-equation map transported through the typed `Incident` and `Outgoing`
+wrappers. -/
 def outputMap (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
     ModeAmplitude (Incident (Fin 2 ⊕ Fin 2)) →ₗ[ℂ]
       ModeAmplitude (Outgoing (Fin 2 ⊕ Fin 2)) :=

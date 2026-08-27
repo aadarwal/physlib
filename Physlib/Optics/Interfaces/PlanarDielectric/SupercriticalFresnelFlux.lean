@@ -18,18 +18,24 @@ positive-normal-decay transmitted branch to actual Poynting-flux statements. The
 reflected carriers remain ordinary propagating material Jones waves in the negative-side medium.
 Unit reflection modulus first gives equal Jones intensity and hence equal material irradiance.
 Together with opposite signed propagation normals, their separate actual one-period normal fluxes
-sum to zero.
+sum to zero; the signs are pinned by `supercriticalFresnelFluxRegression_incident_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:149`) and
+`supercriticalFresnelFluxRegression_reflected_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:168`).
 
 The canonical transmitted complex carrier is treated through its Maxwell-qualified harmonic-flux
 theorem, not through the propagating Jones irradiance formula. Its actual one-period mean normal
-flux is zero at every point. These two results give a separate-wave balance. Pointwise cancellation
-of incident-reflected normal interference then shows that the actual superposed negative-side
-field also has zero one-period normal flux when the reflected carrier is electrically zero or has
-the incident frequency.
+flux is zero at every point, pinned by
+`supercriticalFresnelFluxRegression_transmitted_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:187`). These
+two results give a separate-wave balance. Pointwise cancellation of incident-reflected normal
+interference then shows that the actual superposed negative-side field also has zero one-period
+normal flux when the reflected carrier is electrically zero or has the incident frequency.
 
 The result is local to the stored interface point on the propagating side. It does not interpret
-the transmitted decay-frame Jones norm as power, make the transmitted field a positive-power
-port, or supply outgoing, causal, limiting-absorption, aperture-power, or modal-power semantics.
+the transmitted decay-frame Jones norm as power. Unguarded convention statement (review only): it
+does not make the transmitted field a positive-power port or supply outgoing semantics. It supplies
+no causal, limiting-absorption, aperture-power, or modal-power semantics either.
 
 ## ii. Key results
 
@@ -52,8 +58,9 @@ port, or supply outgoing, causal, limiting-absorption, aperture-power, or modal-
 
 The boundary hypotheses are reduced complex-amplitude balances and referenced carrier connectors.
 They are not derived here from integral Maxwell laws. No nonzero incident amplitude is required;
-the zero solution remains a valid degenerate case. A later named physical-classification layer may
-add a nonzero incident guard when the phrase "an incident field is totally reflected" is intended.
+the zero solution remains a valid degenerate case. Unguarded convention statement (review only): a
+later named physical-classification layer may add a nonzero incident guard when the phrase "an
+incident field is totally reflected" is intended.
 
 -/
 
@@ -83,8 +90,8 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 /-- Boundary-selected total internal reflection gives equal material irradiance for the
 propagating incident and reflected Jones waves in their common negative-side medium.
 
-This equality concerns local propagating-wave flux density. It assigns no irradiance or power
-meaning to the transmitted decay-frame Jones data. -/
+This equality concerns local propagating-wave flux density. Unguarded convention statement (review
+only): it assigns no irradiance or power meaning to the transmitted decay-frame Jones data. -/
 lemma complexFresnel_reflected_materialPlaneWaveIrradiance_eq_of_referenced_balances
     (hElectric : configuration.HasReferencedJointElectricBalance)
     (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)
@@ -114,7 +121,11 @@ lemma complexFresnel_reflected_materialPlaneWaveIrradiance_eq_of_referenced_bala
     JonesVector.materialPlaneWaveIrradiance_eq_half_inv_impedance_mul_intensity, hIntensity]
 
 /-- The actual reflected own-period mean Poynting flux is the negative of the incident own-period
-mean flux along the stored interface normal.
+mean flux along the stored interface normal; the signs are pinned by
+`supercriticalFresnelFluxRegression_incident_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:149`) and
+`supercriticalFresnelFluxRegression_reflected_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:168`).
 
 An active reflected wave uses the opposite signed propagation normal. In the zero-field branch,
 its arbitrary dummy normal contributes no flux, and equal reflected/incident irradiance forces
@@ -172,7 +183,13 @@ lemma complexFresnel_reflected_normalMeanFlux_eq_neg_incident
 
 /-- The boundary-selected positive-normal-decay solution balances the three separate actual
 one-period mean normal fluxes: the incident and reflected propagating contributions cancel, and
-the transmitted decay carrier has zero normal mean flux. -/
+the transmitted decay carrier has zero normal mean flux. The three values are pinned by
+`supercriticalFresnelFluxRegression_incident_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:149`),
+`supercriticalFresnelFluxRegression_reflected_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:168`), and
+`supercriticalFresnelFluxRegression_transmitted_normalFlux`
+(`Physlib/Optics/Interfaces/PlanarDielectric/SupercriticalFresnelFluxRegression.lean:187`). -/
 lemma complexFresnel_separateWave_normalFlux_balance
     (hElectric : configuration.HasReferencedJointElectricBalance)
     (hMagnetic : configuration.HasReferencedTangentialMagneticFieldStrengthBalance)

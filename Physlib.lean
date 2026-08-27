@@ -223,6 +223,8 @@ public import Physlib.Mathematics.ZTransform.Convolution
 public import Physlib.Mathematics.ZTransform.ConvolutionRegression
 public import Physlib.Mathematics.ZTransform.DifferenceEquation
 public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
+public import Physlib.Mathematics.ZTransform.Differentiation
+public import Physlib.Mathematics.ZTransform.DifferentiationRegression
 public import Physlib.Mathematics.ZTransform.Existence
 public import Physlib.Mathematics.ZTransform.ExistenceRegression
 public import Physlib.Mathematics.ZTransform.FrequencyResponse
@@ -295,6 +297,8 @@ public import Physlib.Optics.Components.Retarder.Regression
 public import Physlib.Optics.Components.Retarder.WavePlate
 public import Physlib.Optics.Evanescent
 public import Physlib.Optics.EvanescentRegression
+public import Physlib.Optics.Examples.CROW
+public import Physlib.Optics.Examples.CROWRegression
 public import Physlib.Optics.HarmonicFlux.Aperture
 public import Physlib.Optics.HarmonicFlux.ApertureRegression
 public import Physlib.Optics.HarmonicFlux.ApertureRegressionOrthogonality
@@ -381,6 +385,8 @@ public import Physlib.Optics.Network.ConnectionFamilyTransport
 public import Physlib.Optics.Network.ConnectionRoutingRephase
 public import Physlib.Optics.Network.Conservation
 public import Physlib.Optics.Network.ConservationRegression
+public import Physlib.Optics.Network.ExactReferences
+public import Physlib.Optics.Network.ExactReferencesRegression
 public import Physlib.Optics.Network.ExternalChannel
 public import Physlib.Optics.Network.ExternalChannelRegression
 public import Physlib.Optics.Network.FlatNetlist
@@ -414,6 +420,8 @@ public import Physlib.Optics.Network.PartialRouting
 public import Physlib.Optics.Network.PartialRoutingRegression
 public import Physlib.Optics.Network.Port
 public import Physlib.Optics.Network.PortRegression
+public import Physlib.Optics.Network.Reciprocity
+public import Physlib.Optics.Network.ReciprocityRegression
 public import Physlib.Optics.Network.RectangularBehavior
 public import Physlib.Optics.Network.RectangularBehaviorRegression
 public import Physlib.Optics.Network.ScatteringComponentFamily
@@ -550,8 +558,12 @@ public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponse
 public import Physlib.Optics.Systems.DelayTransfer.FrequencyResponseRegression
 public import Physlib.Optics.Systems.DelayTransfer.GroupDelay
 public import Physlib.Optics.Systems.DelayTransfer.GroupDelayRegression
+public import Physlib.Optics.Systems.DelayTransfer.NetworkPoleCriterion
+public import Physlib.Optics.Systems.DelayTransfer.NetworkPoleCriterionRegression
 public import Physlib.Optics.Systems.DelayTransfer.Poles
 public import Physlib.Optics.Systems.DelayTransfer.PolesRegression
+public import Physlib.Optics.Systems.DelayTransfer.RationalElimination
+public import Physlib.Optics.Systems.DelayTransfer.RationalEliminationRegression
 public import Physlib.Optics.Systems.DelayTransfer.Stability
 public import Physlib.Optics.Systems.DelayTransfer.StabilityRegression
 public import Physlib.Optics.Systems.MachZehnder.Basic

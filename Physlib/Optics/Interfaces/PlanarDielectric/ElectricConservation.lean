@@ -20,8 +20,8 @@ frequency or wave-vector matching is assumed.
 
 First, the aggregate is equal to the transmitted stored-point-referenced joint electric
 coefficient in either reflected branch. Its nonvanishing therefore forces the transmitted electric
-amplitude to be nonzero. This makes the transmitted label electrically active, but does not assign
-it an outgoing, propagating, on-shell, or positive-power role.
+amplitude to be nonzero. Unguarded convention statement (review only): electrical activity of the
+transmitted label does not assign it an outgoing, propagating, on-shell, or positive-power role.
 
 Second, `boundaryExponent_eq_iff` decodes the exponent equalities from label matching. The
 transmitted angular frequency and every complex-bilinear wave-vector pairing against a real

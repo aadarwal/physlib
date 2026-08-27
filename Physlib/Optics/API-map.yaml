@@ -604,8 +604,8 @@ Requirements:
       (Physlib.ZTransform.not_isSchurStable_onePole_two,
       Physlib.ZTransform.candidatePoles_twoPole, Physlib.ZTransform.isSchurStable_twoPole)
 
-  - description: "The delay-transfer layer supplies finite formal-delay tuples, retained polynomial-quotient models and their evaluation domains, N5F compilation of rational component entries, solve/response-domain-preserving Laplace and reciprocal-Z reparameterizations, an abstract internal-determinant/candidate-singularity and reduced-response/cancellation schema, finite zero/pole sets with degree bounds, Schur/BIBO equivalence for the explicitly stated nonzero proper causal one-pole class, proof-gated frequency response under `q = exp (-s * τ) = z⁻¹`, and branch-audited local group delay and dispersion for selected N5F response entries. The production all-pass specialization retains the physical ring wiring, derives its cleared external response from the compiled N5 equations, and has exact resonance, antiresonance, non-real quadrature, group-delay, and dispersion regressions. The row remains incomplete: generic symbolic rationality of eliminated external responses, a network-level no-cancellation or reachability/observability bridge from candidate singularities to actual poles, and general proper-rational BIBO equivalence are withheld; no rationality in physical frequency is claimed."
-    done: false
+  - description: "The delay-transfer layer supplies finite formal-delay tuples, retained polynomial-quotient models and their evaluation domains, N5F compilation of rational component entries, solve/response-domain-preserving Laplace and reciprocal-Z reparameterizations, and cleared-polynomial elimination of every finite external response entry. The eliminator forms `B = D * 1 - C * S_clear`, retains the adjugate numerator and determinant denominator, and agrees with the N5F response exactly where component denominators and the evaluated determinant are nonzero. A cancellation-hiding regression independently expands both the retained quotient and the raw N5 equations. The layer also supplies an abstract internal-determinant/candidate-singularity and reduced-response/cancellation schema, plus an explicit certificate connecting a selected one-delay network response to that schema. Under component regularity and pointwise no cancellation, actual-pole membership is exactly failure of the N5F solve gate; a visible-pole regression independently expands the retained numerator, denominator, raw N5 kernel, and wrong-sign control. Finite zero/pole sets with degree bounds, Schur/BIBO equivalence for the explicitly stated nonzero proper causal one-pole class, proof-gated frequency response under `q = exp (-s * τ) = z⁻¹`, and branch-audited local group delay and dispersion for selected N5F response entries are included. The production all-pass specialization retains the physical ring wiring and derives its cleared external response from the compiled N5 equations. The certificate is supplied explicitly: no canonical reduction, general reachability/observability, or minimal-realization theorem is claimed. General proper-rational BIBO equivalence and rationality in physical frequency are not claimed."
+    done: true
     location: >-
       Physlib/Optics/Systems/DelayTransfer/Basic.lean
       (Optics.DelayTransfer.DelayTuple, Optics.DelayTransfer.DelayPolynomial,
@@ -620,6 +620,35 @@ Requirements:
       Optics.DelayTransfer.RationalNetlist.mem_compileBehavior_iff_unguardedResponse,
       Optics.DelayTransfer.RationalNetlist.response_laplace,
       Optics.DelayTransfer.RationalNetlist.response_reciprocalZ);
+      Physlib/Optics/Systems/DelayTransfer/RationalElimination.lean
+      (Optics.DelayTransfer.RationalNetlist.commonDenominator,
+      Optics.DelayTransfer.RationalNetlist.clearedScattering,
+      Optics.DelayTransfer.RationalNetlist.clearedFeedback,
+      Optics.DelayTransfer.RationalNetlist.responseNumerator,
+      Optics.DelayTransfer.RationalNetlist.responseDenominator,
+      Optics.DelayTransfer.RationalNetlist.responseEntryModel,
+      Optics.DelayTransfer.RationalNetlist.eval_responseDenominator_ne_zero_iff_solveDomain,
+      Optics.DelayTransfer.RationalNetlist.evaluatedResponseQuotient_eq_unguardedResponse,
+      Optics.DelayTransfer.RationalNetlist.evaluatedResponseQuotient_eq_response,
+      Optics.DelayTransfer.RationalNetlist.responseEntryModel_eval_eq_response);
+      Physlib/Optics/Systems/DelayTransfer/RationalEliminationRegression.lean
+      (Optics.DelayTransfer.cancellationHiding_responseNumerator,
+      Optics.DelayTransfer.cancellationHiding_responseDenominator,
+      Optics.DelayTransfer.cancellationHiding_independent_regular_anchor,
+      Optics.DelayTransfer.cancellationHiding_singular_anchor);
+      Physlib/Optics/Systems/DelayTransfer/NetworkPoleCriterion.lean
+      (Optics.DelayTransfer.OneDelayNetworkResponseReduction,
+      Optics.DelayTransfer.OneDelayNetworkResponseReduction.candidateSingularities,
+      Optics.DelayTransfer.OneDelayNetworkResponseReduction.actualPoles,
+      Optics.DelayTransfer.OneDelayNetworkResponseReduction.mem_actualPoles_iff_not_mem_solveDomain,
+      Optics.DelayTransfer.OneDelayNetworkResponseReduction.reduced_eval_eq_response);
+      Physlib/Optics/Systems/DelayTransfer/NetworkPoleCriterionRegression.lean
+      (Optics.DelayTransfer.visiblePole_responseNumerator,
+      Optics.DelayTransfer.visiblePole_responseDenominator,
+      Optics.DelayTransfer.visiblePole_actualPole,
+      Optics.DelayTransfer.visiblePole_not_mem_solveDomain,
+      Optics.DelayTransfer.visiblePole_wrongSign_det_ne_zero,
+      Optics.DelayTransfer.visiblePole_independent_anchor);
       Physlib/Optics/Systems/Microring/AllPassDelayTransfer.lean
       (Optics.DelayTransfer.allPassRationalComponents,
       Optics.DelayTransfer.allPassRationalNetlist,

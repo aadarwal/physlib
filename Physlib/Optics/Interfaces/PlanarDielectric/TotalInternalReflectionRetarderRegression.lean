@@ -60,7 +60,8 @@ The design fixture proves the incident-normal bounds and the normalized negative
 identity, but does not construct a complete three-wave boundary configuration or a two-face prism
 geometry. Interpreting matrix self-composition as two bounces requires the caller to identify the
 intermediate `s`/`p` coordinates externally and to handle inter-bounce path phase. The regression
-assigns no circular-polarization handedness name and makes no modal-power claim.
+has an unguarded convention statement (review only): it assigns no circular-polarization
+handedness name. It makes no modal-power claim.
 
 -/
 

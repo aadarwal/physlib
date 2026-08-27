@@ -36,7 +36,8 @@ interpretations require later impedance, field-profile, and Poynting-flux normal
 - `JonesVector.ofComponents`: a Jones vector constructed from two complex components.
 - `JonesVector.intensity`: the squared Euclidean norm of a Jones vector.
 - `JonesVector.horizontal`, `vertical`, `diagonal`, `antidiagonal`, `plusIQuadrature`, and
-  `minusIQuadrature`: normalized canonical coordinate states without circular-handedness names.
+  `minusIQuadrature`: normalized canonical coordinate states. Unguarded convention statement
+  (review only): these states have no circular-handedness names in this API.
 - `JonesMatrix`: a wrapped `2 x 2` complex matrix.
 - `JonesMatrix.act`: the action of a Jones matrix on a Jones vector.
 - `JonesMatrix.scale`: common complex scaling of every Jones-matrix entry.
@@ -362,13 +363,15 @@ noncomputable def antidiagonal : JonesVector :=
 
 /-- The unit quadrature Jones state whose second component is `I` times its first component.
 
-No circular-polarization handedness name is assigned by this algebraic definition. -/
+Unguarded convention statement (review only): this algebraic definition assigns no
+circular-polarization handedness name. -/
 noncomputable def plusIQuadrature : JonesVector :=
   ofComponents unitEqualAmplitude (Complex.I * unitEqualAmplitude)
 
 /-- The unit quadrature Jones state whose second component is `-I` times its first component.
 
-No circular-polarization handedness name is assigned by this algebraic definition. -/
+Unguarded convention statement (review only): this algebraic definition assigns no
+circular-polarization handedness name. -/
 noncomputable def minusIQuadrature : JonesVector :=
   ofComponents unitEqualAmplitude (-Complex.I * unitEqualAmplitude)
 

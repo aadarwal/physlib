@@ -18,9 +18,10 @@ This file drives the singleton propagating Maxwell family with complex modal coo
 electric field `(0, 3, -4)` and magnetic field strength `(0, 4, 3)`. Their instantaneous Poynting
 vector is `(25, 0, 0)`.
 
-The singleton profile is independently shown to be outgoing flux-normalized under counting
-measure. The physical normalization theorem then gives actual integrated one-period normal flux
-twenty-five for every period start, equal to the coordinate power `|3 + 4 I|^2`.
+The sentinel `propagatingModePowerRegression_isApertureFluxOrthonormal` independently pins the
+singleton profile's outgoing flux normalization under counting measure. The physical normalization
+theorem then gives actual integrated one-period normal flux twenty-five for every period start,
+equal to the coordinate power `|3 + 4 I|^2`.
 
 ## ii. Key results
 
@@ -57,7 +58,8 @@ noncomputable section
 
 -/
 
-/-- The physical singleton profile is outgoing flux-orthonormal under counting measure. -/
+/-- The physical singleton profile is outgoing flux-orthonormal under counting measure (sentinel:
+`propagatingModePowerRegression_isApertureFluxOrthonormal`). -/
 lemma propagatingModePowerRegression_isApertureFluxOrthonormal :
     HarmonicFieldProfile.IsApertureFluxOrthonormal Measure.count
       propagatingModeRegressionPlane .outgoing
@@ -145,7 +147,9 @@ lemma propagatingModePowerRegression_isMacroscopicMaxwellSolution :
   propagatingModeRegressionFamily.synthesized_isMacroscopicMaxwellSolution
     propagatingModePowerRegressionAmplitude
 
-/-- For every period start, actual integrated one-period normal flux equals coordinate power 25. -/
+/-- For every period start, actual integrated one-period normal flux equals coordinate power 25;
+its outgoing role sign is pinned by
+`propagatingModePowerRegression_isApertureFluxOrthonormal`. -/
 lemma propagatingModePowerRegression_integratedActualMeanNormalFlux (startTime : Time) :
     propagatingModeRegressionFamily.integratedActualMeanNormalFlux Measure.count
       propagatingModeRegressionPlane propagatingModeRegressionPoint

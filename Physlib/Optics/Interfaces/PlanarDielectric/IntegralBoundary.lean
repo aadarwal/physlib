@@ -148,9 +148,9 @@ def twoSidedFields (configuration : PlanarDielectricWaveConfiguration) :
 /-- Literal integral Maxwell laws for the explicit three-wave side fields imply the optical local
 boundary predicate under the corresponding thin-cell regularity hypotheses.
 
-The result assumes neither one-sided illumination nor a propagation branch. It derives the local
-four-law boundary predicate only; all later phase-matching and Fresnel conclusions retain their
-existing hypotheses. -/
+Unguarded convention statement (review only): the result assumes neither one-sided illumination
+nor a propagation branch. It derives the local four-law boundary predicate only; all later
+phase-matching and Fresnel conclusions retain their existing hypotheses. -/
 lemma isLocalBoundary_of_integralMaxwell
     (configuration : PlanarDielectricWaveConfiguration)
     {sources : PlanarMaxwellBulkSources configuration.interface.plane}

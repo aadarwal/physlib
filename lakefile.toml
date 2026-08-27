@@ -136,6 +136,10 @@ name = "find_TODOs"
 srcDir = "scripts"
 
 [[lean_exe]]
+name = "exact_references"
+srcDir = "scripts"
+
+[[lean_exe]]
 name = "notes"
 srcDir = "scripts/MetaPrograms"
 supportInterpreter = true
