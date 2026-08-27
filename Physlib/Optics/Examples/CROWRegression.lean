@@ -94,14 +94,14 @@ def crowRegressionParameters : Parameters 2 where
 def crowRegressionFirstIsolatedRing : AllPass.Parameters where
   throughAmplitude := 3 / 5
   crossAmplitude := 4 / 5
-  fieldAttenuation := 1 / 2
+  fieldAttenuation := (1 / 2) * (1 / 2)
   roundTripPhase := 0
 
 /-- The second isolated-ring baseline parameter used by the non-product comparison. -/
 def crowRegressionSecondIsolatedRing : AllPass.Parameters where
   throughAmplitude := 5 / 13
   crossAmplitude := 12 / 13
-  fieldAttenuation := 1 / 2
+  fieldAttenuation := (1 / 2) * (1 / 2)
   roundTripPhase := 0
 
 /-- The end-coupler amplitudes obey the exact Pythagorean losslessness identity. -/
