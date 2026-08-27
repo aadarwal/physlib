@@ -383,7 +383,6 @@ lemma crowRegressionExternalAmbientChannel_not_connected
           (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
         cases port <;>
           simp [crowRegressionExternalAmbientChannel] at hLabel
-        exact forwardIndex.castSucc_ne_last (by simpa using hLabel)
     · rcases localChannel with mode | mode <;> cases mode
       all_goals
         first
@@ -398,7 +397,6 @@ lemma crowRegressionExternalAmbientChannel_not_connected
           (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
         cases port <;>
           simp [crowRegressionExternalAmbientChannel] at hLabel
-        exact returnIndex.castSucc_ne_last (by simpa using hLabel)
 
 /-- One typed external channel at the concrete CROW boundary. -/
 def crowRegressionExternalChannel (port : CrowRegressionExternalPort) :
