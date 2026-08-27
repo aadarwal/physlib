@@ -1,11 +1,11 @@
-# S7D slice 12 handoff: L9 nonzero reciprocal-Z coordinates
+# S7D slice 12 SS-2 handoff: L9 nonzero reciprocal-Z coordinates
 
 ## Cutoff identity
 
 - Branch: `optics/s7d-dcdr`.
 - Exact sync target: `b8ef32367b30e1880c396b838c7f1ae43d5eafde`.
 - Exact sync merge: `28978c56e8e3c5df7bf30188096aab209401797d`.
-- Gated source: `28978c56e8e3c5df7bf30188096aab209401797d`.
+- Gated source: `c72a60e8afd9765b6c77af94be807011b532773a`.
 - This file is the HANDOFF-only cutoff child.
 - `Physlib.lean` is byte-identical to the exact sync target. Its SHA-256 is
   `c54d6030b0fe32d41cd7088aec51224141d6f35cb5997bd4b0f4668f9a1cf0bf`.
@@ -18,6 +18,10 @@ The source cache was refreshed from the `optics-development` worktree after the 
 merge. The Lean source delta against that target is exactly the 18 existing files itemized
 below. No file was added or removed, no module registration changed, and the S8 ZT-07
 coordination-fence file was not touched.
+
+Relative to the rejected source `28978c56e8e3c5df7bf30188096aab209401797d`, the SS-2 source
+delta changes only module documentation in six existing files. No declaration, statement, proof,
+import, or executable definition changed.
 
 ## Goal and decision resolution
 
@@ -47,12 +51,53 @@ claim. The existing Laplace substitution remains `q_i = exp (-s * τ_i)` at
 `Physlib/Optics/Systems/DelayTransfer/Basic.lean:231`; the unilateral transform remains
 `sum n, f n * (z⁻¹)^n` at `Physlib/Mathematics/ZTransform/Basic.lean:149-157`.
 
+## SS-2 documentation repair
+
+The nonzero-state boundary now ships in the module doc at
+`Physlib/Mathematics/ZTransform/Basic.lean:24-26`: the finite advance startup sum is not an
+initial-state model, this file proves no nonzero-state recurrence theorem, and any extension must
+expose a separately named `initialStateContribution`. This is the correct home because
+`advanceStartup` and `transform_advance` are declared in that module; the HANDOFF is no longer the
+only place carrying the boundary.
+
+The bounded citation sweep checked 35 pre-existing cited targets or prose ranges across all 18
+touched files. Twenty-four were correct at the source ref and remain unchanged. Eleven stale
+targets were fixed:
+
+- `Basic.lean:225-227` became the `laplaceEvaluation` declaration at line 231.
+- `Evaluation.lean:396-495` became the reciprocal map at line 401 and response transports at
+  lines 510-550.
+- nonexistent `EvaluationRegression.lean:845-912` became the citing module's direct solve at
+  `FrequencyResponseRegression.lean:156`.
+- the DCDR reciprocal-substitution citation `Evaluation.lean:396-399` became line 401.
+- the reduced Schur citation `Stability.lean:185-232` became line 288.
+- the one-pole BIBO citation `Stability.lean:374-403` became line 458.
+- `HOL-CORPUS.md:307-308` became the FMICS'15 inventory at lines 316-326.
+- the frequency-response goal citation moved from `goal.md:2279` to line 2334.
+- the resonance-wording goal citation moved from `goal.md:2284-2289` to lines 2340-2344.
+- the degree-bound goal citation moved from `goal.md:2274` to line 2329.
+- the stated-class Schur/BIBO goal citation moved from `goal.md:2277-2278` to lines 2332-2333.
+
+The declaration-line verification was run against the gated source with
+`git show c72a60e8:<path> | sed -n '<line>p'`. The checked first lines are declarations:
+
+- `DelayTransfer/Basic.lean:231`: `def laplaceEvaluation`.
+- `DelayTransfer/Evaluation.lean:401`: `def reciprocalZ`.
+- `DelayTransfer/Evaluation.lean:510`: `lemma response_reciprocalZ`.
+- `DelayTransfer/FrequencyResponseRegression.lean:156`:
+  `lemma allPassRationalNetlist_quadrature_compiled_entry_via_equations`.
+- `DelayTransfer/Stability.lean:288`: `def IsSchurStable`.
+- `DelayTransfer/Stability.lean:458`: `lemma isBIBOStable_iff_isSchurStable`.
+
+The four repaired `goal.md` ranges and `HOL-CORPUS.md:316-326` were also printed and read in full.
+
 ## Exact source file set
 
 ### Z-transform startup API
 
-- `Physlib/Mathematics/ZTransform/Basic.lean`: adds `advanceStartup` at line 318 and states
-  `transform_advance` through that named finite sum at line 377.
+- `Physlib/Mathematics/ZTransform/Basic.lean`: adds `advanceStartup` at line 322 and states
+  `transform_advance` through that named finite sum at line 381; its module doc carries the
+  nonzero-state boundary at lines 24-26.
 - `Physlib/Mathematics/ZTransform/BasicRegression.lean`: independently pins startup `1`, the
   corrected value `2 * (1 - 1) = 0`, and the wrong-parentheses value
   `2 * 1 - 1 = 1` at lines 150, 154, and 161.
@@ -78,7 +123,7 @@ claim. The existing Laplace substitution remains `q_i = exp (-s * τ_i)` at
   coordinate at line 114, proves its semantic evaluation at line 130, and migrates the domain
   and response equivalences at lines 260-287.
 - `Physlib/Optics/Systems/DelayTransfer/FrequencyResponseRegression.lean`: migrates the exact
-  quadrature frequency/reciprocal-Z anchor at line 216.
+  quadrature frequency/reciprocal-Z anchor at line 217.
 - `Physlib/Optics/Systems/DelayTransfer/Stability.lean`: retains `zZeros` and `zPoles` at lines
   156 and 201 while correcting their docs to say that formal `q = 0` has no finite coordinate
   and that this API supplies no projective interpretation.
@@ -86,8 +131,8 @@ claim. The existing Laplace substitution remains `q_i = exp (-s * τ_i)` at
 ### DCDR migration
 
 - `Physlib/Optics/Systems/DCDR/Poles.lean`: changes
-  `rationalZEliminationResponse` and its model equality to the subtype at lines 572 and 581;
-  `formalZeros` at line 670 gets the explicit finite-coordinate legend.
+  `rationalZEliminationResponse` and its model equality to the subtype at lines 573 and 582;
+  `formalZeros` at line 671 gets the explicit finite-coordinate legend.
 - `Physlib/Optics/Systems/DCDR/PolesRegression.lean`: packages `z = 1` and `z = I` at lines
   450 and 454; migrates the stable and active exact response anchors at lines 458-608; and
   proves the formal-`q = 0` no-finite-coordinate sentinel at line 694.
@@ -200,8 +245,8 @@ must expose a separately named `initialStateContribution`.
   `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:523`.
 - `RationalNetlist.response_reciprocalZ_reindex_of_evaluation_eq` —
   `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:539`.
-- `advanceStartup` — `Physlib/Mathematics/ZTransform/Basic.lean:318`.
-- `transform_advance` — `Physlib/Mathematics/ZTransform/Basic.lean:377`.
+- `advanceStartup` — `Physlib/Mathematics/ZTransform/Basic.lean:322`.
+- `transform_advance` — `Physlib/Mathematics/ZTransform/Basic.lean:381`.
 
 ### Generic exact anchors
 
@@ -231,9 +276,9 @@ must expose a separately named `initialStateContribution`.
 ### DCDR and ring adapters
 
 - `DCDR.rationalZEliminationResponse` —
-  `Physlib/Optics/Systems/DCDR/Poles.lean:572`.
+  `Physlib/Optics/Systems/DCDR/Poles.lean:573`.
 - `DCDR.rationalZEliminationResponse_eq_responseModel` —
-  `Physlib/Optics/Systems/DCDR/Poles.lean:581`.
+  `Physlib/Optics/Systems/DCDR/Poles.lean:582`.
 - `DCDR.oneReciprocalZCoordinate` —
   `Physlib/Optics/Systems/DCDR/PolesRegression.lean:450`.
 - `DCDR.imaginaryUnitReciprocalZCoordinate` —
@@ -303,9 +348,11 @@ must expose a separately named `initialStateContribution`.
   `DelayTransfer/EvaluationRegression.lean:148` is byte-identical to the sync target.
 - `lake-lock exe module_doc_lint`: the full repository retains its known baseline failures;
   filtering error headers against all 18 touched files is empty.
+- SS-2 targeted documentation build: green, 2,791 jobs.
+- SS-2 module-doc error-header filter: empty for all six docs-only files.
 - `./scripts/lint-style.sh`: green on committed state.
 - `git diff --check`: green.
-- Lean source delta: 18 existing files, 378 insertions, 146 deletions.
+- Lean source delta: 18 existing files, 402 insertions, 164 deletions.
 - Maximum touched-file length: 773 lines.
 - Maximum touched-file line length: 100 Unicode codepoints.
 - Added banned declarations/options: 0. Added `theorem` declarations: 0.
