@@ -79,9 +79,8 @@ def oneDelayPolynomialEquiv : DelayPolynomial 1 ≃ₐ[ℂ] Polynomial ℂ :=
 lemma oneDelayPolynomialEquiv_eval (polynomial : DelayPolynomial 1) (q : ℂ) :
     (oneDelayPolynomialEquiv polynomial).eval q =
       MvPolynomial.eval (fun _ : Fin 1 => q) polynomial := by
-  simpa [oneDelayPolynomialEquiv, Polynomial.eval, MvPolynomial.eval] using
-    (MvPolynomial.eval₂_const_uniqueAlgEquiv
-      (R := ℂ) (S := ℂ) (f := polynomial) (a := q))
+  exact MvPolynomial.eval₂_const_uniqueAlgEquiv
+    (R := ℂ) (S := ℂ) (f := polynomial) (φ := RingHom.id ℂ) (a := q)
 
 /-!
 
@@ -128,7 +127,7 @@ lemma isGenericallyWellPosed
 
 /-- Roots of the selected response's cleared internal determinant. -/
 def candidateSingularities
-    (certificate : OneDelayNetworkResponseReduction netlist output input) : Set ℂ :=
+    (_certificate : OneDelayNetworkResponseReduction netlist output input) : Set ℂ :=
   {q | MvPolynomial.eval (fun _ : Fin 1 => q) netlist.responseDenominator = 0}
 
 /-- Reduced denominator roots of the selected certified network response. -/
