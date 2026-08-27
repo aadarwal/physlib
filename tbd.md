@@ -1750,6 +1750,16 @@ PR unless maintainers explicitly ask to retain it.
   reciprocity, Maxwell time-domain realization, or ROC/N5 equivalence is claimed.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
+- [ ] Human-check the cleared-polynomial finite-network eliminator before upstreaming. Confirm that
+  the aggregate denominator is the product of the retained assembled component-entry
+  denominators, `S_clear` clears each entry exactly, and
+  `B = D * 1 - C * S_clear` evaluates to `D * (1 - C * S)`. Recheck that the retained external
+  numerator is `E_outᴴ * S_clear * adj(B) * E_in`, its denominator is `det(B)`, and evaluation
+  agrees with the N5F response only under component regularity and nonzero evaluated determinant.
+  In the cancellation-hiding fixture, independently expand the retained quotient and raw N5
+  matrices to one at `q = -1`, while both retained polynomials vanish at `q = 1`. This construction
+  is deliberately unreduced: it proves neither minimality nor that every retained denominator root
+  is an actual pole. The network-level reachability/no-cancellation criterion remains S4-B.
 
 ## Ray and transfer source checks
 
