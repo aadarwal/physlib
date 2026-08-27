@@ -101,47 +101,42 @@ lemma crowRegression_middleCoupler_pythagorean :
 /-- Componentwise incident values obtained by solving the primitive two-ring equations. -/
 def crowRegressionIncidentValue :
     (component : Component 2) → (componentPortFamily component).Channel → ℂ
-  | .coupler interface, ⟨port, ()⟩ =>
-      match interface.val, port with
-      | 0, .leftFirst => 1
-      | 0, .leftSecond => -(244 / 4717) * Complex.I
-      | 1, .leftFirst => -(1960 / 4717) * Complex.I
-      | 1, .leftSecond => -(288 / 4717)
-      | 2, .leftFirst => -(960 / 4717)
-      | _, _ => 0
-  | .forwardArc ring, ⟨port, ()⟩ =>
-      match ring.val, port with
-      | 0, .left => -(3920 / 4717) * Complex.I
-      | 1, .left => -(1920 / 4717)
-      | _, _ => 0
-  | .returnArc ring, ⟨port, ()⟩ =>
-      match ring.val, port with
-      | 0, .left => -(488 / 4717) * Complex.I
-      | 1, .left => -(576 / 4717)
-      | _, _ => 0
+  | .coupler interface, ⟨.leftFirst, ()⟩ =>
+      if interface = 0 then 1
+      else if interface = 1 then -(1960 / 4717) * Complex.I
+      else -(960 / 4717)
+  | .coupler interface, ⟨.leftSecond, ()⟩ =>
+      if interface = 0 then -(244 / 4717) * Complex.I
+      else if interface = 1 then -(288 / 4717)
+      else 0
+  | .coupler _, ⟨.rightFirst, ()⟩ => 0
+  | .coupler _, ⟨.rightSecond, ()⟩ => 0
+  | .forwardArc ring, ⟨.left, ()⟩ =>
+      if ring = 0 then -(3920 / 4717) * Complex.I else -(1920 / 4717)
+  | .forwardArc _, ⟨.right, ()⟩ => 0
+  | .returnArc ring, ⟨.left, ()⟩ =>
+      if ring = 0 then -(488 / 4717) * Complex.I else -(576 / 4717)
+  | .returnArc _, ⟨.right, ()⟩ => 0
 
 /-- Componentwise outgoing values induced by the primitive scattering laws. -/
 def crowRegressionOutgoingValue :
     (component : Component 2) → (componentPortFamily component).Channel → ℂ
-  | .coupler interface, ⟨port, ()⟩ =>
-      match interface.val, port with
-      | 0, .rightFirst => 2635 / 4717
-      | 0, .rightSecond => -(3920 / 4717) * Complex.I
-      | 1, .rightFirst => -(488 / 4717) * Complex.I
-      | 1, .rightSecond => -(1920 / 4717)
-      | 2, .rightFirst => -(576 / 4717)
-      | 2, .rightSecond => (768 / 4717) * Complex.I
-      | _, _ => 0
-  | .forwardArc ring, ⟨port, ()⟩ =>
-      match ring.val, port with
-      | 0, .right => -(1960 / 4717) * Complex.I
-      | 1, .right => -(960 / 4717)
-      | _, _ => 0
-  | .returnArc ring, ⟨port, ()⟩ =>
-      match ring.val, port with
-      | 0, .right => -(244 / 4717) * Complex.I
-      | 1, .right => -(288 / 4717)
-      | _, _ => 0
+  | .coupler _, ⟨.leftFirst, ()⟩ => 0
+  | .coupler _, ⟨.leftSecond, ()⟩ => 0
+  | .coupler interface, ⟨.rightFirst, ()⟩ =>
+      if interface = 0 then 2635 / 4717
+      else if interface = 1 then -(488 / 4717) * Complex.I
+      else -(576 / 4717)
+  | .coupler interface, ⟨.rightSecond, ()⟩ =>
+      if interface = 0 then -(3920 / 4717) * Complex.I
+      else if interface = 1 then -(1920 / 4717)
+      else (768 / 4717) * Complex.I
+  | .forwardArc _, ⟨.left, ()⟩ => 0
+  | .forwardArc ring, ⟨.right, ()⟩ =>
+      if ring = 0 then -(1960 / 4717) * Complex.I else -(960 / 4717)
+  | .returnArc _, ⟨.left, ()⟩ => 0
+  | .returnArc ring, ⟨.right, ()⟩ =>
+      if ring = 0 then -(244 / 4717) * Complex.I else -(288 / 4717)
 
 /-- Aggregate channels of the concrete two-ring component family. -/
 abbrev CrowRegressionChannel :=
