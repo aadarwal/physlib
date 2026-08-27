@@ -1002,7 +1002,12 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
   have hReturn1 := crowRegression_returnArc_equations 1 incident outgoing hScattering
   have hCoupler2Parameters :
       crowRegressionParameters.coupler (2 : Fin 3) = crowRegressionEndCoupler := by
-    norm_num [crowRegressionParameters]
+    change (if (2 : Fin 3) = 1 then crowRegressionMiddleCoupler
+      else crowRegressionEndCoupler) = crowRegressionEndCoupler
+    rw [if_neg]
+    intro hEqual
+    have hValue := congrArg Fin.val hEqual
+    norm_num at hValue
   rw [hCoupler2Parameters] at hCoupler2
   norm_num [crowRegressionParameters, crowRegressionEndCoupler,
     crowRegressionMiddleCoupler, crowRegressionHalfArc,
@@ -1184,6 +1189,11 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
     hReverseOutputEnd hReverseReturnNext hReverseReturnLink hReverseReturnEnd
   rcases hForwardZero with ⟨hC0L2, hF0L, hC1L1, hR0L, hF1L, hC2L1, hR1L, hC1L2⟩
   rcases hReverseZero with ⟨hC2R1, hF1R, hC1R2, hR1R, hF0R, hC0R2, hR0R, hC1R1⟩
+  have hChannel (component : Component 2)
+      (channel : (componentPortFamily component).Channel) :
+      crowRegressionChannel component channel =
+        ⟨⟨component, channel.1⟩, channel.2⟩ := by
+    rfl
   apply WithLp.ofLp_injective 2
   funext endpoint
   change incident endpoint = 0
@@ -1191,30 +1201,30 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
   rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
   · fin_cases interface <;> cases port <;> cases mode
     all_goals first
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hLeftInputZero
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC0L2
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hLeftOutputZero
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC0R2
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC1L1
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC1L2
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC1R1
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC1R2
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC2L1
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hRightInputZero
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hC2R1
-      | simpa [crowRegressionCouplerChannel, crowRegressionChannel] using hRightOutputZero
+      | simpa [crowRegressionCouplerChannel, hChannel] using hLeftInputZero
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC0L2
+      | simpa [crowRegressionCouplerChannel, hChannel] using hLeftOutputZero
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC0R2
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC1L1
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC1L2
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC1R1
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC1R2
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC2L1
+      | simpa [crowRegressionCouplerChannel, hChannel] using hRightInputZero
+      | simpa [crowRegressionCouplerChannel, hChannel] using hC2R1
+      | simpa [crowRegressionCouplerChannel, hChannel] using hRightOutputZero
   · fin_cases ring <;> cases port <;> cases mode
     all_goals first
-      | simpa [crowRegressionForwardArcChannel, crowRegressionChannel] using hF0L
-      | simpa [crowRegressionForwardArcChannel, crowRegressionChannel] using hF0R
-      | simpa [crowRegressionForwardArcChannel, crowRegressionChannel] using hF1L
-      | simpa [crowRegressionForwardArcChannel, crowRegressionChannel] using hF1R
+      | simpa [crowRegressionForwardArcChannel, hChannel] using hF0L
+      | simpa [crowRegressionForwardArcChannel, hChannel] using hF0R
+      | simpa [crowRegressionForwardArcChannel, hChannel] using hF1L
+      | simpa [crowRegressionForwardArcChannel, hChannel] using hF1R
   · fin_cases ring <;> cases port <;> cases mode
     all_goals first
-      | simpa [crowRegressionReturnArcChannel, crowRegressionChannel] using hR0L
-      | simpa [crowRegressionReturnArcChannel, crowRegressionChannel] using hR0R
-      | simpa [crowRegressionReturnArcChannel, crowRegressionChannel] using hR1L
-      | simpa [crowRegressionReturnArcChannel, crowRegressionChannel] using hR1R
+      | simpa [crowRegressionReturnArcChannel, hChannel] using hR0L
+      | simpa [crowRegressionReturnArcChannel, hChannel] using hR0R
+      | simpa [crowRegressionReturnArcChannel, hChannel] using hR1L
+      | simpa [crowRegressionReturnArcChannel, hChannel] using hR1R
 
 /-!
 ## C. Raw flat-network witness
