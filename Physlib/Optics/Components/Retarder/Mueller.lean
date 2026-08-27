@@ -25,9 +25,9 @@ For `a = cos (2 • axis)`, `b = sin (2 • axis)`, `c = cos retardance`, and
   [(1 - c) * a * b, b ^ 2 + c * a ^ 2, s * a], [s * b, -s * a, c]]`.
 
 This algebraic sign pattern follows from the Jones eigenvalue `exp (-I * retardance)` and the
-established third Stokes coordinate. Its observer-dependent Poincare-sphere orientation remains a
-separate certification requirement. No circular handedness, electromagnetic irradiance, Poynting
-flux, or modal-power interpretation is assigned here.
+established third Stokes coordinate. Unguarded convention statement (review only): no
+observer-dependent Poincare-sphere orientation or circular-handedness name is assigned here.
+No electromagnetic irradiance, Poynting flux, or modal-power interpretation is assigned either.
 
 ## ii. Key results
 

@@ -15,9 +15,9 @@ public import Physlib.SpaceAndTime.Space.CrossProduct
 
 This file embeds two-component Jones amplitudes into three-dimensional complex electric
 amplitudes. A `PolarizationFrame` is an ordered orthonormal pair whose cross product is the
-specified propagation direction. The orientation equality is proof-bearing data: it excludes a
-reflected transverse coordinate pair without assigning observer-dependent circular-polarization
-names.
+specified propagation direction. The orientation equality is proof-bearing data and excludes a
+reflected transverse coordinate pair. Unguarded convention statement (review only): that
+orientation is assigned no observer-dependent circular-polarization name.
 
 For Jones coordinates `J = (z₀, z₁)` and frame axes `(e₀, e₁)`, the spatial phasor is
 `z₀ e₀ + z₁ e₁`. Its real and imaginary parts give two real transverse quadratures, and realization
@@ -53,7 +53,8 @@ irradiance or power.
 The construction is derived from the imported Physlib Jones and Euclidean cross-product APIs. The
 frame is local data; this file does not choose a global frame over all propagation directions. It
 contains no material model, field equation, interface convention, electromagnetic power,
-potential, gauge, or circular-handedness claim.
+potential, or gauge claim. Unguarded convention statement (review only): it assigns no
+circular-handedness name.
 -/
 
 @[expose] public section
@@ -74,8 +75,8 @@ noncomputable section
 /-- An oriented orthonormal polarization frame transverse to a propagation direction.
 
 The ordered axes satisfy `axis 0 × axis 1 = n`, where `n` is the Euclidean coordinate vector of
-the unit propagation direction. Thus the orientation is mathematical right-handedness of the
-ordered triad, not an observer-dependent name for a circular-polarization state. -/
+the unit propagation direction. Unguarded convention statement (review only): “right-handed”
+describes this ordered mathematical triad, not a circular-polarization state. -/
 @[ext]
 structure PolarizationFrame (direction : Space.Direction 3) where
   /-- The two ordered real polarization axes. -/
@@ -405,7 +406,8 @@ namespace JonesVector
 /-- The Jones-coordinate quarter-turn induced by `n × E`, with propagation vector `n` on the left.
 
 In every oriented polarization frame this sends coordinates `(z₀, z₁)` to `(-z₁, z₀)`. It does
-not assign a circular-polarization handedness name. -/
+not assign a circular-polarization handedness name; this is an unguarded convention statement
+checked only by review. -/
 def propagationCross (J : JonesVector) : JonesVector :=
   ofComponents (-J.components 1) (J.components 0)
 
@@ -493,7 +495,8 @@ lemma electricImag_propagationCross (frame : PolarizationFrame direction)
     frame.realizeJones_propagationCross J (-(Real.pi / 2))
 
 /-- The positive-`I` quadrature state realizes with a negative sine coefficient on the second
-oriented frame axis. This is an algebraic sign regression, not a handedness name. -/
+oriented frame axis. Unguarded convention statement (review only): this is not a handedness
+name. -/
 lemma realizeJones_plusIQuadrature (frame : PolarizationFrame direction)
     (carrierPhase : ℝ) :
     frame.realizeJones JonesVector.plusIQuadrature carrierPhase =
@@ -504,7 +507,8 @@ lemma realizeJones_plusIQuadrature (frame : PolarizationFrame direction)
   module
 
 /-- The negative-`I` quadrature state realizes with a positive sine coefficient on the second
-oriented frame axis. This is an algebraic sign regression, not a handedness name. -/
+oriented frame axis. Unguarded convention statement (review only): this is not a handedness
+name. -/
 lemma realizeJones_minusIQuadrature (frame : PolarizationFrame direction)
     (carrierPhase : ℝ) :
     frame.realizeJones JonesVector.minusIQuadrature carrierPhase =

@@ -42,11 +42,11 @@ spatial envelope multiplies zero.
 This Physlib-original cancellation result uses the complex-wave-vector convention documented in
 `ComplexWaveVector`. The conclusion is a local time-averaged flux-density statement. It does not
 say that the instantaneous normal Poynting vector vanishes, and it permits nonzero tangential mean
-flux. It supplies no material dispersion, Maxwell, interface, incident, reflected, transmitted,
-outgoing,
-Fresnel, total-internal-reflection, conservation, half-space-support, aperture-power, or
-modal-power conclusion. The carrier remains globally defined and grows under displacement
-opposite to its positive decay direction.
+flux. It supplies no material dispersion, Maxwell, interface, Fresnel,
+total-internal-reflection, conservation, half-space-support, aperture-power, or modal-power
+conclusion. Unguarded convention statement (review only): it assigns no incident, reflected,
+transmitted, or outgoing wave role. The carrier remains globally defined and grows under
+displacement opposite to its positive decay direction.
 -/
 
 @[expose] public section

@@ -22,7 +22,7 @@ The convention is fixed algebraically by
 `S₀ = 2 c₀`, `S₁ = 2 c₃`, `S₂ = 2 c₁`, and `S₃ = 2 c₂`, where the `cᵢ` are the neutral Pauli
 coefficients. Thus reconstruction is
 `(S₀ σ₀ + S₁ σ₃ + S₂ σ₁ + S₃ σ₂) / 2`. The final coordinate is not assigned a right- or
-left-circular name here; that physical naming also depends on observer and handedness conventions.
+left-circular name here; this is an unguarded convention statement checked only by review.
 
 ## ii. Key results
 

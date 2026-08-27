@@ -13,13 +13,15 @@ public import Physlib.Optics.HarmonicFlux.ModePower
 
 ## i. Overview
 
-This file packages the exact two-cell positive-flux profiles as a two-mode outgoing family. It
-independently computes modal coordinate power and measured field flux before comparing the two
-normalization conventions.
+This file packages the exact two-cell positive-flux profiles as a two-mode outgoing family, pinned
+by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`. It independently computes
+modal coordinate power and measured field flux before comparing the two normalization conventions.
 
-The outgoing amplitude `(2 + I, 1 - I)` has modal power seven and synthesized aperture flux seven.
-These are statements only on the declared synthesis image, not completeness or whole-device
-conservation.
+The outgoing amplitude `(2 + I, 1 - I)` has modal power seven and synthesized aperture flux seven;
+the outgoing role sign is pinned by
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
+`apertureFluxRegressionSynthesis_flux`. These are statements only on the declared synthesis image,
+not completeness or whole-device conservation.
 
 ## ii. Key results
 
@@ -90,13 +92,13 @@ lemma apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal :
 
 -/
 
-/-- The exact outgoing modal amplitudes `(2 + I, 1 - I)`. -/
+/-- The exact modal amplitudes `(2 + I, 1 - I)`. -/
 def apertureFluxRegressionAmplitude : ModeAmplitude Bool :=
   WithLp.toLp 2 fun
     | false => 2 + Complex.I
     | true => 1 - Complex.I
 
-/-- The two outgoing modal coordinates have total normalized modal power seven. -/
+/-- The two modal coordinates have total normalized modal power seven. -/
 lemma apertureFluxRegressionAmplitude_power :
     apertureFluxRegressionAmplitude.power = 7 := by
   rw [ModeAmplitude.power_eq_sum_normSq]
@@ -147,7 +149,9 @@ lemma apertureFluxRegressionSynthesis_pairing_smul_second :
   norm_num [Complex.star_def]
   ac_rfl
 
-/-- The independently computed synthesized outgoing aperture flux is exactly seven. -/
+/-- The independently computed synthesized outgoing aperture flux is exactly seven (sentinels:
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
+`apertureFluxRegressionSynthesis_flux`). -/
 lemma apertureFluxRegressionSynthesis_flux :
     integratedMeanNormalFlux Measure.count apertureFluxRegressionPlane
         (modeSynthesis apertureFluxRegressionPositiveModes

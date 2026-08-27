@@ -17,9 +17,10 @@ This file assigns two homogeneous isotropic media to the geometric sides of an o
 plane. The negative-side medium is medium 1, the positive-side medium is medium 2, and the stored
 normal points from medium 1 toward medium 2. Equal media are allowed.
 
-The structure supplies only interface geometry and material assignment. It stores no incident,
-reflected, or transmitted wave; boundary condition; common frequency; phase-matching condition;
-propagation or decay branch; Fresnel coefficient; irradiance; or power normalization.
+The structure supplies only interface geometry and material assignment. Unguarded convention
+statement (review only): it assigns no incident, reflected, or transmitted wave role and selects
+no propagation or decay branch. It stores no boundary condition, common frequency, phase-matching
+condition, Fresnel coefficient, irradiance, or power normalization.
 
 ## ii. Key results
 

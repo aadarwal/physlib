@@ -26,9 +26,10 @@ proved to realize that behavior exactly. `componentFamily` is a direct singleton
 Physlib's `Phasor.realize` is the positive-time convention
 `Re (z exp (I * carrierPhase))` (`Polarization/Basic.lean:66-70`). The registered
 `JonesVector.plusIQuadrature` has second component `I` times the first
-(`Polarization/Basic.lean:363-367`). Under the binding C-02 receiver/optics observer convention it
-is the right-circular state. This package adds no handedness alias, alters no convention, and
-manufactures no propagation direction from Jones data.
+(`Polarization/Basic.lean:363-367`). These declarations enforce only the algebraic
+`plusIQuadrature` state; they do not assign it a circular-handedness name. Unguarded convention
+statement (review only): this package adds no handedness alias, alters no nomenclature convention,
+and manufactures no propagation direction from Jones data.
 
 ## ii. Key results
 

@@ -17,8 +17,9 @@ axes and polarization states. The positive zero-axis quarter-wave plate is exact
 so it sends diagonal polarization to the negative-`I` quadrature state. Its negative-retardance
 counterpart reverses these mappings.
 
-The regression suite deliberately retains algebraic quadrature names. It makes no observer-based
-circular-polarization handedness claim and no electromagnetic power claim.
+Unguarded convention statement (review only): the regression suite retains algebraic quadrature
+names and assigns no observer-based circular-polarization handedness name. It makes no
+electromagnetic-power claim.
 
 ## ii. Key results
 

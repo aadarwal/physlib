@@ -30,9 +30,10 @@ boundary projects to this result while its free surface current remains arbitrar
 The zero-map conclusion is not a labelwise amplitude identity or an exponent-conservation result.
 For example, waves with the same exponent may cancel at that key, and a zero electric amplitude
 places no constraint on its wave label. This file assumes no common frequency, phase matching,
-Maxwell equation, material dispersion, propagation or decay branch, Fresnel coefficient,
-irradiance, or power normalization. The conditional label-matching and reverse connection results
-needed for fixed-frequency reduction are separate.
+Maxwell equation, or material dispersion. Unguarded convention statement (review only): it selects
+no propagation or decay branch. It assumes no Fresnel coefficient, irradiance, or power
+normalization. The conditional label-matching and reverse connection results needed for
+fixed-frequency reduction are separate.
 
 ## ii. Key results
 

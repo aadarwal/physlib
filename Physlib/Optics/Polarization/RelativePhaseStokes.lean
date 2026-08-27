@@ -17,8 +17,9 @@ This file connects the normalized equal-amplitude Jones family to raw Stokes coo
 relative phase `φ` maps to the unit polarization direction `(0, cos φ, sin φ)` under Physlib's
 established third-coordinate sign.
 
-The coordinate names remain algebraic. No observer-dependent circular-polarization handedness,
-electromagnetic irradiance, or modal-power interpretation is assigned here.
+Unguarded convention statement (review only): the coordinate names remain algebraic and are
+assigned no observer-dependent circular-polarization handedness name. No electromagnetic
+irradiance or modal-power interpretation is assigned here.
 
 ## ii. Key results
 

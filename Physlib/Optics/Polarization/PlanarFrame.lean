@@ -24,9 +24,10 @@ For full-vector Jones coordinates this gives the interface-plane coordinates
 corresponding geometry needed for tangential magnetic-field amplitudes.
 
 The signed factor is left explicit: it distinguishes propagation toward the positive and negative
-sides of the plane and vanishes at grazing incidence. The results are purely geometric. They do
-not assign incident, reflected, or transmitted roles; impose a material model or boundary law;
-or state a Fresnel, observable, irradiance, or power result.
+sides of the plane and vanishes at grazing incidence. The results are purely geometric. Unguarded
+convention statement (review only): they assign no incident, reflected, or transmitted role. They
+impose no material model or boundary law and state no Fresnel, observable, irradiance, or power
+result.
 
 At normal incidence the plane of incidence cannot select the common first axis. The
 `IsSelectedTangentNormalIncidence` relation instead records an independently supplied plane frame,
@@ -144,8 +145,9 @@ lemma tangentialProjection_axis_one_of_axis_zero_eq
 its first axis is exactly the independently selected first axis of the plane frame and its
 propagation vector is exactly that side's unit normal.
 
-The geometric side supplies only a sign relative to the stored normal. This relation assigns no
-incident, reflected, transmitted, incoming, outgoing, material, or power role. -/
+The geometric side supplies only a sign relative to the stored normal. Unguarded convention
+statement (review only): this relation assigns no incident, reflected, transmitted, incoming,
+outgoing, material, or power role. -/
 def IsSelectedTangentNormalIncidence (frame : PolarizationFrame direction)
     (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
     (side : OrientedAffineHyperplane.Side) : Prop :=
@@ -293,8 +295,8 @@ lemma normalComponent_cross_realizeJones_of_axis_zero_eq
 /-- The exact stored-normal interference between two instantaneous Jones realizations and their
 propagation-quarter-turn realizations in aligned frames.
 
-The two carrier phases are independent. The result is purely real frame geometry and does not
-assign incident or reflected roles to either frame. -/
+The two carrier phases are independent. The result is purely real frame geometry. Unguarded
+convention statement (review only): it assigns no incident or reflected role to either frame. -/
 lemma normalComponent_cross_realizeJones_propagationCross_add_swap
     (plane : OrientedAffineHyperplane 3) (planeFrame : PolarizationFrame plane.normal)
     (firstFrame : PolarizationFrame direction₁) (secondFrame : PolarizationFrame direction₂)

@@ -48,7 +48,8 @@ same realization.
 The construction is derived from the imported Physlib polarization-frame and material plane-wave
 APIs. It permits the zero Jones vector and reconstructs fields, not a gauge potential. Squared
 Jones intensity remains a raw electric-amplitude quantity; this file makes no irradiance, power,
-handedness, interface, evanescence, finite-beam, dispersive, conducting, or lossy-material claim.
+interface, evanescence, finite-beam, dispersive, conducting, or lossy-material claim. Unguarded
+convention statement (review only): it assigns no handedness name.
 -/
 
 @[expose] public section

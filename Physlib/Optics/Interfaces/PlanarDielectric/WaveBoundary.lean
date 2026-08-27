@@ -31,15 +31,16 @@ full local boundary projects to this electric predicate while the free surface c
 arbitrary. The reverse bridge reconstructs only the two electric laws, not either magnetic law,
 and makes no noncancellation or frequency-conservation claim.
 
-The incident, reflected, and transmitted names are trace-membership labels, not stored propagation
-hypotheses. The incident and reflected labels are symmetric in the negative trace. The structure
-has no fourth slot labeled as a wave incident from the positive side, but that omission does not
-prove one-sided illumination. In particular, the structure assumes no common frequency,
-tangential wave-vector matching, nonzero amplitude, transversality, material dispersion, Maxwell
-equation, incoming or outgoing direction, decay branch, Fresnel coefficient, irradiance, or power
-normalization. Those facts must be supplied or derived separately. A zero-electric-amplitude
-candidate retains unconstrained frequency and wave-vector data. Incident and reflected field
-values may also cancel, so a local boundary hypothesis alone gives no labelwise conservation law.
+Unguarded convention statement (review only): the incident, reflected, and transmitted names are
+trace-membership labels, not stored propagation hypotheses, and the incident and reflected labels
+are symmetric in the negative trace. The structure has no fourth slot labeled as a wave incident
+from the positive side, but that omission does not prove one-sided illumination. In particular,
+the structure assumes no common frequency, tangential wave-vector matching, nonzero amplitude,
+transversality, material dispersion, Maxwell equation, incoming or outgoing direction, decay
+branch, Fresnel coefficient, irradiance, or power normalization. Those facts must be supplied or
+derived separately. A zero-electric-amplitude candidate retains unconstrained frequency and
+wave-vector data. Incident and reflected field values may also cancel, so a local boundary
+hypothesis alone gives no labelwise conservation law.
 
 The traces below are pointwise restrictions of globally defined explicit plane-wave fields. They
 are not by themselves analytic one-sided traces of fields defined only on open half-spaces. This
@@ -96,10 +97,10 @@ noncomputable section
 /-- Three independently parameterized complex-carrier plane-wave candidates assigned to a planar
 dielectric interface.
 
-The wave-role names carry no stored propagation, phase-matching, Maxwell, or nonvanishing
-hypothesis. They specify which trace contains each wave. There is no fourth positive-trace wave
-slot, but this omission is not an incoming-direction predicate. Each wave keeps its own positive
-angular frequency and complex wave vector. -/
+Unguarded convention statement (review only): the wave-role names specify trace membership and
+carry no stored propagation, phase-matching, Maxwell, or nonvanishing hypothesis. There is no
+fourth positive-trace wave slot, but this omission is not an incoming-direction predicate. Each
+wave keeps its own positive angular frequency and complex wave vector. -/
 structure PlanarDielectricWaveConfiguration where
   /-- The oriented interface and its negative- and positive-side media. -/
   interface : PlanarDielectricInterface

@@ -22,10 +22,10 @@ field, and ordinary magnetic induction all have the same exact exponential scali
 displacement along the stored interface normal. The scaling is inherited from the shared complex
 wave vector, so it requires no transversality or Maxwell hypothesis.
 
-These objects are carrier candidates only. Their amplitude may vanish or fail transversality, and
-the results do not impose an interface boundary-amplitude equation, one-sided support, Maxwell
-equations, an outgoing radiation condition, total internal reflection, a Fresnel coefficient,
-irradiance, or power flow.
+These objects are carrier candidates only. Their amplitude may vanish or fail transversality.
+Unguarded convention statement (review only): the results do not impose an interface
+boundary-amplitude equation, one-sided support, Maxwell equations, an outgoing radiation
+condition, total internal reflection, a Fresnel coefficient, irradiance, or power flow.
 
 ## ii. Key results
 
@@ -307,9 +307,9 @@ variable {configuration : PlanarDielectricWaveConfiguration}
 
 /-- A supplied phase-matched, positive-medium-dispersive transmitted carrier with zero incident
 tangential attenuation and positive-side attenuation direction satisfies the
-positive-normal-decay transmitted carrier specification. The direction describes only the
-attenuation-vector geometry; it supplies no phase, ray, group-velocity, energy-flow, outgoing,
-Maxwell, irradiance, or power direction. -/
+positive-normal-decay transmitted carrier specification. Unguarded convention statement (review
+only): the direction describes only the attenuation-vector geometry; it supplies no phase, ray,
+group-velocity, energy-flow, outgoing, Maxwell, irradiance, or power direction. -/
 lemma transmitted_isPositiveNormalDecayTransmittedCandidate
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched
@@ -327,9 +327,9 @@ lemma transmitted_isPositiveNormalDecayTransmittedCandidate
 carrier with zero incident tangential attenuation is the canonical family member with its stored
 electric amplitude.
 
-The direction is supplied rather than derived from the transmitted label and has no phase, ray,
-group-velocity, energy-flow, outgoing, total-internal-reflection, Maxwell, irradiance, or power-flow
-meaning. -/
+Unguarded convention statement (review only): the direction is supplied rather than derived from
+the transmitted label and has no phase, ray, group-velocity, energy-flow, outgoing,
+total-internal-reflection, Maxwell, irradiance, or power-flow meaning. -/
 lemma transmitted_eq_positiveNormalDecayTransmittedCandidate
     (h : configuration.IsElectricPhaseMatched)
     (hTransmittedDispersion : configuration.transmitted.IsDispersionMatched

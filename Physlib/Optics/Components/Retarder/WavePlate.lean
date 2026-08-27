@@ -18,8 +18,9 @@ declared reference principal axis by `π / 2` under Physlib's positive-carrier-p
 convention.
 
 The resulting laws are exact Jones-amplitude statements. In particular, the half-wave plate
-reflects a linear-polarization angle across its reference axis. No circular-polarization handedness
-or electromagnetic power interpretation is assigned here.
+reflects a linear-polarization angle across its reference axis. Unguarded convention statement
+(review only): no circular-polarization handedness name is assigned here. No electromagnetic-power
+interpretation is assigned either.
 
 ## ii. Key results
 
