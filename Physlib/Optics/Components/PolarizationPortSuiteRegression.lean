@@ -43,7 +43,8 @@ or aggregate-channel reindex errors.
 
 All coefficients are algebraic sentinels and modal-amplitude bookkeeping, not electromagnetic
 power. No reciprocity, time reversal, reverse-incidence Maxwell law, modal completeness,
-propagation, causality, dispersion, material, coating, or physical realization is asserted.
+propagation, causality, dispersion, material, coating, measurement, or physical realization is
+asserted. No `tau` pairing is defined or inferred.
 The polarization fixture uses Physlib's positive-time phase convention. The interface fixture
 uses the fork-declared full-vector p sign and the registered negative-side/positive-side kernel
 order; it does not assert typed reciprocity or reference-plane laws.

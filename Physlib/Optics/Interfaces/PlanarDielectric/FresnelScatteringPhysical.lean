@@ -34,6 +34,7 @@ preserves the registered full-vector coefficients and does not force a cross-con
 
 - `PlanarDielectricInterface.portFamily`: the owned negative- and positive-side ports.
 - `PlanarDielectricInterface.channelEquiv`: the pinned side/polarization channel equivalence.
+- `PlanarDielectricInterface.endpointOutput`: the four independent s/p side equations.
 - `PlanarDielectricInterface.polarizedScattering`: parallel registered s/p kernels.
 - `PlanarDielectricInterface.physicalBehavior`: the kernel graph in owned endpoint labels.
 - `PlanarDielectricInterface.physicalScattering`: the kernel in owned channel labels.
@@ -43,7 +44,7 @@ preserves the registered full-vector coefficients and does not force a cross-con
 ## iii. Table of contents
 
 - A. Owned sides and pinned polarization coordinates
-- B. Registered-kernel behavior and scattering realization
+- B. Independent endpoint behavior and scattering realization
 - C. Direct component-family witness
 
 ## iv. References
@@ -52,8 +53,9 @@ This file packages the algebraic completion from `FresnelScattering.lean`; it do
 completion to a reverse-incidence Maxwell derivation or an E6 physical bidirectional interface.
 Its losslessness result is normalized squared-amplitude bookkeeping, not electromagnetic power.
 No reciprocity, time reversal, reference-plane law, modal completeness, propagation, causality,
-dispersion, observer convention, or physical realization is asserted. The typed reciprocity
-predicate and its reference-plane convention belong to a separate development.
+dispersion, observer convention, measurement, or physical realization is asserted. No `tau`
+pairing is defined or inferred. The typed reciprocity predicate and its reference-plane convention
+belong to a separate development.
 -/
 
 @[expose] public section
@@ -164,8 +166,118 @@ def outgoingChannelEquiv :
   Outgoing.relabelEquiv channelEquiv
 
 /-!
-## B. Registered-kernel behavior and scattering realization
+## B. Independent endpoint behavior and scattering realization
 -/
+
+/-- One polarization's independent two-side endpoint map.
+
+The definition states reflection/transmission coordinates directly and does not use a scattering
+matrix or a Fresnel kernel.
+-/
+def sideOutputMap (reflection normalizedTransmission : ℝ) :
+    ModeAmplitude (Fin 2) →ₗ[ℂ] ModeAmplitude (Fin 2) :=
+  Matrix.toEuclideanLin !![
+    (reflection : ℂ), (normalizedTransmission : ℂ);
+    (normalizedTransmission : ℂ), -(reflection : ℂ)]
+
+/-- The independent two-side map satisfies its two displayed endpoint equations. -/
+lemma sideOutputMap_apply (reflection normalizedTransmission : ℝ)
+    (input : ModeAmplitude (Fin 2)) :
+    sideOutputMap reflection normalizedTransmission input =
+      WithLp.toLp 2 ![
+        (reflection : ℂ) * input 0 + (normalizedTransmission : ℂ) * input 1,
+        (normalizedTransmission : ℂ) * input 0 - (reflection : ℂ) * input 1] := by
+  apply WithLp.ofLp_injective 2
+  funext output
+  fin_cases output <;>
+    simp [sideOutputMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
+      Fin.sum_univ_two, sub_eq_add_neg]
+
+/-- The four independently specified s/p side-coordinate endpoint equations.
+
+The s block precedes the p block, and within each block coordinate zero is the negative side. The
+coefficients are the registered Fresnel coefficient primitives and their registered flux
+normalization. No scattering matrix occurs in this definition.
+-/
+def endpointOutput (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
+    (input : ModeAmplitude (Fin 2 ⊕ Fin 2)) : ModeAmplitude (Fin 2 ⊕ Fin 2) :=
+  let flux := interface.fresnelTransmissionFluxFactor chi_i chi_t
+  let sReflection := interface.sFresnelReflectionCoefficient chi_i chi_t
+  let sTransmission := powerNormalizedFresnelTransmissionCoefficient flux
+    (interface.sFresnelTransmissionCoefficient chi_i chi_t)
+  let pReflection := interface.pFresnelReflectionCoefficient chi_i chi_t
+  let pTransmission := powerNormalizedFresnelTransmissionCoefficient flux
+    (interface.pFresnelTransmissionCoefficient chi_i chi_t)
+  (WithLp.toLp 2 ![
+    (sReflection : ℂ) * input (Sum.inl 0) +
+      (sTransmission : ℂ) * input (Sum.inl 1),
+    (sTransmission : ℂ) * input (Sum.inl 0) -
+      (sReflection : ℂ) * input (Sum.inl 1)]).directSum
+    (WithLp.toLp 2 ![
+      (pReflection : ℂ) * input (Sum.inr 0) +
+        (pTransmission : ℂ) * input (Sum.inr 1),
+      (pTransmission : ℂ) * input (Sum.inr 0) -
+        (pReflection : ℂ) * input (Sum.inr 1)])
+
+/-- The independent endpoint-equation map with nominal incident and outgoing wrappers. -/
+def outputMap (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
+    ModeAmplitude (Incident (Fin 2 ⊕ Fin 2)) →ₗ[ℂ]
+      ModeAmplitude (Outgoing (Fin 2 ⊕ Fin 2)) :=
+  let rawIncident :=
+    (ModeAmplitude.reindex
+      (Incident.channelEquiv :
+        Incident (Fin 2 ⊕ Fin 2) ≃ Fin 2 ⊕ Fin 2)).toLinearEquiv.toLinearMap
+  let sIncident :=
+    (ModeAmplitude.restrictInlLinearMap :
+      ModeAmplitude (Fin 2 ⊕ Fin 2) →ₗ[ℂ] ModeAmplitude (Fin 2)).comp rawIncident
+  let pIncident :=
+    (ModeAmplitude.restrictInrLinearMap :
+      ModeAmplitude (Fin 2 ⊕ Fin 2) →ₗ[ℂ] ModeAmplitude (Fin 2)).comp rawIncident
+  let flux := interface.fresnelTransmissionFluxFactor chi_i chi_t
+  let sOutput :=
+    (sideOutputMap (interface.sFresnelReflectionCoefficient chi_i chi_t)
+      (powerNormalizedFresnelTransmissionCoefficient flux
+        (interface.sFresnelTransmissionCoefficient chi_i chi_t))).comp sIncident
+  let pOutput :=
+    (sideOutputMap (interface.pFresnelReflectionCoefficient chi_i chi_t)
+      (powerNormalizedFresnelTransmissionCoefficient flux
+        (interface.pFresnelTransmissionCoefficient chi_i chi_t))).comp pIncident
+  (ModeAmplitude.reindex
+      (Outgoing.channelEquiv.symm :
+        (Fin 2 ⊕ Fin 2) ≃ Outgoing (Fin 2 ⊕ Fin 2))).toLinearEquiv.toLinearMap.comp
+    (ModeAmplitude.directSumLinearEquiv.toLinearMap.comp
+      (sOutput.prod pOutput))
+
+/-- The independent endpoint map evaluates to the four declared side equations. -/
+lemma outputMap_apply (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
+    (incident : ModeAmplitude (Incident (Fin 2 ⊕ Fin 2))) :
+    outputMap interface chi_i chi_t incident =
+      ModeAmplitude.reindex Outgoing.channelEquiv.symm
+        (endpointOutput interface chi_i chi_t
+          (ModeAmplitude.reindex Incident.channelEquiv incident)) := by
+  change ModeAmplitude.reindex Outgoing.channelEquiv.symm
+      ((sideOutputMap _ _
+          (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInl).directSum
+        (sideOutputMap _ _
+          (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInr)) = _
+  rw [sideOutputMap_apply, sideOutputMap_apply]
+  rfl
+
+/-- The independent four-equation behavior before physical-channel relabeling. -/
+def behavior (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
+    LinearBehavior (Incident (Fin 2 ⊕ Fin 2)) (Outgoing (Fin 2 ⊕ Fin 2)) :=
+  LinearBehavior.ofLinearMap (outputMap interface chi_i chi_t)
+
+/-- Raw behavior membership is exactly the four independent endpoint equations. -/
+@[simp]
+lemma mem_behavior_iff (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
+    (incident : ModeAmplitude (Incident (Fin 2 ⊕ Fin 2)))
+    (outgoing : ModeAmplitude (Outgoing (Fin 2 ⊕ Fin 2))) :
+    (incident, outgoing) ∈ behavior interface chi_i chi_t ↔
+      outgoing = ModeAmplitude.reindex Outgoing.channelEquiv.symm
+        (endpointOutput interface chi_i chi_t
+          (ModeAmplitude.reindex Incident.channelEquiv incident)) := by
+  rw [behavior, LinearBehavior.mem_ofLinearMap_iff, outputMap_apply]
 
 /-- The registered s and p Fresnel kernels in independent parallel polarization blocks. -/
 def polarizedScattering (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
@@ -173,42 +285,26 @@ def polarizedScattering (interface : PlanarDielectricInterface) (chi_i chi_t : �
   (interface.sFresnelScatteringKernel chi_i chi_t).directSum
     (interface.pFresnelScatteringKernel chi_i chi_t)
 
-/-- The parallel registered-kernel action with nominal incident and outgoing endpoints. -/
-def outputMap (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
-    ModeAmplitude (Incident (Fin 2 ⊕ Fin 2)) →ₗ[ℂ]
-      ModeAmplitude (Outgoing (Fin 2 ⊕ Fin 2)) :=
-  (ModeAmplitude.reindex
-      (Outgoing.channelEquiv.symm :
-        (Fin 2 ⊕ Fin 2) ≃ Outgoing (Fin 2 ⊕ Fin 2))).toLinearEquiv.toLinearMap.comp
-    ((polarizedScattering interface chi_i chi_t).toModeTransform.toLinearMap.comp
-      (ModeAmplitude.reindex
-        (Incident.channelEquiv :
-          Incident (Fin 2 ⊕ Fin 2) ≃ Fin 2 ⊕ Fin 2)).toLinearEquiv.toLinearMap)
-
-/-- The registered polarized-kernel graph before physical-channel relabeling. -/
-def behavior (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
-    LinearBehavior (Incident (Fin 2 ⊕ Fin 2)) (Outgoing (Fin 2 ⊕ Fin 2)) :=
-  LinearBehavior.ofLinearMap (outputMap interface chi_i chi_t)
-
-/-- Raw behavior membership is exactly the endpoint-wrapped polarized-kernel action. -/
-@[simp]
-lemma mem_behavior_iff (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
-    (incident : ModeAmplitude (Incident (Fin 2 ⊕ Fin 2)))
-    (outgoing : ModeAmplitude (Outgoing (Fin 2 ⊕ Fin 2))) :
-    (incident, outgoing) ∈ behavior interface chi_i chi_t ↔
-      outgoing = ModeAmplitude.reindex Outgoing.channelEquiv.symm
-        ((polarizedScattering interface chi_i chi_t).toModeTransform.toLinearMap
-          (ModeAmplitude.reindex Incident.channelEquiv incident)) := by
+/-- The direct-sum kernel action satisfies the independently stated four endpoint equations. -/
+lemma polarizedScattering_toLinearMap_apply (interface : PlanarDielectricInterface)
+    (chi_i chi_t : ℝ) (input : ModeAmplitude (Fin 2 ⊕ Fin 2)) :
+    (polarizedScattering interface chi_i chi_t).toModeTransform.toLinearMap input =
+      endpointOutput interface chi_i chi_t input := by
+  rw [← ModeAmplitude.directSum_restrict input, polarizedScattering,
+    ModeTransform.directSum_apply, sFresnelScatteringKernel,
+    pFresnelScatteringKernel, scalarFresnelScatteringKernel_toLinearMap_apply,
+    scalarFresnelScatteringKernel_toLinearMap_apply]
   rfl
 
-/-- The parallel registered Fresnel kernels realize their endpoint behavior exactly. -/
+/-- The parallel registered kernels realize the independent four-equation behavior exactly. -/
 lemma polarizedScattering_realizes_behavior (interface : PlanarDielectricInterface)
     (chi_i chi_t : ℝ) :
     (polarizedScattering interface chi_i chi_t).toOrientedModeTransform.toBehavior =
       behavior interface chi_i chi_t := by
   ext ⟨incident, outgoing⟩
   rw [ModeTransform.mem_toBehavior_iff_toLinearMap, mem_behavior_iff,
-    ScatteringMatrix.toLinearMap_toOrientedModeTransform]
+    ScatteringMatrix.toLinearMap_toOrientedModeTransform,
+    polarizedScattering_toLinearMap_apply]
 
 /-- The registered polarized-kernel behavior in component-owned endpoint labels. -/
 def physicalBehavior (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :

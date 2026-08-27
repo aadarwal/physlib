@@ -51,7 +51,7 @@ This is a coordinate and ownership adapter for the registered Jones primitives. 
 result is squared raw-Jones-amplitude bookkeeping, not electromagnetic power or a physical
 losslessness claim. No reciprocity, time reversal, reverse-incidence Maxwell law, modal
 completeness, propagation, reference-plane, causality, dispersion, or physical realization is
-asserted.
+asserted. No `tau` pairing is defined or inferred, and no measurement claim is made.
 -/
 
 @[expose] public section
