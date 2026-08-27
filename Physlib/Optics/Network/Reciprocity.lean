@@ -200,6 +200,8 @@ lemma isReciprocal_reindex_iff {channel : Type u} {newChannel : Type v}
       scattering.IsReciprocal pairing := by
   rw [IsReciprocal, pairedMatrix_reindex, Matrix.isSymm_reindex_iff]
 
+end ScatteringMatrix
+
 /-!
 ## D. Reference-plane rephasing
 -/
@@ -214,6 +216,8 @@ structure ReferencePlaneShift {channel : Type u} (pairing : ChannelPairing chann
   /-- A paired outgoing coordinate carries the inverse incident phase. -/
   inverse_paired : ∀ label,
     outgoingGauge (pairing (Incident.mk label)).channel = (incidentGauge label)⁻¹
+
+namespace ScatteringMatrix
 
 /-- General rephasing changes a paired entry by the paired output phase and inverse input phase. -/
 @[simp]
