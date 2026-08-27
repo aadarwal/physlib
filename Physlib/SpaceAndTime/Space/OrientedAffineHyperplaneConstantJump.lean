@@ -183,8 +183,8 @@ def coordinatePositiveConstantField {F : Type} [Zero F] {d : ℕ} (c : F) :
 /-- Both ambient extensions of a coordinate positive-side constant field are distribution
 bounded. -/
 lemma coordinatePositiveConstantField_isDistBounded {F : Type} [NormedAddCommGroup F]
-    [NormedSpace ℝ F] {d : ℕ} (c : F) :
-    ∀ side, IsDistBounded (coordinatePositiveConstantField (d := d) c side) := by
+    {d : ℕ} (c : F) : ∀ side,
+    IsDistBounded (coordinatePositiveConstantField (d := d) c side) := by
   intro side
   cases side
   · change IsDistBounded (fun _ : Space d => (0 : F))
