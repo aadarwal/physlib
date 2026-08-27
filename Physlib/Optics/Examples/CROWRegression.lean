@@ -212,6 +212,36 @@ def crowRegressionOutput : ModeAmplitude (Outgoing crowRegressionConnections.Ext
 ## B. Primitive component equations
 -/
 
+/-- The incident table restricted to one declared primitive component. -/
+def crowRegressionLocalIncident (component : Component 2) :
+    ModeAmplitude (Incident (componentPortFamily component).Channel) :=
+  WithLp.toLp 2 fun endpoint => crowRegressionIncidentValue component endpoint.channel
+
+/-- The outgoing table restricted to one declared primitive component. -/
+def crowRegressionLocalOutgoing (component : Component 2) :
+    ModeAmplitude (Outgoing (componentPortFamily component).Channel) :=
+  WithLp.toLp 2 fun endpoint => crowRegressionOutgoingValue component endpoint.channel
+
+/-- Aggregate incident restriction recovers the declared local incident table. -/
+lemma crowRegressionIncident_restrict (component : Component 2) :
+    crowRegressionIncident.restrictEmbedding
+        (Incident.relabelEmbedding
+          ((components crowRegressionParameters).componentChannelEmbedding component)) =
+      crowRegressionLocalIncident component := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rfl
+
+/-- Aggregate outgoing restriction recovers the declared local outgoing table. -/
+lemma crowRegressionOutgoing_restrict (component : Component 2) :
+    crowRegressionOutgoing.restrictEmbedding
+        (Outgoing.relabelEmbedding
+          ((components crowRegressionParameters).componentChannelEmbedding component)) =
+      crowRegressionLocalOutgoing component := by
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rfl
+
 /-- The declared aggregate amplitudes satisfy every primitive scattering equation directly. -/
 lemma crowRegression_mem_componentBehavior :
     (crowRegressionIncident, crowRegressionOutgoing) ∈
@@ -246,20 +276,25 @@ lemma crowRegression_mem_componentBehavior :
               (.coupler interface)))) ∈
       (DirectionalCoupler.physicalScattering
         (crowRegressionParameters.coupler interface) Unit).toOrientedModeTransform.toBehavior
-    rw [DirectionalCoupler.physicalScattering_realizes_physicalBehavior,
+    rw [crowRegressionIncident_restrict, crowRegressionOutgoing_restrict,
+      DirectionalCoupler.physicalScattering_realizes_physicalBehavior,
       DirectionalCoupler.mem_physicalBehavior_iff,
       DirectionalCoupler.mem_behavior_iff,
       DirectionalCoupler.mixing_toLinearMap_apply,
       DirectionalCoupler.mixing_toLinearMap_apply]
     apply WithLp.ofLp_injective 2
     funext endpoint
-    rcases endpoint with ⟨mode | mode⟩ | ⟨mode | mode⟩ <;> cases mode <;>
+    rcases endpoint with endpoint | endpoint <;>
+      rcases endpoint with ⟨channel⟩ <;>
+      rcases channel with ⟨⟩ | ⟨⟩ <;>
       fin_cases interface <;>
-      norm_num [ModeAmplitude.reindex_apply, ModeAmplitude.restrictEmbedding_apply,
-        crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
-        crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionEndCoupler,
+      norm_num [crowRegressionLocalIncident, crowRegressionLocalOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionParameters, crowRegressionEndCoupler,
         crowRegressionMiddleCoupler, DirectionalCoupler.crossCoefficient,
-        ScatteringComponentFamily.componentChannelEmbedding]
+        ModeAmplitude.directSum, ModeAmplitude.reindex_apply,
+        ModeAmplitude.restrictInl, ModeAmplitude.restrictInr] <;>
+      apply Complex.ext <;> norm_num
   · change
       (crowRegressionIncident.restrictEmbedding
           (Incident.relabelEmbedding
@@ -271,16 +306,21 @@ lemma crowRegression_mem_componentBehavior :
               (.forwardArc ring)))) ∈
       (MatchedPropagation.physicalScattering
         (crowRegressionParameters.forwardArc ring) Unit).toOrientedModeTransform.toBehavior
-    rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior,
+    rw [crowRegressionIncident_restrict, crowRegressionOutgoing_restrict,
+      MatchedPropagation.physicalScattering_realizes_physicalBehavior,
       MatchedPropagation.mem_physicalBehavior_iff,
       MatchedPropagation.mem_behavior_iff]
     apply WithLp.ofLp_injective 2
     funext endpoint
-    rcases endpoint with ⟨mode⟩ | ⟨mode⟩ <;> cases mode <;> fin_cases ring <;>
-      norm_num [ModeAmplitude.reindex_apply, ModeAmplitude.restrictEmbedding_apply,
-        crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
-        crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionHalfArc,
-        MatchedPropagation.transmissionCoefficient]
+    rcases endpoint with endpoint | endpoint <;>
+      rcases endpoint with ⟨mode⟩ <;> cases mode <;> fin_cases ring <;>
+      norm_num [crowRegressionLocalIncident, crowRegressionLocalOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionParameters, crowRegressionHalfArc,
+        MatchedPropagation.transmissionCoefficient,
+        MatchedPropagation.carrierPhaseFactor, ModeAmplitude.directSum,
+        ModeAmplitude.reindex_apply] <;>
+      apply Complex.ext <;> norm_num
   · change
       (crowRegressionIncident.restrictEmbedding
           (Incident.relabelEmbedding
@@ -292,16 +332,21 @@ lemma crowRegression_mem_componentBehavior :
               (.returnArc ring)))) ∈
       (MatchedPropagation.physicalScattering
         (crowRegressionParameters.returnArc ring) Unit).toOrientedModeTransform.toBehavior
-    rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior,
+    rw [crowRegressionIncident_restrict, crowRegressionOutgoing_restrict,
+      MatchedPropagation.physicalScattering_realizes_physicalBehavior,
       MatchedPropagation.mem_physicalBehavior_iff,
       MatchedPropagation.mem_behavior_iff]
     apply WithLp.ofLp_injective 2
     funext endpoint
-    rcases endpoint with ⟨mode⟩ | ⟨mode⟩ <;> cases mode <;> fin_cases ring <;>
-      norm_num [ModeAmplitude.reindex_apply, ModeAmplitude.restrictEmbedding_apply,
-        crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
-        crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionHalfArc,
-        MatchedPropagation.transmissionCoefficient]
+    rcases endpoint with endpoint | endpoint <;>
+      rcases endpoint with ⟨mode⟩ <;> cases mode <;> fin_cases ring <;>
+      norm_num [crowRegressionLocalIncident, crowRegressionLocalOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionParameters, crowRegressionHalfArc,
+        MatchedPropagation.transmissionCoefficient,
+        MatchedPropagation.carrierPhaseFactor, ModeAmplitude.directSum,
+        ModeAmplitude.reindex_apply] <;>
+      apply Complex.ext <;> norm_num
 
 /-- The eight homogeneous channel equations in either travel direction have only the zero state. -/
 lemma crowRegression_chainCoordinates_eq_zero
