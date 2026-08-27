@@ -1135,7 +1135,10 @@ lemma physicalPortSuite9b_indexed_action :
         (physicalPortSuite9bScattering selected).toModeTransform)
       physicalPortSuite9bIndexedInput output = _
   rcases output with ⟨component, channel⟩
-  rw [ModeTransform.blockDiagonal'_apply]
+  have hBlock := ModeTransform.blockDiagonal'_apply
+    (fun selected => (physicalPortSuite9bScattering selected).toModeTransform)
+    physicalPortSuite9bIndexedInput component channel
+  rw [hBlock]
   cases component
   · rw [physicalPortSuite9bIndexedInput_restrict_polarization,
       physicalPortSuite9b_polarization_local_action]
@@ -1290,8 +1293,12 @@ lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
         ⟨PhysicalPortSuite9bComponent.interface,
           ⟨PlanarDielectricInterface.Port.negativeSide,
             PlanarDielectricInterface.PolarizationMode.s⟩⟩ = _
-  rw [ModeTransform.blockDiagonal'_apply,
-    physicalPortSuite9bIndexedInput_restrict_interface,
+  have hBlock := ModeTransform.blockDiagonal'_apply
+    (fun selected => (physicalPortSuite9bHostileScattering selected).toModeTransform)
+    physicalPortSuite9bIndexedInput PhysicalPortSuite9bComponent.interface
+      ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩
+  rw [hBlock, physicalPortSuite9bIndexedInput_restrict_interface,
     physicalPortSuite9b_hostile_interface_local_action]
   change physicalPortSuite9bInterfaceRawOutput
       (PlanarDielectricInterface.channelEquiv.symm
