@@ -147,6 +147,42 @@ def physicalPortSuite9bInterfaceRawOutput : ModeAmplitude (Fin 2 ⊕ Fin 2) :=
   ModeAmplitude.directSum (WithLp.toLp 2 ![11 / 5, -2 / 5])
     (WithLp.toLp 2 ![7 / 5, 24 / 5])
 
+/-- Owned negative-side s returns to raw s coordinate zero. -/
+@[simp]
+lemma physicalPortSuite9b_channelEquiv_symm_negative_s :
+    PlanarDielectricInterface.channelEquiv.symm
+        ⟨PlanarDielectricInterface.Port.negativeSide,
+          PlanarDielectricInterface.PolarizationMode.s⟩ =
+      Sum.inl 0 := by
+  rfl
+
+/-- Owned positive-side s returns to raw s coordinate one. -/
+@[simp]
+lemma physicalPortSuite9b_channelEquiv_symm_positive_s :
+    PlanarDielectricInterface.channelEquiv.symm
+        ⟨PlanarDielectricInterface.Port.positiveSide,
+          PlanarDielectricInterface.PolarizationMode.s⟩ =
+      Sum.inl 1 := by
+  rfl
+
+/-- Owned negative-side p returns to raw p coordinate zero. -/
+@[simp]
+lemma physicalPortSuite9b_channelEquiv_symm_negative_p :
+    PlanarDielectricInterface.channelEquiv.symm
+        ⟨PlanarDielectricInterface.Port.negativeSide,
+          PlanarDielectricInterface.PolarizationMode.p⟩ =
+      Sum.inr 0 := by
+  rfl
+
+/-- Owned positive-side p returns to raw p coordinate one. -/
+@[simp]
+lemma physicalPortSuite9b_channelEquiv_symm_positive_p :
+    PlanarDielectricInterface.channelEquiv.symm
+        ⟨PlanarDielectricInterface.Port.positiveSide,
+          PlanarDielectricInterface.PolarizationMode.p⟩ =
+      Sum.inr 1 := by
+  rfl
+
 /-- The registered s kernel is the exact rational primitive matrix at the fixture. -/
 lemma physicalPortSuite9b_s_kernel :
     (physicalPortSuite9bInterface.sFresnelScatteringKernel 1 1).toModeTransform =
@@ -484,17 +520,9 @@ lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
   rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
   rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
   cases outputComponent <;> cases inputComponent
-  · cases outputPort
-    cases inputPort
-    fin_cases outputMode <;> fin_cases inputMode
-  · cases outputPort
-    fin_cases outputMode
-    all_goals cases inputPort <;> cases inputMode
-  · cases outputPort <;> cases outputMode
-    all_goals cases inputPort
-    all_goals fin_cases inputMode
-  · cases outputPort <;> cases outputMode <;>
-      cases inputPort <;> cases inputMode
+  all_goals
+    fin_cases outputPort <;> fin_cases outputMode <;>
+      fin_cases inputPort <;> fin_cases inputMode
   all_goals
     simp [ScatteringComponentFamily.indexedScatteringMatrix,
       physicalPortSuite9bExplicitIndexedTransform, physicalPortSuite9bFamily,
@@ -739,17 +767,9 @@ lemma physicalPortSuite9b_hostile_indexedScatteringMatrix_eq_reindex :
   rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
   rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
   cases outputComponent <;> cases inputComponent
-  · cases outputPort
-    cases inputPort
-    fin_cases outputMode <;> fin_cases inputMode
-  · cases outputPort
-    fin_cases outputMode
-    all_goals cases inputPort <;> cases inputMode
-  · cases outputPort <;> cases outputMode
-    all_goals cases inputPort
-    all_goals fin_cases inputMode
-  · cases outputPort <;> cases outputMode <;>
-      cases inputPort <;> cases inputMode
+  all_goals
+    fin_cases outputPort <;> fin_cases outputMode <;>
+      fin_cases inputPort <;> fin_cases inputMode
   all_goals
     simp [ScatteringComponentFamily.indexedScatteringMatrix,
       physicalPortSuite9bHostileFamily, physicalPortSuite9bHostileScattering,
