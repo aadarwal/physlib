@@ -484,8 +484,16 @@ lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
   rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
   rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
   cases outputComponent <;> cases inputComponent
-  all_goals
-    cases outputPort <;> cases outputMode <;>
+  · cases outputPort
+    cases inputPort
+    fin_cases outputMode <;> fin_cases inputMode
+  · cases outputPort
+    fin_cases outputMode
+    all_goals cases inputPort <;> cases inputMode
+  · cases outputPort <;> cases outputMode
+    all_goals cases inputPort
+    all_goals fin_cases inputMode
+  · cases outputPort <;> cases outputMode <;>
       cases inputPort <;> cases inputMode
   all_goals
     simp [ScatteringComponentFamily.indexedScatteringMatrix,
@@ -531,6 +539,9 @@ lemma physicalPortSuite9b_indexed_action :
   rw [physicalPortSuite9b_indexedScatteringMatrix_eq_explicit]
   apply WithLp.ofLp_injective 2
   funext output
+  simp only [ModeTransform.toLinearMap, Matrix.toLpLin_apply,
+    Matrix.mulVec, dotProduct]
+  rw [physicalPortSuite9b_sum_indexed]
   rcases output with ⟨component, ⟨port, mode⟩⟩
   cases component
   · cases port
@@ -544,8 +555,12 @@ lemma physicalPortSuite9b_indexed_action :
         physicalPortSuite9bInterfaceRawOutput,
         PlanarDielectricInterface.channelEquiv,
         PlanarDielectricInterface.sideEquiv, ModeAmplitude.directSum,
-        ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-        dotProduct, physicalPortSuite9b_sum_indexed]
+        physicalPortSuite9bPolarizationZeroIndexed,
+        physicalPortSuite9bPolarizationOneIndexed,
+        physicalPortSuite9bInterfaceNegativeSIndexed,
+        physicalPortSuite9bInterfacePositiveSIndexed,
+        physicalPortSuite9bInterfaceNegativePIndexed,
+        physicalPortSuite9bInterfacePositivePIndexed]
     all_goals ring_nf
   · cases port <;> cases mode
     all_goals
@@ -557,8 +572,12 @@ lemma physicalPortSuite9b_indexed_action :
         physicalPortSuite9bInterfaceRawOutput,
         PlanarDielectricInterface.channelEquiv,
         PlanarDielectricInterface.sideEquiv, ModeAmplitude.directSum,
-        ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
-        dotProduct, physicalPortSuite9b_sum_indexed]
+        physicalPortSuite9bPolarizationZeroIndexed,
+        physicalPortSuite9bPolarizationOneIndexed,
+        physicalPortSuite9bInterfaceNegativeSIndexed,
+        physicalPortSuite9bInterfacePositiveSIndexed,
+        physicalPortSuite9bInterfaceNegativePIndexed,
+        physicalPortSuite9bInterfacePositivePIndexed]
     all_goals ring_nf
 
 /-- The mixed input in aggregate component-owned physical-channel coordinates. -/
@@ -720,8 +739,16 @@ lemma physicalPortSuite9b_hostile_indexedScatteringMatrix_eq_reindex :
   rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
   rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
   cases outputComponent <;> cases inputComponent
-  all_goals
-    cases outputPort <;> cases outputMode <;>
+  · cases outputPort
+    cases inputPort
+    fin_cases outputMode <;> fin_cases inputMode
+  · cases outputPort
+    fin_cases outputMode
+    all_goals cases inputPort <;> cases inputMode
+  · cases outputPort <;> cases outputMode
+    all_goals cases inputPort
+    all_goals fin_cases inputMode
+  · cases outputPort <;> cases outputMode <;>
       cases inputPort <;> cases inputMode
   all_goals
     simp [ScatteringComponentFamily.indexedScatteringMatrix,
@@ -730,8 +757,7 @@ lemma physicalPortSuite9b_hostile_indexedScatteringMatrix_eq_reindex :
       physicalPortSuite9bHostileInterfaceScattering,
       physicalPortSuite9bIndexedNegativePolarizationSwap,
       physicalPortSuite9bInterfaceNegativePolarizationSwap,
-      ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
-      Matrix.blockDiagonal'_apply]
+      ModeTransform.reindex_apply, Matrix.blockDiagonal'_apply]
 
 /-- The hostile family instead gives the p value `7/5` at negative-side s. -/
 lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
