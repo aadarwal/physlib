@@ -159,7 +159,7 @@ inductive ExactReferenceKind where
   | matrix
   deriving DecidableEq
 
-/-- Serializable data obtained only through a proof-carrying reference constructor. -/
+/-- Serializable transport data for an exact scalar or matrix reference. -/
 structure ExactReference where
   /-- Stable comparison-contract row identifier. -/
   rowId : String
