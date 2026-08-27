@@ -323,29 +323,59 @@ lemma crowRegressionExternalAmbientChannel_not_connected
   · rcases right with ⟨ring, kind⟩
     cases kind <;> rcases localChannel with mode | mode <;> cases mode
     all_goals
-      simp only [crowRegressionRightForward_left_embedding,
-        crowRegressionRightForward_right_embedding,
-        crowRegressionRightReturn_left_embedding,
-        crowRegressionRightReturn_right_embedding] at hChannel
+      first
+      | change crowRegressionConnections.channelEmbedding
+            (crowRegressionRightConnectedChannel ring false .left) = _ at hChannel
+        rw [crowRegressionRightForward_left_embedding] at hChannel
+      | change crowRegressionConnections.channelEmbedding
+            (crowRegressionRightConnectedChannel ring false .right) = _ at hChannel
+        rw [crowRegressionRightForward_right_embedding] at hChannel
+      | change crowRegressionConnections.channelEmbedding
+            (crowRegressionRightConnectedChannel ring true .left) = _ at hChannel
+        rw [crowRegressionRightReturn_left_embedding] at hChannel
+      | change crowRegressionConnections.channelEmbedding
+            (crowRegressionRightConnectedChannel ring true .right) = _ at hChannel
+        rw [crowRegressionRightReturn_right_embedding] at hChannel
+    all_goals
+      have hLabel := congrArg
+        (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
       cases port <;>
         simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
           crowRegressionForwardArcChannel, crowRegressionReturnArcChannel,
-          crowRegressionChannel] at hChannel
+          crowRegressionChannel, couplerPort, forwardArcPort, returnArcPort] at hLabel
   · rcases forwardOrReturn with forwardIndex | returnIndex
     · rcases localChannel with mode | mode <;> cases mode
       all_goals
-        simp only [crowRegressionForward_left_embedding,
-          crowRegressionForward_right_embedding] at hChannel
+        first
+        | change crowRegressionConnections.channelEmbedding
+              (crowRegressionForwardConnectedChannel forwardIndex .left) = _ at hChannel
+          rw [crowRegressionForward_left_embedding] at hChannel
+        | change crowRegressionConnections.channelEmbedding
+              (crowRegressionForwardConnectedChannel forwardIndex .right) = _ at hChannel
+          rw [crowRegressionForward_right_embedding] at hChannel
+      all_goals
+        have hLabel := congrArg
+          (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
         cases port <;>
           simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
-            crowRegressionForwardArcChannel, crowRegressionChannel] at hChannel
+            crowRegressionForwardArcChannel, crowRegressionChannel, couplerPort,
+            forwardArcPort] at hLabel
     · rcases localChannel with mode | mode <;> cases mode
       all_goals
-        simp only [crowRegressionReturn_left_embedding,
-          crowRegressionReturn_right_embedding] at hChannel
+        first
+        | change crowRegressionConnections.channelEmbedding
+              (crowRegressionReturnConnectedChannel returnIndex .left) = _ at hChannel
+          rw [crowRegressionReturn_left_embedding] at hChannel
+        | change crowRegressionConnections.channelEmbedding
+              (crowRegressionReturnConnectedChannel returnIndex .right) = _ at hChannel
+          rw [crowRegressionReturn_right_embedding] at hChannel
+      all_goals
+        have hLabel := congrArg
+          (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
         cases port <;>
           simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
-            crowRegressionReturnArcChannel, crowRegressionChannel] at hChannel
+            crowRegressionReturnArcChannel, crowRegressionChannel, couplerPort,
+            returnArcPort] at hLabel
 
 /-- One typed external channel at the concrete CROW boundary. -/
 def crowRegressionExternalChannel (port : CrowRegressionExternalPort) :
