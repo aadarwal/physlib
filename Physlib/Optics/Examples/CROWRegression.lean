@@ -904,6 +904,256 @@ lemma crowRegression_chainCoordinates_eq_zero
   exact ⟨hReturnEndZero, hLaunchEndZero, hLaunchMiddleZero, hReturnMiddleZero,
     hLaunchNextZero, hOutputEndZero, hReturnNextZero, hReturnLinkZero⟩
 
+/-- Every homogeneous feedback state of the exact two-ring fixture is zero. -/
+lemma crowRegression_feedbackFixedPoint_eq_zero
+    (incident : ModeAmplitude (netlist crowRegressionParameters).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist crowRegressionParameters).OutgoingIndex)
+    (hScattering : outgoing =
+      (netlist crowRegressionParameters).scatteringTransform.toLinearMap incident)
+    (hAssembly : incident =
+      crowRegressionConnections.incidentAssembly outgoing 0) :
+    incident = 0 := by
+  have hConnected (channel : crowRegressionConnections.Channel) :
+      incident (Incident.mk (crowRegressionConnections.channelEmbedding channel)) =
+        outgoing (Outgoing.mk (crowRegressionConnections.channelEmbedding
+          (crowRegressionConnections.mateEquiv channel))) := by
+    have hCoordinate := congrArg (fun amplitude =>
+      amplitude (Incident.mk (crowRegressionConnections.channelEmbedding channel))) hAssembly
+    simpa only [crowRegressionConnections.incidentAssembly_apply_connected_channel] using
+      hCoordinate
+  have hExternal (port : CrowRegressionExternalPort) :
+      incident (Incident.mk (crowRegressionExternalAmbientChannel port)) = 0 := by
+    have hCoordinate := congrArg (fun amplitude =>
+      amplitude (Incident.mk (crowRegressionExternalAmbientChannel port))) hAssembly
+    simpa [crowRegressionExternalChannel] using hCoordinate
+  have hForwardLaunchRoute (ring : Fin 2) :
+      incident (Incident.mk (crowRegressionForwardArcChannel ring .left)) =
+        outgoing (Outgoing.mk
+          (crowRegressionCouplerChannel ring.castSucc .rightSecond)) := by
+    simpa only [crowRegressionForward_right_embedding,
+      crowRegressionForwardConnectedChannel_mate_right,
+      crowRegressionForward_left_embedding] using
+        hConnected (crowRegressionForwardConnectedChannel ring .right)
+  have hForwardFinishRoute (ring : Fin 2) :
+      incident (Incident.mk (crowRegressionCouplerChannel ring.succ .leftFirst)) =
+        outgoing (Outgoing.mk (crowRegressionForwardArcChannel ring .right)) := by
+    simpa only [crowRegressionRightForward_right_embedding,
+      crowRegressionRightConnectedChannel_mate_right,
+      crowRegressionRightForward_left_embedding] using
+        hConnected (crowRegressionRightConnectedChannel ring false .right)
+  have hReturnLaunchRoute (ring : Fin 2) :
+      incident (Incident.mk (crowRegressionReturnArcChannel ring .left)) =
+        outgoing (Outgoing.mk (crowRegressionCouplerChannel ring.succ .rightFirst)) := by
+    simpa only [crowRegressionRightReturn_right_embedding,
+      crowRegressionRightConnectedChannel_mate_right,
+      crowRegressionRightReturn_left_embedding] using
+        hConnected (crowRegressionRightConnectedChannel ring true .right)
+  have hReturnFinishRoute (ring : Fin 2) :
+      incident (Incident.mk
+          (crowRegressionCouplerChannel ring.castSucc .leftSecond)) =
+        outgoing (Outgoing.mk (crowRegressionReturnArcChannel ring .right)) := by
+    simpa only [crowRegressionReturn_right_embedding,
+      crowRegressionReturnConnectedChannel_mate_right,
+      crowRegressionReturn_left_embedding] using
+        hConnected (crowRegressionReturnConnectedChannel ring .right)
+  have hReverseForwardLaunchRoute (ring : Fin 2) :
+      incident (Incident.mk (crowRegressionForwardArcChannel ring .right)) =
+        outgoing (Outgoing.mk (crowRegressionCouplerChannel ring.succ .leftFirst)) := by
+    simpa only [crowRegressionRightForward_left_embedding,
+      crowRegressionRightConnectedChannel_mate_left,
+      crowRegressionRightForward_right_embedding] using
+        hConnected (crowRegressionRightConnectedChannel ring false .left)
+  have hReverseForwardFinishRoute (ring : Fin 2) :
+      incident (Incident.mk
+          (crowRegressionCouplerChannel ring.castSucc .rightSecond)) =
+        outgoing (Outgoing.mk (crowRegressionForwardArcChannel ring .left)) := by
+    simpa only [crowRegressionForward_left_embedding,
+      crowRegressionForwardConnectedChannel_mate_left,
+      crowRegressionForward_right_embedding] using
+        hConnected (crowRegressionForwardConnectedChannel ring .left)
+  have hReverseReturnLaunchRoute (ring : Fin 2) :
+      incident (Incident.mk (crowRegressionReturnArcChannel ring .right)) =
+        outgoing (Outgoing.mk
+          (crowRegressionCouplerChannel ring.castSucc .leftSecond)) := by
+    simpa only [crowRegressionReturn_left_embedding,
+      crowRegressionReturnConnectedChannel_mate_left,
+      crowRegressionReturn_right_embedding] using
+        hConnected (crowRegressionReturnConnectedChannel ring .left)
+  have hReverseReturnFinishRoute (ring : Fin 2) :
+      incident (Incident.mk (crowRegressionCouplerChannel ring.succ .rightFirst)) =
+        outgoing (Outgoing.mk (crowRegressionReturnArcChannel ring .left)) := by
+    simpa only [crowRegressionRightReturn_left_embedding,
+      crowRegressionRightConnectedChannel_mate_left,
+      crowRegressionRightReturn_right_embedding] using
+        hConnected (crowRegressionRightConnectedChannel ring true .left)
+  have hCoupler0 := crowRegression_coupler_equations 0 incident outgoing hScattering
+  have hCoupler1 := crowRegression_coupler_equations 1 incident outgoing hScattering
+  have hCoupler2 := crowRegression_coupler_equations 2 incident outgoing hScattering
+  have hForward0 := crowRegression_forwardArc_equations 0 incident outgoing hScattering
+  have hForward1 := crowRegression_forwardArc_equations 1 incident outgoing hScattering
+  have hReturn0 := crowRegression_returnArc_equations 0 incident outgoing hScattering
+  have hReturn1 := crowRegression_returnArc_equations 1 incident outgoing hScattering
+  norm_num [crowRegressionParameters, crowRegressionEndCoupler,
+    crowRegressionMiddleCoupler, crowRegressionHalfArc,
+    DirectionalCoupler.crossCoefficient, MatchedPropagation.transmissionCoefficient,
+    MatchedPropagation.carrierPhaseFactor] at hCoupler0 hCoupler1 hCoupler2
+      hForward0 hForward1 hReturn0 hReturn1
+  have hLeftInputZero := hExternal .leftInput
+  have hLeftOutputZero := hExternal .leftOutput
+  have hRightInputZero := hExternal .rightInput
+  have hRightOutputZero := hExternal .rightOutput
+  have hForwardLaunchEnd :
+      incident (Incident.mk (crowRegressionForwardArcChannel 0 .left)) =
+        (3 / 5) * incident
+          (Incident.mk (crowRegressionCouplerChannel 0 .leftSecond)) := by
+    rw [hForwardLaunchRoute 0, hCoupler0.2.1, hLeftInputZero]
+    ring
+  have hForwardLaunchMiddle :
+      incident (Incident.mk (crowRegressionCouplerChannel 1 .leftFirst)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionForwardArcChannel 0 .left)) := by
+    rw [hForwardFinishRoute 0, hForward0.1]
+  have hForwardReturnMiddle :
+      incident (Incident.mk (crowRegressionReturnArcChannel 0 .left)) =
+        (5 / 13) * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .leftFirst)) -
+          (12 / 13) * Complex.I * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .leftSecond)) := by
+    rw [hReturnLaunchRoute 0, hCoupler1.1]
+    ring
+  have hForwardLaunchNext :
+      incident (Incident.mk (crowRegressionForwardArcChannel 1 .left)) =
+        -(12 / 13) * Complex.I * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .leftFirst)) +
+          (5 / 13) * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .leftSecond)) := by
+    rw [hForwardLaunchRoute 1, hCoupler1.2.1]
+    ring
+  have hForwardOutputEnd :
+      incident (Incident.mk (crowRegressionCouplerChannel 2 .leftFirst)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionForwardArcChannel 1 .left)) := by
+    rw [hForwardFinishRoute 1, hForward1.1]
+  have hForwardReturnNext :
+      incident (Incident.mk (crowRegressionReturnArcChannel 1 .left)) =
+        (3 / 5) * incident
+          (Incident.mk (crowRegressionCouplerChannel 2 .leftFirst)) := by
+    rw [hReturnLaunchRoute 1, hCoupler2.1, hRightInputZero]
+    ring
+  have hForwardReturnLink :
+      incident (Incident.mk (crowRegressionCouplerChannel 1 .leftSecond)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionReturnArcChannel 1 .left)) := by
+    rw [hReturnFinishRoute 1, hReturn1.1]
+  have hForwardReturnEnd :
+      incident (Incident.mk (crowRegressionCouplerChannel 0 .leftSecond)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionReturnArcChannel 0 .left)) := by
+    rw [hReturnFinishRoute 0, hReturn0.1]
+  have hForwardZero := crowRegression_chainCoordinates_eq_zero
+    (incident (Incident.mk (crowRegressionCouplerChannel 0 .leftSecond)))
+    (incident (Incident.mk (crowRegressionForwardArcChannel 0 .left)))
+    (incident (Incident.mk (crowRegressionCouplerChannel 1 .leftFirst)))
+    (incident (Incident.mk (crowRegressionReturnArcChannel 0 .left)))
+    (incident (Incident.mk (crowRegressionForwardArcChannel 1 .left)))
+    (incident (Incident.mk (crowRegressionCouplerChannel 2 .leftFirst)))
+    (incident (Incident.mk (crowRegressionReturnArcChannel 1 .left)))
+    (incident (Incident.mk (crowRegressionCouplerChannel 1 .leftSecond)))
+    hForwardLaunchEnd hForwardLaunchMiddle hForwardReturnMiddle hForwardLaunchNext
+    hForwardOutputEnd hForwardReturnNext hForwardReturnLink hForwardReturnEnd
+  have hReverseLaunchEnd :
+      incident (Incident.mk (crowRegressionForwardArcChannel 1 .right)) =
+        (3 / 5) * incident
+          (Incident.mk (crowRegressionCouplerChannel 2 .rightFirst)) := by
+    rw [hReverseForwardLaunchRoute 1, hCoupler2.2.2.1, hRightOutputZero]
+    ring
+  have hReverseLaunchMiddle :
+      incident (Incident.mk (crowRegressionCouplerChannel 1 .rightSecond)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionForwardArcChannel 1 .right)) := by
+    rw [hReverseForwardFinishRoute 1, hForward1.2]
+  have hReverseReturnMiddle :
+      incident (Incident.mk (crowRegressionReturnArcChannel 1 .right)) =
+        (5 / 13) * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .rightSecond)) -
+          (12 / 13) * Complex.I * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .rightFirst)) := by
+    rw [hReverseReturnLaunchRoute 1, hCoupler1.2.2.2]
+    ring
+  have hReverseLaunchNext :
+      incident (Incident.mk (crowRegressionForwardArcChannel 0 .right)) =
+        -(12 / 13) * Complex.I * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .rightSecond)) +
+          (5 / 13) * incident
+            (Incident.mk (crowRegressionCouplerChannel 1 .rightFirst)) := by
+    rw [hReverseForwardLaunchRoute 0, hCoupler1.2.2.1]
+    ring
+  have hReverseOutputEnd :
+      incident (Incident.mk (crowRegressionCouplerChannel 0 .rightSecond)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionForwardArcChannel 0 .right)) := by
+    rw [hReverseForwardFinishRoute 0, hForward0.2]
+  have hReverseReturnNext :
+      incident (Incident.mk (crowRegressionReturnArcChannel 0 .right)) =
+        (3 / 5) * incident
+          (Incident.mk (crowRegressionCouplerChannel 0 .rightSecond)) := by
+    rw [hReverseReturnLaunchRoute 0, hCoupler0.2.2.2, hLeftOutputZero]
+    ring
+  have hReverseReturnLink :
+      incident (Incident.mk (crowRegressionCouplerChannel 1 .rightFirst)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionReturnArcChannel 0 .right)) := by
+    rw [hReverseReturnFinishRoute 0, hReturn0.2]
+  have hReverseReturnEnd :
+      incident (Incident.mk (crowRegressionCouplerChannel 2 .rightFirst)) =
+        (1 / 2) * incident
+          (Incident.mk (crowRegressionReturnArcChannel 1 .right)) := by
+    rw [hReverseReturnFinishRoute 1, hReturn1.2]
+  have hReverseZero := crowRegression_chainCoordinates_eq_zero
+    (incident (Incident.mk (crowRegressionCouplerChannel 2 .rightFirst)))
+    (incident (Incident.mk (crowRegressionForwardArcChannel 1 .right)))
+    (incident (Incident.mk (crowRegressionCouplerChannel 1 .rightSecond)))
+    (incident (Incident.mk (crowRegressionReturnArcChannel 1 .right)))
+    (incident (Incident.mk (crowRegressionForwardArcChannel 0 .right)))
+    (incident (Incident.mk (crowRegressionCouplerChannel 0 .rightSecond)))
+    (incident (Incident.mk (crowRegressionReturnArcChannel 0 .right)))
+    (incident (Incident.mk (crowRegressionCouplerChannel 1 .rightFirst)))
+    hReverseLaunchEnd hReverseLaunchMiddle hReverseReturnMiddle hReverseLaunchNext
+    hReverseOutputEnd hReverseReturnNext hReverseReturnLink hReverseReturnEnd
+  rcases hForwardZero with ⟨hC0L2, hF0L, hC1L1, hR0L, hF1L, hC2L1, hR1L, hC1L2⟩
+  rcases hReverseZero with ⟨hC2R1, hF1R, hC1R2, hR1R, hF0R, hC0R2, hR0R, hC1R1⟩
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  change incident endpoint = 0
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
+  · fin_cases interface <;> cases port <;> cases mode
+    all_goals first
+      | simpa [crowRegressionCouplerChannel] using hLeftInputZero
+      | simpa [crowRegressionCouplerChannel] using hC0L2
+      | simpa [crowRegressionCouplerChannel] using hLeftOutputZero
+      | simpa [crowRegressionCouplerChannel] using hC0R2
+      | simpa [crowRegressionCouplerChannel] using hC1L1
+      | simpa [crowRegressionCouplerChannel] using hC1L2
+      | simpa [crowRegressionCouplerChannel] using hC1R1
+      | simpa [crowRegressionCouplerChannel] using hC1R2
+      | simpa [crowRegressionCouplerChannel] using hC2L1
+      | simpa [crowRegressionCouplerChannel] using hRightInputZero
+      | simpa [crowRegressionCouplerChannel] using hC2R1
+      | simpa [crowRegressionCouplerChannel] using hRightOutputZero
+  · fin_cases ring <;> cases port <;> cases mode
+    all_goals first
+      | simpa [crowRegressionForwardArcChannel] using hF0L
+      | simpa [crowRegressionForwardArcChannel] using hF0R
+      | simpa [crowRegressionForwardArcChannel] using hF1L
+      | simpa [crowRegressionForwardArcChannel] using hF1R
+  · fin_cases ring <;> cases port <;> cases mode
+    all_goals first
+      | simpa [crowRegressionReturnArcChannel] using hR0L
+      | simpa [crowRegressionReturnArcChannel] using hR0R
+      | simpa [crowRegressionReturnArcChannel] using hR1L
+      | simpa [crowRegressionReturnArcChannel] using hR1R
+
 /-!
 ## C. Raw flat-network witness
 -/
