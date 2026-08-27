@@ -643,6 +643,80 @@ lemma crowRegression_chainCoordinates_eq_zero
 ## C. Raw flat-network witness
 -/
 
+/-- Mate routing and the restricted external input reconstruct the exact incident table. -/
+lemma crowRegression_incidentAssembly :
+    crowRegressionIncident =
+      crowRegressionConnections.incidentAssembly
+        crowRegressionOutgoing crowRegressionInput := by
+  classical
+  have hConnected (channel : crowRegressionConnections.Channel) :
+      crowRegressionConnections.incidentAssembly
+          crowRegressionOutgoing crowRegressionInput
+            (Incident.mk (crowRegressionConnections.channelEmbedding channel)) =
+        crowRegressionOutgoing
+          (Outgoing.mk (crowRegressionConnections.channelEmbedding
+            (crowRegressionConnections.mateEquiv channel))) :=
+    crowRegressionConnections.incidentAssembly_apply_connected_channel
+      crowRegressionOutgoing crowRegressionInput channel
+  have hExternal (port : CrowRegressionExternalPort) :
+      crowRegressionConnections.incidentAssembly
+          crowRegressionOutgoing crowRegressionInput
+            (Incident.mk (crowRegressionExternalAmbientChannel port)) =
+        crowRegressionInput (Incident.mk (crowRegressionExternalChannel port)) :=
+    crowRegressionConnections.incidentAssembly_apply_external
+      crowRegressionOutgoing crowRegressionInput (crowRegressionExternalChannel port)
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
+  rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
+  all_goals
+    first
+    | fin_cases interface
+    | fin_cases ring
+  all_goals cases port <;> cases mode
+  all_goals
+    first
+    | rw [hExternal .leftInput]
+      rfl
+    | rw [hExternal .leftOutput]
+      rfl
+    | rw [hExternal .rightInput]
+      rfl
+    | rw [hExternal .rightOutput]
+      rfl
+    | rw [← crowRegressionRightForward_left_embedding, hConnected,
+        (crowRegressionRightConnectedChannel_mate _ false).1,
+        crowRegressionRightForward_right_embedding]
+      rfl
+    | rw [← crowRegressionRightForward_right_embedding, hConnected,
+        (crowRegressionRightConnectedChannel_mate _ false).2,
+        crowRegressionRightForward_left_embedding]
+      rfl
+    | rw [← crowRegressionRightReturn_left_embedding, hConnected,
+        (crowRegressionRightConnectedChannel_mate _ true).1,
+        crowRegressionRightReturn_right_embedding]
+      rfl
+    | rw [← crowRegressionRightReturn_right_embedding, hConnected,
+        (crowRegressionRightConnectedChannel_mate _ true).2,
+        crowRegressionRightReturn_left_embedding]
+      rfl
+    | rw [← crowRegressionForward_left_embedding, hConnected,
+        (crowRegressionForwardConnectedChannel_mate _).1,
+        crowRegressionForward_right_embedding]
+      rfl
+    | rw [← crowRegressionForward_right_embedding, hConnected,
+        (crowRegressionForwardConnectedChannel_mate _).2,
+        crowRegressionForward_left_embedding]
+      rfl
+    | rw [← crowRegressionReturn_left_embedding, hConnected,
+        (crowRegressionReturnConnectedChannel_mate _).1,
+        crowRegressionReturn_right_embedding]
+      rfl
+    | rw [← crowRegressionReturn_right_embedding, hConnected,
+        (crowRegressionReturnConnectedChannel_mate _).2,
+        crowRegressionReturn_left_embedding]
+      rfl
+
 /-!
 ## D. Compiled response and negative controls
 -/
