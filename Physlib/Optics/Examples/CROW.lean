@@ -23,9 +23,9 @@ resonator-coupled sequence rather than a sequence of rings side-coupled to one c
 
 The component family contains `ringCount + 1` couplers and two propagation half-arcs per ring.
 The wiring is staged without changing its meaning: right-interface links are closed first, then
-the two left-interface link families. `HierarchicalNetlist.flatten_behavior_eq` identifies this
-staged relation with the flat netlist, while `PortConnectionFamily.append_assoc_transport`
-identifies the two three-stage parenthesizations after the canonical dependent-boundary transport.
+the two left-interface link families. `hierarchy_flatten_preserves_behavior` directly specializes
+the generic flattening theorem, while `PortConnectionFamily.append_assoc_transport` identifies
+the two three-stage parenthesizations after the canonical dependent-boundary transport.
 
 On a supplied proof that the finite feedback equations are well posed, `generic_spine_agrees`
 applies the generic theorem spine to the whole family at once. It identifies the flat relation
@@ -44,7 +44,7 @@ claim is made.
 
 - `CROW.netlist`: the flat directly coupled `ringCount`-ring network.
 - `CROW.connections_assoc_transport`: canonical three-stage wiring associativity.
-- `CROW.netlist_behavior_eq_staged`: hierarchical and flat relational semantics agree.
+- `CROW.hierarchy_flatten_preserves_behavior`: generic flattening preserves the relation.
 - `CROW.generic_spine_agrees`: the generic response spine on the well-posedness gate.
 
 ## iii. Table of contents
@@ -504,12 +504,6 @@ noncomputable instance hierarchyFlattenChannelFintype {ringCount : ℕ}
   change Fintype (components p).aggregatePortModeFamily.Channel
   exact componentsChannelFintype p
 
-/-- The hierarchy's inner netlist shares the finite aggregate primitive channels. -/
-noncomputable instance hierarchyInnerChannelFintype {ringCount : ℕ}
-    (p : Parameters ringCount) : Fintype (hierarchy p).innerNetlist.Channel := by
-  change Fintype (components p).aggregatePortModeFamily.Channel
-  exact componentsChannelFintype p
-
 /-- The hierarchy's inner netlist has finite right-interface connected channels. -/
 noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) :
@@ -517,81 +511,34 @@ noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
   change Fintype (rightConnections p).Channel
   exact rightChannelFintype p
 
-/-- The first-stage hierarchy has finitely many external channels. -/
-noncomputable instance hierarchyInnerExternalChannelFintype {ringCount : ℕ}
-    (p : Parameters ringCount) : Fintype (hierarchy p).inner.ExternalChannel := by
-  change Fintype { channel //
-    channel ∉ Set.range (rightConnections p).channelEmbedding }
-  classical
-  infer_instance
-
-/-- The first-stage hierarchy boundary has finite channels. -/
-noncomputable instance hierarchyInnerBoundaryChannelFintype {ringCount : ℕ}
-    (p : Parameters ringCount) :
-    Fintype (hierarchy p).inner.externalPortModeFamily.Channel :=
-  Fintype.ofEquiv _ (hierarchy p).inner.boundaryChannelEquiv.symm
-
 /-- The hierarchy's outer two-stage connection family has finite channels. -/
 noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).outer.Channel := by
   change Fintype ((forwardConnections p).append (returnConnections p)).Channel
   exact outerChannelFintype p
 
-/-- The final hierarchy boundary has finitely many external channels. -/
-noncomputable instance hierarchyOuterExternalChannelFintype {ringCount : ℕ}
-    (p : Parameters ringCount) : Fintype (hierarchy p).outer.ExternalChannel := by
-  change Fintype { channel // channel ∉ Set.range
-    ((forwardConnections p).append (returnConnections p)).channelEmbedding }
-  classical
-  infer_instance
-
-/-- The flattened hierarchy has finitely many connected channels. -/
-noncomputable instance hierarchyFlattenConnectedChannelFintype {ringCount : ℕ}
-    (p : Parameters ringCount) : Fintype (hierarchy p).flatten.ConnectedChannel := by
-  change Fintype
-    ((rightConnections p).append
-      ((forwardConnections p).append (returnConnections p))).Channel
-  exact Fintype.ofEquiv _
-    ((rightConnections p).appendChannelEquiv
-      ((forwardConnections p).append (returnConnections p))).symm
-
 /-!
 ## D. Generic theorem-spine instantiation
 -/
 
-/-- The staged hierarchical behavior of the directly coupled sequence. -/
-@[reducible]
-def stagedBehavior {ringCount : ℕ} (p : Parameters ringCount) :
-    LinearBehavior (netlist p).ExternalIncident (netlist p).ExternalOutgoing :=
-  ((hierarchy p).outer.closeBehavior
-      ((hierarchy p).innerNetlist.behavior.reindex
-        (Incident.relabelEquiv (hierarchy p).inner.boundaryChannelEquiv.symm)
-        (Outgoing.relabelEquiv (hierarchy p).inner.boundaryChannelEquiv.symm))).reindex
-    (Incident.relabelEquiv
-      ((hierarchy p).inner.appendExternalChannelEquiv (hierarchy p).outer)).symm
-    (Outgoing.relabelEquiv
-      ((hierarchy p).inner.appendExternalChannelEquiv (hierarchy p).outer)).symm
-
-/-- The flat CROW relation is exactly the generic staged hierarchical relation. -/
-lemma netlist_behavior_eq_staged {ringCount : ℕ} (p : Parameters ringCount) :
-    (netlist p).behavior = stagedBehavior p := by
-  exact (hierarchy p).flatten_behavior_eq
+/-- Generic hierarchical flattening preserves the CROW relation exactly. -/
+lemma hierarchy_flatten_preserves_behavior {ringCount : ℕ} (p : Parameters ringCount) :=
+  (hierarchy p).flatten_behavior_eq
 
 /-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
 
-The result identifies component closure, the flat relation, staged hierarchical closure, compiled
-elimination, and Mason extraction by instantiating generic API lemmas. The hierarchy equality does
-not need well-posedness; the compiled and Mason equalities do. No topology-specific elimination is
-performed, and no topology-specific bridge is added.
+The result identifies component closure, the flat relation, compiled elimination, and Mason
+extraction by instantiating generic API lemmas. `hierarchy_flatten_preserves_behavior` separately
+specializes the singular-safe hierarchy theorem. No topology-specific elimination is performed,
+and no topology-specific bridge is added.
 -/
 lemma generic_spine_agrees {ringCount : ℕ} (p : Parameters ringCount)
     (hWellPosed : (netlist p).IsWellPosed) :
     (netlist p).behavior =
         (netlist p).connections.closeBehavior (netlist p).componentBehavior ∧
-      (netlist p).behavior = stagedBehavior p ∧
       (netlist p).behavior = ((netlist p).responseTransform hWellPosed).toBehavior ∧
       (netlist p).responseTransform hWellPosed = (netlist p).masonResponseTransform := by
-  refine ⟨(netlist p).behavior_eq_closeBehavior, netlist_behavior_eq_staged p, ?_, ?_⟩
+  refine ⟨(netlist p).behavior_eq_closeBehavior, ?_, ?_⟩
   · exact ((netlist p).toBehavior_responseTransform hWellPosed).symm
   · exact (netlist p).responseTransform_eq_masonResponseTransform hWellPosed
 
