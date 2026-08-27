@@ -286,6 +286,11 @@ abbrev physicalPortSuite9bFamily : ScatteringComponentFamily where
   portFamily := physicalPortSuite9bPortFamily
   scattering := physicalPortSuite9bScattering
 
+/-- The concrete dependent indexed-channel family used by the mixed fixture. -/
+abbrev PhysicalPortSuite9bIndexedChannel :=
+  Σ component : PhysicalPortSuite9bComponent,
+    (physicalPortSuite9bPortFamily component).Channel
+
 /-- Every Phase 9b local channel family is finite. -/
 local instance physicalPortSuite9bLocalChannelFintype
     (component : PhysicalPortSuite9bComponent) :
@@ -308,7 +313,7 @@ local instance physicalPortSuite9bLocalChannelDecidableEq
 
 /-- The indexed Phase 9b channels have decidable equality. -/
 local instance physicalPortSuite9bIndexedChannelDecidableEq :
-    DecidableEq physicalPortSuite9bFamily.IndexedChannel :=
+    DecidableEq PhysicalPortSuite9bIndexedChannel :=
   Classical.decEq _
 
 /-- The aggregate Phase 9b channels are finite by indexed reassociation. -/
@@ -324,7 +329,7 @@ local instance physicalPortSuite9bAggregateChannelDecidableEq :
 
 /-- The nonzero mixed input in component-indexed owned-channel coordinates. -/
 def physicalPortSuite9bIndexedInput :
-    ModeAmplitude physicalPortSuite9bFamily.IndexedChannel :=
+    ModeAmplitude PhysicalPortSuite9bIndexedChannel :=
   WithLp.toLp 2 fun
     | ⟨.polarization, ⟨JonesMatrix.Port.aperture, coordinate⟩⟩ =>
         physicalPortSuite9bPolarizationRawInput coordinate
@@ -334,7 +339,7 @@ def physicalPortSuite9bIndexedInput :
 
 /-- The exact mixed output in component-indexed owned-channel coordinates. -/
 def physicalPortSuite9bIndexedOutput :
-    ModeAmplitude physicalPortSuite9bFamily.IndexedChannel :=
+    ModeAmplitude PhysicalPortSuite9bIndexedChannel :=
   WithLp.toLp 2 fun
     | ⟨.polarization, ⟨JonesMatrix.Port.aperture, coordinate⟩⟩ =>
         physicalPortSuite9bPolarizationRawOutput coordinate
@@ -344,47 +349,47 @@ def physicalPortSuite9bIndexedOutput :
 
 /-- Jones coordinate zero in indexed component coordinates. -/
 abbrev physicalPortSuite9bPolarizationZeroIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
+    PhysicalPortSuite9bIndexedChannel :=
   ⟨PhysicalPortSuite9bComponent.polarization,
     ⟨JonesMatrix.Port.aperture, 0⟩⟩
 
 /-- Jones coordinate one in indexed component coordinates. -/
 abbrev physicalPortSuite9bPolarizationOneIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
+    PhysicalPortSuite9bIndexedChannel :=
   ⟨PhysicalPortSuite9bComponent.polarization,
     ⟨JonesMatrix.Port.aperture, 1⟩⟩
 
 /-- The negative-side s channel in indexed component coordinates. -/
 abbrev physicalPortSuite9bInterfaceNegativeSIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
+    PhysicalPortSuite9bIndexedChannel :=
   ⟨PhysicalPortSuite9bComponent.interface,
     ⟨PlanarDielectricInterface.Port.negativeSide,
       PlanarDielectricInterface.PolarizationMode.s⟩⟩
 
 /-- The positive-side s channel in indexed component coordinates. -/
 abbrev physicalPortSuite9bInterfacePositiveSIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
+    PhysicalPortSuite9bIndexedChannel :=
   ⟨PhysicalPortSuite9bComponent.interface,
     ⟨PlanarDielectricInterface.Port.positiveSide,
       PlanarDielectricInterface.PolarizationMode.s⟩⟩
 
 /-- The negative-side p channel in indexed component coordinates. -/
 abbrev physicalPortSuite9bInterfaceNegativePIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
+    PhysicalPortSuite9bIndexedChannel :=
   ⟨PhysicalPortSuite9bComponent.interface,
     ⟨PlanarDielectricInterface.Port.negativeSide,
       PlanarDielectricInterface.PolarizationMode.p⟩⟩
 
 /-- The positive-side p channel in indexed component coordinates. -/
 abbrev physicalPortSuite9bInterfacePositivePIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
+    PhysicalPortSuite9bIndexedChannel :=
   ⟨PhysicalPortSuite9bComponent.interface,
     ⟨PlanarDielectricInterface.Port.positiveSide,
       PlanarDielectricInterface.PolarizationMode.p⟩⟩
 
 /-- A finite indexed sum is the sum of its six displayed physical coordinates. -/
 lemma physicalPortSuite9b_sum_indexed
-    (value : physicalPortSuite9bFamily.IndexedChannel → ℂ) :
+    (value : PhysicalPortSuite9bIndexedChannel → ℂ) :
     (∑ channel, value channel) =
       value physicalPortSuite9bPolarizationZeroIndexed +
         value physicalPortSuite9bPolarizationOneIndexed +
@@ -394,7 +399,7 @@ lemma physicalPortSuite9b_sum_indexed
                 value physicalPortSuite9bInterfacePositivePIndexed := by
   classical
   have hUniv :
-      (Finset.univ : Finset physicalPortSuite9bFamily.IndexedChannel) =
+      (Finset.univ : Finset PhysicalPortSuite9bIndexedChannel) =
         {physicalPortSuite9bPolarizationZeroIndexed,
           physicalPortSuite9bPolarizationOneIndexed,
           physicalPortSuite9bInterfaceNegativeSIndexed,
@@ -414,12 +419,12 @@ lemma physicalPortSuite9b_sum_indexed
     physicalPortSuite9bInterfacePositiveSIndexed,
     physicalPortSuite9bInterfaceNegativePIndexed,
     physicalPortSuite9bInterfacePositivePIndexed]
-  ring
+  ring_nf
 
 /-- The six-channel primitive matrix in indexed component coordinates. -/
 def physicalPortSuite9bExplicitIndexedTransform :
-    ModeTransform physicalPortSuite9bFamily.IndexedChannel
-      physicalPortSuite9bFamily.IndexedChannel := fun output input =>
+    ModeTransform PhysicalPortSuite9bIndexedChannel
+      PhysicalPortSuite9bIndexedChannel := fun output input =>
   match output, input with
   | ⟨.polarization, ⟨JonesMatrix.Port.aperture, 0⟩⟩,
       ⟨.polarization, ⟨JonesMatrix.Port.aperture, 0⟩⟩ => 1
@@ -459,6 +464,14 @@ def physicalPortSuite9bExplicitIndexedTransform :
         PlanarDielectricInterface.PolarizationMode.p⟩⟩ => 3 / 5
   | _, _ => 0
 
+/-- The primitive zero-axis quarter-wave plate has entries `diag(1, -I)`. -/
+lemma physicalPortSuite9b_quarterWavePlate_entries :
+    (JonesMatrix.quarterWavePlate 0).entries =
+      !![(1 : ℂ), 0; 0, -Complex.I] := by
+  rw [JonesMatrix.quarterWavePlate,
+    JonesMatrix.linearRetarder_zero_axis_entries]
+  simp
+
 /-- Unfolding the two owned laws gives the displayed primitive indexed matrix. -/
 lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
     physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform =
@@ -478,8 +491,7 @@ lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
       PlanarDielectricInterface.physicalScattering,
       ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
       JonesMatrix.scattering, JonesMatrix.channelEquiv,
-      JonesMatrix.quarterWavePlate, JonesMatrix.linearRetarder_zero_axis_entries,
-      JonesMatrix.linearRetarderPhase_pi_div_two,
+      physicalPortSuite9b_quarterWavePlate_entries,
       PlanarDielectricInterface.polarizedScattering,
       PlanarDielectricInterface.channelEquiv,
       PlanarDielectricInterface.sideEquiv, ScatteringMatrix.directSum,
@@ -670,8 +682,8 @@ lemma physicalPortSuite9b_indexed_negative_s_value :
 
 /-- Lift the one-side polarization swap to the interface block of indexed channels. -/
 def physicalPortSuite9bIndexedNegativePolarizationSwap :
-    physicalPortSuite9bFamily.IndexedChannel ≃
-      physicalPortSuite9bFamily.IndexedChannel where
+    PhysicalPortSuite9bIndexedChannel ≃
+      PhysicalPortSuite9bIndexedChannel where
   toFun
     | ⟨PhysicalPortSuite9bComponent.polarization, channel⟩ =>
       ⟨PhysicalPortSuite9bComponent.polarization, channel⟩
