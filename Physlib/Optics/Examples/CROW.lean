@@ -504,6 +504,12 @@ noncomputable instance hierarchyFlattenChannelFintype {ringCount : ℕ}
   change Fintype (components p).aggregatePortModeFamily.Channel
   exact componentsChannelFintype p
 
+/-- The hierarchy's inner netlist shares the finite aggregate primitive channels. -/
+noncomputable instance hierarchyInnerChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).innerNetlist.Channel := by
+  change Fintype (components p).aggregatePortModeFamily.Channel
+  exact componentsChannelFintype p
+
 /-- The hierarchy's inner netlist has finite right-interface connected channels. -/
 noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) :
@@ -511,19 +517,56 @@ noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
   change Fintype (rightConnections p).Channel
   exact rightChannelFintype p
 
+/-- The first-stage hierarchy has finitely many external channels. -/
+noncomputable instance hierarchyInnerExternalChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).inner.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The first-stage hierarchy boundary has finite channels. -/
+noncomputable instance hierarchyInnerBoundaryChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) :
+    Fintype (hierarchy p).inner.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ (hierarchy p).inner.boundaryChannelEquiv.symm
+
 /-- The hierarchy's outer two-stage connection family has finite channels. -/
 noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).outer.Channel := by
   change Fintype ((forwardConnections p).append (returnConnections p)).Channel
   exact outerChannelFintype p
 
+/-- The final hierarchy boundary has finitely many external channels. -/
+noncomputable instance hierarchyOuterExternalChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).outer.ExternalChannel := by
+  classical
+  infer_instance
+
+/-- The flattened hierarchy has finitely many connected channels. -/
+noncomputable instance hierarchyFlattenConnectedChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).flatten.ConnectedChannel := by
+  change Fintype
+    ((rightConnections p).append
+      ((forwardConnections p).append (returnConnections p))).Channel
+  exact Fintype.ofEquiv _
+    ((rightConnections p).appendChannelEquiv
+      ((forwardConnections p).append (returnConnections p))).symm
+
 /-!
 ## D. Generic theorem-spine instantiation
 -/
 
 /-- Generic hierarchical flattening preserves the CROW relation exactly. -/
-lemma hierarchy_flatten_preserves_behavior {ringCount : ℕ} (p : Parameters ringCount) : _ :=
-  (hierarchy p).flatten_behavior_eq
+lemma hierarchy_flatten_preserves_behavior {ringCount : ℕ} (p : Parameters ringCount) :
+    (hierarchy p).flatten.behavior =
+      ((hierarchy p).outer.closeBehavior
+          ((hierarchy p).innerNetlist.behavior.reindex
+            (Incident.relabelEquiv (hierarchy p).inner.boundaryChannelEquiv.symm)
+            (Outgoing.relabelEquiv (hierarchy p).inner.boundaryChannelEquiv.symm))).reindex
+        (Incident.relabelEquiv
+          ((hierarchy p).inner.appendExternalChannelEquiv (hierarchy p).outer)).symm
+        (Outgoing.relabelEquiv
+          ((hierarchy p).inner.appendExternalChannelEquiv (hierarchy p).outer)).symm := by
+  exact (hierarchy p).flatten_behavior_eq
 
 /-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
 
