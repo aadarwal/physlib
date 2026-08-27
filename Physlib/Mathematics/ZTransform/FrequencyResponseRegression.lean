@@ -92,6 +92,16 @@ private lemma one_sub_I_half_ne_zero : 1 - (1 / 2 : ℂ) * Complex.I ≠ 0 := by
   have hRe := congrArg Complex.re h
   norm_num at hRe
 
+private lemma two_add_I_ne_zero : (2 : ℂ) + Complex.I ≠ 0 := by
+  intro h
+  have hRe := congrArg Complex.re h
+  norm_num at hRe
+
+private lemma two_sub_I_ne_zero : (2 : ℂ) - Complex.I ≠ 0 := by
+  intro h
+  have hRe := congrArg Complex.re h
+  norm_num at hRe
+
 /-- The quadrature fixture has transfer value `-2 I` at angular frequency `π / 2`. This proof
 expands the defining coefficient primitives independently of the production transfer formula. -/
 lemma transferFunction_quadrature :
@@ -99,8 +109,8 @@ lemma transferFunction_quadrature :
       (unitCirclePoint (Real.pi / 2)) = -2 * Complex.I := by
   rw [transferFunction, quadratureUnitCirclePoint]
   norm_num [delaySymbol, quadratureFeedback, quadratureFeedforward]
-  field_simp [one_add_I_half_ne_zero]
-  ring
+  field_simp [one_add_I_half_ne_zero, two_add_I_ne_zero]
+  ring_nf
 
 /-- Replacing the reciprocal point `I⁻¹ = -I` by `I` reverses the frequency sign and changes the
 fixture value. Both sides expand from the primitive transfer and coefficient definitions. -/
@@ -112,7 +122,8 @@ lemma transferFunction_wrongUnitCircleSign_ne :
   rw [transferFunction, unitCirclePoint, Complex.exp_ofReal_mul_I]
   norm_num [delaySymbol, quadratureFeedback, quadratureFeedforward]
   intro h
-  field_simp [one_add_I_half_ne_zero, one_sub_I_half_ne_zero] at h
+  field_simp [one_add_I_half_ne_zero, one_sub_I_half_ne_zero, two_add_I_ne_zero,
+    two_sub_I_ne_zero] at h
   have hIm := congrArg Complex.im h
   norm_num at hIm
 
