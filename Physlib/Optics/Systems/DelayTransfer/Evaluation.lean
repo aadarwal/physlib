@@ -30,9 +30,10 @@ lemma is a direct specialization of
 `Physlib/Optics/Network/ParameterizedResponse.lean:583`: on the pointwise algebraic solve domain,
 evaluating the formal delays, compiling, and eliminating gives the compiled relational behavior.
 
-`laplace` and `reciprocalZ` are N5F reparameterizations. Consequently their solve and response
-domains are exact preimages, and their proof-gated responses are the original rational-delay
-response evaluated at `q_i = exp (-s * τ_i)` or `q = z⁻¹`.
+`laplace` and `reciprocalZ` are N5F reparameterizations. The former is indexed by all complex
+Laplace coordinates. The latter is indexed by `ReciprocalZCoordinate`, so `q = z⁻¹` is semantic
+only for `z ≠ 0`. Their solve and response domains are exact preimages on those parameter types.
+The named carrier domains on `ℂ` conjoin nonzeroness with formal-delay domain membership.
 
 ## ii. Key results
 
@@ -44,7 +45,9 @@ response evaluated at `q_i = exp (-s * τ_i)` or `q = z⁻¹`.
 - `RationalNetlist.laplace`: substitution by `q_i = exp (-s * τ_i)`.
 - `RationalNetlist.response_laplace`: proof-gated response commutes with that substitution.
 - `RationalNetlist.response_laplace_reindex_of_evaluation_eq`: named-value response transport.
-- `RationalNetlist.reciprocalZ`: substitution by `q = z⁻¹`.
+- `RationalNetlist.reciprocalZ`: nonzero-coordinate substitution by `q = z⁻¹`.
+- `RationalNetlist.reciprocalZSolveDomain`: the punctured solve domain viewed in `ℂ`.
+- `RationalNetlist.reciprocalZResponseDomain`: the punctured response domain viewed in `ℂ`.
 - `RationalNetlist.response_reciprocalZ`: proof-gated response commutes with that substitution.
 - `RationalNetlist.response_reciprocalZ_reindex_of_evaluation_eq`: reciprocal-Z transport.
 
@@ -394,10 +397,20 @@ lemma response_laplace_reindex_of_evaluation_eq (delays : Fin n → ℝ) {s : �
   exact (netlist.response_laplace_reindex delays hLaplace).trans
     (netlist.toParameterizedNetlist.response_congr _ hValue)
 
-/-- The one-delay N5F family obtained by substituting `q = z⁻¹`. -/
+/-- The one-delay N5F family obtained by substituting `q = z⁻¹` at nonzero Z coordinates. -/
 def reciprocalZ (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) :
-    ParameterizedNetlist ℂ :=
-  oneDelayNetlist.toParameterizedNetlist.reparameterize zInverseEvaluation
+    ParameterizedNetlist ReciprocalZCoordinate :=
+  oneDelayNetlist.toParameterizedNetlist.reparameterize zInverseEvaluationOnReciprocalZ
+
+/-- The reciprocal-Z solve domain viewed on the ambient complex carrier. -/
+def reciprocalZSolveDomain (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype oneDelayNetlist.Channel] [Fintype oneDelayNetlist.ConnectedChannel] : Set ℂ :=
+  {z | z ≠ 0 ∧ zInverseEvaluation z ∈ oneDelayNetlist.solveDomain}
+
+/-- The reciprocal-Z response domain viewed on the ambient complex carrier. -/
+def reciprocalZResponseDomain (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype oneDelayNetlist.Channel] [Fintype oneDelayNetlist.ConnectedChannel] : Set ℂ :=
+  {z | z ≠ 0 ∧ zInverseEvaluation z ∈ oneDelayNetlist.responseDomain}
 
 /-- Reciprocal-Z reparameterization leaves the external channel labels unchanged. -/
 def reciprocalZExternalChannelEquiv
@@ -439,40 +452,82 @@ local instance reciprocalZExternalChannelFintype
   classical
   infer_instance
 
-/-- The reciprocal-z solve domain is the exact preimage of the formal-delay solve domain. -/
+/-- The subtype reciprocal-Z solve domain is the exact formal-delay preimage. -/
 lemma solveDomain_reciprocalZ (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] :
-    netlist.reciprocalZ.solveDomain = zInverseEvaluation ⁻¹' netlist.solveDomain :=
-  netlist.toParameterizedNetlist.solveDomain_reparameterize zInverseEvaluation
+    netlist.reciprocalZ.solveDomain =
+      zInverseEvaluationOnReciprocalZ ⁻¹' netlist.solveDomain :=
+  netlist.toParameterizedNetlist.solveDomain_reparameterize
+    zInverseEvaluationOnReciprocalZ
 
-/-- The reciprocal-z response domain is the exact preimage of the formal-delay response domain. -/
+/-- The subtype reciprocal-Z response domain is the exact formal-delay preimage. -/
 lemma responseDomain_reciprocalZ (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] :
-    netlist.reciprocalZ.responseDomain = zInverseEvaluation ⁻¹' netlist.responseDomain :=
-  netlist.toParameterizedNetlist.responseDomain_reparameterize zInverseEvaluation
+    netlist.reciprocalZ.responseDomain =
+      zInverseEvaluationOnReciprocalZ ⁻¹' netlist.responseDomain :=
+  netlist.toParameterizedNetlist.responseDomain_reparameterize
+    zInverseEvaluationOnReciprocalZ
+
+/-- Subtype solve-domain membership is equivalent to the ambient punctured carrier view. -/
+lemma mk_mem_reciprocalZ_solveDomain_iff
+    (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
+    {z : ℂ} (hz : z ≠ 0) :
+    (⟨z, hz⟩ : ReciprocalZCoordinate) ∈ netlist.reciprocalZ.solveDomain ↔
+      z ∈ netlist.reciprocalZSolveDomain := by
+  rw [netlist.solveDomain_reciprocalZ]
+  change zInverseEvaluation z ∈ netlist.solveDomain ↔
+    z ≠ 0 ∧ zInverseEvaluation z ∈ netlist.solveDomain
+  exact ⟨fun hDomain => ⟨hz, hDomain⟩, fun hDomain => hDomain.2⟩
+
+/-- Subtype response-domain membership is equivalent to the ambient punctured carrier view. -/
+lemma mk_mem_reciprocalZ_responseDomain_iff
+    (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
+    {z : ℂ} (hz : z ≠ 0) :
+    (⟨z, hz⟩ : ReciprocalZCoordinate) ∈ netlist.reciprocalZ.responseDomain ↔
+      z ∈ netlist.reciprocalZResponseDomain := by
+  rw [netlist.responseDomain_reciprocalZ]
+  change zInverseEvaluation z ∈ netlist.responseDomain ↔
+    z ≠ 0 ∧ zInverseEvaluation z ∈ netlist.responseDomain
+  exact ⟨fun hDomain => ⟨hz, hDomain⟩, fun hDomain => hDomain.2⟩
+
+/-- The complex origin never belongs to the reciprocal-Z solve-domain carrier view. -/
+lemma zero_not_mem_reciprocalZSolveDomain
+    (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] :
+    (0 : ℂ) ∉ netlist.reciprocalZSolveDomain := by
+  simp [reciprocalZSolveDomain]
+
+/-- The complex origin never belongs to the reciprocal-Z response-domain carrier view. -/
+lemma zero_not_mem_reciprocalZResponseDomain
+    (netlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] :
+    (0 : ℂ) ∉ netlist.reciprocalZResponseDomain := by
+  simp [reciprocalZResponseDomain]
 
 /-- Proof-gated response commutes with the selected `q = z⁻¹` substitution. -/
 lemma response_reciprocalZ (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
-    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain) :
+    {z : ReciprocalZCoordinate} (hZ : z ∈ netlist.reciprocalZ.responseDomain) :
     netlist.reciprocalZ.response hZ =
       netlist.toParameterizedNetlist.response
-        (value := zInverseEvaluation z) (by
+        (value := zInverseEvaluationOnReciprocalZ z) (by
           rw [netlist.responseDomain_reciprocalZ] at hZ
           exact hZ) :=
   netlist.toParameterizedNetlist.response_reparameterize
-    (value' := z) zInverseEvaluation hZ _
+    (value' := z) zInverseEvaluationOnReciprocalZ hZ _
 
 /-- Reciprocal-Z response commutes with substitution after the unchanged external labels are
 made explicit. -/
 lemma response_reciprocalZ_reindex (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
-    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain) :
+    {z : ReciprocalZCoordinate} (hZ : z ∈ netlist.reciprocalZ.responseDomain) :
     (netlist.reciprocalZ.response hZ).reindex
         (Incident.relabelEquiv netlist.reciprocalZExternalChannelEquiv)
         (Outgoing.relabelEquiv netlist.reciprocalZExternalChannelEquiv) =
       netlist.toParameterizedNetlist.response
-        (value := zInverseEvaluation z) (by
+        (value := zInverseEvaluationOnReciprocalZ z) (by
           rw [netlist.responseDomain_reciprocalZ] at hZ
           exact hZ) := by
   have hResponse := netlist.response_reciprocalZ hZ
@@ -484,8 +539,8 @@ when an equality and its domain proof are supplied. -/
 lemma response_reciprocalZ_reindex_of_evaluation_eq
     (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
-    {z : ℂ} (hZ : z ∈ netlist.reciprocalZ.responseDomain)
-    {value : DelayTuple 1} (hEvaluation : zInverseEvaluation z = value)
+    {z : ReciprocalZCoordinate} (hZ : z ∈ netlist.reciprocalZ.responseDomain)
+    {value : DelayTuple 1} (hEvaluation : zInverseEvaluationOnReciprocalZ z = value)
     (hValue : value ∈ netlist.responseDomain) :
     (netlist.reciprocalZ.response hZ).reindex
         (Incident.relabelEquiv netlist.reciprocalZExternalChannelEquiv)

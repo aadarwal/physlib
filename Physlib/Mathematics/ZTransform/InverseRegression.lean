@@ -160,7 +160,7 @@ lemma tendsto_transform_geometricSeq {a : ℂ} (ha : a ≠ 0) :
 the ratio `a`. -/
 lemma tendsto_inversion_geometricSeq_one {a : ℂ} (ha : a ≠ 0) :
     Tendsto (fun z : ℂ => z ^ 1 *
-        (transform (geometricSeq a) z - ∑ n ∈ Finset.range 1, seriesTerm (geometricSeq a) z n))
+        (transform (geometricSeq a) z - advanceStartup (geometricSeq a) z 1))
       (cobounded ℂ) (nhds a) := by
   have h := tendsto_inversion_cobounded (two_mul_mem_ROC_geometricSeq ha) 1
   rwa [geometricSeq_natCast, pow_one] at h

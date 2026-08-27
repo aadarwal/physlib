@@ -108,7 +108,8 @@ lemma ringDCDRX01Regression_independentAnchors :
           (Sum.inr (ForwardWave.mk ())) (Sum.inr (ForwardWave.mk ())) = 1 / 7 ∧
       transform (DCDR.causalOutput DCDR.stableUnitDelayParameters unitImpulse) Complex.I =
           -(7 / 8) * Complex.I ∧
-      DCDR.rationalZEliminationResponse DCDR.stableUnitDelayParameters Complex.I
+      DCDR.rationalZEliminationResponse DCDR.stableUnitDelayParameters
+          DCDR.imaginaryUnitReciprocalZCoordinate
           DCDR.stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
       DCDR.eliminationResponse DCDR.zChainRegressionParameters
           (DCDR.isWellPosed_of_hasNonzeroDenominator DCDR.zChainRegressionParameters

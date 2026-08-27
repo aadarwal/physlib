@@ -88,7 +88,8 @@ lemma allPassZRegression_cross_semantics :
     transform
         (causalOutput
           (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) unitImpulse) 1 = 1 / 7 ∧
-      reciprocalZThroughResponse p 1 h.mem_reciprocalZResponseDomain = 1 / 7 ∧
+      reciprocalZThroughResponse p h.reciprocalZCoordinate
+        h.mem_reciprocalZResponseDomain = 1 / 7 ∧
       throughTransferSeries p = 1 / 7 ∧
       (netlist p).responseTransform
           (isWellPosed_of_hasNonzeroDenominator p h.hasNonzeroDenominator)
@@ -189,7 +190,7 @@ lemma allPassZRegression_quarterTurn_throughTransfer :
 
 /-- The quarter-turn point belongs to the raw reciprocal-Z compiled-response domain. -/
 lemma allPassZRegression_quarterTurn_reciprocalZDomain :
-    Complex.I ∈
+    quadratureReciprocalZCoordinate ∈
       (allPassRationalNetlist
         allPassZRegressionQuarterTurnParameters).reciprocalZ.responseDomain := by
   have hParameters : allPassZRegressionQuarterTurnParameters =
@@ -200,7 +201,8 @@ lemma allPassZRegression_quarterTurn_reciprocalZDomain :
 /-- The raw proof-gated reciprocal-Z response, reached through the compiled N7/N5 equations,
 has the pinned nonreal value. -/
 lemma allPassZRegression_quarterTurn_reciprocalZThroughResponse :
-    reciprocalZThroughResponse allPassZRegressionQuarterTurnParameters Complex.I
+    reciprocalZThroughResponse allPassZRegressionQuarterTurnParameters
+        quadratureReciprocalZCoordinate
         allPassZRegression_quarterTurn_reciprocalZDomain =
       75 / 109 + 32 / 109 * Complex.I := by
   simpa [reciprocalZThroughResponse, allPassZRegressionQuarterTurnParameters,
@@ -214,7 +216,8 @@ lemma allPassZRegression_quarterTurn_rawN5F_agreement :
         (allPassZRegressionQuarterTurnParameters.throughAmplitude : ℂ)
         (allPassZRegressionQuarterTurnParameters.fieldAttenuation : ℂ)
         (carrierPoint allPassZRegressionQuarterTurnParameters) =
-      reciprocalZThroughResponse allPassZRegressionQuarterTurnParameters Complex.I
+      reciprocalZThroughResponse allPassZRegressionQuarterTurnParameters
+        quadratureReciprocalZCoordinate
         allPassZRegression_quarterTurn_reciprocalZDomain := by
   rw [allPassZRegression_quarterTurn_carrierPoint,
     allPassZRegression_quarterTurn_reciprocalZThroughResponse]

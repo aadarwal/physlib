@@ -62,12 +62,12 @@ decimal pole list. The printed incoherent theorem is retained only as a non-stri
 with no implication to or from strict Schur stability. No physical resonance theorem,
 physical-frequency interpretation, material amplifier model, passivity claim, power observable,
 or DCDR BIBO theorem is asserted. S4's BIBO equivalence at
-`Physlib/Optics/Systems/DelayTransfer/Stability.lean:374-403` is only for
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:458` is only for
 `ProperCausalOnePole`; both denominators here have a nonzero quadratic coefficient.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Table 1 and Theorem 4. The corresponding HOL corpus
-audit is recorded at `HOL-CORPUS.md:307-308`.
+inventory is recorded at `HOL-CORPUS.md:316-326`.
 -/
 
 @[expose] public section
@@ -446,6 +446,22 @@ lemma unstableResponseReduction_noPoleCancellation :
 
 -/
 
+/-- The semantic reciprocal-Z coordinate `z = 1`. -/
+def oneReciprocalZCoordinate : DelayTransfer.ReciprocalZCoordinate :=
+  ⟨1, one_ne_zero⟩
+
+/-- The semantic reciprocal-Z coordinate `z = I`. -/
+def imaginaryUnitReciprocalZCoordinate : DelayTransfer.ReciprocalZCoordinate :=
+  ⟨Complex.I, Complex.I_ne_zero⟩
+
+/-- The coordinate `z = 1` selects the formal delay `q = 1`. -/
+lemma zInverseEvaluationOnReciprocalZ_one :
+    DelayTransfer.zInverseEvaluationOnReciprocalZ oneReciprocalZCoordinate =
+      (fun _ : Fin 1 => 1) := by
+  funext delay
+  norm_num [DelayTransfer.zInverseEvaluationOnReciprocalZ,
+    oneReciprocalZCoordinate, DelayTransfer.zInverseEvaluation]
+
 /-- The regular value `q = 1` belongs to the stable compiled response domain. -/
 lemma stable_one_mem_responseDomain :
     (fun _ : Fin 1 => (1 : ℂ)) ∈
@@ -466,64 +482,62 @@ lemma unstable_one_mem_responseDomain :
 
 /-- The reciprocal-Z value `z = 1` belongs to the stable proof-gated response domain. -/
 lemma stable_one_mem_reciprocalZResponseDomain :
-    (1 : ℂ) ∈ (rationalNetlist stableUnitDelayParameters).reciprocalZ.responseDomain := by
-  have hMembership := congrArg (fun domain : Set ℂ => (1 : ℂ) ∈ domain)
+    oneReciprocalZCoordinate ∈
+      (rationalNetlist stableUnitDelayParameters).reciprocalZ.responseDomain := by
+  have hMembership := congrArg
+    (fun domain : Set DelayTransfer.ReciprocalZCoordinate =>
+      oneReciprocalZCoordinate ∈ domain)
     ((rationalNetlist stableUnitDelayParameters).responseDomain_reciprocalZ)
   apply hMembership.mpr
-  have hEvaluation : DelayTransfer.zInverseEvaluation (1 : ℂ) =
-      (fun _ : Fin 1 => 1) := by
-    funext delay
-    rw [DelayTransfer.zInverseEvaluation_apply]
-    norm_num
-  change DelayTransfer.zInverseEvaluation (1 : ℂ) ∈
+  change DelayTransfer.zInverseEvaluationOnReciprocalZ oneReciprocalZCoordinate ∈
     (rationalNetlist stableUnitDelayParameters).responseDomain
-  rw [hEvaluation]
+  rw [zInverseEvaluationOnReciprocalZ_one]
   exact stable_one_mem_responseDomain
 
 /-- The reciprocal-Z value `z = 1` belongs to the active proof-gated response domain. -/
 lemma unstable_one_mem_reciprocalZResponseDomain :
-    (1 : ℂ) ∈ (rationalNetlist unstableAmplifierParameters).reciprocalZ.responseDomain := by
-  have hMembership := congrArg (fun domain : Set ℂ => (1 : ℂ) ∈ domain)
+    oneReciprocalZCoordinate ∈
+      (rationalNetlist unstableAmplifierParameters).reciprocalZ.responseDomain := by
+  have hMembership := congrArg
+    (fun domain : Set DelayTransfer.ReciprocalZCoordinate =>
+      oneReciprocalZCoordinate ∈ domain)
     ((rationalNetlist unstableAmplifierParameters).responseDomain_reciprocalZ)
   apply hMembership.mpr
-  have hEvaluation : DelayTransfer.zInverseEvaluation (1 : ℂ) =
-      (fun _ : Fin 1 => 1) := by
-    funext delay
-    rw [DelayTransfer.zInverseEvaluation_apply]
-    norm_num
-  change DelayTransfer.zInverseEvaluation (1 : ℂ) ∈
+  change DelayTransfer.zInverseEvaluationOnReciprocalZ oneReciprocalZCoordinate ∈
     (rationalNetlist unstableAmplifierParameters).responseDomain
-  rw [hEvaluation]
+  rw [zInverseEvaluationOnReciprocalZ_one]
   exact unstable_one_mem_responseDomain
 
 /-- Direct rational-data expansion gives the stable proof-gated network response at `z = 1`. -/
 lemma stable_rationalZEliminationResponse_one :
-    rationalZEliminationResponse stableUnitDelayParameters 1
+    rationalZEliminationResponse stableUnitDelayParameters oneReciprocalZCoordinate
       stable_one_mem_reciprocalZResponseDomain = -1 := by
   rw [rationalZEliminationResponse_eq_responseModel,
     DelayTransfer.RationalModel.eval_eq]
   simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
   rw [stable_responseNumeratorPolynomial_expansion,
     stable_denominatorPolynomial_expansion]
-  norm_num [stableNumerator, stableDenominator]
+  norm_num [stableNumerator, stableDenominator, oneReciprocalZCoordinate]
 
 /-- Direct rational-data expansion gives the active proof-gated network response at `z = 1`. -/
 lemma unstable_rationalZEliminationResponse_one :
-    rationalZEliminationResponse unstableAmplifierParameters 1
+    rationalZEliminationResponse unstableAmplifierParameters oneReciprocalZCoordinate
       unstable_one_mem_reciprocalZResponseDomain = -67 / 20 := by
   rw [rationalZEliminationResponse_eq_responseModel,
     DelayTransfer.RationalModel.eval_eq]
   simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
   rw [unstable_responseNumeratorPolynomial_expansion,
     unstable_denominatorPolynomial_expansion]
-  norm_num [unstableNumerator, unstableDenominator]
+  norm_num [unstableNumerator, unstableDenominator, oneReciprocalZCoordinate]
 
 /-- At `z = I`, S4's reciprocal evaluation selects the formal delay `q = -I`. -/
-lemma zInverseEvaluation_I :
-    DelayTransfer.zInverseEvaluation Complex.I =
+lemma zInverseEvaluationOnReciprocalZ_I :
+    DelayTransfer.zInverseEvaluationOnReciprocalZ imaginaryUnitReciprocalZCoordinate =
       (fun _ : Fin 1 => -Complex.I) := by
   funext delay
-  rw [DelayTransfer.zInverseEvaluation_apply, Complex.inv_I]
+  simp [DelayTransfer.zInverseEvaluationOnReciprocalZ,
+    imaginaryUnitReciprocalZCoordinate, DelayTransfer.zInverseEvaluation,
+    Complex.inv_I]
 
 /-- The asymmetric formal delay `q = -I` belongs to the stable compiled response domain. -/
 lemma stable_neg_I_mem_responseDomain :
@@ -536,14 +550,16 @@ lemma stable_neg_I_mem_responseDomain :
 
 /-- The reciprocal-Z value `z = I` belongs to the stable proof-gated response domain. -/
 lemma stable_I_mem_reciprocalZResponseDomain :
-    Complex.I ∈
+    imaginaryUnitReciprocalZCoordinate ∈
       (rationalNetlist stableUnitDelayParameters).reciprocalZ.responseDomain := by
-  have hMembership := congrArg (fun domain : Set ℂ => Complex.I ∈ domain)
+  have hMembership := congrArg
+    (fun domain : Set DelayTransfer.ReciprocalZCoordinate =>
+      imaginaryUnitReciprocalZCoordinate ∈ domain)
     ((rationalNetlist stableUnitDelayParameters).responseDomain_reciprocalZ)
   apply hMembership.mpr
-  change DelayTransfer.zInverseEvaluation Complex.I ∈
+  change DelayTransfer.zInverseEvaluationOnReciprocalZ imaginaryUnitReciprocalZCoordinate ∈
     (rationalNetlist stableUnitDelayParameters).responseDomain
-  rw [zInverseEvaluation_I]
+  rw [zInverseEvaluationOnReciprocalZ_I]
   exact stable_neg_I_mem_responseDomain
 
 /-- Direct rational-data expansion gives the formal-delay response at `q = -I`. -/
@@ -566,11 +582,11 @@ The proof deliberately instantiates the generic reciprocal-Z response transport 
 DCDR-specific `rationalZEliminationResponse_eq_responseModel` bridge.
 -/
 lemma stable_rationalZEliminationResponse_I :
-    rationalZEliminationResponse stableUnitDelayParameters Complex.I
+    rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
       stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I := by
   have hResponse :=
     (rationalNetlist stableUnitDelayParameters).response_reciprocalZ_reindex_of_evaluation_eq
-      stable_I_mem_reciprocalZResponseDomain zInverseEvaluation_I
+      stable_I_mem_reciprocalZResponseDomain zInverseEvaluationOnReciprocalZ_I
         stable_neg_I_mem_responseDomain
   have hEntry := congrArg (fun response =>
       response (Outgoing.mk (rationalOutputChannel stableUnitDelayParameters))
@@ -590,7 +606,7 @@ lemma stable_responseModel_I_expansion :
 
 /-- The non-real anchor distinguishes `q = z⁻¹` from the reversed substitution `q = z`. -/
 lemma stable_rationalZEliminationResponse_I_ne_reversed :
-    rationalZEliminationResponse stableUnitDelayParameters Complex.I
+    rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
         stable_I_mem_reciprocalZResponseDomain ≠
       (responseModel stableUnitDelayParameters).eval (fun _ : Fin 1 => Complex.I) := by
   rw [stable_rationalZEliminationResponse_I, stable_responseModel_I_expansion]
@@ -665,11 +681,25 @@ lemma unstableResponseReduction_two_mul_I_mem_actualPoles :
     unstableRationalReduction] using unstableReducedResponse_two_mul_I_mem_zPoles
 
 /-- Direct numerator substitution shows that `q = 0` is a formal-delay zero of the active
-response. It represents `z = ∞`, so it is not evidence of a finite reciprocal-Z zero. -/
+response. It is not evidence of a finite reciprocal-Z zero. -/
 lemma unstableResponseReduction_zero_mem_formalZeros :
     0 ∈ unstableResponseReduction.formalZeros := by
   change unstableNumerator.eval 0 = 0
   norm_num [unstableNumerator]
+
+/-- The active formal zero `q = 0` has no finite semantic reciprocal-Z coordinate.
+
+The statement has no projective or extended-complex interpretation.
+-/
+lemma unstableResponseReduction_zero_formal_only :
+    0 ∈ unstableResponseReduction.formalZeros ∧
+      ¬ ∃ z : DelayTransfer.ReciprocalZCoordinate,
+        DelayTransfer.zInverseEvaluationOnReciprocalZ z = (fun _ : Fin 1 => 0) := by
+  refine ⟨unstableResponseReduction_zero_mem_formalZeros, ?_⟩
+  rintro ⟨z, hZero⟩
+  have hCoordinate := congrFun hZero 0
+  change ((z : ℂ)⁻¹) = 0 at hCoordinate
+  exact (inv_ne_zero z.property) hCoordinate
 
 /-!
 

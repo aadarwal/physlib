@@ -22,9 +22,10 @@ unilateral transform because the transform never sees a negative index, yet dela
 sample moves that sample to index `0` and produces transform `1`. The right-shift law therefore
 fails without the causality hypothesis, and by exactly the amount that the hypothesis excludes.
 
-The second negative example removes the startup sum. The unit impulse advanced by one sample has
-zero unilateral transform, while `z` times the transform of the unit impulse is `z`. The
-left-shift law therefore fails without its explicit startup term at every nonzero `z`.
+The second negative example removes or mis-parenthesizes the startup sum. The unit impulse
+advanced by one sample has zero unilateral transform, while `z` times the transform of the unit
+impulse is `z`. At `z = 2`, the named startup value is exactly `1`, the corrected expression is
+`2 * (1 - 1) = 0`, and the false placement is `2 * 1 - 1 = 1`.
 
 The remaining examples are positive: a two-tap finite-impulse-response sequence has the expected
 polynomial transform in `z⁻¹`, and scaling in the `z` domain moves a delayed impulse in the
@@ -36,6 +37,8 @@ direction that the law asserts rather than the reciprocal direction.
   the causality hypothesis.
 - `Physlib.ZTransform.transform_advance_ne_without_startup`: the left-shift law is false without
   its startup sum.
+- `Physlib.ZTransform.transform_advance_unitImpulse_two_ne_wrong_parentheses`: at `z = 2`, moving
+  the startup contribution outside the product changes the value from `0` to `1`.
 - `Physlib.ZTransform.transform_twoTap`: a two-tap sequence transforms to `b₀ + b₁ * z⁻¹`.
 - `Physlib.ZTransform.transform_zScale_delay_unitImpulse`: `z`-domain scaling of a delayed
   impulse produces `a * z⁻¹`, not `a⁻¹ * z⁻¹`.
@@ -140,8 +143,26 @@ lemma transform_advance_unitImpulse (z : ℂ) : transform (advance 1 unitImpulse
 /-- The left-shift law holds for the unit impulse exactly because of its startup term. -/
 lemma transform_advance_unitImpulse_eq (z : ℂ) (hz : z ≠ 0) :
     transform (advance 1 unitImpulse) z =
-      z ^ 1 * (transform unitImpulse z - ∑ n ∈ Finset.range 1, seriesTerm unitImpulse z n) :=
+      z ^ 1 * (transform unitImpulse z - advanceStartup unitImpulse z 1) :=
   transform_advance hz 1 (summable_seriesTerm_unitImpulse z)
+
+/-- At `z = 2`, the unit impulse contributes the exact startup value `1`. -/
+lemma advanceStartup_unitImpulse_two : advanceStartup unitImpulse 2 1 = 1 := by
+  norm_num [advanceStartup, seriesTerm, unitImpulse]
+
+/-- Primitive expansion at `z = 2` gives the correctly parenthesized advance value `0`. -/
+lemma transform_advance_unitImpulse_two_correct :
+    transform (advance 1 unitImpulse) 2 =
+      (2 : ℂ) ^ 1 * (transform unitImpulse 2 - advanceStartup unitImpulse 2 1) := by
+  rw [transform_advance_unitImpulse, transform_unitImpulse, advanceStartup_unitImpulse_two]
+  norm_num
+
+/-- At `z = 2`, placing the startup contribution outside the product gives `1`, not `0`. -/
+lemma transform_advance_unitImpulse_two_ne_wrong_parentheses :
+    transform (advance 1 unitImpulse) 2 ≠
+      (2 : ℂ) ^ 1 * transform unitImpulse 2 - advanceStartup unitImpulse 2 1 := by
+  rw [transform_advance_unitImpulse, transform_unitImpulse, advanceStartup_unitImpulse_two]
+  norm_num
 
 /-- Dropping the startup sum makes the left-shift law false at every nonzero `z`: the advanced
 transform is `0` while `z` times the original transform is `z`. -/

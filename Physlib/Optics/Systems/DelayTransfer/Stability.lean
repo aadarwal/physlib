@@ -16,8 +16,9 @@ public import Physlib.Optics.Systems.DelayTransfer.Poles
 The numerator and denominator roots of an abstract `ReducedRationalResponse` are finite because
 both complex polynomials are nonzero. Their distinct-root counts are bounded by the corresponding
 polynomial degrees. Under `q = z⁻¹`, `zPoles` removes the formal root `q = 0` and inverts the
-remaining denominator roots; `q = 0` has no finite reciprocal coordinate and formally represents
-`z = ∞`. Its cardinality has the same degree bound. `IsSchurStable` says literally that every
+remaining denominator roots; `q = 0` has no finite reciprocal coordinate. This
+complex-coordinate API supplies no projective interpretation. The reciprocal root set has the
+same degree bound. `IsSchurStable` says literally that every
 such reciprocal-coordinate denominator root lies inside the unit disk.
 
 The BIBO equivalence is deliberately restricted to the named nonzero proper causal one-pole
@@ -60,7 +61,7 @@ the neutral production modules `Physlib/Mathematics/ZTransform/OnePole.lean:73-1
 `Physlib/Mathematics/ZTransform/OnePoleBIBO.lean`.
 
 FMICS'15 Definition 7 calls the condition that every nonzero numerator root lies inside the unit
-disk a “resonance condition”, according to the audited statement in `goal.md:2284-2289`. Here
+disk a “resonance condition”, according to the audited statement in `goal.md:2340-2344`. Here
 `zZeros` are exactly the finite `z`-coordinate images of nonzero formal-`q` numerator roots. This
 module names only the literal predicate `AllZerosInsideUnitDisk`; it proves no physical resonance
 theorem. As stated in `Poles.lean`, no generic `ReducedRationalResponse` is certified to equal a
@@ -69,8 +70,8 @@ quotient results, not network transfer-zero or transfer-pole theorems. This modu
 Schur/BIBO equivalence for arbitrary proper causal rational responses, no reachability or
 observability theorem, and no physical-frequency, passivity, group-delay, or dispersion result.
 
-This module implements the requested “degree and finiteness bounds” at `goal.md:2274` and the
-stated-class Schur/BIBO requirement at `goal.md:2277-2278`.
+This module implements the requested “degree and finiteness bounds” at `goal.md:2329` and the
+stated-class Schur/BIBO requirement at `goal.md:2332-2333`.
 
 -/
 
@@ -149,7 +150,8 @@ lemma ncard_poles_le_natDegree (response : ReducedRationalResponse) :
 
 /-- Nonzero numerator roots in the `z` coordinate selected by `q = z⁻¹`.
 
-The omitted formal root `q = 0` has no finite reciprocal `z`; it formally represents `z = ∞`.
+The omitted formal root `q = 0` has no finite reciprocal `z`; this complex-coordinate API supplies
+no projective interpretation.
 -/
 def zZeros (response : ReducedRationalResponse) : Set ℂ :=
   {z | z ≠ 0 ∧ z⁻¹ ∈ response.zeros}
@@ -193,7 +195,8 @@ lemma card_zZeroFinset_le_natDegree (response : ReducedRationalResponse) :
 
 /-- Nonzero denominator roots in the `z` coordinate selected by `q = z⁻¹`.
 
-The omitted formal root `q = 0` has no finite reciprocal `z`; it formally represents `z = ∞`.
+The omitted formal root `q = 0` has no finite reciprocal `z`; this complex-coordinate API supplies
+no projective interpretation.
 -/
 def zPoles (response : ReducedRationalResponse) : Set ℂ :=
   {z | z ≠ 0 ∧ z⁻¹ ∈ response.poles}

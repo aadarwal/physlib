@@ -21,6 +21,10 @@ negative indices in the domain is what allows the delay and advance laws below t
 without silently discarding startup data: the advance law produces an explicit finite startup
 sum, and the delay law is stated under an explicit causality hypothesis rather than assumed.
 
+The finite startup sum records samples removed by an advance; it is not an initial-state model.
+This file proves no nonzero-state recurrence theorem. Any such extension must expose a separately
+named `initialStateContribution` rather than hide initial data in the transform law.
+
 Two regions of convergence are defined and deliberately kept apart. `ROC f` is the set of nonzero
 `z` at which the term sequence is `Summable`, which for a complex-valued series is absolute
 convergence. `condROC f` is the set of nonzero `z` at which the sequence of partial sums over
@@ -44,6 +48,7 @@ summability hypothesis it needs, and no theorem in this file asserts a value at 
 - `Physlib.ZTransform.transform_add`, `Physlib.ZTransform.transform_const_mul`: linearity.
 - `Physlib.ZTransform.transform_delay`: the right-shift law
   `z⁻¹ ^ m * transform f z` for a causal sequence.
+- `Physlib.ZTransform.advanceStartup`: the finite startup contribution removed by an advance.
 - `Physlib.ZTransform.transform_advance`: the left-shift law with its explicit startup sum.
 - `Physlib.ZTransform.transform_firstDifference`: the first-difference law `(1 - z⁻¹)`.
 - `Physlib.ZTransform.transform_zScale`: scaling in the `z` domain.
@@ -313,6 +318,10 @@ def delay (m : ℕ) (f : ℤ → ℂ) : ℤ → ℂ := fun n => f (n - m)
 /-- The left shift, or time advance, of a sequence by `m` samples. -/
 def advance (m : ℕ) (f : ℤ → ℂ) : ℤ → ℂ := fun n => f (n + m)
 
+/-- The finite startup contribution removed before advancing a unilateral transform. -/
+def advanceStartup (f : ℤ → ℂ) (z : ℂ) (m : ℕ) : ℂ :=
+  ∑ n ∈ Finset.range m, seriesTerm f z n
+
 /-- Delaying a causal sequence keeps it causal. -/
 lemma IsCausal.delay {f : ℤ → ℂ} (hf : IsCausal f) (m : ℕ) : IsCausal (delay m f) := by
   intro n hn
@@ -372,7 +381,7 @@ transform by `z ^ m` after removing the explicit startup sum of the first `m` sa
 lemma transform_advance {f : ℤ → ℂ} {z : ℂ} (hz : z ≠ 0) (m : ℕ)
     (hs : Summable (seriesTerm f z)) :
     transform (advance m f) z =
-      z ^ m * (transform f z - ∑ n ∈ Finset.range m, seriesTerm f z n) := by
+      z ^ m * (transform f z - advanceStartup f z m) := by
   have hsplit := hs.sum_add_tsum_nat_add (f := seriesTerm f z) m
   have hpowinv : z⁻¹ ^ m * z ^ m = 1 := by
     rw [← mul_pow, inv_mul_cancel₀ hz, one_pow]
@@ -382,9 +391,10 @@ lemma transform_advance {f : ℤ → ℂ} {z : ℂ} (hz : z ≠ 0) (m : ℕ)
     rw [← seriesTerm_advance_eq hz m n, ← mul_assoc, hpowinv, one_mul]
   have hpow : z ^ m * z⁻¹ ^ m = 1 := by
     rw [← mul_pow, mul_inv_cancel₀ hz, one_pow]
-  have hrec : transform f z - ∑ n ∈ Finset.range m, seriesTerm f z n =
+  have hrec : transform f z - advanceStartup f z m =
       z⁻¹ ^ m * transform (advance m f) z := by
-    rw [← hshift, transform, ← hsplit]; ring
+    rw [advanceStartup, ← hshift, transform, ← hsplit]
+    ring
   rw [hrec, ← mul_assoc, hpow, one_mul]
 
 /-!

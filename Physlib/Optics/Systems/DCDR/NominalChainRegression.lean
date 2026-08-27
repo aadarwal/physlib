@@ -632,7 +632,7 @@ This conjunction does not invoke `zChainCrossSemantics_agree` or
 lemma zChainRegression_independent_common_point :
     transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
         -(7 / 8) * Complex.I ∧
-      rationalZEliminationResponse stableUnitDelayParameters Complex.I
+      rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
           stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
       eliminationResponse zChainRegressionParameters
           (isWellPosed_of_hasNonzeroDenominator zChainRegressionParameters

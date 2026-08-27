@@ -48,6 +48,7 @@ evaluation, pointwise compilation, S2 wiring, and N5 elimination.
 - `allPassRationalNetlist_antiresonance_response_entry`: compiled half-turn response `11/13`.
 - `allPassRationalNetlist_quadrature_response_entry`: compiled non-real response.
 - `laplaceEvaluation_quadrature`, `zInverseEvaluation_quadrature`: both conventions give `-I`.
+- `quadratureReciprocalZCoordinate`: the nonzero `z = I` coordinate used by reciprocal-Z N5F.
 - `allPassRationalNetlist_laplace_quadrature_response_entry`: mapped Laplace response anchor.
 - `allPassRationalNetlist_reciprocalZ_quadrature_response_entry`: mapped reciprocal-Z anchor.
 
@@ -372,6 +373,33 @@ lemma zInverseEvaluation_quadrature :
   funext i
   rw [zInverseEvaluation_apply, Complex.inv_I]
 
+/-- The quadrature point `z = I`, packaged with the nonzero gate required by reciprocal-Z N5F. -/
+def quadratureReciprocalZCoordinate : ReciprocalZCoordinate :=
+  ⟨Complex.I, Complex.I_ne_zero⟩
+
+/-- The semantic quadrature coordinate retains the exact convention anchor `q = -I`. -/
+lemma zInverseEvaluationOnReciprocalZ_quadrature :
+    zInverseEvaluationOnReciprocalZ quadratureReciprocalZCoordinate =
+      (fun _ => -Complex.I) := by
+  funext i
+  simp [zInverseEvaluationOnReciprocalZ, quadratureReciprocalZCoordinate,
+    zInverseEvaluation, Complex.inv_I]
+
+/-- The raw totalized helper sends `z = 0` to the zero formal-delay tuple. -/
+lemma zInverseEvaluation_zero_expansion :
+    zInverseEvaluation 0 = (fun _ : Fin 1 => 0) := by
+  funext i
+  norm_num [zInverseEvaluation]
+
+/-- The semantic quadrature coordinate cannot map to the zero formal-delay tuple. -/
+lemma zInverseEvaluationOnReciprocalZ_quadrature_ne_zero :
+    zInverseEvaluationOnReciprocalZ quadratureReciprocalZCoordinate ≠
+      (fun _ : Fin 1 => 0) := by
+  rw [zInverseEvaluationOnReciprocalZ_quadrature]
+  intro hZero
+  have hCoordinate := congrFun hZero 0
+  exact Complex.I_ne_zero (neg_eq_zero.mp hCoordinate)
+
 /-- The unit-delay quadrature Laplace point belongs to the mapped proof-gated response domain. -/
 lemma allPassRationalNetlistLaplaceQuadratureDomain :
     Complex.I * (Real.pi / 2 : ℝ) ∈
@@ -415,13 +443,13 @@ lemma allPassRationalNetlist_laplace_quadrature_response_entry :
 
 /-- The point `z = I` belongs to the reciprocal-Z proof-gated response domain. -/
 lemma allPassRationalNetlistReciprocalZQuadratureDomain :
-    Complex.I ∈
+    quadratureReciprocalZCoordinate ∈
       (allPassRationalNetlist
         allPassRationalQuadratureParameters).reciprocalZ.responseDomain := by
-  change zInverseEvaluation Complex.I ∈
+  change zInverseEvaluationOnReciprocalZ quadratureReciprocalZCoordinate ∈
     (allPassRationalNetlist
       allPassRationalQuadratureParameters).toParameterizedNetlist.responseDomain
-  rw [zInverseEvaluation_quadrature]
+  rw [zInverseEvaluationOnReciprocalZ_quadrature]
   exact allPassRationalQuadratureDomain
 
 /-- The proof-gated reciprocal-Z fixture carries the compiled non-real response at `z = I`. -/
@@ -442,7 +470,7 @@ lemma allPassRationalNetlist_reciprocalZ_quadrature_response_entry :
     (allPassRationalNetlist
       allPassRationalQuadratureParameters).response_reciprocalZ_reindex_of_evaluation_eq
         allPassRationalNetlistReciprocalZQuadratureDomain
-        zInverseEvaluation_quadrature allPassRationalQuadratureDomain
+        zInverseEvaluationOnReciprocalZ_quadrature allPassRationalQuadratureDomain
   have hEntry := congrArg
     (fun response => response
       (Outgoing.mk (allPassRationalFormalThroughChannel

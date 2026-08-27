@@ -30,12 +30,14 @@ equality of their pointwise evaluations. Thus the explicit denominator is domain
 second equality notion for rational functions.
 
 The physical substitutions are separate named maps. `laplaceEvaluation delays s` sends the
-`i`-th formal variable to `exp (-s * delays i)`. `zInverseEvaluation z` sends the single formal
-delay to `z⁻¹`. Neither definition identifies Laplace frequency, discrete `z`, or physical
-angular frequency.
+`i`-th formal variable to `exp (-s * delays i)`. The raw helper `zInverseEvaluation z` sends the
+single formal delay to `z⁻¹`; at `z = 0` it uses the field's totalized inverse and has no
+reciprocal-Z interpretation. Semantic reciprocal evaluation instead uses
+`ReciprocalZCoordinate = {z : ℂ // z ≠ 0}` and `zInverseEvaluationOnReciprocalZ`.
 
-At `z = 0`, `zInverseEvaluation` uses the field's totalized inverse. It has no reciprocal-Z
-interpretation there.
+Thus formal delay is `q`, the unilateral-transform coordinate is `z`, and on the named nonzero
+coordinate `q = z⁻¹`. Formal `q = 0` has no finite reciprocal preimage in this complex API.
+Neither substitution identifies Laplace frequency, discrete `z`, or physical angular frequency.
 
 ## ii. Key results
 
@@ -47,7 +49,9 @@ interpretation there.
 - `RationalModel.eval_eq_of_toRational_eq`: presentation-independent evaluation on a common
   regular domain.
 - `laplaceEvaluation`: the substitution `q_i = exp (-s * τ_i)`.
-- `zInverseEvaluation`: the one-delay substitution `q = z⁻¹`.
+- `zInverseEvaluation`: the raw totalized one-delay helper.
+- `ReciprocalZCoordinate`: the nonzero complex reciprocal-Z coordinate.
+- `zInverseEvaluationOnReciprocalZ`: the semantic substitution `q = z⁻¹`.
 
 ## iii. Table of contents
 
@@ -238,6 +242,36 @@ def zInverseEvaluation (z : ℂ) : DelayTuple 1 :=
 /-- The unique coordinate of the reciprocal-z substitution is `z⁻¹`. -/
 lemma zInverseEvaluation_apply (z : ℂ) (i : Fin 1) :
     zInverseEvaluation z i = z⁻¹ := rfl
+
+/-- The nonzero complex coordinates on which `q = z⁻¹` has reciprocal-Z semantics. -/
+def ReciprocalZCoordinate := {z : ℂ // z ≠ 0}
+
+/-- A reciprocal-Z coordinate exposes its underlying nonzero complex value. -/
+instance : Coe ReciprocalZCoordinate ℂ := ⟨fun z => z.1⟩
+
+/-- Evaluate the formal delay at the reciprocal of a named nonzero Z coordinate. -/
+def zInverseEvaluationOnReciprocalZ (z : ReciprocalZCoordinate) : DelayTuple 1 :=
+  zInverseEvaluation (z : ℂ)
+
+/-- The reciprocal-Z substitution evaluates its unique coordinate at `z⁻¹`. -/
+lemma zInverseEvaluationOnReciprocalZ_apply (z : ReciprocalZCoordinate) (i : Fin 1) :
+    zInverseEvaluationOnReciprocalZ z i = ((z : ℂ)⁻¹) := rfl
+
+/-- The raw totalized helper maps the complex origin to the zero formal-delay tuple.
+
+This equality is a negative control and has no reciprocal-Z interpretation.
+-/
+lemma zInverseEvaluation_zero : zInverseEvaluation 0 = (fun _ : Fin 1 => 0) := by
+  funext i
+  simp [zInverseEvaluation_apply]
+
+/-- No semantic reciprocal-Z coordinate evaluates to the zero formal-delay tuple. -/
+lemma zInverseEvaluationOnReciprocalZ_ne_zero (z : ReciprocalZCoordinate) :
+    zInverseEvaluationOnReciprocalZ z ≠ (fun _ : Fin 1 => 0) := by
+  intro hZero
+  have hCoordinate := congrFun hZero 0
+  change ((z : ℂ)⁻¹) = 0 at hCoordinate
+  exact (inv_ne_zero z.property) hCoordinate
 
 end
 

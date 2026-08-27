@@ -21,9 +21,9 @@ The estimate that drives everything is elementary. If the transform converges ab
 the total mass at `w` times `‖w‖ / ‖z‖`. Letting `‖z‖` grow gives the initial-value
 theorem: the transform tends to the sample at index zero as `z` leaves every bounded set.
 
-Applying that to the advanced sequence, and using the left-shift law with its startup sum, gives
+Applying that to the advanced sequence, and using the left-shift law with `advanceStartup`, gives
 an explicit inversion formula for every sample: `f m` is the limit at infinity of
-`z ^ m * (transform f z - ∑ n < m, f n * z⁻¹ ^ n)`. No complex differentiation and no
+`z ^ m * (transform f z - advanceStartup f z m)`. No complex differentiation and no
 analyticity machinery is used.
 
 Uniqueness follows by strong induction on the index. Two sequences whose transforms agree on the
@@ -191,7 +191,7 @@ lemma tendsto_transform_cobounded (hw : w ∈ ROC f) :
 /-- The inversion formula: the sample at index `m` is the limit at infinity of `z ^ m` times the
 transform with its first `m` startup terms removed. -/
 lemma tendsto_inversion_cobounded (hw : w ∈ ROC f) (m : ℕ) :
-    Tendsto (fun z : ℂ => z ^ m * (transform f z - ∑ n ∈ Finset.range m, seriesTerm f z n))
+    Tendsto (fun z : ℂ => z ^ m * (transform f z - advanceStartup f z m))
       (cobounded ℂ) (nhds (f m)) := by
   have hwne : w ≠ 0 := hw.1
   have hadv : w ∈ ROC (advance m f) :=
@@ -220,11 +220,12 @@ lemma eq_natCast_of_transform_eqOn (hf : w ∈ ROC f) (hg : w ∈ ROC g)
   induction n using Nat.strong_induction_on with
   | _ m ih =>
     have hlim : Tendsto
-        (fun z : ℂ => z ^ m * (transform f z - ∑ n ∈ Finset.range m, seriesTerm f z n))
+        (fun z : ℂ => z ^ m * (transform f z - advanceStartup f z m))
         (cobounded ℂ) (nhds (g m)) := by
       refine (tendsto_inversion_cobounded hg m).congr' ?_
       filter_upwards [eventually_cobounded_le_norm (E := ℂ) ‖w‖] with z hz
       rw [heq z hz]
+      unfold advanceStartup
       refine congrArg _ (congrArg _ (Finset.sum_congr rfl fun n hn => ?_))
       rw [seriesTerm, seriesTerm, ih n (Finset.mem_range.mp hn)]
     exact tendsto_nhds_unique (tendsto_inversion_cobounded hf m) hlim
