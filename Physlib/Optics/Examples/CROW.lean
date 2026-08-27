@@ -551,6 +551,12 @@ noncomputable instance hierarchyFlattenConnectedChannelFintype {ringCount : ℕ}
     ((rightConnections p).appendChannelEquiv
       ((forwardConnections p).append (returnConnections p))).symm
 
+/-- The appended hierarchy exposes finitely many final external channels. -/
+noncomputable instance hierarchyAppendExternalChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) :
+    Fintype ((hierarchy p).inner.append (hierarchy p).outer).ExternalChannel := by
+  exact externalChannelFintype p
+
 /-!
 ## D. Generic theorem-spine instantiation
 -/
