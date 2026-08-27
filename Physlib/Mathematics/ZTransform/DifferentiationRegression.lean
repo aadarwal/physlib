@@ -27,6 +27,8 @@ correct factor `-z` gives `3 / 2`; reversing the sign gives `-3 / 2`, and omitti
 - `Physlib.ZTransform.transform_indexMul_differentiationFixture`: direct transform after index
   multiplication.
 - `Physlib.ZTransform.deriv_transform_differentiationFixture_at_two`: primitive derivative value.
+- `Physlib.ZTransform.transform_indexMul_differentiationFixture_production_agreement`: the
+  production identity specialized to the independently witnessed fixture domain.
 - `Physlib.ZTransform.transform_indexMul_wrongSign_or_missingFactor_ne`: hostile sign-and-factor
   sentinel.
 
@@ -34,7 +36,8 @@ correct factor `-z` gives `3 / 2`; reversing the sign gives `-3 / 2`, and omitti
 
 - A. Finite-support fixture
 - B. Primitive transform and derivative computations
-- C. Hostile sign-and-factor sentinel
+- C. Production agreement
+- D. Hostile sign-and-factor sentinel
 
 ## iv. References
 
@@ -112,7 +115,30 @@ lemma deriv_transform_differentiationFixture_at_two :
 
 /-!
 
-## C. Hostile sign-and-factor sentinel
+## C. Production agreement
+
+-/
+
+/-- The independently finite-supported fixture belongs to the absolute ROC at one. -/
+lemma one_mem_ROC_differentiationFixture :
+    (1 : ℂ) ∈ ROC differentiationFixture := by
+  exact ⟨by norm_num, summable_seriesTerm_differentiationFixture 1⟩
+
+/-- The production specialization uses a genuinely strict radial margin from one to two. -/
+lemma norm_one_lt_norm_two : ‖(1 : ℂ)‖ < ‖(2 : ℂ)‖ := by
+  norm_num
+
+/-- The production index-multiplication theorem agrees with the independently computed fixture
+at its concrete nonunit evaluation point. -/
+lemma transform_indexMul_differentiationFixture_production_agreement :
+    transform (fun n : ℤ => (n : ℂ) * differentiationFixture n) 2 =
+      -2 * deriv (transform differentiationFixture) 2 := by
+  exact transform_indexMul_eq_neg_z_mul_deriv
+    one_mem_ROC_differentiationFixture norm_one_lt_norm_two
+
+/-!
+
+## D. Hostile sign-and-factor sentinel
 
 -/
 
