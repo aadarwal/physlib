@@ -231,21 +231,26 @@ lemma portLabelEquiv_returnArcPort {ringCount : ℕ} (p : Parameters ringCount)
 /-- Right-interface links, two for each ring. -/
 abbrev RightConnection (ringCount : ℕ) := Fin ringCount × Bool
 
+/-- One selected half-arc connection at a ring's right interface. -/
+def rightConnection {ringCount : ℕ} (p : Parameters ringCount) :
+    RightConnection ringCount →
+      PortConnection (components p).aggregatePortModeFamily
+  | ⟨ring, false⟩ =>
+      { left := forwardArcPort p ring MatchedPropagation.Port.right
+        right := couplerPort p ring.succ DirectionalCoupler.Port.leftFirst
+        left_ne_right := by intro h; cases h
+        modeEquiv := Equiv.refl Unit }
+  | ⟨ring, true⟩ =>
+      { left := couplerPort p ring.succ DirectionalCoupler.Port.rightFirst
+        right := returnArcPort p ring MatchedPropagation.Port.left
+        left_ne_right := by intro h; cases h
+        modeEquiv := Equiv.refl Unit }
+
 /-- Links from both half-arcs to the coupler at the right interface of each ring. -/
 def rightConnections {ringCount : ℕ} (p : Parameters ringCount) :
     PortConnectionFamily (components p).aggregatePortModeFamily
       (RightConnection ringCount) where
-  connection
-    | ⟨ring, false⟩ =>
-        { left := forwardArcPort p ring MatchedPropagation.Port.right
-          right := couplerPort p ring.succ DirectionalCoupler.Port.leftFirst
-          left_ne_right := by intro h; cases h
-          modeEquiv := Equiv.refl Unit }
-    | ⟨ring, true⟩ =>
-        { left := couplerPort p ring.succ DirectionalCoupler.Port.rightFirst
-          right := returnArcPort p ring MatchedPropagation.Port.left
-          left_ne_right := by intro h; cases h
-          modeEquiv := Equiv.refl Unit }
+  connection := rightConnection p
   endpointPort_injective := by
     rintro ⟨⟨firstRing, firstKind⟩, firstEnd⟩
       ⟨⟨secondRing, secondKind⟩, secondEnd⟩ hPort
@@ -253,6 +258,7 @@ def rightConnections {ringCount : ℕ} (p : Parameters ringCount) :
       cases secondKind <;> cases secondEnd
     all_goals
       have hLabel := congrArg (portLabelEquiv p) hPort
+      simp only [rightConnection, PortConnection.endpointPort] at hLabel
       simp_all
 
 /-- A coupler's forward ring port is not consumed by the right-interface stage. -/
@@ -262,7 +268,9 @@ lemma coupler_rightSecond_not_rightConnected {ringCount : ℕ}
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
   cases kind <;> cases endpoint <;>
-    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
+    have hLabel := congrArg (portLabelEquiv p) hPort <;>
+      simp [PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        rightConnections, rightConnection, PortConnection.endpointPort] at hLabel
 
 /-- A forward half-arc's left port is not consumed by the right-interface stage. -/
 lemma forwardArc_left_not_rightConnected {ringCount : ℕ}
@@ -271,7 +279,9 @@ lemma forwardArc_left_not_rightConnected {ringCount : ℕ}
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
   cases kind <;> cases endpoint <;>
-    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
+    have hLabel := congrArg (portLabelEquiv p) hPort <;>
+      simp [PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        rightConnections, rightConnection, PortConnection.endpointPort] at hLabel
 
 /-- A return half-arc's right port is not consumed by the right-interface stage. -/
 lemma returnArc_right_not_rightConnected {ringCount : ℕ}
@@ -280,7 +290,9 @@ lemma returnArc_right_not_rightConnected {ringCount : ℕ}
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
   cases kind <;> cases endpoint <;>
-    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
+    have hLabel := congrArg (portLabelEquiv p) hPort <;>
+      simp [PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        rightConnections, rightConnection, PortConnection.endpointPort] at hLabel
 
 /-- A coupler's return ring port is not consumed by the right-interface stage. -/
 lemma coupler_leftSecond_not_rightConnected {ringCount : ℕ}
@@ -289,27 +301,35 @@ lemma coupler_leftSecond_not_rightConnected {ringCount : ℕ}
       Set.range (rightConnections p).endpointEmbedding := by
   rintro ⟨⟨⟨otherRing, kind⟩, endpoint⟩, hPort⟩
   cases kind <;> cases endpoint <;>
-    have hLabel := congrArg (portLabelEquiv p) hPort <;> simp_all
+    have hLabel := congrArg (portLabelEquiv p) hPort <;>
+      simp [PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        rightConnections, rightConnection, PortConnection.endpointPort] at hLabel
 
 /-- Forward left-interface links, one for each ring. -/
 abbrev ForwardConnection (ringCount : ℕ) := Fin ringCount
+
+/-- One forward half-arc connection on the first-stage boundary. -/
+def forwardConnection {ringCount : ℕ} (p : Parameters ringCount)
+    (ring : ForwardConnection ringCount) :
+    PortConnection (rightConnections p).externalPortModeFamily :=
+  { left := ⟨couplerPort p ring.castSucc DirectionalCoupler.Port.rightSecond,
+      coupler_rightSecond_not_rightConnected p ring⟩
+    right := ⟨forwardArcPort p ring MatchedPropagation.Port.left,
+      forwardArc_left_not_rightConnected p ring⟩
+    left_ne_right := by intro h; cases h
+    modeEquiv := Equiv.refl Unit }
 
 /-- The forward half-arcs connected on the boundary left by the right-interface stage. -/
 def forwardConnections {ringCount : ℕ} (p : Parameters ringCount) :
     PortConnectionFamily (rightConnections p).externalPortModeFamily
       (ForwardConnection ringCount) where
-  connection ring :=
-    { left := ⟨couplerPort p ring.castSucc DirectionalCoupler.Port.rightSecond,
-        coupler_rightSecond_not_rightConnected p ring⟩
-      right := ⟨forwardArcPort p ring MatchedPropagation.Port.left,
-        forwardArc_left_not_rightConnected p ring⟩
-      left_ne_right := by intro h; cases h
-      modeEquiv := Equiv.refl Unit }
+  connection := forwardConnection p
   endpointPort_injective := by
     rintro ⟨firstRing, firstEnd⟩ ⟨secondRing, secondEnd⟩ hPort
     cases firstEnd <;> cases secondEnd
     all_goals
       have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort
+      simp only [forwardConnection, PortConnection.endpointPort] at hLabel
       simp_all
 
 /-- A return half-arc's right boundary port is not consumed by the forward stage. -/
@@ -321,7 +341,9 @@ lemma returnArc_right_not_forwardConnected {ringCount : ℕ}
       Set.range (forwardConnections p).endpointEmbedding := by
   rintro ⟨⟨otherRing, endpoint⟩, hPort⟩
   cases endpoint <;>
-    have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort <;> simp_all
+    have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort <;>
+      simp [PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        forwardConnections, forwardConnection, PortConnection.endpointPort] at hLabel
 
 /-- A coupler's return boundary port is not consumed by the forward stage. -/
 lemma coupler_leftSecond_not_forwardConnected {ringCount : ℕ}
@@ -332,31 +354,39 @@ lemma coupler_leftSecond_not_forwardConnected {ringCount : ℕ}
       Set.range (forwardConnections p).endpointEmbedding := by
   rintro ⟨⟨otherRing, endpoint⟩, hPort⟩
   cases endpoint <;>
-    have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort <;> simp_all
+    have hLabel := congrArg (fun port => portLabelEquiv p port.1) hPort <;>
+      simp [PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        forwardConnections, forwardConnection, PortConnection.endpointPort] at hLabel
 
 /-- Return left-interface links, one for each ring. -/
 abbrev ReturnConnection (ringCount : ℕ) := Fin ringCount
+
+/-- One return half-arc connection on the boundary left by the first two stages. -/
+def returnConnection {ringCount : ℕ} (p : Parameters ringCount)
+    (ring : ReturnConnection ringCount) :
+    PortConnection (forwardConnections p).externalPortModeFamily :=
+  { left :=
+      ⟨⟨returnArcPort p ring MatchedPropagation.Port.right,
+          returnArc_right_not_rightConnected p ring⟩,
+        returnArc_right_not_forwardConnected p ring⟩
+    right :=
+      ⟨⟨couplerPort p ring.castSucc DirectionalCoupler.Port.leftSecond,
+          coupler_leftSecond_not_rightConnected p ring⟩,
+        coupler_leftSecond_not_forwardConnected p ring⟩
+    left_ne_right := by intro h; cases h
+    modeEquiv := Equiv.refl Unit }
 
 /-- The return half-arcs connected after the right and forward stages. -/
 def returnConnections {ringCount : ℕ} (p : Parameters ringCount) :
     PortConnectionFamily (forwardConnections p).externalPortModeFamily
       (ReturnConnection ringCount) where
-  connection ring :=
-    { left :=
-        ⟨⟨returnArcPort p ring MatchedPropagation.Port.right,
-            returnArc_right_not_rightConnected p ring⟩,
-          returnArc_right_not_forwardConnected p ring⟩
-      right :=
-        ⟨⟨couplerPort p ring.castSucc DirectionalCoupler.Port.leftSecond,
-            coupler_leftSecond_not_rightConnected p ring⟩,
-          coupler_leftSecond_not_forwardConnected p ring⟩
-      left_ne_right := by intro h; cases h
-      modeEquiv := Equiv.refl Unit }
+  connection := returnConnection p
   endpointPort_injective := by
     rintro ⟨firstRing, firstEnd⟩ ⟨secondRing, secondEnd⟩ hPort
     cases firstEnd <;> cases secondEnd
     all_goals
       have hLabel := congrArg (fun port => portLabelEquiv p port.1.1) hPort
+      simp only [returnConnection, PortConnection.endpointPort] at hLabel
       simp_all
 
 /-- The right-associated three-stage connection family used by the CROW hierarchy. -/
