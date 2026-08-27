@@ -74,22 +74,30 @@ half-phase exponents because it is a left-to-right transfer matrix mixing counte
 boundary fields. Therefore those signs are not compared term by term; slice 1B must first derive
 the scattering-to-transfer conversion in the pinned `(A, B)` order.
 
-## Domain differences that block a slice-1 numerical verdict
+## Preconditions for any slice-1B Table-1 comparison
 
-- **Uniformity.** Table 1 uses one bulk coupler pair `(r, t)`. `CROW.Parameters` permits one
-  coupler per interface. The regression deliberately uses `(3/5, 4/5)` at both end couplers and
-  `(5/13, 12/13)` at the middle coupler, so it is not a uniform Table-1 fixture.
-- **Propagation amplitude.** The regression half-arcs have amplitude transmission `1/2`.
-  Table 1's displayed bulk construction neglects loss. Slice 1B therefore needs a separate
-  uniform, unit-amplitude propagation fixture; the fail-capable slice-1 anchor is not altered.
-- **Boundary condition.** Table 1 supplies a bulk unit-cell matrix for an infinite periodic
-  sequence. Physlib's example is a finite chain of `N` rings with `N + 1` couplers and four
-  exposed end channels. A finite response comparison needs explicit left and right access
-  matrices in addition to the bulk-cell product.
-- **Observed quantity.** Table 1 advances the two-component internal state `(A_j, B_j)`.
-  The regression observes a selected external response after the general flat-network solve.
-  Slice 1B must prove the internal-field extraction and end-boundary readout before comparing
-  those quantities.
+The domain differences below are preconditions, not observations to resolve after running the
+comparison. No exact or numerical Table-1 comparison may run until the slice-1B fixture and its
+coordinate proofs satisfy all four conditions.
+
+1. **Uniformity delta.** Table 1 uses one bulk coupler pair `(r, t)`, whereas
+   `CROW.Parameters` permits one coupler per interface. Slice 1B must use a separate fixture with
+   one pinned Pythagorean pair at every compared bulk interface. Its half-arcs must also have
+   unit amplitude, matching the displayed loss-neglecting construction. The slice-1 regression
+   remains deliberately nonuniform, with `(3/5, 4/5)` at both ends, `(5/13, 12/13)` in the
+   middle, and half-arc amplitude `1/2`; it is not a Table-1 comparison fixture.
+2. **End-boundary delta.** Table 1 supplies a bulk unit-cell matrix for an infinite periodic
+   sequence. Physlib's example is a finite CROW with four exposed end channels. Before comparing
+   a finite response, slice 1B must state and prove the left and right access matrices, identify
+   the bulk-cell range, and prove the end-boundary readout.
+3. **Phase structure.** Table 1 advances `(A_j, B_j)` using signed half-phase factors, while
+   Physlib propagation supplies directed scattering relations. Slice 1B must pin the two
+   half-arc phases, prove their sum is the corresponding full-ring `phi_1` or `phi_2`, and derive
+   the scattering-to-transfer conversion in the stated `(A, B)` order before comparing entries.
+4. **Coupler convention.** The source uses `+i t` and Physlib uses `-i crossAmplitude`.
+   Slice 1B must prove the `r`/`t` coefficient map and transport the `D = diag(1, -1)` gauge
+   consistently through every compared cell boundary. It must also prove the internal-field
+   extraction; no external channel is silently identified with every repeated `A_j` or `B_j`.
 
 ## Exact lossless-coupler compatibility
 
@@ -107,8 +115,7 @@ fixture into a physical loss model or establish global losslessness.
 
 ## Slice-1B comparison contract
 
-Slice 1B starts from this map and adds: one uniform Pythagorean coupler fixture, unit-amplitude
-half-arcs with pinned phases, explicit finite end-boundary matrices, and a proved extraction between
-the Table-1 `(A_j, B_j)` state and Physlib's internal channels. Only after those steps may it test
-exact numerical parity. The allowed outcomes remain agreement, a Physlib defect, or a source
-discrepancy requiring investigation; this document records none of those outcomes.
+Slice 1B must discharge all four preconditions above before it runs exact parity. It must then
+record which of three outcomes fired: agreement, ours-wrong, or table-wrong. Each outcome is
+publishable evidence. Any disagreement is a finding to investigate, not a mismatch to explain
+away. This document records none of those outcomes.
