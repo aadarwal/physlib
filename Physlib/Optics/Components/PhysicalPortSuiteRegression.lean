@@ -922,7 +922,7 @@ lemma physicalPortSuite9b_s_kernel :
   fin_cases output <;> fin_cases input <;>
     simp [PlanarDielectricInterface.sFresnelScatteringKernel,
       PlanarDielectricInterface.scalarFresnelScatteringKernel, hRS, hNormalized]
-  <;> norm_num
+  all_goals norm_num
 
 /-- The registered p kernel pins the fork-declared full-vector reflection sign. -/
 lemma physicalPortSuite9b_p_kernel :
@@ -939,7 +939,7 @@ lemma physicalPortSuite9b_p_kernel :
   fin_cases output <;> fin_cases input <;>
     simp [PlanarDielectricInterface.pFresnelScatteringKernel,
       PlanarDielectricInterface.scalarFresnelScatteringKernel, hRP, hNormalized]
-  <;> norm_num
+  all_goals norm_num
 
 /-- Primitive block-matrix multiplication gives all four exact polarized-interface outputs. -/
 lemma physicalPortSuite9b_interface_raw_action :
@@ -1132,7 +1132,7 @@ lemma physicalPortSuite9b_indexed_action :
   funext output
   change ModeTransform.toLinearMap
       (Matrix.blockDiagonal' fun selected =>
-        (physicalPortSuite9bFamily.scattering selected).toModeTransform)
+        (physicalPortSuite9bScattering selected).toModeTransform)
       physicalPortSuite9bIndexedInput output = _
   rcases output with ⟨component, channel⟩
   rw [ModeTransform.blockDiagonal'_apply]
@@ -1285,7 +1285,7 @@ lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
   unfold physicalPortSuite9bInterfaceNegativeSIndexed
   change ModeTransform.toLinearMap
       (Matrix.blockDiagonal' fun selected =>
-        (physicalPortSuite9bHostileFamily.scattering selected).toModeTransform)
+        (physicalPortSuite9bHostileScattering selected).toModeTransform)
       physicalPortSuite9bIndexedInput
         ⟨PhysicalPortSuite9bComponent.interface,
           ⟨PlanarDielectricInterface.Port.negativeSide,
