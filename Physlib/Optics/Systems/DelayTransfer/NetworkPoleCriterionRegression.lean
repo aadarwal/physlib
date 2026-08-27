@@ -102,6 +102,11 @@ def visiblePoleComponents : RationalComponentFamily 1 where
     RationalModel.ofPolynomial (visiblePoleEntryPolynomial output input)
   ModelValidAt := fun _ value => ‖value 0‖ ≤ 4
 
+/-- The component-family aggregate channel at one selected fixture port. -/
+def visiblePoleAggregateChannel (port : VisiblePolePort) :
+    visiblePoleComponents.toParameterizedComponentFamily.aggregatePortModeFamily.Channel :=
+  ⟨⟨(), port⟩, ()⟩
+
 /-- The aggregate left feedback port. -/
 def visiblePoleLeftPort :
     visiblePoleComponents.toParameterizedComponentFamily.aggregatePortModeFamily.Port :=
@@ -175,6 +180,18 @@ def visiblePoleExternalChannel : visiblePoleNetlist.ExternalChannel :=
     · exact VisiblePolePort.noConfusion
         (congrArg (fun channel => channel.1.2) hChannel)⟩
 
+/-- The external aggregate channel is outside the connected-channel embedding. -/
+lemma visiblePoleAggregateExternal_not_mem_range :
+    visiblePoleAggregateChannel .external ∉
+      Set.range visiblePoleConnections.channelEmbedding := by
+  rintro ⟨⟨connection, localChannel⟩, hChannel⟩
+  cases connection
+  rcases localChannel with mode | mode <;> cases mode
+  · exact VisiblePolePort.noConfusion
+      (congrArg (fun channel => channel.1.2) hChannel)
+  · exact VisiblePolePort.noConfusion
+      (congrArg (fun channel => channel.1.2) hChannel)
+
 /-!
 
 ## B. Typed finite coordinates
@@ -192,13 +209,29 @@ noncomputable instance visiblePoleConnectedChannelFintype :
   change Fintype (Σ _ : Unit, Unit ⊕ Unit)
   infer_instance
 
+/-- The connection-family spelling of connected fixture channels is finite. -/
+noncomputable instance visiblePoleConnectionChannelFintype :
+    Fintype visiblePoleConnections.Channel := by
+  change Fintype (Σ _ : Unit, Unit ⊕ Unit)
+  infer_instance
+
 /-- Classical equality on aggregate fixture channels. -/
 noncomputable instance visiblePoleChannelDecidableEq :
     DecidableEq visiblePoleNetlist.Channel := Classical.decEq _
 
+/-- Classical equality in the component-family spelling of aggregate channels. -/
+noncomputable instance visiblePoleAggregateChannelDecidableEq :
+    DecidableEq
+      visiblePoleComponents.toParameterizedComponentFamily.aggregatePortModeFamily.Channel :=
+  Classical.decEq _
+
 /-- Classical equality on connected fixture channels. -/
 noncomputable instance visiblePoleConnectedChannelDecidableEq :
     DecidableEq visiblePoleNetlist.ConnectedChannel := Classical.decEq _
+
+/-- Classical equality in the connection-family spelling of connected channels. -/
+noncomputable instance visiblePoleConnectionChannelDecidableEq :
+    DecidableEq visiblePoleConnections.Channel := Classical.decEq _
 
 /-- The explicit ordering `external`, `left`, `right` of aggregate fixture channels. -/
 def visiblePoleChannelEquiv : visiblePoleNetlist.Channel ≃ Fin 3 where
@@ -224,6 +257,30 @@ def visiblePoleIncidentEquiv : visiblePoleNetlist.IncidentIndex ≃ Fin 3 :=
 def visiblePoleOutgoingEquiv : visiblePoleNetlist.OutgoingIndex ≃ Fin 3 :=
   (Outgoing.relabelEquiv visiblePoleChannelEquiv).trans Outgoing.channelEquiv
 
+@[simp]
+lemma visiblePoleIncidentEquiv_symm_zero :
+    visiblePoleIncidentEquiv.symm 0 = Incident.mk (visiblePoleChannel .external) := rfl
+
+@[simp]
+lemma visiblePoleIncidentEquiv_symm_one :
+    visiblePoleIncidentEquiv.symm 1 = Incident.mk (visiblePoleChannel .left) := rfl
+
+@[simp]
+lemma visiblePoleIncidentEquiv_symm_two :
+    visiblePoleIncidentEquiv.symm 2 = Incident.mk (visiblePoleChannel .right) := rfl
+
+@[simp]
+lemma visiblePoleOutgoingEquiv_symm_zero :
+    visiblePoleOutgoingEquiv.symm 0 = Outgoing.mk (visiblePoleChannel .external) := rfl
+
+@[simp]
+lemma visiblePoleOutgoingEquiv_symm_one :
+    visiblePoleOutgoingEquiv.symm 1 = Outgoing.mk (visiblePoleChannel .left) := rfl
+
+@[simp]
+lemma visiblePoleOutgoingEquiv_symm_two :
+    visiblePoleOutgoingEquiv.symm 2 = Outgoing.mk (visiblePoleChannel .right) := rfl
+
 /-- The left endpoint of the internal connection. -/
 def visiblePoleConnectedLeft : visiblePoleNetlist.ConnectedChannel :=
   ⟨(), Sum.inl ()⟩
@@ -235,12 +292,12 @@ def visiblePoleConnectedRight : visiblePoleNetlist.ConnectedChannel :=
 @[simp]
 lemma visiblePoleConnectedLeft_embedding :
     visiblePoleConnections.channelEmbedding visiblePoleConnectedLeft =
-      visiblePoleChannel .left := rfl
+      visiblePoleAggregateChannel .left := rfl
 
 @[simp]
 lemma visiblePoleConnectedRight_embedding :
     visiblePoleConnections.channelEmbedding visiblePoleConnectedRight =
-      visiblePoleChannel .right := rfl
+      visiblePoleAggregateChannel .right := rfl
 
 @[simp]
 lemma visiblePoleConnectedLeft_mate :
@@ -344,6 +401,115 @@ def visiblePoleNumeratorPolynomial : Polynomial ℂ :=
 /-- The exact cleared determinant `1 - 3*q/10`. -/
 def visiblePoleDenominatorPolynomial : Polynomial ℂ :=
   1 - Polynomial.C (3 / 10) * Polynomial.X
+
+/-- Reindexing the cleared scattering law exposes the displayed sparse polynomial matrix. -/
+lemma visiblePole_clearedScattering_reindex :
+    Matrix.reindex visiblePoleOutgoingEquiv visiblePoleIncidentEquiv
+        visiblePoleNetlist.clearedScattering =
+      visiblePoleClearedScatteringMatrix := by
+  ext output input
+  fin_cases output <;> fin_cases input <;>
+    simp [Matrix.reindex_apply, visiblePoleClearedScatteringMatrix,
+      visiblePole_clearedScattering_entry, visiblePoleEntryPolynomial]
+
+@[simp]
+lemma visiblePole_polynomialRouting_external_row (outgoing : VisiblePolePort) :
+    visiblePoleNetlist.polynomialRouting
+        (Incident.mk (visiblePoleChannel .external))
+        (Outgoing.mk (visiblePoleChannel outgoing)) = 0 := by
+  change MvPolynomial.C (visiblePoleConnections.partialRouting
+    (Incident.mk (visiblePoleAggregateChannel .external))
+    (Outgoing.mk (visiblePoleAggregateChannel outgoing))) = 0
+  rw [visiblePoleConnections.partialRouting_entry_of_incident_not_mem_range
+    (visiblePoleAggregateChannel .external) visiblePoleAggregateExternal_not_mem_range]
+  simp
+
+@[simp]
+lemma visiblePole_polynomialRouting_external_column (incident : VisiblePolePort) :
+    visiblePoleNetlist.polynomialRouting
+        (Incident.mk (visiblePoleChannel incident))
+        (Outgoing.mk (visiblePoleChannel .external)) = 0 := by
+  change MvPolynomial.C (visiblePoleConnections.partialRouting
+    (Incident.mk (visiblePoleAggregateChannel incident))
+    (Outgoing.mk (visiblePoleAggregateChannel .external))) = 0
+  rw [visiblePoleConnections.partialRouting_entry_of_outgoing_not_mem_range
+    (visiblePoleAggregateChannel .external) visiblePoleAggregateExternal_not_mem_range]
+  simp
+
+@[simp]
+lemma visiblePole_polynomialRouting_left_left :
+    visiblePoleNetlist.polynomialRouting
+        (Incident.mk (visiblePoleChannel .left))
+        (Outgoing.mk (visiblePoleChannel .left)) = 0 := by
+  change MvPolynomial.C (visiblePoleConnections.partialRouting
+    (Incident.mk (visiblePoleAggregateChannel .left))
+    (Outgoing.mk (visiblePoleConnections.channelEmbedding visiblePoleConnectedLeft))) = 0
+  have hNe : visiblePoleAggregateChannel .left ≠ visiblePoleAggregateChannel .right := by
+    intro hEqual
+    exact VisiblePolePort.noConfusion (congrArg (fun channel => channel.1.2) hEqual)
+  have hRouting := visiblePoleConnections.partialRouting_entry_connected_column
+    (visiblePoleAggregateChannel .left) visiblePoleConnectedLeft
+  simp only [visiblePoleConnectedLeft_mate,
+    visiblePoleConnectedRight_embedding] at hRouting
+  have hZero := hRouting.trans (if_neg hNe)
+  have hZero' : visiblePoleConnections.partialRouting
+      (Incident.mk (visiblePoleAggregateChannel .left))
+      (Outgoing.mk (visiblePoleAggregateChannel .left)) = 0 := by
+    simpa only [visiblePoleConnectedLeft_embedding] using hZero
+  simpa using congrArg (MvPolynomial.C : ℂ → DelayPolynomial 1) hZero'
+
+@[simp]
+lemma visiblePole_polynomialRouting_left_right :
+    visiblePoleNetlist.polynomialRouting
+        (Incident.mk (visiblePoleChannel .left))
+        (Outgoing.mk (visiblePoleChannel .right)) = 1 := by
+  change MvPolynomial.C (visiblePoleConnections.partialRouting
+    (Incident.mk (visiblePoleAggregateChannel .left))
+    (Outgoing.mk (visiblePoleConnections.channelEmbedding visiblePoleConnectedRight))) = 1
+  simpa using congrArg MvPolynomial.C
+    (visiblePoleConnections.partialRouting_entry_mate visiblePoleConnectedRight)
+
+@[simp]
+lemma visiblePole_polynomialRouting_right_left :
+    visiblePoleNetlist.polynomialRouting
+        (Incident.mk (visiblePoleChannel .right))
+        (Outgoing.mk (visiblePoleChannel .left)) = 1 := by
+  change MvPolynomial.C (visiblePoleConnections.partialRouting
+    (Incident.mk (visiblePoleAggregateChannel .right))
+    (Outgoing.mk (visiblePoleConnections.channelEmbedding visiblePoleConnectedLeft))) = 1
+  simpa using congrArg MvPolynomial.C
+    (visiblePoleConnections.partialRouting_entry_mate visiblePoleConnectedLeft)
+
+@[simp]
+lemma visiblePole_polynomialRouting_right_right :
+    visiblePoleNetlist.polynomialRouting
+        (Incident.mk (visiblePoleChannel .right))
+        (Outgoing.mk (visiblePoleChannel .right)) = 0 := by
+  change MvPolynomial.C (visiblePoleConnections.partialRouting
+    (Incident.mk (visiblePoleAggregateChannel .right))
+    (Outgoing.mk (visiblePoleConnections.channelEmbedding visiblePoleConnectedRight))) = 0
+  have hNe : visiblePoleAggregateChannel .right ≠ visiblePoleAggregateChannel .left := by
+    intro hEqual
+    exact VisiblePolePort.noConfusion (congrArg (fun channel => channel.1.2) hEqual)
+  have hRouting := visiblePoleConnections.partialRouting_entry_connected_column
+    (visiblePoleAggregateChannel .right) visiblePoleConnectedRight
+  simp only [visiblePoleConnectedRight_mate,
+    visiblePoleConnectedLeft_embedding] at hRouting
+  have hZero := hRouting.trans (if_neg hNe)
+  have hZero' : visiblePoleConnections.partialRouting
+      (Incident.mk (visiblePoleAggregateChannel .right))
+      (Outgoing.mk (visiblePoleAggregateChannel .right)) = 0 := by
+    simpa only [visiblePoleConnectedRight_embedding] using hZero
+  simpa using congrArg (MvPolynomial.C : ℂ → DelayPolynomial 1) hZero'
+
+/-- Reindexing ideal routing exposes the displayed internal left-right swap. -/
+lemma visiblePole_polynomialRouting_reindex :
+    Matrix.reindex visiblePoleIncidentEquiv visiblePoleOutgoingEquiv
+        visiblePoleNetlist.polynomialRouting =
+      visiblePolePolynomialRoutingMatrix := by
+  ext incident outgoing
+  fin_cases incident <;> fin_cases outgoing <;>
+    simp [Matrix.reindex_apply, visiblePolePolynomialRoutingMatrix]
 
 end
 
