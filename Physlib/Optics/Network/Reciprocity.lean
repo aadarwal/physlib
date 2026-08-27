@@ -116,7 +116,8 @@ lemma reindex_apply {channel : Type u} {newChannel : Type v}
     pairing.reindex equiv (Incident.mk label) =
       Outgoing.mk
         (equiv ((pairing (Incident.mk (equiv.symm label))).channel)) := by
-  simp [reindex]
+  apply Outgoing.ext
+  simp [reindex, Incident.relabelEquiv, Outgoing.relabelEquiv]
 
 /-- Transporting the nominal pairing leaves it nominal on the new labels. -/
 lemma reindex_nominalPairing {channel : Type u} {newChannel : Type v}
@@ -189,7 +190,9 @@ lemma pairedMatrix_reindex {channel : Type u} {newChannel : Type v}
     (scattering.reindex equiv).pairedMatrix (pairing.reindex equiv) =
       (scattering.pairedMatrix pairing).reindex equiv equiv := by
   ext output input
-  simp [pairedMatrix, ChannelPairing.reindex]
+  simp only [pairedMatrix_apply, ScatteringMatrix.toModeTransform_reindex,
+    ModeTransform.reindex_apply, ChannelPairing.reindex_apply,
+    Equiv.symm_apply_apply, Matrix.reindex_apply]
 
 /-- Relabeling the scattering coordinates and the supplied pairing preserves and reflects
 reciprocity. -/
@@ -198,7 +201,10 @@ lemma isReciprocal_reindex_iff {channel : Type u} {newChannel : Type v}
     (pairing : ChannelPairing channel) :
     (scattering.reindex equiv).IsReciprocal (pairing.reindex equiv) ↔
       scattering.IsReciprocal pairing := by
-  rw [IsReciprocal, pairedMatrix_reindex, Matrix.isSymm_reindex_iff]
+  change
+    ((scattering.reindex equiv).pairedMatrix (pairing.reindex equiv)).IsSymm ↔
+      (scattering.pairedMatrix pairing).IsSymm
+  rw [pairedMatrix_reindex, Matrix.isSymm_reindex_iff]
 
 end ScatteringMatrix
 
@@ -242,6 +248,7 @@ lemma pairedMatrix_rephase_referencePlaneShift_eq_D_mul_D
   ext output input
   rw [pairedMatrix_rephase_apply, Matrix.mul_diagonal, Matrix.diagonal_mul]
   rw [shift.inverse_paired output]
+  simp only [Circle.coe_inv]
 
 /-- For the nominal pairing, a reference-plane shift is the usual `D * S * D` congruence. -/
 lemma rephase_referencePlaneShift_eq_D_S_D
@@ -267,6 +274,7 @@ lemma isReciprocal_rephase_tauInversePaired {channel : Type u}
   intro first second
   rw [pairedMatrix_rephase_apply, pairedMatrix_rephase_apply,
     hInversePaired first, hInversePaired second, hReciprocal first second]
+  simp only [Circle.coe_inv]
   ring
 
 /-- Rephasing preserves every paired-symmetric scattering matrix exactly when the product of the
@@ -296,7 +304,13 @@ lemma rephase_preserves_pairedIsSymm_iff_constant {channel : Type u}
         (outgoingGauge (pairing (Incident.mk second)).channel : ℂ) * 1 *
           (incidentGauge first : ℂ)⁻¹ at hRephased
     field_simp [Circle.coe_ne_zero] at hRephased
-    simpa only [mul_one] using hRephased
+    have hCross :
+        (outgoingGauge (pairing (Incident.mk first)).channel : ℂ) *
+            (incidentGauge first : ℂ) =
+          (incidentGauge second : ℂ) *
+            (outgoingGauge (pairing (Incident.mk second)).channel : ℂ) := by
+      simpa only [mul_one] using hRephased
+    exact hCross.trans (mul_comm _ _)
   · intro hConstant scattering hSymmetric
     apply Matrix.IsSymm.ext
     intro first second
