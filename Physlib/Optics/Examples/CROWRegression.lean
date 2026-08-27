@@ -286,7 +286,7 @@ lemma crowRegression_mem_componentBehavior :
     funext endpoint
     rcases endpoint with endpoint | endpoint <;>
       rcases endpoint with ⟨channel⟩ <;>
-      rcases channel with ⟨⟩ | ⟨⟩ <;>
+      rcases channel with mode | mode <;> cases mode <;>
       fin_cases interface <;>
       norm_num [crowRegressionLocalIncident, crowRegressionLocalOutgoing,
         crowRegressionIncidentValue, crowRegressionOutgoingValue,
@@ -294,7 +294,8 @@ lemma crowRegression_mem_componentBehavior :
         crowRegressionMiddleCoupler, DirectionalCoupler.crossCoefficient,
         ModeAmplitude.directSum, ModeAmplitude.reindex_apply,
         ModeAmplitude.restrictInl, ModeAmplitude.restrictInr] <;>
-      apply Complex.ext <;> norm_num
+      apply Complex.ext <;>
+      norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
   · change
       (crowRegressionIncident.restrictEmbedding
           (Incident.relabelEmbedding
@@ -320,7 +321,8 @@ lemma crowRegression_mem_componentBehavior :
         MatchedPropagation.transmissionCoefficient,
         MatchedPropagation.carrierPhaseFactor, ModeAmplitude.directSum,
         ModeAmplitude.reindex_apply] <;>
-      apply Complex.ext <;> norm_num
+      apply Complex.ext <;>
+      norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
   · change
       (crowRegressionIncident.restrictEmbedding
           (Incident.relabelEmbedding
@@ -346,7 +348,8 @@ lemma crowRegression_mem_componentBehavior :
         MatchedPropagation.transmissionCoefficient,
         MatchedPropagation.carrierPhaseFactor, ModeAmplitude.directSum,
         ModeAmplitude.reindex_apply] <;>
-      apply Complex.ext <;> norm_num
+      apply Complex.ext <;>
+      norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
 
 /-- The eight homogeneous channel equations in either travel direction have only the zero state. -/
 lemma crowRegression_chainCoordinates_eq_zero
