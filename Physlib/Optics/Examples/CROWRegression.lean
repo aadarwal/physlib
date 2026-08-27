@@ -291,7 +291,6 @@ lemma crowRegression_mem_componentBehavior :
         DirectionalCoupler.outgoingChannelEquiv, DirectionalCoupler.channelEquiv,
         ModeAmplitude.directSum, ModeAmplitude.reindex_apply,
         ModeAmplitude.restrictInl, ModeAmplitude.restrictInr] <;>
-      (try simp) <;>
       apply Complex.ext <;>
       norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
   · change
