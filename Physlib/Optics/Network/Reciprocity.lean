@@ -192,7 +192,7 @@ lemma pairedMatrix_reindex {channel : Type u} {newChannel : Type v}
   ext output input
   simp only [pairedMatrix_apply, ScatteringMatrix.toModeTransform_reindex,
     ModeTransform.reindex_apply, ChannelPairing.reindex_apply,
-    Equiv.symm_apply_apply, Matrix.reindex_apply]
+    Equiv.symm_apply_apply, Matrix.reindex_apply, Matrix.submatrix_apply]
 
 /-- Relabeling the scattering coordinates and the supplied pairing preserves and reflects
 reciprocity. -/
