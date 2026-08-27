@@ -142,9 +142,27 @@ def visiblePoleNetlist : RationalNetlist 1 where
   Connection := Unit
   connections := visiblePoleConnections
 
+/-- The unique component in the assembled rational fixture. -/
+def visiblePoleComponent : visiblePoleNetlist.components.Component := by
+  change Unit
+  exact ()
+
+/-- One local channel of the fixture's unique component. -/
+def visiblePoleLocalChannel (port : VisiblePolePort) :
+    (visiblePoleNetlist.components.portFamily visiblePoleComponent).Channel := by
+  change visiblePolePortFamily.Channel
+  exact ⟨port, ()⟩
+
 /-- The aggregate channel at one selected fixture port. -/
 def visiblePoleChannel (port : VisiblePolePort) : visiblePoleNetlist.Channel :=
   ⟨⟨(), port⟩, ()⟩
+
+@[simp]
+lemma visiblePoleComponent_channel (port : VisiblePolePort) :
+    visiblePoleNetlist.components.indexedChannelEquiv
+        ⟨visiblePoleComponent, visiblePoleLocalChannel port⟩ =
+      visiblePoleChannel port := by
+  rfl
 
 /-- The externally exposed aggregate channel. -/
 def visiblePoleExternalChannel : visiblePoleNetlist.ExternalChannel :=
@@ -246,19 +264,29 @@ lemma visiblePole_scatteringEntryModel (output input : VisiblePolePort) :
         (visiblePoleChannel output) (visiblePoleChannel input) =
       RationalModel.ofPolynomial
         (visiblePoleEntryPolynomial ⟨output, ()⟩ ⟨input, ()⟩) := by
-  cases output <;> cases input <;> rfl
+  rw [← visiblePoleComponent_channel output, ← visiblePoleComponent_channel input,
+    visiblePoleNetlist.scatteringEntryModel_same]
+  rfl
 
 /-- Every assembled fixture entry has unit retained denominator. -/
 lemma visiblePole_scatteringEntryModel_denominator
     (output input : visiblePoleNetlist.Channel) :
     (visiblePoleNetlist.scatteringEntryModel output input).denominator = 1 := by
-  rcases output with ⟨⟨outputComponent, outputPort⟩, outputMode⟩
-  rcases input with ⟨⟨inputComponent, inputPort⟩, inputMode⟩
+  obtain ⟨⟨outputComponent, outputChannel⟩, rfl⟩ :=
+    visiblePoleNetlist.components.indexedChannelEquiv.surjective output
+  obtain ⟨⟨inputComponent, inputChannel⟩, rfl⟩ :=
+    visiblePoleNetlist.components.indexedChannelEquiv.surjective input
   cases outputComponent
   cases inputComponent
+  rcases outputChannel with ⟨outputPort, outputMode⟩
+  rcases inputChannel with ⟨inputPort, inputMode⟩
   cases outputMode
   cases inputMode
-  cases outputPort <;> cases inputPort <;> rfl
+  change VisiblePolePort at outputPort inputPort
+  change (visiblePoleNetlist.scatteringEntryModel
+    (visiblePoleChannel outputPort) (visiblePoleChannel inputPort)).denominator = 1
+  rw [visiblePole_scatteringEntryModel]
+  rfl
 
 /-- Every stored denominator is one, so the aggregate common denominator is one. -/
 lemma visiblePole_commonDenominator : visiblePoleNetlist.commonDenominator = 1 := by
