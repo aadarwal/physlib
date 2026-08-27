@@ -518,8 +518,7 @@ noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
 /-- The first-stage hierarchy has finitely many external channels. -/
 noncomputable instance hierarchyInnerExternalChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).inner.ExternalChannel := by
-  classical
-  infer_instance
+  exact Fintype.ofFinite _
 
 /-- The first-stage hierarchy boundary has finite channels. -/
 noncomputable instance hierarchyInnerBoundaryChannelFintype {ringCount : ℕ}
@@ -536,8 +535,7 @@ noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
 /-- The final hierarchy boundary has finitely many external channels. -/
 noncomputable instance hierarchyOuterExternalChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).outer.ExternalChannel := by
-  classical
-  infer_instance
+  exact Fintype.ofFinite _
 
 /-!
 ## D. Generic theorem-spine instantiation
@@ -558,7 +556,8 @@ def stagedBehavior {ringCount : ℕ} (p : Parameters ringCount) :
 /-- The flat CROW relation is exactly the generic staged hierarchical relation. -/
 lemma netlist_behavior_eq_staged {ringCount : ℕ} (p : Parameters ringCount) :
     (netlist p).behavior = stagedBehavior p := by
-  simpa only [netlist, stagedBehavior] using (hierarchy p).flatten_behavior_eq
+  change (hierarchy p).flatten.behavior = _
+  exact (hierarchy p).flatten_behavior_eq
 
 /-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
 
