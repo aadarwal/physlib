@@ -190,7 +190,7 @@ lemma sideOutputMap_apply (reflection normalizedTransmission : ℝ)
   apply WithLp.ofLp_injective 2
   funext output
   fin_cases output <;>
-    simp [sideOutputMap, Matrix.toLpLin_apply, Matrix.mulVec, dotProduct,
+    simp [sideOutputMap, Matrix.toLpLin_apply, dotProduct,
       Fin.sum_univ_two, sub_eq_add_neg]
 
 /-- The four independently specified s/p side-coordinate endpoint equations.
@@ -208,11 +208,12 @@ def endpointOutput (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ)
   let pReflection := interface.pFresnelReflectionCoefficient chi_i chi_t
   let pTransmission := powerNormalizedFresnelTransmissionCoefficient flux
     (interface.pFresnelTransmissionCoefficient chi_i chi_t)
-  (WithLp.toLp 2 ![
-    (sReflection : ℂ) * input (Sum.inl 0) +
-      (sTransmission : ℂ) * input (Sum.inl 1),
-    (sTransmission : ℂ) * input (Sum.inl 0) -
-      (sReflection : ℂ) * input (Sum.inl 1)]).directSum
+  ModeAmplitude.directSum
+    (WithLp.toLp 2 ![
+      (sReflection : ℂ) * input (Sum.inl 0) +
+        (sTransmission : ℂ) * input (Sum.inl 1),
+      (sTransmission : ℂ) * input (Sum.inl 0) -
+        (sReflection : ℂ) * input (Sum.inl 1)])
     (WithLp.toLp 2 ![
       (pReflection : ℂ) * input (Sum.inr 0) +
         (pTransmission : ℂ) * input (Sum.inr 1),
@@ -261,7 +262,10 @@ lemma outputMap_apply (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ
         (sideOutputMap _ _
           (ModeAmplitude.reindex Incident.channelEquiv incident).restrictInr)) = _
   rw [sideOutputMap_apply, sideOutputMap_apply]
-  rfl
+  apply congrArg (ModeAmplitude.reindex Outgoing.channelEquiv.symm)
+  apply WithLp.ofLp_injective 2
+  funext channel
+  rcases channel with channel | channel <;> fin_cases channel <;> rfl
 
 /-- The independent four-equation behavior before physical-channel relabeling. -/
 def behavior (interface : PlanarDielectricInterface) (chi_i chi_t : ℝ) :
@@ -291,10 +295,12 @@ lemma polarizedScattering_toLinearMap_apply (interface : PlanarDielectricInterfa
     (polarizedScattering interface chi_i chi_t).toModeTransform.toLinearMap input =
       endpointOutput interface chi_i chi_t input := by
   rw [← ModeAmplitude.directSum_restrict input, polarizedScattering,
-    ModeTransform.directSum_apply, sFresnelScatteringKernel,
+    ScatteringMatrix.directSum, ModeTransform.directSum_apply, sFresnelScatteringKernel,
     pFresnelScatteringKernel, scalarFresnelScatteringKernel_toLinearMap_apply,
     scalarFresnelScatteringKernel_toLinearMap_apply]
-  rfl
+  apply WithLp.ofLp_injective 2
+  funext channel
+  rcases channel with channel | channel <;> fin_cases channel <;> rfl
 
 /-- The parallel registered kernels realize the independent four-equation behavior exactly. -/
 lemma polarizedScattering_realizes_behavior (interface : PlanarDielectricInterface)
