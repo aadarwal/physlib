@@ -32,7 +32,8 @@ orientation claim.
 ## ii. Key results
 
 - `crowRegression_mem_behavior`: the exact raw state satisfies the flat network relation.
-- `crowRegression_responseTransform_entry`: compiled elimination returns the exact bus response.
+- `crowRegression_responseTransform_selectedOutput`: compiled elimination returns the exact bus
+  response for the displayed raw input.
 - `crowRegression_wrongRingIndex_ne_response`: the internal-ring coordinate differs exactly.
 - `crowResponse_ne_isolatedRingTransferProduct`: the response is not the isolated-ring product.
 
@@ -1363,9 +1364,88 @@ lemma crowRegression_mem_behavior :
     crowRegressionConnections.externalOutgoingReadout_apply,
     ModeAmplitude.restrictEmbedding_apply]
 
+/-- The raw primitive table has the exact selected right-bus output. -/
+lemma crowRegression_rawSelectedOutput :
+    crowRegressionOutput
+        (Outgoing.mk (crowRegressionExternalChannel .rightOutput)) =
+      (768 / 4717) * Complex.I := by
+  rw [crowRegressionOutput, ModeAmplitude.restrictEmbedding_apply]
+  change crowRegressionOutgoing
+      (Outgoing.mk (crowRegressionCouplerChannel 2 .rightSecond)) = _
+  norm_num [crowRegressionOutgoingValue]
+
 /-!
 ## D. Compiled response and negative controls
 -/
+
+/-- Generic compiled elimination returns the exact selected right-bus output. -/
+lemma crowRegression_responseTransform_selectedOutput :
+    ((netlist crowRegressionParameters).responseTransform
+        crowRegression_isWellPosed).toLinearMap crowRegressionInput
+          (Outgoing.mk (crowRegressionExternalChannel .rightOutput)) =
+      (768 / 4717) * Complex.I := by
+  have hResponse :=
+    ((netlist crowRegressionParameters).mem_behavior_iff_eq_responseTransform
+      crowRegression_isWellPosed crowRegressionInput crowRegressionOutput).mp
+        crowRegression_mem_behavior
+  have hCoordinate := congrArg (fun amplitude =>
+    amplitude (Outgoing.mk (crowRegressionExternalChannel .rightOutput))) hResponse
+  exact hCoordinate.symm.trans crowRegression_rawSelectedOutput
+
+/-- The generic Mason extraction returns the same exact selected right-bus output. -/
+lemma crowRegression_masonResponseTransform_selectedOutput :
+    (netlist crowRegressionParameters).masonResponseTransform.toLinearMap
+        crowRegressionInput
+          (Outgoing.mk (crowRegressionExternalChannel .rightOutput)) =
+      (768 / 4717) * Complex.I := by
+  rw [← (generic_spine_agrees crowRegressionParameters
+    crowRegression_isWellPosed).2.2]
+  exact crowRegression_responseTransform_selectedOutput
+
+/-- A wrong internal-ring coordinate is not the selected right-bus response value. -/
+lemma crowRegression_wrongRingIndex_ne_response :
+    crowRegressionOutgoing
+        (Outgoing.mk (crowRegressionCouplerChannel 1 .rightSecond)) ≠
+      (768 / 4717) * Complex.I := by
+  intro hEqual
+  have hImaginary := congrArg Complex.im hEqual
+  norm_num [crowRegressionOutgoingValue] at hImaginary
+
+/-- The first isolated-ring primitive expression evaluates exactly to `7 / 17`. -/
+lemma crowRegression_firstIsolatedRingTransfer :
+    (((3 / 5 : ℂ) - (1 / 2) * (1 / 2)) /
+      (1 - (3 / 5) * (1 / 2) * (1 / 2))) = 7 / 17 := by
+  norm_num
+
+/-- The second isolated-ring primitive expression evaluates exactly to `7 / 47`. -/
+lemma crowRegression_secondIsolatedRingTransfer :
+    (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
+      (1 - (5 / 13) * (1 / 2) * (1 / 2))) = 7 / 47 := by
+  norm_num
+
+/-- The coupled response differs from the product of the two isolated-ring transfers.
+
+This does not exclude a product of coupled unit-cell transfer matrices; published CROW
+formulations use such matrices.
+-/
+lemma crowResponse_ne_isolatedRingTransferProduct :
+    ((netlist crowRegressionParameters).responseTransform
+        crowRegression_isWellPosed).toLinearMap crowRegressionInput
+          (Outgoing.mk (crowRegressionExternalChannel .rightOutput)) ≠
+      (((3 / 5 : ℂ) - (1 / 2) * (1 / 2)) /
+          (1 - (3 / 5) * (1 / 2) * (1 / 2))) *
+        (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
+          (1 - (5 / 13) * (1 / 2) * (1 / 2))) := by
+  have hResponse :=
+    ((netlist crowRegressionParameters).mem_behavior_iff_eq_responseTransform
+      crowRegression_isWellPosed crowRegressionInput crowRegressionOutput).mp
+        crowRegression_mem_behavior
+  have hCoordinate := congrArg (fun amplitude =>
+    amplitude (Outgoing.mk (crowRegressionExternalChannel .rightOutput))) hResponse
+  rw [← hCoordinate, crowRegression_rawSelectedOutput]
+  intro hEqual
+  have hImaginary := congrArg Complex.im hEqual
+  norm_num at hImaginary
 
 end CROW
 
