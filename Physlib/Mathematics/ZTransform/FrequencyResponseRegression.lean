@@ -33,7 +33,7 @@ than using the production unit-circle expansion.
 - A. Quadrature coefficient fixture
 - B. Exact response and hostile sign sentinel
 
-## iv. Scope
+## iv. References
 
 These are exact algebraic regressions. They assert no frequency band, stability, physical
 realization, or existence of a sequence solving the associated recurrence.

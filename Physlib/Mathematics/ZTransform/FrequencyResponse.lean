@@ -44,7 +44,7 @@ real and imaginary parts of a complex number.
 - B. Cosine and sine delay sums
 - C. Transfer magnitude, phase, and the recurrence-derived response
 
-## iv. References and scope
+## iv. References
 
 The result formalizes Theorem 13 (IIR Frequency Response, p. 496) of U. Siddique,
 M. Y. Mahmoud, and S. Tahar, "On the Formalization of Z-Transform in HOL", ITP 2014,
