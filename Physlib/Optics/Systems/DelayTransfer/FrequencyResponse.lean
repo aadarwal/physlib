@@ -29,6 +29,7 @@ equals the reciprocal-Z response at `unitCirclePoint`.
 - `imaginaryFrequency`: the embedding `ω ↦ I * ω`.
 - `frequencyDelayEvaluation`: the delay tuple `q_i = exp (-I * ω * τ_i)`.
 - `unitCirclePoint`: the reciprocal-Z coordinate `z = exp (I * ω * τ)`.
+- `unitCircleReciprocalZCoordinate`: that point packaged with its nonzero proof.
 - `RationalNetlist.frequencyResponseDomain`: the proof-gated frequency domain.
 - `RationalNetlist.frequencyResponse`: the reindexed N5F response on that domain.
 - `RationalNetlist.frequencyResponse_eq_formalDelay`: the formal-delay response identity.
@@ -109,6 +110,11 @@ lemma unitCirclePoint_ne_zero (delay angularFrequency : ℝ) :
     unitCirclePoint delay angularFrequency ≠ 0 :=
   Complex.exp_ne_zero _
 
+/-- The unit-circle point packaged as a semantic reciprocal-Z coordinate. -/
+def unitCircleReciprocalZCoordinate (delay angularFrequency : ℝ) :
+    ReciprocalZCoordinate :=
+  ⟨unitCirclePoint delay angularFrequency, unitCirclePoint_ne_zero delay angularFrequency⟩
+
 /-- For one delay, the unit-circle reciprocal and imaginary-axis substitutions agree exactly. -/
 lemma zInverseEvaluation_unitCirclePoint (delay angularFrequency : ℝ) :
     zInverseEvaluation (unitCirclePoint delay angularFrequency) =
@@ -119,6 +125,13 @@ lemma zInverseEvaluation_unitCirclePoint (delay angularFrequency : ℝ) :
   congr 1
   push_cast
   ring
+
+/-- The packaged nonzero unit-circle coordinate has the same formal-delay evaluation. -/
+lemma zInverseEvaluationOnReciprocalZ_unitCirclePoint (delay angularFrequency : ℝ) :
+    zInverseEvaluationOnReciprocalZ
+        (unitCircleReciprocalZCoordinate delay angularFrequency) =
+      frequencyDelayEvaluation (fun _ : Fin 1 ↦ delay) angularFrequency :=
+  zInverseEvaluation_unitCirclePoint delay angularFrequency
 
 /-!
 
@@ -248,12 +261,14 @@ lemma unitCirclePoint_mem_reciprocalZ_responseDomain_iff
     (netlist : RationalNetlist.{u, v, w, x} 1)
     [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel]
     (delay angularFrequency : ℝ) :
-    unitCirclePoint delay angularFrequency ∈ netlist.reciprocalZ.responseDomain ↔
+    unitCircleReciprocalZCoordinate delay angularFrequency ∈
+        netlist.reciprocalZ.responseDomain ↔
       angularFrequency ∈ netlist.frequencyResponseDomain (fun _ ↦ delay) := by
-  change zInverseEvaluation (unitCirclePoint delay angularFrequency) ∈
+  change zInverseEvaluationOnReciprocalZ
+      (unitCircleReciprocalZCoordinate delay angularFrequency) ∈
       netlist.responseDomain ↔
     frequencyDelayEvaluation (fun _ ↦ delay) angularFrequency ∈ netlist.responseDomain
-  rw [zInverseEvaluation_unitCirclePoint]
+  rw [zInverseEvaluationOnReciprocalZ_unitCirclePoint]
 
 /-- Frequency-domain membership supplies the corresponding reciprocal-Z domain witness. -/
 lemma unitCirclePoint_mem_reciprocalZ_responseDomain
@@ -262,7 +277,8 @@ lemma unitCirclePoint_mem_reciprocalZ_responseDomain
     {delay angularFrequency : ℝ}
     (hFrequency : angularFrequency ∈
       netlist.frequencyResponseDomain (fun _ ↦ delay)) :
-    unitCirclePoint delay angularFrequency ∈ netlist.reciprocalZ.responseDomain :=
+    unitCircleReciprocalZCoordinate delay angularFrequency ∈
+      netlist.reciprocalZ.responseDomain :=
   (netlist.unitCirclePoint_mem_reciprocalZ_responseDomain_iff
     delay angularFrequency).mpr hFrequency
 
@@ -283,7 +299,7 @@ lemma frequencyResponse_eq_reciprocalZ
   symm
   exact netlist.response_reciprocalZ_reindex_of_evaluation_eq
     (netlist.unitCirclePoint_mem_reciprocalZ_responseDomain hFrequency)
-    (zInverseEvaluation_unitCirclePoint delay angularFrequency)
+    (zInverseEvaluationOnReciprocalZ_unitCirclePoint delay angularFrequency)
     ((netlist.mem_frequencyResponseDomain_iff _ _).mp hFrequency)
 
 end Finite
