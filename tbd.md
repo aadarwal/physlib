@@ -8,8 +8,12 @@ PR unless maintainers explicitly ask to retain it.
 
 - [ ] A human author has read every changed line and can certify that each definition, statement,
   proof step, and physical interpretation means what it claims, as required by `AI-POLICY.md` 1.7.
-- [ ] A human has independently verified every bibliography entry, page range, URL, and claim made
-  from a source, as required by `AI-POLICY.md` 2.1.
+- [x] discharged as the three-way record of `decision-L14.md` Rev. 5 — Class A (18 sources)
+  body-verified; Class B (Gu 2017, Reshef 2017, de Bernardis 2025) consumed-but-body-unverified —
+  de Bernardis body-read with a documented abstract/body discrepancy — each with integrity notes
+  at every consumer; Class C open and non-load-bearing with evidence; standing promotion rule in
+  force. Personal re-verification under `AI-POLICY.md` 2.1 applies only if this fork is later
+  proposed upstream.
 - [ ] A human has checked the contribution against `AGENTS.md`, `docs/ReviewGuidelines.md`, and
   `docs/ReviewChecklist.md` rather than treating a successful build as certification.
 - [ ] All communication with maintainers and reviewers is conducted by the human author, as

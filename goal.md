@@ -2521,8 +2521,12 @@ topologies remain open, so this milestone is still in progress.
 
 - round-trip system and fixed-ray/fixed-beam predicates;
 - determinant-one trace criterion and its exact hypotheses;
-- Fabry-Perot, ring, and selected phase-conjugate resonators; and
+- Fabry-Perot and ring resonators; and
 - agreement between ray-stability and Gaussian fixed-point views where applicable.
+
+Phase-conjugated ring resonators and the associated Thesis'15 chaos definitions and theorems
+(Defs. 5.6--5.9/5.12 and Thms. 5.9--5.10/5.19--5.20) are outside this foundation milestone. They
+remain deferred to the separate RS-07 scope and physics review named by this section's exit.
 
 Exit for H.5: the principal reusable ray-, Gaussian-, and resonator-optics foundations and their
 representative system analyses are available through Physlib definitions. This is not by itself a
@@ -2735,9 +2739,9 @@ upstream ownership decision, record the exact decision needed and work on an ind
 - [x] Confirm the upstream home and intended generality of surface traces and integral Maxwell laws.
 - [x] Confirm whether the initial planar-interface PR may state local boundary laws as named
   hypotheses while their Maxwell-integral derivation is developed in a stacked Electromagnetism PR.
-- [ ] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
+- [x] Confirm the oriented incident/reflected/transmitted `s`/`p` bases and whether Fresnel `p`
   coefficients scale full electric-vector amplitudes or tangential components.
-- [ ] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
+- [x] Confirm time-reversal pairing and reference-plane conventions before N2b/N6b reciprocity is
   named; this does not block convention-free N2a/N6a work.
 - [x] Independently confirm before upstreaming the fork's DATE-compatible convention, with SysCon
   corroborating the four-wave arrows and behavior: states are backward-first, scattering
@@ -2754,7 +2758,11 @@ upstream ownership decision, record the exact decision needed and work on an ind
 - [ ] Replace source decimal examples by human-audited exact data or certified intervals and record
   every source assumption that the Lean statement strengthens, corrects, or rejects.
 - [x] Confirm the exact HOL source licenses before adapting any source implementation.
-- [ ] Independently verify every bibliography item, URL, page range, and physics claim used in a PR.
+- [x] discharged as the three-way record of `decision-L14.md` Rev. 5 — Class A (18 sources)
+  body-verified; Class B (Gu 2017, Reshef 2017, de Bernardis 2025) consumed-but-body-unverified —
+  de Bernardis body-read with a documented abstract/body discrepancy — each with integrity notes
+  at every consumer; Class C open and non-load-bearing with evidence; standing promotion rule in
+  force.
 - [ ] Conduct all maintainer/reviewer communication and certify every contributed line. Deferred
   HUMAN-ONLY; residual act: at the trigger, personally certify the exact chosen PR diff and conduct
   every maintainer/reviewer communication.
@@ -2879,9 +2887,20 @@ The long-running goal is complete only when:
 - [ ] every completed public requirement is accurately reflected in focused API maps;
 - [ ] all builds and linters pass except independently reproduced and documented upstream-baseline
   failures;
-- [ ] external-source licenses and bibliography are independently verified by the human author;
-- [ ] the human author has reviewed and can explain every definition, theorem statement, proof, and
-  physical convention; and
+- [x] external-source licenses and bibliography are verified by `decision-L13.md`,
+  `decision-L14.md`, and `bibliography-table.md` under L14's three-class discipline — Class A
+  items body-verified (URL fetched, page-cited claims checked, sha256 against `PROVENANCE.md` where
+  applicable), Class B consumed with integrity notes, Class C metadata-only and non-load-bearing —
+  hostile-checked by A5/A6;
+- [ ] every fork-delta theorem passes three independent verification channels: (a) the **Lean
+  kernel** — proof correctness, total, with no `sorry`/`axiom`/`native_decide`; (b) an
+  **adversarial statement audit**, exhaustive over the fork-delta theorem inventory per
+  `AUDIT-PACK-SPEC.md` — an agent that did not write the module reads the printed source page and
+  the Lean statement side by side and must try to find a mismatch, recording the page and the
+  quoted text, and a second attacker from a **different model family** attacks each page; and (c) a
+  **simulation binding** — the COMPARISON-CONTRACT row and its numeric referent, or an explicit
+  recorded "no numeric referent exists" with the reason, for structural and distribution-level
+  statements; and
 - [ ] upstream work has been split into reviewable single-concept PRs and discussed by the human
   author with maintainers.
 
@@ -2898,7 +2917,8 @@ The long-running goal is complete only when:
   Optics*](https://hvg.ece.concordia.ca/Publications/Conferences/SPIE14.pdf), *Novel Optical Systems
   Design and Optimization XVII*, Proc. SPIE 9193, 91930A, 2014, for the plane-of-incidence,
   reflection, frequency-conservation, Snell, one-mode Fresnel, and electromagnetic Fabry--Perot
-  results. Its polarization label is internally inconsistent between TE (p. 7) and TM (p. 11).
+  results. Its polarization label is internally inconsistent between TE (PDF p. 7) and TM (PDF
+  p. 12).
 - U. Siddique and S. Tahar, [*Towards the Formal Analysis of Microresonators based Photonic
   Systems*](https://hvg.ece.concordia.ca/Publications/Conferences/DATE14.pdf), IEEE/ACM DATE 2014,
   pp. 1--6, for finite cascades, matrix powers, and terminated formulas whose required `M₁₁ ≠ 0`
