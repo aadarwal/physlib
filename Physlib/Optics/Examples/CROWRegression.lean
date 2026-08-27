@@ -664,107 +664,97 @@ lemma crowRegression_incidentAssembly :
       crowRegressionConnections.incidentAssembly
         crowRegressionOutgoing crowRegressionInput := by
   classical
-  have hConnected (channel : crowRegressionConnections.Channel) :
-      crowRegressionConnections.incidentAssembly
-          crowRegressionOutgoing crowRegressionInput
-            (Incident.mk (crowRegressionConnections.channelEmbedding channel)) =
-        crowRegressionOutgoing
-          (Outgoing.mk (crowRegressionConnections.channelEmbedding
-            (crowRegressionConnections.mateEquiv channel))) :=
-    crowRegressionConnections.incidentAssembly_apply_connected_channel
-      crowRegressionOutgoing crowRegressionInput channel
-  have hExternal (port : CrowRegressionExternalPort) :
-      crowRegressionConnections.incidentAssembly
-          crowRegressionOutgoing crowRegressionInput
-            (Incident.mk (crowRegressionExternalAmbientChannel port)) =
-        crowRegressionInput (Incident.mk (crowRegressionExternalChannel port)) :=
-    crowRegressionConnections.incidentAssembly_apply_external
-      crowRegressionOutgoing crowRegressionInput (crowRegressionExternalChannel port)
+  rw [crowRegressionConnections.incidentAssembly_eq_reindex_directSum]
+  apply (ModeAmplitude.reindex
+    crowRegressionConnections.incidentPartitionEquiv.symm).injective
+  rw [ModeAmplitude.reindex_symm_reindex]
   apply WithLp.ofLp_injective 2
   funext endpoint
-  rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
-  rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
-  all_goals cases mode
-  all_goals
-    first
-    | change crowRegressionIncident
-          (Incident.mk (crowRegressionCouplerChannel interface port)) =
-        crowRegressionConnections.incidentAssembly
-          crowRegressionOutgoing crowRegressionInput
-            (Incident.mk (crowRegressionCouplerChannel interface port))
-    | change crowRegressionIncident
-          (Incident.mk (crowRegressionForwardArcChannel ring port)) =
-        crowRegressionConnections.incidentAssembly
-          crowRegressionOutgoing crowRegressionInput
-            (Incident.mk (crowRegressionForwardArcChannel ring port))
-    | change crowRegressionIncident
-          (Incident.mk (crowRegressionReturnArcChannel ring port)) =
-        crowRegressionConnections.incidentAssembly
-          crowRegressionOutgoing crowRegressionInput
-            (Incident.mk (crowRegressionReturnArcChannel ring port))
-  all_goals
-    first
-    | fin_cases interface
-    | fin_cases ring
-  all_goals cases port
-  all_goals
-    first
-    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
-        PortConnectionFamily.externalIncidentEmbedding_apply,
-        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
-        (hExternal .leftInput).symm
-    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
-        PortConnectionFamily.externalIncidentEmbedding_apply,
-        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
-        (hExternal .leftOutput).symm
-    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
-        PortConnectionFamily.externalIncidentEmbedding_apply,
-        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
-        (hExternal .rightInput).symm
-    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
-        PortConnectionFamily.externalIncidentEmbedding_apply,
-        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
-        (hExternal .rightOutput).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionRightConnectedChannel _ false .left)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionRightConnectedChannel _ false .right)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionRightConnectedChannel _ true .left)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionRightConnectedChannel _ true .right)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionForwardConnectedChannel _ .left)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionForwardConnectedChannel _ .right)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionReturnConnectedChannel _ .left)).symm
-    | simpa [crowRegressionIncident, crowRegressionOutgoing,
-        crowRegressionIncidentValue, crowRegressionOutgoingValue,
-        crowRegressionChannel, crowRegressionCouplerChannel,
-        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
-        (hConnected (crowRegressionReturnConnectedChannel _ .right)).symm
+  rcases endpoint with connected | external
+  · rcases connected with ⟨channel⟩
+    rw [ModeAmplitude.reindex_apply, Equiv.symm_symm,
+      crowRegressionConnections.incidentPartitionEquiv_apply_inl,
+      crowRegressionConnections.incidentChannelEmbedding_apply,
+      ModeAmplitude.directSum_apply_inl]
+    have hRouting :
+        crowRegressionConnections.idealRouting.toLinearMap
+            (crowRegressionOutgoing.restrictEmbedding
+              crowRegressionConnections.outgoingChannelEmbedding)
+              (Incident.mk channel) =
+          crowRegressionOutgoing
+            (Outgoing.mk (crowRegressionConnections.channelEmbedding
+              (crowRegressionConnections.mateEquiv channel))) := by
+      simpa only [crowRegressionConnections.mateEquiv_apply_apply,
+        ModeAmplitude.restrictEmbedding_apply,
+        crowRegressionConnections.outgoingChannelEmbedding_apply] using
+          crowRegressionConnections.idealRouting_apply
+            (crowRegressionOutgoing.restrictEmbedding
+              crowRegressionConnections.outgoingChannelEmbedding)
+                (crowRegressionConnections.mateEquiv channel)
+    rw [hRouting]
+    rcases channel with ⟨connection, localChannel⟩
+    rcases connection with right | forwardOrReturn
+    · rcases right with ⟨ring, kind⟩
+      cases kind <;> rcases localChannel with mode | mode <;> cases mode
+      all_goals
+        first
+        | change crowRegressionIncident
+              (Incident.mk (crowRegressionForwardArcChannel ring .right)) =
+            crowRegressionOutgoing
+              (Outgoing.mk (crowRegressionCouplerChannel ring.succ .leftFirst))
+        | change crowRegressionIncident
+              (Incident.mk (crowRegressionCouplerChannel ring.succ .leftFirst)) =
+            crowRegressionOutgoing
+              (Outgoing.mk (crowRegressionForwardArcChannel ring .right))
+        | change crowRegressionIncident
+              (Incident.mk (crowRegressionCouplerChannel ring.succ .rightFirst)) =
+            crowRegressionOutgoing
+              (Outgoing.mk (crowRegressionReturnArcChannel ring .left))
+        | change crowRegressionIncident
+              (Incident.mk (crowRegressionReturnArcChannel ring .left)) =
+            crowRegressionOutgoing
+              (Outgoing.mk (crowRegressionCouplerChannel ring.succ .rightFirst))
+      all_goals fin_cases ring
+      all_goals norm_num [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue]
+    · rcases forwardOrReturn with forwardIndex | returnIndex
+      · rcases localChannel with mode | mode <;> cases mode
+        all_goals
+          first
+          | change crowRegressionIncident
+                (Incident.mk
+                  (crowRegressionCouplerChannel forwardIndex.castSucc .rightSecond)) =
+              crowRegressionOutgoing
+                (Outgoing.mk (crowRegressionForwardArcChannel forwardIndex .left))
+          | change crowRegressionIncident
+                (Incident.mk (crowRegressionForwardArcChannel forwardIndex .left)) =
+              crowRegressionOutgoing
+                (Outgoing.mk
+                  (crowRegressionCouplerChannel forwardIndex.castSucc .rightSecond))
+        all_goals fin_cases forwardIndex
+        all_goals norm_num [crowRegressionIncident, crowRegressionOutgoing,
+          crowRegressionIncidentValue, crowRegressionOutgoingValue]
+      · rcases localChannel with mode | mode <;> cases mode
+        all_goals
+          first
+          | change crowRegressionIncident
+                (Incident.mk (crowRegressionReturnArcChannel returnIndex .right)) =
+              crowRegressionOutgoing
+                (Outgoing.mk
+                  (crowRegressionCouplerChannel returnIndex.castSucc .leftSecond))
+          | change crowRegressionIncident
+                (Incident.mk
+                  (crowRegressionCouplerChannel returnIndex.castSucc .leftSecond)) =
+              crowRegressionOutgoing
+                (Outgoing.mk (crowRegressionReturnArcChannel returnIndex .right))
+        all_goals fin_cases returnIndex
+        all_goals norm_num [crowRegressionIncident, crowRegressionOutgoing,
+          crowRegressionIncidentValue, crowRegressionOutgoingValue]
+  · rcases external with ⟨channel⟩
+    simp only [ModeAmplitude.reindex_apply, Equiv.symm_symm,
+      crowRegressionConnections.incidentPartitionEquiv_apply_inr,
+      ModeAmplitude.directSum_apply_inr, crowRegressionInput,
+      ModeAmplitude.restrictEmbedding_apply]
 
 /-!
 ## D. Compiled response and negative controls
