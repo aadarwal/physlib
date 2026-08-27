@@ -220,8 +220,9 @@ lemma reciprocityRegression_s15_restoring_inversePaired (label : Fin 2) :
         (reciprocityRegressionSwapPairing (Incident.mk label)).channel =
       (reciprocityRegressionS15Incident label)⁻¹ := by
   fin_cases label <;> apply Subtype.ext <;>
+    simp only [Circle.coe_inv] <;>
     norm_num [reciprocityRegressionI, reciprocityRegressionNegI,
-      Circle.coe_inv, Complex.ext_iff]
+      Complex.ext_iff]
 
 /-- Direct primitive expansion of the S-15 pairing-aware restoring gauge. -/
 lemma reciprocityRegression_s15_restoring_matrix :
