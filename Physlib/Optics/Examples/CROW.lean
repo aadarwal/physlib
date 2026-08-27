@@ -16,10 +16,10 @@ public import Physlib.Optics.Network.HierarchicalReuse
 ## i. Overview
 
 This file is an end-to-end user of the typed network API. For every natural number `ringCount`,
-it assembles a chain of `ringCount` ring resonators from existing physical-port directional
+it assembles a sequence of `ringCount` ring resonators from existing physical-port directional
 couplers and matched-propagation components. Adjacent rings share a directional coupler. Only the
 unused arm of the first and last couplers supplies bus access, so this is a directly
-resonator-coupled chain rather than a sequence of rings side-coupled to one common bus.
+resonator-coupled sequence rather than a sequence of rings side-coupled to one common bus.
 
 The component family contains `ringCount + 1` couplers and two propagation half-arcs per ring.
 The wiring is staged without changing its meaning: right-interface links are closed first, then
@@ -27,10 +27,10 @@ the two left-interface link families. `HierarchicalNetlist.flatten_behavior_eq` 
 staged relation with the flat netlist, while `PortConnectionFamily.append_assoc_transport`
 identifies the two three-stage parenthesizations after the canonical dependent-boundary transport.
 
-On a supplied proof that the finite feedback equations are well posed, `semantics_agree` applies
-the general API to the whole family at once. It equates the component-closure, flat relational,
-hierarchical, N5 response, and Mason response presentations. No CROW-specific eliminator or stored
-closed response is introduced.
+On a supplied proof that the finite feedback equations are well posed, `generic_spine_agrees`
+applies the generic theorem spine to the whole family at once. It identifies the flat relation
+with compiled elimination and Mason response, while the hierarchy equality is singular safe. No
+CROW-specific eliminator or stored closed response is introduced.
 
 This is a fixed-carrier, single-mode algebraic network. The parameters do not constitute a
 physical loss model, dispersion model, fabrication-tolerance model, or thermal model. The file
@@ -45,14 +45,14 @@ claim is made.
 - `CROW.netlist`: the flat directly coupled `ringCount`-ring network.
 - `CROW.connections_assoc_transport`: canonical three-stage wiring associativity.
 - `CROW.netlist_behavior_eq_staged`: hierarchical and flat relational semantics agree.
-- `CROW.semantics_agree`: the all-`ringCount` cross-semantics result on the N5 solve gate.
+- `CROW.generic_spine_agrees`: the generic response spine on the well-posedness gate.
 
 ## iii. Table of contents
 
 - A. Parameters and existing component family
 - B. Three stages of directly coupled wiring
 - C. Flat network boundary
-- D. Generic cross-semantics instantiation
+- D. Generic theorem-spine instantiation
 
 ## iv. References
 
@@ -74,7 +74,7 @@ namespace CROW
 ## A. Parameters and existing component family
 -/
 
-/-- Component parameters for a directly coupled chain of `ringCount` resonators. -/
+/-- Component parameters for a directly coupled sequence of `ringCount` resonators. -/
 structure Parameters (ringCount : ℕ) where
   /-- Coupler parameters at the two bus interfaces and every inter-ring interface. -/
   coupler : Fin (ringCount + 1) → DirectionalCoupler.Parameters
@@ -83,7 +83,7 @@ structure Parameters (ringCount : ℕ) where
   /-- Propagation parameters on the return half-arc of each ring. -/
   returnArc : Fin ringCount → MatchedPropagation.Parameters
 
-/-- Labels for the existing couplers and matched-propagation half-arcs in the chain. -/
+/-- Labels for the existing couplers and matched-propagation half-arcs in the sequence. -/
 inductive Component (ringCount : ℕ)
   | coupler (interface : Fin (ringCount + 1))
   | forwardArc (ring : Fin ringCount)
@@ -516,10 +516,10 @@ noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
   exact outerChannelFintype p
 
 /-!
-## D. Generic cross-semantics instantiation
+## D. Generic theorem-spine instantiation
 -/
 
-/-- The staged hierarchical behavior of the directly coupled chain. -/
+/-- The staged hierarchical behavior of the directly coupled sequence. -/
 def stagedBehavior {ringCount : ℕ} (p : Parameters ringCount) :
     LinearBehavior (netlist p).ExternalIncident (netlist p).ExternalOutgoing :=
   ((hierarchy p).outer.closeBehavior
@@ -536,13 +536,14 @@ lemma netlist_behavior_eq_staged {ringCount : ℕ} (p : Parameters ringCount) :
     (netlist p).behavior = stagedBehavior p := by
   exact (hierarchy p).flatten_behavior_eq
 
-/-- All five generic network presentations agree for every well-posed directly coupled CROW.
+/-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
 
-The five presentations are the component graph closed by the flat wiring, the flat relational
-behavior, staged hierarchical closure, the N5 response graph, and the Mason response transform.
-The proof only instantiates generic API results; it performs no topology-specific elimination.
+The result identifies component closure, the flat relation, staged hierarchical closure, compiled
+elimination, and Mason extraction by instantiating generic API lemmas. The hierarchy equality does
+not need well-posedness; the compiled and Mason equalities do. No topology-specific elimination is
+performed, and no topology-specific bridge is added.
 -/
-lemma semantics_agree {ringCount : ℕ} (p : Parameters ringCount)
+lemma generic_spine_agrees {ringCount : ℕ} (p : Parameters ringCount)
     (hWellPosed : (netlist p).IsWellPosed) :
     (netlist p).behavior =
         (netlist p).connections.closeBehavior (netlist p).componentBehavior ∧
