@@ -715,7 +715,8 @@ lemma crowRegression_incidentAssembly :
             crowRegressionOutgoing
               (Outgoing.mk (crowRegressionCouplerChannel ring.succ .rightFirst))
       all_goals fin_cases ring
-      all_goals norm_num [crowRegressionIncident, crowRegressionOutgoing,
+      all_goals norm_num [crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel,
         crowRegressionIncidentValue, crowRegressionOutgoingValue]
     · rcases forwardOrReturn with forwardIndex | returnIndex
       · rcases localChannel with mode | mode <;> cases mode
@@ -732,8 +733,9 @@ lemma crowRegression_incidentAssembly :
                 (Outgoing.mk
                   (crowRegressionCouplerChannel forwardIndex.castSucc .rightSecond))
         all_goals fin_cases forwardIndex
-        all_goals norm_num [crowRegressionIncident, crowRegressionOutgoing,
-          crowRegressionIncidentValue, crowRegressionOutgoingValue]
+        all_goals norm_num [crowRegressionCouplerChannel,
+          crowRegressionForwardArcChannel, crowRegressionIncidentValue,
+          crowRegressionOutgoingValue]
       · rcases localChannel with mode | mode <;> cases mode
         all_goals
           first
@@ -748,8 +750,9 @@ lemma crowRegression_incidentAssembly :
               crowRegressionOutgoing
                 (Outgoing.mk (crowRegressionReturnArcChannel returnIndex .right))
         all_goals fin_cases returnIndex
-        all_goals norm_num [crowRegressionIncident, crowRegressionOutgoing,
-          crowRegressionIncidentValue, crowRegressionOutgoingValue]
+        all_goals norm_num [crowRegressionCouplerChannel,
+          crowRegressionReturnArcChannel, crowRegressionIncidentValue,
+          crowRegressionOutgoingValue]
   · rcases external with ⟨channel⟩
     simp only [ModeAmplitude.reindex_apply, Equiv.symm_symm,
       crowRegressionConnections.incidentPartitionEquiv_apply_inr,
