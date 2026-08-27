@@ -342,6 +342,150 @@ def physicalPortSuite9bIndexedOutput :
         physicalPortSuite9bInterfaceRawOutput
           (PlanarDielectricInterface.channelEquiv.symm ⟨port, mode⟩)
 
+/-- Jones coordinate zero in indexed component coordinates. -/
+abbrev physicalPortSuite9bPolarizationZeroIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.polarization,
+    ⟨JonesMatrix.Port.aperture, 0⟩⟩
+
+/-- Jones coordinate one in indexed component coordinates. -/
+abbrev physicalPortSuite9bPolarizationOneIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.polarization,
+    ⟨JonesMatrix.Port.aperture, 1⟩⟩
+
+/-- The negative-side s channel in indexed component coordinates. -/
+abbrev physicalPortSuite9bInterfaceNegativeSIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.interface,
+    ⟨PlanarDielectricInterface.Port.negativeSide,
+      PlanarDielectricInterface.PolarizationMode.s⟩⟩
+
+/-- The positive-side s channel in indexed component coordinates. -/
+abbrev physicalPortSuite9bInterfacePositiveSIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.interface,
+    ⟨PlanarDielectricInterface.Port.positiveSide,
+      PlanarDielectricInterface.PolarizationMode.s⟩⟩
+
+/-- The negative-side p channel in indexed component coordinates. -/
+abbrev physicalPortSuite9bInterfaceNegativePIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.interface,
+    ⟨PlanarDielectricInterface.Port.negativeSide,
+      PlanarDielectricInterface.PolarizationMode.p⟩⟩
+
+/-- The positive-side p channel in indexed component coordinates. -/
+abbrev physicalPortSuite9bInterfacePositivePIndexed :
+    physicalPortSuite9bFamily.IndexedChannel :=
+  ⟨PhysicalPortSuite9bComponent.interface,
+    ⟨PlanarDielectricInterface.Port.positiveSide,
+      PlanarDielectricInterface.PolarizationMode.p⟩⟩
+
+/-- A finite indexed sum is the sum of its six displayed physical coordinates. -/
+lemma physicalPortSuite9b_sum_indexed
+    (value : physicalPortSuite9bFamily.IndexedChannel → ℂ) :
+    (∑ channel, value channel) =
+      value physicalPortSuite9bPolarizationZeroIndexed +
+        value physicalPortSuite9bPolarizationOneIndexed +
+          value physicalPortSuite9bInterfaceNegativeSIndexed +
+            value physicalPortSuite9bInterfacePositiveSIndexed +
+              value physicalPortSuite9bInterfaceNegativePIndexed +
+                value physicalPortSuite9bInterfacePositivePIndexed := by
+  classical
+  have hUniv :
+      (Finset.univ : Finset physicalPortSuite9bFamily.IndexedChannel) =
+        {physicalPortSuite9bPolarizationZeroIndexed,
+          physicalPortSuite9bPolarizationOneIndexed,
+          physicalPortSuite9bInterfaceNegativeSIndexed,
+          physicalPortSuite9bInterfacePositiveSIndexed,
+          physicalPortSuite9bInterfaceNegativePIndexed,
+          physicalPortSuite9bInterfacePositivePIndexed} := by
+    ext channel
+    rcases channel with ⟨component, ⟨port, mode⟩⟩
+    cases component
+    · cases port
+      fin_cases mode <;> simp
+    · cases port <;> cases mode <;> simp
+  rw [hUniv]
+  simp [physicalPortSuite9bPolarizationZeroIndexed,
+    physicalPortSuite9bPolarizationOneIndexed,
+    physicalPortSuite9bInterfaceNegativeSIndexed,
+    physicalPortSuite9bInterfacePositiveSIndexed,
+    physicalPortSuite9bInterfaceNegativePIndexed,
+    physicalPortSuite9bInterfacePositivePIndexed]
+  ring
+
+/-- The six-channel primitive matrix in indexed component coordinates. -/
+def physicalPortSuite9bExplicitIndexedTransform :
+    ModeTransform physicalPortSuite9bFamily.IndexedChannel
+      physicalPortSuite9bFamily.IndexedChannel := fun output input =>
+  match output, input with
+  | ⟨.polarization, ⟨JonesMatrix.Port.aperture, 0⟩⟩,
+      ⟨.polarization, ⟨JonesMatrix.Port.aperture, 0⟩⟩ => 1
+  | ⟨.polarization, ⟨JonesMatrix.Port.aperture, 1⟩⟩,
+      ⟨.polarization, ⟨JonesMatrix.Port.aperture, 1⟩⟩ => -Complex.I
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩ => 3 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩ => 4 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩ => 4 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.s⟩⟩ => -3 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩ => -3 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩ => 4 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.negativeSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩ => 4 / 5
+  | ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩,
+      ⟨.interface, ⟨PlanarDielectricInterface.Port.positiveSide,
+        PlanarDielectricInterface.PolarizationMode.p⟩⟩ => 3 / 5
+  | _, _ => 0
+
+/-- Unfolding the two owned laws gives the displayed primitive indexed matrix. -/
+lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
+    physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform =
+      physicalPortSuite9bExplicitIndexedTransform := by
+  ext output input
+  rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
+  rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
+  cases outputComponent <;> cases inputComponent
+  all_goals
+    cases outputPort <;> cases outputMode <;>
+      cases inputPort <;> cases inputMode
+  all_goals
+    simp [ScatteringComponentFamily.indexedScatteringMatrix,
+      physicalPortSuite9bExplicitIndexedTransform, physicalPortSuite9bFamily,
+      physicalPortSuite9bScattering, physicalPortSuite9bPortFamily,
+      JonesMatrix.physicalScattering,
+      PlanarDielectricInterface.physicalScattering,
+      ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
+      JonesMatrix.scattering, JonesMatrix.channelEquiv,
+      JonesMatrix.quarterWavePlate, JonesMatrix.linearRetarder_zero_axis_entries,
+      JonesMatrix.linearRetarderPhase_pi_div_two,
+      PlanarDielectricInterface.polarizedScattering,
+      PlanarDielectricInterface.channelEquiv,
+      PlanarDielectricInterface.sideEquiv, ScatteringMatrix.directSum,
+      ModeTransform.directSum, physicalPortSuite9b_s_kernel,
+      physicalPortSuite9b_p_kernel, Matrix.blockDiagonal'_apply]
+
 /-- Restricting the mixed input recovers the owned Jones local input. -/
 lemma physicalPortSuite9bIndexedInput_restrict_polarization :
     physicalPortSuite9bIndexedInput.restrictEmbedding
@@ -368,31 +512,38 @@ lemma physicalPortSuite9b_indexed_action :
     physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
         physicalPortSuite9bIndexedInput =
       physicalPortSuite9bIndexedOutput := by
+  rw [physicalPortSuite9b_indexedScatteringMatrix_eq_explicit]
   apply WithLp.ofLp_injective 2
   funext output
-  change ModeTransform.toLinearMap
-      (Matrix.blockDiagonal' fun selected =>
-        (physicalPortSuite9bScattering selected).toModeTransform)
-      physicalPortSuite9bIndexedInput output = _
-  rcases output with ⟨component, channel⟩
-  have hBlock := ModeTransform.blockDiagonal'_apply
-    (fun selected => (physicalPortSuite9bScattering selected).toModeTransform)
-    physicalPortSuite9bIndexedInput component channel
-  calc
-    _ = (physicalPortSuite9bScattering component).toModeTransform.toLinearMap
-        (physicalPortSuite9bIndexedInput.restrictEmbedding
-          (Function.Embedding.sigmaMk component)) channel := hBlock
-    _ = _ := by
-      cases component
-      · rw [physicalPortSuite9bIndexedInput_restrict_polarization,
-          physicalPortSuite9b_polarization_local_action]
-        rcases channel with ⟨port, coordinate⟩
-        cases port
-        rfl
-      · rw [physicalPortSuite9bIndexedInput_restrict_interface,
-          physicalPortSuite9b_interface_local_action]
-        rcases channel with ⟨port, mode⟩
-        cases port <;> cases mode <;> rfl
+  rcases output with ⟨component, ⟨port, mode⟩⟩
+  cases component
+  · cases port
+    fin_cases mode
+    all_goals
+      simp [physicalPortSuite9bExplicitIndexedTransform,
+        physicalPortSuite9bIndexedInput, physicalPortSuite9bIndexedOutput,
+        physicalPortSuite9bPolarizationRawInput,
+        physicalPortSuite9bPolarizationRawOutput,
+        physicalPortSuite9bInterfaceRawInput,
+        physicalPortSuite9bInterfaceRawOutput,
+        PlanarDielectricInterface.channelEquiv,
+        PlanarDielectricInterface.sideEquiv, ModeAmplitude.directSum,
+        ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
+        dotProduct, physicalPortSuite9b_sum_indexed]
+    all_goals ring_nf
+  · cases port <;> cases mode
+    all_goals
+      simp [physicalPortSuite9bExplicitIndexedTransform,
+        physicalPortSuite9bIndexedInput, physicalPortSuite9bIndexedOutput,
+        physicalPortSuite9bPolarizationRawInput,
+        physicalPortSuite9bPolarizationRawOutput,
+        physicalPortSuite9bInterfaceRawInput,
+        physicalPortSuite9bInterfaceRawOutput,
+        PlanarDielectricInterface.channelEquiv,
+        PlanarDielectricInterface.sideEquiv, ModeAmplitude.directSum,
+        ModeTransform.toLinearMap, Matrix.toLpLin_apply, Matrix.mulVec,
+        dotProduct, physicalPortSuite9b_sum_indexed]
+    all_goals ring_nf
 
 /-- The mixed input in aggregate component-owned physical-channel coordinates. -/
 def physicalPortSuite9bAggregateInput :
@@ -498,13 +649,6 @@ abbrev physicalPortSuite9bHostileFamily : ScatteringComponentFamily where
   portFamily := physicalPortSuite9bPortFamily
   scattering := physicalPortSuite9bHostileScattering
 
-/-- The negative-side s channel in indexed component coordinates. -/
-abbrev physicalPortSuite9bInterfaceNegativeSIndexed :
-    physicalPortSuite9bFamily.IndexedChannel :=
-  ⟨PhysicalPortSuite9bComponent.interface,
-    ⟨PlanarDielectricInterface.Port.negativeSide,
-      PlanarDielectricInterface.PolarizationMode.s⟩⟩
-
 /-- The correct indexed action gives `11/5` at negative-side s. -/
 lemma physicalPortSuite9b_indexed_negative_s_value :
     physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
@@ -524,54 +668,85 @@ lemma physicalPortSuite9b_indexed_negative_s_value :
   rw [hChannel]
   rfl
 
+/-- Lift the one-side polarization swap to the interface block of indexed channels. -/
+def physicalPortSuite9bIndexedNegativePolarizationSwap :
+    physicalPortSuite9bFamily.IndexedChannel ≃
+      physicalPortSuite9bFamily.IndexedChannel where
+  toFun
+    | ⟨PhysicalPortSuite9bComponent.polarization, channel⟩ =>
+      ⟨PhysicalPortSuite9bComponent.polarization, channel⟩
+    | ⟨PhysicalPortSuite9bComponent.interface, channel⟩ =>
+      ⟨PhysicalPortSuite9bComponent.interface,
+        physicalPortSuite9bInterfaceNegativePolarizationSwap channel⟩
+  invFun
+    | ⟨PhysicalPortSuite9bComponent.polarization, channel⟩ =>
+      ⟨PhysicalPortSuite9bComponent.polarization, channel⟩
+    | ⟨PhysicalPortSuite9bComponent.interface, channel⟩ =>
+      ⟨PhysicalPortSuite9bComponent.interface,
+        physicalPortSuite9bInterfaceNegativePolarizationSwap.symm channel⟩
+  left_inv := by
+    rintro ⟨component, ⟨port, mode⟩⟩
+    cases component
+    · rfl
+    · cases port <;> cases mode <;> rfl
+  right_inv := by
+    rintro ⟨component, ⟨port, mode⟩⟩
+    cases component
+    · rfl
+    · cases port <;> cases mode <;> rfl
+
+/-- The hostile indexed matrix is exactly the one-block output-row reindex. -/
+lemma physicalPortSuite9b_hostile_indexedScatteringMatrix_eq_reindex :
+    physicalPortSuite9bHostileFamily.indexedScatteringMatrix.toModeTransform =
+      physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.reindex
+        (Equiv.refl _) physicalPortSuite9bIndexedNegativePolarizationSwap := by
+  ext output input
+  rcases output with ⟨outputComponent, ⟨outputPort, outputMode⟩⟩
+  rcases input with ⟨inputComponent, ⟨inputPort, inputMode⟩⟩
+  cases outputComponent <;> cases inputComponent
+  all_goals
+    cases outputPort <;> cases outputMode <;>
+      cases inputPort <;> cases inputMode
+  all_goals
+    simp [ScatteringComponentFamily.indexedScatteringMatrix,
+      physicalPortSuite9bHostileFamily, physicalPortSuite9bHostileScattering,
+      physicalPortSuite9bFamily, physicalPortSuite9bScattering,
+      physicalPortSuite9bHostileInterfaceScattering,
+      physicalPortSuite9bIndexedNegativePolarizationSwap,
+      physicalPortSuite9bInterfaceNegativePolarizationSwap,
+      ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
+      Matrix.blockDiagonal'_apply]
+
 /-- The hostile family instead gives the p value `7/5` at negative-side s. -/
 lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
     physicalPortSuite9bHostileFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
       physicalPortSuite9bIndexedInput
         physicalPortSuite9bInterfaceNegativeSIndexed = 7 / 5 := by
-  unfold physicalPortSuite9bInterfaceNegativeSIndexed
-  change ModeTransform.toLinearMap
-      (Matrix.blockDiagonal' fun selected =>
-        (physicalPortSuite9bHostileScattering selected).toModeTransform)
-      physicalPortSuite9bIndexedInput
-        ⟨PhysicalPortSuite9bComponent.interface,
-          ⟨PlanarDielectricInterface.Port.negativeSide,
-            PlanarDielectricInterface.PolarizationMode.s⟩⟩ = _
-  have hBlock := ModeTransform.blockDiagonal'_apply
-    (fun selected => (physicalPortSuite9bHostileScattering selected).toModeTransform)
-    physicalPortSuite9bIndexedInput PhysicalPortSuite9bComponent.interface
-      ⟨PlanarDielectricInterface.Port.negativeSide,
-        PlanarDielectricInterface.PolarizationMode.s⟩
-  calc
-    _ = (physicalPortSuite9bHostileScattering
-          PhysicalPortSuite9bComponent.interface).toModeTransform.toLinearMap
-        (physicalPortSuite9bIndexedInput.restrictEmbedding
-          (Function.Embedding.sigmaMk PhysicalPortSuite9bComponent.interface))
+  rw [physicalPortSuite9b_hostile_indexedScatteringMatrix_eq_reindex,
+    ModeTransform.toLinearMap_reindex_eq]
+  have hInput :
+      ModeAmplitude.reindex (Equiv.refl _).symm
+          physicalPortSuite9bIndexedInput =
+        physicalPortSuite9bIndexedInput := by
+    apply WithLp.ofLp_injective 2
+    funext channel
+    rfl
+  rw [hInput, physicalPortSuite9b_indexed_action]
+  change physicalPortSuite9bIndexedOutput
+      (physicalPortSuite9bIndexedNegativePolarizationSwap.symm
+        physicalPortSuite9bInterfaceNegativeSIndexed) = _
+  change physicalPortSuite9bInterfaceRawOutput
+      (PlanarDielectricInterface.channelEquiv.symm
         ⟨PlanarDielectricInterface.Port.negativeSide,
-          PlanarDielectricInterface.PolarizationMode.s⟩ := hBlock
-    _ = _ := by
-      rw [physicalPortSuite9bIndexedInput_restrict_interface,
-        physicalPortSuite9b_hostile_interface_local_action]
-      change physicalPortSuite9bInterfaceRawOutput
-          (PlanarDielectricInterface.channelEquiv.symm
-            (physicalPortSuite9bInterfaceNegativePolarizationSwap.symm
-              ⟨PlanarDielectricInterface.Port.negativeSide,
-                PlanarDielectricInterface.PolarizationMode.s⟩)) = _
-      have hSwap :
-          physicalPortSuite9bInterfaceNegativePolarizationSwap.symm
-              ⟨PlanarDielectricInterface.Port.negativeSide,
-                PlanarDielectricInterface.PolarizationMode.s⟩ =
-            ⟨PlanarDielectricInterface.Port.negativeSide,
-              PlanarDielectricInterface.PolarizationMode.p⟩ := by
-        rfl
-      have hChannel :
-          PlanarDielectricInterface.channelEquiv.symm
-              ⟨PlanarDielectricInterface.Port.negativeSide,
-                PlanarDielectricInterface.PolarizationMode.p⟩ =
-            Sum.inr 0 := by
-        rfl
-      rw [hSwap, hChannel]
-      rfl
+          PlanarDielectricInterface.PolarizationMode.p⟩) = _
+  have hChannel :
+      PlanarDielectricInterface.channelEquiv.symm
+          ⟨PlanarDielectricInterface.Port.negativeSide,
+            PlanarDielectricInterface.PolarizationMode.p⟩ =
+        Sum.inr 0 := by
+    rfl
+  rw [hChannel]
+  rfl
 
 /-- Swapping one owned side's polarization fiber changes the mixed-family output. -/
 lemma physicalPortSuite9b_hostile_action_ne :
@@ -588,4 +763,3 @@ lemma physicalPortSuite9b_hostile_action_ne :
 end
 
 end Optics
-
