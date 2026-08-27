@@ -318,10 +318,10 @@ lemma crowRegressionExternalAmbientChannel_not_connected
     (port : CrowRegressionExternalPort) :
     crowRegressionExternalAmbientChannel port ∉
       Set.range crowRegressionConnections.channelEmbedding := by
-  rintro ⟨⟨connection, local⟩, hChannel⟩
+  rintro ⟨⟨connection, localChannel⟩, hChannel⟩
   rcases connection with right | forwardOrReturn
   · rcases right with ⟨ring, kind⟩
-    cases kind <;> rcases local with mode | mode <;> cases mode
+    cases kind <;> rcases localChannel with mode | mode <;> cases mode
     all_goals
       simp only [crowRegressionRightForward_left_embedding,
         crowRegressionRightForward_right_embedding,
@@ -332,14 +332,14 @@ lemma crowRegressionExternalAmbientChannel_not_connected
           crowRegressionForwardArcChannel, crowRegressionReturnArcChannel,
           crowRegressionChannel] at hChannel
   · rcases forwardOrReturn with forwardIndex | returnIndex
-    · rcases local with mode | mode <;> cases mode
+    · rcases localChannel with mode | mode <;> cases mode
       all_goals
         simp only [crowRegressionForward_left_embedding,
           crowRegressionForward_right_embedding] at hChannel
         cases port <;>
           simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
             crowRegressionForwardArcChannel, crowRegressionChannel] at hChannel
-    · rcases local with mode | mode <;> cases mode
+    · rcases localChannel with mode | mode <;> cases mode
       all_goals
         simp only [crowRegressionReturn_left_embedding,
           crowRegressionReturn_right_embedding] at hChannel
