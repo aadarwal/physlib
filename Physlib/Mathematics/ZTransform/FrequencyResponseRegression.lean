@@ -111,6 +111,8 @@ lemma transferFunction_quadrature :
   norm_num [delaySymbol, quadratureFeedback, quadratureFeedforward]
   field_simp [one_add_I_half_ne_zero, two_add_I_ne_zero]
   ring_nf
+  rw [Complex.I_sq]
+  ring
 
 /-- Replacing the reciprocal point `I⁻¹ = -I` by `I` reverses the frequency sign and changes the
 fixture value. Both sides expand from the primitive transfer and coefficient definitions. -/
