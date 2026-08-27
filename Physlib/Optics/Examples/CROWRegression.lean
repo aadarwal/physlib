@@ -174,6 +174,124 @@ def crowRegressionReturnArcChannel (ring : Fin 2) (port : MatchedPropagation.Por
     CrowRegressionChannel :=
   crowRegressionChannel (.returnArc ring) ⟨port, ()⟩
 
+/-- One connected channel in the concrete right-interface wiring stage. -/
+def crowRegressionRightConnectedChannel (ring : Fin 2) (kind : Bool)
+    (endpoint : PortConnection.End) : crowRegressionConnections.Channel :=
+  match endpoint with
+  | .left => ⟨Sum.inl (ring, kind), Sum.inl ()⟩
+  | .right => ⟨Sum.inl (ring, kind), Sum.inr ()⟩
+
+/-- One connected channel in the concrete forward left-interface wiring stage. -/
+def crowRegressionForwardConnectedChannel (ring : Fin 2)
+    (endpoint : PortConnection.End) : crowRegressionConnections.Channel :=
+  match endpoint with
+  | .left => ⟨Sum.inr (Sum.inl ring), Sum.inl ()⟩
+  | .right => ⟨Sum.inr (Sum.inl ring), Sum.inr ()⟩
+
+/-- One connected channel in the concrete return left-interface wiring stage. -/
+def crowRegressionReturnConnectedChannel (ring : Fin 2)
+    (endpoint : PortConnection.End) : crowRegressionConnections.Channel :=
+  match endpoint with
+  | .left => ⟨Sum.inr (Sum.inr ring), Sum.inl ()⟩
+  | .right => ⟨Sum.inr (Sum.inr ring), Sum.inr ()⟩
+
+/-- The first endpoint of a forward right-interface link is the forward half-arc output. -/
+@[simp]
+lemma crowRegressionRightForward_left_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionRightConnectedChannel ring false .left) =
+      crowRegressionForwardArcChannel ring .right := by
+  rfl
+
+/-- The second endpoint of a forward right-interface link is the next coupler input. -/
+@[simp]
+lemma crowRegressionRightForward_right_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionRightConnectedChannel ring false .right) =
+      crowRegressionCouplerChannel ring.succ .leftFirst := by
+  rfl
+
+/-- The first endpoint of a return right-interface link is the next coupler output. -/
+@[simp]
+lemma crowRegressionRightReturn_left_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionRightConnectedChannel ring true .left) =
+      crowRegressionCouplerChannel ring.succ .rightFirst := by
+  rfl
+
+/-- The second endpoint of a return right-interface link is the return half-arc input. -/
+@[simp]
+lemma crowRegressionRightReturn_right_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionRightConnectedChannel ring true .right) =
+      crowRegressionReturnArcChannel ring .left := by
+  rfl
+
+/-- The first endpoint of a forward-stage link is the coupler's forward-ring output. -/
+@[simp]
+lemma crowRegressionForward_left_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionForwardConnectedChannel ring .left) =
+      crowRegressionCouplerChannel ring.castSucc .rightSecond := by
+  rfl
+
+/-- The second endpoint of a forward-stage link is the forward half-arc input. -/
+@[simp]
+lemma crowRegressionForward_right_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionForwardConnectedChannel ring .right) =
+      crowRegressionForwardArcChannel ring .left := by
+  rfl
+
+/-- The first endpoint of a return-stage link is the return half-arc output. -/
+@[simp]
+lemma crowRegressionReturn_left_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionReturnConnectedChannel ring .left) =
+      crowRegressionReturnArcChannel ring .right := by
+  rfl
+
+/-- The second endpoint of a return-stage link is the coupler's return-ring input. -/
+@[simp]
+lemma crowRegressionReturn_right_embedding (ring : Fin 2) :
+    crowRegressionConnections.channelEmbedding
+        (crowRegressionReturnConnectedChannel ring .right) =
+      crowRegressionCouplerChannel ring.castSucc .leftSecond := by
+  rfl
+
+/-- Mate routing exchanges the two ends of every concrete right-interface link. -/
+@[simp]
+lemma crowRegressionRightConnectedChannel_mate (ring : Fin 2) (kind : Bool) :
+    crowRegressionConnections.mateEquiv
+        (crowRegressionRightConnectedChannel ring kind .left) =
+      crowRegressionRightConnectedChannel ring kind .right ∧
+    crowRegressionConnections.mateEquiv
+        (crowRegressionRightConnectedChannel ring kind .right) =
+      crowRegressionRightConnectedChannel ring kind .left := by
+  constructor <;> rfl
+
+/-- Mate routing exchanges the two ends of every concrete forward-stage link. -/
+@[simp]
+lemma crowRegressionForwardConnectedChannel_mate (ring : Fin 2) :
+    crowRegressionConnections.mateEquiv
+        (crowRegressionForwardConnectedChannel ring .left) =
+      crowRegressionForwardConnectedChannel ring .right ∧
+    crowRegressionConnections.mateEquiv
+        (crowRegressionForwardConnectedChannel ring .right) =
+      crowRegressionForwardConnectedChannel ring .left := by
+  constructor <;> rfl
+
+/-- Mate routing exchanges the two ends of every concrete return-stage link. -/
+@[simp]
+lemma crowRegressionReturnConnectedChannel_mate (ring : Fin 2) :
+    crowRegressionConnections.mateEquiv
+        (crowRegressionReturnConnectedChannel ring .left) =
+      crowRegressionReturnConnectedChannel ring .right ∧
+    crowRegressionConnections.mateEquiv
+        (crowRegressionReturnConnectedChannel ring .right) =
+      crowRegressionReturnConnectedChannel ring .left := by
+  constructor <;> rfl
+
 /-- Aggregate incident evaluation reduces to the declared componentwise table. -/
 @[simp]
 lemma crowRegressionIncident_component (component : Component 2)
