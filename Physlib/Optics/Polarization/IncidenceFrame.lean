@@ -120,7 +120,9 @@ lemma inner_propagation_sPolarizationAxis
 
 /-- The `p`-polarization unit axis completing the right-handed transverse frame.
 
-The order `k × s` is essential: with Jones order `(s, p)`, it gives `s × p = k`. -/
+The order `k × s` is essential: with Jones order `(s, p)`, it gives `s × p = k`. Unguarded
+convention statement (review only): “right-handed” describes this ordered mathematical triad,
+not a circular-polarization state. -/
 def pPolarizationAxis (propagationDirection interfaceNormal : Space.Direction 3)
     (h : IsNonNormalIncidence propagationDirection interfaceNormal) :
     EuclideanSpace ℝ (Fin 3) :=

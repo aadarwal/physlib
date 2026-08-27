@@ -113,10 +113,14 @@ lemma polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal 
 -/
 
 /-- The connected fixture has incident flux `-1` and retarded output flux `1 / 2`; its role signs
-are pinned by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`. -/
+are pinned by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`
+(`Physlib/Optics/Systems/PolarizerRetarderPhysicalPowerRegression.lean:64`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`
+(`Physlib/Optics/Systems/PolarizerRetarderPhysicalPowerRegression.lean:94`). -/
 lemma polarizerRetarderPhysicalPowerRegression_actualFluxes (startTime : Time) :
     (MaterialJonesMode.linearPolarizationFamily 0
       polarizerModeNormalizationRegressionMedium polarizerModeNormalizationRegressionFrame 1

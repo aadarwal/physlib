@@ -24,10 +24,14 @@ wave constructed from the Jones-matrix output. Its squared coordinate power then
 cosine-squared law. Finally, when the input and output measured profiles are separately proved
 incident- and outgoing-flux orthonormal, E3b identifies those modal powers with the corresponding
 actual integrated one-period Poynting fluxes. The role signs are independently pinned by
-`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`.
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:117`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:180`).
 
 ## ii. Key results
 
@@ -129,10 +133,14 @@ lemma linearPolarizer_malus_modePower (z : ℂ) (analyzer input : Real.Angle) :
 flux is the negative input normal flux times the squared axis cosine.
 
 The sign converting the incident plane's outward-normal flux to positive incident power is pinned
-by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`. -/
+by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:117`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:180`). -/
 lemma linearPolarizer_malus_integratedActualMeanNormalFlux
     {Ain Aout : Type*} [MeasurableSpace Ain] [MeasurableSpace Aout]
     (z : ℂ) (analyzer input : Real.Angle) (medium : HomogeneousIsotropicMedium)

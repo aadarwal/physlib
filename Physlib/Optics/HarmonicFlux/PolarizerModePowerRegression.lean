@@ -16,10 +16,14 @@ This file applies the independently normalized material-Jones fixture to a horiz
 `π / 4` analyzer. The complex input coordinate `1 + I` has modal and actual incident power two.
 The analyzer output has coordinate power and actual outgoing flux one, so the physical flux is
 halved exactly; the role signs are pinned by
-`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`.
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:117`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:180`).
 
 ## ii. Key results
 
@@ -104,8 +108,10 @@ lemma polarizerModePowerRegression_output_power :
 -/
 
 /-- At every period origin, the actual incident normal flux is minus two; its role sign is pinned by
-`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`. -/
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`). -/
 lemma polarizerModePowerRegression_input_actualFlux (startTime : Time) :
     (MaterialJonesMode.linearPolarizationFamily polarizerModePowerRegressionInputAngle
       polarizerModeNormalizationRegressionMedium polarizerModeNormalizationRegressionFrame 1
@@ -122,8 +128,10 @@ lemma polarizerModePowerRegression_input_actualFlux (startTime : Time) :
   linarith
 
 /-- At every period origin, the actual analyzer-output normal flux is one; its outgoing role sign
-is pinned by `polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux` and
-`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`. -/
+is pinned by `polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:117`) and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:180`). -/
 lemma polarizerModePowerRegression_output_actualFlux (startTime : Time) :
     (MaterialJonesMode.linearPolarizationFamily polarizerModePowerRegressionAnalyzerAngle
       polarizerModeNormalizationRegressionMedium polarizerModeNormalizationRegressionFrame 1
@@ -144,9 +152,13 @@ lemma polarizerModePowerRegression_output_actualFlux (startTime : Time) :
 
 /-- The independently computed actual output flux is one half of the positive incident power; the
 role signs are pinned by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
-and `polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`. -/
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerModeNormalizationRegression_outgoing_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:117`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerModeNormalizationRegression_outgoing_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:180`). -/
 lemma polarizerModePowerRegression_actualFlux_halved (startTime : Time) :
     (MaterialJonesMode.linearPolarizationFamily polarizerModePowerRegressionAnalyzerAngle
       polarizerModeNormalizationRegressionMedium polarizerModeNormalizationRegressionFrame 1

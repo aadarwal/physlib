@@ -37,7 +37,9 @@ The selected normal signs are explicit geometric branch hypotheses. Unguarded co
 statement (review only): they do not follow from the incident or reflected labels and are not
 identified here with group velocity, energy flux, or an outgoing radiation condition. At normal
 incidence these hypotheses select no unique incidence plane or `s` axis; an independently selected
-tangent frame is required.
+tangent frame is required, as pinned by
+`normalIncidenceRegressionFrames_not_canonicalNonNormal`
+(`Physlib/Optics/Polarization/IncidenceFrameRegression.lean:229`).
 
 ## ii. Key results
 

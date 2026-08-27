@@ -17,10 +17,14 @@ normalization theorem. The ideal retarder changes the output Jones state but lea
 singleton modal coordinate unchanged. Under separate incident and outgoing normalization proofs,
 the actual integrated one-period Poynting flux therefore obeys the analyzer's cosine-squared law.
 The role signs are pinned by
-`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`.
+`polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`
+(`Physlib/Optics/Systems/PolarizerRetarderPhysicalPowerRegression.lean:64`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`
+(`Physlib/Optics/Systems/PolarizerRetarderPhysicalPowerRegression.lean:94`).
 
 ## ii. Key results
 
@@ -59,10 +63,14 @@ namespace JonesMatrix
 polarizer-retarder chain is the negative input normal flux times the squared analyzer cosine.
 
 The sign converting the incident plane's outward-normal flux to positive incident power is pinned
-by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux` and
-`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`, together with
-`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal` and
-`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`. -/
+by `polarizerModeNormalizationRegression_incident_integratedMeanNormalFlux`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:146`) and
+`polarizerRetarderPhysicalPowerRegression_output_integratedMeanNormalFlux`
+(`Physlib/Optics/Systems/PolarizerRetarderPhysicalPowerRegression.lean:64`), together with
+`polarizerModeNormalizationRegression_incident_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/PolarizerModeNormalizationRegression.lean:197`) and
+`polarizerRetarderPhysicalPowerRegression_output_isApertureFluxOrthonormal`
+(`Physlib/Optics/Systems/PolarizerRetarderPhysicalPowerRegression.lean:94`). -/
 lemma linearRetarder_comp_linearPolarizer_malus_integratedActualMeanNormalFlux
     {Ain Aout : Type*} [MeasurableSpace Ain] [MeasurableSpace Aout]
     (z : ℂ) (retarderAxis retardance analyzer input : Real.Angle)

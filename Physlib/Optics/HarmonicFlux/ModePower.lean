@@ -15,19 +15,25 @@ public import Physlib.Optics.HarmonicFlux.ModeSynthesis
 This file declares when a finite family of supplied harmonic field profiles is pairwise integrable,
 mutually flux-orthogonal, and unit normalized relative to the stored normal on an explicitly
 measured profile domain. The independent sentinels
-`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` pin the declared role signs:
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`) pin the declared role signs:
 positive signed flux for outgoing profiles and negative signed flux for incident profiles.
 
 The coherent cross-term expansion then proves, rather than stores, that synthesis identifies
 outgoing integrated normal flux with `ModeAmplitude.power` and identifies the negative of incident
 integrated normal flux with that same nonnegative coordinate power. The role assignments are pinned
-by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`; the independent sentinels
-`apertureFluxRegressionSynthesis_flux` and `apertureFluxRegressionIncidentSynthesis_flux` pin the
-synthesized signs. These conclusions hold only on the synthesis image of the supplied finite
-family; they assert no electromagnetic modal completeness or absence of omitted radiation and
-absorption channels.
+by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`); the independent sentinels
+`apertureFluxRegressionSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`) and
+`apertureFluxRegressionIncidentSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`) pin the synthesized signs.
+These conclusions hold only on the synthesis image of the supplied finite family; they assert no
+electromagnetic modal completeness or absence of omitted radiation and absorption channels.
 
 ## ii. Key results
 
@@ -35,11 +41,15 @@ absorption channels.
   modal Hermitian pairing.
 - `IsApertureFluxOrthonormal.integratedMeanNormalFlux_modeSynthesis`: exact signed-flux formula.
 - `IsApertureFluxOrthonormal.outgoing_modeSynthesis_power`: outgoing flux equals modal power,
-  pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-  `apertureFluxRegressionSynthesis_flux`.
+  pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+  (`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+  `apertureFluxRegressionSynthesis_flux`
+  (`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`).
 - `IsApertureFluxOrthonormal.incident_modeSynthesis_power`: negative incident flux equals power,
-  pinned by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` and
-  `apertureFluxRegressionIncidentSynthesis_flux`.
+  pinned by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+  (`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`) and
+  `apertureFluxRegressionIncidentSynthesis_flux`
+  (`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`).
 
 ## iii. Table of contents
 
@@ -75,8 +85,10 @@ noncomputable section
 
 Unguarded convention statement (review only): the stored normal is interpreted as outward, and the
 constructors do not infer a wave role from plane geometry. The independent sentinels
-`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` pin the selected signs. -/
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`) pin the selected signs. -/
 inductive ApertureWaveRole
   | incident
   | outgoing
@@ -85,8 +97,10 @@ inductive ApertureWaveRole
 namespace ApertureWaveRole
 
 /-- Signed normal-flux normalization selected by a declared aperture wave role, with both choices
-pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`. -/
+pinned by `apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`). -/
 @[simp]
 def normalFluxSign : ApertureWaveRole → ℝ
   | incident => -1
@@ -124,11 +138,15 @@ namespace IsApertureFluxOrthonormal
 
 /-- Synthesis by a flux-orthonormal family turns the field pairing into the role sign times the
 modal Hermitian pairing. The role assignments are pinned by
-`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`; the pairing signs are pinned by
-`apertureFluxRegressionSynthesis_pairing` and
-`apertureFluxRegressionIncidentSynthesis_pairing`. The arguments are reversed because the field
-pairing is linear first. -/
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`); the pairing signs are pinned by
+`apertureFluxRegressionSynthesis_pairing`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:108`) and
+`apertureFluxRegressionIncidentSynthesis_pairing`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:97`). The arguments are reversed
+because the field pairing is linear first. -/
 lemma pairing_modeSynthesis {A ι : Type*} [MeasurableSpace A] [Fintype ι]
     {measure : Measure A} {plane : Space.OrientedAffineHyperplane 3}
     {role : ApertureWaveRole} {modes : ι → HarmonicFieldProfile A}
@@ -164,9 +182,14 @@ lemma pairing_modeSynthesis {A ι : Type*} [MeasurableSpace A] [Fintype ι]
 
 /-- The integrated mean normal flux of a synthesized normalized family is its role sign times the
 nonnegative modal coordinate power. The role assignments are pinned by
-`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`; the synthesized signs are pinned by
-`apertureFluxRegressionSynthesis_flux` and `apertureFluxRegressionIncidentSynthesis_flux`. -/
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`); the synthesized signs are
+pinned by `apertureFluxRegressionSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`) and
+`apertureFluxRegressionIncidentSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`). -/
 lemma integratedMeanNormalFlux_modeSynthesis {A ι : Type*}
     [MeasurableSpace A] [Fintype ι]
     {measure : Measure A} {plane : Space.OrientedAffineHyperplane 3}
@@ -182,8 +205,10 @@ lemma integratedMeanNormalFlux_modeSynthesis {A ι : Type*}
 
 /-- For a family declared outgoing relative to the stored outward normal, integrated mean normal
 flux equals normalized modal power on the family's synthesis image; the sign is pinned by
-`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal` and
-`apertureFluxRegressionSynthesis_flux`. -/
+`apertureFluxRegressionPositiveModes_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:69`) and
+`apertureFluxRegressionSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerRegression.lean:155`). -/
 lemma outgoing_modeSynthesis_power {A ι : Type*} [MeasurableSpace A] [Fintype ι]
     {measure : Measure A} {plane : Space.OrientedAffineHyperplane 3}
     {modes : ι → HarmonicFieldProfile A}
@@ -195,8 +220,10 @@ lemma outgoing_modeSynthesis_power {A ι : Type*} [MeasurableSpace A] [Fintype �
 
 /-- For a family declared incident relative to the stored outward normal, the negative integrated
 mean normal flux equals normalized modal power on the family's synthesis image; the sign is pinned
-by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal` and
-`apertureFluxRegressionIncidentSynthesis_flux`. -/
+by `apertureFluxRegressionNegativeMode_isApertureFluxOrthonormal`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:67`) and
+`apertureFluxRegressionIncidentSynthesis_flux`
+(`Physlib/Optics/HarmonicFlux/ModePowerIncidentRegression.lean:114`). -/
 lemma incident_modeSynthesis_power {A ι : Type*} [MeasurableSpace A] [Fintype ι]
     {measure : Measure A} {plane : Space.OrientedAffineHyperplane 3}
     {modes : ι → HarmonicFieldProfile A}
