@@ -273,8 +273,7 @@ lemma crowRegressionRightConnectedChannel_mate (ring : Fin 2) (kind : Bool) :
     crowRegressionConnections.mateEquiv
         (crowRegressionRightConnectedChannel ring kind .right) =
       crowRegressionRightConnectedChannel ring kind .left := by
-  cases kind
-  constructor <;> rfl
+  cases kind <;> constructor <;> rfl
 
 /-- Mate routing exchanges the two ends of every concrete forward-stage link. -/
 @[simp]
