@@ -387,9 +387,9 @@ lemma sourceThmFourMismatch_scriptConditions_fail :
   have hNonnegative : (0 : ℂ) ≤ 4 :=
     (RCLike.nonneg_iff).2 ⟨by norm_num, by norm_num⟩
   have hSqrtFour : Real.sqrt (4 : ℝ) = 2 := by
-    norm_num
-  rw [Complex.sqrt_of_nonneg hNonnegative, hSqrtFour] at hBound
-  norm_num at hBound
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  rw [Complex.sqrt_of_nonneg hNonnegative] at hBound
+  norm_num [hSqrtFour, Complex.norm_real, Real.norm_eq_abs] at hBound
 
 /-- At one exact source point, the printed conditions hold and the recovered-script conditions
 fail.
