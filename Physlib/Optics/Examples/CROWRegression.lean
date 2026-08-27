@@ -212,6 +212,108 @@ def crowRegressionOutput : ModeAmplitude (Outgoing crowRegressionConnections.Ext
 ## B. Primitive component equations
 -/
 
+/-- The declared aggregate amplitudes satisfy every primitive scattering equation directly. -/
+lemma crowRegression_mem_componentBehavior :
+    (crowRegressionIncident, crowRegressionOutgoing) ∈
+      (netlist crowRegressionParameters).componentBehavior := by
+  classical
+  apply ((netlist crowRegressionParameters).mem_componentBehavior_iff_forall_component
+    crowRegressionIncident crowRegressionOutgoing).2
+  intro component
+  rcases component with (.coupler interface | .forwardArc ring | .returnArc ring)
+  · change (_, _) ∈
+      (DirectionalCoupler.physicalScattering
+        (crowRegressionParameters.coupler interface) Unit).toOrientedModeTransform.toBehavior
+    rw [DirectionalCoupler.physicalScattering_realizes_physicalBehavior,
+      DirectionalCoupler.mem_physicalBehavior_iff,
+      DirectionalCoupler.mem_behavior_iff,
+      DirectionalCoupler.mixing_toLinearMap_apply,
+      DirectionalCoupler.mixing_toLinearMap_apply]
+    apply WithLp.ofLp_injective 2
+    funext endpoint
+    rcases endpoint with ⟨mode | mode⟩ | ⟨mode | mode⟩ <;> cases mode <;>
+      fin_cases interface <;>
+      norm_num [ModeAmplitude.reindex_apply, ModeAmplitude.restrictEmbedding_apply,
+        crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
+        crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionEndCoupler,
+        crowRegressionMiddleCoupler, DirectionalCoupler.crossCoefficient,
+        ScatteringComponentFamily.componentChannelEmbedding]
+  · change (_, _) ∈
+      (MatchedPropagation.physicalScattering
+        (crowRegressionParameters.forwardArc ring) Unit).toOrientedModeTransform.toBehavior
+    rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior,
+      MatchedPropagation.mem_physicalBehavior_iff,
+      MatchedPropagation.mem_behavior_iff]
+    apply WithLp.ofLp_injective 2
+    funext endpoint
+    rcases endpoint with ⟨mode⟩ | ⟨mode⟩ <;> cases mode <;> fin_cases ring <;>
+      norm_num [ModeAmplitude.reindex_apply, ModeAmplitude.restrictEmbedding_apply,
+        crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
+        crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionHalfArc,
+        MatchedPropagation.transmissionCoefficient]
+  · change (_, _) ∈
+      (MatchedPropagation.physicalScattering
+        (crowRegressionParameters.returnArc ring) Unit).toOrientedModeTransform.toBehavior
+    rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior,
+      MatchedPropagation.mem_physicalBehavior_iff,
+      MatchedPropagation.mem_behavior_iff]
+    apply WithLp.ofLp_injective 2
+    funext endpoint
+    rcases endpoint with ⟨mode⟩ | ⟨mode⟩ <;> cases mode <;> fin_cases ring <;>
+      norm_num [ModeAmplitude.reindex_apply, ModeAmplitude.restrictEmbedding_apply,
+        crowRegressionIncident, crowRegressionOutgoing, crowRegressionIncidentValue,
+        crowRegressionOutgoingValue, crowRegressionParameters, crowRegressionHalfArc,
+        MatchedPropagation.transmissionCoefficient]
+
+/-- The eight homogeneous channel equations in either travel direction have only the zero state. -/
+lemma crowRegression_chainCoordinates_eq_zero
+    (returnEnd launchEnd launchMiddle returnMiddle launchNext outputEnd returnNext returnLink : ℂ)
+    (hLaunchEnd : launchEnd = (3 / 5) * returnEnd)
+    (hLaunchMiddle : launchMiddle = (1 / 2) * launchEnd)
+    (hReturnMiddle :
+      returnMiddle = (5 / 13) * launchMiddle - (12 / 13) * Complex.I * returnLink)
+    (hLaunchNext :
+      launchNext = -(12 / 13) * Complex.I * launchMiddle + (5 / 13) * returnLink)
+    (hOutputEnd : outputEnd = (1 / 2) * launchNext)
+    (hReturnNext : returnNext = (3 / 5) * outputEnd)
+    (hReturnLink : returnLink = (1 / 2) * returnNext)
+    (hReturnEnd : returnEnd = (1 / 2) * returnMiddle) :
+    returnEnd = 0 ∧ launchEnd = 0 ∧ launchMiddle = 0 ∧ returnMiddle = 0 ∧
+      launchNext = 0 ∧ outputEnd = 0 ∧ returnNext = 0 ∧ returnLink = 0 := by
+  have hI : Complex.I * Complex.I = -(1 : ℂ) := Complex.I_mul_I
+  have hLaunchMiddleScaled : (4717 : ℂ) * launchMiddle = 0 := by
+    linear_combination
+      2450 * hLaunchEnd + 4900 * hLaunchMiddle + 735 * hReturnMiddle -
+        108 * Complex.I * hLaunchNext - 216 * Complex.I * hOutputEnd -
+        360 * Complex.I * hReturnNext - 720 * Complex.I * hReturnLink +
+        1470 * hReturnEnd + ((1296 / 13) * launchMiddle) * hI
+  have hLaunchMiddleZero : launchMiddle = 0 :=
+    (mul_eq_zero.mp hLaunchMiddleScaled).resolve_left (by norm_num)
+  have hLaunchEndZero : launchEnd = 0 := by
+    rw [hLaunchMiddleZero] at hLaunchMiddle
+    exact (mul_eq_zero.mp hLaunchMiddle.symm).resolve_left (by norm_num)
+  have hReturnEndZero : returnEnd = 0 := by
+    rw [hLaunchEndZero] at hLaunchEnd
+    exact (mul_eq_zero.mp hLaunchEnd.symm).resolve_left (by norm_num)
+  have hReturnMiddleZero : returnMiddle = 0 := by
+    rw [hReturnEndZero] at hReturnEnd
+    exact (mul_eq_zero.mp hReturnEnd.symm).resolve_left (by norm_num)
+  have hReturnLinkZero : returnLink = 0 := by
+    rw [hReturnMiddleZero, hLaunchMiddleZero, zero_mul, zero_sub] at hReturnMiddle
+    exact (mul_eq_zero.mp hReturnMiddle.symm).resolve_left (by
+      norm_num [Complex.I_ne_zero])
+  have hLaunchNextZero : launchNext = 0 := by
+    rw [hLaunchMiddleZero, hReturnLinkZero, mul_zero, zero_add] at hLaunchNext
+    exact hLaunchNext
+  have hOutputEndZero : outputEnd = 0 := by
+    rw [hLaunchNextZero, mul_zero] at hOutputEnd
+    exact hOutputEnd
+  have hReturnNextZero : returnNext = 0 := by
+    rw [hOutputEndZero, mul_zero] at hReturnNext
+    exact hReturnNext
+  exact ⟨hReturnEndZero, hLaunchEndZero, hLaunchMiddleZero, hReturnMiddleZero,
+    hLaunchNextZero, hOutputEndZero, hReturnNextZero, hReturnLinkZero⟩
+
 /-!
 ## C. Raw flat-network witness
 -/
