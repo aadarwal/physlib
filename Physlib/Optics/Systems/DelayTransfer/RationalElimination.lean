@@ -85,13 +85,14 @@ def indexedChannelEquiv :
     rfl
 
 /-- The retained rational model of one entry of the aggregate block-diagonal component law. -/
-def aggregateEntryModel (output input : family.IndexedChannel) : RationalModel n :=
-  if hComponent : output.1 = input.1 then
-    family.entryModel output.1 output.2
-      (Eq.mp (congrArg (fun component => (family.portFamily component).Channel)
-        hComponent.symm) input.2)
-  else
-    RationalModel.constant 0
+def aggregateEntryModel (output input : family.IndexedChannel) : RationalModel n := by
+  classical
+  exact if hComponent : output.1 = input.1 then
+      family.entryModel output.1 output.2
+        (Eq.mp (congrArg (fun component => (family.portFamily component).Channel)
+          hComponent.symm) input.2)
+    else
+      RationalModel.constant 0
 
 /-- A diagonal aggregate entry is exactly its selected local rational model. -/
 @[simp]
@@ -115,6 +116,12 @@ end RationalComponentFamily
 namespace RationalNetlist
 
 variable {n : ℕ} (netlist : RationalNetlist.{u, v, w, x} n)
+
+/-- The full incident index of the aggregate rational-netlist boundary. -/
+abbrev IncidentIndex := netlist.toParameterizedNetlist.IncidentIndex
+
+/-- The full outgoing index of the aggregate rational-netlist boundary. -/
+abbrev OutgoingIndex := netlist.toParameterizedNetlist.OutgoingIndex
 
 /-- Every retained local component entry is regular at one formal-delay assignment. -/
 def ComponentEntriesRegularAt (value : DelayTuple n) : Prop :=
@@ -203,20 +210,25 @@ def denominatorComplement (output input : netlist.Channel) : DelayPolynomial n :
     (netlist.scatteringEntryModel entry.1 entry.2).denominator
 
 /-- One entry denominator times its complementary product is the common denominator. -/
+omit [Fintype netlist.ConnectedChannel] in
 lemma denominator_mul_denominatorComplement (output input : netlist.Channel) :
     (netlist.scatteringEntryModel output input).denominator *
         netlist.denominatorComplement output input =
       netlist.commonDenominator := by
   rw [commonDenominator, denominatorComplement]
-  exact Finset.mul_prod_erase _ (Finset.mem_univ (output, input))
+  exact Finset.mul_prod_erase Finset.univ
+    (fun entry => (netlist.scatteringEntryModel entry.1 entry.2).denominator)
+    (Finset.mem_univ (output, input))
 
 /-- The aggregate common denominator is a nonzero formal polynomial. -/
+omit [Fintype netlist.ConnectedChannel] in
 lemma commonDenominator_ne_zero : netlist.commonDenominator ≠ 0 := by
   rw [commonDenominator]
   exact Finset.prod_ne_zero_iff.mpr fun entry _ =>
     (netlist.scatteringEntryModel entry.1 entry.2).denominator_ne_zero
 
 /-- Componentwise regularity makes every retained aggregate entry denominator nonzero. -/
+omit [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] in
 lemma scatteringEntryModel_regular (value : DelayTuple n)
     (hRegular : netlist.ComponentEntriesRegularAt value)
     (output input : netlist.Channel) :
@@ -230,7 +242,7 @@ lemma scatteringEntryModel_regular (value : DelayTuple n)
     rw [netlist.scatteringEntryModel_same]
     exact hRegular outputComponent outputChannel inputChannel
   · rw [netlist.scatteringEntryModel_of_ne hComponent,
-      RationalModel.evaluationDomain_ofPolynomial]
+      RationalModel.constant, RationalModel.evaluationDomain_ofPolynomial]
     exact Set.mem_univ _
 
 /-- The common denominator evaluates nontrivially at every component-regular point. -/
@@ -259,20 +271,25 @@ lemma eval_clearedScattering (value : DelayTuple n)
   let model := netlist.scatteringEntryModel output.channel input.channel
   have hDenominator : MvPolynomial.eval value model.denominator ≠ 0 :=
     netlist.scatteringEntryModel_regular value hRegular output.channel input.channel
-  have hProduct := congrArg (MvPolynomial.eval value)
-    (netlist.denominator_mul_denominatorComplement output.channel input.channel)
+  have hProduct :
+      MvPolynomial.eval value model.denominator *
+          MvPolynomial.eval value
+            (netlist.denominatorComplement output.channel input.channel) =
+        MvPolynomial.eval value netlist.commonDenominator := by
+    simpa only [model, MvPolynomial.eval_mul] using
+      congrArg (MvPolynomial.eval value)
+        (netlist.denominator_mul_denominatorComplement output.channel input.channel)
   change
     MvPolynomial.eval value
         (model.numerator * netlist.denominatorComplement output.channel input.channel) =
       MvPolynomial.eval value netlist.commonDenominator *
         netlist.toParameterizedNetlist.scatteringTransform value output input
-  rw [netlist.scatteringEntryModel_eval]
+  rw [← netlist.scatteringEntryModel_eval value output.channel input.channel]
   change
     MvPolynomial.eval value
         (model.numerator * netlist.denominatorComplement output.channel input.channel) =
       MvPolynomial.eval value netlist.commonDenominator * model.eval value
   simp only [MvPolynomial.eval_mul, RationalModel.eval_eq]
-  simp only [MvPolynomial.eval_mul] at hProduct
   rw [← hProduct]
   field_simp
 
@@ -340,6 +357,7 @@ def evaluatedResponseQuotient (value : DelayTuple n) :
 -/
 
 /-- Evaluation removes the polynomial lift from the routing matrix. -/
+omit [Fintype netlist.Channel] in
 lemma eval_polynomialRouting (value : DelayTuple n) :
     netlist.polynomialRouting.map (MvPolynomial.eval value) =
       netlist.toParameterizedNetlist.routingTransform := by
@@ -347,6 +365,7 @@ lemma eval_polynomialRouting (value : DelayTuple n) :
   simp [polynomialRouting]
 
 /-- Evaluation removes the polynomial lift from the external incident injection. -/
+omit [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] in
 lemma eval_polynomialInputExposure (value : DelayTuple n) :
     netlist.polynomialInputExposure.map (MvPolynomial.eval value) =
       netlist.toParameterizedNetlist.inputExposure := by
@@ -354,6 +373,7 @@ lemma eval_polynomialInputExposure (value : DelayTuple n) :
   simp [polynomialInputExposure]
 
 /-- Evaluation removes the polynomial lift from the external outgoing readout. -/
+omit [Fintype netlist.Channel] [Fintype netlist.ConnectedChannel] in
 lemma eval_polynomialOutputReadout (value : DelayTuple n) :
     netlist.polynomialOutputReadout.map (MvPolynomial.eval value) =
       netlist.toParameterizedNetlist.outputReadout := by
@@ -367,21 +387,174 @@ lemma eval_clearedFeedback (value : DelayTuple n)
     netlist.clearedFeedback.map (MvPolynomial.eval value) =
       MvPolynomial.eval value netlist.commonDenominator •
         netlist.toParameterizedNetlist.feedbackOperator value := by
-  rw [clearedFeedback, Matrix.map_sub _ _ (map_sub _), Matrix.map_mul,
-    netlist.eval_polynomialRouting, netlist.eval_clearedScattering value hRegular]
-  ext incident input
-  simp only [Matrix.map_apply, Matrix.smul_apply, Matrix.one_apply,
-    map_smul, map_one, smul_eq_mul, Matrix.sub_apply,
+  rw [clearedFeedback,
+    Matrix.map_sub (MvPolynomial.eval value)
+      (fun first second => (MvPolynomial.eval value).map_sub first second),
+    Matrix.map_smul' (MvPolynomial.eval value) netlist.commonDenominator
+      (1 : Matrix netlist.IncidentIndex netlist.IncidentIndex (DelayPolynomial n))
+      (fun first second => (MvPolynomial.eval value).map_mul first second),
+    Matrix.map_one (MvPolynomial.eval value)
+      (MvPolynomial.eval value).map_zero (MvPolynomial.eval value).map_one,
+    Matrix.map_mul,
+    netlist.eval_polynomialRouting,
+    netlist.eval_clearedScattering value hRegular,
+    Matrix.mul_smul, ← smul_sub,
     ParameterizedNetlist.feedbackOperator_eq]
-  rw [Matrix.mul_apply, Matrix.mul_apply]
-  simp only [Finset.mul_sum, Finset.sum_mul, mul_assoc]
-  ring
 
 /-- Evaluating the retained response denominator evaluates the cleared determinant. -/
 lemma eval_responseDenominator (value : DelayTuple n) :
     MvPolynomial.eval value netlist.responseDenominator =
       (netlist.clearedFeedback.map (MvPolynomial.eval value)).det := by
   exact (MvPolynomial.eval value).map_det netlist.clearedFeedback
+
+/-- Evaluation commutes with the four polynomial matrix factors defining the retained response
+numerator. -/
+lemma eval_responseNumerator (value : DelayTuple n)
+    (hRegular : netlist.ComponentEntriesRegularAt value) :
+    netlist.responseNumerator.map (MvPolynomial.eval value) =
+      netlist.toParameterizedNetlist.outputReadout *
+        (MvPolynomial.eval value netlist.commonDenominator •
+          netlist.toParameterizedNetlist.scatteringTransform value) *
+        (MvPolynomial.eval value netlist.commonDenominator •
+          netlist.toParameterizedNetlist.feedbackOperator value).adjugate *
+        netlist.toParameterizedNetlist.inputExposure := by
+  have hAdjugate :=
+    (MvPolynomial.eval value).map_adjugate netlist.clearedFeedback
+  change netlist.clearedFeedback.adjugate.map (MvPolynomial.eval value) =
+    (netlist.clearedFeedback.map (MvPolynomial.eval value)).adjugate at hAdjugate
+  rw [responseNumerator, Matrix.map_mul, Matrix.map_mul, Matrix.map_mul,
+    hAdjugate,
+    netlist.eval_polynomialOutputReadout,
+    netlist.eval_clearedScattering value hRegular,
+    netlist.eval_clearedFeedback value hRegular,
+    netlist.eval_polynomialInputExposure]
+
+private lemma adjugateQuotient_fourFactor
+    {internal outgoing externalOutgoing externalIncident : Type*}
+    [Fintype internal] [DecidableEq internal]
+    [Fintype outgoing]
+    (denominator : ℂ) (hDenominator : denominator ≠ 0)
+    (scattering : Matrix outgoing internal ℂ)
+    (feedback : Matrix internal internal ℂ)
+    (hFeedback : feedback.det ≠ 0)
+    (readout : Matrix externalOutgoing outgoing ℂ)
+    (exposure : Matrix internal externalIncident ℂ) :
+    (fun output input =>
+        (readout * (denominator • scattering) *
+            (denominator • feedback).adjugate * exposure) output input /
+          (denominator • feedback).det) =
+      readout * scattering * feedback⁻¹ * exposure := by
+  let _ : Invertible denominator := invertibleOfNonzero hDenominator
+  have hFeedbackUnit : IsUnit feedback.det := hFeedback.isUnit
+  have hQuotient :
+      (fun output input =>
+        (readout * (denominator • scattering) *
+            (denominator • feedback).adjugate * exposure) output input /
+          (denominator • feedback).det) =
+        ((denominator • feedback).det)⁻¹ •
+          (readout * (denominator • scattering) *
+            (denominator • feedback).adjugate * exposure) := by
+    ext output input
+    simp only [smul_apply, smul_eq_mul, div_eq_inv_mul]
+  have hAdjugate :
+      ((denominator • feedback).det)⁻¹ •
+          (readout * (denominator • scattering) *
+            (denominator • feedback).adjugate * exposure) =
+        readout * (denominator • scattering) *
+          (denominator • feedback)⁻¹ * exposure := by
+    rw [Matrix.inv_def, Ring.inverse_eq_inv]
+    simp only [Matrix.mul_smul, Matrix.smul_mul]
+  have hScale :
+      readout * (denominator • scattering) *
+          (denominator • feedback)⁻¹ * exposure =
+        readout * scattering * feedback⁻¹ * exposure := by
+    rw [Matrix.inv_smul feedback denominator hFeedbackUnit, invOf_eq_inv]
+    simp only [Matrix.mul_smul, Matrix.smul_mul, smul_smul,
+      mul_inv_cancel₀ hDenominator, one_smul]
+  exact hQuotient.trans (hAdjugate.trans hScale)
+
+/-- The evaluated cleared determinant is the corresponding scalar power times the N5F feedback
+determinant. -/
+lemma eval_responseDenominator_eq (value : DelayTuple n)
+    (hRegular : netlist.ComponentEntriesRegularAt value) :
+    MvPolynomial.eval value netlist.responseDenominator =
+      MvPolynomial.eval value netlist.commonDenominator ^
+          Fintype.card netlist.IncidentIndex *
+        (netlist.toParameterizedNetlist.feedbackOperator value).det := by
+  rw [netlist.eval_responseDenominator,
+    netlist.eval_clearedFeedback value hRegular, Matrix.det_smul]
+
+/-- At a component-regular point, the retained response denominator is nonzero exactly on the
+N5F algebraic solve domain. -/
+lemma eval_responseDenominator_ne_zero_iff_solveDomain (value : DelayTuple n)
+    (hRegular : netlist.ComponentEntriesRegularAt value) :
+    MvPolynomial.eval value netlist.responseDenominator ≠ 0 ↔
+      value ∈ netlist.toParameterizedNetlist.solveDomain := by
+  rw [netlist.eval_responseDenominator_eq value hRegular,
+    netlist.toParameterizedNetlist.mem_solveDomain_iff_det_ne_zero]
+  simp only [mul_ne_zero_iff]
+  exact and_iff_right
+    (pow_ne_zero _ (netlist.eval_commonDenominator_ne_zero value hRegular))
+
+/-- Evaluation of the cleared adjugate quotient agrees with the existing N5F total-inverse
+formula wherever every component entry and the cleared determinant are regular. -/
+lemma evaluatedResponseQuotient_eq_unguardedResponse (value : DelayTuple n)
+    (hRegular : netlist.ComponentEntriesRegularAt value)
+    (hDeterminant : MvPolynomial.eval value netlist.responseDenominator ≠ 0) :
+    netlist.evaluatedResponseQuotient value =
+      netlist.toParameterizedNetlist.unguardedResponse value := by
+  have hSolve : value ∈ netlist.toParameterizedNetlist.solveDomain :=
+    (netlist.eval_responseDenominator_ne_zero_iff_solveDomain value hRegular).mp hDeterminant
+  have hFeedback :
+      (netlist.toParameterizedNetlist.feedbackOperator value).det ≠ 0 :=
+    (netlist.toParameterizedNetlist.mem_solveDomain_iff_det_ne_zero value).mp hSolve
+  change
+    (fun output input =>
+      (netlist.responseNumerator.map (MvPolynomial.eval value)) output input /
+        MvPolynomial.eval value netlist.responseDenominator) =
+      netlist.toParameterizedNetlist.outputReadout *
+        netlist.toParameterizedNetlist.scatteringTransform value *
+        (netlist.toParameterizedNetlist.feedbackOperator value)⁻¹ *
+        netlist.toParameterizedNetlist.inputExposure
+  rw [netlist.eval_responseNumerator value hRegular,
+    netlist.eval_responseDenominator,
+    netlist.eval_clearedFeedback value hRegular]
+  exact adjugateQuotient_fourFactor
+    (MvPolynomial.eval value netlist.commonDenominator)
+    (netlist.eval_commonDenominator_ne_zero value hRegular)
+    (netlist.toParameterizedNetlist.scatteringTransform value)
+    (netlist.toParameterizedNetlist.feedbackOperator value)
+    hFeedback
+    netlist.toParameterizedNetlist.outputReadout
+    netlist.toParameterizedNetlist.inputExposure
+
+/-- Physical response-domain membership supplies regularity of every retained component entry. -/
+lemma componentEntriesRegularAt_of_mem_responseDomain {value : DelayTuple n}
+    (hValue : value ∈ netlist.responseDomain) : netlist.ComponentEntriesRegularAt value :=
+  fun component => (hValue.2 component).2
+
+/-- On the physical response domain, the evaluated cleared quotient is the proof-gated N5F
+response. -/
+lemma evaluatedResponseQuotient_eq_response {value : DelayTuple n}
+    (hValue : value ∈ netlist.responseDomain) :
+    netlist.evaluatedResponseQuotient value =
+      netlist.toParameterizedNetlist.response hValue := by
+  have hRegular := netlist.componentEntriesRegularAt_of_mem_responseDomain hValue
+  have hDeterminant : MvPolynomial.eval value netlist.responseDenominator ≠ 0 :=
+    (netlist.eval_responseDenominator_ne_zero_iff_solveDomain value hRegular).mpr hValue.1
+  rw [netlist.evaluatedResponseQuotient_eq_unguardedResponse value hRegular hDeterminant,
+    netlist.toParameterizedNetlist.unguardedResponse_eq_response hValue]
+
+/-- Every retained response-entry model evaluates to the proof-gated N5F response on the physical
+response domain. -/
+lemma responseEntryModel_eval_eq_response (hGeneric : netlist.IsGenericallyWellPosed)
+    {value : DelayTuple n} (hValue : value ∈ netlist.responseDomain)
+    (output : netlist.ExternalOutgoing) (input : netlist.ExternalIncident) :
+    (netlist.responseEntryModel hGeneric output input).eval value =
+      netlist.toParameterizedNetlist.response hValue output input := by
+  change netlist.evaluatedResponseQuotient value output input = _
+  exact congrFun
+    (congrFun (netlist.evaluatedResponseQuotient_eq_response hValue) output) input
 
 end Finite
 
