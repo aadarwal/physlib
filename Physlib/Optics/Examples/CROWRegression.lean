@@ -303,7 +303,7 @@ inductive CrowRegressionExternalPort
   | leftOutput
   | rightInput
   | rightOutput
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
 
 /-- The ambient component channel selected by one exposed finite-bus port. -/
 def crowRegressionExternalAmbientChannel :
@@ -330,7 +330,7 @@ lemma crowRegressionExternalAmbientChannel_not_connected
         PortConnectionFamily.append, rightConnections, rightConnection,
         PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
         PortConnection.endpointPort] at hLabel
-  · rcases forwardOrReturn with forward | return
+  · rcases forwardOrReturn with forwardIndex | returnIndex
     · cases port <;> cases endpoint
       all_goals
         have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
