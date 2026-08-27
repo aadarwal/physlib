@@ -902,6 +902,7 @@ public import Physlib.SpaceAndTime.Space.Derivatives.MatrixDiv
 public import Physlib.SpaceAndTime.Space.Derivatives.MultiIndex
 public import Physlib.SpaceAndTime.Space.DistConst
 public import Physlib.SpaceAndTime.Space.DistOfFunction
+public import Physlib.SpaceAndTime.Space.DistributionCoordinates
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Action
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.AffineGroup
 public import Physlib.SpaceAndTime.Space.EuclideanGroup.Basic
@@ -932,6 +933,8 @@ public import Physlib.SpaceAndTime.Space.Norm.Basic
 public import Physlib.SpaceAndTime.Space.Norm.IteratedLaplacian
 public import Physlib.SpaceAndTime.Space.Norm.Regularized
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplane
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneConstantJump
+public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneConstantJumpRegression
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneCrossProduct
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistribution
 public import Physlib.SpaceAndTime.Space.OrientedAffineHyperplaneDistributionRegression
