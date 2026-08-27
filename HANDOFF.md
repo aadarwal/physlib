@@ -1,118 +1,96 @@
 # HANDOFF
 
 - Branch: `optics/s8-tbd`
-- Gated source: `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- Source parent: `718aa5486c98bde98735493178bf08f2d909a4b7` (cleared slice-2 HANDOFF child)
-- Production file: `Physlib/Mathematics/ZTransform/FrequencyResponse.lean`
-- Regression file: `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean`
-- Parity input: ledger row `ZT-06` read at live parity head
-  `054b294fbaf2d7769aa570fae9c6aa5c0b2b8da7`.
+- Gated source: `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- Source parent: `5ac9c10473b2de1ca8059c9ab5a13d13ada6bf9d` (cleared slice-3 HANDOFF child)
+- Production file: `Physlib/Mathematics/ZTransform/Differentiation.lean`
+- Regression file: `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean`
+- Parity input: ledger row `ZT-04` read at live parity head `16022cfcfe12c8c93f5b1a15e356d92cfde26f20`.
 
 ## Registration requested
 
 Add these sorted imports to `Physlib.lean` after
-`Physlib.Mathematics.ZTransform.ExistenceRegression` and before
-`Physlib.Mathematics.ZTransform.Inverse`:
+`Physlib.Mathematics.ZTransform.DifferenceEquationRegression` and before
+`Physlib.Mathematics.ZTransform.Existence`:
 
 ```lean
-public import Physlib.Mathematics.ZTransform.FrequencyResponse
-public import Physlib.Mathematics.ZTransform.FrequencyResponseRegression
+public import Physlib.Mathematics.ZTransform.Differentiation
+public import Physlib.Mathematics.ZTransform.DifferentiationRegression
 ```
 
-Production imports only `Physlib.Mathematics.ZTransform.DifferenceEquation`; it does not import
-the regression. The regression is a leaf importing the production module.
+Register production first and regression second. Production imports the Mathlib calculus support
+and `Physlib.Mathematics.ZTransform.Convergence`; regression is a leaf importing production.
 
 ## Production declarations
 
-- `Physlib.ZTransform.unitCirclePoint` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:80` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.norm_unitCirclePoint` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:85` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.unitCirclePoint_ne_zero` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:90` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.unitCirclePoint_inv` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:94` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.unitCirclePoint_inv_pow` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:99` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.delayCosineSum` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:120` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.delaySineSum` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:124` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.frequencyNumerator` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:128` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.frequencyDenominator` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:132` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.delaySymbol_unitCircle` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:137` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.one_sub_delaySymbol_unitCircle` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:154` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.transferFunction_unitCircle` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:168` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.transferFunction_unitCircle_norm` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:176` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.transferFunction_unitCircle_polar` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:183` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.frequencyDenominator_ne_zero_of_mem_iirROC` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:199` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.transform_div_unitCircle_polar` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponse.lean:207` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
+- `Physlib.ZTransform.hasDerivAt_seriesTerm` —
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:96` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.summable_derivativeSeries` —
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:120` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- Private proof helper `norm_derivativeSeriesTerm_le` —
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:151` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.hasDerivAt_transform` —
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:174` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.transform_indexMul_eq_neg_z_mul_deriv` —
+  `Physlib/Mathematics/ZTransform/Differentiation.lean:233` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
 
 ## Regression declarations
 
-- `Physlib.ZTransform.quadratureFeedforward` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:56` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.quadratureFeedback` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:60` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.delaySymbol_quadratureFeedforward` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:64` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.delaySymbol_quadratureFeedback` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:69` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.quadratureUnitCirclePoint` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:81` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- Private proof helper `one_add_I_half_ne_zero` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:85` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- Private proof helper `one_sub_I_half_ne_zero` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:90` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- Private proof helper `two_add_I_ne_zero` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:95` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- Private proof helper `two_sub_I_ne_zero` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:100` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.transferFunction_quadrature` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:107` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
-- `Physlib.ZTransform.transferFunction_wrongUnitCircleSign_ne` —
-  `Physlib/Mathematics/ZTransform/FrequencyResponseRegression.lean:119` @ `d18001a2c0817ac0826e8ded57cb00be3c6666e7`
+- `Physlib.ZTransform.differentiationFixture` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:58` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.seriesTerm_differentiationFixture` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:62` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.summable_seriesTerm_differentiationFixture` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:72` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.transform_differentiationFixture` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:85` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.transform_indexMul_differentiationFixture` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:94` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.deriv_transform_differentiationFixture_at_two` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:104` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
+- `Physlib.ZTransform.transform_indexMul_wrongSign_or_missingFactor_ne` —
+  `Physlib/Mathematics/ZTransform/DifferentiationRegression.lean:121` @ `8e72d04953eed17baa7f6a08f35b8cfee218b31a`
 
-## Source correspondence and anchor
+## Source correspondence and analytic anchor
 
-- `unitCirclePoint` uses a real angular frequency and is proved to have norm one.
-- `delaySymbol_unitCircle` derives the `cos - I sin` expansion from the exponential and finite
-  delay-symbol primitives.
-- `transform_div_unitCircle_polar` uses the source lag ranges `Finset.Icc 0 N` and
-  `Finset.Icc 1 M`; the latter encodes the stipulated zero leading feedback coefficient.
-- Its hypotheses retain causal input and output, IIR-ROC membership, a nonzero input transform,
-  and the recurrence model. Its first proof step is
-  `transform_eq_transferFunction_mul_of_mem_iirROC`; the transform quotient is not introduced by
-  definition.
-- `frequencyDenominator_ne_zero_of_mem_iirROC` extracts the denominator gate from IIR-ROC
-  membership before the polar transfer lemma is applied.
-- The magnitude is the norm quotient and the phase is `Complex.arg` of the expanded quotient,
-  matching the formal source statement for complex coefficients.
+- The public domain is `w ∈ ROC f` together with `‖w‖ < ‖z‖`. It is the explicit radial
+  margin used to justify termwise complex differentiation; it also forces both witnesses
+  nonzero.
+- `summable_derivativeSeries` factors each derivative term into the absolutely summable
+  transform term at `w` and a geometric factor tending to zero.
+- `hasDerivAt_transform` chooses the midpoint radius between `‖w‖` and `‖z‖`, builds an open
+  ball about `z` outside that radius, supplies one summable derivative majorant on the ball,
+  and applies Mathlib's `hasDerivAt_tsum_of_isPreconnected`.
+- `transform_indexMul_eq_neg_z_mul_deriv` is downstream of that recurrence-free analytic
+  theorem. It distributes `-z` through the proved-summable derivative series and cancels one
+  inverse power; it does not introduce the target identity as a definition or rewrite with it.
+- The conclusion is exactly `Z{n f[n]}(z) = -z * deriv (Z{f[n]}) z`. The source's positive
+  real-part restriction is unnecessary under the stated strict radial convergence margin.
+- No boundary differentiability, converse, inverse-transform, stability, physics, or optics
+  claim is made.
 
 ## Hostile regression
 
-At `ω = π / 2`, the primitive fixture has feedforward symbol `1 + 2u`, feedback symbol `u / 2`,
-and transfer value `-2I` because the delay variable is the reciprocal point `-I`.
-`transferFunction_wrongUnitCircleSign_ne` substitutes `I` instead and proves the two values differ.
-It unfolds `transferFunction`, `delaySymbol`, `unitCirclePoint`, and both coefficient definitions;
-it does not call any production unit-circle or polar theorem.
+The primitive fixture is supported only at index two with coefficient `3`. Its transform and
+index-multiplied transform are computed directly from finite `tsum`s, while the derivative at
+`z = 2` is computed from Mathlib's derivative of inversion. Thus the regression does not use
+the production differentiation identity as an oracle.
+
+At `z = 2`, the index-multiplied transform is `3 / 2` and the derivative is `-3 / 4`; the
+correct factor `-z` yields `3 / 2`. The hostile sentinel proves both `2 * deriv = -3 / 2`
+(wrong sign) and `-deriv = 3 / 4` (missing factor `z`) differ from the independently computed
+index-multiplied transform.
 
 ## Pre-existing-line and registration accounting
 
-The source delta `718aa5486c98bde98735493178bf08f2d909a4b7` →
-`d18001a2c0817ac0826e8ded57cb00be3c6666e7` adds exactly the two new modules. It changes zero
-pre-existing production, regression, import, or documentation lines.
+The source delta `5ac9c10473b2de1ca8059c9ab5a13d13ada6bf9d` → `8e72d04953eed17baa7f6a08f35b8cfee218b31a` adds exactly
+the two new modules: 251 production lines and 132 regression lines. It changes zero
+pre-existing production, regression, import, or documentation lines. In particular, the
+reviewed pre-existing first-difference, z-scaling, ROC, transform, and series-term declarations
+are byte-stable.
 
-The two requested imports were added to `Physlib.lean` only temporarily for the root gate and then
+For branch-wide root and import gates, the two slice-4 imports and the already stacked slice-3
+production/regression imports were added to `Physlib.lean` temporarily and then all four were
 removed. Byte-identical restoration was checked:
 
 - SHA-256: `f7486c686c1d5087c1cb8a87f33b3af2dd11cb761b14fa0ebbc0a0e9489d0a20`
@@ -122,27 +100,33 @@ The only change in the child after the gated source is this replacement `HANDOFF
 
 ## Gates
 
-- `lake-lock build Physlib.Mathematics.ZTransform.FrequencyResponse
-  Physlib.Mathematics.ZTransform.FrequencyResponseRegression`: pass at the exact cutoff.
-- Temporary sorted registration followed by `lake-lock build Physlib`: pass,
-  `Build completed successfully (5013 jobs)`.
-- `lake-lock exe check_file_imports`: pass.
-- `lake-lock exe sorry_lint`: pass.
-- `lake-lock exe runPhyslibLinters`: pass for Physlib and QuantumInfo.
-- `lake-lock exe lint_all`: exit 0; no finding names either new module.
-- `lake-lock exe module_doc_lint`: repository baseline 147 error headings; zero findings for either
-  new module.
-- `./scripts/lint-style.sh`: pass.
-- `git diff --check`: pass.
+- `lake-lock build Physlib.Mathematics.ZTransform.Differentiation
+  Physlib.Mathematics.ZTransform.DifferentiationRegression`: pass at the exact cutoff,
+  `Build completed successfully (2393 jobs)`.
+- Temporary sorted registration followed by `lake-lock build Physlib`: pass at the exact
+  cutoff, `Build completed successfully (5015 jobs)`.
+- `lake-lock exe check_file_imports`: pass at the exact cutoff; all files imported correctly
+  under temporary registration.
+- `lake-lock exe sorry_lint`: pass at the exact cutoff.
+- `lake-lock exe runPhyslibLinters`: pass for Physlib and QuantumInfo after the final source
+  edit and root build.
+- `lake-lock exe lint_all`: exit 0 on the preceding cutoff; its only slice-local finding was a
+  redundant production import, removed in `8e72d049`. Exact-cutoff
+  `lake-lock exe redundant_imports` exits 0 and names neither new module.
+- `lake-lock exe module_doc_lint`: repository baseline remains nonzero; an exact-cutoff filter
+  for both new paths exits 0 with no output.
+- `./scripts/lint-style.sh`: pass after committing the exact source cutoff.
+- `git diff --check`: pass; production is 251 lines, regression is 132 lines, and neither file
+  has a line over 100 codepoints.
 
 ## Milestone
 
-ITP'14 Thm. 13 IIR frequency-response identity added; ZT-06 moves PARTIAL -> discharged on merge.
+ITP'14 Thm. 10 complex-differentiation identity added; ZT-04 moves PARTIAL -> discharged on merge.
 
 ## Verbatim ledger row
 
-`PARITY-LEDGER.md` @ `054b294fbaf2d7769aa570fae9c6aa5c0b2b8da7`:
+`PARITY-LEDGER.md` @ `16022cfcfe12c8c93f5b1a15e356d92cfde26f20`:
 
 ```text
-| ZT-06 | ITP'14 Defs. 11–13 + Thms. 12–13 p. 494–496: IIR model, causality condition, `IIR_ROC` (ROC minus poles), transfer function, frequency response | **PARTIAL — and the split matters.** Covered: `transferFunction` (`Physlib/Mathematics/ZTransform/DifferenceEquation.lean:273` @ `110eb5cd`), `iirROC` (`:278`, the ROC intersection minus denominator zeros), and the IIR transfer law `transform_eq_transferFunction_mul` (`:283`) with its ROC-membership form `…_of_mem_iirROC` (`:292`). **NOT covered: Thm. 13, the IIR frequency response at `z = e^{jω}` with its magnitude/argument decomposition — there is no such declaration in the generic `ZTransform` layer.** A `frequencyResponse` DOES exist at `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean`, but that is the optics delay-transfer object of **IP-64** (`q = e^{−sτ} = z⁻¹`), a different construction at a different layer; **matching it to ITP'14 Thm. 13 on the strength of the name would be exactly the cross-layer confusion this ledger exists to prevent** — **on `optics/development` @ `110eb5cd`** | `HD α_lst = 0` structural constraint; `z = e^{jω}` for frequency response | Retained all four hypotheses of Thm. 12 | **PARTIALLY proved and GATED on `optics/development` @ `110eb5cd`** — Defs. 11–13 and Thm. 12 discharged; **Thm. 13 (frequency response) still WITHHELD**. Regression **T-04**. **INTEGRITY NOTE — this row was STALE and is corrected 2026-08-27.** It read *"TBD — not yet formalized"* while its target already existed. Found by A7's regression index, verified here against the tree, and cited at `110eb5cd`. **It went stale invisibly:** `tools/sweep.py` exempts any row whose lean cell contains `TBD` from the location-ref check, so no check was ever looking at it — the exemption is now reported rather than silent. **S8 TRIAGE 2026-08-27 — OPEN**, smallest named slice: named in the triage. Implementation proceeds on the S8 lane in the triage's §8 order. | parity |
+| ZT-04 | ITP'14 Thm. 7 p. 490 (first difference), Thms. 8–9 p. 491 (z-domain scaling), Thm. 10 p. 491 (complex differentiation) | **PARTIAL.** Covered: Thm. 7 first difference `transform_firstDifference` (`Physlib/Mathematics/ZTransform/Basic.lean:406` @ `110eb5cd`, under `IsCausal`), and Thms. 8–9 z-domain scaling `transform_zScale` (`:439`) with `ROC_zScale` (`:444`). **NOT covered: Thm. 10, complex differentiation — no declaration for it exists anywhere in `Physlib/Mathematics/ZTransform/` (checked repo-wide).** Same treatment as ZT-06: discharge what exists, withhold the rest, and name the missing theorem rather than flipping the row whole — **on `optics/development` @ `110eb5cd`** | — | Retained | **PARTIALLY proved and GATED on `optics/development` @ `110eb5cd`** — Thms. 7–9 discharged; **Thm. 10 (complex differentiation) WITHHELD**. **INTEGRITY NOTE — STALE, corrected 2026-08-27 in the 15-row TBD sweep.** It read *"TBD — not yet formalized"* while its target already existed; found by the sweep the TBD-listing check now makes possible. **S8 TRIAGE 2026-08-27 — OPEN**, smallest named slice: named in the triage. Implementation proceeds on the S8 lane in the triage's §8 order. **Lines below are DECLARATION lines resolved by this lane at `9c1f4929`; the triage cited docstring-start lines.** Nearest existing work: `transform_firstDifference` (`Physlib/Mathematics/ZTransform/Basic.lean:406`). | parity |
 ```
