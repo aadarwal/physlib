@@ -515,6 +515,12 @@ noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
   change Fintype (rightConnections p).Channel
   exact rightChannelFintype p
 
+/-- The first-stage hierarchy has finitely many external channels. -/
+noncomputable instance hierarchyInnerExternalChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).inner.ExternalChannel := by
+  classical
+  infer_instance
+
 /-- The first-stage hierarchy boundary has finite channels. -/
 noncomputable instance hierarchyInnerBoundaryChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) :
@@ -526,6 +532,12 @@ noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).outer.Channel := by
   change Fintype ((forwardConnections p).append (returnConnections p)).Channel
   exact outerChannelFintype p
+
+/-- The final hierarchy boundary has finitely many external channels. -/
+noncomputable instance hierarchyOuterExternalChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).outer.ExternalChannel := by
+  classical
+  infer_instance
 
 /-!
 ## D. Generic theorem-spine instantiation
