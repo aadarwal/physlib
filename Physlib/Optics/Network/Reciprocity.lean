@@ -163,8 +163,8 @@ lemma isReciprocal_iff {channel : Type u} (scattering : ScatteringMatrix channel
           scattering.pairedMatrix pairing second first := by
   rw [IsReciprocal, Matrix.IsSymm.ext_iff]
   constructor <;> intro h first second
-  · exact (h second first).symm
-  · exact (h second first).symm
+  · exact h second first
+  · exact h second first
 
 /-- Under the nominal pairing, the paired matrix is the underlying scattering transform. -/
 @[simp]
