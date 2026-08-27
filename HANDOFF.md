@@ -1,344 +1,322 @@
-# S7D slice 11 handoff: L8 field/intensity source boundaries
+# S7D slice 12 handoff: L9 nonzero reciprocal-Z coordinates
 
 ## Cutoff identity
 
 - Branch: `optics/s7d-dcdr`.
-- Exact sync target: `66df1929ccc0bb40098c1fd733675899e99c5052`.
-- Exact sync merge: `53024e8f90979835d8fdc5d27c1370df76aef8b5`.
-- Gated source: `9bfb7efa3096f38513a3edb6bbff7e0cce2f932e`.
+- Exact sync target: `b8ef32367b30e1880c396b838c7f1ae43d5eafde`.
+- Exact sync merge: `28978c56e8e3c5df7bf30188096aab209401797d`.
+- Gated source: `28978c56e8e3c5df7bf30188096aab209401797d`.
 - This file is the HANDOFF-only cutoff child.
-- `Physlib.lean` is unchanged from the exact sync target. Its SHA-256 is
-  `856a58e9bcc9d4d7a832cdb50cb05b867d75a0a16600a0f6f35280a1f8fc263c`.
+- `Physlib.lean` is byte-identical to the exact sync target. Its SHA-256 is
+  `c54d6030b0fe32d41cd7088aec51224141d6f35cb5997bd4b0f4668f9a1cf0bf`.
+- The fenced
+  `Physlib/Mathematics/ZTransform/DifferenceEquationRegression.lean` is untouched.
+  Its base and cutoff SHA-256 is
+  `3d35e7134bd6336e4328dc8d6156f37b8e18789b732edcb434bec4ae198ee9df`.
 
-The cache was refreshed from the `optics-development` worktree immediately after the exact sync
-merge. The complete cutoff delta is the twelve existing Lean files below plus this HANDOFF-only
-child. No module was added, removed, or newly registered.
+The source cache was refreshed from the `optics-development` worktree after the exact sync
+merge. The Lean source delta against that target is exactly the 18 existing files itemized
+below. No file was added or removed, no module registration changed, and the S8 ZT-07
+coordination-fence file was not touched.
 
 ## Goal and decision resolution
 
-At this cutoff ref, `goal.md:2747-2748` says verbatim:
+At this cutoff ref, `goal.md:2753-2754` says verbatim:
 
-> - [ ] Confirm that every ring model distinguishes field from power attenuation and amplitude from
->   power coupling coefficients.
+> - [ ] Confirm the exact `z` versus `q = z⁻¹` convention, the sign in `exp (-s * τ)`, and every
+>   startup term before S4/S5 identities are named.
 
 This slice implements option 1 of
-`scratchpad/lanes/decisions/decision-L8.md`, “L8 – Ring attenuation and coupling roles.” It closes
-the implementation side of L8 by making the two source-to-coherent DCDR maps use named square-root
-field gains and by renaming DATE's stored `alpha` as a coefficient rather than a retention factor.
-The goal checkbox remains for the conductor and the required human certification.
+`scratchpad/lanes/decisions/decision-L9.md`, “L9 – Formal delay, Z coordinate, exponential sign,
+and startup terms.” The generic semantic reciprocal-Z netlist is now indexed by a nonzero
+coordinate subtype. The ambient carrier domains state the nonzero gate explicitly, the ring and
+DCDR bridges construct that subtype only from existing ROC proofs, and the unilateral advance
+startup contribution has a public name. This closes the implementation side of the quoted L9
+gate; any checkbox update belongs to the conductor.
 
-The four mandatory decision names are present exactly:
+The decision's registry sentence is adopted verbatim:
 
-- `intensityGainToFieldAmplitudeGain` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:202`.
-- `fieldAmplitudeGainToIntensityGain` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:206`.
-- `SourceParameters.toCoherentUnitDelayParameters` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:253`.
-- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:141`.
+> Formal delay is `q`; `Z{x}(z)=sum_{n>=0}x[n]z^{-n}`; on `ReciprocalZCoordinate`, `q=z⁻¹`.
+> Formal `q=0` has no finite reciprocal preimage. It may be described as `z=∞` only inside a
+> separately named projective/extended-complex interpretation, which the current `ℂ` API does
+> not provide. `q_i(s)=exp(-s*tau_i)`, so `s=I*omega` gives
+> `q_i=exp(-I*omega*tau_i)` and one-delay `z=exp(+I*omega*tau)`.
 
-The old source-map names `SourceParameters.toUnitDelayParameters` and
-`MultipleDelaySourceParameters.toMultipleDelayParameters` were removed without compatibility
-aliases. `DateParameters.powerAttenuation` was renamed to
-`DateParameters.powerAttenuationCoefficient` at
-`Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:75`. Searches for all three old qualified
-names are clean. The similarly spelled `DCDR.UnitDelayParameters.toMultipleDelayParameters` is a
-different coherent unit-exponent embedding and intentionally remains.
+The implementation uses no projective or extended-complex API and therefore makes no `z = ∞`
+claim. The existing Laplace substitution remains `q_i = exp (-s * τ_i)` at
+`Physlib/Optics/Systems/DelayTransfer/Basic.lean:231`; the unilateral transform remains
+`sum n, f n * (z⁻¹)^n` at `Physlib/Mathematics/ZTransform/Basic.lean:149-157`.
 
 ## Exact source file set
 
-### Semantic DCDR changes
+### Z-transform startup API
 
-- `Physlib/Optics/Systems/DCDR/SourceBridge.lean`: declares the two role-bearing conversions,
-  converts every coherent `G_i` field with `sqrt`, adds the three square-recovery results, and
-  updates the named coherent loop coefficient. The entry declarations begin at lines 202, 253,
-  311, and 329.
-- `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean`: adds the exact unit-delay gain-role
-  fixture and the independent printed-polynomial noninterference anchor at lines 220-280; it also
-  migrates the all-one divergence fixture to the corrected coherent map at lines 282-308.
-- `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean`: transports the nonnegative-gain
-  predicate, corrects the multiple-delay coherent map, adds all three square-recovery results,
-  and preserves the unit-delay embedding bridge at lines 131-205.
-- `Physlib/Optics/Systems/DCDR/MultipleDelayRegression.lean`: adds the distinct-delay gain-role
-  and printed-polynomial anchors at lines 240-290.
-- `Physlib/Optics/Systems/DCDR/PassiveCaseRegression.lean`: mechanically unfolds the corrected
-  map in the already accepted passive exact-data anchors declared at lines 125, 178, and 206.
+- `Physlib/Mathematics/ZTransform/Basic.lean`: adds `advanceStartup` at line 318 and states
+  `transform_advance` through that named finite sum at line 377.
+- `Physlib/Mathematics/ZTransform/BasicRegression.lean`: independently pins startup `1`, the
+  corrected value `2 * (1 - 1) = 0`, and the wrong-parentheses value
+  `2 * 1 - 1 = 1` at lines 150, 154, and 161.
+- `Physlib/Mathematics/ZTransform/Inverse.lean`: migrates
+  `tendsto_inversion_cobounded` and `eq_natCast_of_transform_eqOn` at lines 193 and 217 to the
+  named startup term.
+- `Physlib/Mathematics/ZTransform/InverseRegression.lean`: migrates
+  `tendsto_inversion_geometricSeq_one` at line 161.
 
-### DATE production changes
+### Generic reciprocal-Z API
 
-- `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean`: renames the DATE source field at line
-  75 and makes `DateParameters.fieldAttenuation` at line 89 consume that coefficient.
-- `Physlib/Optics/Systems/Microring/PhysicalSourceBridge.lean`: propagates the coefficient into
-  physical data through `DateParameters.toPhysicalPropagation` at line 109 and its validity bridge
-  at line 145.
+- `Physlib/Optics/Systems/DelayTransfer/Basic.lean`: adds
+  `ReciprocalZCoordinate`, `zInverseEvaluationOnReciprocalZ`, the raw-zero negative control,
+  and semantic nonzero result at lines 247, 253, 264, and 269.
+- `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean`: changes
+  `RationalNetlist.reciprocalZ` at line 401 to the subtype; adds the ambient solve and response
+  carrier domains at lines 406 and 411; proves subtype/carrier equivalences and zero exclusion
+  at lines 456-503; and migrates the three response transports at lines 510-539.
+- `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean`: packages `z = I`, pins
+  semantic `q = -I`, expands raw `z = 0`, rejects semantic `q = 0`, and migrates the compiled
+  quadrature response at lines 377-456.
+- `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean`: packages every unit-circle
+  coordinate at line 114, proves its semantic evaluation at line 130, and migrates the domain
+  and response equivalences at lines 260-287.
+- `Physlib/Optics/Systems/DelayTransfer/FrequencyResponseRegression.lean`: migrates the exact
+  quadrature frequency/reciprocal-Z anchor at line 216.
+- `Physlib/Optics/Systems/DelayTransfer/Stability.lean`: retains `zZeros` and `zPoles` at lines
+  156 and 201 while correcting their docs to say that formal `q = 0` has no finite coordinate
+  and that this API supplies no projective interpretation.
 
-### Five mechanical constructor-propagation files
+### DCDR migration
 
-- `Physlib/Optics/Systems/Microring/SourceBridgeRegression.lean`:
-  `sourceBridgeRegressionDateParameters` at line 66.
-- `Physlib/Optics/Systems/Microring/PhysicalRegression.lean`:
-  `physicalRegressionDateParameters` at line 477.
-- `Physlib/Optics/Systems/Cascade/HeterogeneousRegression.lean`:
-  `dateCascadeRegressionQuarterTurnRing` at line 169.
-- `Physlib/Optics/Systems/Cascade/IdenticalRegression.lean`:
-  `dateJoinedSylvesterRegressionRing` at line 229.
-- `Physlib/Optics/Systems/Cascade/TerminationRegression.lean`:
-  `dateTerminationRegressionRing` at line 63 and
-  `dateTerminationRegressionSingularRing` at line 716.
+- `Physlib/Optics/Systems/DCDR/Poles.lean`: changes
+  `rationalZEliminationResponse` and its model equality to the subtype at lines 572 and 581;
+  `formalZeros` at line 670 gets the explicit finite-coordinate legend.
+- `Physlib/Optics/Systems/DCDR/PolesRegression.lean`: packages `z = 1` and `z = I` at lines
+  450 and 454; migrates the stable and active exact response anchors at lines 458-608; and
+  proves the formal-`q = 0` no-finite-coordinate sentinel at line 694.
+- `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean`: migrates the proof-gated rational domain
+  and response bridge at lines 92 and 117; packages the semantic coordinate from ROC membership
+  at line 264; and migrates common-domain membership and agreement at lines 285 and 345.
+- `Physlib/Optics/Systems/DCDR/ZTransformRegression.lean`: migrates the exact real and nonreal
+  response anchors at lines 343 and 548-584.
+- `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean`: mechanically migrates the existing
+  independent chain/common-domain anchor at line 632.
 
-These five files contain only the constructor field-name propagation. In particular,
-`PhysicalRegression.lean` changes only the initializer at line 482; its pre-existing style-linter
-indentation findings occur on other lines and are byte-identical to the sync target.
+### Microring and joint-witness migration
+
+- `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean`: migrates the rational domain,
+  selected response, cleared law, and recurrence equality at lines 126-187; packages the
+  semantic coordinate from ROC membership at line 348; and migrates common-domain membership
+  and agreement at lines 358 and 421.
+- `Physlib/Optics/Systems/Microring/AllPassZTransformBridgeRegression.lean`: migrates the exact
+  common-domain and quarter-turn response anchors at lines 85 and 192-214.
+- `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean`: mechanically migrates the
+  DCDR half of `ringDCDRX01Regression_independentAnchors` at line 96.
+
+## Semantic domain audit
+
+`RationalNetlist.reciprocalZ` has no all-complex compatibility alias. Its parameter type is
+`ReciprocalZCoordinate`, and the two canonical ambient views are exactly
+
+```text
+{z : ℂ | z ≠ 0 ∧ zInverseEvaluation z ∈ netlist.solveDomain}
+{z : ℂ | z ≠ 0 ∧ zInverseEvaluation z ∈ netlist.responseDomain}.
+```
+
+`mk_mem_reciprocalZ_solveDomain_iff` and
+`mk_mem_reciprocalZ_responseDomain_iff` relate those views to the subtype netlist. The generic
+zero-exclusion lemmas show that no rational netlist admits the complex origin in either carrier
+domain. `zInverseEvaluation 0 = fun _ => 0` remains only as an explicitly nonsemantic negative
+control, while `zInverseEvaluationOnReciprocalZ_ne_zero` proves that no semantic coordinate maps
+to the zero delay tuple.
+
+Both DCDR and ring common-domain structures continue to store ROC membership over the ambient
+complex coordinate. Their new `reciprocalZCoordinate` projections derive nonzeroness from that
+existing analytic proof. No result derives ROC, Schur, contraction, or a solve gate from the
+subtype itself.
+
+The exact quadrature anchor remains
+
+```text
+tau = 1, z = I, q = z⁻¹ = -I.
+```
+
+The DCDR active response still has formal `q = 0` as a formal zero, but the new sentinel proves
+that no finite `ReciprocalZCoordinate` evaluates to it. This is not a statement about infinity.
+
+## Startup-term audit
+
+`advanceStartup f z m` is definitionally
+
+```text
+sum n in range m, seriesTerm f z n.
+```
+
+The public advance law is now
+
+```text
+transform (advance m f) z =
+  z^m * (transform f z - advanceStartup f z m).
+```
+
+The fail-capable fixture expands the unit impulse at `m = 1`, `z = 2` from the primitive finite
+sum. It proves startup `1` and corrected result `0`, while the false conference placement gives
+`1`; therefore dropping the parentheses cannot pass the fixture. Inversion and uniqueness reuse
+the same named startup term. No nonzero-state recurrence theorem is added: any future such result
+must expose a separately named `initialStateContribution`.
 
 ## Validation names with declaration lines
 
-### Production conversion and unit-delay dictionary
+### Mandatory production names
 
-- `intensityGainToFieldAmplitudeGain` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:202`.
-- `fieldAmplitudeGainToIntensityGain` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:206`.
-- `fieldAmplitudeGainToIntensityGain_intensityGainToFieldAmplitudeGain` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:210`.
-- `intensityGainToFieldAmplitudeGain_fieldAmplitudeGainToIntensityGain` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:216`.
-- `SourceParameters.HasNonnegativeGains` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:244`.
-- `SourceParameters.toCoherentUnitDelayParameters` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:253`.
-- `SourceParameters.toCoherentUnitDelayParameters_data` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:266`.
-- `SourceParameters.toCoherentUnitDelayParameters_isAdmissible` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:282`.
-- `SourceParameters.firstThroughAmplitude_sq` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:287`.
-- `SourceParameters.firstCrossAmplitude_sq` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:293`.
-- `SourceParameters.secondThroughAmplitude_sq` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:299`.
-- `SourceParameters.secondCrossAmplitude_sq` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:305`.
-- `SourceParameters.toCoherentUnitDelayParameters_upperGain_intensity` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:311`.
-- `SourceParameters.toCoherentUnitDelayParameters_lowerGain_intensity` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:317`.
-- `SourceParameters.toCoherentUnitDelayParameters_feedbackGain_intensity` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:323`.
-- `SourceParameters.coherentLoopCoefficient` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:329`.
-- `SourceParameters.toCoherentUnitDelayParameters_loopCoefficient` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:342`.
-- `SourceParameters.toCoherentUnitDelayParameters_denominatorPolynomial` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:348`.
-- `passiveCaseUnitDelayParameters` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:451`.
+- `ReciprocalZCoordinate` —
+  `Physlib/Optics/Systems/DelayTransfer/Basic.lean:247`.
+- `zInverseEvaluationOnReciprocalZ` —
+  `Physlib/Optics/Systems/DelayTransfer/Basic.lean:253`.
+- `zInverseEvaluationOnReciprocalZ_apply` —
+  `Physlib/Optics/Systems/DelayTransfer/Basic.lean:257`.
+- `zInverseEvaluation_zero` —
+  `Physlib/Optics/Systems/DelayTransfer/Basic.lean:264`.
+- `zInverseEvaluationOnReciprocalZ_ne_zero` —
+  `Physlib/Optics/Systems/DelayTransfer/Basic.lean:269`.
+- `RationalNetlist.reciprocalZ` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:401`.
+- `RationalNetlist.reciprocalZSolveDomain` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:406`.
+- `RationalNetlist.reciprocalZResponseDomain` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:411`.
+- `RationalNetlist.solveDomain_reciprocalZ` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:456`.
+- `RationalNetlist.responseDomain_reciprocalZ` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:464`.
+- `RationalNetlist.mk_mem_reciprocalZ_solveDomain_iff` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:472`.
+- `RationalNetlist.mk_mem_reciprocalZ_responseDomain_iff` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:484`.
+- `RationalNetlist.zero_not_mem_reciprocalZSolveDomain` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:496`.
+- `RationalNetlist.zero_not_mem_reciprocalZResponseDomain` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:503`.
+- `RationalNetlist.response_reciprocalZ` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:510`.
+- `RationalNetlist.response_reciprocalZ_reindex` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:523`.
+- `RationalNetlist.response_reciprocalZ_reindex_of_evaluation_eq` —
+  `Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:539`.
+- `advanceStartup` — `Physlib/Mathematics/ZTransform/Basic.lean:318`.
+- `transform_advance` — `Physlib/Mathematics/ZTransform/Basic.lean:377`.
 
-### Production multiple-delay dictionary
+### Generic exact anchors
 
-- `MultipleDelaySourceParameters.HasNonnegativeGains` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:131`.
-- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:141`.
-- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_data` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:157`.
-- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_upperGain_sq` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:178`.
-- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_lowerGain_sq` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:186`.
-- `MultipleDelaySourceParameters.toCoherentMultipleDelayParameters_feedbackGain_sq` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:194`.
-- `SourceParameters.toMultipleDelaySourceParameters_coherent` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:202`.
+- `advanceStartup_unitImpulse_two` —
+  `Physlib/Mathematics/ZTransform/BasicRegression.lean:150`.
+- `transform_advance_unitImpulse_two_correct` —
+  `Physlib/Mathematics/ZTransform/BasicRegression.lean:154`.
+- `transform_advance_unitImpulse_two_ne_wrong_parentheses` —
+  `Physlib/Mathematics/ZTransform/BasicRegression.lean:161`.
+- `quadratureReciprocalZCoordinate` —
+  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:377`.
+- `zInverseEvaluationOnReciprocalZ_quadrature` —
+  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:381`.
+- `zInverseEvaluation_zero_expansion` —
+  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:389`.
+- `zInverseEvaluationOnReciprocalZ_quadrature_ne_zero` —
+  `Physlib/Optics/Systems/DelayTransfer/EvaluationRegression.lean:395`.
+- `unitCircleReciprocalZCoordinate` —
+  `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:114`.
+- `zInverseEvaluationOnReciprocalZ_unitCirclePoint` —
+  `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:130`.
+- `RationalNetlist.unitCirclePoint_mem_reciprocalZ_responseDomain_iff` —
+  `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:260`.
+- `RationalNetlist.frequencyResponse_eq_reciprocalZ` —
+  `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean:287`.
 
-### Exact independent DCDR regressions
+### DCDR and ring adapters
 
-- `sourceGainConversionParameters` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:220`.
-- `sourceGainConversion_hasNonnegativeGains` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:228`.
-- `sourceGainConversion_coherentGains` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:234`.
-- `sourceGainConversion_squaredGains` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:249`.
-- `sourceGainConversion_printedPolynomials` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:268`.
-- `sourceDictionaryDivergenceParameters` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:282`.
-- `sourceDictionaryDivergence_printedLoopCoefficient` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:290`.
-- `sourceDictionaryDivergence_coherentLoopCoefficient` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:296`.
-- `sourceDictionaryDivergence_loopCoefficients_ne` —
-  `Physlib/Optics/Systems/DCDR/SourceBridgeRegression.lean:304`.
-- `multipleDelayGainConversionParameters` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelayRegression.lean:240`.
-- `multipleDelayGainConversion_hasNonnegativeGains` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelayRegression.lean:251`.
-- `multipleDelayGainConversion_coherentGains` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelayRegression.lean:258`.
-- `multipleDelayGainConversion_printedPolynomials` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelayRegression.lean:278`.
-- `passiveCaseUnitDelayParameters_data` —
-  `Physlib/Optics/Systems/DCDR/PassiveCaseRegression.lean:125`.
-- `passiveCase_coherentLoopCoefficient` —
-  `Physlib/Optics/Systems/DCDR/PassiveCaseRegression.lean:178`.
-- `passiveCase_coherentNumeratorPolynomial_expansion` —
-  `Physlib/Optics/Systems/DCDR/PassiveCaseRegression.lean:206`.
+- `DCDR.rationalZEliminationResponse` —
+  `Physlib/Optics/Systems/DCDR/Poles.lean:572`.
+- `DCDR.rationalZEliminationResponse_eq_responseModel` —
+  `Physlib/Optics/Systems/DCDR/Poles.lean:581`.
+- `DCDR.oneReciprocalZCoordinate` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:450`.
+- `DCDR.imaginaryUnitReciprocalZCoordinate` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:454`.
+- `DCDR.zInverseEvaluationOnReciprocalZ_I` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:534`.
+- `DCDR.stable_I_mem_reciprocalZResponseDomain` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:552`.
+- `DCDR.stable_rationalZEliminationResponse_I` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:584`.
+- `DCDR.stable_rationalZEliminationResponse_I_ne_reversed` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:608`.
+- `DCDR.unstableResponseReduction_zero_formal_only` —
+  `Physlib/Optics/Systems/DCDR/PolesRegression.lean:694`.
+- `DCDR.rationalNetlist_mem_reciprocalZ_responseDomain` —
+  `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean:92`.
+- `DCDR.zTransfer_eq_rationalZEliminationResponse` —
+  `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean:117`.
+- `DCDR.IsZCrossSemanticsDomain.reciprocalZCoordinate` —
+  `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean:264`.
+- `DCDR.IsZCrossSemanticsDomain.mem_reciprocalZResponseDomain` —
+  `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean:285`.
+- `DCDR.zCrossSemantics_agree` —
+  `Physlib/Optics/Systems/DCDR/ZTransformBridge.lean:345`.
+- `AllPass.allPassRationalNetlist_mem_reciprocalZ_responseDomain` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:126`.
+- `AllPass.reciprocalZThroughResponse` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:138`.
+- `AllPass.zTransfer_eq_reciprocalZThroughResponse` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:187`.
+- `AllPass.IsZCrossSemanticsDomain.reciprocalZCoordinate` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:348`.
+- `AllPass.IsZCrossSemanticsDomain.mem_reciprocalZResponseDomain` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:358`.
+- `AllPass.zCrossSemantics_agree` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridge.lean:421`.
 
-### DATE production and constructor sentinels
+### Migrated fail-capable regressions
 
-- `DateParameters.powerAttenuationCoefficient` —
-  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:75`.
-- `DateParameters.fieldAttenuation` —
-  `Physlib/Optics/Systems/Microring/SourceBridgeDate.lean:89`.
-- `DateParameters.toPhysicalPropagation` —
-  `Physlib/Optics/Systems/Microring/PhysicalSourceBridge.lean:109`.
-- `DateParameters.toPhysicalPropagation_fieldAttenuation` —
-  `Physlib/Optics/Systems/Microring/PhysicalSourceBridge.lean:124`.
-- `DateParameters.toPhysicalAddDrop_isValid` —
-  `Physlib/Optics/Systems/Microring/PhysicalSourceBridge.lean:145`.
-- `sourceBridgeRegressionDateParameters` —
-  `Physlib/Optics/Systems/Microring/SourceBridgeRegression.lean:66`.
-- `sourceBridgeRegression_date_fieldAttenuation` —
-  `Physlib/Optics/Systems/Microring/SourceBridgeRegression.lean:86`.
-- `physicalRegressionDateParameters` —
-  `Physlib/Optics/Systems/Microring/PhysicalRegression.lean:477`.
-- `physicalRegression_date_toPhysicalAddDrop` —
-  `Physlib/Optics/Systems/Microring/PhysicalRegression.lean:486`.
-- `physicalRegression_date_fieldAttenuation` —
-  `Physlib/Optics/Systems/Microring/PhysicalRegression.lean:490`.
-- `dateCascadeRegressionQuarterTurnRing` —
-  `Physlib/Optics/Systems/Cascade/HeterogeneousRegression.lean:169`.
-- `dateCascadeRegression_quarterTurnRing_fieldAttenuation` —
-  `Physlib/Optics/Systems/Cascade/HeterogeneousRegression.lean:211`.
-- `dateJoinedSylvesterRegressionRing` —
-  `Physlib/Optics/Systems/Cascade/IdenticalRegression.lean:229`.
-- `dateJoinedSylvesterRegressionRing_fieldAttenuation` —
-  `Physlib/Optics/Systems/Cascade/IdenticalRegression.lean:250`.
-- `dateTerminationRegressionRing` —
-  `Physlib/Optics/Systems/Cascade/TerminationRegression.lean:63`.
-- `dateTerminationRegressionRing_fieldAttenuation` —
-  `Physlib/Optics/Systems/Cascade/TerminationRegression.lean:83`.
-- `dateTerminationRegressionSingularRing` —
-  `Physlib/Optics/Systems/Cascade/TerminationRegression.lean:716`.
-
-## Exact conversion and noninterference audit
-
-For both source dictionaries, the printed `G1`, `G2`, and `G3` fields remain real intensity gains.
-The corrected coherent maps store
-
-```text
-(sqrt G1, sqrt G2, sqrt G3)
-```
-
-as field-amplitude gains. The inverse results are deliberately gated by nonnegativity. The unit
-map's target is algebraically admissible because every real square root is nonnegative; the
-source-intensity interpretation and square recovery still require
-`SourceParameters.HasNonnegativeGains`. The multiple-delay predicate transports that same source
-domain while preserving all three exponents.
-
-The independent exact source fixture is
-
-```text
-(G1, G2, G3, k1, k2) = (1/4, 1/9, 4/25, 1, 1).
-```
-
-Primitive square-root expansion gives coherent field gains `(1/2, 1/3, 2/5)`, and primitive
-squaring recovers `(1/4, 1/9, 4/25)`. The unit-delay printed polynomials independently expand to
-
-```text
-numerator   = C (1/9) * X - C (1/225) * X^3
-denominator = 1 - C (1/25) * X^2.
-```
-
-The multiple-delay fixture uses `(m1, m2, m3) = (2, 3, 4)`. It has the same coherent field gains,
-while its independently expanded printed polynomials are
-
-```text
-numerator   = C (1/9) * X^3 - C (1/225) * X^9
-denominator = 1 - C (1/25) * X^6.
-```
-
-These anchors unfold conversion and polynomial primitives; they do not route through the recovery
-lemmas under test. A direct-`G_i` coherent map, a `sqrt G_i` substitution into the printed formulas,
-or a wrong delay breaks an exact value.
-
-The literal production definitions were not changed:
-
-- `SourceParameters.printedNumeratorPolynomial` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:375`.
-- `SourceParameters.printedDenominatorPolynomial` —
-  `Physlib/Optics/Systems/DCDR/SourceBridge.lean:381`.
-- `MultipleDelaySourceParameters.printedNumeratorPolynomial` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:234`.
-- `MultipleDelaySourceParameters.printedDenominatorPolynomial` —
-  `Physlib/Optics/Systems/DCDR/MultipleDelaySource.lean:241`.
-
-The existing all-one divergence tooth remains fail-capable: the literal printed loop coefficient
-is `1`, while direct coherent N7 amplitude expansion gives `-1`. This is a model-separation
-sentinel, not a coherent/incoherent equivalence.
-
-DATE's stored `alpha` is now named `powerAttenuationCoefficient`; the field factor remains exactly
-`exp (-alpha * couplingLength / 2)`. Existing 3-4-5, physical, cascade, and termination fixtures
-retain their old exact values after the mechanical constructor migration.
-
-## Registration and registry request
-
-All twelve Lean files were already registered at the exact sync target. No import is requested,
-and `Physlib.lean` must remain untouched.
-
-Per `decision-L8.md`, the controller/conductor should extend registry entry Z-01 and the mandatory
-name list, if that bookkeeping is maintained outside this lane, with:
-
-```text
-intensityGainToFieldAmplitudeGain
-fieldAmplitudeGainToIntensityGain
-SourceParameters.toCoherentUnitDelayParameters
-MultipleDelaySourceParameters.toCoherentMultipleDelayParameters
-```
-
-This lane intentionally did not edit an API map, registry, parity ledger, validation ledger, or
-`goal.md`.
+- `DCDR.zRegression_stable_rawCompiled_I` —
+  `Physlib/Optics/Systems/DCDR/ZTransformRegression.lean:548`.
+- `DCDR.zRegression_stable_independent_nonzeroLoop_I` —
+  `Physlib/Optics/Systems/DCDR/ZTransformRegression.lean:565`.
+- `DCDR.zRegression_stable_I_commonDomain_independent_anchor` —
+  `Physlib/Optics/Systems/DCDR/ZTransformRegression.lean:584`.
+- `DCDR.zChainRegression_independent_common_point` —
+  `Physlib/Optics/Systems/DCDR/NominalChainRegression.lean:632`.
+- `AllPass.allPassZRegression_quarterTurn_reciprocalZDomain` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridgeRegression.lean:192`.
+- `AllPass.allPassZRegression_quarterTurn_reciprocalZThroughResponse` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridgeRegression.lean:203`.
+- `AllPass.allPassZRegression_quarterTurn_rawN5F_agreement` —
+  `Physlib/Optics/Systems/Microring/AllPassZTransformBridgeRegression.lean:214`.
+- `AllPass.ringDCDRX01Regression_independentAnchors` —
+  `Physlib/Optics/Systems/Microring/AllPassDCDRX01Regression.lean:96`.
 
 ## Gate record
 
-All Lean invocations ran through the machine-wide `lake-lock`, and the source was committed before
-long waits.
+- Post-sync targeted build: green, 2,827 jobs.
+- Root `lake-lock build Physlib -KwarningAsError=true`: green, 5,021 jobs.
+- `lake-lock exe check_file_imports`: green.
+- `lake-lock exe sorry_lint`: green.
+- `lake-lock exe runPhyslibLinters`: green for Physlib and QuantumInfo.
+- `lake-lock exe api_map_index`: green.
+- `lake-lock exe lint_all`: exit 0; its advisory output contains only repository baseline
+  findings. The cited double-empty-line finding in
+  `DelayTransfer/EvaluationRegression.lean:148` is byte-identical to the sync target.
+- `lake-lock exe module_doc_lint`: the full repository retains its known baseline failures;
+  filtering error headers against all 18 touched files is empty.
+- `./scripts/lint-style.sh`: green on committed state.
+- `git diff --check`: green.
+- Lean source delta: 18 existing files, 378 insertions, 146 deletions.
+- Maximum touched-file length: 773 lines.
+- Maximum touched-file line length: 100 Unicode codepoints.
+- Added banned declarations/options: 0. Added `theorem` declarations: 0.
 
-- The exact sync target `66df1929` was merged, not rebased or substituted.
-- The cache was refreshed from the battery-green `optics-development` worktree.
-- The final targeted warnings-as-errors build passed: 2,832 jobs.
-- The root warnings-as-errors `Physlib` build then passed: 5,016 jobs.
-- In hardened post-root order, `check_file_imports`, `sorry_lint`, and
-  `runPhyslibLinters` passed; the latter passed for both Physlib and QuantumInfo.
-- `api_map_index` and `lint_all` exited zero. `lint_all` continues to print repository-baseline
-  advisory style and transitive-import findings. Its only touched-file style output is the
-  pre-existing indentation backlog in `Microring/PhysicalRegression.lean`, outside its one-line
-  initializer rename.
-- The repository-wide `module_doc_lint` still exits one on its known global documentation backlog.
-  Filtering its exact-source output for all twelve touched modules returns no findings.
-- `scripts/lint-style.sh` passes on the exact gated source.
-- `git diff --check` passes. Added Lean lines contain zero `sorry`, `axiom`, `native_decide`, or
-  `maxHeartbeats`, and add zero `theorem` declarations.
-- Every touched Lean file is below 1,500 lines. Maxima are 98-100 Unicode codepoints; the largest
-  file is `Microring/SourceBridgeDate.lean` at 1,125 lines.
-- `Physlib.lean` was never temporarily edited and remains byte-identical to the sync target.
+## Non-claims and human review
 
-## Claims, non-claims, and human certification
+This slice does not identify a fixed-carrier phase with a time delay, does not add a nonzero-state
+recurrence result, and does not claim physical frequency, causality beyond the unilateral
+zero-state API, BIBO behavior, resonance, reciprocity, modal or electromagnetic power, or a
+projective value at infinity. It changes no finite `zZeros` or `zPoles` set.
 
-This slice proves a role-safe source-boundary interpretation: nonnegative printed intensity gains
-map canonically to coherent field-amplitude square roots, and squaring recovers the source data.
-It also removes the DATE coefficient/factor name collision while preserving the existing field
-attenuation formula.
-
-It does not claim that FMICS'15's printed incoherent coefficient model equals the coherent N7 DCDR,
-and it does not alter the literal source polynomials. It makes no claim of physical resonance,
-power flux, electromagnetic energy, reciprocity, physical time reversal, physical reference
-planes, causality or Maxwell time-domain meaning, physical-frequency meaning, BIBO stability, or
-HOL-script semantics.
-
-Per `AI-POLICY.md`, a human author must independently certify the source-role readings, the
-square-root boundary, the exact fixture values, and the DATE coefficient interpretation before
-upstreaming. A green build proves formal consistency, not that the code matches the human author's
-intended physics.
+Per `decision-L9.md`, Human-only is **no** for the fork convention and nonzero-domain repair.
+A human must certify source attribution if this material is upstreamed; that source-certification
+step is separate from the implemented coordinate-domain gate.
