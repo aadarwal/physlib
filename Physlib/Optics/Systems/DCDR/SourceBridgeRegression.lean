@@ -30,6 +30,11 @@ Another exact source fixture satisfies the strict version of printed Theorem 4's
 the reciprocal pole of Theorem 3's differently indexed denominator has norm two. It makes the
 withholding of a forced strict Theorem 4 bridge executable.
 
+At that same fixture, the printed `G1*G2` expression is `1/4`, while direct expansion of the
+recovered script's `G1*G3` expression is `4`. The printed condition holds and the script condition
+fails. These two facts are proved separately from the literal products; no source-convention
+conversion is used.
+
 The gain-role fixture uses printed intensities `(1/4, 1/9, 4/25)`. Primitive square-root
 expansion gives coherent field gains `(1/2, 1/3, 2/5)`, while an independent printed-polynomial
 expansion retains the literal intensity values. Thus replacing the coherent map cannot silently
@@ -44,6 +49,9 @@ replace `G_i` by `sqrt G_i` in the source transcription.
 - `sourceGainConversion_printedPolynomials`: literal printed-source noninterference anchor.
 - `sourceDictionaryDivergence_loopCoefficients_ne`: incoherent/coherent divergence witness.
 - `sourceThmFourMismatch_not_isSchurStable`: executable Theorem 3/4 mismatch witness.
+- `sourceThmFourMismatch_printedExpression`: the printed `G1*G2` value `1/4`.
+- `sourceThmFourMismatch_scriptExpression`: the script `G1*G3` value `4`.
+- `sourceThmFourMismatch_conditions_disagree`: the two source conditions differ at one point.
 
 ## iii. Table of contents
 
@@ -56,6 +64,9 @@ replace `G_i` by `sqrt G_i` in the source transcription.
 These exact algebraic fixtures do not claim physical resonance, coherent--incoherent equivalence,
 BIBO stability, normalized-modal or electromagnetic power, causality or time-domain behavior, or
 a physical-frequency interpretation.
+
+The recovered script's `G1*G3` condition is audited as a separate object from the printed
+Theorem 4 `G1*G2` condition; no equality or implication between them is asserted.
 -/
 
 @[expose] public section
@@ -316,6 +327,24 @@ def sourceThmFourMismatchParameters : DCDRSourceBridge.SourceParameters where
   k1 := 1
   k2 := 1
 
+/-- Direct expansion gives the printed Theorem 4 `G1*G2` expression `1/4`. -/
+lemma sourceThmFourMismatch_printedExpression :
+    printedIncoherentStabilityExpression
+      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+      sourceThmFourMismatchParameters.k2 = (1 / 4 : ℂ) := by
+  norm_num [printedIncoherentStabilityExpression, sourceThmFourMismatchParameters]
+
+/-- Direct expansion gives the recovered script's `G1*G3` expression `4`. -/
+lemma sourceThmFourMismatch_scriptExpression :
+    (sourceThmFourMismatchParameters.k1 : ℂ) *
+          sourceThmFourMismatchParameters.k2 * sourceThmFourMismatchParameters.G1 *
+          sourceThmFourMismatchParameters.G3 +
+        (1 - sourceThmFourMismatchParameters.k1) *
+          (1 - sourceThmFourMismatchParameters.k2) *
+          sourceThmFourMismatchParameters.G2 * sourceThmFourMismatchParameters.G3 = 4 := by
+  norm_num [sourceThmFourMismatchParameters]
+
 /-- The mismatch fixture satisfies the strict square-root bound and the printed nonzero gate. -/
 lemma sourceThmFourMismatch_strictConditions :
     ‖Complex.sqrt (printedIncoherentStabilityExpression
@@ -326,12 +355,7 @@ lemma sourceThmFourMismatch_strictConditions :
       sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
       sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
       sourceThmFourMismatchParameters.k2 ≠ 0 := by
-  have hExpression : printedIncoherentStabilityExpression
-      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
-      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
-      sourceThmFourMismatchParameters.k2 = (1 / 4 : ℂ) := by
-    norm_num [printedIncoherentStabilityExpression, sourceThmFourMismatchParameters]
-  rw [hExpression]
+  rw [sourceThmFourMismatch_printedExpression]
   constructor
   · have hNonneg : (0 : ℂ) ≤ 1 / 4 :=
       (RCLike.nonneg_iff).2 ⟨by norm_num, by norm_num⟩
@@ -341,6 +365,48 @@ lemma sourceThmFourMismatch_strictConditions :
     rw [Complex.sqrt_of_nonneg hNonneg]
     norm_num [hRealSqrt]
   · norm_num
+
+/-- The mismatch fixture satisfies the printed paper's non-strict Theorem 4 conditions. -/
+lemma sourceThmFourMismatch_printedConditions :
+    PrintedIncoherentStabilityConditions
+      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+      sourceThmFourMismatchParameters.k2 :=
+  ⟨sourceThmFourMismatch_strictConditions.1.le,
+    sourceThmFourMismatch_strictConditions.2⟩
+
+/-- The mismatch fixture fails the recovered script's non-strict conditions because its square
+root has norm two. -/
+lemma sourceThmFourMismatch_scriptConditions_fail :
+    ¬FMICSScriptIncoherentStabilityConditions
+      sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+      sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+      sourceThmFourMismatchParameters.k2 := by
+  rintro ⟨hBound, _⟩
+  rw [sourceThmFourMismatch_scriptExpression] at hBound
+  have hNonnegative : (0 : ℂ) ≤ 4 :=
+    (RCLike.nonneg_iff).2 ⟨by norm_num, by norm_num⟩
+  have hSqrtFour : Real.sqrt (4 : ℝ) = 2 := by
+    rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  rw [Complex.sqrt_of_nonneg hNonnegative] at hBound
+  norm_num [hSqrtFour, Complex.norm_real, Real.norm_eq_abs] at hBound
+
+/-- At one exact source point, the printed conditions hold and the recovered-script conditions
+fail.
+
+The two conjuncts come from independent literal-product expansions.
+-/
+lemma sourceThmFourMismatch_conditions_disagree :
+    PrintedIncoherentStabilityConditions
+        sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+        sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+        sourceThmFourMismatchParameters.k2 ∧
+      ¬FMICSScriptIncoherentStabilityConditions
+        sourceThmFourMismatchParameters.G1 sourceThmFourMismatchParameters.G2
+        sourceThmFourMismatchParameters.G3 sourceThmFourMismatchParameters.k1
+        sourceThmFourMismatchParameters.k2 :=
+  ⟨sourceThmFourMismatch_printedConditions,
+    sourceThmFourMismatch_scriptConditions_fail⟩
 
 /-- The same fixture's printed Theorem 3 denominator has quadratic coefficient four. -/
 lemma sourceThmFourMismatch_denominatorPolynomial_expansion :

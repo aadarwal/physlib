@@ -5,7 +5,7 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Physlib.Optics.Systems.DCDR.Poles
+public import Physlib.Optics.Systems.DCDR.SourceBridge
 
 /-!
 # Zero-location observables for the double-coupler double-ring
@@ -14,7 +14,7 @@ public import Physlib.Optics.Systems.DCDR.Poles
 
 This file gives the coherent DCDR response certificate a literal reciprocal-coordinate
 zero-location observable. It reuses `ReducedRationalResponse.AllZerosInsideUnitDisk` from
-`Physlib/Optics/Systems/DelayTransfer/Stability.lean:238-239`; it does not attach a physical
+`Physlib/Optics/Systems/DelayTransfer/Stability.lean:295`; it does not attach a physical
 resonance interpretation to that predicate. FMICS'15 Definition 7, p. 170, calls this condition
 "resonance", but states only that every nonzero numerator root has norm strictly below one; see
 `goal.md:2313-2318`.
@@ -31,6 +31,12 @@ conclusion. The literal printed Theorem 5 implication is false at the norm-one b
 therefore keeps the printed audit predicate separate from a strict sufficient predicate; the
 proved lemma strengthens the first bound to `< 1`.
 
+The printed paper's strict convention is named
+`PrintedIncoherentAllZerosInsideOpenUnitDisk`. The recovered HOL Light script instead uses the
+non-strict `FMICSScriptAllZerosInClosedUnitDisk` predicate inherited from
+`FMICSScriptInClosedUnitDisk`. Both constrain an explicitly named zero set; no result converts,
+equates, or implies one source convention from the other.
+
 Coherent N7 `t`/`-I * k` is the FMICS'15 source's own unprinted coherent branch. The printed
 incoherent `1 - k`/`k` numerator below is a different case. No theorem identifies it with the
 coherent response certificate.
@@ -38,14 +44,17 @@ coherent response certificate.
 ## ii. Key results
 
 - `ResponseReduction.allZerosInsideUnitDisk`: the coherent reduced-response observable.
+- `printedIncoherentZeroSet`: the finite reciprocal-zero set of the printed numerator.
+- `PrintedIncoherentAllZerosInsideOpenUnitDisk`: the printed strict zero predicate.
+- `FMICSScriptAllZerosInClosedUnitDisk`: the recovered script's non-strict zero predicate.
 - `PrintedIncoherentTheoremFiveConditions`: all three hypotheses printed in FMICS'15 Theorem 5.
 - `PrintedIncoherentStrictAllZerosConditions`: the strict Physlib sufficient conditions.
-- `printedIncoherent_allZerosInsideUnitDisk_of_strict`: the strict zero-location result.
+- `printedIncoherent_allZerosInsideOpenUnitDisk_of_strict`: the strict zero-location result.
 
 ## iii. Table of contents
 
 - A. Coherent reduced-response observable
-- B. Printed incoherent zero data
+- B. Printed incoherent zero data and source conventions
 - C. Audited and strict Theorem 5 conditions
 - D. Strict zero-location result
 
@@ -55,9 +64,13 @@ This file proves no physical resonance, frequency-response, passivity, or BIBO t
 introduces neither normalized-modal power nor electromagnetic power; no E3b power bridge is used.
 It gives no causality or time-domain interpretation. Formal `q` and reciprocal `z` are algebraic
 coordinates. The printed incoherent result is not a parity bridge to the coherent N7 netlist.
+The printed open-disk and recovered-script closed-disk predicates remain separate source records.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definitions 6-8 and Theorem 5.
+
+The recovered script's closed-disk convention is in
+`hol-optics-scripts/extracted/sfg/sfg/Stability_Resonance.ml:71-83,117-137`.
 -/
 
 @[expose] public section
@@ -91,7 +104,7 @@ end ResponseReduction
 
 /-!
 
-## B. Printed incoherent zero data
+## B. Printed incoherent zero data and source conventions
 
 -/
 
@@ -119,17 +132,32 @@ lemma eval_printedIncoherentZeroPolynomial
         printedIncoherentZeroCubicCoefficient G1 G2 G3 k1 k2 * q ^ 3 := by
   simp [printedIncoherentZeroPolynomial]
 
+/-- The nonzero reciprocal-coordinate roots of the printed incoherent numerator. -/
+def printedIncoherentZeroSet
+    (G1 G2 G3 k1 k2 : ℂ) : Set ℂ :=
+  {z | z ≠ 0 ∧
+    (printedIncoherentZeroPolynomial G1 G2 G3 k1 k2).eval z⁻¹ = 0}
+
 /-- Every finite reciprocal-coordinate root of the printed incoherent numerator lies strictly
 inside the unit disk.
 
 This states only the zero-location content of FMICS'15 Definition 7. It is deliberately not named
 "resonance" and is not a claim about the coherent N7 response.
 -/
-def PrintedIncoherentAllZerosInsideUnitDisk
+def PrintedIncoherentAllZerosInsideOpenUnitDisk
     (G1 G2 G3 k1 k2 : ℂ) : Prop :=
-  ∀ z : ℂ, z ≠ 0 →
-    (printedIncoherentZeroPolynomial G1 G2 G3 k1 k2).eval z⁻¹ = 0 →
-      ‖z‖ < 1
+  ∀ z ∈ printedIncoherentZeroSet G1 G2 G3 k1 k2, ‖z‖ < 1
+
+/-- Deprecated spelling for the printed paper's strict open-unit-disk zero predicate. -/
+@[deprecated PrintedIncoherentAllZerosInsideOpenUnitDisk (since := "2026-08-26")]
+abbrev PrintedIncoherentAllZerosInsideUnitDisk
+    (G1 G2 G3 k1 k2 : ℂ) : Prop :=
+  PrintedIncoherentAllZerosInsideOpenUnitDisk G1 G2 G3 k1 k2
+
+/-- Every member of an explicitly supplied zero set satisfies the recovered script's
+closed-unit-disk predicate. -/
+def FMICSScriptAllZerosInClosedUnitDisk (zeros : Set ℂ) : Prop :=
+  ∀ z ∈ zeros, FMICSScriptInClosedUnitDisk z
 
 /-!
 
@@ -182,11 +210,11 @@ strict so that its conclusion matches the paper's own strict Definition 7 predic
 
 The two nonzero hypotheses are retained exactly. No coherent/incoherent identification is used.
 -/
-lemma printedIncoherent_allZerosInsideUnitDisk_of_strict
+lemma printedIncoherent_allZerosInsideOpenUnitDisk_of_strict
     (G1 G2 G3 k1 k2 : ℂ)
     (hConditions : PrintedIncoherentStrictAllZerosConditions G1 G2 G3 k1 k2) :
-    PrintedIncoherentAllZerosInsideUnitDisk G1 G2 G3 k1 k2 := by
-  intro z hz hRoot
+    PrintedIncoherentAllZerosInsideOpenUnitDisk G1 G2 G3 k1 k2 := by
+  rintro z ⟨hz, hRoot⟩
   have hEquation :
       printedIncoherentZeroLinearCoefficient G1 G2 k1 k2 * z⁻¹ -
         printedIncoherentZeroCubicCoefficient G1 G2 G3 k1 k2 * z⁻¹ ^ 3 = 0 := by

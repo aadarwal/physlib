@@ -21,7 +21,7 @@ the finite zero `z = 1` and fails the strict all-zeros condition.
 
 Every response polynomial, Bezout identity, reciprocal root, and norm bound is expanded directly
 from the rational data. The positive and negative conclusions do not use
-`printedIncoherent_allZerosInsideUnitDisk_of_strict` or any other observable result. Thus the
+`printedIncoherent_allZerosInsideOpenUnitDisk_of_strict` or any other observable result. Thus the
 negative fixture can fail if the coefficients or strictness change.
 
 The separately printed incoherent FMICS'15 Theorem 5 assumptions are also checked at a boundary
@@ -30,6 +30,11 @@ paper, while the strict conclusion fails. This records the paper's non-strict/st
 does not re-credit the two nonzero hypotheses to Physlib and does not identify the printed model
 with the coherent fixtures.
 
+The same source boundary also distinguishes the printed paper from its recovered script. Direct
+factorization gives the printed reciprocal-zero set `{1, -1}`. The paper's strict open-disk
+predicate fails there, while the script's non-strict closed-disk predicate holds. Neither side is
+proved through the other.
+
 ## ii. Key results
 
 - `insideZerosParameters`: coherent response with finite zeros at `±1/2`.
@@ -37,7 +42,10 @@ with the coherent fixtures.
 - `boundaryZerosParameters`: coherent response with a finite zero at `1`.
 - `boundaryZerosResponseReduction_not_allZerosInsideUnitDisk`: required failing check.
 - `printedIncoherentTheoremFiveConditions_boundary`: all printed assumptions hold at the boundary.
-- `printedIncoherentAllZerosInsideUnitDisk_boundary_fails`: the strict conclusion fails there.
+- `printedIncoherentZeroSet_boundary_eq_pair`: the exact boundary zero set `{1, -1}`.
+- `printedIncoherentAllZerosInsideOpenUnitDisk_boundary_fails`: the printed strict failure.
+- `fmicsscriptAllZerosInClosedUnitDisk_boundary`: the recovered-script closed-disk success.
+- `printedOpen_scriptClosed_zeroBoundary_disagree`: the same-set boundary discriminator.
 
 ## iii. Table of contents
 
@@ -45,7 +53,7 @@ with the coherent fixtures.
 - B. Hand-expanded rational data
 - C. Explicit coprime reductions
 - D. Direct coherent zero-location anchors
-- E. Printed incoherent strictness boundary
+- E. Printed and script-specific strictness boundary
 
 ## iv. References
 
@@ -53,6 +61,9 @@ No statement calls the zero-location condition "resonance". This file introduces
 normalized-modal power nor electromagnetic power; no E3b power bridge is used. It supplies no
 physical-frequency, passivity, BIBO, coherent/incoherent equivalence, or material-model claim and
 gives no causality or time-domain interpretation.
+
+The recovered script's zero convention is non-strict and is kept separate from the printed
+paper's strict Definition 7 predicate; no equality or implication joins them.
 
 U. Siddique, S. M. Beillahi, and S. Tahar, "On the Formal Analysis of Photonic Signal
 Processing Systems", FMICS 2015, LNCS 9128, Definition 7 and Theorem 5.
@@ -358,7 +369,7 @@ lemma boundaryZerosResponseReduction_not_allZerosInsideUnitDisk :
 
 /-!
 
-## E. Printed incoherent strictness boundary
+## E. Printed and script-specific strictness boundary
 
 -/
 
@@ -383,13 +394,69 @@ lemma printedIncoherentZeroPolynomial_boundary_one :
     printedIncoherentZeroCubicCoefficient,
     printedIncoherentZeroLinearCoefficient]
 
+/-- Primitive factorization gives exactly the two finite reciprocal zeros `{1, -1}`. -/
+lemma printedIncoherentZeroSet_boundary_eq_pair :
+    printedIncoherentZeroSet 1 1 1 0 0 = {(1 : ℂ), -1} := by
+  ext z
+  simp only [printedIncoherentZeroSet, Set.mem_ofPred_eq, Set.mem_insert_iff,
+    Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hz, hRoot⟩
+    have hEquation : z⁻¹ - z⁻¹ ^ 3 = 0 := by
+      simpa [printedIncoherentZeroPolynomial,
+        printedIncoherentZeroCubicCoefficient,
+        printedIncoherentZeroLinearCoefficient] using hRoot
+    have hSquare : z ^ 2 = 1 := by
+      field_simp [hz] at hEquation ⊢
+      linear_combination hEquation
+    have hFactor : (z - 1) * (z + 1) = 0 := by
+      calc
+        (z - 1) * (z + 1) = z ^ 2 - 1 := by ring
+        _ = 0 := by rw [hSquare]; ring
+    rcases mul_eq_zero.mp hFactor with hPositive | hNegative
+    · left
+      linear_combination hPositive
+    · right
+      linear_combination hNegative
+  · rintro (rfl | rfl)
+    · constructor
+      · norm_num
+      · exact printedIncoherentZeroPolynomial_boundary_one
+    · constructor
+      · norm_num
+      · norm_num [printedIncoherentZeroPolynomial,
+          printedIncoherentZeroCubicCoefficient,
+          printedIncoherentZeroLinearCoefficient]
+
 /-- The printed Theorem 5 boundary point fails the paper's strict Definition 7 zero condition. -/
-lemma printedIncoherentAllZerosInsideUnitDisk_boundary_fails :
-    ¬PrintedIncoherentAllZerosInsideUnitDisk 1 1 1 0 0 := by
+lemma printedIncoherentAllZerosInsideOpenUnitDisk_boundary_fails :
+    ¬PrintedIncoherentAllZerosInsideOpenUnitDisk 1 1 1 0 0 := by
   intro hInside
-  have hStrict := hInside 1 (by norm_num)
-    printedIncoherentZeroPolynomial_boundary_one
+  have hStrict := hInside 1
+    ⟨by norm_num, printedIncoherentZeroPolynomial_boundary_one⟩
   norm_num at hStrict
+
+/-- The recovered script's closed-disk zero predicate holds on the exact boundary pair. -/
+lemma fmicsscriptAllZerosInClosedUnitDisk_boundary :
+    FMICSScriptAllZerosInClosedUnitDisk (printedIncoherentZeroSet 1 1 1 0 0) := by
+  rw [printedIncoherentZeroSet_boundary_eq_pair]
+  intro z hz
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+  rcases hz with (rfl | rfl)
+  · norm_num [FMICSScriptInClosedUnitDisk]
+  · norm_num [FMICSScriptInClosedUnitDisk]
+
+/-- On the same exact zero set, the printed open-disk predicate fails while the script
+closed-disk predicate holds.
+
+Both conjuncts are independently anchored by the primitive factorization and norm-one values.
+-/
+lemma printedOpen_scriptClosed_zeroBoundary_disagree :
+    (¬PrintedIncoherentAllZerosInsideOpenUnitDisk 1 1 1 0 0) ∧
+      FMICSScriptAllZerosInClosedUnitDisk
+        (printedIncoherentZeroSet 1 1 1 0 0) :=
+  ⟨printedIncoherentAllZerosInsideOpenUnitDisk_boundary_fails,
+    fmicsscriptAllZerosInClosedUnitDisk_boundary⟩
 
 end
 
