@@ -16,12 +16,15 @@ public import Physlib.Optics.Systems.Microring.AllPass
 This file expands one two-ring CROW fixture directly through primitive component and wiring
 equations. The two end couplers use the exact `3-4-5` amplitudes, the shared inter-ring coupler
 uses `5-12-13`, and every half-arc has amplitude transmission `1 / 2` and zero phase. The selected
-bus response is therefore sensitive to both the mutually coupled topology and the coupler order.
+bus response is therefore certified for this mutually coupled fixture. No coupler-order sensitivity
+claim is made: this regression contains no order-permutation sentinel.
 
 The expected state is a raw witness for the flat relation. It does not use the production
 theorem-spine lemma as an oracle. A separate exact inequality compares the response only with the
 product of two isolated-ring transfers. It does not exclude coupled unit-cell transfer-matrix
-products; such a formulation is published for CROWs.
+products; such a formulation is published for CROWs. For that comparison only, the first isolated
+factor is attributed the end coupler `3/5`, and the second the shared middle coupler `5/13`; this is
+a modelling choice because the middle coupler belongs to both rings in the CROW fixture.
 
 These are fixed-carrier normalized modal-amplitude checks. They assert no physical loss model,
 dispersion, fabrication tolerance, thermal effect, frequency sweep, stability, causality,
@@ -86,6 +89,20 @@ def crowRegressionParameters : Parameters 2 where
     else crowRegressionEndCoupler
   forwardArc _ := crowRegressionHalfArc
   returnArc _ := crowRegressionHalfArc
+
+/-- The first isolated-ring baseline parameter used by the non-product comparison. -/
+def crowRegressionFirstIsolatedRing : AllPass.Parameters where
+  throughAmplitude := 3 / 5
+  crossAmplitude := 4 / 5
+  fieldAttenuation := 1 / 2
+  roundTripPhase := 0
+
+/-- The second isolated-ring baseline parameter used by the non-product comparison. -/
+def crowRegressionSecondIsolatedRing : AllPass.Parameters where
+  throughAmplitude := 5 / 13
+  crossAmplitude := 12 / 13
+  fieldAttenuation := 1 / 2
+  roundTripPhase := 0
 
 /-- The end-coupler amplitudes obey the exact Pythagorean losslessness identity. -/
 lemma crowRegression_endCoupler_pythagorean :
@@ -1420,16 +1437,61 @@ lemma crowRegression_firstIsolatedRingTransfer :
       (1 - (3 / 5) * (1 / 2) * (1 / 2))) = 7 / 17 := by
   norm_num
 
+/-- The first isolated baseline literal is the standard all-pass transfer expression. -/
+lemma crowRegression_firstIsolatedRingTransfer_eq_standard :
+    (((3 / 5 : ℂ) - (1 / 2) * (1 / 2)) /
+      (1 - (3 / 5) * (1 / 2) * (1 / 2))) =
+      AllPass.standardThroughTransfer crowRegressionFirstIsolatedRing := by
+  norm_num [AllPass.standardThroughTransfer, AllPass.Parameters.denominator,
+    AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
+    AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
+    MatchedPropagation.carrierPhaseFactor, crowRegressionFirstIsolatedRing]
+
+/-- The first isolated baseline is certified by the existing all-pass network transfer API. -/
+lemma crowRegression_firstIsolatedRingTransfer_eq_allPass :
+    AllPass.throughTransfer crowRegressionFirstIsolatedRing =
+      AllPass.standardThroughTransfer crowRegressionFirstIsolatedRing := by
+  apply AllPass.throughTransfer_eq_standard
+  · norm_num [AllPass.Parameters.coupler, DirectionalCoupler.Parameters.IsUnitary,
+      DirectionalCoupler.Parameters.powerFactor, crowRegressionFirstIsolatedRing]
+  · norm_num [AllPass.Parameters.HasNonzeroDenominator, AllPass.Parameters.denominator,
+      AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
+      AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
+      MatchedPropagation.carrierPhaseFactor, crowRegressionFirstIsolatedRing]
+
 /-- The second isolated-ring primitive expression evaluates exactly to `7 / 47`. -/
 lemma crowRegression_secondIsolatedRingTransfer :
     (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
       (1 - (5 / 13) * (1 / 2) * (1 / 2))) = 7 / 47 := by
   norm_num
 
+/-- The second isolated baseline literal is the standard all-pass transfer expression. -/
+lemma crowRegression_secondIsolatedRingTransfer_eq_standard :
+    (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
+      (1 - (5 / 13) * (1 / 2) * (1 / 2))) =
+      AllPass.standardThroughTransfer crowRegressionSecondIsolatedRing := by
+  norm_num [AllPass.standardThroughTransfer, AllPass.Parameters.denominator,
+    AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
+    AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
+    MatchedPropagation.carrierPhaseFactor, crowRegressionSecondIsolatedRing]
+
+/-- The second isolated baseline is certified by the existing all-pass network transfer API. -/
+lemma crowRegression_secondIsolatedRingTransfer_eq_allPass :
+    AllPass.throughTransfer crowRegressionSecondIsolatedRing =
+      AllPass.standardThroughTransfer crowRegressionSecondIsolatedRing := by
+  apply AllPass.throughTransfer_eq_standard
+  · norm_num [AllPass.Parameters.coupler, DirectionalCoupler.Parameters.IsUnitary,
+      DirectionalCoupler.Parameters.powerFactor, crowRegressionSecondIsolatedRing]
+  · norm_num [AllPass.Parameters.HasNonzeroDenominator, AllPass.Parameters.denominator,
+      AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
+      AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
+      MatchedPropagation.carrierPhaseFactor, crowRegressionSecondIsolatedRing]
+
 /-- The coupled response differs from the product of the two isolated-ring transfers.
 
 This does not exclude a product of coupled unit-cell transfer matrices; published CROW
-formulations use such matrices.
+formulations use such matrices. The isolated factors assign the end coupler to ring one and the
+shared middle coupler to ring two as an explicit modelling choice, certified against `AllPass`.
 -/
 lemma crowResponse_ne_isolatedRingTransferProduct :
     ((netlist crowRegressionParameters).responseTransform

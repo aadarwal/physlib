@@ -9,6 +9,11 @@ doi:10.1364/JOSAB.21.001818. It is a convention map, not a numerical comparison.
 
 **Convention mapping written; numeric Table-1 parity deferred to slice 1B; NO verdict.**
 
+The Figure-3 and lossless-relation source-content citations below are **PROVISIONAL pending their
+addition to `scratchpad/paper/crow-scissor-citations.md`**. They were checked against the local
+primary PDF at printed page 1820 (PDF page 3 of 15), rendered at 300 dpi with `pdftoppm -f 3 -l 3
+-r 300`; the paper-track citation file remains the required permanent source.
+
 The source pages and formulas cited below were checked against the primary PDF. The human author
 must still certify the source transcription and the proposed mapping before publication.
 
@@ -26,8 +31,12 @@ Figure 3 orders the local coupler inputs as `(E_1, E_2)` and outputs as `(E_3, E
 (E_3, E_4)^T = [[r, i t], [i t, r]] (E_1, E_2)^T.
 ```
 
+**[PROVISIONAL local-PDF citation pending citations-file update: Heebner et al. (2004), printed
+p. 1820, PDF p. 3; Figure 3 and the paragraph following Eq. (1); 300-dpi render as noted above.]**
+
 Here `r` is the real self-coupling coefficient, `t` is the real cross-coupling coefficient, and
-the paper imposes `r^2 + t^2 = 1` when coupling loss is neglected. Table 1 then gives the CROW
+the paper imposes `r^2 + t^2 = 1` when coupling loss is neglected (**same provisional local-PDF
+citation: printed p. 1820, PDF p. 3; pending citations-file update**). Table 1 then gives the CROW
 bulk transfer matrix in terms of one pair `(r, t)` and two full resonator phases `phi_1, phi_2`.
 
 ## Physlib coordinates

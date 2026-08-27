@@ -100,11 +100,13 @@ nonblank, noncomment Lean source lines, including attributes, declaration header
 proofs. It excludes imports, namespaces, the module doc, section headings, and closing `end` lines.
 
 - Total general-API-to-CROW wiring/result code in that scope: **325 LOC**.
-- Generic-but-unhoused structural lifting, lines 120–174 and 437–502: **85 LOC**.
-- Topology-specific construction, routing proofs, and theorem-spine application: **240 LOC**.
+- Generic-in-need structural lifting: **172 LOC**. This includes the projected-instance bands
+  120–174 and 437–502 (**85 LOC**), plus normalized aggregate-port and non-consumption bands
+  195–231, 268–310, and 339–363 (**87 LOC**).
+- Topology-specific construction, routing proofs, and theorem-spine application: **153 LOC**.
 
 The parse was a line-state scan that removes `/- ... -/` blocks before testing for nonwhitespace.
-The equality `325 = 85 + 240` was reproduced at the gated source ref.
+The equality `325 = 172 + 153` was reproduced at the gated source ref.
 
 ### What was awkward
 
@@ -112,8 +114,10 @@ Dependent projections through `ScatteringComponentFamily`, successive external b
 appended connection families do not retain the required `Fintype` and `DecidableEq` instances
 automatically. The repeated lifting is structural. Endpoint disjointness was most robust when
 compared through the explicit normalized `PortLabel` equivalence, rather than by the construction
-history of nested subtype witnesses. Once those facts were present, hierarchy flattening,
-associativity transport, relational closure, elimination, and Mason extraction applied unchanged.
+history of nested subtype witnesses. The reviewer classifies that normalization and its six
+non-consumption obligations as generic-in-need structural lifting too. Once those facts were
+present, hierarchy flattening, associativity transport, relational closure, elimination, and Mason
+extraction applied unchanged.
 
 Declarations that would move into a neutral finite-family/flattening combinator are:
 
@@ -137,6 +141,17 @@ Declarations that would move into a neutral finite-family/flattening combinator 
 - `channelDecidableEq` — `Physlib/Optics/Examples/CROW.lean:491`
 - `connectedChannelDecidableEq` — `Physlib/Optics/Examples/CROW.lean:495`
 - `externalChannelFintype` — `Physlib/Optics/Examples/CROW.lean:499`
+- `PortLabel` — `Physlib/Optics/Examples/CROW.lean:195`
+- `portLabelEquiv` — `Physlib/Optics/Examples/CROW.lean:202`
+- `portLabelEquiv_couplerPort` — `Physlib/Optics/Examples/CROW.lean:216`
+- `portLabelEquiv_forwardArcPort` — `Physlib/Optics/Examples/CROW.lean:221`
+- `portLabelEquiv_returnArcPort` — `Physlib/Optics/Examples/CROW.lean:226`
+- `coupler_rightSecond_not_rightConnected` — `Physlib/Optics/Examples/CROW.lean:268`
+- `forwardArc_left_not_rightConnected` — `Physlib/Optics/Examples/CROW.lean:279`
+- `returnArc_right_not_rightConnected` — `Physlib/Optics/Examples/CROW.lean:290`
+- `coupler_leftSecond_not_rightConnected` — `Physlib/Optics/Examples/CROW.lean:301`
+- `returnArc_right_not_forwardConnected` — `Physlib/Optics/Examples/CROW.lean:339`
+- `coupler_leftSecond_not_forwardConnected` — `Physlib/Optics/Examples/CROW.lean:352`
 
 ### Semantic-glue audit and slice-2 decidable test
 
@@ -146,7 +161,11 @@ of direct applications of existing generic theorems. Neither declares nor re-pro
 equation. All glue that makes those applications typecheck arranges labels, finite instances,
 ports, endpoints, and transports.
 
-Would the 85-LOC lift/replication glue have to be rewritten essentially unchanged for slice 2's
+The regression's former prose claim of coupler-order sensitivity was weakened: no order-permutation
+sentinel is present in slice 1, so the shipped text now claims only certification for the selected
+mutually coupled fixture.
+
+Would the 172-LOC lift/replication glue have to be rewritten essentially unchanged for slice 2's
 heterogeneous ring-assisted MZI? **YES.** The component cases and wiring are different, but the
 projected dependent-family and appended-boundary instance obligations recur. This is a genuine
 missing structural combinator. It is not a missing semantic theorem. Per the sequencing ruling,
