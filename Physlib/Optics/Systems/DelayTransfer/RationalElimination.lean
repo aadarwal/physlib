@@ -44,9 +44,12 @@ cancelling them belongs to the separate reduced-response layer.
 
 The formula is the finite-dimensional adjugate identity applied to the already-defined N5F
 operator `1 - C * S`. It proves rationality in formal delay variables only; the retained
-denominator is unreduced and its roots are not called physical poles. The network-level
-reachability/observability or no-cancellation criterion remains withheld. It also makes no claim
-of minimality, physical-frequency rationality, causality, stability, passivity, resonance,
+denominator is unreduced and its roots are not called physical poles. The separate selected
+one-delay bridge in
+`Physlib/Optics/Systems/DelayTransfer/NetworkPoleCriterion.lean:93-266` assumes an explicit
+reduction certificate and supplies a pointwise no-cancellation criterion; no canonical reduction,
+general reachability/observability test, or minimal-realization theorem is claimed. This file also
+makes no claim of physical-frequency rationality, causality, stability, passivity, resonance,
 bandwidth, or material dispersion.
 
 -/

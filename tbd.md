@@ -1750,16 +1750,20 @@ PR unless maintainers explicitly ask to retain it.
   reciprocity, Maxwell time-domain realization, or ROC/N5 equivalence is claimed.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
-- [ ] Human-check the cleared-polynomial finite-network eliminator before upstreaming. Confirm that
+- [ ] Human-check the cleared-polynomial finite-network eliminator and its selected one-delay pole
+  bridge before upstreaming. Confirm that
   the aggregate denominator is the product of the retained assembled component-entry
   denominators, `S_clear` clears each entry exactly, and
   `B = D * 1 - C * S_clear` evaluates to `D * (1 - C * S)`. Recheck that the retained external
   numerator is `E_outᴴ * S_clear * adj(B) * E_in`, its denominator is `det(B)`, and evaluation
   agrees with the N5F response only under component regularity and nonzero evaluated determinant.
   In the cancellation-hiding fixture, independently expand the retained quotient and raw N5
-  matrices to one at `q = -1`, while both retained polynomials vanish at `q = 1`. This construction
-  is deliberately unreduced: it proves neither minimality nor that every retained denominator root
-  is an actual pole. The network-level reachability/no-cancellation criterion remains S4-B.
+  matrices to one at `q = -1`, while both retained polynomials vanish at `q = 1`. In the visible
+  `3/5`, `-4*I/5` fixture, independently check the selected numerator `3/5 - q/2`, denominator
+  `1 - 3*q/10`, nonzero numerator and raw N5 kernel at `q = 10/3`, and the invertible wrong-sign
+  control. The shipped network criterion assumes an explicit reduction certificate, component
+  regularity, and pointwise no cancellation. It constructs neither a canonical reduction nor a
+  general reachability/observability or minimal-realization criterion.
 
 ## Ray and transfer source checks
 
