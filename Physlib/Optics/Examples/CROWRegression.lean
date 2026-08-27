@@ -669,11 +669,29 @@ lemma crowRegression_incidentAssembly :
   funext endpoint
   rcases endpoint with ⟨⟨⟨component, port⟩, mode⟩⟩
   rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
+  all_goals cases mode
+  all_goals
+    first
+    | change crowRegressionIncident
+          (Incident.mk (crowRegressionCouplerChannel interface port)) =
+        crowRegressionConnections.incidentAssembly
+          crowRegressionOutgoing crowRegressionInput
+            (Incident.mk (crowRegressionCouplerChannel interface port))
+    | change crowRegressionIncident
+          (Incident.mk (crowRegressionForwardArcChannel ring port)) =
+        crowRegressionConnections.incidentAssembly
+          crowRegressionOutgoing crowRegressionInput
+            (Incident.mk (crowRegressionForwardArcChannel ring port))
+    | change crowRegressionIncident
+          (Incident.mk (crowRegressionReturnArcChannel ring port)) =
+        crowRegressionConnections.incidentAssembly
+          crowRegressionOutgoing crowRegressionInput
+            (Incident.mk (crowRegressionReturnArcChannel ring port))
   all_goals
     first
     | fin_cases interface
     | fin_cases ring
-  all_goals cases port <;> cases mode
+  all_goals cases port
   all_goals
     first
     | rw [hExternal .leftInput]
