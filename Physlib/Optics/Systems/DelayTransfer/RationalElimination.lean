@@ -14,16 +14,15 @@ public import Physlib.Optics.Systems.DelayTransfer.Evaluation
 
 This file clears the retained denominators of every component scattering entry before eliminating
 the internal network state. A single aggregate polynomial `D` clears the assembled component
-matrix `S`. The resulting internal matrix is
-
-`B = D * 1 - C * S_clear`,
-
-so its adjugate and determinant give an explicit retained polynomial numerator and denominator for
-every external response entry. Evaluation is compared with the existing N5F elimination only at
-points where all retained component denominators and the evaluated determinant of `B` are nonzero.
-
-The construction is deliberately unreduced. Common factors can encode removable singularities,
-and identifying or cancelling them belongs to the separate reduced-response layer.
+matrix `S`, giving `B = D * 1 - C * S_clear` and an adjugate/determinant response representative.
+Evaluation is compared with the existing N5F elimination only where all retained component
+denominators and the evaluated determinant of `B` are nonzero. The N5F matrices and operator are
+defined in `Physlib/Optics/Network/ParameterizedResponse.lean:376-428`; its total-inverse and
+proof-gated response bridge is at `Physlib/Optics/Network/ParameterizedResponse.lean:545-574`.
+`RationalNetlist`, its inherited domains, and its response specialization are defined in
+`Physlib/Optics/Systems/DelayTransfer/Evaluation.lean:153-170,228-260`. The construction is
+deliberately unreduced. Common factors can encode removable singularities, and identifying or
+cancelling them belongs to the separate reduced-response layer.
 
 ## ii. Key results
 
@@ -44,10 +43,11 @@ and identifying or cancelling them belongs to the separate reduced-response laye
 ## iv. References
 
 The formula is the finite-dimensional adjugate identity applied to the already-defined N5F
-operator `1 - C * S`. It proves rationality in formal delay variables only. It makes no statement
-about rationality in physical frequency, minimality, pole visibility, causality, stability,
-passivity, resonance, bandwidth, or material dispersion. The retained denominator is generally
-not reduced, and its roots are not called physical poles.
+operator `1 - C * S`. It proves rationality in formal delay variables only; the retained
+denominator is unreduced and its roots are not called physical poles. The network-level
+reachability/observability or no-cancellation criterion remains withheld. It also makes no claim
+of minimality, physical-frequency rationality, causality, stability, passivity, resonance,
+bandwidth, or material dispersion.
 
 -/
 
