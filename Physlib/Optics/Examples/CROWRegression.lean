@@ -174,6 +174,9 @@ def crowRegressionReturnArcChannel (ring : Fin 2) (port : MatchedPropagation.Por
     CrowRegressionChannel :=
   crowRegressionChannel (.returnArc ring) ⟨port, ()⟩
 
+/-- The concrete flat connection family. -/
+abbrev crowRegressionConnections := (netlist crowRegressionParameters).connections
+
 /-- One connected channel in the concrete right-interface wiring stage. -/
 def crowRegressionRightConnectedChannel (ring : Fin 2) (kind : Bool)
     (endpoint : PortConnection.End) : crowRegressionConnections.Channel :=
@@ -309,9 +312,6 @@ lemma crowRegressionOutgoing_component (component : Component 2)
         (Outgoing.mk (crowRegressionChannel component channel)) =
       crowRegressionOutgoingValue component channel := by
   rfl
-
-/-- The concrete flat connection family. -/
-abbrev crowRegressionConnections := (netlist crowRegressionParameters).connections
 
 /-- The external input induced by the exact aggregate incident state. -/
 def crowRegressionInput : ModeAmplitude (Incident crowRegressionConnections.ExternalChannel) :=
