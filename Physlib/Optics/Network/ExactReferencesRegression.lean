@@ -263,6 +263,8 @@ def n6CoherencyExactReference : ExactMatrixReference 2 2 n6CoherencySemantic whe
   value := n6CoherencyExactValue
   sound := n6CoherencyExactReference_sound
 
+end
+
 /-!
 
 ## D. Manifest and hostile sentinel
@@ -279,19 +281,37 @@ def n6ExactReferenceStatementSnapshot : List String :=
 
 /-- The five certified N6 references in validation transport order. -/
 def n6ExactReferences : List ExactReference :=
-  [n6ResponseExactReference.toReference,
-    n6ColumnAPowerExactReference.toReference,
-    n6ColumnBPowerExactReference.toReference,
-    n6CrossExactReference.toReference,
-    n6CoherencyExactReference.toReference]
+  [ExactReference.ofMatrixValue "N6-NET-RESPONSE"
+      "Optics.conservationRegression_responseTransform_eq"
+      "Optics.n6ResponseExactReference_sound" .gaussianRational n6ResponseExactValue,
+    ExactReference.ofScalarValue "N6-NET-COL-A"
+      "Optics.conservationRegressionResponse_column_a_power"
+      "Optics.n6ColumnAPowerExactReference_sound" .rational n6ColumnAPowerExactValue,
+    ExactReference.ofScalarValue "N6-NET-COL-B"
+      "Optics.conservationRegressionResponse_column_b_power"
+      "Optics.n6ColumnBPowerExactReference_sound" .rational n6ColumnBPowerExactValue,
+    ExactReference.ofMatrixValue "N6-NET-CROSS"
+      "Optics.conservationRegressionResponse_cross_entries"
+      "Optics.n6CrossExactReference_sound" .gaussianRational n6CrossExactValue,
+    ExactReference.ofMatrixValue "N6-COHERENCY"
+      "Optics.conservationCoherencyRegression_diagonal_map_apply"
+      "Optics.n6CoherencyExactReference_sound" .gaussianRational n6CoherencyExactValue]
+
+/-- The executable table is exactly the transport projection of the five certificates. -/
+lemma n6ExactReferences_eq_certificates :
+    n6ExactReferences =
+      [n6ResponseExactReference.toReference,
+        n6ColumnAPowerExactReference.toReference,
+        n6ColumnBPowerExactReference.toReference,
+        n6CrossExactReference.toReference,
+        n6CoherencyExactReference.toReference] := by
+  rfl
 
 /-- The transport table contains five distinct comparison-contract row identifiers. -/
 lemma n6ExactReferences_rowIds_nodup :
     (n6ExactReferences.map ExactReference.rowId).Nodup := by
-  simp [n6ExactReferences, ExactMatrixReference.toReference,
-    ExactScalarReference.toReference, n6ResponseExactReference,
-    n6ColumnAPowerExactReference, n6ColumnBPowerExactReference,
-    n6CrossExactReference, n6CoherencyExactReference]
+  simp [n6ExactReferences, ExactReference.ofMatrixValue,
+    ExactReference.ofScalarValue]
 
 /-- The emitted semantic declaration names match the validation statement snapshot. -/
 lemma n6ExactReferences_declarations_eq_snapshot :
@@ -304,10 +324,10 @@ lemma n6ExactReferences_declarations_eq_snapshot :
 This proof expands only the table certificate and its exact Gaussian-rational primitives. It does
 not use any sound theorem or semantic coherency declaration. -/
 lemma n6CoherencyExactReference_rejects_transposed_sign :
-    n6CoherencyExactReference.value 0 1 ≠ n6CoherencyExactReference.value 1 0 := by
-  norm_num [n6CoherencyExactReference, n6CoherencyExactValue,
-    GaussianRational.ofParts, QuadraticAlgebra.ext_iff]
-
-end
+    (n6ExactReferences[4]).values[1] = GaussianRational.ofParts 2 (-2) ∧
+      (n6ExactReferences[4]).values[1] ≠ GaussianRational.ofParts 2 2 := by
+  norm_num [n6ExactReferences, ExactReference.ofMatrixValue,
+    n6CoherencyExactValue, GaussianRational.ofParts, QuadraticAlgebra.ext_iff,
+    List.finRange_succ]
 
 end Optics

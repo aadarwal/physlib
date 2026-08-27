@@ -27,8 +27,8 @@ same equality. Family adapters should therefore expose their finite formulas and
 not assume that bare decision reduction will normalize derived rational matrices.
 
 The JSON emitter is transport; each sound theorem is the certificate; a buggy emitter is caught by
-exact regeneration, never by trusting it. Family tables obtain their entries through the scalar and
-matrix certificate conversion functions.
+exact regeneration, never by trusting it. A computational family table is joined to the scalar and
+matrix certificate conversions by a kernel-checked equality.
 
 ## ii. Key results
 
@@ -181,20 +181,31 @@ structure ExactReference where
   /-- One scalar or a flattened row-major matrix. -/
   values : List GaussianRational
 
+/-- Build the serializable payload of an exact scalar value. -/
+def ExactReference.ofScalarValue (rowId leanDeclaration proofDeclaration : String)
+    (exactField : ExactReferenceField) (value : GaussianRational) : ExactReference :=
+  .mk rowId leanDeclaration proofDeclaration exactField .scalar [] [value]
+
+/-- Build the serializable row-major payload of an exact matrix value. -/
+def ExactReference.ofMatrixValue {rows columns : ℕ}
+    (rowId leanDeclaration proofDeclaration : String) (exactField : ExactReferenceField)
+    (value : Matrix (Fin rows) (Fin columns) GaussianRational) : ExactReference :=
+  .mk rowId leanDeclaration proofDeclaration exactField .matrix [rows, columns]
+    ((List.finRange rows).flatMap fun row ↦
+      (List.finRange columns).map fun column ↦ value row column)
+
 /-- Erase a scalar certificate to its serializable transport payload. -/
 def ExactScalarReference.toReference {semantic : ℂ}
     (reference : ExactScalarReference semantic) : ExactReference :=
-  .mk reference.rowId reference.leanDeclaration reference.proofDeclaration reference.exactField
-    .scalar [] [reference.value]
+  ExactReference.ofScalarValue reference.rowId reference.leanDeclaration
+    reference.proofDeclaration reference.exactField reference.value
 
 /-- Erase a matrix certificate to a row-major serializable transport payload. -/
 def ExactMatrixReference.toReference {rows columns : ℕ}
     {semantic : Matrix (Fin rows) (Fin columns) ℂ}
     (reference : ExactMatrixReference rows columns semantic) : ExactReference :=
-  .mk reference.rowId reference.leanDeclaration reference.proofDeclaration reference.exactField
-    .matrix [rows, columns]
-    ((List.finRange rows).flatMap fun row ↦
-      (List.finRange columns).map fun column ↦ reference.value row column)
+  ExactReference.ofMatrixValue reference.rowId reference.leanDeclaration
+    reference.proofDeclaration reference.exactField reference.value
 
 /-!
 
