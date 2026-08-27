@@ -274,6 +274,8 @@ public import Physlib.Optics.Components.MatchedPropagationRegression
 public import Physlib.Optics.Components.Mirror
 public import Physlib.Optics.Components.MirrorPhysical
 public import Physlib.Optics.Components.PhysicalPortSuiteRegression
+public import Physlib.Optics.Components.PolarizationPortSuiteRegression
+public import Physlib.Optics.Components.PolarizationScatteringPhysical
 public import Physlib.Optics.Components.Polarizer
 public import Physlib.Optics.Components.Polarizer.Basic
 public import Physlib.Optics.Components.Polarizer.Coherency
@@ -346,6 +348,7 @@ public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelFluxRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterference
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelInterferenceRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScattering
+public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringPhysical
 public import Physlib.Optics.Interfaces.PlanarDielectric.FresnelScatteringRegression
 public import Physlib.Optics.Interfaces.PlanarDielectric.IntegralBoundary
 public import Physlib.Optics.Interfaces.PlanarDielectric.JonesBoundary
