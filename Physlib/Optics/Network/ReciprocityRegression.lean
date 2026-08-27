@@ -391,7 +391,7 @@ lemma reciprocityRegression_nominal_not_timeReversalRealization :
       reciprocityRegressionToyExactFrameTransport := by
   intro realization
   have hZero := realization.same_transverse_mode (Incident.mk 0)
-  simpa [reciprocityRegressionToySameTransverseMode, nominalPairing] using hZero
+  simp [reciprocityRegressionToySameTransverseMode, nominalPairing] at hZero
 
 /-!
 ## F. Wrong-sign reference-plane sentinel
