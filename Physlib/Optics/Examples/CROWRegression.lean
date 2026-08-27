@@ -1372,7 +1372,10 @@ lemma crowRegression_rawSelectedOutput :
   rw [crowRegressionOutput, ModeAmplitude.restrictEmbedding_apply]
   change crowRegressionOutgoing
       (Outgoing.mk (crowRegressionCouplerChannel 2 .rightSecond)) = _
-  norm_num [crowRegressionOutgoingValue]
+  rw [crowRegressionOutgoing_coupler]
+  simp only [crowRegressionOutgoingValue,
+    if_neg (show (2 : Fin 3) ≠ 0 by decide),
+    if_neg (show (2 : Fin 3) ≠ 1 by decide)]
 
 /-!
 ## D. Compiled response and negative controls
