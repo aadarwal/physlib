@@ -177,6 +177,43 @@ Requirements:
     done: true
     location: "Physlib/Optics/Network/Conservation.lean (Optics.FlatNetlist.externalScatteringMatrix, Optics.FlatNetlist.externalScatteringMatrix_apply, Optics.FlatNetlist.externalScatteringMatrix_isPassive, Optics.FlatNetlist.externalScatteringMatrix_isLossless, Optics.FlatNetlist.externalScatteringMatrix_isLossless_of_components_isLossless); Physlib/Optics/Network/Hierarchical.lean (Optics.FlatNetlist.packagedScattering, Optics.FlatNetlist.toOrientedModeTransform_packagedScattering, Optics.FlatNetlist.packagedScattering_toModeTransform_apply, Optics.FlatNetlist.toBehavior_toOrientedModeTransform_packagedScattering, Optics.FlatNetlist.mem_behavior_iff_packagedScattering)"
 
+  - description: "The hierarchical network API appends connection families, closes an arbitrary component behavior relationally, and proves without a solve hypothesis that staged closure equals the fully flattened netlist behavior. A port-family equivalence transports connections, connection families, incident assembly, external readout, and closure. This transport proves replacement of an inner family by an equivalent boundary relation and literal three-stage append associativity after the canonical port-family identification. Independent N-08 fixtures cross the raw flattened and staged equations, force a nonzero forward value, and reject mis-lifted or hostile transported ports. Apart from structural finite channel-index assumptions, no well-posedness or physical hypothesis enters these relational reuse results; only functional subsystem packaging requires well-posedness."
+    done: true
+    location: >-
+      Physlib/Optics/Network/Hierarchical.lean
+      (Optics.PortConnectionFamily.externalPortModeFamily,
+      Optics.PortConnectionFamily.append,
+      Optics.HierarchicalNetlist,
+      Optics.HierarchicalNetlist.innerNetlist,
+      Optics.HierarchicalNetlist.flatten,
+      Optics.FlatNetlist.packagedScattering,
+      Optics.PortConnectionFamily.closeBehavior,
+      Optics.PortConnectionFamily.closeBehavior_append,
+      Optics.PortConnectionFamily.closeBehavior_append_congr,
+      Optics.FlatNetlist.behavior_eq_closeBehavior,
+      Optics.HierarchicalNetlist.flatten_behavior_eq);
+      Physlib/Optics/Network/ConnectionFamilyTransport.lean
+      (Optics.PortModeFamily.Equiv,
+      Optics.PortConnection.transport,
+      Optics.PortConnectionFamily.transport,
+      Optics.PortConnectionFamily.incidentAssembly_transport,
+      Optics.PortConnectionFamily.externalOutgoingReadout_transport,
+      Optics.PortConnectionFamily.closeBehavior_transport);
+      Physlib/Optics/Network/HierarchicalReuse.lean
+      (Optics.PortConnectionFamily.appendThreeLeft,
+      Optics.PortConnectionFamily.appendThreeRight,
+      Optics.PortConnectionFamily.append_assoc_transport,
+      Optics.PortConnectionFamily.innerBoundaryBehavior_eq_of_boundaryRelation,
+      Optics.PortConnectionFamily.replaceInnerFamily);
+      Physlib/Optics/Network/HierarchicalRegression.lean
+      (Optics.hierarchicalRegression_mem_flatten_behavior,
+      Optics.hierarchicalRegression_mem_outerClosure,
+      Optics.hierarchicalRegression_flatten_output_forced,
+      Optics.hierarchicalRegression_misLifted_not_mem_flatten_behavior);
+      Physlib/Optics/Network/HierarchicalReuseRegression.lean
+      (Optics.reuseRegression_mem_both_parenthesizations,
+      Optics.reuseRegression_hostile_incidentAssembly_ne)
+
   - description: "The foundational two-port series operation is the singular-safe relational composition of complete backward-first middle states. A canonical two-device FlatNetlist realizes exactly this relation, unconditionally and up to the stated external-channel equivalence; the same result is packaged through N5H closeBehavior. On the common domain where both the flat netlist and the typed feedback pivot are well posed, the reindexed N5 response transform equals the behavior-derived Redheffer star transform, which in turn equals the exact noncommutative four-block formula. Independent reflectionless and singular fixtures cross the FlatNetlist equations, and a separate reflective anchor reaches a star entry through relational membership rather than the block-formula theorem. This discharges the local two-device X-01 agreement at the relational, N5H-composition, and N5-elimination layers. It does not prove converse minimality of the pivot gate, associativity, an identity element, the broader Mason/system-level X-01 comparisons, contraction, reciprocity, passivity, losslessness, or a physical realization."
     done: true
     location: >-

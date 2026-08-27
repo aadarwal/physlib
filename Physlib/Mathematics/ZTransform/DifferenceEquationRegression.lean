@@ -28,12 +28,13 @@ be exactly one. That is a property, not a formula, so it fails if the numerator 
 coefficients are swapped.
 
 The third example is the audited second-order low-pass filter of the source, with the exact
-rational coefficients the source uses. Its symbols are computed, its gain at `z = 1` is exactly
-one, and its gain at `z = -1` is exactly zero. The first of those detects a sign error in the
-feedback symbol, since replacing `1 - delaySymbol` by `1 + delaySymbol` changes the value at
-`z = 1` from `1` to a number that is not `1`. The second is the Nyquist null that makes the
-endpoint check sensitive to the numerator signs. These two values do not by themselves establish
-a low-pass response over a frequency interval.
+rational coefficients the source uses. Its model specializes the generic recurrence semantics,
+and its symbolic transfer quotient is derived from those coefficients. On the IIR region of
+convergence, causality and a nonzero input transform then give the complete transform-ratio
+identity by the generic recurrence theorem. Its gain at `z = 1` is exactly one, and its gain at
+`z = -1` is exactly zero. A separate hostile check shows that replacing `1 - delaySymbol` by
+`1 + delaySymbol` changes the value at `z = 1`. These exact identities do not establish a
+low-pass response over a frequency interval.
 
 ## ii. Key results
 
@@ -43,9 +44,15 @@ a low-pass response over a frequency interval.
   the transfer function times the input transform.
 - `Physlib.ZTransform.transferFunction_allPass`: the first-order all-pass symbolic form.
 - `Physlib.ZTransform.norm_transferFunction_allPass`: its modulus is one on the unit circle.
+- `Physlib.ZTransform.IsLowPassModel`: the exact second-order recurrence model.
+- `Physlib.ZTransform.transferFunction_lowPass_eq`: its symbolic transfer quotient.
+- `Physlib.ZTransform.lowPass_transform_div_eq_transferFunction`: the transform-ratio identity
+  on the IIR domain.
 - `Physlib.ZTransform.transferFunction_lowPass_one`: the audited low-pass has unit gain at
   `z = 1`.
 - `Physlib.ZTransform.transferFunction_lowPass_neg_one`: it has zero gain at `z = -1`.
+- `Physlib.ZTransform.transferFunction_lowPass_wrongFeedbackSign_ne`: the denominator-sign
+  sentinel.
 
 ## iii. Table of contents
 
@@ -64,12 +71,13 @@ feedback is strictly causal, which appears here as the lag set `{1, 2}` not cont
 
 The all-pass section and the unit-gain and Nyquist-null checks are standard; a textbook reference
 is A. V. Oppenheim and R. W. Schafer, *Discrete-Time Signal Processing*, 3rd ed., Pearson, 2010,
-chapter 5. The source proves a frequency response for the low-pass filter, not these two exact
-values; the values are chosen here because they are exact and because each detects a specific
-error.
+chapter 5. The full symbolic and transform-ratio identities below are the transfer statement of
+Theorem 14. The source's generic frequency-response result is separate and is not claimed here.
+The two point values are chosen because they are exact and because each detects a specific error.
 
 These are algebraic regressions on complex sequences. No physical, optical, or signal-processing
-interpretation is asserted, and no claim is made that any of these filters is realizable.
+interpretation is asserted, and no claim is made that any of these filters is realizable. The
+name "low-pass" identifies the source fixture; no frequency-response property is asserted.
 
 -/
 
@@ -228,6 +236,11 @@ lemma lowPassFeedforward_two : lowPassFeedforward 2 = 605 / 10000 := by
 causal. -/
 lemma zero_notMem_lowPass_lags : (0 : ℕ) ∉ ({1, 2} : Finset ℕ) := by decide
 
+/-- The source's exact second-order model as a specialization of the generic recurrence
+semantics. The missing lag-zero feedback term represents its stipulated zero coefficient. -/
+def IsLowPassModel (x y : ℤ → ℂ) : Prop :=
+  IsRecurrenceSolution {1, 2} {0, 1, 2} lowPassFeedback lowPassFeedforward x y
+
 /-- The feedforward symbol of the audited filter. -/
 lemma delaySymbol_lowPassFeedforward (u : ℂ) :
     delaySymbol {0, 1, 2} lowPassFeedforward u =
@@ -244,6 +257,35 @@ lemma delaySymbol_lowPassFeedback (u : ℂ) :
     lowPassFeedback_two, pow_one]
   ring
 
+/-- The exact second-order transfer quotient obtained by expanding the recurrence symbols. -/
+lemma transferFunction_lowPass_eq (z : ℂ) :
+    transferFunction {1, 2} {0, 1, 2} lowPassFeedback lowPassFeedforward z =
+      (605 / 10000 + 121 / 1000 * z⁻¹ + 605 / 10000 * z⁻¹ ^ 2) /
+        (1 - 1194 / 1000 * z⁻¹ + 436 / 1000 * z⁻¹ ^ 2) := by
+  rw [transferFunction, delaySymbol_lowPassFeedforward, delaySymbol_lowPassFeedback]
+  congr 1
+  ring
+
+/-- On the IIR region of convergence, a causal low-pass model with nonzero input transform has
+the exact second-order transform ratio. This specializes the generic recurrence theorem. -/
+lemma lowPass_transform_div_eq_transferFunction {x y : ℤ → ℂ} {z : ℂ}
+    (hx : IsCausal x) (hy : IsCausal y)
+    (hz : z ∈ iirROC {1, 2} lowPassFeedback x y) (hInput : transform x z ≠ 0)
+    (hModel : IsLowPassModel x y) :
+    transform y z / transform x z =
+      (605 / 10000 + 121 / 1000 * z⁻¹ + 605 / 10000 * z⁻¹ ^ 2) /
+        (1 - 1194 / 1000 * z⁻¹ + 436 / 1000 * z⁻¹ ^ 2) := by
+  have hTransform :
+      transform y z =
+        transferFunction {1, 2} {0, 1, 2} lowPassFeedback lowPassFeedforward z *
+          transform x z :=
+    transform_eq_transferFunction_mul_of_mem_iirROC hx hy hz hModel
+  calc
+    transform y z / transform x z =
+        transferFunction {1, 2} {0, 1, 2} lowPassFeedback lowPassFeedforward z := by
+      rw [hTransform, mul_div_assoc, div_self hInput, mul_one]
+    _ = _ := transferFunction_lowPass_eq z
+
 /-- The audited low-pass filter has exactly unit gain at `z = 1`. Replacing the denominator
 `1 - delaySymbol` by `1 + delaySymbol` changes this value, so the check fixes that sign. -/
 lemma transferFunction_lowPass_one :
@@ -256,6 +298,14 @@ lemma transferFunction_lowPass_neg_one :
     transferFunction {1, 2} {0, 1, 2} lowPassFeedback lowPassFeedforward (-1) = 0 := by
   rw [transferFunction, delaySymbol_lowPassFeedforward, delaySymbol_lowPassFeedback]
   norm_num
+
+/-- At `z = 1`, negating the feedback coefficients does not give the transfer function. This
+turns the recurrence denominator subtraction into the wrong addition and expands from the
+coefficient fixtures directly. -/
+lemma transferFunction_lowPass_wrongFeedbackSign_ne :
+    transferFunction {1, 2} {0, 1, 2} (fun k => -lowPassFeedback k) lowPassFeedforward 1 ≠
+      transferFunction {1, 2} {0, 1, 2} lowPassFeedback lowPassFeedforward 1 := by
+  norm_num [transferFunction, delaySymbol, lowPassFeedback, lowPassFeedforward]
 
 end
 
