@@ -1748,11 +1748,6 @@ PR unless maintainers explicitly ask to retain it.
   the N5 denominator gate, contraction/Schur stability, and the nonzero chain pivot, and the
   load-bearing unitary-coupler counterexample. No material dispersion, physical time delay,
   reciprocity, Maxwell time-domain realization, or ROC/N5 equivalence is claimed.
-- [ ] Add one transport operation for a `PortConnectionFamily` along an equivalence of port
-  families. This is the shared missing machinery behind both N5H inner-family replacement by an
-  equal boundary relation and literal three-stage append associativity; treat it as one gap, not
-  two. N-08 hierarchical/flattened equality and fixed-inner-wiring congruence are complete under
-  structural `Fintype` hypotheses only.
 - [ ] Use the delay convention `q = exp (-s * τ) = z⁻¹` and state region-of-convergence,
   nondegeneracy, stability, and dispersion hypotheses explicitly.
 

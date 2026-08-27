@@ -2121,11 +2121,12 @@ from the same network semantics at every frequency where the response is defined
   forcing, and a mis-lifted-port negative control;
 - [x] functional packaging of a child as a scattering/response component only after that child's
   well-posedness and external-channel pairing have been proved; and
-- [x] the remaining reuse machinery: transport of a `PortConnectionFamily` along an equivalence of
-  port families. This single construction is needed both to replace an inner family by another
-  with the same boundary relation and to state literal three-stage append associativity. The
-  fixed-inner-wiring congruence is already complete. All current N-08 hypotheses are structural
-  `Fintype` assumptions on channel indices, not physical assumptions.
+- [x] transport of a `PortConnectionFamily` along an equivalence of port families, with covariance
+  of incident assembly, external readout, and relational closure. This supports replacement of an
+  inner family by another with the same boundary relation and literal three-stage append
+  associativity after the canonical port-family transport. The fixed-inner-wiring congruence is
+  also complete. All N-08 reuse hypotheses are structural `Fintype` assumptions on channel
+  indices, not physical assumptions.
 
 Exit: proofs scale by verified subsystem boundaries without changing the result obtained from the
 fully flattened channel equations.
@@ -2852,7 +2853,7 @@ current integration base; a designed package whose prerequisite is merely active
 | N4C certified compiler | done | N4 | finite executable data, reflected structural checker, proof-carrying N4 compilation, generic executable `S`, `C`, `E_in`, `E_out`, transposed readout, `1 - C * S`, exact evaluated semantic soundness, normalized executable rational coefficients, guarded rational-function evaluation, and hostile singular regressions |
 | N5 elimination | done | N4, N4C | complete-state unique solvability, all finite square feedback criteria, proof-gated inverse, exact solution/response graphs, wiring covariance, canonical external scattering packaging, singular-safe two-port series, reflection-free cascade, proof-gated Redheffer realization, and canonical FlatNetlist/N5H/common-domain response agreement are complete |
 | N5F parameterized compilation | done | N5, N7 parameterized components | validity, solve, and response domains; guarded compilation/response commutation; reparameterization and algebraic regularity are complete |
-| N5H hierarchy/flattening | in progress | N4, N5 | connection append, hierarchy data, flattening, well-posed subsystem packaging, close behavior, append assembly, unconditional hierarchical/flattened semantic equality, N-08 evidence, and fixed-inner-wiring congruence are complete; one port-family transport construction remains for both inner-family replacement and literal three-stage associativity |
+| N5H hierarchy/flattening | done | N4, N5 | connection append, hierarchy data, flattening, well-posed subsystem packaging, close behavior, append assembly, unconditional hierarchical/flattened semantic equality, N-08 evidence, fixed-inner-wiring congruence, port-family transport, inner-family replacement, and literal three-stage append associativity after canonical transport are complete |
 | N6a conservation | done | N2a, N5; E3b for physical meaning | exact wiring power balance, componentwise passive/lossless closure, and lossless external scattering matrix |
 | N6b reciprocity | blocked | N2b, N6a | convention-aware reciprocity closure suite |
 | N6c coherent/incoherent observables | done | P2a, N5, N6a | PSD amplitude/channel-power coherencies, congruence response, trace power bounds/equalities, incoherent sums, channel powers, and explicit cross-term identity |
@@ -2861,7 +2862,7 @@ current integration base; a designed package whose prerequisite is merely active
 | S1 Mach-Zehnder (Physlib extension) | done | N5, N6a, N7 | explicit two-coupler/two-arm netlist, unconditional feed-forward well-posedness, N5 amplitudes, balanced power/dark-port/phase-ratio results, and N6 power balance; no HOL source |
 | S2/S3 microrings | in progress: S2 amplitudes/series, S3 observables, the gated source bridge, and the all-pass X-01 ring instance are integrated | S0, N5, N5F, N6a, N7 | explicit one- and two-bus netlists, exact solve gates, N5 responses, contraction-gated series, N6 power balance, observables, nondispersive FSR, DATE/SysCon/SFG response identifications, and common-domain causal-Z/N5F/N5/Mason/scattering/chain/relational agreement are complete under their stated gates; IP-06/IP-07 source questions and the remaining physical/source extensions stay open |
 | S4 delay transfer | in progress | N5F, N7 | formal rational component entries, retained evaluation domains, N5F compilation, Laplace/reciprocal-Z/frequency evaluation, and abstract pole-reduction schema are complete; symbolic external-response elimination and a network actual-pole criterion remain |
-| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; network reachability/no-cancellation and broader rational BIBO remain |
+| S4P poles/zeros/stability | in progress | S4, N5F | reduced zeros/poles, reciprocal-coordinate finite sets and degree bounds, a stated one-pole Schur/BIBO equivalence, and branch-audited local group delay/dispersion are complete; a network reachability/no-cancellation criterion remains |
 | S5 Z-transform | done | Mathlib analysis audit | causal sequence, conditional/absolute ROC, shift, recurrence/transfer, stability, limit inversion, uniqueness, convolution, and causal-solution existence suites; literal Taylor presentation remains in `tbd.md` |
 | S6 Mason | done | N5, finite graph audit | neutral node- and edge-indexed Mason theory, `C * S` extraction, exact determinant gate, Mason feedback inverse, and typed external-response equality are complete; ring and DCDR instantiations belong to the S7 system suite |
 | S7 HOL integrated parity | blocked | N5H, S0--S6 | source ledger and cross-semantics suite |
