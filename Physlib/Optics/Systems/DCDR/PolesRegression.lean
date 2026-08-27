@@ -459,8 +459,8 @@ lemma zInverseEvaluationOnReciprocalZ_one :
     DelayTransfer.zInverseEvaluationOnReciprocalZ oneReciprocalZCoordinate =
       (fun _ : Fin 1 => 1) := by
   funext delay
-  rw [DelayTransfer.zInverseEvaluationOnReciprocalZ_apply]
-  norm_num
+  norm_num [DelayTransfer.zInverseEvaluationOnReciprocalZ,
+    oneReciprocalZCoordinate, DelayTransfer.zInverseEvaluation]
 
 /-- The regular value `q = 1` belongs to the stable compiled response domain. -/
 lemma stable_one_mem_responseDomain :
@@ -517,7 +517,7 @@ lemma stable_rationalZEliminationResponse_one :
   simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
   rw [stable_responseNumeratorPolynomial_expansion,
     stable_denominatorPolynomial_expansion]
-  norm_num [stableNumerator, stableDenominator]
+  norm_num [stableNumerator, stableDenominator, oneReciprocalZCoordinate]
 
 /-- Direct rational-data expansion gives the active proof-gated network response at `z = 1`. -/
 lemma unstable_rationalZEliminationResponse_one :
@@ -528,14 +528,16 @@ lemma unstable_rationalZEliminationResponse_one :
   simp only [responseModel, MvPolynomial.eval_toMvPolynomial]
   rw [unstable_responseNumeratorPolynomial_expansion,
     unstable_denominatorPolynomial_expansion]
-  norm_num [unstableNumerator, unstableDenominator]
+  norm_num [unstableNumerator, unstableDenominator, oneReciprocalZCoordinate]
 
 /-- At `z = I`, S4's reciprocal evaluation selects the formal delay `q = -I`. -/
 lemma zInverseEvaluationOnReciprocalZ_I :
     DelayTransfer.zInverseEvaluationOnReciprocalZ imaginaryUnitReciprocalZCoordinate =
       (fun _ : Fin 1 => -Complex.I) := by
   funext delay
-  rw [DelayTransfer.zInverseEvaluationOnReciprocalZ_apply, Complex.inv_I]
+  simp [DelayTransfer.zInverseEvaluationOnReciprocalZ,
+    imaginaryUnitReciprocalZCoordinate, DelayTransfer.zInverseEvaluation,
+    Complex.inv_I]
 
 /-- The asymmetric formal delay `q = -I` belongs to the stable compiled response domain. -/
 lemma stable_neg_I_mem_responseDomain :

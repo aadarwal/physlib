@@ -382,7 +382,8 @@ lemma zInverseEvaluationOnReciprocalZ_quadrature :
     zInverseEvaluationOnReciprocalZ quadratureReciprocalZCoordinate =
       (fun _ => -Complex.I) := by
   funext i
-  rw [zInverseEvaluationOnReciprocalZ_apply, Complex.inv_I]
+  simp [zInverseEvaluationOnReciprocalZ, quadratureReciprocalZCoordinate,
+    zInverseEvaluation, Complex.inv_I]
 
 /-- The raw totalized helper sends `z = 0` to the zero formal-delay tuple. -/
 lemma zInverseEvaluation_zero_expansion :
