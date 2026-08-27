@@ -1226,6 +1226,26 @@ lemma crowRegression_feedbackFixedPoint_eq_zero
       | simpa [crowRegressionReturnArcChannel, hChannel] using hR1L
       | simpa [crowRegressionReturnArcChannel, hChannel] using hR1R
 
+/-- The exact two-ring fixture is well posed by its directly expanded homogeneous equations. -/
+lemma crowRegression_isWellPosed :
+    (netlist crowRegressionParameters).IsWellPosed := by
+  rw [(netlist crowRegressionParameters).isWellPosed_iff_feedbackOperator_injective]
+  intro first second hFeedback
+  let difference := first - second
+  have hKernel :
+      (netlist crowRegressionParameters).feedbackOperator.toLinearMap difference = 0 := by
+    simp [difference, hFeedback]
+  let outgoing :=
+    (netlist crowRegressionParameters).scatteringTransform.toLinearMap difference
+  have hAssembly :
+      difference = crowRegressionConnections.incidentAssembly outgoing 0 := by
+    rw [PortConnectionFamily.incidentAssembly, map_zero, add_zero]
+    rw [(netlist crowRegressionParameters).feedbackOperator_apply] at hKernel
+    exact sub_eq_zero.mp hKernel
+  have hDifference := crowRegression_feedbackFixedPoint_eq_zero
+    difference outgoing rfl hAssembly
+  exact sub_eq_zero.mp hDifference
+
 /-!
 ## C. Raw flat-network witness
 -/
