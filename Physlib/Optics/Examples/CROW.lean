@@ -91,12 +91,14 @@ inductive Component (ringCount : ℕ)
   deriving DecidableEq, Fintype
 
 /-- The owned physical-port family selected by each CROW component label. -/
+@[reducible]
 def componentPortFamily {ringCount : ℕ} : Component ringCount → PortModeFamily
   | .coupler _ => DirectionalCoupler.portFamily Unit
   | .forwardArc _ => MatchedPropagation.portFamily Unit
   | .returnArc _ => MatchedPropagation.portFamily Unit
 
 /-- The local scattering law of every CROW component, selected from existing components. -/
+@[reducible]
 def componentScattering {ringCount : ℕ} (p : Parameters ringCount) :
     (component : Component ringCount) →
       ScatteringMatrix (componentPortFamily component).Channel
