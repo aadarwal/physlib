@@ -140,7 +140,7 @@ def crowRegressionOutgoingValue :
 
 /-- Aggregate channels of the concrete two-ring component family. -/
 abbrev CrowRegressionChannel :=
-  (components crowRegressionParameters).aggregatePortModeFamily.Channel
+  (netlist crowRegressionParameters).Channel
 
 /-- The aggregate incident amplitude of the exact raw solution. -/
 def crowRegressionIncident : ModeAmplitude (Incident CrowRegressionChannel) :=
