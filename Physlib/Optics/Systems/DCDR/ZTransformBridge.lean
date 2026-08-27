@@ -89,13 +89,14 @@ local instance zBridgeExternalChannelFintype (p : Parameters) :
 
 /-- Admissibility and a nonzero reciprocal-coordinate denominator put `z` in the compiled
 reciprocal-Z response domain. -/
-lemma rationalNetlist_mem_reciprocalZ_responseDomain (p : UnitDelayParameters) (z : ℂ)
-    (hp : p.IsAdmissible) (hDenominator : p.denominatorPolynomial.eval z⁻¹ ≠ 0) :
+lemma rationalNetlist_mem_reciprocalZ_responseDomain (p : UnitDelayParameters)
+    (z : ReciprocalZCoordinate) (hp : p.IsAdmissible)
+    (hDenominator : p.denominatorPolynomial.eval ((z : ℂ)⁻¹) ≠ 0) :
     z ∈ (rationalNetlist p).reciprocalZ.responseDomain := by
-  change zInverseEvaluation z ∈ (rationalNetlist p).responseDomain
-  convert rationalNetlist_mem_responseDomain p z⁻¹ hp hDenominator using 1
+  change zInverseEvaluationOnReciprocalZ z ∈ (rationalNetlist p).responseDomain
+  convert rationalNetlist_mem_responseDomain p ((z : ℂ)⁻¹) hp hDenominator using 1
   funext delay
-  exact zInverseEvaluation_apply z delay
+  exact zInverseEvaluationOnReciprocalZ_apply z delay
 
 /-- The recurrence loop symbol is exactly the fixed-carrier loop gain at `q = z⁻¹`. -/
 lemma delaySymbol_eq_fixedLoopGain (p : UnitDelayParameters) (z : ℂ) :
@@ -113,9 +114,10 @@ lemma recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator
   rw [Parameters.HasNonzeroDenominator, ← p.eval_denominatorPolynomial]
 
 /-- The recurrence transfer equals the proof-gated compiled reciprocal-Z response. -/
-lemma zTransfer_eq_rationalZEliminationResponse (p : UnitDelayParameters) (z : ℂ)
+lemma zTransfer_eq_rationalZEliminationResponse (p : UnitDelayParameters)
+    (z : ReciprocalZCoordinate)
     (hZ : z ∈ (rationalNetlist p).reciprocalZ.responseDomain) :
-    zTransfer p z = rationalZEliminationResponse p z hZ := by
+    zTransfer p (z : ℂ) = rationalZEliminationResponse p z hZ := by
   rw [zTransfer_eq_responseModel, rationalZEliminationResponse_eq_responseModel]
 
 /-- On the S4 cancellation and evaluation gates, the recurrence transfer equals the selected
@@ -258,6 +260,12 @@ structure IsZCrossSemanticsDomain (p : UnitDelayParameters)
   mem_reducedEvaluationDomain :
     z⁻¹ ∈ certificate.reduction.reduced.evaluationDomain
 
+/-- A common-domain witness packages its ROC-certified nonzero complex coordinate. -/
+def IsZCrossSemanticsDomain.reciprocalZCoordinate
+    {p : UnitDelayParameters} {certificate : ResponseReduction p} {z : ℂ}
+    (h : IsZCrossSemanticsDomain p certificate z) : ReciprocalZCoordinate :=
+  ⟨z, ne_zero_of_mem_zTransferROC h.mem_zTransferROC⟩
+
 /-- A common-domain witness supplies the recurrence denominator gate from its ROC field. -/
 lemma IsZCrossSemanticsDomain.recurrenceDenominator_ne_zero
     {p : UnitDelayParameters} {certificate : ResponseReduction p} {z : ℂ}
@@ -277,8 +285,8 @@ lemma IsZCrossSemanticsDomain.hasNonzeroDenominator
 lemma IsZCrossSemanticsDomain.mem_reciprocalZResponseDomain
     {p : UnitDelayParameters} {certificate : ResponseReduction p} {z : ℂ}
     (h : IsZCrossSemanticsDomain p certificate z) :
-    z ∈ (rationalNetlist p).reciprocalZ.responseDomain :=
-  rationalNetlist_mem_reciprocalZ_responseDomain p z h.isAdmissible
+    h.reciprocalZCoordinate ∈ (rationalNetlist p).reciprocalZ.responseDomain :=
+  rationalNetlist_mem_reciprocalZ_responseDomain p h.reciprocalZCoordinate h.isAdmissible
     h.recurrenceDenominator_ne_zero
 
 /-- Recurrence contraction gives the neutral Z-transform Schur predicate independently of ROC. -/
@@ -303,7 +311,8 @@ structure ZCrossSemanticsAgreement (p : UnitDelayParameters)
     zTransfer p z = certificate.reduction.reduced.eval z⁻¹
   /-- The recurrence transfer equals the compiled reciprocal-Z N5F response. -/
   rationalN5F :
-    zTransfer p z = rationalZEliminationResponse p z h.mem_reciprocalZResponseDomain
+    zTransfer p z = rationalZEliminationResponse p h.reciprocalZCoordinate
+      h.mem_reciprocalZResponseDomain
   /-- The recurrence transfer equals the convergent coherent circulation series. -/
   circulation : zTransfer p z = circulationSeries p z
   /-- The recurrence transfer equals the selected fixed-carrier N5 response. -/
@@ -342,8 +351,10 @@ lemma zCrossSemantics_agree (p : UnitDelayParameters)
     transform_causalImpulseResponse_eq_zTransfer h.mem_zTransferROC
   reducedRationalResponse := zTransfer_eq_reducedResponse certificate z
     h.noPoleCancellation h.mem_reducedEvaluationDomain
-  rationalN5F := zTransfer_eq_rationalZEliminationResponse p z
-    h.mem_reciprocalZResponseDomain
+  rationalN5F := by
+    simpa [IsZCrossSemanticsDomain.reciprocalZCoordinate] using
+      zTransfer_eq_rationalZEliminationResponse p h.reciprocalZCoordinate
+        h.mem_reciprocalZResponseDomain
   circulation := zTransfer_eq_circulationSeries p z h.loopIsContractive
   fixedN5Response := zTransfer_eq_eliminationResponse p z h.hasNonzeroDenominator
   completeMason := zTransfer_eq_masonResponse p z h.hasNonzeroDenominator

@@ -123,17 +123,19 @@ lemma zFeedback_isSchurStable_of_isContractive (p : Parameters)
 
 /-- Valid component models and the exact ring solve gate put `z` in the reciprocal-Z response
 domain of the rational all-pass netlist. -/
-lemma allPassRationalNetlist_mem_reciprocalZ_responseDomain (p : Parameters) (z : ℂ)
-    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹)
+lemma allPassRationalNetlist_mem_reciprocalZ_responseDomain (p : Parameters)
+    (z : ReciprocalZCoordinate)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹))
     (hp : p.IsValid) (hDenominator : p.HasNonzeroDenominator) :
     z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain := by
-  change zInverseEvaluation z ∈
+  change zInverseEvaluationOnReciprocalZ z ∈
     (allPassRationalNetlist p).toParameterizedNetlist.responseDomain
-  convert allPassRationalNetlist_mem_responseDomain p z⁻¹ hLoop hp hDenominator using 1
+  convert allPassRationalNetlist_mem_responseDomain p ((z : ℂ)⁻¹) hLoop hp
+    hDenominator using 1
   rfl
 
 /-- The selected input-to-through entry of the proof-gated reciprocal-Z response. -/
-noncomputable def reciprocalZThroughResponse (p : Parameters) (z : ℂ)
+noncomputable def reciprocalZThroughResponse (p : Parameters) (z : ReciprocalZCoordinate)
     (hZ : z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain) : ℂ :=
   (((allPassRationalNetlist p).reciprocalZ.response
         hZ).reindex
@@ -150,25 +152,26 @@ The response side is transported to the formal-delay model and then discharged b
 `allPassRationalNetlist_response_cleared`, whose proof expands the compiled N7 component and N5
 wiring equations.
 -/
-lemma recurrenceDenominator_mul_reciprocalZThroughResponse (p : Parameters) (z : ℂ)
+lemma recurrenceDenominator_mul_reciprocalZThroughResponse (p : Parameters)
+    (z : ReciprocalZCoordinate)
     (hZ : z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain)
-    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹))
     (hp : p.IsValid) (hUnitary : p.coupler.IsUnitary)
     (hDenominator : p.HasNonzeroDenominator) :
-    (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹) *
+    (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹)) *
         reciprocalZThroughResponse p z hZ =
-      (p.throughAmplitude : ℂ) - (p.fieldAttenuation : ℂ) * z⁻¹ := by
+      (p.throughAmplitude : ℂ) - (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹) := by
   have hResponse := (allPassRationalNetlist p).response_reciprocalZ_reindex hZ
   have hTransport := congrArg
     (fun transform =>
-      (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹) *
+      (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹)) *
         transform (Outgoing.mk (allPassRationalFormalThroughChannel p))
           (Incident.mk (allPassRationalFormalInputChannel p)))
     hResponse
   have hCleared := allPassRationalNetlist_response_cleared
-    p z⁻¹ hLoop hp hUnitary hDenominator
+    p ((z : ℂ)⁻¹) hLoop hp hUnitary hDenominator
   change
-    (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * z⁻¹) *
+    (1 - (p.throughAmplitude : ℂ) * (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹)) *
         (((allPassRationalNetlist p).reciprocalZ.response hZ).reindex
           (Incident.relabelEquiv
             (allPassRationalNetlist p).reciprocalZExternalChannelEquiv)
@@ -176,20 +179,22 @@ lemma recurrenceDenominator_mul_reciprocalZThroughResponse (p : Parameters) (z :
             (allPassRationalNetlist p).reciprocalZExternalChannelEquiv))
           (Outgoing.mk (allPassRationalFormalThroughChannel p))
           (Incident.mk (allPassRationalFormalInputChannel p)) =
-      (p.throughAmplitude : ℂ) - (p.fieldAttenuation : ℂ) * z⁻¹
+      (p.throughAmplitude : ℂ) - (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹)
   exact hTransport.trans hCleared
 
 /-- On the rational response domain, the causal recurrence transfer equals the proof-gated
 reciprocal-Z response derived from the compiled N7/N5 channel equations. -/
-lemma zTransfer_eq_reciprocalZThroughResponse (p : Parameters) (z : ℂ)
+lemma zTransfer_eq_reciprocalZThroughResponse (p : Parameters)
+    (z : ReciprocalZCoordinate)
     (hZ : z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain)
-    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * z⁻¹)
+    (hLoop : p.loopCoefficient = (p.fieldAttenuation : ℂ) * ((z : ℂ)⁻¹))
     (hp : p.IsValid) (hUnitary : p.coupler.IsUnitary)
     (hDenominator : p.HasNonzeroDenominator) :
-    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
+    zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) (z : ℂ) =
       reciprocalZThroughResponse p z hZ := by
   have hRecurrenceDenominator :=
-    (recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator p z hLoop).2 hDenominator
+    (recurrenceDenominator_ne_zero_iff_hasNonzeroDenominator p (z : ℂ) hLoop).2
+      hDenominator
   apply mul_left_cancel₀ hRecurrenceDenominator
   rw [recurrenceDenominator_mul_zTransfer hRecurrenceDenominator,
     recurrenceDenominator_mul_reciprocalZThroughResponse
@@ -339,6 +344,11 @@ structure IsZCrossSemanticsDomain (p : Parameters) (z : ℂ) : Prop where
   /-- The external bus transmission is nonzero, supplying the backward-first chain pivot. -/
   throughTransfer_ne_zero : throughTransfer p ≠ 0
 
+/-- A ring common-domain witness packages its ROC-certified nonzero complex coordinate. -/
+def IsZCrossSemanticsDomain.reciprocalZCoordinate {p : Parameters} {z : ℂ}
+    (h : IsZCrossSemanticsDomain p z) : ReciprocalZCoordinate :=
+  ⟨z, ne_zero_of_mem_zTransferROC h.mem_zTransferROC⟩
+
 /-- A common-domain witness supplies the fixed-frequency N5 solve gate. -/
 lemma IsZCrossSemanticsDomain.hasNonzeroDenominator {p : Parameters} {z : ℂ}
     (h : IsZCrossSemanticsDomain p z) : p.HasNonzeroDenominator :=
@@ -347,8 +357,8 @@ lemma IsZCrossSemanticsDomain.hasNonzeroDenominator {p : Parameters} {z : ℂ}
 /-- A common-domain witness supplies the proof-gated rational reciprocal-Z response point. -/
 lemma IsZCrossSemanticsDomain.mem_reciprocalZResponseDomain {p : Parameters} {z : ℂ}
     (h : IsZCrossSemanticsDomain p z) :
-    z ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain :=
-  allPassRationalNetlist_mem_reciprocalZ_responseDomain p z
+    h.reciprocalZCoordinate ∈ (allPassRationalNetlist p).reciprocalZ.responseDomain :=
+  allPassRationalNetlist_mem_reciprocalZ_responseDomain p h.reciprocalZCoordinate
     h.loopCoefficient_eq h.isValid h.hasNonzeroDenominator
 
 /-- Fixed-carrier contraction in the common domain gives recurrence Schur stability, independently
@@ -372,7 +382,8 @@ structure ZCrossSemanticsAgreement (p : Parameters) (z : ℂ)
   /-- The recurrence transfer equals the rational/N5F reciprocal-Z response. -/
   rationalN5F :
     zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
-      reciprocalZThroughResponse p z h.mem_reciprocalZResponseDomain
+      reciprocalZThroughResponse p h.reciprocalZCoordinate
+        h.mem_reciprocalZResponseDomain
   /-- The recurrence transfer equals the convergent circulation series. -/
   circulationSeries :
     zTransfer (p.throughAmplitude : ℂ) (p.fieldAttenuation : ℂ) z =
@@ -410,9 +421,11 @@ and singular-safe relational semantics all agree. -/
 lemma zCrossSemantics_agree (p : Parameters) (z : ℂ)
     (h : IsZCrossSemanticsDomain p z) : ZCrossSemanticsAgreement p z h where
   causalImpulseResponse := transform_causalImpulseResponse_eq_zTransfer h.mem_zTransferROC
-  rationalN5F := zTransfer_eq_reciprocalZThroughResponse p z
-    h.mem_reciprocalZResponseDomain h.loopCoefficient_eq h.isValid h.couplerIsUnitary
-    h.hasNonzeroDenominator
+  rationalN5F := by
+    simpa [IsZCrossSemanticsDomain.reciprocalZCoordinate] using
+      zTransfer_eq_reciprocalZThroughResponse p h.reciprocalZCoordinate
+        h.mem_reciprocalZResponseDomain h.loopCoefficient_eq h.isValid h.couplerIsUnitary
+        h.hasNonzeroDenominator
   circulationSeries := zTransfer_eq_throughTransferSeries p z
     h.couplerIsUnitary h.isContractive h.loopCoefficient_eq
   fixedN5Response := zTransfer_eq_responseTransform_entry p z h.couplerIsUnitary

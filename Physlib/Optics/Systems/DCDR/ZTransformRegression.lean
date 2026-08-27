@@ -341,7 +341,8 @@ lemma zRegression_reducedResponse_one : zRegressionReducedResponse.eval 1 = -1 :
 
 /-- Direct compiled rational-data expansion gives the reciprocal-Z response value `-1`. -/
 lemma zRegression_rationalZEliminationResponse_one :
-    rationalZEliminationResponse zRegressionParameters 1
+    rationalZEliminationResponse zRegressionParameters
+      zRegression_crossSemanticsDomain.reciprocalZCoordinate
       zRegression_crossSemanticsDomain.mem_reciprocalZResponseDomain = -1 := by
   rw [rationalZEliminationResponse_eq_responseModel,
     DelayTransfer.RationalModel.eval_eq]
@@ -447,7 +448,8 @@ The proof uses the independent anchors above and does not invoke `zCrossSemantic
 lemma zRegression_crossSemantics :
     transform (causalOutput zRegressionParameters unitImpulse) 1 = -1 ∧
       zRegressionReducedResponse.eval 1 = -1 ∧
-      rationalZEliminationResponse zRegressionParameters 1
+      rationalZEliminationResponse zRegressionParameters
+        zRegression_crossSemanticsDomain.reciprocalZCoordinate
         zRegression_crossSemanticsDomain.mem_reciprocalZResponseDomain = -1 ∧
       circulationSeries zRegressionParameters 1 = -1 ∧
       eliminationResponse (zRegressionParameters.at (1 : ℂ))
@@ -544,14 +546,14 @@ lemma zRegression_stable_causalTransform_I :
 The transported formal-coordinate value is expanded independently in `PolesRegression`.
 -/
 lemma zRegression_stable_rawCompiled_I :
-    rationalZEliminationResponse stableUnitDelayParameters Complex.I
+    rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
       stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I := by
   exact stable_rationalZEliminationResponse_I
 
 /-- The nonreal recurrence and raw compiled anchors agree without the cross-semantics bridge. -/
 lemma zRegression_nonreal_raw_compiled :
     transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
-      rationalZEliminationResponse stableUnitDelayParameters Complex.I
+      rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
         stable_I_mem_reciprocalZResponseDomain := by
   rw [zRegression_stable_causalTransform_I, zRegression_stable_rawCompiled_I]
 
@@ -561,9 +563,9 @@ The conjuncts respectively use the primitive causal recurrence, generic reciproc
 the eight raw N5 equations, and the complete eleven-branch Mason enumeration.
 -/
 lemma zRegression_stable_independent_nonzeroLoop_I :
-    transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
+      transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
         -(7 / 8) * Complex.I ∧
-      rationalZEliminationResponse stableUnitDelayParameters Complex.I
+      rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
           stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
       eliminationResponse (stableUnitDelayParameters.at (-Complex.I))
           (isWellPosed_of_hasNonzeroDenominator
@@ -584,7 +586,7 @@ lemma zRegression_stable_I_commonDomain_independent_anchor :
     ZCrossSemanticsAgreement stableUnitDelayParameters stableResponseReduction Complex.I h ∧
       transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
           -(7 / 8) * Complex.I ∧
-      rationalZEliminationResponse stableUnitDelayParameters Complex.I
+      rationalZEliminationResponse stableUnitDelayParameters h.reciprocalZCoordinate
           h.mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
       eliminationResponse (stableUnitDelayParameters.at Complex.I⁻¹)
           (isWellPosed_of_hasNonzeroDenominator
@@ -595,7 +597,11 @@ lemma zRegression_stable_I_commonDomain_independent_anchor :
   let h := zRegression_stable_I_crossSemanticsDomain
   refine ⟨zCrossSemantics_agree stableUnitDelayParameters
     stableResponseReduction Complex.I h, ?_⟩
-  simpa using zRegression_stable_independent_nonzeroLoop_I
+  have hCoordinate : h.reciprocalZCoordinate = imaginaryUnitReciprocalZCoordinate := by
+    apply Subtype.ext
+    rfl
+  rw [hCoordinate]
+  exact zRegression_stable_independent_nonzeroLoop_I
 
 /-!
 
