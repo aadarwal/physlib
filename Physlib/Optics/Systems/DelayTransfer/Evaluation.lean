@@ -403,11 +403,13 @@ def reciprocalZ (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) :
   oneDelayNetlist.toParameterizedNetlist.reparameterize zInverseEvaluationOnReciprocalZ
 
 /-- The reciprocal-Z solve domain viewed on the ambient complex carrier. -/
-def reciprocalZSolveDomain (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) : Set ℂ :=
+def reciprocalZSolveDomain (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype oneDelayNetlist.Channel] [Fintype oneDelayNetlist.ConnectedChannel] : Set ℂ :=
   {z | z ≠ 0 ∧ zInverseEvaluation z ∈ oneDelayNetlist.solveDomain}
 
 /-- The reciprocal-Z response domain viewed on the ambient complex carrier. -/
-def reciprocalZResponseDomain (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1) : Set ℂ :=
+def reciprocalZResponseDomain (oneDelayNetlist : RationalNetlist.{u, v, w, x} 1)
+    [Fintype oneDelayNetlist.Channel] [Fintype oneDelayNetlist.ConnectedChannel] : Set ℂ :=
   {z | z ≠ 0 ∧ zInverseEvaluation z ∈ oneDelayNetlist.responseDomain}
 
 /-- Reciprocal-Z reparameterization leaves the external channel labels unchanged. -/
@@ -474,8 +476,9 @@ lemma mk_mem_reciprocalZ_solveDomain_iff
     (⟨z, hz⟩ : ReciprocalZCoordinate) ∈ netlist.reciprocalZ.solveDomain ↔
       z ∈ netlist.reciprocalZSolveDomain := by
   rw [netlist.solveDomain_reciprocalZ]
-  simp only [reciprocalZSolveDomain, Set.mem_setOf_eq, hz, true_and,
-    zInverseEvaluationOnReciprocalZ]
+  change zInverseEvaluation z ∈ netlist.solveDomain ↔
+    z ≠ 0 ∧ zInverseEvaluation z ∈ netlist.solveDomain
+  exact ⟨fun hDomain => ⟨hz, hDomain⟩, fun hDomain => hDomain.2⟩
 
 /-- Subtype response-domain membership is equivalent to the ambient punctured carrier view. -/
 lemma mk_mem_reciprocalZ_responseDomain_iff
@@ -485,8 +488,9 @@ lemma mk_mem_reciprocalZ_responseDomain_iff
     (⟨z, hz⟩ : ReciprocalZCoordinate) ∈ netlist.reciprocalZ.responseDomain ↔
       z ∈ netlist.reciprocalZResponseDomain := by
   rw [netlist.responseDomain_reciprocalZ]
-  simp only [reciprocalZResponseDomain, Set.mem_setOf_eq, hz, true_and,
-    zInverseEvaluationOnReciprocalZ]
+  change zInverseEvaluation z ∈ netlist.responseDomain ↔
+    z ≠ 0 ∧ zInverseEvaluation z ∈ netlist.responseDomain
+  exact ⟨fun hDomain => ⟨hz, hDomain⟩, fun hDomain => hDomain.2⟩
 
 /-- The complex origin never belongs to the reciprocal-Z solve-domain carrier view. -/
 lemma zero_not_mem_reciprocalZSolveDomain
