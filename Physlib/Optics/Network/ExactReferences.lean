@@ -99,12 +99,10 @@ lemma toComplex_apply (value : GaussianRational) :
   simp [toComplex, QuadraticAlgebra.lift_apply_apply, Algebra.smul_def]
 
 /-- Embedding the Gaussian-rational generator gives the complex imaginary unit. -/
-@[simp]
 lemma toComplex_I : toComplex I = Complex.I := by
   norm_num [I]
 
 /-- Embedding explicit rational coordinates gives the corresponding complex number. -/
-@[simp]
 lemma toComplex_ofParts (re im : ℚ) :
     toComplex (ofParts re im) = (re : ℂ) + (im : ℂ) * Complex.I := by
   norm_num [ofParts]

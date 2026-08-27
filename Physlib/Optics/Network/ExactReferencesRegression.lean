@@ -60,31 +60,37 @@ namespace Optics
 
 noncomputable section
 
-/- The response expression below uses the fixture's proof-gated semantic API. -/
+/-- Local enumeration of channels for each component in the proof-gated N6 fixture. -/
 local instance conservationExactLocalChannelFintype (component : Bool) :
     Fintype (conservationRegressionComponents.portFamily component).Channel := by
   change Fintype (Σ _ : Bool, Unit)
   infer_instance
 
+/-- Local channel equality for each component in the proof-gated N6 fixture. -/
 local instance conservationExactLocalChannelDecidableEq (component : Bool) :
     DecidableEq (conservationRegressionComponents.portFamily component).Channel :=
   Classical.decEq _
 
+/-- Local enumeration of every channel in the proof-gated N6 fixture. -/
 local instance conservationExactChannelFintype : Fintype conservationRegression.Channel := by
   change Fintype (Σ _ : (Σ _ : Bool, Bool), Unit)
   infer_instance
 
+/-- Local channel equality for the proof-gated N6 fixture. -/
 local instance conservationExactChannelDecidableEq :
     DecidableEq conservationRegression.Channel := Classical.decEq _
 
+/-- Local enumeration of connected channels in the proof-gated N6 fixture. -/
 local instance conservationExactConnectedChannelFintype :
     Fintype conservationRegression.ConnectedChannel := by
   change Fintype (Σ _ : Unit, Unit ⊕ Unit)
   infer_instance
 
+/-- Local connected-channel equality for the proof-gated N6 fixture. -/
 local instance conservationExactConnectedChannelDecidableEq :
     DecidableEq conservationRegression.ConnectedChannel := Classical.decEq _
 
+/-- Local enumeration of exposed channels in the proof-gated N6 fixture. -/
 local instance conservationExactExternalChannelFintype :
     Fintype conservationRegression.ExternalChannel := by
   classical
