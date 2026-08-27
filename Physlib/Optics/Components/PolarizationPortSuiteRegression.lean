@@ -529,7 +529,7 @@ lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
       physicalPortSuite9bScattering, physicalPortSuite9bPortFamily,
       JonesMatrix.physicalScattering,
       PlanarDielectricInterface.physicalScattering,
-      ScatteringMatrix.toModeTransform_reindex, ModeTransform.reindex_apply,
+      ScatteringMatrix.toModeTransform_reindex,
       JonesMatrix.scattering, JonesMatrix.channelEquiv,
       physicalPortSuite9b_quarterWavePlate_entries,
       PlanarDielectricInterface.polarizedScattering,
@@ -537,6 +537,7 @@ lemma physicalPortSuite9b_indexedScatteringMatrix_eq_explicit :
       PlanarDielectricInterface.sideEquiv, ScatteringMatrix.directSum,
       ModeTransform.directSum, physicalPortSuite9b_s_kernel,
       physicalPortSuite9b_p_kernel, Matrix.blockDiagonal'_apply]
+  all_goals rfl
 
 /-- Restricting the mixed input recovers the owned Jones local input. -/
 lemma physicalPortSuite9bIndexedInput_restrict_polarization :
@@ -581,8 +582,7 @@ lemma physicalPortSuite9b_indexed_action :
         physicalPortSuite9bPolarizationRawOutput,
         physicalPortSuite9bInterfaceRawInput,
         physicalPortSuite9bInterfaceRawOutput,
-        PlanarDielectricInterface.channelEquiv,
-        PlanarDielectricInterface.sideEquiv, ModeAmplitude.directSum,
+        ModeAmplitude.directSum,
         physicalPortSuite9bPolarizationZeroIndexed,
         physicalPortSuite9bPolarizationOneIndexed,
         physicalPortSuite9bInterfaceNegativeSIndexed,
@@ -598,8 +598,7 @@ lemma physicalPortSuite9b_indexed_action :
         physicalPortSuite9bPolarizationRawOutput,
         physicalPortSuite9bInterfaceRawInput,
         physicalPortSuite9bInterfaceRawOutput,
-        PlanarDielectricInterface.channelEquiv,
-        PlanarDielectricInterface.sideEquiv, ModeAmplitude.directSum,
+        ModeAmplitude.directSum,
         physicalPortSuite9bPolarizationZeroIndexed,
         physicalPortSuite9bPolarizationOneIndexed,
         physicalPortSuite9bInterfaceNegativeSIndexed,
@@ -778,6 +777,7 @@ lemma physicalPortSuite9b_hostile_indexedScatteringMatrix_eq_reindex :
       physicalPortSuite9bIndexedNegativePolarizationSwap,
       physicalPortSuite9bInterfaceNegativePolarizationSwap,
       ModeTransform.reindex_apply, Matrix.blockDiagonal'_apply]
+  all_goals rfl
 
 /-- The hostile family instead gives the p value `7/5` at negative-side s. -/
 lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
