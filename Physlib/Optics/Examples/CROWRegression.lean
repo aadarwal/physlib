@@ -812,7 +812,12 @@ lemma crowRegression_mem_behavior :
   rw [(netlist crowRegressionParameters).mem_behavior_iff_componentBehavior]
   refine ⟨crowRegressionIncident, crowRegressionOutgoing,
     crowRegression_mem_componentBehavior, crowRegression_incidentAssembly, ?_⟩
-  rfl
+  apply WithLp.ofLp_injective 2
+  funext endpoint
+  rcases endpoint with ⟨channel⟩
+  rw [crowRegressionOutput, FlatNetlist.outputReadout,
+    crowRegressionConnections.externalOutgoingReadout_apply,
+    ModeAmplitude.restrictEmbedding_apply]
 
 /-!
 ## D. Compiled response and negative controls
