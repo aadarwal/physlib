@@ -502,12 +502,24 @@ noncomputable instance hierarchyFlattenChannelFintype {ringCount : ℕ}
   change Fintype (components p).aggregatePortModeFamily.Channel
   exact componentsChannelFintype p
 
+/-- The hierarchy's inner netlist shares the finite aggregate primitive channels. -/
+noncomputable instance hierarchyInnerChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).innerNetlist.Channel := by
+  change Fintype (components p).aggregatePortModeFamily.Channel
+  exact componentsChannelFintype p
+
 /-- The hierarchy's inner netlist has finite right-interface connected channels. -/
 noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) :
     Fintype (hierarchy p).innerNetlist.ConnectedChannel := by
   change Fintype (rightConnections p).Channel
   exact rightChannelFintype p
+
+/-- The first-stage hierarchy boundary has finite channels. -/
+noncomputable instance hierarchyInnerBoundaryChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) :
+    Fintype (hierarchy p).inner.externalPortModeFamily.Channel :=
+  Fintype.ofEquiv _ (hierarchy p).inner.boundaryChannelEquiv.symm
 
 /-- The hierarchy's outer two-stage connection family has finite channels. -/
 noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
@@ -534,7 +546,7 @@ def stagedBehavior {ringCount : ℕ} (p : Parameters ringCount) :
 /-- The flat CROW relation is exactly the generic staged hierarchical relation. -/
 lemma netlist_behavior_eq_staged {ringCount : ℕ} (p : Parameters ringCount) :
     (netlist p).behavior = stagedBehavior p := by
-  exact (hierarchy p).flatten_behavior_eq
+  simpa only [netlist, stagedBehavior] using (hierarchy p).flatten_behavior_eq
 
 /-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
 
