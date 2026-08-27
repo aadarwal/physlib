@@ -179,11 +179,11 @@ lemma reciprocityRegression_s15_restoring_inversePaired (label : Fin 2) :
     reciprocityRegressionS15RestoringOutgoing
         (reciprocityRegressionSwapPairing (Incident.mk label)).channel =
       (reciprocityRegressionS15Incident label)⁻¹ := by
-  fin_cases label <;>
+  fin_cases label <;> apply Subtype.ext <;>
     norm_num [reciprocityRegressionS15RestoringOutgoing,
       reciprocityRegressionS15Incident, reciprocityRegressionSwapPairing,
-      reciprocityRegressionI, reciprocityRegressionNegI, Circle.ext_iff,
-      Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionI, reciprocityRegressionNegI, Circle.coe_inv,
+      Complex.ext_iff]
 
 /-- Direct primitive expansion of the S-15 pairing-aware restoring gauge. -/
 lemma reciprocityRegression_s15_restoring_matrix :
@@ -233,9 +233,9 @@ lemma reciprocityRegression_s16_not_inversePaired :
         (reciprocityRegressionS16Gauge label)⁻¹ := by
   intro hInversePaired
   have hZero := hInversePaired (0 : Fin 2)
+  have hZeroCoe := congrArg (fun phase : Circle => (phase : ℂ)) hZero
   norm_num [reciprocityRegressionS16Gauge, reciprocityRegressionSwapPairing,
-    reciprocityRegressionNegOne, Circle.ext_iff, Circle.coe_inv,
-    Complex.ext_iff] at hZero
+    reciprocityRegressionNegOne, Circle.coe_inv, Complex.ext_iff] at hZeroCoe
 
 /-- Direct primitive expansion of the S-16 constant-factor rephasing. -/
 lemma reciprocityRegression_s16_matrix :
