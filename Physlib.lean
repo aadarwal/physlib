@@ -225,6 +225,8 @@ public import Physlib.Mathematics.ZTransform.DifferenceEquation
 public import Physlib.Mathematics.ZTransform.DifferenceEquationRegression
 public import Physlib.Mathematics.ZTransform.Existence
 public import Physlib.Mathematics.ZTransform.ExistenceRegression
+public import Physlib.Mathematics.ZTransform.FrequencyResponse
+public import Physlib.Mathematics.ZTransform.FrequencyResponseRegression
 public import Physlib.Mathematics.ZTransform.Inverse
 public import Physlib.Mathematics.ZTransform.InverseRegression
 public import Physlib.Mathematics.ZTransform.OnePole
