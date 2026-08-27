@@ -663,13 +663,14 @@ lemma visiblePole_polynomialOutputReadout_reindex :
       exact VisiblePolePort.noConfusion
         (congrArg (fun channel => channel.1.2) hEqual)
 
-/-- Reindexing the four retained-numerator factors exposes the selected scalar polynomial. -/
-lemma visiblePole_responseNumerator_reindex :
+/-- Reindexing the retained numerator exposes its four displayed matrix factors. -/
+lemma visiblePole_responseNumerator_factors_reindex :
     Matrix.reindex visiblePoleExternalOutgoingEquiv visiblePoleExternalIncidentEquiv
         visiblePoleNetlist.responseNumerator =
-      (fun _ _ => MvPolynomial.C (3 / 5) -
-        MvPolynomial.C (1 / 2) * MvPolynomial.X 0 :
-        Matrix Unit Unit (DelayPolynomial 1)) := by
+      ((visiblePolePolynomialOutputReadoutMatrix *
+          visiblePoleClearedScatteringMatrix) *
+        visiblePoleClearedFeedbackMatrix.adjugate) *
+        visiblePolePolynomialInputExposureMatrix := by
   rw [RationalNetlist.responseNumerator]
   change (Matrix.reindexLinearEquiv (DelayPolynomial 1) (DelayPolynomial 1)
     visiblePoleExternalOutgoingEquiv visiblePoleExternalIncidentEquiv)
@@ -698,6 +699,15 @@ lemma visiblePole_responseNumerator_reindex :
     ← Matrix.adjugate_reindex,
     visiblePole_clearedFeedback_reindex,
     visiblePole_polynomialInputExposure_reindex]
+
+/-- Reindexing the four retained-numerator factors exposes the selected scalar polynomial. -/
+lemma visiblePole_responseNumerator_reindex :
+    Matrix.reindex visiblePoleExternalOutgoingEquiv visiblePoleExternalIncidentEquiv
+        visiblePoleNetlist.responseNumerator =
+      (fun _ _ => MvPolynomial.C (3 / 5) -
+        MvPolynomial.C (1 / 2) * MvPolynomial.X 0 :
+        Matrix Unit Unit (DelayPolynomial 1)) := by
+  rw [visiblePole_responseNumerator_factors_reindex]
   apply Matrix.ext
   intro output input
   cases output
