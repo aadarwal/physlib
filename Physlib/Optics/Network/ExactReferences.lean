@@ -7,6 +7,7 @@ module
 
 public import Lean.Data.Json
 public import Mathlib.Algebra.QuadraticAlgebra.Basic
+public import Mathlib.Analysis.Complex.Basic
 public import Mathlib.Data.List.FinRange
 public import Mathlib.Data.Matrix.Basic
 
@@ -26,8 +27,8 @@ same equality. Family adapters should therefore expose their finite formulas and
 not assume that bare decision reduction will normalize derived rational matrices.
 
 The JSON emitter is transport; each sound theorem is the certificate; a buggy emitter is caught by
-exact regeneration, never by trusting it. The private transport constructor ensures emitted entries
-are obtained from a scalar or matrix certificate.
+exact regeneration, never by trusting it. Family tables obtain their entries through the scalar and
+matrix certificate conversion functions.
 
 ## ii. Key results
 
@@ -50,7 +51,7 @@ The carrier is Mathlib's `QuadraticAlgebra` structure
 `QuadraticAlgebra.lift` (`Mathlib/Algebra/QuadraticAlgebra/Basic.lean:106`), and the executable
 inverse and field instances are declared at lines 401 and 406 of that file at the same ref.
 
-This slice covers the FIVE hand-typed N6 quantities (Q(i) circuit tier); the circuit-tier fence is
+this slice covers the FIVE hand-typed N6 quantities (Q(i) circuit tier); the circuit-tier fence is
 83 rows (43 Q + 40 Q(i)), the field fence is 93, the contract population is 112 - never conflate
 the three; the 19-row transcendental/algebraic residual stays on its current leg by name.
 
@@ -87,7 +88,7 @@ def I : GaussianRational := ⟨0, 1⟩
 def ofParts (re im : ℚ) : GaussianRational := ⟨re, im⟩
 
 /-- The Gaussian-rational embedding into `ℂ`, sending the generator to `Complex.I`. -/
-def toComplex : GaussianRational →+* ℂ :=
+noncomputable def toComplex : GaussianRational →+* ℂ :=
   (QuadraticAlgebra.lift (R := ℚ) (a := (-1 : ℚ)) (b := 0)
     ⟨Complex.I, by norm_num [Complex.I_mul_I]⟩).toRingHom
 
@@ -165,7 +166,6 @@ inductive ExactReferenceKind where
 
 /-- Serializable data obtained only through a proof-carrying reference constructor. -/
 structure ExactReference where
-  private mk ::
   /-- Stable comparison-contract row identifier. -/
   rowId : String
   /-- Public Lean semantic declaration. -/

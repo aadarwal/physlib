@@ -45,7 +45,7 @@ off-diagonal entry, whose imaginary sign is flipped.
 The JSON emitter is transport; each sound theorem is the certificate; a buggy emitter is caught by
 exact regeneration, never by trusting it.
 
-This slice covers the FIVE hand-typed N6 quantities (Q(i) circuit tier); the circuit-tier fence is
+this slice covers the FIVE hand-typed N6 quantities (Q(i) circuit tier); the circuit-tier fence is
 83 rows (43 Q + 40 Q(i)), the field fence is 93, the contract population is 112 - never conflate
 the three; the 19-row transcendental/algebraic residual stays on its current leg by name.
 
@@ -116,11 +116,14 @@ def n6ResponseExactValue : Matrix (Fin 2) (Fin 2) GaussianRational :=
 /-- The emitted exact response embeds to the public proof-gated N6 response. -/
 lemma n6ResponseExactReference_sound :
     n6ResponseExactValue.map GaussianRational.toComplex = n6ResponseSemantic := by
-  rw [n6ResponseSemantic, conservationRegression_responseTransform_eq]
   ext row column
+  change GaussianRational.toComplex (n6ResponseExactValue row column) =
+    conservationRegression.responseTransform conservationRegression_isWellPosed
+      (n6ResponseOutput row) (n6ResponseInput column)
+  rw [conservationRegression_responseTransform_eq]
   fin_cases row <;> fin_cases column <;>
     norm_num [n6ResponseExactValue, n6ResponseOutput, n6ResponseInput,
-      conservationRegressionResponse]
+      conservationRegressionResponse, GaussianRational.I]
 
 /-- Proof-carrying exact reference for comparison row `N6-NET-RESPONSE`. -/
 def n6ResponseExactReference : ExactMatrixReference 2 2 n6ResponseSemantic where
@@ -139,12 +142,12 @@ def n6ResponseExactReference : ExactMatrixReference 2 2 n6ResponseSemantic where
 
 /-- The first displayed N6 response-column power, embedded in `ℂ` for transport. -/
 def n6ColumnAPowerSemantic : ℂ :=
-  Complex.normSq (conservationRegressionResponse
-      (Outgoing.mk conservationRegressionExternalA)
-      (Incident.mk conservationRegressionExternalA)) +
-    Complex.normSq (conservationRegressionResponse
-      (Outgoing.mk conservationRegressionExternalB)
-      (Incident.mk conservationRegressionExternalA))
+  ((Complex.normSq (conservationRegressionResponse
+        (Outgoing.mk conservationRegressionExternalA)
+        (Incident.mk conservationRegressionExternalA)) +
+      Complex.normSq (conservationRegressionResponse
+        (Outgoing.mk conservationRegressionExternalB)
+        (Incident.mk conservationRegressionExternalA)) : ℝ) : ℂ)
 
 /-- The first N6 column-power exact value. -/
 def n6ColumnAPowerExactValue : GaussianRational := 1
@@ -153,7 +156,8 @@ def n6ColumnAPowerExactValue : GaussianRational := 1
 lemma n6ColumnAPowerExactReference_sound :
     GaussianRational.toComplex n6ColumnAPowerExactValue = n6ColumnAPowerSemantic := by
   rw [n6ColumnAPowerSemantic, conservationRegressionResponse_column_a_power]
-  norm_num [n6ColumnAPowerExactValue]
+  norm_num [n6ColumnAPowerExactValue, QuadraticAlgebra.re_one,
+    QuadraticAlgebra.im_one]
 
 /-- Proof-carrying exact reference for comparison row `N6-NET-COL-A`. -/
 def n6ColumnAPowerExactReference : ExactScalarReference n6ColumnAPowerSemantic where
@@ -166,12 +170,12 @@ def n6ColumnAPowerExactReference : ExactScalarReference n6ColumnAPowerSemantic w
 
 /-- The second displayed N6 response-column power, embedded in `ℂ` for transport. -/
 def n6ColumnBPowerSemantic : ℂ :=
-  Complex.normSq (conservationRegressionResponse
-      (Outgoing.mk conservationRegressionExternalA)
-      (Incident.mk conservationRegressionExternalB)) +
-    Complex.normSq (conservationRegressionResponse
-      (Outgoing.mk conservationRegressionExternalB)
-      (Incident.mk conservationRegressionExternalB))
+  ((Complex.normSq (conservationRegressionResponse
+        (Outgoing.mk conservationRegressionExternalA)
+        (Incident.mk conservationRegressionExternalB)) +
+      Complex.normSq (conservationRegressionResponse
+        (Outgoing.mk conservationRegressionExternalB)
+        (Incident.mk conservationRegressionExternalB)) : ℝ) : ℂ)
 
 /-- The second N6 column-power exact value. -/
 def n6ColumnBPowerExactValue : GaussianRational := 1
@@ -180,7 +184,8 @@ def n6ColumnBPowerExactValue : GaussianRational := 1
 lemma n6ColumnBPowerExactReference_sound :
     GaussianRational.toComplex n6ColumnBPowerExactValue = n6ColumnBPowerSemantic := by
   rw [n6ColumnBPowerSemantic, conservationRegressionResponse_column_b_power]
-  norm_num [n6ColumnBPowerExactValue]
+  norm_num [n6ColumnBPowerExactValue, QuadraticAlgebra.re_one,
+    QuadraticAlgebra.im_one]
 
 /-- Proof-carrying exact reference for comparison row `N6-NET-COL-B`. -/
 def n6ColumnBPowerExactReference : ExactScalarReference n6ColumnBPowerSemantic where
@@ -213,8 +218,11 @@ lemma n6CrossExactReference_sound :
     n6CrossExactValue.map GaussianRational.toComplex = n6CrossSemantic := by
   rcases conservationRegressionResponse_cross_entries with ⟨hFirst, hSecond⟩
   ext row column
+  change GaussianRational.toComplex (n6CrossExactValue row column) =
+    n6CrossSemantic row column
   fin_cases row <;> fin_cases column <;>
-    norm_num [n6CrossExactValue, n6CrossSemantic, hFirst, hSecond]
+    norm_num [n6CrossExactValue, n6CrossSemantic, hFirst, hSecond,
+      GaussianRational.I]
 
 /-- Proof-carrying exact reference for comparison row `N6-NET-CROSS`. -/
 def n6CrossExactReference : ExactMatrixReference 2 1 n6CrossSemantic where
@@ -240,8 +248,11 @@ def n6CoherencyExactValue : Matrix (Fin 2) (Fin 2) GaussianRational :=
 lemma n6CoherencyExactReference_sound :
     n6CoherencyExactValue.map GaussianRational.toComplex = n6CoherencySemantic := by
   ext row column
+  change GaussianRational.toComplex (n6CoherencyExactValue row column) =
+    n6CoherencySemantic row column
   rw [n6CoherencySemantic, conservationCoherencyRegression_diagonal_map_apply]
-  fin_cases row <;> fin_cases column <;> norm_num [n6CoherencyExactValue]
+  fin_cases row <;> fin_cases column <;>
+    norm_num [n6CoherencyExactValue, GaussianRational.ofParts, sub_eq_add_neg]
 
 /-- Proof-carrying exact reference for comparison row `N6-COHERENCY`. -/
 def n6CoherencyExactReference : ExactMatrixReference 2 2 n6CoherencySemantic where
@@ -277,8 +288,10 @@ def n6ExactReferences : List ExactReference :=
 /-- The transport table contains five distinct comparison-contract row identifiers. -/
 lemma n6ExactReferences_rowIds_nodup :
     (n6ExactReferences.map ExactReference.rowId).Nodup := by
-  norm_num [n6ExactReferences, ExactMatrixReference.toReference,
-    ExactScalarReference.toReference]
+  simp [n6ExactReferences, ExactMatrixReference.toReference,
+    ExactScalarReference.toReference, n6ResponseExactReference,
+    n6ColumnAPowerExactReference, n6ColumnBPowerExactReference,
+    n6CrossExactReference, n6CoherencyExactReference]
 
 /-- The emitted semantic declaration names match the validation statement snapshot. -/
 lemma n6ExactReferences_declarations_eq_snapshot :
@@ -294,5 +307,7 @@ lemma n6CoherencyExactReference_rejects_transposed_sign :
     n6CoherencyExactReference.value 0 1 ≠ n6CoherencyExactReference.value 1 0 := by
   norm_num [n6CoherencyExactReference, n6CoherencyExactValue,
     GaussianRational.ofParts, QuadraticAlgebra.ext_iff]
+
+end
 
 end Optics
