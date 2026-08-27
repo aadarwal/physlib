@@ -108,6 +108,7 @@ def componentScattering {ringCount : ℕ} (p : Parameters ringCount) :
       MatchedPropagation.physicalScattering (p.returnArc ring) Unit
 
 /-- The heterogeneous family of existing primitive components used by the CROW. -/
+@[reducible]
 def components {ringCount : ℕ} (p : Parameters ringCount) : ScatteringComponentFamily where
   Component := Component ringCount
   portFamily := componentPortFamily
