@@ -522,7 +522,7 @@ noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
 -/
 
 /-- Generic hierarchical flattening preserves the CROW relation exactly. -/
-lemma hierarchy_flatten_preserves_behavior {ringCount : ℕ} (p : Parameters ringCount) :=
+lemma hierarchy_flatten_preserves_behavior {ringCount : ℕ} (p : Parameters ringCount) : _ :=
   (hierarchy p).flatten_behavior_eq
 
 /-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
