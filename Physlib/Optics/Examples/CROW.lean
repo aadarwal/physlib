@@ -413,6 +413,7 @@ lemma connections_assoc_transport {ringCount : ℕ} (p : Parameters ringCount) :
     (forwardConnections p) (returnConnections p)
 
 /-- The two-stage hierarchy grouping right links before the remaining left links. -/
+@[reducible]
 def hierarchy {ringCount : ℕ} (p : Parameters ringCount) : HierarchicalNetlist where
   components := components p
   InnerConnection := RightConnection ringCount
@@ -425,6 +426,7 @@ def hierarchy {ringCount : ℕ} (p : Parameters ringCount) : HierarchicalNetlist
 -/
 
 /-- The flat directly coupled CROW netlist obtained from the three-stage hierarchy. -/
+@[reducible]
 def netlist {ringCount : ℕ} (p : Parameters ringCount) : FlatNetlist :=
   (hierarchy p).flatten
 
@@ -518,7 +520,8 @@ noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
 /-- The first-stage hierarchy has finitely many external channels. -/
 noncomputable instance hierarchyInnerExternalChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).inner.ExternalChannel := by
-  change Fintype ((Set.range (rightConnections p).channelEmbedding)ᶜ)
+  change Fintype { channel //
+    channel ∉ Set.range (rightConnections p).channelEmbedding }
   classical
   infer_instance
 
@@ -537,8 +540,8 @@ noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
 /-- The final hierarchy boundary has finitely many external channels. -/
 noncomputable instance hierarchyOuterExternalChannelFintype {ringCount : ℕ}
     (p : Parameters ringCount) : Fintype (hierarchy p).outer.ExternalChannel := by
-  change Fintype ((Set.range
-    ((forwardConnections p).append (returnConnections p)).channelEmbedding)ᶜ)
+  change Fintype { channel // channel ∉ Set.range
+    ((forwardConnections p).append (returnConnections p)).channelEmbedding }
   classical
   infer_instance
 
@@ -557,6 +560,7 @@ noncomputable instance hierarchyFlattenConnectedChannelFintype {ringCount : ℕ}
 -/
 
 /-- The staged hierarchical behavior of the directly coupled sequence. -/
+@[reducible]
 def stagedBehavior {ringCount : ℕ} (p : Parameters ringCount) :
     LinearBehavior (netlist p).ExternalIncident (netlist p).ExternalOutgoing :=
   ((hierarchy p).outer.closeBehavior
@@ -571,7 +575,6 @@ def stagedBehavior {ringCount : ℕ} (p : Parameters ringCount) :
 /-- The flat CROW relation is exactly the generic staged hierarchical relation. -/
 lemma netlist_behavior_eq_staged {ringCount : ℕ} (p : Parameters ringCount) :
     (netlist p).behavior = stagedBehavior p := by
-  change (hierarchy p).flatten.behavior = _
   exact (hierarchy p).flatten_behavior_eq
 
 /-- The generic response spine and hierarchy agree for every well-posed directly coupled CROW.
