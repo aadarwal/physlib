@@ -88,7 +88,7 @@ lemma norm_unitCirclePoint (ω : ℝ) : ‖unitCirclePoint ω‖ = 1 := by
 /-- A unit-circle point is nonzero. -/
 @[simp]
 lemma unitCirclePoint_ne_zero (ω : ℝ) : unitCirclePoint ω ≠ 0 := by
-  simpa [unitCirclePoint] using Complex.exp_ne_zero ((ω : ℂ) * Complex.I)
+  simp [unitCirclePoint]
 
 /-- The reciprocal unit-circle point is the exponential with negated angle. -/
 lemma unitCirclePoint_inv (ω : ℝ) :
