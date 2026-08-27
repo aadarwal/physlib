@@ -650,6 +650,73 @@ lemma crowRegression_mem_componentBehavior :
         apply Complex.ext <;>
         norm_num [crowRegressionIncidentValue, crowRegressionOutgoingValue]
 
+/-- A global scattering equation exposes all four primitive equations at one fixture coupler. -/
+lemma crowRegression_coupler_equations (interface : Fin 3)
+    (incident : ModeAmplitude (netlist crowRegressionParameters).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist crowRegressionParameters).OutgoingIndex)
+    (hScattering : outgoing =
+      (netlist crowRegressionParameters).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk (crowRegressionCouplerChannel interface .rightFirst)) =
+        (crowRegressionParameters.coupler interface).throughAmplitude *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .leftFirst)) +
+          DirectionalCoupler.crossCoefficient
+              (crowRegressionParameters.coupler interface) *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .leftSecond)) ∧
+      outgoing (Outgoing.mk (crowRegressionCouplerChannel interface .rightSecond)) =
+        DirectionalCoupler.crossCoefficient
+              (crowRegressionParameters.coupler interface) *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .leftFirst)) +
+          (crowRegressionParameters.coupler interface).throughAmplitude *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .leftSecond)) ∧
+      outgoing (Outgoing.mk (crowRegressionCouplerChannel interface .leftFirst)) =
+        (crowRegressionParameters.coupler interface).throughAmplitude *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .rightFirst)) +
+          DirectionalCoupler.crossCoefficient
+              (crowRegressionParameters.coupler interface) *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .rightSecond)) ∧
+      outgoing (Outgoing.mk (crowRegressionCouplerChannel interface .leftSecond)) =
+        DirectionalCoupler.crossCoefficient
+              (crowRegressionParameters.coupler interface) *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .rightFirst)) +
+          (crowRegressionParameters.coupler interface).throughAmplitude *
+            incident (Incident.mk (crowRegressionCouplerChannel interface .rightSecond)) := by
+  have hMember : (incident, outgoing) ∈
+      (netlist crowRegressionParameters).componentBehavior :=
+    ((netlist crowRegressionParameters).mem_componentBehavior_iff incident outgoing).mpr
+      hScattering
+  have hLocal :=
+    ((netlist crowRegressionParameters).mem_componentBehavior_iff_forall_component
+      incident outgoing).mp hMember (.coupler interface)
+  change
+    (incident.restrictEmbedding
+          (Incident.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.coupler interface))),
+      outgoing.restrictEmbedding
+          (Outgoing.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.coupler interface)))) ∈
+        (DirectionalCoupler.physicalScattering
+          (crowRegressionParameters.coupler interface) Unit).toOrientedModeTransform.toBehavior
+    at hLocal
+  rw [DirectionalCoupler.physicalScattering_realizes_physicalBehavior] at hLocal
+  have hRaw :=
+    (DirectionalCoupler.mem_physicalBehavior_iff
+      (crowRegressionParameters.coupler interface) _ _).mp hLocal
+  rw [DirectionalCoupler.mem_behavior_iff,
+    DirectionalCoupler.mixing_toLinearMap_apply,
+    DirectionalCoupler.mixing_toLinearMap_apply] at hRaw
+  have hRightFirst := congrArg
+    (fun amplitude => amplitude (Sum.inr (Outgoing.mk (Sum.inl ())))) hRaw
+  have hRightSecond := congrArg
+    (fun amplitude => amplitude (Sum.inr (Outgoing.mk (Sum.inr ())))) hRaw
+  have hLeftFirst := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk (Sum.inl ())))) hRaw
+  have hLeftSecond := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk (Sum.inr ())))) hRaw
+  change _ = _ at hRightFirst hRightSecond hLeftFirst hLeftSecond
+  exact ⟨hRightFirst, hRightSecond, hLeftFirst, hLeftSecond⟩
+
 /-- The eight homogeneous channel equations in either travel direction have only the zero state. -/
 lemma crowRegression_chainCoordinates_eq_zero
     (returnEnd launchEnd launchMiddle returnMiddle launchNext outputEnd returnNext returnLink : ℂ)
