@@ -318,35 +318,34 @@ lemma crowRegressionExternalAmbientChannel_not_connected
     (port : CrowRegressionExternalPort) :
     crowRegressionExternalAmbientChannel port ∉
       Set.range crowRegressionConnections.channelEmbedding := by
-  rw [crowRegressionConnections.channel_mem_range_channelEmbedding_iff]
-  rintro ⟨⟨connection, endpoint⟩, hPort⟩
+  rintro ⟨⟨connection, local⟩, hChannel⟩
   rcases connection with right | forwardOrReturn
   · rcases right with ⟨ring, kind⟩
-    cases port <;> cases kind <;> cases endpoint
+    cases kind <;> rcases local with mode | mode <;> cases mode
     all_goals
-      have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
-      simp [crowRegressionExternalAmbientChannel, crowRegressionConnections,
-        connections, PortConnectionFamily.appendThreeRight,
-        PortConnectionFamily.append, rightConnections, rightConnection,
-        PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
-        PortConnection.endpointPort] at hLabel
+      simp only [crowRegressionRightForward_left_embedding,
+        crowRegressionRightForward_right_embedding,
+        crowRegressionRightReturn_left_embedding,
+        crowRegressionRightReturn_right_embedding] at hChannel
+      cases port <;>
+        simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
+          crowRegressionForwardArcChannel, crowRegressionReturnArcChannel,
+          crowRegressionChannel] at hChannel
   · rcases forwardOrReturn with forwardIndex | returnIndex
-    · cases port <;> cases endpoint
+    · rcases local with mode | mode <;> cases mode
       all_goals
-        have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
-        simp [crowRegressionExternalAmbientChannel, crowRegressionConnections,
-          connections, PortConnectionFamily.appendThreeRight,
-          PortConnectionFamily.append, forwardConnections, forwardConnection,
-          PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
-          PortConnection.endpointPort] at hLabel
-    · cases port <;> cases endpoint
+        simp only [crowRegressionForward_left_embedding,
+          crowRegressionForward_right_embedding] at hChannel
+        cases port <;>
+          simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
+            crowRegressionForwardArcChannel, crowRegressionChannel] at hChannel
+    · rcases local with mode | mode <;> cases mode
       all_goals
-        have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
-        simp [crowRegressionExternalAmbientChannel, crowRegressionConnections,
-          connections, PortConnectionFamily.appendThreeRight,
-          PortConnectionFamily.append, returnConnections, returnConnection,
-          PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
-          PortConnection.endpointPort] at hLabel
+        simp only [crowRegressionReturn_left_embedding,
+          crowRegressionReturn_right_embedding] at hChannel
+        cases port <;>
+          simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
+            crowRegressionReturnArcChannel, crowRegressionChannel] at hChannel
 
 /-- One typed external channel at the concrete CROW boundary. -/
 def crowRegressionExternalChannel (port : CrowRegressionExternalPort) :
