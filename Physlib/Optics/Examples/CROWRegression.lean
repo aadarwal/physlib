@@ -805,6 +805,15 @@ lemma crowRegression_incidentAssembly :
       ModeAmplitude.directSum_apply_inr, crowRegressionInput,
       ModeAmplitude.restrictEmbedding_apply]
 
+/-- The exact primitive state projects to a member of the flat CROW relation. -/
+lemma crowRegression_mem_behavior :
+    (crowRegressionInput, crowRegressionOutput) ∈
+      (netlist crowRegressionParameters).behavior := by
+  rw [(netlist crowRegressionParameters).mem_behavior_iff_componentBehavior]
+  refine ⟨crowRegressionIncident, crowRegressionOutgoing,
+    crowRegression_mem_componentBehavior, crowRegression_incidentAssembly, ?_⟩
+  rfl
+
 /-!
 ## D. Compiled response and negative controls
 -/
