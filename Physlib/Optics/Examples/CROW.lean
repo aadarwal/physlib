@@ -496,6 +496,25 @@ noncomputable instance externalChannelFintype {ringCount : ℕ}
   classical
   infer_instance
 
+/-- The hierarchy's flattened ambient channel family is finite. -/
+noncomputable instance hierarchyFlattenChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).flatten.Channel := by
+  change Fintype (components p).aggregatePortModeFamily.Channel
+  exact componentsChannelFintype p
+
+/-- The hierarchy's inner netlist has finite right-interface connected channels. -/
+noncomputable instance hierarchyInnerConnectedChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) :
+    Fintype (hierarchy p).innerNetlist.ConnectedChannel := by
+  change Fintype (rightConnections p).Channel
+  exact rightChannelFintype p
+
+/-- The hierarchy's outer two-stage connection family has finite channels. -/
+noncomputable instance hierarchyOuterChannelFintype {ringCount : ℕ}
+    (p : Parameters ringCount) : Fintype (hierarchy p).outer.Channel := by
+  change Fintype ((forwardConnections p).append (returnConnections p)).Channel
+  exact outerChannelFintype p
+
 /-!
 ## D. Generic cross-semantics instantiation
 -/
