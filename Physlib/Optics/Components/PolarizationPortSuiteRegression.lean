@@ -269,7 +269,7 @@ instance : Fintype PhysicalPortSuite9bComponent where
     cases component <;> simp
 
 /-- The owned port family selected by each Phase 9b component. -/
-def physicalPortSuite9bPortFamily : PhysicalPortSuite9bComponent → PortModeFamily
+abbrev physicalPortSuite9bPortFamily : PhysicalPortSuite9bComponent → PortModeFamily
   | .polarization => JonesMatrix.portFamily
   | .interface => PlanarDielectricInterface.portFamily
 
