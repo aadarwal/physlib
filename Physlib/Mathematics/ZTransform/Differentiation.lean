@@ -5,7 +5,6 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Mathlib.Analysis.Asymptotics.Lemmas
 public import Mathlib.Analysis.Calculus.Deriv.ZPow
 public import Mathlib.Analysis.Calculus.SmoothSeries
 public import Physlib.Mathematics.ZTransform.Convergence
