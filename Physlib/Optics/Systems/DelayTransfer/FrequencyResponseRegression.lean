@@ -238,7 +238,7 @@ lemma allPassRationalNetlist_frequency_eq_reciprocalZ_quadrature_entry :
     (allPassRationalNetlist
       allPassRationalQuadratureParameters).response_reciprocalZ_reindex_of_evaluation_eq
         allPassRationalNetlistReciprocalZQuadratureDomain
-        zInverseEvaluation_quadrature allPassRationalQuadratureDomain
+        zInverseEvaluationOnReciprocalZ_quadrature allPassRationalQuadratureDomain
   have hEntry := congrArg
     (fun response => response
       (Outgoing.mk (allPassRationalFormalThroughChannel
