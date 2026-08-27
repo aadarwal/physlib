@@ -135,6 +135,14 @@ The only change in the child after the gated source is this replacement `HANDOFF
 - `./scripts/lint-style.sh`: pass.
 - `git diff --check`: pass.
 
+## Verbatim ledger row
+
+`PARITY-LEDGER.md` @ `054b294fbaf2d7769aa570fae9c6aa5c0b2b8da7`:
+
+```text
+| ZT-06 | ITP'14 Defs. 11–13 + Thms. 12–13 p. 494–496: IIR model, causality condition, `IIR_ROC` (ROC minus poles), transfer function, frequency response | **PARTIAL — and the split matters.** Covered: `transferFunction` (`Physlib/Mathematics/ZTransform/DifferenceEquation.lean:273` @ `110eb5cd`), `iirROC` (`:278`, the ROC intersection minus denominator zeros), and the IIR transfer law `transform_eq_transferFunction_mul` (`:283`) with its ROC-membership form `…_of_mem_iirROC` (`:292`). **NOT covered: Thm. 13, the IIR frequency response at `z = e^{jω}` with its magnitude/argument decomposition — there is no such declaration in the generic `ZTransform` layer.** A `frequencyResponse` DOES exist at `Physlib/Optics/Systems/DelayTransfer/FrequencyResponse.lean`, but that is the optics delay-transfer object of **IP-64** (`q = e^{−sτ} = z⁻¹`), a different construction at a different layer; **matching it to ITP'14 Thm. 13 on the strength of the name would be exactly the cross-layer confusion this ledger exists to prevent** — **on `optics/development` @ `110eb5cd`** | `HD α_lst = 0` structural constraint; `z = e^{jω}` for frequency response | Retained all four hypotheses of Thm. 12 | **PARTIALLY proved and GATED on `optics/development` @ `110eb5cd`** — Defs. 11–13 and Thm. 12 discharged; **Thm. 13 (frequency response) still WITHHELD**. Regression **T-04**. **INTEGRITY NOTE — this row was STALE and is corrected 2026-08-27.** It read *"TBD — not yet formalized"* while its target already existed. Found by A7's regression index, verified here against the tree, and cited at `110eb5cd`. **It went stale invisibly:** `tools/sweep.py` exempts any row whose lean cell contains `TBD` from the location-ref check, so no check was ever looking at it — the exemption is now reported rather than silent. **S8 TRIAGE 2026-08-27 — OPEN**, smallest named slice: named in the triage. Implementation proceeds on the S8 lane in the triage's §8 order. | parity |
+```
+
 ## Milestone
 
 ITP'14 Thm. 13 IIR frequency-response identity added; ZT-06 moves PARTIAL -> discharged on merge.
