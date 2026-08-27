@@ -563,7 +563,7 @@ The conjuncts respectively use the primitive causal recurrence, generic reciproc
 the eight raw N5 equations, and the complete eleven-branch Mason enumeration.
 -/
 lemma zRegression_stable_independent_nonzeroLoop_I :
-      transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
+    transform (causalOutput stableUnitDelayParameters unitImpulse) Complex.I =
         -(7 / 8) * Complex.I ∧
       rationalZEliminationResponse stableUnitDelayParameters imaginaryUnitReciprocalZCoordinate
           stable_I_mem_reciprocalZResponseDomain = -(7 / 8) * Complex.I ∧
