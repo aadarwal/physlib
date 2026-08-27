@@ -364,8 +364,8 @@ time-reversal realization.
 
 The four predicates are supplied by a component because neutral channel labels contain no carrier,
 frame, stored plane point, or modal normalization data. Under C-07, a concrete frame-transport
-predicate records `(e₀, e₁, k) ↦ (e₀, -e₁, -k)` and Jones conjugation, including any
-component-owned orthogonal sign correction.
+predicate records `(e₀, e₁, k) ↦ (e₀, -e₁, -k)` and
+`(J₀, J₁) ↦ (conj J₀, -conj J₁)`, including any component-owned orthogonal sign correction.
 -/
 structure TimeReversalRealization {channel : Type u} (pairing : ChannelPairing channel)
     (SameTransverseMode SameReferencePlane EqualPowerNormalization ExactFrameTransport :
