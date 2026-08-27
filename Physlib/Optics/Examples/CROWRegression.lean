@@ -732,6 +732,126 @@ lemma crowRegression_coupler_equations (interface : Fin 3)
   change _ = _ at hRightFirst hRightSecond hLeftFirst hLeftSecond
   exact ⟨hRightFirst, hRightSecond, hLeftFirst, hLeftSecond⟩
 
+/-- A global scattering equation exposes both primitive equations on one forward half-arc. -/
+lemma crowRegression_forwardArc_equations (ring : Fin 2)
+    (incident : ModeAmplitude (netlist crowRegressionParameters).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist crowRegressionParameters).OutgoingIndex)
+    (hScattering : outgoing =
+      (netlist crowRegressionParameters).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk (crowRegressionForwardArcChannel ring .right)) =
+        MatchedPropagation.transmissionCoefficient
+            (crowRegressionParameters.forwardArc ring) *
+          incident (Incident.mk (crowRegressionForwardArcChannel ring .left)) ∧
+      outgoing (Outgoing.mk (crowRegressionForwardArcChannel ring .left)) =
+        MatchedPropagation.transmissionCoefficient
+            (crowRegressionParameters.forwardArc ring) *
+          incident (Incident.mk (crowRegressionForwardArcChannel ring .right)) := by
+  classical
+  let componentFintype : Fintype
+      (netlist crowRegressionParameters).components.Component := by
+    change Fintype (Component 2)
+    infer_instance
+  let _ : Fintype (netlist crowRegressionParameters).components.Component :=
+    componentFintype
+  let localFintype
+      (component : (netlist crowRegressionParameters).components.Component) :
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel := by
+    change Fintype (componentPortFamily component).Channel
+    exact localChannelFintype component
+  let _ : ∀ component : (netlist crowRegressionParameters).components.Component,
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel :=
+    localFintype
+  have hMember : (incident, outgoing) ∈
+      (netlist crowRegressionParameters).componentBehavior :=
+    ((netlist crowRegressionParameters).mem_componentBehavior_iff incident outgoing).mpr
+      hScattering
+  have hLocal :=
+    ((netlist crowRegressionParameters).mem_componentBehavior_iff_forall_component
+      incident outgoing).mp hMember (.forwardArc ring)
+  change
+    (incident.restrictEmbedding
+          (Incident.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.forwardArc ring))),
+      outgoing.restrictEmbedding
+          (Outgoing.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.forwardArc ring)))) ∈
+        (MatchedPropagation.physicalScattering
+          (crowRegressionParameters.forwardArc ring) Unit).toOrientedModeTransform.toBehavior
+    at hLocal
+  rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior] at hLocal
+  have hRaw :=
+    (MatchedPropagation.mem_physicalBehavior_iff
+      (crowRegressionParameters.forwardArc ring) _ _).mp hLocal
+  rw [MatchedPropagation.mem_behavior_iff] at hRaw
+  have hRight := congrArg
+    (fun amplitude => amplitude (Sum.inr (Outgoing.mk ()))) hRaw
+  have hLeft := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk ()))) hRaw
+  change _ = _ at hRight hLeft
+  exact ⟨hRight, hLeft⟩
+
+/-- A global scattering equation exposes both primitive equations on one return half-arc. -/
+lemma crowRegression_returnArc_equations (ring : Fin 2)
+    (incident : ModeAmplitude (netlist crowRegressionParameters).IncidentIndex)
+    (outgoing : ModeAmplitude (netlist crowRegressionParameters).OutgoingIndex)
+    (hScattering : outgoing =
+      (netlist crowRegressionParameters).scatteringTransform.toLinearMap incident) :
+    outgoing (Outgoing.mk (crowRegressionReturnArcChannel ring .right)) =
+        MatchedPropagation.transmissionCoefficient
+            (crowRegressionParameters.returnArc ring) *
+          incident (Incident.mk (crowRegressionReturnArcChannel ring .left)) ∧
+      outgoing (Outgoing.mk (crowRegressionReturnArcChannel ring .left)) =
+        MatchedPropagation.transmissionCoefficient
+            (crowRegressionParameters.returnArc ring) *
+          incident (Incident.mk (crowRegressionReturnArcChannel ring .right)) := by
+  classical
+  let componentFintype : Fintype
+      (netlist crowRegressionParameters).components.Component := by
+    change Fintype (Component 2)
+    infer_instance
+  let _ : Fintype (netlist crowRegressionParameters).components.Component :=
+    componentFintype
+  let localFintype
+      (component : (netlist crowRegressionParameters).components.Component) :
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel := by
+    change Fintype (componentPortFamily component).Channel
+    exact localChannelFintype component
+  let _ : ∀ component : (netlist crowRegressionParameters).components.Component,
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel :=
+    localFintype
+  have hMember : (incident, outgoing) ∈
+      (netlist crowRegressionParameters).componentBehavior :=
+    ((netlist crowRegressionParameters).mem_componentBehavior_iff incident outgoing).mpr
+      hScattering
+  have hLocal :=
+    ((netlist crowRegressionParameters).mem_componentBehavior_iff_forall_component
+      incident outgoing).mp hMember (.returnArc ring)
+  change
+    (incident.restrictEmbedding
+          (Incident.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.returnArc ring))),
+      outgoing.restrictEmbedding
+          (Outgoing.relabelEmbedding
+            ((components crowRegressionParameters).componentChannelEmbedding
+              (.returnArc ring)))) ∈
+        (MatchedPropagation.physicalScattering
+          (crowRegressionParameters.returnArc ring) Unit).toOrientedModeTransform.toBehavior
+    at hLocal
+  rw [MatchedPropagation.physicalScattering_realizes_physicalBehavior] at hLocal
+  have hRaw :=
+    (MatchedPropagation.mem_physicalBehavior_iff
+      (crowRegressionParameters.returnArc ring) _ _).mp hLocal
+  rw [MatchedPropagation.mem_behavior_iff] at hRaw
+  have hRight := congrArg
+    (fun amplitude => amplitude (Sum.inr (Outgoing.mk ()))) hRaw
+  have hLeft := congrArg
+    (fun amplitude => amplitude (Sum.inl (Outgoing.mk ()))) hRaw
+  change _ = _ at hRight hLeft
+  exact ⟨hRight, hLeft⟩
+
 /-- The eight homogeneous channel equations in either travel direction have only the zero state. -/
 lemma crowRegression_chainCoordinates_eq_zero
     (returnEnd launchEnd launchMiddle returnMiddle launchNext outputEnd returnNext returnLink : ℂ)
