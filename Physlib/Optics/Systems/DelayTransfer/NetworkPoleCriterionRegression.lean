@@ -780,6 +780,63 @@ lemma visiblePole_responseDenominator :
   rw [visiblePole_responseDenominator_mv]
   simp [oneDelayPolynomialEquiv, visiblePoleDenominatorPolynomial]
 
+/-!
+
+## D. Independent visible-pole anchor
+
+-/
+
+/-- The retained numerator is a nonzero formal polynomial. -/
+lemma visiblePoleNumeratorPolynomial_ne_zero : visiblePoleNumeratorPolynomial ≠ 0 := by
+  intro hZero
+  have hEval := congrArg (Polynomial.eval 0) hZero
+  norm_num [visiblePoleNumeratorPolynomial] at hEval
+
+/-- The retained denominator is a nonzero formal polynomial. -/
+lemma visiblePoleDenominatorPolynomial_ne_zero : visiblePoleDenominatorPolynomial ≠ 0 := by
+  intro hZero
+  have hEval := congrArg (Polynomial.eval 0) hZero
+  norm_num [visiblePoleDenominatorPolynomial] at hEval
+
+/-- The visible fixture numerator and denominator are coprime by an explicit Bézout identity. -/
+lemma visiblePolePolynomials_isCoprime :
+    IsCoprime visiblePoleNumeratorPolynomial visiblePoleDenominatorPolynomial := by
+  refine ⟨Polynomial.C (-15 / 16), Polynomial.C (25 / 16), ?_⟩
+  ext degree
+  rcases degree with _ | _ | degree
+  · norm_num [visiblePoleNumeratorPolynomial, visiblePoleDenominatorPolynomial]
+  · norm_num [visiblePoleNumeratorPolynomial, visiblePoleDenominatorPolynomial,
+      Polynomial.coeff_one]
+  · simp [visiblePoleNumeratorPolynomial, visiblePoleDenominatorPolynomial,
+      Polynomial.coeff_one]
+
+/-- The selected quotient is already reduced: its cancelled factor is one. -/
+def visiblePoleReducedResponse : ReducedRationalResponse where
+  numerator := visiblePoleNumeratorPolynomial
+  denominator := visiblePoleDenominatorPolynomial
+  numerator_ne_zero := visiblePoleNumeratorPolynomial_ne_zero
+  denominator_ne_zero := visiblePoleDenominatorPolynomial_ne_zero
+  isCoprime := visiblePolePolynomials_isCoprime
+
+/-- The explicit unit-factor reduction of the selected raw network quotient. -/
+def visiblePoleReduction : RationalReduction where
+  rawNumerator := visiblePoleNumeratorPolynomial
+  rawDenominator := visiblePoleDenominatorPolynomial
+  cancelledFactor := 1
+  reduced := visiblePoleReducedResponse
+  cancelledFactor_ne_zero := one_ne_zero
+  rawNumerator_eq := by simp [visiblePoleReducedResponse]
+  rawDenominator_eq := by simp [visiblePoleReducedResponse]
+
+/-- The selected external response entry is certified by the independently expanded reduction. -/
+def visiblePoleCertificate : OneDelayNetworkResponseReduction visiblePoleNetlist
+    (Outgoing.mk visiblePoleExternalChannel) (Incident.mk visiblePoleExternalChannel) where
+  reduction := visiblePoleReduction
+  rawNumerator_eq := by
+    simpa [visiblePoleReduction] using visiblePole_responseNumerator.symm
+  rawDenominator_eq := by
+    simpa [visiblePoleReduction] using visiblePole_responseDenominator.symm
+
 end
 
 end Optics.DelayTransfer
