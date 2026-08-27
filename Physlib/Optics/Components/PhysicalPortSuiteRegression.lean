@@ -1138,17 +1138,21 @@ lemma physicalPortSuite9b_indexed_action :
   have hBlock := ModeTransform.blockDiagonal'_apply
     (fun selected => (physicalPortSuite9bScattering selected).toModeTransform)
     physicalPortSuite9bIndexedInput component channel
-  rw [hBlock]
-  cases component
-  · rw [physicalPortSuite9bIndexedInput_restrict_polarization,
-      physicalPortSuite9b_polarization_local_action]
-    rcases channel with ⟨port, coordinate⟩
-    cases port
-    rfl
-  · rw [physicalPortSuite9bIndexedInput_restrict_interface,
-      physicalPortSuite9b_interface_local_action]
-    rcases channel with ⟨port, mode⟩
-    cases port <;> cases mode <;> rfl
+  calc
+    _ = (physicalPortSuite9bScattering component).toModeTransform.toLinearMap
+        (physicalPortSuite9bIndexedInput.restrictEmbedding
+          (Function.Embedding.sigmaMk component)) channel := hBlock
+    _ = _ := by
+      cases component
+      · rw [physicalPortSuite9bIndexedInput_restrict_polarization,
+          physicalPortSuite9b_polarization_local_action]
+        rcases channel with ⟨port, coordinate⟩
+        cases port
+        rfl
+      · rw [physicalPortSuite9bIndexedInput_restrict_interface,
+          physicalPortSuite9b_interface_local_action]
+        rcases channel with ⟨port, mode⟩
+        cases port <;> cases mode <;> rfl
 
 /-- The mixed input in aggregate component-owned physical-channel coordinates. -/
 def physicalPortSuite9bAggregateInput :
@@ -1298,28 +1302,36 @@ lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
     physicalPortSuite9bIndexedInput PhysicalPortSuite9bComponent.interface
       ⟨PlanarDielectricInterface.Port.negativeSide,
         PlanarDielectricInterface.PolarizationMode.s⟩
-  rw [hBlock, physicalPortSuite9bIndexedInput_restrict_interface,
-    physicalPortSuite9b_hostile_interface_local_action]
-  change physicalPortSuite9bInterfaceRawOutput
-      (PlanarDielectricInterface.channelEquiv.symm
-        (physicalPortSuite9bInterfaceNegativePolarizationSwap.symm
-          ⟨PlanarDielectricInterface.Port.negativeSide,
-            PlanarDielectricInterface.PolarizationMode.s⟩)) = _
-  have hSwap :
-      physicalPortSuite9bInterfaceNegativePolarizationSwap.symm
-          ⟨PlanarDielectricInterface.Port.negativeSide,
-            PlanarDielectricInterface.PolarizationMode.s⟩ =
+  calc
+    _ = (physicalPortSuite9bHostileScattering
+          PhysicalPortSuite9bComponent.interface).toModeTransform.toLinearMap
+        (physicalPortSuite9bIndexedInput.restrictEmbedding
+          (Function.Embedding.sigmaMk PhysicalPortSuite9bComponent.interface))
         ⟨PlanarDielectricInterface.Port.negativeSide,
-          PlanarDielectricInterface.PolarizationMode.p⟩ := by
-    rfl
-  have hChannel :
-      PlanarDielectricInterface.channelEquiv.symm
-          ⟨PlanarDielectricInterface.Port.negativeSide,
-            PlanarDielectricInterface.PolarizationMode.p⟩ =
-        Sum.inr 0 := by
-    rfl
-  rw [hSwap, hChannel]
-  rfl
+          PlanarDielectricInterface.PolarizationMode.s⟩ := hBlock
+    _ = _ := by
+      rw [physicalPortSuite9bIndexedInput_restrict_interface,
+        physicalPortSuite9b_hostile_interface_local_action]
+      change physicalPortSuite9bInterfaceRawOutput
+          (PlanarDielectricInterface.channelEquiv.symm
+            (physicalPortSuite9bInterfaceNegativePolarizationSwap.symm
+              ⟨PlanarDielectricInterface.Port.negativeSide,
+                PlanarDielectricInterface.PolarizationMode.s⟩)) = _
+      have hSwap :
+          physicalPortSuite9bInterfaceNegativePolarizationSwap.symm
+              ⟨PlanarDielectricInterface.Port.negativeSide,
+                PlanarDielectricInterface.PolarizationMode.s⟩ =
+            ⟨PlanarDielectricInterface.Port.negativeSide,
+              PlanarDielectricInterface.PolarizationMode.p⟩ := by
+        rfl
+      have hChannel :
+          PlanarDielectricInterface.channelEquiv.symm
+              ⟨PlanarDielectricInterface.Port.negativeSide,
+                PlanarDielectricInterface.PolarizationMode.p⟩ =
+            Sum.inr 0 := by
+        rfl
+      rw [hSwap, hChannel]
+      rfl
 
 /-- Swapping one owned side's polarization fiber changes the mixed-family output. -/
 lemma physicalPortSuite9b_hostile_action_ne :
