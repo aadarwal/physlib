@@ -217,9 +217,20 @@ lemma crowRegression_mem_componentBehavior :
     (crowRegressionIncident, crowRegressionOutgoing) ∈
       (netlist crowRegressionParameters).componentBehavior := by
   classical
-  letI : Fintype (netlist crowRegressionParameters).components.Component := by
+  let componentFintype : Fintype
+      (netlist crowRegressionParameters).components.Component := by
     change Fintype (Component 2)
     infer_instance
+  let _ : Fintype (netlist crowRegressionParameters).components.Component :=
+    componentFintype
+  let localFintype
+      (component : (netlist crowRegressionParameters).components.Component) :
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel := by
+    change Fintype (componentPortFamily component).Channel
+    exact localChannelFintype component
+  let _ : ∀ component : (netlist crowRegressionParameters).components.Component,
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel :=
+    localFintype
   apply ((netlist crowRegressionParameters).mem_componentBehavior_iff_forall_component
     crowRegressionIncident crowRegressionOutgoing).2
   intro component
