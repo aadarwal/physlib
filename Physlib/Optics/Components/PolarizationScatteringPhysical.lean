@@ -18,15 +18,17 @@ owns one aperture port with the existing two Jones coordinates as its mode fiber
 pins coordinate `0` and coordinate `1` to that owned port without assigning new polarization
 names or changing the registered Jones convention.
 
-The behavior transports `JonesMatrix.act` through incident and outgoing endpoint wrappers. The
-scattering adapter stores the same registered Jones entries and is proved to realize that behavior
-exactly. `componentFamily` is a direct singleton `ScatteringComponentFamily`, so no downstream
-caller supplies a post-hoc port identification.
+The behavior transports `JonesMatrix.act` (`Polarization/Basic.lean:390-396`) through incident and
+outgoing endpoint wrappers. The scattering adapter stores the same registered Jones entries and is
+proved to realize that behavior exactly. `componentFamily` is a direct singleton
+`ScatteringComponentFamily`, so no downstream caller supplies a post-hoc port identification.
 
-Physlib uses the positive-time phasor convention recorded by `Phasor.realize`. In the registered
-Jones basis, `JonesVector.plusIQuadrature` is the right-circular state under the receiver/optics
-handedness convention. The package does not alter that convention or manufacture a propagation
-direction from Jones data.
+Physlib's `Phasor.realize` is the positive-time convention
+`Re (z exp (I * carrierPhase))` (`Polarization/Basic.lean:66-70`). The registered
+`JonesVector.plusIQuadrature` has second component `I` times the first
+(`Polarization/Basic.lean:363-367`). Under the binding C-02 receiver/optics observer convention it
+is the right-circular state. This package adds no handedness alias, alters no convention, and
+manufactures no propagation direction from Jones data.
 
 ## ii. Key results
 

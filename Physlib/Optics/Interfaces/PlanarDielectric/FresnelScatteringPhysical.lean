@@ -16,18 +16,19 @@ public import Physlib.Optics.Network.ScatteringComponentFamily
 This file gives the registered s- and p-polarized Fresnel kernels two component-owned side ports.
 Each port carries distinct `s` and `p` modes. `channelEquiv` pins the raw kernel ordering: the left
 summand is s polarization, the right summand is p polarization, and coordinate `0`/`1` is the
-negative/positive side. The two registered kernels are combined only by block-diagonal parallel
-composition and then transported to these owned channels.
+negative/positive side. This is the ordering declared by
+`FresnelScattering.lean:83-95,145-161`. The two registered kernels are combined only by
+block-diagonal parallel composition and then transported to these owned channels.
 
 The angle convention is the one already fixed in `AngularGeometry.lean`: incident and transmitted
 angles are measured from the positive-side normal (`AngularGeometry.lean:88-89,105-106`), while
 the reflected angle is measured from the negative-side normal (`AngularGeometry.lean:97-98`). The
 present algebraic kernel carries only `chi_i` and `chi_t`; it does not redefine those angles.
 
-The p entries use Physlib's fork-declared full-electric-vector convention. At normal incidence
-`r_p = -r_s` and `t_p = t_s`; some literature instead orients the reflected p basis so the
-reflection signs agree. This package preserves the registered full-vector coefficients and does
-not force a cross-convention match.
+The p entries use Physlib's fork-declared full-electric-vector convention
+(`FresnelAmplitude.lean:135-149`). At normal incidence `r_p = -r_s` and `t_p = t_s`; some
+literature instead orients the reflected p basis so the reflection signs agree. This package
+preserves the registered full-vector coefficients and does not force a cross-convention match.
 
 ## ii. Key results
 
