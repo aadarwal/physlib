@@ -174,6 +174,33 @@ def crowRegressionReturnArcChannel (ring : Fin 2) (port : MatchedPropagation.Por
     CrowRegressionChannel :=
   crowRegressionChannel (.returnArc ring) ⟨port, ()⟩
 
+/-- The explicit port label underlying a concrete coupler channel. -/
+@[simp]
+lemma portLabelEquiv_crowRegressionCouplerChannel (interface : Fin 3)
+    (port : DirectionalCoupler.Port) :
+    portLabelEquiv crowRegressionParameters
+        (crowRegressionCouplerChannel interface port).1 =
+      .coupler interface port := by
+  rfl
+
+/-- The explicit port label underlying a concrete forward half-arc channel. -/
+@[simp]
+lemma portLabelEquiv_crowRegressionForwardArcChannel (ring : Fin 2)
+    (port : MatchedPropagation.Port) :
+    portLabelEquiv crowRegressionParameters
+        (crowRegressionForwardArcChannel ring port).1 =
+      .forwardArc ring port := by
+  rfl
+
+/-- The explicit port label underlying a concrete return half-arc channel. -/
+@[simp]
+lemma portLabelEquiv_crowRegressionReturnArcChannel (ring : Fin 2)
+    (port : MatchedPropagation.Port) :
+    portLabelEquiv crowRegressionParameters
+        (crowRegressionReturnArcChannel ring port).1 =
+      .returnArc ring port := by
+  rfl
+
 /-- The concrete flat connection family. -/
 abbrev crowRegressionConnections := (netlist crowRegressionParameters).connections
 
@@ -340,9 +367,7 @@ lemma crowRegressionExternalAmbientChannel_not_connected
       have hLabel := congrArg
         (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
       cases port <;>
-        simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
-          crowRegressionForwardArcChannel, crowRegressionReturnArcChannel,
-          crowRegressionChannel, couplerPort, forwardArcPort, returnArcPort] at hLabel
+        simp [crowRegressionExternalAmbientChannel] at hLabel
   · rcases forwardOrReturn with forwardIndex | returnIndex
     · rcases localChannel with mode | mode <;> cases mode
       all_goals
@@ -357,9 +382,7 @@ lemma crowRegressionExternalAmbientChannel_not_connected
         have hLabel := congrArg
           (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
         cases port <;>
-          simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
-            crowRegressionForwardArcChannel, crowRegressionChannel, couplerPort,
-            forwardArcPort] at hLabel
+          simp [crowRegressionExternalAmbientChannel] at hLabel
     · rcases localChannel with mode | mode <;> cases mode
       all_goals
         first
@@ -373,9 +396,7 @@ lemma crowRegressionExternalAmbientChannel_not_connected
         have hLabel := congrArg
           (fun channel => portLabelEquiv crowRegressionParameters channel.1) hChannel
         cases port <;>
-          simp [crowRegressionExternalAmbientChannel, crowRegressionCouplerChannel,
-            crowRegressionReturnArcChannel, crowRegressionChannel, couplerPort,
-            returnArcPort] at hLabel
+          simp [crowRegressionExternalAmbientChannel] at hLabel
 
 /-- One typed external channel at the concrete CROW boundary. -/
 def crowRegressionExternalChannel (port : CrowRegressionExternalPort) :
