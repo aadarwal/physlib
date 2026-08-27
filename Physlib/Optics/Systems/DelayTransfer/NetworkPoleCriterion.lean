@@ -20,9 +20,9 @@ cleared internal determinant. Its reduced denominator roots are consequently act
 selected formal response.
 
 At a delay value where every retained component entry is regular, a root of the cleared internal
-determinant is exactly failure of the N5F solve gate. Such a candidate root is an actual pole
-precisely when the certificate's explicitly removed factor does not vanish there. This is a
-pointwise no-cancellation criterion, not a reachability or observability test.
+determinant is exactly failure of the N5F solve gate. If the certificate's removed factor does not
+vanish there, candidate-root and actual-pole membership agree. This is an explicit sufficient
+pointwise no-cancellation condition, not a necessary condition or a reachability/observability test.
 
 ## ii. Key results
 
