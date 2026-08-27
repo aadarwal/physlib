@@ -680,6 +680,21 @@ lemma crowRegression_coupler_equations (interface : Fin 3)
             incident (Incident.mk (crowRegressionCouplerChannel interface .rightFirst)) +
           (crowRegressionParameters.coupler interface).throughAmplitude *
             incident (Incident.mk (crowRegressionCouplerChannel interface .rightSecond)) := by
+  classical
+  let componentFintype : Fintype
+      (netlist crowRegressionParameters).components.Component := by
+    change Fintype (Component 2)
+    infer_instance
+  let _ : Fintype (netlist crowRegressionParameters).components.Component :=
+    componentFintype
+  let localFintype
+      (component : (netlist crowRegressionParameters).components.Component) :
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel := by
+    change Fintype (componentPortFamily component).Channel
+    exact localChannelFintype component
+  let _ : ∀ component : (netlist crowRegressionParameters).components.Component,
+      Fintype ((netlist crowRegressionParameters).components.portFamily component).Channel :=
+    localFintype
   have hMember : (incident, outgoing) ∈
       (netlist crowRegressionParameters).componentBehavior :=
     ((netlist crowRegressionParameters).mem_componentBehavior_iff incident outgoing).mpr
