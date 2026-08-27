@@ -385,10 +385,10 @@ public import Physlib.Optics.Network.ConnectionFamilyTransport
 public import Physlib.Optics.Network.ConnectionRoutingRephase
 public import Physlib.Optics.Network.Conservation
 public import Physlib.Optics.Network.ConservationRegression
-public import Physlib.Optics.Network.ExternalChannel
-public import Physlib.Optics.Network.ExternalChannelRegression
 public import Physlib.Optics.Network.ExactReferences
 public import Physlib.Optics.Network.ExactReferencesRegression
+public import Physlib.Optics.Network.ExternalChannel
+public import Physlib.Optics.Network.ExternalChannelRegression
 public import Physlib.Optics.Network.FlatNetlist
 public import Physlib.Optics.Network.FlatNetlistElimination
 public import Physlib.Optics.Network.FlatNetlistEliminationRegression
@@ -420,10 +420,10 @@ public import Physlib.Optics.Network.PartialRouting
 public import Physlib.Optics.Network.PartialRoutingRegression
 public import Physlib.Optics.Network.Port
 public import Physlib.Optics.Network.PortRegression
-public import Physlib.Optics.Network.RectangularBehavior
-public import Physlib.Optics.Network.RectangularBehaviorRegression
 public import Physlib.Optics.Network.Reciprocity
 public import Physlib.Optics.Network.ReciprocityRegression
+public import Physlib.Optics.Network.RectangularBehavior
+public import Physlib.Optics.Network.RectangularBehaviorRegression
 public import Physlib.Optics.Network.ScatteringComponentFamily
 public import Physlib.Optics.Network.ScatteringComponentFamilyRegression
 public import Physlib.Optics.Network.TwoPortBehavior
