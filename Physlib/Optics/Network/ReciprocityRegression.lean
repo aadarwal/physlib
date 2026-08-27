@@ -27,6 +27,12 @@ expansion gives the symmetric matrix `!![-1, 1; 1, -1]`. This positive sentinel 
 general characterization from being weakened to nominal pairing or only the designated
 inverse-paired gauge.
 
+The remaining fixtures enforce the convention registry at the algebraic structure level. A toy
+four-predicate realization accepts the swap pairing and refuses the nominal pairing. A wrong-sign
+reference-plane gauge changes `-I` to `I`. Finally, a raw-symmetric matrix fails paired symmetry,
+while a Hermitian matrix fails transpose symmetry. These are finite sentinels, not physical
+component instances.
+
 ## ii. Key results
 
 - `reciprocityRegression_s15_sameLabel_offDiagonal_ne`: the explicit `-1 != 1` witness.
@@ -36,6 +42,10 @@ inverse-paired gauge.
 - `reciprocityRegression_s16_pairingFactor`: the same-label factor is constantly `-1`.
 - `reciprocityRegression_s16_matrix`: the direct nonidentity-pairing expansion.
 - `reciprocityRegression_s16_isReciprocal`: S-16 must pass.
+- `reciprocityRegression_nominal_not_timeReversalRealization`: a wrong toy pairing is refused.
+- `reciprocityRegression_s15_wrongSign_not_reciprocal`: a wrong shift sign is refused.
+- `reciprocityRegression_rawSymmetric_not_reciprocal`: raw symmetry is insufficient.
+- `reciprocityRegression_hermitian_not_reciprocal`: conjugate symmetry is insufficient.
 
 ## iii. Table of contents
 
@@ -43,6 +53,9 @@ inverse-paired gauge.
 - B. All-ones paired scattering fixture
 - C. S-15 failure and pairing-aware restoration
 - D. S-16 constant-factor preservation
+- E. Structure-level time-reversal pairing sentinel
+- F. Wrong-sign reference-plane sentinel
+- G. Raw-symmetry and conjugate-symmetry sentinels
 
 ## iv. References
 
@@ -56,6 +69,11 @@ is not time reversal. The fixtures make no losslessness, passivity, raw Jones or
 reverse-incidence Maxwell, component, propagation-distance, delay, electromagnetic-power,
 measurement, or physical-realization claim. A reference-plane shift remains distinct from
 `PortConnectionFamily.IsMatchedGauge`.
+
+C-07 is enforced here only for the abstract proof-bearing structure using explicitly toy
+predicates. Supplying physical component instances remains N6b's obligation. C-08 and C-09 are
+enforced only as the algebraic reference-plane and paired-transpose conventions represented by
+the concrete fixtures below.
 -/
 
 @[expose] public section
@@ -109,6 +127,10 @@ def reciprocityRegressionS15SameLabelOutgoing : ModePhaseGauge (Fin 2) :=
 def reciprocityRegressionS15RestoringOutgoing : ModePhaseGauge (Fin 2) :=
   ![reciprocityRegressionNegI, (1 : Circle)]
 
+/-- The wrong-sign output gauge is `I` and `1` after transport through the swap pairing. -/
+def reciprocityRegressionS15WrongSignOutgoing : ModePhaseGauge (Fin 2) :=
+  ![reciprocityRegressionI, (1 : Circle)]
+
 /-- S-16 uses the same-label phases `1` and `-1` on both legs. -/
 def reciprocityRegressionS16Gauge : ModePhaseGauge (Fin 2) :=
   ![(1 : Circle), reciprocityRegressionNegOne]
@@ -142,6 +164,16 @@ lemma reciprocityRegressionS15RestoringOutgoing_zero :
 @[simp]
 lemma reciprocityRegressionS15RestoringOutgoing_one :
     reciprocityRegressionS15RestoringOutgoing 1 = 1 := rfl
+
+/-- The wrong-sign output gauge has phase `I` at coordinate zero. -/
+@[simp]
+lemma reciprocityRegressionS15WrongSignOutgoing_zero :
+    reciprocityRegressionS15WrongSignOutgoing 0 = reciprocityRegressionI := rfl
+
+/-- The wrong-sign output gauge has phase one at coordinate one. -/
+@[simp]
+lemma reciprocityRegressionS15WrongSignOutgoing_one :
+    reciprocityRegressionS15WrongSignOutgoing 1 = 1 := rfl
 
 /-- S-16 coordinate zero has phase one. -/
 @[simp]
@@ -295,6 +327,167 @@ lemma reciprocityRegression_s16_isReciprocal :
   apply Matrix.IsSymm.ext
   intro first second
   fin_cases first <;> fin_cases second <;> rfl
+
+/-!
+## E. Structure-level time-reversal pairing sentinel
+-/
+
+/-- Toy transverse-mode matching requires the direction-reversing swap.
+
+This predicate is a regression fixture and carries no component or physical-mode claim.
+-/
+def reciprocityRegressionToySameTransverseMode (incident : Incident (Fin 2))
+    (outgoing : Outgoing (Fin 2)) : Prop :=
+  outgoing.channel = (Equiv.swap (0 : Fin 2) 1) incident.channel
+
+/-- Toy plane matching pins the complementary finite labels.
+
+This predicate is a regression fixture and carries no reference-plane geometry.
+-/
+def reciprocityRegressionToySameReferencePlane (incident : Incident (Fin 2))
+    (outgoing : Outgoing (Fin 2)) : Prop :=
+  outgoing.channel.val + incident.channel.val = 1
+
+/-- Toy normalization matching requires distinct finite labels.
+
+This predicate is a regression fixture and carries no electromagnetic-power semantics.
+-/
+def reciprocityRegressionToyEqualPowerNormalization (incident : Incident (Fin 2))
+    (outgoing : Outgoing (Fin 2)) : Prop :=
+  outgoing.channel ≠ incident.channel
+
+/-- Toy frame transport requires the direction-reversing swap.
+
+This predicate is a regression fixture and carries no physical frame or Jones-vector data.
+-/
+def reciprocityRegressionToyExactFrameTransport (incident : Incident (Fin 2))
+    (outgoing : Outgoing (Fin 2)) : Prop :=
+  outgoing.channel = (Equiv.swap (0 : Fin 2) 1) incident.channel
+
+/-- The explicit swap pairing satisfies all four toy component predicates. -/
+lemma reciprocityRegressionSwap_timeReversalRealization :
+    TimeReversalRealization reciprocityRegressionSwapPairing
+      reciprocityRegressionToySameTransverseMode
+      reciprocityRegressionToySameReferencePlane
+      reciprocityRegressionToyEqualPowerNormalization
+      reciprocityRegressionToyExactFrameTransport := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  all_goals
+    intro incident
+    rcases incident with ⟨label⟩
+    fin_cases label <;>
+      simp [reciprocityRegressionToySameTransverseMode,
+        reciprocityRegressionToySameReferencePlane,
+        reciprocityRegressionToyEqualPowerNormalization,
+        reciprocityRegressionToyExactFrameTransport,
+        reciprocityRegressionSwapPairing]
+
+/-- The nominal identity pairing is refused when the toy predicates demand direction reversal. -/
+lemma reciprocityRegression_nominal_not_timeReversalRealization :
+    ¬TimeReversalRealization (nominalPairing : ChannelPairing (Fin 2))
+      reciprocityRegressionToySameTransverseMode
+      reciprocityRegressionToySameReferencePlane
+      reciprocityRegressionToyEqualPowerNormalization
+      reciprocityRegressionToyExactFrameTransport := by
+  intro realization
+  have hZero := realization.same_transverse_mode (Incident.mk 0)
+  simpa [reciprocityRegressionToySameTransverseMode, nominalPairing] using hZero
+
+/-!
+## F. Wrong-sign reference-plane sentinel
+-/
+
+/-- Direct primitive expansion when the output shift uses the incident sign after pairing. -/
+lemma reciprocityRegression_s15_wrongSign_matrix :
+    (reciprocityRegressionAllOnes.rephase reciprocityRegressionS15Incident
+      reciprocityRegressionS15WrongSignOutgoing).pairedMatrix
+        reciprocityRegressionSwapPairing =
+      !![(1 : ℂ), -Complex.I; Complex.I, 1] := by
+  ext output input
+  fin_cases output <;> fin_cases input <;>
+    norm_num [ScatteringMatrix.pairedMatrix, ScatteringMatrix.rephase,
+      ModeTransform.rephase, reciprocityRegressionAllOnes,
+      reciprocityRegressionI, Circle.coe_inv, Complex.ext_iff]
+
+/-- The wrong-sign gauge changes the pinned lower-left value from `-I` to `I`. -/
+lemma reciprocityRegression_s15_wrongSign_changes_pinned_entry :
+    (reciprocityRegressionAllOnes.rephase reciprocityRegressionS15Incident
+        reciprocityRegressionS15WrongSignOutgoing).pairedMatrix
+          reciprocityRegressionSwapPairing 1 0 ≠
+      (reciprocityRegressionAllOnes.rephase reciprocityRegressionS15Incident
+        reciprocityRegressionS15RestoringOutgoing).pairedMatrix
+          reciprocityRegressionSwapPairing 1 0 := by
+  rw [reciprocityRegression_s15_wrongSign_matrix,
+    reciprocityRegression_s15_restoring_matrix]
+  norm_num [Complex.ext_iff]
+
+/-- The wrong-sign reference-plane gauge fails paired reciprocity. -/
+lemma reciprocityRegression_s15_wrongSign_not_reciprocal :
+    ¬(reciprocityRegressionAllOnes.rephase reciprocityRegressionS15Incident
+      reciprocityRegressionS15WrongSignOutgoing).IsReciprocal
+        reciprocityRegressionSwapPairing := by
+  intro hReciprocal
+  have hOffDiagonal := Matrix.IsSymm.apply hReciprocal 1 0
+  rw [reciprocityRegression_s15_wrongSign_matrix] at hOffDiagonal
+  norm_num [Complex.ext_iff] at hOffDiagonal
+
+/-!
+## G. Raw-symmetry and conjugate-symmetry sentinels
+-/
+
+/-- A primitive raw-symmetric matrix whose diagonal entries distinguish the paired rows. -/
+def reciprocityRegressionRawSymmetric : ScatteringMatrix (Fin 2) where
+  toModeTransform := !![(1 : ℂ), 0; 0, 2]
+
+/-- The fixture is symmetric in its unpaired coordinate order. -/
+lemma reciprocityRegressionRawSymmetric_isSymm :
+    reciprocityRegressionRawSymmetric.toModeTransform.IsSymm := by
+  apply Matrix.IsSymm.ext
+  intro first second
+  fin_cases first <;> fin_cases second <;> rfl
+
+/-- Swapping the outgoing pairing rows exposes the asymmetric values `2` and `1`. -/
+lemma reciprocityRegressionRawSymmetric_pairedMatrix :
+    reciprocityRegressionRawSymmetric.pairedMatrix
+        reciprocityRegressionSwapPairing =
+      !![(0 : ℂ), 2; 1, 0] := by
+  ext output input
+  fin_cases output <;> fin_cases input <;> rfl
+
+/-- A raw-symmetric matrix is refused by paired reciprocity for the nonidentity pairing. -/
+lemma reciprocityRegression_rawSymmetric_not_reciprocal :
+    ¬reciprocityRegressionRawSymmetric.IsReciprocal
+      reciprocityRegressionSwapPairing := by
+  intro hReciprocal
+  have hOffDiagonal := Matrix.IsSymm.apply hReciprocal 1 0
+  rw [reciprocityRegressionRawSymmetric_pairedMatrix] at hOffDiagonal
+  norm_num at hOffDiagonal
+
+/-- A primitive Hermitian matrix with unequal transpose off-diagonal entries `I` and `-I`. -/
+def reciprocityRegressionHermitian : ScatteringMatrix (Fin 2) where
+  toModeTransform := !![(0 : ℂ), Complex.I; -Complex.I, 0]
+
+/-- The primitive conjugate-transpose expansion verifies that the fixture is Hermitian. -/
+lemma reciprocityRegressionHermitian_isHermitian :
+    reciprocityRegressionHermitian.toModeTransform.IsHermitian := by
+  apply Matrix.IsHermitian.ext
+  intro first second
+  fin_cases first <;> fin_cases second <;>
+    norm_num [reciprocityRegressionHermitian, Complex.ext_iff]
+
+/-- The Hermitian fixture's transpose off-diagonal entries `I` and `-I` are unequal. -/
+lemma reciprocityRegressionHermitian_offDiagonal_ne :
+    reciprocityRegressionHermitian.toModeTransform 0 1 ≠
+      reciprocityRegressionHermitian.toModeTransform 1 0 := by
+  norm_num [reciprocityRegressionHermitian, Complex.ext_iff]
+
+/-- Hermitian symmetry is refused as a substitute for nominal paired-transpose reciprocity. -/
+lemma reciprocityRegression_hermitian_not_reciprocal :
+    ¬reciprocityRegressionHermitian.IsReciprocal
+      (nominalPairing : ChannelPairing (Fin 2)) := by
+  intro hReciprocal
+  apply reciprocityRegressionHermitian_offDiagonal_ne
+  exact Matrix.IsSymm.apply hReciprocal 1 0
 
 end
 
