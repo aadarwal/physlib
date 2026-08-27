@@ -113,6 +113,46 @@ def reciprocityRegressionS15RestoringOutgoing : ModePhaseGauge (Fin 2) :=
 def reciprocityRegressionS16Gauge : ModePhaseGauge (Fin 2) :=
   ![(1 : Circle), reciprocityRegressionNegOne]
 
+/-- S-15 incident coordinate zero has phase one. -/
+@[simp]
+lemma reciprocityRegressionS15Incident_zero :
+    reciprocityRegressionS15Incident 0 = 1 := rfl
+
+/-- S-15 incident coordinate one has phase `I`. -/
+@[simp]
+lemma reciprocityRegressionS15Incident_one :
+    reciprocityRegressionS15Incident 1 = reciprocityRegressionI := rfl
+
+/-- S-15 hostile outgoing coordinate zero has phase one. -/
+@[simp]
+lemma reciprocityRegressionS15SameLabelOutgoing_zero :
+    reciprocityRegressionS15SameLabelOutgoing 0 = 1 := rfl
+
+/-- S-15 hostile outgoing coordinate one has phase `-I`. -/
+@[simp]
+lemma reciprocityRegressionS15SameLabelOutgoing_one :
+    reciprocityRegressionS15SameLabelOutgoing 1 = reciprocityRegressionNegI := rfl
+
+/-- S-15 restoring outgoing coordinate zero has phase `-I`. -/
+@[simp]
+lemma reciprocityRegressionS15RestoringOutgoing_zero :
+    reciprocityRegressionS15RestoringOutgoing 0 = reciprocityRegressionNegI := rfl
+
+/-- S-15 restoring outgoing coordinate one has phase one. -/
+@[simp]
+lemma reciprocityRegressionS15RestoringOutgoing_one :
+    reciprocityRegressionS15RestoringOutgoing 1 = 1 := rfl
+
+/-- S-16 coordinate zero has phase one. -/
+@[simp]
+lemma reciprocityRegressionS16Gauge_zero :
+    reciprocityRegressionS16Gauge 0 = 1 := rfl
+
+/-- S-16 coordinate one has phase `-1`. -/
+@[simp]
+lemma reciprocityRegressionS16Gauge_one :
+    reciprocityRegressionS16Gauge 1 = reciprocityRegressionNegOne := rfl
+
 /-!
 ## B. All-ones paired scattering fixture
 -/
@@ -151,10 +191,8 @@ lemma reciprocityRegression_s15_sameLabel_matrix :
   fin_cases output <;> fin_cases input <;>
     norm_num [ScatteringMatrix.pairedMatrix, ScatteringMatrix.rephase,
       ModeTransform.rephase, reciprocityRegressionAllOnes,
-      reciprocityRegressionSwapPairing, reciprocityRegressionS15Incident,
-      reciprocityRegressionS15SameLabelOutgoing, reciprocityRegressionI,
-      reciprocityRegressionNegI, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionI, reciprocityRegressionNegI, Circle.coe_inv,
+      Complex.ext_iff]
 
 /-- S-15 has unequal off-diagonal entries `-1` and `1`. -/
 lemma reciprocityRegression_s15_sameLabel_offDiagonal_ne :
@@ -182,11 +220,8 @@ lemma reciprocityRegression_s15_restoring_inversePaired (label : Fin 2) :
         (reciprocityRegressionSwapPairing (Incident.mk label)).channel =
       (reciprocityRegressionS15Incident label)⁻¹ := by
   fin_cases label <;> apply Subtype.ext <;>
-    norm_num [reciprocityRegressionS15RestoringOutgoing,
-      reciprocityRegressionS15Incident, reciprocityRegressionSwapPairing,
-      reciprocityRegressionI, reciprocityRegressionNegI,
-      Matrix.cons_val_zero, Matrix.cons_val_one, Circle.coe_inv,
-      Complex.ext_iff]
+    norm_num [reciprocityRegressionI, reciprocityRegressionNegI,
+      Circle.coe_inv, Complex.ext_iff]
 
 /-- Direct primitive expansion of the S-15 pairing-aware restoring gauge. -/
 lemma reciprocityRegression_s15_restoring_matrix :
@@ -198,10 +233,8 @@ lemma reciprocityRegression_s15_restoring_matrix :
   fin_cases output <;> fin_cases input <;>
     norm_num [ScatteringMatrix.pairedMatrix, ScatteringMatrix.rephase,
       ModeTransform.rephase, reciprocityRegressionAllOnes,
-      reciprocityRegressionSwapPairing, reciprocityRegressionS15Incident,
-      reciprocityRegressionS15RestoringOutgoing, reciprocityRegressionI,
-      reciprocityRegressionNegI, Matrix.cons_val_zero, Matrix.cons_val_one,
-      Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionI, reciprocityRegressionNegI, Circle.coe_inv,
+      Complex.ext_iff]
 
 /-- The pairing-aware S-15 gauge restores reciprocity by direct matrix expansion. -/
 lemma reciprocityRegression_s15_restoring_isReciprocal :
@@ -226,9 +259,7 @@ lemma reciprocityRegression_s16_pairingFactor (label : Fin 2) :
         (reciprocityRegressionSwapPairing (Incident.mk label)).channel : ℂ) *
         (reciprocityRegressionS16Gauge label : ℂ) = -1 := by
   fin_cases label <;>
-    norm_num [reciprocityRegressionS16Gauge, reciprocityRegressionSwapPairing,
-      reciprocityRegressionNegOne, Matrix.cons_val_zero,
-      Matrix.cons_val_one, Complex.ext_iff]
+    norm_num [reciprocityRegressionNegOne, Complex.ext_iff]
 
 /-- The S-16 same-label gauge is not the designated inverse-paired gauge. -/
 lemma reciprocityRegression_s16_not_inversePaired :
@@ -239,9 +270,8 @@ lemma reciprocityRegression_s16_not_inversePaired :
   intro hInversePaired
   have hZero := hInversePaired (0 : Fin 2)
   have hZeroCoe := congrArg (fun phase : Circle => (phase : ℂ)) hZero
-  norm_num [reciprocityRegressionS16Gauge, reciprocityRegressionSwapPairing,
-    reciprocityRegressionNegOne, Matrix.cons_val_zero,
-    Matrix.cons_val_one, Circle.coe_inv, Complex.ext_iff] at hZeroCoe
+  norm_num [reciprocityRegressionNegOne, Circle.coe_inv,
+    Complex.ext_iff] at hZeroCoe
 
 /-- Direct primitive expansion of the S-16 constant-factor rephasing. -/
 lemma reciprocityRegression_s16_matrix :
@@ -252,9 +282,7 @@ lemma reciprocityRegression_s16_matrix :
   fin_cases output <;> fin_cases input <;>
     norm_num [ScatteringMatrix.pairedMatrix, ScatteringMatrix.rephase,
       ModeTransform.rephase, reciprocityRegressionAllOnes,
-      reciprocityRegressionSwapPairing, reciprocityRegressionS16Gauge,
-      reciprocityRegressionNegOne, Matrix.cons_val_zero,
-      Matrix.cons_val_one, Circle.coe_inv, Complex.ext_iff]
+      reciprocityRegressionNegOne, Circle.coe_inv, Complex.ext_iff]
 
 /-- S-16: the nonidentity-pairing constant-factor gauge preserves reciprocity. -/
 lemma reciprocityRegression_s16_isReciprocal :
