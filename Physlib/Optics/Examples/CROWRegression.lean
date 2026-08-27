@@ -765,7 +765,7 @@ lemma crowRegression_incidentAssembly :
       all_goals fin_cases ring
       all_goals norm_num [crowRegressionIncidentValue,
         crowRegressionOutgoingValue]
-      all_goals simp [crowRegressionIncidentValue, crowRegressionOutgoingValue]
+      all_goals simp
     · rcases forwardOrReturn with forwardIndex | returnIndex
       · rcases localChannel with mode | mode <;> cases mode
         all_goals
