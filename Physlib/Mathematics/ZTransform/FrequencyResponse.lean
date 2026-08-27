@@ -87,8 +87,8 @@ lemma norm_unitCirclePoint (ω : ℝ) : ‖unitCirclePoint ω‖ = 1 := by
 
 /-- A unit-circle point is nonzero. -/
 @[simp]
-lemma unitCirclePoint_ne_zero (ω : ℝ) : unitCirclePoint ω ≠ 0 :=
-  Complex.exp_ne_zero
+lemma unitCirclePoint_ne_zero (ω : ℝ) : unitCirclePoint ω ≠ 0 := by
+  simpa [unitCirclePoint] using Complex.exp_ne_zero ((ω : ℂ) * Complex.I)
 
 /-- The reciprocal unit-circle point is the exponential with negated angle. -/
 lemma unitCirclePoint_inv (ω : ℝ) :
@@ -139,10 +139,16 @@ lemma delaySymbol_unitCircle (s : Finset ℕ) (c : ℕ → ℂ) (ω : ℝ) :
       delayCosineSum s c ω - Complex.I * delaySineSum s c ω := by
   rw [delaySymbol, delayCosineSum, delaySineSum]
   simp_rw [unitCirclePoint_inv_pow]
-  rw [Finset.sum_sub_distrib, Finset.mul_sum]
-  apply Finset.sum_congr rfl
-  intro k hk
-  ring
+  calc
+    ∑ k ∈ s, c k *
+        ((Real.cos ((k : ℝ) * ω) : ℂ) -
+          (Real.sin ((k : ℝ) * ω) : ℂ) * Complex.I) =
+        ∑ k ∈ s, (c k * (Real.cos ((k : ℝ) * ω) : ℂ) -
+          Complex.I * (c k * (Real.sin ((k : ℝ) * ω) : ℂ))) := by
+      apply Finset.sum_congr rfl
+      intro k hk
+      ring
+    _ = _ := by rw [Finset.sum_sub_distrib, Finset.mul_sum]
 
 /-- The recurrence denominator at a unit-circle point is its trigonometric denominator. -/
 lemma one_sub_delaySymbol_unitCircle (s : Finset ℕ) (α : ℕ → ℂ) (ω : ℝ) :
