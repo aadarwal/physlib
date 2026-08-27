@@ -66,7 +66,14 @@ inductive VisiblePolePort
   | external
   | left
   | right
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
+
+/-- The three fixture ports form a finite type. -/
+instance visiblePolePortFintype : Fintype VisiblePolePort where
+  elems := {.external, .left, .right}
+  complete := by
+    intro port
+    cases port <;> simp
 
 /-- Every fixture port carries one scalar mode. -/
 def visiblePolePortFamily : PortModeFamily where
@@ -239,8 +246,19 @@ lemma visiblePole_scatteringEntryModel (output input : VisiblePolePort) :
         (visiblePoleChannel output) (visiblePoleChannel input) =
       RationalModel.ofPolynomial
         (visiblePoleEntryPolynomial ⟨output, ()⟩ ⟨input, ()⟩) := by
-  simpa [visiblePoleNetlist, visiblePoleComponents, visiblePoleChannel] using
-    visiblePoleNetlist.scatteringEntryModel_same () ⟨output, ()⟩ ⟨input, ()⟩
+  cases output <;> cases input <;> rfl
+
+/-- Every assembled fixture entry has unit retained denominator. -/
+lemma visiblePole_scatteringEntryModel_denominator
+    (output input : visiblePoleNetlist.Channel) :
+    (visiblePoleNetlist.scatteringEntryModel output input).denominator = 1 := by
+  rcases output with ⟨⟨outputComponent, outputPort⟩, outputMode⟩
+  rcases input with ⟨⟨inputComponent, inputPort⟩, inputMode⟩
+  cases outputComponent
+  cases inputComponent
+  cases outputMode
+  cases inputMode
+  cases outputPort <;> cases inputPort <;> rfl
 
 /-- Every stored denominator is one, so the aggregate common denominator is one. -/
 lemma visiblePole_commonDenominator : visiblePoleNetlist.commonDenominator = 1 := by
@@ -248,14 +266,7 @@ lemma visiblePole_commonDenominator : visiblePoleNetlist.commonDenominator = 1 :
   rw [RationalNetlist.commonDenominator]
   apply Finset.prod_eq_one
   rintro ⟨output, input⟩ _
-  rcases output with ⟨⟨outputComponent, outputPort⟩, outputMode⟩
-  rcases input with ⟨⟨inputComponent, inputPort⟩, inputMode⟩
-  cases outputComponent
-  cases inputComponent
-  cases outputMode
-  cases inputMode
-  rw [visiblePole_scatteringEntryModel]
-  rfl
+  exact visiblePole_scatteringEntryModel_denominator output input
 
 /-- Removing any selected entry still leaves a product of unit denominators. -/
 lemma visiblePole_denominatorComplement (output input : visiblePoleNetlist.Channel) :
@@ -264,14 +275,7 @@ lemma visiblePole_denominatorComplement (output input : visiblePoleNetlist.Chann
   rw [RationalNetlist.denominatorComplement]
   apply Finset.prod_eq_one
   rintro ⟨otherOutput, otherInput⟩ _
-  rcases otherOutput with ⟨⟨outputComponent, outputPort⟩, outputMode⟩
-  rcases otherInput with ⟨⟨inputComponent, inputPort⟩, inputMode⟩
-  cases outputComponent
-  cases inputComponent
-  cases outputMode
-  cases inputMode
-  rw [visiblePole_scatteringEntryModel]
-  rfl
+  exact visiblePole_scatteringEntryModel_denominator otherOutput otherInput
 
 /-- Clearing denominators leaves each stored polynomial entry unchanged. -/
 lemma visiblePole_clearedScattering_entry (output input : VisiblePolePort) :
