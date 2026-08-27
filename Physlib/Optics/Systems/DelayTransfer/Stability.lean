@@ -16,8 +16,9 @@ public import Physlib.Optics.Systems.DelayTransfer.Poles
 The numerator and denominator roots of an abstract `ReducedRationalResponse` are finite because
 both complex polynomials are nonzero. Their distinct-root counts are bounded by the corresponding
 polynomial degrees. Under `q = z⁻¹`, `zPoles` removes the formal root `q = 0` and inverts the
-remaining denominator roots; `q = 0` has no finite reciprocal coordinate and formally represents
-`z = ∞`. Its cardinality has the same degree bound. `IsSchurStable` says literally that every
+remaining denominator roots; `q = 0` has no finite reciprocal coordinate. This
+complex-coordinate API supplies no projective interpretation. The reciprocal root set has the
+same degree bound. `IsSchurStable` says literally that every
 such reciprocal-coordinate denominator root lies inside the unit disk.
 
 The BIBO equivalence is deliberately restricted to the named nonzero proper causal one-pole
@@ -149,7 +150,8 @@ lemma ncard_poles_le_natDegree (response : ReducedRationalResponse) :
 
 /-- Nonzero numerator roots in the `z` coordinate selected by `q = z⁻¹`.
 
-The omitted formal root `q = 0` has no finite reciprocal `z`; it formally represents `z = ∞`.
+The omitted formal root `q = 0` has no finite reciprocal `z`; this complex-coordinate API supplies
+no projective interpretation.
 -/
 def zZeros (response : ReducedRationalResponse) : Set ℂ :=
   {z | z ≠ 0 ∧ z⁻¹ ∈ response.zeros}
@@ -193,7 +195,8 @@ lemma card_zZeroFinset_le_natDegree (response : ReducedRationalResponse) :
 
 /-- Nonzero denominator roots in the `z` coordinate selected by `q = z⁻¹`.
 
-The omitted formal root `q = 0` has no finite reciprocal `z`; it formally represents `z = ∞`.
+The omitted formal root `q = 0` has no finite reciprocal `z`; this complex-coordinate API supplies
+no projective interpretation.
 -/
 def zPoles (response : ReducedRationalResponse) : Set ℂ :=
   {z | z ≠ 0 ∧ z⁻¹ ∈ response.poles}

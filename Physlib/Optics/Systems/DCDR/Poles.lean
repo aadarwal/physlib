@@ -569,7 +569,8 @@ lemma rationalEliminationResponse_eq_responseModel (p : UnitDelayParameters) (q 
   exact (responseModel_eval p q).symm
 
 /-- The selected proof-gated response entry after S4's reciprocal substitution `q = z⁻¹`. -/
-def rationalZEliminationResponse (p : UnitDelayParameters) (z : ℂ)
+def rationalZEliminationResponse (p : UnitDelayParameters)
+    (z : DelayTransfer.ReciprocalZCoordinate)
     (hZ : z ∈ (rationalNetlist p).reciprocalZ.responseDomain) : ℂ :=
   ((rationalNetlist p).reciprocalZ.response hZ).reindex
       (Incident.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
@@ -577,19 +578,23 @@ def rationalZEliminationResponse (p : UnitDelayParameters) (z : ℂ)
     (Outgoing.mk (rationalOutputChannel p)) (Incident.mk (rationalInputChannel p))
 
 /-- The proof-gated reciprocal-Z response is the retained quotient evaluated at `q = z⁻¹`. -/
-lemma rationalZEliminationResponse_eq_responseModel (p : UnitDelayParameters) (z : ℂ)
+lemma rationalZEliminationResponse_eq_responseModel (p : UnitDelayParameters)
+    (z : DelayTransfer.ReciprocalZCoordinate)
     (hZ : z ∈ (rationalNetlist p).reciprocalZ.responseDomain) :
     rationalZEliminationResponse p z hZ =
-      (responseModel p).eval (fun _ : Fin 1 => z⁻¹) := by
-  have hDelayRaw : DelayTransfer.zInverseEvaluation z ∈
+      (responseModel p).eval (fun _ : Fin 1 => ((z : ℂ)⁻¹)) := by
+  have hDelayRaw : DelayTransfer.zInverseEvaluationOnReciprocalZ z ∈
       (rationalNetlist p).responseDomain := by
-    have hDomainMembership := congrArg (fun domain : Set ℂ => z ∈ domain)
+    have hDomainMembership := congrArg
+      (fun domain : Set DelayTransfer.ReciprocalZCoordinate => z ∈ domain)
       ((rationalNetlist p).responseDomain_reciprocalZ)
     exact hDomainMembership.mp hZ
-  have hEvaluation : DelayTransfer.zInverseEvaluation z = (fun _ : Fin 1 => z⁻¹) := by
+  have hEvaluation : DelayTransfer.zInverseEvaluationOnReciprocalZ z =
+      (fun _ : Fin 1 => ((z : ℂ)⁻¹)) := by
     funext delay
-    exact DelayTransfer.zInverseEvaluation_apply z delay
-  have hDelay : (fun _ : Fin 1 => z⁻¹) ∈ (rationalNetlist p).responseDomain := by
+    exact DelayTransfer.zInverseEvaluationOnReciprocalZ_apply z delay
+  have hDelay : (fun _ : Fin 1 => ((z : ℂ)⁻¹)) ∈
+      (rationalNetlist p).responseDomain := by
     rw [← hEvaluation]
     exact hDelayRaw
   have hResponse :=
@@ -598,17 +603,17 @@ lemma rationalZEliminationResponse_eq_responseModel (p : UnitDelayParameters) (z
   have hEntry := congrArg (fun response =>
       response (Outgoing.mk (rationalOutputChannel p))
         (Incident.mk (rationalInputChannel p))) hResponse
-  have hModel := rationalEliminationResponse_eq_responseModel p z⁻¹ hDelay
+  have hModel := rationalEliminationResponse_eq_responseModel p ((z : ℂ)⁻¹) hDelay
   change (rationalNetlist p).toParameterizedNetlist.response hDelay
       (Outgoing.mk (rationalOutputChannel p))
       (Incident.mk (rationalInputChannel p)) =
-    (responseModel p).eval (fun _ : Fin 1 => z⁻¹) at hModel
+    (responseModel p).eval (fun _ : Fin 1 => ((z : ℂ)⁻¹)) at hModel
   change ((rationalNetlist p).reciprocalZ.response hZ).reindex
       (Incident.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
       (Outgoing.relabelEquiv (rationalNetlist p).reciprocalZExternalChannelEquiv)
         (Outgoing.mk (rationalOutputChannel p))
         (Incident.mk (rationalInputChannel p)) =
-    (responseModel p).eval (fun _ : Fin 1 => z⁻¹)
+    (responseModel p).eval (fun _ : Fin 1 => ((z : ℂ)⁻¹))
   exact hEntry.trans hModel
 
 /-!
@@ -659,7 +664,8 @@ variable {p : UnitDelayParameters}
 
 /-- Formal-`q` zeros of the certified reduced DCDR response.
 
-This is not the reciprocal-coordinate `zZeros` set: in particular, `q = 0` represents `z = ∞`.
+This is not the reciprocal-coordinate `zZeros` set. In particular, `q = 0` has no finite
+reciprocal-Z coordinate; this complex-coordinate API supplies no projective interpretation.
 -/
 def formalZeros (certificate : ResponseReduction p) : Set ℂ :=
   certificate.reduction.reduced.zeros
