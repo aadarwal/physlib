@@ -17,6 +17,10 @@ fixture has a directly expanded printed Theorem 3 numerator and denominator. Tho
 anchors depend on the stored exponents, so changing a row's `m_i` data breaks the regression
 rather than merely changing a descriptive predicate.
 
+The source gain-role fixture has printed intensities `(1/4, 1/9, 4/25)` and distinct delays.
+Direct square-root expansion pins the coherent field gains to `(1/2, 1/3, 2/5)`, while a
+separate primitive expansion keeps the literal intensities in both printed polynomials.
+
 The distinct-delay coherent fixture uses `(m1, m2, m3) = (2, 1, 3)`. Its selected response is
 `-q / (1-q^4)`, with no cancellation. Its raw denominator has degree four and its reciprocal-`z`
 pole set, under `q = z⁻¹`, is proved directly to be `{1, -1, I, -I}`. Thus the pole count is
@@ -41,6 +45,8 @@ domain bridge visibly load-bearing.
 - `DCDRSourceBridge.tableOpticalAmplifier_printedPolynomials`: the `G_i > 1` row.
 - `DCDRSourceBridge.tablePassive_printedPolynomials`: the unit-gain passive row.
 - `DCDRSourceBridge.tableMultipleDelay_printedPolynomials`: the distinct-exponent row.
+- `DCDRSourceBridge.multipleDelayGainConversion_coherentGains`: converted field gains.
+- `DCDRSourceBridge.multipleDelayGainConversion_printedPolynomials`: source noninterference.
 - `DCDR.tightMultipleDelay_denominatorPolynomial_expansion`: exact degree-four denominator.
 - `DCDR.tightMultipleDelay_responseNumeratorPolynomial_expansion`: exact noncancelled numerator.
 - `DCDR.tightMultipleDelay_zPoles_eq_four`: direct reciprocal-coordinate pole enumeration.
@@ -229,6 +235,53 @@ lemma tableMultipleDelay_printedPolynomials :
       MultipleDelaySourceParameters.printedCubicCoefficient,
       MultipleDelaySourceParameters.printedUpperLoopCoefficient,
       MultipleDelaySourceParameters.printedLowerLoopCoefficient]
+
+/-- Exact multiple-delay source intensities with rational canonical field gains. -/
+def multipleDelayGainConversionParameters : MultipleDelaySourceParameters where
+  G1 := 1 / 4
+  G2 := 1 / 9
+  G3 := 4 / 25
+  k1 := 1
+  k2 := 1
+  m1 := 2
+  m2 := 3
+  m3 := 4
+
+/-- The multiple-delay fixture lies in the faithful square-root source domain. -/
+lemma multipleDelayGainConversion_hasNonnegativeGains :
+    multipleDelayGainConversionParameters.HasNonnegativeGains := by
+  norm_num [MultipleDelaySourceParameters.HasNonnegativeGains,
+    MultipleDelaySourceParameters.toSourceParameters,
+    SourceParameters.HasNonnegativeGains, multipleDelayGainConversionParameters]
+
+/-- Primitive expansion pins all three coherent field gains and all three delays. -/
+lemma multipleDelayGainConversion_coherentGains :
+    multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.upperGain = 1 / 2 ∧
+      multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.lowerGain =
+          1 / 3 ∧
+        multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.feedbackGain =
+            2 / 5 ∧
+          multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.m1 = 2 ∧
+            multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.m2 = 3 ∧
+              multipleDelayGainConversionParameters.toCoherentMultipleDelayParameters.m3 = 4 := by
+  norm_num [MultipleDelaySourceParameters.toCoherentMultipleDelayParameters,
+    intensityGainToFieldAmplitudeGain, multipleDelayGainConversionParameters]
+
+/-- The independently expanded printed polynomials retain source intensities and delays. -/
+lemma multipleDelayGainConversion_printedPolynomials :
+    multipleDelayGainConversionParameters.printedNumeratorPolynomial =
+        C (1 / 9) * X ^ 3 - C (1 / 225) * X ^ 9 ∧
+      multipleDelayGainConversionParameters.printedDenominatorPolynomial =
+        1 - C (1 / 25) * X ^ 6 := by
+  constructor <;>
+    norm_num [MultipleDelaySourceParameters.printedNumeratorPolynomial,
+      MultipleDelaySourceParameters.printedDenominatorPolynomial,
+      MultipleDelaySourceParameters.printedUpperCoefficient,
+      MultipleDelaySourceParameters.printedLowerCoefficient,
+      MultipleDelaySourceParameters.printedCubicCoefficient,
+      MultipleDelaySourceParameters.printedUpperLoopCoefficient,
+      MultipleDelaySourceParameters.printedLowerLoopCoefficient,
+      multipleDelayGainConversionParameters]
 
 end DCDRSourceBridge
 

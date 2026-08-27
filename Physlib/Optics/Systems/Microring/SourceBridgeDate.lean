@@ -72,7 +72,7 @@ structure DateParameters where
   /-- The source coupling or cavity length `L_c` (`HOL-CORPUS.md:194-196`). -/
   couplingLength : ℝ
   /-- The source power-attenuation coefficient `alpha` (`HOL-CORPUS.md:194-196`). -/
-  powerAttenuation : ℝ
+  powerAttenuationCoefficient : ℝ
   /-- The source wavelength `lambda` (`HOL-CORPUS.md:194-196`). -/
   wavelength : ℝ
   /-- The source effective index `n_eff` (`HOL-CORPUS.md:194-196`). -/
@@ -87,7 +87,7 @@ def DateParameters.roundTripPhase (p : DateParameters) : ℝ :=
 The source calls `alpha` a power-attenuation coefficient, but `tau` itself multiplies fields.
 -/
 def DateParameters.fieldAttenuation (p : DateParameters) : ℝ :=
-  Real.exp (-p.powerAttenuation * p.couplingLength / 2)
+  Real.exp (-p.powerAttenuationCoefficient * p.couplingLength / 2)
 
 /-- DATE's `exp(-j*delta)` written in Physlib's fixed-carrier phase convention
 (`HOL-CORPUS.md:196` and `Physlib/Optics/Components/MatchedPropagation.lean:93-99`). -/

@@ -26,10 +26,11 @@ coherent analogue of FMICS'15 p. 174's “2 poles at maximum” consequence of i
 
 `DCDRSourceBridge.SourceParameters` is a symbol dictionary for the five real unit-delay source
 parameters `G1`, `G2`, `G3`, `k1`, and `k2`. Its printed incoherent polynomials retain the
-intensity coefficients `1-k` and `k`. Its map to the coherent Physlib family instead uses the
-amplitudes `sqrt (1-k)` and `sqrt k`, with N7 cross coefficient `-I * sqrt k`. The squared
-amplitudes recover the printed intensities on the stated coupling domain, but no transfer,
-denominator, pole, or stability equivalence between these two models is asserted.
+intensity gains `G_i` and intensity coefficients `1-k` and `k`. Its map to the coherent Physlib
+family instead uses the named field gains `sqrt G_i`, the amplitudes `sqrt (1-k)` and `sqrt k`,
+and N7 cross coefficient `-I * sqrt k`. Squaring the mapped gains and amplitudes recovers the
+printed intensities on the stated source domains, but no transfer, denominator, pole, or
+stability equivalence between these two models is asserted.
 
 `passiveCaseSourceParameters` records FMICS'15 p. 175's passive point exactly, replacing the
 printed decimals by rational data only. `passiveCaseUnitDelayParameters` is its coherent N7 image
@@ -40,7 +41,10 @@ through the same dictionary; it does not identify the coherent and printed incoh
 - `DCDR.UnitDelayParameters.loopCoefficient`: the coherent quadratic loop coefficient.
 - `DCDR.UnitDelayParameters.denominatorPolynomial_natDegree_le_two`: the raw degree bound.
 - `DCDR.ResponseReduction.ncard_actualPoles_le_two`: the cancellation-aware pole bound.
+- `DCDRSourceBridge.intensityGainToFieldAmplitudeGain`: intensity-to-field conversion.
+- `DCDRSourceBridge.fieldAmplitudeGainToIntensityGain`: field-to-intensity conversion.
 - `DCDRSourceBridge.SourceParameters`: the five-symbol FMICS'15 unit-delay dictionary.
+- `DCDRSourceBridge.SourceParameters.toCoherentUnitDelayParameters`: its coherent N7 map.
 - `DCDRSourceBridge.SourceParameters.coherentLoopCoefficient`: its named coherent coefficient.
 - `DCDRSourceBridge.SourceParameters.printedDenominatorPolynomial`: the printed incoherent data.
 - `DCDRSourceBridge.SourceParameters.printedDenominatorPolynomial_eq_coefficients`: its
@@ -194,6 +198,26 @@ namespace DCDRSourceBridge
 
 -/
 
+/-- Convert a nonnegative intensity gain to its canonical coherent field-amplitude gain. -/
+def intensityGainToFieldAmplitudeGain (G : ℝ) : ℝ :=
+  Real.sqrt G
+
+/-- Convert a real field-amplitude gain to its intensity gain. -/
+def fieldAmplitudeGainToIntensityGain (g : ℝ) : ℝ :=
+  g ^ 2
+
+/-- Squaring the canonical field gain recovers a nonnegative source intensity gain. -/
+lemma fieldAmplitudeGainToIntensityGain_intensityGainToFieldAmplitudeGain
+    {G : ℝ} (hG : 0 ≤ G) :
+    fieldAmplitudeGainToIntensityGain (intensityGainToFieldAmplitudeGain G) = G := by
+  exact Real.sq_sqrt hG
+
+/-- Taking the canonical square root recovers a nonnegative field-amplitude gain. -/
+lemma intensityGainToFieldAmplitudeGain_fieldAmplitudeGainToIntensityGain
+    {g : ℝ} (hg : 0 ≤ g) :
+    intensityGainToFieldAmplitudeGain (fieldAmplitudeGainToIntensityGain g) = g := by
+  exact Real.sqrt_sq hg
+
 /-- The five real parameters of FMICS'15's printed incoherent unit-delay DCDR formulas.
 
 The paper quantifies complex symbols. This structure records the real-valued subfamily that can
@@ -201,11 +225,11 @@ be mapped to Physlib's real N7 amplitudes and real formal path gains without dis
 parts.
 -/
 structure SourceParameters where
-  /-- Printed upper-path gain `G1`. -/
+  /-- Printed upper-path intensity gain `G1`. -/
   G1 : ℝ
-  /-- Printed lower-path gain `G2`. -/
+  /-- Printed lower-path intensity gain `G2`. -/
   G2 : ℝ
-  /-- Printed feedback-path gain `G3`. -/
+  /-- Printed feedback-path intensity gain `G3`. -/
   G3 : ℝ
   /-- Printed first incoherent intensity coefficient `k1`. -/
   k1 : ℝ
@@ -220,11 +244,13 @@ def SourceParameters.HasAdmissibleCouplings (p : SourceParameters) : Prop :=
 def SourceParameters.HasNonnegativeGains (p : SourceParameters) : Prop :=
   0 ≤ p.G1 ∧ 0 ≤ p.G2 ∧ 0 ≤ p.G3
 
-/-- The symbol map from printed intensities to coherent N7 amplitudes and unit-delay gains.
+/-- The symbol map from printed intensities to coherent N7 amplitudes and field gains.
 
-This is a dictionary, not an equality between the incoherent and coherent response models.
+Its source interpretation is restricted to `HasNonnegativeGains`, where squaring each mapped
+field gain recovers the printed intensity. This is a dictionary, not an equality between the
+incoherent and coherent response models.
 -/
-def SourceParameters.toUnitDelayParameters
+def SourceParameters.toCoherentUnitDelayParameters
     (p : SourceParameters) : DCDR.UnitDelayParameters where
   firstCoupler :=
     { throughAmplitude := Real.sqrt (1 - p.k1)
@@ -232,56 +258,80 @@ def SourceParameters.toUnitDelayParameters
   secondCoupler :=
     { throughAmplitude := Real.sqrt (1 - p.k2)
       crossAmplitude := Real.sqrt p.k2 }
-  upperGain := p.G1
-  lowerGain := p.G2
-  feedbackGain := p.G3
+  upperGain := intensityGainToFieldAmplitudeGain p.G1
+  lowerGain := intensityGainToFieldAmplitudeGain p.G2
+  feedbackGain := intensityGainToFieldAmplitudeGain p.G3
 
-/-- The source dictionary preserves the five symbols and exposes both coherent amplitudes. -/
-lemma SourceParameters.toUnitDelayParameters_data (p : SourceParameters) :
-    p.toUnitDelayParameters.firstCoupler.throughAmplitude = Real.sqrt (1 - p.k1) ∧
-      p.toUnitDelayParameters.firstCoupler.crossAmplitude = Real.sqrt p.k1 ∧
-      p.toUnitDelayParameters.secondCoupler.throughAmplitude = Real.sqrt (1 - p.k2) ∧
-      p.toUnitDelayParameters.secondCoupler.crossAmplitude = Real.sqrt p.k2 ∧
-      p.toUnitDelayParameters.upperGain = p.G1 ∧
-      p.toUnitDelayParameters.lowerGain = p.G2 ∧
-      p.toUnitDelayParameters.feedbackGain = p.G3 :=
+/-- The coherent map exposes the four coupler amplitudes and three converted field gains. -/
+lemma SourceParameters.toCoherentUnitDelayParameters_data (p : SourceParameters) :
+    p.toCoherentUnitDelayParameters.firstCoupler.throughAmplitude =
+        Real.sqrt (1 - p.k1) ∧
+      p.toCoherentUnitDelayParameters.firstCoupler.crossAmplitude = Real.sqrt p.k1 ∧
+      p.toCoherentUnitDelayParameters.secondCoupler.throughAmplitude =
+          Real.sqrt (1 - p.k2) ∧
+      p.toCoherentUnitDelayParameters.secondCoupler.crossAmplitude = Real.sqrt p.k2 ∧
+      p.toCoherentUnitDelayParameters.upperGain =
+          intensityGainToFieldAmplitudeGain p.G1 ∧
+      p.toCoherentUnitDelayParameters.lowerGain =
+          intensityGainToFieldAmplitudeGain p.G2 ∧
+      p.toCoherentUnitDelayParameters.feedbackGain =
+          intensityGainToFieldAmplitudeGain p.G3 :=
   ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
-/-- Nonnegative printed gains map to the coherent family's algebraic gain domain. -/
-lemma SourceParameters.toUnitDelayParameters_isAdmissible {p : SourceParameters}
-    (hp : p.HasNonnegativeGains) :
-    p.toUnitDelayParameters.IsAdmissible := by
-  exact hp
+/-- Canonical square-root gains lie in the coherent family's algebraic gain domain. -/
+lemma SourceParameters.toCoherentUnitDelayParameters_isAdmissible (p : SourceParameters) :
+    p.toCoherentUnitDelayParameters.IsAdmissible := by
+  exact ⟨Real.sqrt_nonneg p.G1, Real.sqrt_nonneg p.G2, Real.sqrt_nonneg p.G3⟩
 
 /-- On the source coupling domain, the first coherent through amplitude squares to `1-k1`. -/
 lemma SourceParameters.firstThroughAmplitude_sq {p : SourceParameters}
     (hp : p.HasAdmissibleCouplings) :
-    p.toUnitDelayParameters.firstCoupler.throughAmplitude ^ 2 = 1 - p.k1 := by
+    p.toCoherentUnitDelayParameters.firstCoupler.throughAmplitude ^ 2 = 1 - p.k1 := by
   exact Real.sq_sqrt (sub_nonneg.mpr hp.2.1)
 
 /-- On the source coupling domain, the first coherent cross amplitude squares to `k1`. -/
 lemma SourceParameters.firstCrossAmplitude_sq {p : SourceParameters}
     (hp : p.HasAdmissibleCouplings) :
-    p.toUnitDelayParameters.firstCoupler.crossAmplitude ^ 2 = p.k1 := by
+    p.toCoherentUnitDelayParameters.firstCoupler.crossAmplitude ^ 2 = p.k1 := by
   exact Real.sq_sqrt hp.1
 
 /-- On the source coupling domain, the second coherent through amplitude squares to `1-k2`. -/
 lemma SourceParameters.secondThroughAmplitude_sq {p : SourceParameters}
     (hp : p.HasAdmissibleCouplings) :
-    p.toUnitDelayParameters.secondCoupler.throughAmplitude ^ 2 = 1 - p.k2 := by
+    p.toCoherentUnitDelayParameters.secondCoupler.throughAmplitude ^ 2 = 1 - p.k2 := by
   exact Real.sq_sqrt (sub_nonneg.mpr hp.2.2.2)
 
 /-- On the source coupling domain, the second coherent cross amplitude squares to `k2`. -/
 lemma SourceParameters.secondCrossAmplitude_sq {p : SourceParameters}
     (hp : p.HasAdmissibleCouplings) :
-    p.toUnitDelayParameters.secondCoupler.crossAmplitude ^ 2 = p.k2 := by
+    p.toCoherentUnitDelayParameters.secondCoupler.crossAmplitude ^ 2 = p.k2 := by
   exact Real.sq_sqrt hp.2.2.1
+
+/-- The mapped upper field gain squares back to the printed upper intensity gain. -/
+lemma SourceParameters.toCoherentUnitDelayParameters_upperGain_intensity
+    {p : SourceParameters} (hp : p.HasNonnegativeGains) :
+    fieldAmplitudeGainToIntensityGain p.toCoherentUnitDelayParameters.upperGain = p.G1 := by
+  exact fieldAmplitudeGainToIntensityGain_intensityGainToFieldAmplitudeGain hp.1
+
+/-- The mapped lower field gain squares back to the printed lower intensity gain. -/
+lemma SourceParameters.toCoherentUnitDelayParameters_lowerGain_intensity
+    {p : SourceParameters} (hp : p.HasNonnegativeGains) :
+    fieldAmplitudeGainToIntensityGain p.toCoherentUnitDelayParameters.lowerGain = p.G2 := by
+  exact fieldAmplitudeGainToIntensityGain_intensityGainToFieldAmplitudeGain hp.2.1
+
+/-- The mapped feedback field gain squares back to the printed feedback intensity gain. -/
+lemma SourceParameters.toCoherentUnitDelayParameters_feedbackGain_intensity
+    {p : SourceParameters} (hp : p.HasNonnegativeGains) :
+    fieldAmplitudeGainToIntensityGain p.toCoherentUnitDelayParameters.feedbackGain = p.G3 := by
+  exact fieldAmplitudeGainToIntensityGain_intensityGainToFieldAmplitudeGain hp.2.2
 
 /-- The coherent N7 loop coefficient named in the printed source symbols. -/
 def SourceParameters.coherentLoopCoefficient (p : SourceParameters) : ℂ :=
-  (p.G3 : ℂ) *
-    ((Real.sqrt (1 - p.k2) : ℂ) * (p.G2 : ℂ) * Real.sqrt (1 - p.k1) +
-      (-Complex.I * Real.sqrt p.k2) * (p.G1 : ℂ) *
+  (intensityGainToFieldAmplitudeGain p.G3 : ℂ) *
+    ((Real.sqrt (1 - p.k2) : ℂ) *
+        (intensityGainToFieldAmplitudeGain p.G2 : ℂ) * Real.sqrt (1 - p.k1) +
+      (-Complex.I * Real.sqrt p.k2) *
+        (intensityGainToFieldAmplitudeGain p.G1 : ℂ) *
         (-Complex.I * Real.sqrt p.k1))
 
 /-- The mapped coherent loop retains square-root amplitudes and the two `-I` cross gauges.
@@ -289,17 +339,18 @@ def SourceParameters.coherentLoopCoefficient (p : SourceParameters) : ℂ :=
 The definition of `coherentLoopCoefficient` pinpoints why this is not the printed incoherent
 intensity coefficient below.
 -/
-lemma SourceParameters.toUnitDelayParameters_loopCoefficient (p : SourceParameters) :
-    p.toUnitDelayParameters.loopCoefficient =
+lemma SourceParameters.toCoherentUnitDelayParameters_loopCoefficient (p : SourceParameters) :
+    p.toCoherentUnitDelayParameters.loopCoefficient =
       p.coherentLoopCoefficient := by
   rfl
 
 /-- The mapped coherent denominator uses the named amplitude-and-gauge coefficient. -/
-lemma SourceParameters.toUnitDelayParameters_denominatorPolynomial (p : SourceParameters) :
-    p.toUnitDelayParameters.denominatorPolynomial =
+lemma SourceParameters.toCoherentUnitDelayParameters_denominatorPolynomial
+    (p : SourceParameters) :
+    p.toCoherentUnitDelayParameters.denominatorPolynomial =
       1 - C p.coherentLoopCoefficient * X ^ 2 := by
-  rw [p.toUnitDelayParameters.denominatorPolynomial_eq_one_sub_C_mul_X_sq,
-    p.toUnitDelayParameters_loopCoefficient]
+  rw [p.toCoherentUnitDelayParameters.denominatorPolynomial_eq_one_sub_C_mul_X_sq,
+    p.toCoherentUnitDelayParameters_loopCoefficient]
 
 /-!
 
@@ -398,7 +449,7 @@ def passiveCaseSourceParameters : SourceParameters where
 This is a dictionary image, not an equality with the printed incoherent response.
 -/
 def passiveCaseUnitDelayParameters : DCDR.UnitDelayParameters :=
-  passiveCaseSourceParameters.toUnitDelayParameters
+  passiveCaseSourceParameters.toCoherentUnitDelayParameters
 
 end DCDRSourceBridge
 
