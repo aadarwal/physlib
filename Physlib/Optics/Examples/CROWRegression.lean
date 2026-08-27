@@ -217,10 +217,13 @@ lemma crowRegression_mem_componentBehavior :
     (crowRegressionIncident, crowRegressionOutgoing) ∈
       (netlist crowRegressionParameters).componentBehavior := by
   classical
+  letI : Fintype (netlist crowRegressionParameters).components.Component := by
+    change Fintype (Component 2)
+    infer_instance
   apply ((netlist crowRegressionParameters).mem_componentBehavior_iff_forall_component
     crowRegressionIncident crowRegressionOutgoing).2
   intro component
-  rcases component with (.coupler interface | .forwardArc ring | .returnArc ring)
+  rcases component with ⟨interface⟩ | ⟨ring⟩ | ⟨ring⟩
   · change (_, _) ∈
       (DirectionalCoupler.physicalScattering
         (crowRegressionParameters.coupler interface) Unit).toOrientedModeTransform.toBehavior
@@ -299,12 +302,15 @@ lemma crowRegression_chainCoordinates_eq_zero
     rw [hReturnEndZero] at hReturnEnd
     exact (mul_eq_zero.mp hReturnEnd.symm).resolve_left (by norm_num)
   have hReturnLinkZero : returnLink = 0 := by
-    rw [hReturnMiddleZero, hLaunchMiddleZero, zero_mul, zero_sub] at hReturnMiddle
-    exact (mul_eq_zero.mp hReturnMiddle.symm).resolve_left (by
-      norm_num [Complex.I_ne_zero])
+    rw [hReturnMiddleZero, hLaunchMiddleZero] at hReturnMiddle
+    have hProduct : (-(12 / 13 : ℂ) * Complex.I) * returnLink = 0 := by
+      calc
+        _ = (5 / 13) * 0 - (12 / 13) * Complex.I * returnLink := by ring
+        _ = 0 := hReturnMiddle.symm
+    exact (mul_eq_zero.mp hProduct).resolve_left (by norm_num [Complex.I_ne_zero])
   have hLaunchNextZero : launchNext = 0 := by
-    rw [hLaunchMiddleZero, hReturnLinkZero, mul_zero, zero_add] at hLaunchNext
-    exact hLaunchNext
+    rw [hLaunchMiddleZero, hReturnLinkZero] at hLaunchNext
+    simpa using hLaunchNext
   have hOutputEndZero : outputEnd = 0 := by
     rw [hLaunchNextZero, mul_zero] at hOutputEnd
     exact hOutputEnd
