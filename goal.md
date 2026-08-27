@@ -2450,7 +2450,9 @@ the PANDA through/drop pair.
 - the human-audited eight-node, eleven-edge topology with parallel edges retained;
 - the transfer result by N5 elimination and independently by S6 Mason gain;
 - active/passive, unit-delay, and multiple-delay specializations;
-- coherent and incoherent interpretations through N6c;
+- [x] coherent and incoherent interpretations through N6c, where `incoherent` means diagonal or
+  mutually decorrelated second-order coherency data only; this does not identify the coherent N7
+  DCDR with FMICS'15's separately printed incoherent coefficient model;
 - poles, zeros, and stability results; and
 - an exact or interval-certified, human-audited version of the source's reported unstable passive
   parameter case.

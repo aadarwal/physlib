@@ -512,6 +512,8 @@ public import Physlib.Optics.Systems.Cascade.SourceMappedSfgRegression
 public import Physlib.Optics.Systems.Cascade.Termination
 public import Physlib.Optics.Systems.Cascade.TerminationRegression
 public import Physlib.Optics.Systems.DCDR.Bridge
+public import Physlib.Optics.Systems.DCDR.Coherency
+public import Physlib.Optics.Systems.DCDR.CoherencyRegression
 public import Physlib.Optics.Systems.DCDR.Graph
 public import Physlib.Optics.Systems.DCDR.Mason
 public import Physlib.Optics.Systems.DCDR.MultipleDelay
