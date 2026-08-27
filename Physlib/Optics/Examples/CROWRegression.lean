@@ -180,9 +180,11 @@ abbrev crowRegressionConnections := (netlist crowRegressionParameters).connectio
 /-- One connected channel in the concrete right-interface wiring stage. -/
 def crowRegressionRightConnectedChannel (ring : Fin 2) (kind : Bool)
     (endpoint : PortConnection.End) : crowRegressionConnections.Channel :=
-  match endpoint with
-  | .left => ⟨Sum.inl (ring, kind), Sum.inl ()⟩
-  | .right => ⟨Sum.inl (ring, kind), Sum.inr ()⟩
+  match kind, endpoint with
+  | false, .left => ⟨Sum.inl (ring, false), Sum.inl ()⟩
+  | false, .right => ⟨Sum.inl (ring, false), Sum.inr ()⟩
+  | true, .left => ⟨Sum.inl (ring, true), Sum.inl ()⟩
+  | true, .right => ⟨Sum.inl (ring, true), Sum.inr ()⟩
 
 /-- One connected channel in the concrete forward left-interface wiring stage. -/
 def crowRegressionForwardConnectedChannel (ring : Fin 2)
@@ -271,6 +273,7 @@ lemma crowRegressionRightConnectedChannel_mate (ring : Fin 2) (kind : Bool) :
     crowRegressionConnections.mateEquiv
         (crowRegressionRightConnectedChannel ring kind .right) =
       crowRegressionRightConnectedChannel ring kind .left := by
+  cases kind
   constructor <;> rfl
 
 /-- Mate routing exchanges the two ends of every concrete forward-stage link. -/
