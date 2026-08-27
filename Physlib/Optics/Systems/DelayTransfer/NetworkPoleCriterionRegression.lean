@@ -309,6 +309,40 @@ lemma visiblePoleConnectedRight_mate :
     visiblePoleConnections.mateEquiv visiblePoleConnectedRight =
       visiblePoleConnectedLeft := rfl
 
+/-- The externally exposed aggregate channel is unique. -/
+instance visiblePoleExternalChannelUnique : Unique visiblePoleNetlist.ExternalChannel where
+  default := visiblePoleExternalChannel
+  uniq := by
+    rintro ⟨⟨⟨component, port⟩, mode⟩, hExternal⟩
+    cases component
+    cases mode
+    cases port
+    · rfl
+    · exact (hExternal ⟨visiblePoleConnectedLeft, rfl⟩).elim
+    · exact (hExternal ⟨visiblePoleConnectedRight, rfl⟩).elim
+
+/-- The external incident endpoint is unique. -/
+instance visiblePoleExternalIncidentUnique : Unique visiblePoleNetlist.ExternalIncident where
+  default := Incident.mk visiblePoleExternalChannel
+  uniq := by
+    rintro ⟨channel⟩
+    exact congrArg Incident.mk (Subsingleton.elim channel visiblePoleExternalChannel)
+
+/-- The external outgoing endpoint is unique. -/
+instance visiblePoleExternalOutgoingUnique : Unique visiblePoleNetlist.ExternalOutgoing where
+  default := Outgoing.mk visiblePoleExternalChannel
+  uniq := by
+    rintro ⟨channel⟩
+    exact congrArg Outgoing.mk (Subsingleton.elim channel visiblePoleExternalChannel)
+
+/-- External incident endpoints are displayed in a singleton coordinate. -/
+def visiblePoleExternalIncidentEquiv : visiblePoleNetlist.ExternalIncident ≃ Unit :=
+  Equiv.ofUnique _ _
+
+/-- External outgoing endpoints are displayed in a singleton coordinate. -/
+def visiblePoleExternalOutgoingEquiv : visiblePoleNetlist.ExternalOutgoing ≃ Unit :=
+  Equiv.ofUnique _ _
+
 /-!
 
 ## C. Cleared matrix expansion
@@ -393,6 +427,16 @@ def visiblePoleClearedFeedbackMatrix : Matrix (Fin 3) (Fin 3) (DelayPolynomial 1
   !![1, 0, 0;
      0, 1, -(MvPolynomial.C (1 / 2) * MvPolynomial.X 0);
      MvPolynomial.C (4 / 5 * Complex.I), MvPolynomial.C (-3 / 5), 1]
+
+/-- The displayed injection of the singleton external incident coordinate. -/
+def visiblePolePolynomialInputExposureMatrix :
+    Matrix (Fin 3) Unit (DelayPolynomial 1) :=
+  fun incident _ => Fin.cases 1 (fun _ => 0) incident
+
+/-- The displayed readout of the singleton external outgoing coordinate. -/
+def visiblePolePolynomialOutputReadoutMatrix :
+    Matrix Unit (Fin 3) (DelayPolynomial 1) :=
+  fun _ outgoing => Fin.cases 1 (fun _ => 0) outgoing
 
 /-- The exact selected external response numerator `3/5 - q/2`. -/
 def visiblePoleNumeratorPolynomial : Polynomial ℂ :=
@@ -510,6 +554,148 @@ lemma visiblePole_polynomialRouting_reindex :
   ext incident outgoing
   fin_cases incident <;> fin_cases outgoing <;>
     simp [Matrix.reindex_apply, visiblePolePolynomialRoutingMatrix]
+
+/-- Reindexing the cleared feedback law exposes `1 - C*S_clear` in displayed coordinates. -/
+lemma visiblePole_clearedFeedback_reindex :
+    Matrix.reindex visiblePoleIncidentEquiv visiblePoleIncidentEquiv
+        visiblePoleNetlist.clearedFeedback =
+      visiblePoleClearedFeedbackMatrix := by
+  rw [RationalNetlist.clearedFeedback, visiblePole_commonDenominator]
+  simp only [one_smul]
+  change (Matrix.reindexLinearEquiv (DelayPolynomial 1) (DelayPolynomial 1)
+    visiblePoleIncidentEquiv visiblePoleIncidentEquiv)
+      (1 - visiblePoleNetlist.polynomialRouting *
+        visiblePoleNetlist.clearedScattering) = _
+  rw [map_sub, Matrix.reindexLinearEquiv_one,
+    ← Matrix.reindexLinearEquiv_mul (DelayPolynomial 1) (DelayPolynomial 1)
+      visiblePoleIncidentEquiv visiblePoleOutgoingEquiv visiblePoleIncidentEquiv]
+  change 1 - Matrix.reindex visiblePoleIncidentEquiv visiblePoleOutgoingEquiv
+      visiblePoleNetlist.polynomialRouting *
+    Matrix.reindex visiblePoleOutgoingEquiv visiblePoleIncidentEquiv
+      visiblePoleNetlist.clearedScattering = _
+  rw [visiblePole_polynomialRouting_reindex, visiblePole_clearedScattering_reindex]
+  ext incident input
+  fin_cases incident <;> fin_cases input <;>
+    simp [Matrix.sub_apply, visiblePolePolynomialRoutingMatrix,
+      visiblePoleClearedScatteringMatrix, visiblePoleClearedFeedbackMatrix,
+      visiblePolePropagationPolynomial]
+  all_goals split <;> ring
+
+/-- Reindexing the external incident injection selects the displayed external coordinate. -/
+lemma visiblePole_polynomialInputExposure_reindex :
+    Matrix.reindex visiblePoleIncidentEquiv visiblePoleExternalIncidentEquiv
+        visiblePoleNetlist.polynomialInputExposure =
+      visiblePolePolynomialInputExposureMatrix := by
+  apply Matrix.ext
+  intro incident external
+  cases external
+  fin_cases incident
+  · change MvPolynomial.C
+      (visiblePoleNetlist.toParameterizedNetlist.connections.externalIncidentInjection
+      (Incident.mk (visiblePoleChannel .external))
+      (Incident.mk visiblePoleExternalChannel)) = 1
+    have hEmbedding :
+        visiblePoleNetlist.toParameterizedNetlist.connections.externalIncidentEmbedding
+            (Incident.mk visiblePoleExternalChannel) =
+          Incident.mk (visiblePoleChannel .external) := by
+      rw [PortConnectionFamily.externalIncidentEmbedding_apply]
+      rfl
+    rw [PortConnectionFamily.externalIncidentInjection,
+      ModeTransform.zeroExtension_entry, if_pos hEmbedding]
+    simp
+  · change MvPolynomial.C
+      (visiblePoleNetlist.toParameterizedNetlist.connections.externalIncidentInjection
+      (Incident.mk (visiblePoleChannel .left))
+      (Incident.mk visiblePoleExternalChannel)) = 0
+    rw [PortConnectionFamily.externalIncidentInjection_entry_of_ne]
+    · simp
+    · intro hEqual
+      exact VisiblePolePort.noConfusion
+        (congrArg (fun channel => channel.1.2) hEqual)
+  · change MvPolynomial.C
+      (visiblePoleNetlist.toParameterizedNetlist.connections.externalIncidentInjection
+      (Incident.mk (visiblePoleChannel .right))
+      (Incident.mk visiblePoleExternalChannel)) = 0
+    rw [PortConnectionFamily.externalIncidentInjection_entry_of_ne]
+    · simp
+    · intro hEqual
+      exact VisiblePolePort.noConfusion
+        (congrArg (fun channel => channel.1.2) hEqual)
+
+/-- Reindexing the external outgoing readout selects the displayed external coordinate. -/
+lemma visiblePole_polynomialOutputReadout_reindex :
+    Matrix.reindex visiblePoleExternalOutgoingEquiv visiblePoleOutgoingEquiv
+        visiblePoleNetlist.polynomialOutputReadout =
+      visiblePolePolynomialOutputReadoutMatrix := by
+  apply Matrix.ext
+  intro external outgoing
+  cases external
+  fin_cases outgoing
+  · change MvPolynomial.C
+      (visiblePoleNetlist.toParameterizedNetlist.connections.externalOutgoingReadout
+      (Outgoing.mk visiblePoleExternalChannel)
+      (Outgoing.mk (visiblePoleChannel .external))) = 1
+    have hEmbedding :
+        visiblePoleNetlist.toParameterizedNetlist.connections.externalOutgoingEmbedding
+            (Outgoing.mk visiblePoleExternalChannel) =
+          Outgoing.mk (visiblePoleChannel .external) := by
+      rw [PortConnectionFamily.externalOutgoingEmbedding_apply]
+      rfl
+    rw [PortConnectionFamily.externalOutgoingReadout,
+      ModeTransform.restriction_entry, if_pos hEmbedding]
+    simp
+  · change MvPolynomial.C
+      (visiblePoleNetlist.toParameterizedNetlist.connections.externalOutgoingReadout
+      (Outgoing.mk visiblePoleExternalChannel)
+      (Outgoing.mk (visiblePoleChannel .left))) = 0
+    rw [PortConnectionFamily.externalOutgoingReadout_entry_of_ne]
+    · simp
+    · intro hEqual
+      exact VisiblePolePort.noConfusion
+        (congrArg (fun channel => channel.1.2) hEqual)
+  · change MvPolynomial.C
+      (visiblePoleNetlist.toParameterizedNetlist.connections.externalOutgoingReadout
+      (Outgoing.mk visiblePoleExternalChannel)
+      (Outgoing.mk (visiblePoleChannel .right))) = 0
+    rw [PortConnectionFamily.externalOutgoingReadout_entry_of_ne]
+    · simp
+    · intro hEqual
+      exact VisiblePolePort.noConfusion
+        (congrArg (fun channel => channel.1.2) hEqual)
+
+/-- Direct determinant expansion gives the cleared one-delay denominator. -/
+lemma visiblePole_responseDenominator_mv :
+    visiblePoleNetlist.responseDenominator =
+      MvPolynomial.C 1 - MvPolynomial.C (3 / 10) * MvPolynomial.X 0 := by
+  rw [RationalNetlist.responseDenominator,
+    ← Matrix.det_reindex_self visiblePoleIncidentEquiv
+      visiblePoleNetlist.clearedFeedback,
+    visiblePole_clearedFeedback_reindex, Matrix.det_fin_three]
+  simp [visiblePoleClearedFeedbackMatrix]
+  have hCoefficient :
+      (MvPolynomial.C ((2 : ℂ)⁻¹) * MvPolynomial.X 0 *
+        MvPolynomial.C (-3 / 5 : ℂ) :
+        DelayPolynomial 1) =
+        -(MvPolynomial.C (3 / 10 : ℂ) * MvPolynomial.X 0) := by
+    calc
+      (MvPolynomial.C ((2 : ℂ)⁻¹) * MvPolynomial.X 0 *
+          MvPolynomial.C (-3 / 5 : ℂ) : DelayPolynomial 1) =
+          (MvPolynomial.C ((2 : ℂ)⁻¹) * MvPolynomial.C (-3 / 5 : ℂ)) *
+            MvPolynomial.X 0 := by ring
+      _ = MvPolynomial.C ((2 : ℂ)⁻¹ * (-3 / 5)) * MvPolynomial.X 0 := by
+        rw [MvPolynomial.C_mul]
+      _ = MvPolynomial.C (-3 / 10 : ℂ) * MvPolynomial.X 0 := by norm_num
+      _ = -(MvPolynomial.C (3 / 10 : ℂ) * MvPolynomial.X 0) := by
+        norm_num
+  rw [hCoefficient]
+  ring
+
+/-- In the canonical one-delay coordinate, the cleared denominator is `1 - 3*q/10`. -/
+lemma visiblePole_responseDenominator :
+    oneDelayPolynomialEquiv visiblePoleNetlist.responseDenominator =
+      visiblePoleDenominatorPolynomial := by
+  rw [visiblePole_responseDenominator_mv]
+  simp [oneDelayPolynomialEquiv, visiblePoleDenominatorPolynomial]
 
 end
 
