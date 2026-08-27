@@ -291,38 +291,53 @@ lemma crowRegressionReturn_right_embedding (ring : Fin 2) :
       crowRegressionCouplerChannel ring.castSucc .leftSecond := by
   rfl
 
-/-- Mate routing exchanges the two ends of every concrete right-interface link. -/
+/-- Mate routing sends a right-interface link's first end to its second end. -/
 @[simp]
-lemma crowRegressionRightConnectedChannel_mate (ring : Fin 2) (kind : Bool) :
+lemma crowRegressionRightConnectedChannel_mate_left (ring : Fin 2) (kind : Bool) :
     crowRegressionConnections.mateEquiv
         (crowRegressionRightConnectedChannel ring kind .left) =
-      crowRegressionRightConnectedChannel ring kind .right ∧
+      crowRegressionRightConnectedChannel ring kind .right := by
+  cases kind <;> rfl
+
+/-- Mate routing sends a right-interface link's second end to its first end. -/
+@[simp]
+lemma crowRegressionRightConnectedChannel_mate_right (ring : Fin 2) (kind : Bool) :
     crowRegressionConnections.mateEquiv
         (crowRegressionRightConnectedChannel ring kind .right) =
       crowRegressionRightConnectedChannel ring kind .left := by
-  cases kind <;> constructor <;> rfl
+  cases kind <;> rfl
 
-/-- Mate routing exchanges the two ends of every concrete forward-stage link. -/
+/-- Mate routing sends a forward-stage link's first end to its second end. -/
 @[simp]
-lemma crowRegressionForwardConnectedChannel_mate (ring : Fin 2) :
+lemma crowRegressionForwardConnectedChannel_mate_left (ring : Fin 2) :
     crowRegressionConnections.mateEquiv
         (crowRegressionForwardConnectedChannel ring .left) =
-      crowRegressionForwardConnectedChannel ring .right ∧
+      crowRegressionForwardConnectedChannel ring .right := by
+  rfl
+
+/-- Mate routing sends a forward-stage link's second end to its first end. -/
+@[simp]
+lemma crowRegressionForwardConnectedChannel_mate_right (ring : Fin 2) :
     crowRegressionConnections.mateEquiv
         (crowRegressionForwardConnectedChannel ring .right) =
       crowRegressionForwardConnectedChannel ring .left := by
-  constructor <;> rfl
+  rfl
 
-/-- Mate routing exchanges the two ends of every concrete return-stage link. -/
+/-- Mate routing sends a return-stage link's first end to its second end. -/
 @[simp]
-lemma crowRegressionReturnConnectedChannel_mate (ring : Fin 2) :
+lemma crowRegressionReturnConnectedChannel_mate_left (ring : Fin 2) :
     crowRegressionConnections.mateEquiv
         (crowRegressionReturnConnectedChannel ring .left) =
-      crowRegressionReturnConnectedChannel ring .right ∧
+      crowRegressionReturnConnectedChannel ring .right := by
+  rfl
+
+/-- Mate routing sends a return-stage link's second end to its first end. -/
+@[simp]
+lemma crowRegressionReturnConnectedChannel_mate_right (ring : Fin 2) :
     crowRegressionConnections.mateEquiv
         (crowRegressionReturnConnectedChannel ring .right) =
       crowRegressionReturnConnectedChannel ring .left := by
-  constructor <;> rfl
+  rfl
 
 /-- The four finite-bus ports left exposed by the concrete two-ring wiring. -/
 inductive CrowRegressionExternalPort
@@ -694,46 +709,62 @@ lemma crowRegression_incidentAssembly :
   all_goals cases port
   all_goals
     first
-    | rw [hExternal .leftInput]
-      rfl
-    | rw [hExternal .leftOutput]
-      rfl
-    | rw [hExternal .rightInput]
-      rfl
-    | rw [hExternal .rightOutput]
-      rfl
-    | rw [← crowRegressionRightForward_left_embedding, hConnected,
-        (crowRegressionRightConnectedChannel_mate _ false).1,
-        crowRegressionRightForward_right_embedding]
-      rfl
-    | rw [← crowRegressionRightForward_right_embedding, hConnected,
-        (crowRegressionRightConnectedChannel_mate _ false).2,
-        crowRegressionRightForward_left_embedding]
-      rfl
-    | rw [← crowRegressionRightReturn_left_embedding, hConnected,
-        (crowRegressionRightConnectedChannel_mate _ true).1,
-        crowRegressionRightReturn_right_embedding]
-      rfl
-    | rw [← crowRegressionRightReturn_right_embedding, hConnected,
-        (crowRegressionRightConnectedChannel_mate _ true).2,
-        crowRegressionRightReturn_left_embedding]
-      rfl
-    | rw [← crowRegressionForward_left_embedding, hConnected,
-        (crowRegressionForwardConnectedChannel_mate _).1,
-        crowRegressionForward_right_embedding]
-      rfl
-    | rw [← crowRegressionForward_right_embedding, hConnected,
-        (crowRegressionForwardConnectedChannel_mate _).2,
-        crowRegressionForward_left_embedding]
-      rfl
-    | rw [← crowRegressionReturn_left_embedding, hConnected,
-        (crowRegressionReturnConnectedChannel_mate _).1,
-        crowRegressionReturn_right_embedding]
-      rfl
-    | rw [← crowRegressionReturn_right_embedding, hConnected,
-        (crowRegressionReturnConnectedChannel_mate _).2,
-        crowRegressionReturn_left_embedding]
-      rfl
+    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
+        PortConnectionFamily.externalIncidentEmbedding_apply,
+        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
+        (hExternal .leftInput).symm
+    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
+        PortConnectionFamily.externalIncidentEmbedding_apply,
+        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
+        (hExternal .leftOutput).symm
+    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
+        PortConnectionFamily.externalIncidentEmbedding_apply,
+        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
+        (hExternal .rightInput).symm
+    | simpa only [crowRegressionInput, ModeAmplitude.restrictEmbedding_apply,
+        PortConnectionFamily.externalIncidentEmbedding_apply,
+        crowRegressionExternalChannel, crowRegressionExternalAmbientChannel] using
+        (hExternal .rightOutput).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionRightConnectedChannel _ false .left)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionRightConnectedChannel _ false .right)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionRightConnectedChannel _ true .left)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionRightConnectedChannel _ true .right)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionForwardConnectedChannel _ .left)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionForwardConnectedChannel _ .right)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionReturnConnectedChannel _ .left)).symm
+    | simpa [crowRegressionIncident, crowRegressionOutgoing,
+        crowRegressionIncidentValue, crowRegressionOutgoingValue,
+        crowRegressionChannel, crowRegressionCouplerChannel,
+        crowRegressionForwardArcChannel, crowRegressionReturnArcChannel] using
+        (hConnected (crowRegressionReturnConnectedChannel _ .right)).symm
 
 /-!
 ## D. Compiled response and negative controls
