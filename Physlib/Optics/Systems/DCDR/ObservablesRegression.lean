@@ -398,7 +398,7 @@ lemma printedIncoherentZeroPolynomial_boundary_one :
 lemma printedIncoherentZeroSet_boundary_eq_pair :
     printedIncoherentZeroSet 1 1 1 0 0 = {(1 : ℂ), -1} := by
   ext z
-  simp only [printedIncoherentZeroSet, Set.mem_setOf_eq, Set.mem_insert_iff,
+  simp only [printedIncoherentZeroSet, Set.mem_ofPred_eq, Set.mem_insert_iff,
     Set.mem_singleton_iff]
   constructor
   · rintro ⟨hz, hRoot⟩
