@@ -297,6 +297,63 @@ lemma crowRegressionReturnConnectedChannel_mate (ring : Fin 2) :
       crowRegressionReturnConnectedChannel ring .left := by
   constructor <;> rfl
 
+/-- The four finite-bus ports left exposed by the concrete two-ring wiring. -/
+inductive CrowRegressionExternalPort
+  | leftInput
+  | leftOutput
+  | rightInput
+  | rightOutput
+  deriving DecidableEq, Fintype
+
+/-- The ambient component channel selected by one exposed finite-bus port. -/
+def crowRegressionExternalAmbientChannel :
+    CrowRegressionExternalPort → CrowRegressionChannel
+  | .leftInput => crowRegressionCouplerChannel 0 .leftFirst
+  | .leftOutput => crowRegressionCouplerChannel 0 .rightFirst
+  | .rightInput => crowRegressionCouplerChannel 2 .leftSecond
+  | .rightOutput => crowRegressionCouplerChannel 2 .rightSecond
+
+/-- Each displayed finite-bus channel is absent from the concrete connection image. -/
+lemma crowRegressionExternalAmbientChannel_not_connected
+    (port : CrowRegressionExternalPort) :
+    crowRegressionExternalAmbientChannel port ∉
+      Set.range crowRegressionConnections.channelEmbedding := by
+  rw [crowRegressionConnections.channel_mem_range_channelEmbedding_iff]
+  rintro ⟨⟨connection, endpoint⟩, hPort⟩
+  rcases connection with right | forwardOrReturn
+  · rcases right with ⟨ring, kind⟩
+    cases port <;> cases kind <;> cases endpoint
+    all_goals
+      have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
+      simp [crowRegressionExternalAmbientChannel, crowRegressionConnections,
+        connections, PortConnectionFamily.appendThreeRight,
+        PortConnectionFamily.append, rightConnections, rightConnection,
+        PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+        PortConnection.endpointPort] at hLabel
+  · rcases forwardOrReturn with forward | return
+    · cases port <;> cases endpoint
+      all_goals
+        have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
+        simp [crowRegressionExternalAmbientChannel, crowRegressionConnections,
+          connections, PortConnectionFamily.appendThreeRight,
+          PortConnectionFamily.append, forwardConnections, forwardConnection,
+          PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+          PortConnection.endpointPort] at hLabel
+    · cases port <;> cases endpoint
+      all_goals
+        have hLabel := congrArg (portLabelEquiv crowRegressionParameters) hPort
+        simp [crowRegressionExternalAmbientChannel, crowRegressionConnections,
+          connections, PortConnectionFamily.appendThreeRight,
+          PortConnectionFamily.append, returnConnections, returnConnection,
+          PortConnectionFamily.endpointEmbedding, PortConnectionFamily.endpointPort,
+          PortConnection.endpointPort] at hLabel
+
+/-- One typed external channel at the concrete CROW boundary. -/
+def crowRegressionExternalChannel (port : CrowRegressionExternalPort) :
+    crowRegressionConnections.ExternalChannel :=
+  ⟨crowRegressionExternalAmbientChannel port,
+    crowRegressionExternalAmbientChannel_not_connected port⟩
+
 /-- Aggregate incident evaluation reduces to the declared componentwise table. -/
 @[simp]
 lemma crowRegressionIncident_component (component : Component 2)
