@@ -1442,12 +1442,10 @@ lemma crowRegression_firstIsolatedRingTransfer_eq_standard :
     (((3 / 5 : ℂ) - (1 / 2) * (1 / 2)) /
       (1 - (3 / 5) * (1 / 2) * (1 / 2))) =
       AllPass.standardThroughTransfer crowRegressionFirstIsolatedRing := by
-  have hPhase : MatchedPropagation.carrierPhaseFactor (0 : Real.Angle) = 1 := by
-    simp [MatchedPropagation.carrierPhaseFactor, Real.Angle.toCircle_zero]
   norm_num [AllPass.standardThroughTransfer, AllPass.Parameters.denominator,
     AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
     AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
-    MatchedPropagation.carrierPhaseFactor, crowRegressionFirstIsolatedRing, hPhase]
+    MatchedPropagation.carrierPhaseFactor, crowRegressionFirstIsolatedRing]
 
 /-- The first isolated baseline is certified by the existing all-pass network transfer API. -/
 lemma crowRegression_firstIsolatedRingTransfer_eq_allPass :
@@ -1472,12 +1470,10 @@ lemma crowRegression_secondIsolatedRingTransfer_eq_standard :
     (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
       (1 - (5 / 13) * (1 / 2) * (1 / 2))) =
       AllPass.standardThroughTransfer crowRegressionSecondIsolatedRing := by
-  have hPhase : MatchedPropagation.carrierPhaseFactor (0 : Real.Angle) = 1 := by
-    simp [MatchedPropagation.carrierPhaseFactor, Real.Angle.toCircle_zero]
   norm_num [AllPass.standardThroughTransfer, AllPass.Parameters.denominator,
     AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
     AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
-    MatchedPropagation.carrierPhaseFactor, crowRegressionSecondIsolatedRing, hPhase]
+    MatchedPropagation.carrierPhaseFactor, crowRegressionSecondIsolatedRing]
 
 /-- The second isolated baseline is certified by the existing all-pass network transfer API. -/
 lemma crowRegression_secondIsolatedRingTransfer_eq_allPass :
