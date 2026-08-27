@@ -57,6 +57,10 @@ noncomputable section
 
 open Electromagnetism
 
+/-!
+## A. Primitive polarization and interface actions
+-/
+
 /-- The negative-side fixture medium has wave admittance four. -/
 def physicalPortSuite9bNegativeMedium : HomogeneousIsotropicMedium where
   ε := 16
