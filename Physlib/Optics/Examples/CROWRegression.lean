@@ -63,59 +63,49 @@ namespace Optics
 noncomputable section
 
 namespace CROW
-
 /-!
 ## A. Exact two-ring fixture
 -/
-
 /-- The exact `3-4-5` coupler used at both finite bus interfaces. -/
 def crowRegressionEndCoupler : DirectionalCoupler.Parameters where
   throughAmplitude := 3 / 5
   crossAmplitude := 4 / 5
-
 /-- The exact `5-12-13` coupler shared by the two rings. -/
 def crowRegressionMiddleCoupler : DirectionalCoupler.Parameters where
   throughAmplitude := 5 / 13
   crossAmplitude := 12 / 13
-
 /-- The zero-phase half-amplitude propagation law used on all four half-arcs. -/
 def crowRegressionHalfArc : MatchedPropagation.Parameters where
   amplitudeTransmission := 1 / 2
   carrierPathPhase := 0
-
 /-- The nonuniform exact two-ring CROW fixture. -/
 def crowRegressionParameters : Parameters 2 where
   coupler interface := if interface = 1 then crowRegressionMiddleCoupler
     else crowRegressionEndCoupler
   forwardArc _ := crowRegressionHalfArc
   returnArc _ := crowRegressionHalfArc
-
 /-- The first isolated-ring baseline parameter used by the non-product comparison. -/
 def crowRegressionFirstIsolatedRing : AllPass.Parameters where
   throughAmplitude := 3 / 5
   crossAmplitude := 4 / 5
   fieldAttenuation := (1 / 2) * (1 / 2)
   roundTripPhase := 0
-
 /-- The second isolated-ring baseline parameter used by the non-product comparison. -/
 def crowRegressionSecondIsolatedRing : AllPass.Parameters where
   throughAmplitude := 5 / 13
   crossAmplitude := 12 / 13
   fieldAttenuation := (1 / 2) * (1 / 2)
   roundTripPhase := 0
-
 /-- The end-coupler amplitudes obey the exact Pythagorean losslessness identity. -/
 lemma crowRegression_endCoupler_pythagorean :
     crowRegressionEndCoupler.throughAmplitude ^ 2 +
       crowRegressionEndCoupler.crossAmplitude ^ 2 = 1 := by
   norm_num [crowRegressionEndCoupler]
-
 /-- The middle-coupler amplitudes obey the exact Pythagorean losslessness identity. -/
 lemma crowRegression_middleCoupler_pythagorean :
     crowRegressionMiddleCoupler.throughAmplitude ^ 2 +
       crowRegressionMiddleCoupler.crossAmplitude ^ 2 = 1 := by
   norm_num [crowRegressionMiddleCoupler]
-
 /-- Componentwise incident values obtained by solving the primitive two-ring equations. -/
 def crowRegressionIncidentValue :
     (component : Component 2) → (componentPortFamily component).Channel → ℂ
@@ -516,7 +506,6 @@ def crowRegressionOutput : ModeAmplitude (Outgoing crowRegressionConnections.Ext
 /-!
 ## B. Primitive component equations
 -/
-
 /-- The incident table restricted to one declared primitive component. -/
 def crowRegressionLocalIncident (component : Component 2) :
     ModeAmplitude (Incident (componentPortFamily component).Channel) :=
@@ -1267,7 +1256,6 @@ lemma crowRegression_isWellPosed :
 /-!
 ## C. Raw flat-network witness
 -/
-
 /-- Mate routing and the restricted external input reconstruct the exact incident table. -/
 lemma crowRegression_incidentAssembly :
     crowRegressionIncident =
@@ -1397,7 +1385,6 @@ lemma crowRegression_rawSelectedOutput :
 /-!
 ## D. Compiled response and negative controls
 -/
-
 /-- Generic compiled elimination returns the exact selected right-bus output. -/
 lemma crowRegression_responseTransform_selectedOutput :
     ((netlist crowRegressionParameters).responseTransform
@@ -1430,13 +1417,11 @@ lemma crowRegression_wrongRingIndex_ne_response :
   intro hEqual
   have hImaginary := congrArg Complex.im hEqual
   norm_num [crowRegressionOutgoingValue] at hImaginary
-
 /-- The first isolated-ring primitive expression evaluates exactly to `7 / 17`. -/
 lemma crowRegression_firstIsolatedRingTransfer :
     (((3 / 5 : ℂ) - (1 / 2) * (1 / 2)) /
       (1 - (3 / 5) * (1 / 2) * (1 / 2))) = 7 / 17 := by
   norm_num
-
 /-- The first isolated baseline literal is the standard all-pass transfer expression. -/
 lemma crowRegression_firstIsolatedRingTransfer_eq_standard :
     (((3 / 5 : ℂ) - (1 / 2) * (1 / 2)) /
@@ -1446,7 +1431,6 @@ lemma crowRegression_firstIsolatedRingTransfer_eq_standard :
     AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
     AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
     MatchedPropagation.carrierPhaseFactor, crowRegressionFirstIsolatedRing]
-
 /-- The first isolated baseline is certified by the existing all-pass network transfer API. -/
 lemma crowRegression_firstIsolatedRingTransfer_eq_allPass :
     AllPass.throughTransfer crowRegressionFirstIsolatedRing =
@@ -1458,13 +1442,11 @@ lemma crowRegression_firstIsolatedRingTransfer_eq_allPass :
     AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
     AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
       MatchedPropagation.carrierPhaseFactor, crowRegressionFirstIsolatedRing]
-
 /-- The second isolated-ring primitive expression evaluates exactly to `7 / 47`. -/
 lemma crowRegression_secondIsolatedRingTransfer :
     (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
       (1 - (5 / 13) * (1 / 2) * (1 / 2))) = 7 / 47 := by
   norm_num
-
 /-- The second isolated baseline literal is the standard all-pass transfer expression. -/
 lemma crowRegression_secondIsolatedRingTransfer_eq_standard :
     (((5 / 13 : ℂ) - (1 / 2) * (1 / 2)) /
@@ -1474,7 +1456,6 @@ lemma crowRegression_secondIsolatedRingTransfer_eq_standard :
     AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
     AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
     MatchedPropagation.carrierPhaseFactor, crowRegressionSecondIsolatedRing]
-
 /-- The second isolated baseline is certified by the existing all-pass network transfer API. -/
 lemma crowRegression_secondIsolatedRingTransfer_eq_allPass :
     AllPass.throughTransfer crowRegressionSecondIsolatedRing =
@@ -1486,7 +1467,6 @@ lemma crowRegression_secondIsolatedRingTransfer_eq_allPass :
       AllPass.Parameters.loopGain, AllPass.Parameters.loopCoefficient,
       AllPass.Parameters.propagation, MatchedPropagation.transmissionCoefficient,
       MatchedPropagation.carrierPhaseFactor, crowRegressionSecondIsolatedRing]
-
 /-- The coupled response differs from the product of the two isolated-ring transfers.
 
 This does not exclude a product of coupled unit-cell transfer matrices; published CROW
