@@ -896,17 +896,15 @@ lemma physicalPortSuite9b_polarization_raw_action :
   funext output
   fin_cases output <;>
     simp [physicalPortSuite9bPolarizationRawInput,
-      physicalPortSuite9bPolarizationRawOutput, Matrix.toLpLin_apply,
-      Matrix.mulVec, dotProduct, Fin.sum_univ_two]
-  <;> ring
+      physicalPortSuite9bPolarizationRawOutput, Matrix.toLpLin_apply]
 
 /-- The raw interface input is nonzero in both sides of both polarization blocks. -/
 def physicalPortSuite9bInterfaceRawInput : ModeAmplitude (Fin 2 ⊕ Fin 2) :=
-  (WithLp.toLp 2 ![1, 2]).directSum (WithLp.toLp 2 ![3, 4])
+  ModeAmplitude.directSum (WithLp.toLp 2 ![1, 2]) (WithLp.toLp 2 ![3, 4])
 
 /-- The exact raw interface output retains all four independently checked coordinates. -/
 def physicalPortSuite9bInterfaceRawOutput : ModeAmplitude (Fin 2 ⊕ Fin 2) :=
-  (WithLp.toLp 2 ![11 / 5, -2 / 5]).directSum
+  ModeAmplitude.directSum (WithLp.toLp 2 ![11 / 5, -2 / 5])
     (WithLp.toLp 2 ![7 / 5, 24 / 5])
 
 /-- The registered s kernel is the exact rational primitive matrix at the fixture. -/
@@ -914,22 +912,32 @@ lemma physicalPortSuite9b_s_kernel :
     (physicalPortSuite9bInterface.sFresnelScatteringKernel 1 1).toModeTransform =
       !![(3 / 5 : ℂ), (4 / 5 : ℂ); (4 / 5 : ℂ), (-3 / 5 : ℂ)] := by
   rcases physicalPortSuite9b_fresnel_values with ⟨hFactor, hRS, hTS, _, _⟩
+  have hNormalized :
+      PlanarDielectricInterface.powerNormalizedFresnelTransmissionCoefficient
+          (physicalPortSuite9bInterface.fresnelTransmissionFluxFactor 1 1)
+          (physicalPortSuite9bInterface.sFresnelTransmissionCoefficient 1 1) =
+        4 / 5 := by
+    rw [hFactor, hTS, physicalPortSuite9b_normalized_transmission]
   ext output input
   fin_cases output <;> fin_cases input <;>
     simp [PlanarDielectricInterface.sFresnelScatteringKernel,
-      PlanarDielectricInterface.scalarFresnelScatteringKernel, hFactor, hRS, hTS,
-      physicalPortSuite9b_normalized_transmission]
+      PlanarDielectricInterface.scalarFresnelScatteringKernel, hRS, hNormalized]
 
 /-- The registered p kernel pins the fork-declared full-vector reflection sign. -/
 lemma physicalPortSuite9b_p_kernel :
     (physicalPortSuite9bInterface.pFresnelScatteringKernel 1 1).toModeTransform =
       !![(-3 / 5 : ℂ), (4 / 5 : ℂ); (4 / 5 : ℂ), (3 / 5 : ℂ)] := by
   rcases physicalPortSuite9b_fresnel_values with ⟨hFactor, _, _, hRP, hTP⟩
+  have hNormalized :
+      PlanarDielectricInterface.powerNormalizedFresnelTransmissionCoefficient
+          (physicalPortSuite9bInterface.fresnelTransmissionFluxFactor 1 1)
+          (physicalPortSuite9bInterface.pFresnelTransmissionCoefficient 1 1) =
+        4 / 5 := by
+    rw [hFactor, hTP, physicalPortSuite9b_normalized_transmission]
   ext output input
   fin_cases output <;> fin_cases input <;>
     simp [PlanarDielectricInterface.pFresnelScatteringKernel,
-      PlanarDielectricInterface.scalarFresnelScatteringKernel, hFactor, hRP, hTP,
-      physicalPortSuite9b_normalized_transmission]
+      PlanarDielectricInterface.scalarFresnelScatteringKernel, hRP, hNormalized]
 
 /-- Primitive block-matrix multiplication gives all four exact polarized-interface outputs. -/
 lemma physicalPortSuite9b_interface_raw_action :
@@ -1120,17 +1128,19 @@ lemma physicalPortSuite9b_indexed_action :
       physicalPortSuite9bIndexedOutput := by
   apply WithLp.ofLp_injective 2
   funext output
+  change ModeTransform.toLinearMap
+      (Matrix.blockDiagonal' fun selected =>
+        (physicalPortSuite9bFamily.scattering selected).toModeTransform)
+      physicalPortSuite9bIndexedInput output = _
   rcases output with ⟨component, channel⟩
   cases component
-  · rw [ScatteringComponentFamily.indexedScatteringMatrix,
-      ModeTransform.blockDiagonal'_apply,
+  · rw [ModeTransform.blockDiagonal'_apply,
       physicalPortSuite9bIndexedInput_restrict_polarization,
       physicalPortSuite9b_polarization_local_action]
     rcases channel with ⟨port, coordinate⟩
     cases port
     rfl
-  · rw [ScatteringComponentFamily.indexedScatteringMatrix,
-      ModeTransform.blockDiagonal'_apply,
+  · rw [ModeTransform.blockDiagonal'_apply,
       physicalPortSuite9bIndexedInput_restrict_interface,
       physicalPortSuite9b_interface_local_action]
     rcases channel with ⟨port, mode⟩
@@ -1251,20 +1261,34 @@ abbrev physicalPortSuite9bInterfaceNegativeSIndexed :
 lemma physicalPortSuite9b_indexed_negative_s_value :
     physicalPortSuite9bFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
         physicalPortSuite9bIndexedInput
-        physicalPortSuite9bInterfaceNegativeSIndexed = 11 / 5 := by
+      physicalPortSuite9bInterfaceNegativeSIndexed = 11 / 5 := by
   rw [physicalPortSuite9b_indexed_action]
-  rfl
+  simp [physicalPortSuite9bIndexedOutput,
+    physicalPortSuite9bInterfaceNegativeSIndexed,
+    physicalPortSuite9bInterfaceRawOutput,
+    PlanarDielectricInterface.channelEquiv,
+    PlanarDielectricInterface.sideEquiv]
 
 /-- The hostile family instead gives the p value `7/5` at negative-side s. -/
 lemma physicalPortSuite9b_hostile_indexed_negative_s_value :
     physicalPortSuite9bHostileFamily.indexedScatteringMatrix.toModeTransform.toLinearMap
-        physicalPortSuite9bIndexedInput
+      physicalPortSuite9bIndexedInput
         physicalPortSuite9bInterfaceNegativeSIndexed = 7 / 5 := by
-  rw [ScatteringComponentFamily.indexedScatteringMatrix,
-    ModeTransform.blockDiagonal'_apply,
+  change ModeTransform.toLinearMap
+      (Matrix.blockDiagonal' fun selected =>
+        (physicalPortSuite9bHostileFamily.scattering selected).toModeTransform)
+      physicalPortSuite9bIndexedInput
+        physicalPortSuite9bInterfaceNegativeSIndexed = _
+  rw [ModeTransform.blockDiagonal'_apply,
     physicalPortSuite9bIndexedInput_restrict_interface,
     physicalPortSuite9b_hostile_interface_local_action]
-  rfl
+  simp [physicalPortSuite9bHostileInterfaceLocalOutput,
+    physicalPortSuite9bInterfaceLocalOutput,
+    physicalPortSuite9bInterfaceNegativeSIndexed,
+    physicalPortSuite9bInterfaceNegativePolarizationSwap,
+    physicalPortSuite9bInterfaceRawOutput,
+    PlanarDielectricInterface.channelEquiv,
+    PlanarDielectricInterface.sideEquiv, ModeAmplitude.reindex_apply]
 
 /-- Swapping one owned side's polarization fiber changes the mixed-family output. -/
 lemma physicalPortSuite9b_hostile_action_ne :
