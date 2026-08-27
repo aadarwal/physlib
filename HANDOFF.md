@@ -6,7 +6,7 @@
 - Initial assigned base: `e24b21cb`
 - Named battery-green sync target: `b8ef3236`
 - Sync merge: `d7526554`
-- Gated source ref: `9f00abc1063d0d24adce9b52347c46450dfba0b7`
+- Gated source ref: `9cd8083708cd2431a1e06c23c3d75eadf030fea0`
 - Worktree: `/Users/aadarwal/src/aadarwal/physlib-wt/optics-s9-demo`
 
 The source ref above contains all Lean and convention-map content. This handoff is a documentation-
@@ -16,8 +16,8 @@ battery, and any ledger change.
 ## Files and requested registration
 
 - `Physlib/Optics/Examples/CROW.lean` — 534 lines; production construction and generic spine.
-- `Physlib/Optics/Examples/CROWRegression.lean` — 1457 lines; exact two-ring regression.
-- `Physlib/Optics/Examples/CROWTable1ConventionMap.md` — 121 lines; slice-1B comparison contract.
+- `Physlib/Optics/Examples/CROWRegression.lean` — 1523 lines; exact two-ring regression.
+- `Physlib/Optics/Examples/CROWTable1ConventionMap.md` — 130 lines; slice-1B comparison contract.
 
 Please add these sorted imports to `Physlib.lean` after hostile review:
 
@@ -65,6 +65,12 @@ shown to belong to the flat relation.
   `49/799`. `crowResponse_ne_isolatedRingTransferProduct` compares the raw CROW witness with that
   expanded product and rejects equality by imaginary part. It does not invoke the response-value
   lemma under test.
+- `crowRegression_firstIsolatedRingTransfer_eq_standard` and
+  `crowRegression_secondIsolatedRingTransfer_eq_standard` identify those literals with
+  `AllPass.standardThroughTransfer`; the corresponding `*_eq_allPass` lemmas certify the standard
+  transfer through `AllPass.throughTransfer_eq_standard` using unitary couplers and nonzero
+  denominators. The first factor is assigned the end coupler and the second the shared middle
+  coupler as an explicit modelling choice.
 
 The non-product result is qualified: it differs from this product of individual isolated-ring
 factors. It does not rule out products of coupled unit-cell transfer matrices, which occur in the
@@ -95,7 +101,7 @@ No outcome has fired in slice 1.
 
 ### Counting scope
 
-At gated source ref `9f00abc1`, the count covers `CROW.lean` lines 77 through 528. It counts
+At gated source ref `9cd80837`, the count covers `CROW.lean` lines 77 through 528. It counts
 nonblank, noncomment Lean source lines, including attributes, declaration headers, fields, and
 proofs. It excludes imports, namespaces, the module doc, section headings, and closing `end` lines.
 
@@ -211,7 +217,7 @@ measurement, reciprocity, time reversal, reference planes, and electromagnetic p
 
 No `goal.md` row names CROW at the gated source ref. The demonstrator adds evidence for already
 completed infrastructure and for the API-test layer; it does not claim a new completion flip.
-The exact text exercised at `9f00abc1` is:
+The exact text exercised at `9cd80837` is:
 
 > - [x] transport of a `PortConnectionFamily` along an equivalence of port families, with
 > covariance of incident assembly, external readout, and relational closure. This supports
@@ -228,7 +234,7 @@ and:
 The controller owns any additive validation binding and must quote its final ledger text at the
 integration ref.
 
-## Declaration inventory at `9f00abc1`
+## Declaration inventory at `9cd80837`
 
 Every line below points at the line containing the declaration keyword, not its docstring.
 
@@ -348,145 +354,157 @@ Every line below points at the line containing the declaration keyword, not its 
 ### `Physlib/Optics/Examples/CROWRegression.lean`
 
 - `crowRegressionEndCoupler`
-  — `Physlib/Optics/Examples/CROWRegression.lean:69`
+  — `Physlib/Optics/Examples/CROWRegression.lean:72`
 - `crowRegressionMiddleCoupler`
-  — `Physlib/Optics/Examples/CROWRegression.lean:74`
+  — `Physlib/Optics/Examples/CROWRegression.lean:77`
 - `crowRegressionHalfArc`
-  — `Physlib/Optics/Examples/CROWRegression.lean:79`
+  — `Physlib/Optics/Examples/CROWRegression.lean:82`
 - `crowRegressionParameters`
-  — `Physlib/Optics/Examples/CROWRegression.lean:84`
+  — `Physlib/Optics/Examples/CROWRegression.lean:87`
+- `crowRegressionFirstIsolatedRing`
+  — `Physlib/Optics/Examples/CROWRegression.lean:94`
+- `crowRegressionSecondIsolatedRing`
+  — `Physlib/Optics/Examples/CROWRegression.lean:101`
 - `crowRegression_endCoupler_pythagorean`
-  — `Physlib/Optics/Examples/CROWRegression.lean:91`
+  — `Physlib/Optics/Examples/CROWRegression.lean:108`
 - `crowRegression_middleCoupler_pythagorean`
-  — `Physlib/Optics/Examples/CROWRegression.lean:97`
+  — `Physlib/Optics/Examples/CROWRegression.lean:114`
 - `crowRegressionIncidentValue`
-  — `Physlib/Optics/Examples/CROWRegression.lean:103`
+  — `Physlib/Optics/Examples/CROWRegression.lean:120`
 - `crowRegressionOutgoingValue`
-  — `Physlib/Optics/Examples/CROWRegression.lean:123`
+  — `Physlib/Optics/Examples/CROWRegression.lean:140`
 - `CrowRegressionChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:143`
+  — `Physlib/Optics/Examples/CROWRegression.lean:160`
 - `crowRegressionIncident`
-  — `Physlib/Optics/Examples/CROWRegression.lean:147`
-- `crowRegressionOutgoing`
-  — `Physlib/Optics/Examples/CROWRegression.lean:153`
-- `crowRegressionChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:159`
-- `crowRegressionCouplerChannel`
   — `Physlib/Optics/Examples/CROWRegression.lean:164`
+- `crowRegressionOutgoing`
+  — `Physlib/Optics/Examples/CROWRegression.lean:170`
+- `crowRegressionChannel`
+  — `Physlib/Optics/Examples/CROWRegression.lean:176`
+- `crowRegressionCouplerChannel`
+  — `Physlib/Optics/Examples/CROWRegression.lean:181`
 - `crowRegressionForwardArcChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:169`
+  — `Physlib/Optics/Examples/CROWRegression.lean:186`
 - `crowRegressionReturnArcChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:174`
+  — `Physlib/Optics/Examples/CROWRegression.lean:191`
 - `portLabelEquiv_crowRegressionCouplerChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:180`
+  — `Physlib/Optics/Examples/CROWRegression.lean:197`
 - `portLabelEquiv_crowRegressionForwardArcChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:189`
-- `portLabelEquiv_crowRegressionReturnArcChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:198`
-- `crowRegressionConnections`
   — `Physlib/Optics/Examples/CROWRegression.lean:206`
+- `portLabelEquiv_crowRegressionReturnArcChannel`
+  — `Physlib/Optics/Examples/CROWRegression.lean:215`
+- `crowRegressionConnections`
+  — `Physlib/Optics/Examples/CROWRegression.lean:223`
 - `crowRegressionRightConnectedChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:209`
+  — `Physlib/Optics/Examples/CROWRegression.lean:226`
 - `crowRegressionForwardConnectedChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:218`
+  — `Physlib/Optics/Examples/CROWRegression.lean:235`
 - `crowRegressionReturnConnectedChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:225`
+  — `Physlib/Optics/Examples/CROWRegression.lean:242`
 - `crowRegressionRightForward_left_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:233`
+  — `Physlib/Optics/Examples/CROWRegression.lean:250`
 - `crowRegressionRightForward_right_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:241`
+  — `Physlib/Optics/Examples/CROWRegression.lean:258`
 - `crowRegressionRightReturn_left_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:249`
+  — `Physlib/Optics/Examples/CROWRegression.lean:266`
 - `crowRegressionRightReturn_right_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:257`
+  — `Physlib/Optics/Examples/CROWRegression.lean:274`
 - `crowRegressionForward_left_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:265`
+  — `Physlib/Optics/Examples/CROWRegression.lean:282`
 - `crowRegressionForward_right_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:273`
+  — `Physlib/Optics/Examples/CROWRegression.lean:290`
 - `crowRegressionReturn_left_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:281`
+  — `Physlib/Optics/Examples/CROWRegression.lean:298`
 - `crowRegressionReturn_right_embedding`
-  — `Physlib/Optics/Examples/CROWRegression.lean:289`
+  — `Physlib/Optics/Examples/CROWRegression.lean:306`
 - `crowRegressionRightConnectedChannel_mate_left`
-  — `Physlib/Optics/Examples/CROWRegression.lean:297`
+  — `Physlib/Optics/Examples/CROWRegression.lean:314`
 - `crowRegressionRightConnectedChannel_mate_right`
-  — `Physlib/Optics/Examples/CROWRegression.lean:305`
+  — `Physlib/Optics/Examples/CROWRegression.lean:322`
 - `crowRegressionForwardConnectedChannel_mate_left`
-  — `Physlib/Optics/Examples/CROWRegression.lean:313`
+  — `Physlib/Optics/Examples/CROWRegression.lean:330`
 - `crowRegressionForwardConnectedChannel_mate_right`
-  — `Physlib/Optics/Examples/CROWRegression.lean:321`
+  — `Physlib/Optics/Examples/CROWRegression.lean:338`
 - `crowRegressionReturnConnectedChannel_mate_left`
-  — `Physlib/Optics/Examples/CROWRegression.lean:329`
+  — `Physlib/Optics/Examples/CROWRegression.lean:346`
 - `crowRegressionReturnConnectedChannel_mate_right`
-  — `Physlib/Optics/Examples/CROWRegression.lean:337`
+  — `Physlib/Optics/Examples/CROWRegression.lean:354`
 - `CrowRegressionExternalPort`
-  — `Physlib/Optics/Examples/CROWRegression.lean:344`
+  — `Physlib/Optics/Examples/CROWRegression.lean:361`
 - `crowRegressionExternalAmbientChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:352`
+  — `Physlib/Optics/Examples/CROWRegression.lean:369`
 - `crowRegressionExternalAmbientChannel_not_connected`
-  — `Physlib/Optics/Examples/CROWRegression.lean:360`
+  — `Physlib/Optics/Examples/CROWRegression.lean:377`
 - `crowRegressionExternalChannel`
-  — `Physlib/Optics/Examples/CROWRegression.lean:420`
+  — `Physlib/Optics/Examples/CROWRegression.lean:437`
 - `crowRegressionIncident_component`
-  — `Physlib/Optics/Examples/CROWRegression.lean:427`
+  — `Physlib/Optics/Examples/CROWRegression.lean:444`
 - `crowRegressionOutgoing_component`
-  — `Physlib/Optics/Examples/CROWRegression.lean:436`
-- `crowRegressionIncident_coupler`
-  — `Physlib/Optics/Examples/CROWRegression.lean:445`
-- `crowRegressionOutgoing_coupler`
   — `Physlib/Optics/Examples/CROWRegression.lean:453`
+- `crowRegressionIncident_coupler`
+  — `Physlib/Optics/Examples/CROWRegression.lean:462`
+- `crowRegressionOutgoing_coupler`
+  — `Physlib/Optics/Examples/CROWRegression.lean:470`
 - `crowRegressionIncident_forwardArc`
-  — `Physlib/Optics/Examples/CROWRegression.lean:461`
+  — `Physlib/Optics/Examples/CROWRegression.lean:478`
 - `crowRegressionOutgoing_forwardArc`
-  — `Physlib/Optics/Examples/CROWRegression.lean:469`
+  — `Physlib/Optics/Examples/CROWRegression.lean:486`
 - `crowRegressionIncident_returnArc`
-  — `Physlib/Optics/Examples/CROWRegression.lean:477`
+  — `Physlib/Optics/Examples/CROWRegression.lean:494`
 - `crowRegressionOutgoing_returnArc`
-  — `Physlib/Optics/Examples/CROWRegression.lean:485`
+  — `Physlib/Optics/Examples/CROWRegression.lean:502`
 - `crowRegressionInput`
-  — `Physlib/Optics/Examples/CROWRegression.lean:492`
-- `crowRegressionOutput`
-  — `Physlib/Optics/Examples/CROWRegression.lean:496`
-- `crowRegressionLocalIncident`
-  — `Physlib/Optics/Examples/CROWRegression.lean:504`
-- `crowRegressionLocalOutgoing`
   — `Physlib/Optics/Examples/CROWRegression.lean:509`
+- `crowRegressionOutput`
+  — `Physlib/Optics/Examples/CROWRegression.lean:513`
+- `crowRegressionLocalIncident`
+  — `Physlib/Optics/Examples/CROWRegression.lean:521`
+- `crowRegressionLocalOutgoing`
+  — `Physlib/Optics/Examples/CROWRegression.lean:526`
 - `crowRegressionIncident_restrict`
-  — `Physlib/Optics/Examples/CROWRegression.lean:514`
+  — `Physlib/Optics/Examples/CROWRegression.lean:531`
 - `crowRegressionOutgoing_restrict`
-  — `Physlib/Optics/Examples/CROWRegression.lean:524`
+  — `Physlib/Optics/Examples/CROWRegression.lean:541`
 - `crowRegression_mem_componentBehavior`
-  — `Physlib/Optics/Examples/CROWRegression.lean:534`
+  — `Physlib/Optics/Examples/CROWRegression.lean:551`
 - `crowRegression_coupler_equations`
-  — `Physlib/Optics/Examples/CROWRegression.lean:655`
+  — `Physlib/Optics/Examples/CROWRegression.lean:672`
 - `crowRegression_forwardArc_equations`
-  — `Physlib/Optics/Examples/CROWRegression.lean:737`
+  — `Physlib/Optics/Examples/CROWRegression.lean:754`
 - `crowRegression_returnArc_equations`
-  — `Physlib/Optics/Examples/CROWRegression.lean:797`
+  — `Physlib/Optics/Examples/CROWRegression.lean:814`
 - `crowRegression_feedbackCoordinates_eq_zero`
-  — `Physlib/Optics/Examples/CROWRegression.lean:857`
+  — `Physlib/Optics/Examples/CROWRegression.lean:874`
 - `crowRegression_feedbackFixedPoint_eq_zero`
-  — `Physlib/Optics/Examples/CROWRegression.lean:909`
+  — `Physlib/Optics/Examples/CROWRegression.lean:926`
 - `crowRegression_isWellPosed`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1231`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1248`
 - `crowRegression_incidentAssembly`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1255`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1272`
 - `crowRegression_mem_behavior`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1354`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1371`
 - `crowRegression_rawSelectedOutput`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1368`
-- `crowRegression_responseTransform_selectedOutput`
   — `Physlib/Optics/Examples/CROWRegression.lean:1385`
+- `crowRegression_responseTransform_selectedOutput`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1402`
 - `crowRegression_masonResponseTransform_selectedOutput`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1399`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1416`
 - `crowRegression_wrongRingIndex_ne_response`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1409`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1426`
 - `crowRegression_firstIsolatedRingTransfer`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1418`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1435`
+- `crowRegression_firstIsolatedRingTransfer_eq_standard`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1441`
+- `crowRegression_firstIsolatedRingTransfer_eq_allPass`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1453`
 - `crowRegression_secondIsolatedRingTransfer`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1424`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1465`
+- `crowRegression_secondIsolatedRingTransfer_eq_standard`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1471`
+- `crowRegression_secondIsolatedRingTransfer_eq_allPass`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1483`
 - `crowResponse_ne_isolatedRingTransferProduct`
-  — `Physlib/Optics/Examples/CROWRegression.lean:1434`
+  — `Physlib/Optics/Examples/CROWRegression.lean:1500`
 
 ## Gate record
 
