@@ -5,11 +5,8 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-public import Lean.Data.Json
 public import Mathlib.Algebra.QuadraticAlgebra.Basic
 public import Mathlib.Analysis.Complex.Basic
-public import Mathlib.Data.List.FinRange
-public import Mathlib.Data.Matrix.Basic
 
 /-!
 # Proof-carrying exact references for optical networks
