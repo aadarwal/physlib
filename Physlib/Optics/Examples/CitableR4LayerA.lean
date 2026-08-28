@@ -5,25 +5,37 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-/-
-Reconnaissance elaboration probe — R4 layer-(A) claim, binary tree splitter.
-
-Tests ONE claim from R4.md section 3.4: that the binary tree composes at the
-`LinearBehavior` layer by general combinators alone, generically in `N`, with the
-types lining up DEFINITIONALLY at each step and no bespoke module.
-
-Elaboration-only; no proofs and no deferred obligations. If this file elaborates, R4's layer-(A)
-EXPRESSIBLE verdict is confirmed as fact rather than a type-read. If it fails, the
-failure message names which step of the recursion does not line up.
-
-Cited declarations (all at pin cfaeef36):
-  LinearBehavior.weightedSplit  Physlib/Optics/Network/RectangularBehavior.lean:109
-  LinearBehavior.parallel       Physlib/Optics/Network/LinearBehavior.lean:594
-  LinearBehavior.series         Physlib/Optics/Network/LinearBehavior.lean:438
-  LinearBehavior.identity       Physlib/Optics/Network/LinearBehavior.lean:413
--/
-
 public import Physlib.Optics.Network.RectangularBehavior
+
+/-!
+# Citable R4 layer-A probe
+
+## i. Overview
+
+Structural admission only: elaboration does NOT show semantic correctness, physical validity, or
+carrying-capacity. Sorried side-conditions are carrying-capacity grade and excluded.
+
+Elevates R4's layer-(A) claim (binary tree splitter): the tree composes at the `LinearBehavior`
+layer by general combinators alone, generically in `N`, with the types lining up DEFINITIONALLY
+at each step and no bespoke module.
+
+## ii. Key results
+
+The recursion elaborates universe-polymorphically, instantiated at depth 3 and, beyond the recon
+probe, at the non-zero universe `ULift.{1} Unit`. Elaboration-only; no proofs and no deferred
+obligations.
+
+## iii. Table of contents
+
+- A. Structural probe
+
+## iv. References
+
+Elevated from the R4 reconnaissance probe (session record). Cited declarations at probe pin
+cfaeef36: `LinearBehavior.weightedSplit` (Network/RectangularBehavior.lean:109),
+`LinearBehavior.parallel` (Network/LinearBehavior.lean:594), `LinearBehavior.series`
+(Network/LinearBehavior.lean:438), `LinearBehavior.identity` (Network/LinearBehavior.lean:413).
+-/
 
 @[expose] public section
 
@@ -32,6 +44,8 @@ namespace Optics.CitableR4
 open Optics
 
 noncomputable section
+
+/-! ## A. Structural probe -/
 
 universe u
 

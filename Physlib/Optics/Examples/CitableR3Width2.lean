@@ -5,31 +5,45 @@ Authors: Aadarsh Agarwal
 -/
 module
 
-/-
-Reconnaissance elaboration probe — R3 width-2 cascade, optical interleaver.
-
-Tests R3's central claim and its own biggest residue: that the cascade combinators are
-polymorphic in the channel family and nothing fixes the width to one, so the interleaver
-instantiates at W := Unit ⊕ Unit with no reindex and no bespoke module.
-
-`W` is spelled as an `abbrev` deliberately — R3 predicted that an opaque `def` would break
-`Fintype`/`DecidableEq` instance resolution. That prediction is tested separately in
-ReconProbeR3Def.lean.
-
-Elaboration-only. Cited declarations, all at pin cfaeef36:
-  DirectionalCoupler.behavior        Components/DirectionalCoupler.lean:109
-  MatchedPropagation.transmission    Components/MatchedPropagation.lean:108
-  ModeTransform.directSum            Mode/Basic.lean:344
-  ReflectionlessTwoPort.behavior     Components/ReflectionlessTwoPort.lean:109
-  TwoPortScatteringBehavior.redhefferSeries  Network/TwoPortSeries.lean:74
-  BackwardFirstTwoPortBehavior.seriesFold    Network/TwoPortChainFold.lean:69
--/
-
 public import Physlib.Optics.Network.TwoPortChainFold
 public import Physlib.Optics.Network.TwoPortSeries
 public import Physlib.Optics.Components.DirectionalCoupler
 public import Physlib.Optics.Components.MatchedPropagation
 public import Physlib.Optics.Components.ReflectionlessTwoPort
+
+/-!
+# Citable R3 width-2 probe
+
+## i. Overview
+
+Structural admission only: elaboration does NOT show semantic correctness, physical validity, or
+carrying-capacity. Sorried side-conditions are carrying-capacity grade and excluded.
+
+Elevates the R3 reconnaissance finding: the cascade combinators are polymorphic in the channel
+family and nothing fixes the width to one, so an interleaver stage instantiates at
+`W := Unit ⊕ Unit` with no reindex and no bespoke module.
+
+## ii. Key results
+
+The five width-two cascade definitions elaborate. The opaque-`def` hazard R3 predicted is encoded
+in section B as a compiler-checked negative control: the same first step, with `W` an opaque
+`def`, fails instance resolution, and `#guard_msgs` pins the failure.
+
+## iii. Table of contents
+
+- A. Width-two structural probe
+- B. Negative control: the opaque-def hazard
+
+## iv. References
+
+Elevated from the R3 reconnaissance probes (session record). Cited declarations at probe pin
+cfaeef36: `DirectionalCoupler.behavior` (Components/DirectionalCoupler.lean:109),
+`MatchedPropagation.transmission` (Components/MatchedPropagation.lean:108),
+`ModeTransform.directSum` (Mode/Basic.lean:344), `ReflectionlessTwoPort.behavior`
+(Components/ReflectionlessTwoPort.lean:109), `TwoPortScatteringBehavior.redhefferSeries`
+(Network/TwoPortSeries.lean:74), `BackwardFirstTwoPortBehavior.seriesFold`
+(Network/TwoPortChainFold.lean:69).
+-/
 
 @[expose] public section
 
@@ -38,6 +52,8 @@ namespace Optics.CitableR3
 open Optics
 
 noncomputable section
+
+/-! ## A. Width-two structural probe -/
 
 /-- The two-waveguide channel family. `abbrev`, per R3's hazard note. -/
 abbrev W := Unit ⊕ Unit
@@ -69,3 +85,41 @@ def lattice (stages : List (BackwardFirstTwoPortBehavior W W)) :
 end
 
 end Optics.CitableR3
+
+namespace Optics.CitableR3.NegativeControl
+
+open Optics
+
+noncomputable section
+
+/-! ## B. Negative control: the opaque-def hazard -/
+
+/-- R3's predicted hazard, exercised: with the channel family an opaque `def` rather than an
+`abbrev`, instance resolution cannot unfold it. The guard pins the failure so the build checks
+the prediction; loosening or removing it defeats the control. -/
+def WOpaque : Type := Unit ⊕ Unit
+
+def stageCouplerOpaque (p : DirectionalCoupler.Parameters) :
+    TwoPortScatteringBehavior WOpaque WOpaque :=
+  DirectionalCoupler.behavior (ι := Unit) p
+
+def armOpaque (upper lower : MatchedPropagation.Parameters) : ModeTransform WOpaque WOpaque :=
+  ModeTransform.directSum (MatchedPropagation.transmission upper Unit)
+    (MatchedPropagation.transmission lower Unit)
+
+/--
+error: failed to synthesize instance of type class
+  Fintype WOpaque
+
+Hint: Adding the command
+`deriving instance Fintype for Optics.CitableR3.NegativeControl.WOpaque`
+may allow Lean to derive the missing instance.
+-/
+#guard_msgs (whitespace := lax) in
+def stageDelayOpaque (upper lower : MatchedPropagation.Parameters) :
+    TwoPortScatteringBehavior WOpaque WOpaque :=
+  ReflectionlessTwoPort.behavior (armOpaque upper lower) (armOpaque upper lower)
+
+end
+
+end Optics.CitableR3.NegativeControl
