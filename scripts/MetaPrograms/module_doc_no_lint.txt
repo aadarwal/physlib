@@ -70,6 +70,7 @@ Physlib/Meta/Remark/Properties.lean
 Physlib/Meta/TODO/Basic.lean
 Physlib/Meta/TransverseTactics.lean
 Physlib/Optics/Basic.lean
+Physlib/Optics/Examples/CitableR3Width2.lean
 Physlib/Optics/Polarization/Basic.lean
 Physlib/Particles/BeyondTheStandardModel/GeorgiGlashow/Basic.lean
 Physlib/Particles/BeyondTheStandardModel/PatiSalam/Basic.lean

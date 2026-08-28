@@ -300,6 +300,8 @@ public import Physlib.Optics.EvanescentRegression
 public import Physlib.Optics.Examples.CROW
 public import Physlib.Optics.Examples.CROWRegression
 public import Physlib.Optics.Examples.CROWTable1Fixture
+public import Physlib.Optics.Examples.CitableR3Width2
+public import Physlib.Optics.Examples.CitableR4LayerA
 public import Physlib.Optics.HarmonicFlux.Aperture
 public import Physlib.Optics.HarmonicFlux.ApertureRegression
 public import Physlib.Optics.HarmonicFlux.ApertureRegressionOrthogonality
