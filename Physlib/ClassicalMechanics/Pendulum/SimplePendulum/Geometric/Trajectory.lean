@@ -59,8 +59,7 @@ noncomputable section
 
 open scoped Manifold
 
-namespace ClassicalMechanics
-namespace SimplePendulum
+namespace ClassicalMechanics.SimplePendulum
 
 /-!
 
@@ -89,23 +88,19 @@ def ofLift (θ : Time → EuclideanSpace ℝ (Fin 1)) : Trajectory := fun t =>
 lemma ofLift_apply (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
     ofLift θ t = ConfigurationSpace.ofAngle (θ t 0) := rfl
 
-/-- Shifting a lift of the angle by a whole number of turns leaves the described trajectory
-  unchanged. -/
-lemma ofLift_add_int_mul_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
-    ofLift (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) = ofLift θ := by
-  funext t
-  simp only [ofLift_apply]
-  have h0 : (θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1 : EuclideanSpace ℝ (Fin 1)) 0
-      = θ t 0 + n * (2 * Real.pi) := by
-    simp
-  rw [h0]
-  exact ConfigurationSpace.ofAngle_periodic.int_mul n (θ t 0)
-
 /-- Two lifts of the angle describe the same trajectory exactly when at each time they differ by
   a whole number of turns. -/
 lemma ofLift_eq_iff (θ₁ θ₂ : Time → EuclideanSpace ℝ (Fin 1)) :
     ofLift θ₁ = ofLift θ₂ ↔ ∀ t, ∃ n : ℤ, θ₂ t 0 = θ₁ t 0 + n * (2 * Real.pi) := by
   simp only [funext_iff, ofLift_apply, ConfigurationSpace.ofAngle_eq_iff]
+
+/-- Shifting a lift of the angle by a whole number of turns leaves the described trajectory
+  unchanged. -/
+lemma ofLift_add_int_mul_two_pi (θ : Time → EuclideanSpace ℝ (Fin 1)) (n : ℤ) :
+    ofLift (fun t => θ t + (n * (2 * Real.pi)) • EuclideanSpace.single 0 1) = ofLift θ := by
+  rw [ofLift_eq_iff]
+  intro
+  exact ⟨-n, by simp⟩
 
 /-!
 
@@ -129,9 +124,8 @@ lemma continuous_ofLift {θ : Time → EuclideanSpace ℝ (Fin 1)} (hθ : Contin
   circle. -/
 lemma contMDiff_ofLift {n : WithTop ℕ∞} {θ : Time → EuclideanSpace ℝ (Fin 1)}
     (hθ : ContDiff ℝ n θ) : ContMDiff 𝓘(ℝ, Time) (𝓡 1) n (ofLift θ) := by
-  have h : ContDiff ℝ n fun t => θ t 0 :=
-    (ContinuousLinearMap.contDiff (𝕜 := ℝ) (EuclideanSpace.proj (0 : Fin 1))).comp hθ
-  exact (ConfigurationSpace.contMDiff_ofAngle.of_le le_top).comp (contMDiff_iff_contDiff.mpr h)
+  apply (ConfigurationSpace.contMDiff_ofAngle.of_le le_top).comp (contMDiff_iff_contDiff.mpr _)
+  exact (ContinuousLinearMap.contDiff (𝕜 := ℝ) (EuclideanSpace.proj (0 : Fin 1))).comp hθ
 
 /-!
 
@@ -144,7 +138,7 @@ constraint holds at all times: the bob stays on the circle of radius `|ℓ|` abo
 -/
 
 /-- The physical position of the bob along a trajectory, over time, for a rod of length `ℓ`. -/
-def toSpace (ℓ : ℝ) (γ : Trajectory) : Time → Space 2 := fun t => (γ t).toSpace ℓ
+def toSpace (ℓ : ℝ) (γ : Trajectory) (t : Time) : Space 2 := (γ t).toSpace ℓ
 
 /-- Along the trajectory described by a lift `θ` of the angle the bob is at
   `(ℓ sin (θ t 0), -ℓ cos (θ t 0))`. -/
@@ -163,9 +157,6 @@ lemma continuous_toSpace (ℓ : ℝ) {γ : Trajectory} (hγ : Continuous γ) :
     Continuous (toSpace ℓ γ) :=
   (ConfigurationSpace.continuous_toSpace ℓ).comp hγ
 
-end Trajectory
-
-end SimplePendulum
-end ClassicalMechanics
+end ClassicalMechanics.SimplePendulum.Trajectory
 
 end

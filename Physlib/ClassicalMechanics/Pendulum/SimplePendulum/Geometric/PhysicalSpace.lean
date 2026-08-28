@@ -57,8 +57,7 @@ the trajectory module.
 
 open Real InnerProductSpace Time
 
-namespace ClassicalMechanics
-namespace SimplePendulum
+namespace ClassicalMechanics.SimplePendulum
 
 variable (S : SimplePendulum)
 
@@ -87,13 +86,13 @@ lemma spaceTrajectory_eq (θ : Time → EuclideanSpace ℝ (Fin 1)) :
 /-- The horizontal position of the bob along a lifted trajectory is `ℓ sin (θ t 0)`. -/
 lemma spaceTrajectory_apply_zero (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
     S.spaceTrajectory θ t 0 = S.ℓ * Real.sin (θ t 0) := by
-  rw [S.spaceTrajectory_eq θ]; rfl
+  simp [S.spaceTrajectory_eq θ]
 
 /-- The vertical position of the bob along a lifted trajectory is `-ℓ cos (θ t 0)`, the pivot
   being the origin and the second axis pointing upwards. -/
 lemma spaceTrajectory_apply_one (θ : Time → EuclideanSpace ℝ (Fin 1)) (t : Time) :
     S.spaceTrajectory θ t 1 = -S.ℓ * Real.cos (θ t 0) := by
-  rw [S.spaceTrajectory_eq θ]; rfl
+  simp [S.spaceTrajectory_eq θ]
 
 /-- The rod-length constraint along a lifted trajectory: the bob of the pendulum `S` stays at
   distance `ℓ` from the pivot, the length of the rod being positive. -/
@@ -119,42 +118,26 @@ stand-alone lemmas.
   times the angular velocity. -/
 lemma deriv_sin_coord (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differentiable ℝ θ)
     (t : Time) : ∂ₜ (fun s => Real.sin (θ s 0)) t = Real.cos (θ t 0) * (∂ₜ θ t) 0 := by
-  have hc : Differentiable ℝ fun s => θ s 0 :=
-    (EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)).differentiable.comp hθ
-  have h : HasFDerivAt (fun s => Real.sin (θ s 0))
-      (Real.cos (θ t 0) • fderiv ℝ (fun s => θ s 0) t) t :=
-    HasDerivAt.comp_hasFDerivAt (h₂ := Real.sin) t (Real.hasDerivAt_sin (θ t 0))
-      (hc t).hasFDerivAt
-  rw [Time.deriv_eq, h.fderiv, _root_.smul_apply, smul_eq_mul, ← Time.deriv_eq,
-    Time.deriv_euclid hθ t]
+  rw [Time.deriv_eq, fderiv_sin, smul_apply, smul_eq_mul, ← Time.deriv_eq, Time.deriv_euclid hθ t]
+  fun_prop
 
 /-- The time derivative of the cosine of the angle read from a lift is minus the sine of the
   angle times the angular velocity. -/
 lemma deriv_cos_coord (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differentiable ℝ θ)
     (t : Time) : ∂ₜ (fun s => Real.cos (θ s 0)) t = -Real.sin (θ t 0) * (∂ₜ θ t) 0 := by
-  have hc : Differentiable ℝ fun s => θ s 0 :=
-    (EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)).differentiable.comp hθ
-  have h : HasFDerivAt (fun s => Real.cos (θ s 0))
-      (-Real.sin (θ t 0) • fderiv ℝ (fun s => θ s 0) t) t :=
-    HasDerivAt.comp_hasFDerivAt (h₂ := Real.cos) t (Real.hasDerivAt_cos (θ t 0))
-      (hc t).hasFDerivAt
-  rw [Time.deriv_eq, h.fderiv, _root_.smul_apply, smul_eq_mul, ← Time.deriv_eq,
-    Time.deriv_euclid hθ t]
+  rw [Time.deriv_eq, fderiv_cos, smul_apply, smul_eq_mul, ← Time.deriv_eq, Time.deriv_euclid hθ t]
+  fun_prop
 
 /-- Along a differentiable lift of the angle the position of the bob is differentiable in
   time. -/
+@[fun_prop]
 lemma differentiable_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1))
     (hθ : Differentiable ℝ θ) : Differentiable ℝ (S.spaceTrajectory θ) := by
   rw [S.spaceTrajectory_eq θ]
-  have h : Differentiable ℝ fun t => θ t 0 :=
-    (EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)).differentiable.comp hθ
-  have hpi : Differentiable ℝ
-      fun t => (![S.ℓ * Real.sin (θ t 0), -S.ℓ * Real.cos (θ t 0)] : Fin 2 → ℝ) :=
-    differentiable_pi.mpr fun i => by
-      fin_cases i
-      · simpa using (Real.differentiable_sin.comp h).const_mul S.ℓ
-      · simpa using (Real.differentiable_cos.comp h).const_mul (-S.ℓ)
-  exact Space.mk_differentiable.comp hpi
+  apply Space.mk_differentiable.comp
+  rw [differentiable_pi]
+  intro i
+  fin_cases i <;> (simp; fun_prop)
 
 /-- The velocity of the bob along a differentiable lift `θ` of the angle is
   `(ℓ cos (θ t 0), ℓ sin (θ t 0))` times the angular velocity: the vector tangent to the circle
@@ -163,28 +146,16 @@ lemma deriv_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Di
     (t : Time) :
     ∂ₜ (S.spaceTrajectory θ) t =
       ⟨![S.ℓ * Real.cos (θ t 0) * (∂ₜ θ t) 0, S.ℓ * Real.sin (θ t 0) * (∂ₜ θ t) 0]⟩ := by
-  have hF : Differentiable ℝ (S.spaceTrajectory θ) := S.differentiable_spaceTrajectory θ hθ
-  have h0 : ∂ₜ (fun s => S.spaceTrajectory θ s 0) t
-      = S.ℓ * Real.cos (θ t 0) * (∂ₜ θ t) 0 := by
-    simp only [S.spaceTrajectory_apply_zero θ]
-    have hsin : Differentiable ℝ fun s => Real.sin (θ s 0) :=
-      Real.differentiable_sin.comp
-        ((EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)).differentiable.comp hθ)
-    rw [Time.deriv_eq, fderiv_const_mul (hsin t) S.ℓ, _root_.smul_apply, smul_eq_mul,
-      ← Time.deriv_eq, deriv_sin_coord θ hθ t, mul_assoc]
-  have h1 : ∂ₜ (fun s => S.spaceTrajectory θ s 1) t
-      = S.ℓ * Real.sin (θ t 0) * (∂ₜ θ t) 0 := by
-    simp only [S.spaceTrajectory_apply_one θ]
-    have hcos : Differentiable ℝ fun s => Real.cos (θ s 0) :=
-      Real.differentiable_cos.comp
-        ((EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)).differentiable.comp hθ)
-    rw [Time.deriv_eq, fderiv_const_mul (hcos t) (-S.ℓ), _root_.smul_apply, smul_eq_mul,
-      ← Time.deriv_eq, deriv_cos_coord θ hθ t]
+  refine Space.eq_of_apply fun i ↦ ?_
+  fin_cases i <;> apply (Time.deriv_space (by fun_prop) t _).symm.trans
+  · simp only [S.spaceTrajectory_apply_zero, Fin.zero_eta, Matrix.cons_val_zero]
+    rw [Time.deriv_eq, fderiv_const_mul, smul_apply, smul_eq_mul, ← Time.deriv, deriv_sin_coord,
+      mul_assoc]
+    all_goals fun_prop
+  · simp only [Fin.mk_one, S.spaceTrajectory_apply_one, Matrix.cons_val_one, Matrix.cons_val_zero]
+    rw [Time.deriv_eq, fderiv_const_mul, smul_apply, smul_eq_mul, ← Time.deriv, deriv_cos_coord]
     ring
-  refine Space.eq_of_apply fun i => ?_
-  fin_cases i
-  · exact (Time.deriv_space hF t 0).symm.trans h0
-  · exact (Time.deriv_space hF t 1).symm.trans h1
+    all_goals fun_prop
 
 /-- The square of the speed of the bob along a differentiable lift of the angle is `ℓ² θ̇²`. -/
 lemma norm_sq_deriv_spaceTrajectory (θ : Time → EuclideanSpace ℝ (Fin 1))
@@ -216,9 +187,8 @@ lemma kineticEnergy_eq_space (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : D
     (t : Time) :
     S.kineticEnergy θ t = (1 / (2 : ℝ)) * S.m * ‖∂ₜ (S.spaceTrajectory θ) t‖ ^ 2 := by
   rw [S.norm_sq_deriv_spaceTrajectory θ hθ t]
-  show (1 / (2 : ℝ)) * S.inertia * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ = _
-  rw [inertia]
-  simp only [PiLp.inner_apply, RCLike.inner_apply, conj_trivial, Fin.sum_univ_one]
+  show (1 / (2 : ℝ)) * (S.m * S.ℓ ^ 2) * ⟪∂ₜ θ t, ∂ₜ θ t⟫_ℝ = _
+  rw [PiLp.inner_apply, Fin.sum_univ_one, RCLike.inner_apply, conj_trivial]
   ring
 
 /-- The chart potential energy of the pendulum is the gravitational potential of the bob in
@@ -248,10 +218,9 @@ lemma energy_eq_space (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : Differen
     S.energy θ t =
       (1 / (2 : ℝ)) * S.m * ‖∂ₜ (S.spaceTrajectory θ) t‖ ^ 2
         + S.m * S.g * (S.spaceTrajectory θ t 1 + S.ℓ) := by
-  have hE : S.energy θ t = S.kineticEnergy θ t + S.potentialEnergy (θ t) := rfl
-  rw [hE, S.kineticEnergy_eq_space θ hθ t, S.potentialEnergy_eq_height θ t]
+  rw [← S.kineticEnergy_eq_space θ hθ t, ← S.potentialEnergy_eq_height θ t]
+  rfl
 
-end SimplePendulum
-end ClassicalMechanics
+end ClassicalMechanics.SimplePendulum
 
 end
