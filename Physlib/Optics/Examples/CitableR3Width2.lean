@@ -106,8 +106,9 @@ The precise mechanism: the failing step is not the first to need instances (step
 the mode index, and they resolve) but the first to need an instance ON THE CHANNEL FAMILY ITSELF
 (`Fintype WOpaque`). The hazard is exactly the boundary between definitional unfolding, which type
 ascription performs, and instance search, which does not. The guarded declaration below cannot
-carry its own docstring — the doc-comment slot above it is consumed by the guard's expected
-message. -/
+be a named declaration: it is stated as an `example` so the failed elaboration leaves nothing
+in the environment for downstream tooling, and the doc-comment slot above it is consumed by the
+guard's expected message. -/
 def WOpaque : Type := Unit ⊕ Unit
 
 /-- Elaborates despite the opaque `def`: the instances needed here are on the mode index
@@ -130,7 +131,7 @@ Hint: Adding the command
 may allow Lean to derive the missing instance.
 -/
 #guard_msgs (whitespace := lax) in
-def stageDelayOpaque (upper lower : MatchedPropagation.Parameters) :
+example (upper lower : MatchedPropagation.Parameters) :
     TwoPortScatteringBehavior WOpaque WOpaque :=
   ReflectionlessTwoPort.behavior (armOpaque upper lower) (armOpaque upper lower)
 
