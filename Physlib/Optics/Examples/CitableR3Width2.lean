@@ -53,7 +53,9 @@ open Optics
 
 noncomputable section
 
-/-! ## A. Width-two structural probe -/
+/-!
+## A. Width-two structural probe
+-/
 
 /-- The two-waveguide channel family. `abbrev`, per R3's hazard note. -/
 abbrev W := Unit ⊕ Unit
@@ -92,17 +94,29 @@ open Optics
 
 noncomputable section
 
-/-! ## B. Negative control: the opaque-def hazard -/
+/-!
+## B. Negative control: the opaque-def hazard
+-/
 
 /-- R3's predicted hazard, exercised: with the channel family an opaque `def` rather than an
 `abbrev`, instance resolution cannot unfold it. The guard pins the failure so the build checks
-the prediction; loosening or removing it defeats the control. -/
+the prediction; loosening or removing it defeats the control.
+
+The precise mechanism: the failing step is not the first to need instances (step 1 needs two, on
+the mode index, and they resolve) but the first to need an instance ON THE CHANNEL FAMILY ITSELF
+(`Fintype WOpaque`). The hazard is exactly the boundary between definitional unfolding, which type
+ascription performs, and instance search, which does not. The guarded declaration below cannot
+carry its own docstring — the doc-comment slot above it is consumed by the guard's expected
+message. -/
 def WOpaque : Type := Unit ⊕ Unit
 
+/-- Elaborates despite the opaque `def`: the instances needed here are on the mode index
+(`Fintype Unit`), and the result type matches by definitional unification, which does unfold. -/
 def stageCouplerOpaque (p : DirectionalCoupler.Parameters) :
     TwoPortScatteringBehavior WOpaque WOpaque :=
   DirectionalCoupler.behavior (ι := Unit) p
 
+/-- Elaborates: `ModeTransform.directSum` carries no instance binders at all. -/
 def armOpaque (upper lower : MatchedPropagation.Parameters) : ModeTransform WOpaque WOpaque :=
   ModeTransform.directSum (MatchedPropagation.transmission upper Unit)
     (MatchedPropagation.transmission lower Unit)

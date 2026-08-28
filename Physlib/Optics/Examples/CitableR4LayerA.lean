@@ -45,7 +45,9 @@ open Optics
 
 noncomputable section
 
-/-! ## A. Structural probe -/
+/-!
+## A. Structural probe
+-/
 
 universe u
 
