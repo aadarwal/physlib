@@ -50,7 +50,11 @@ cubically small in the angle.
 - `SimplePendulum.LinearizedEquationOfMotion` is the small-angle equation of motion
   `θ̈ + ω² θ = 0`. Its rotational Newton form is `linearizedEquationOfMotion_iff_newton`, and
   `linearizedEquationOfMotion_iff` identifies it, for smooth lifts of the angle, with the
-  equation of motion of the associated harmonic oscillator.
+  equation of motion of the associated harmonic oscillator. The linearization is literally
+  differentiation: `fderiv_torque_zero_apply` identifies the derivative of the torque at the
+  hanging equilibrium with the force of the oscillator, and
+  `linearizedEquationOfMotion_iff_fderiv_torque` restates the linearized equation as the
+  equation of motion with the torque replaced by that derivative.
 - `SimplePendulum.smallAngleTrajectory` is the small-angle motion determined by a choice of
   initial conditions, the trajectory of the associated harmonic oscillator: it has the closed
   form `cos (ω t) x₀ + (sin (ω t)/ω) v₀` (`smallAngleTrajectory_eq`), it is smooth
@@ -75,10 +79,13 @@ cubically small in the angle.
   linearization discards. Its norm is at most `m g ℓ ‖θ‖³/6`
   (`norm_torque_sub_toHarmonicOscillator_force_le`), in coordinates `abs_torque_add_linear_le`,
   and `gradLagrangian_sub_toHarmonicOscillator` identifies the difference of the variational
-  gradients of the two actions with the difference of torque and linearized force.
+  gradients of the two actions with the difference of torque and linearized force, with the
+  norm bound `norm_gradLagrangian_sub_toHarmonicOscillator_le`.
 - `SimplePendulum.norm_equationOfMotion_residual_le`: a small-angle motion nearly solves the
   equation of motion of the pendulum itself, leaving at every instant a residual of norm at
-  most `m g ℓ ‖θ‖³/6` — the sense in which the small-angle theory approximates the pendulum.
+  most `m g ℓ ‖θ‖³/6` — the sense in which the small-angle theory approximates the pendulum;
+  in variational form, `norm_gradLagrangian_le_of_linearizedEquationOfMotion` makes it a
+  near-critical point of the pendulum's action.
 
 ## iii. Table of contents
 
@@ -88,6 +95,7 @@ cubically small in the angle.
 - B. The linearized equation of motion
   - B.1. The linearized equation
   - B.2. Equivalence with the equation of motion of the oscillator
+  - B.3. Linearization as differentiation of the torque
 - C. Small-angle trajectories
   - C.1. The trajectory of given initial conditions
   - C.2. Existence and uniqueness
@@ -239,6 +247,50 @@ lemma linearizedEquationOfMotion_iff (θ : Time → EuclideanSpace ℝ (Fin 1))
     S.LinearizedEquationOfMotion θ ↔ S.toHarmonicOscillator.EquationOfMotion θ := by
   rw [S.toHarmonicOscillator.equationOfMotion_iff_newtons_2nd_law θ hθ]
   exact S.linearizedEquationOfMotion_iff_newton θ
+
+/-!
+
+### B.3. Linearization as differentiation of the torque
+
+The linearized force is not an ansatz: it is the derivative of the pendulum's torque at the
+hanging equilibrium. The torque vanishes at the equilibrium, so its best linear approximation
+there is the derivative alone, and that derivative is exactly the force of the associated
+harmonic oscillator. The linearized equation of motion is therefore the equation of motion
+with the torque replaced by its derivative at the equilibrium — linearizing the pendulum is
+differentiating its torque.
+
+-/
+
+/-- The derivative of the torque at the hanging equilibrium is the force of the associated
+  harmonic oscillator: `(Dτ)(0) v = -m g ℓ v`. Linearizing the pendulum is differentiating
+  its torque at the equilibrium. -/
+lemma fderiv_torque_zero_apply (v : EuclideanSpace ℝ (Fin 1)) :
+    fderiv ℝ S.torque 0 v = S.toHarmonicOscillator.force v := by
+  have h1 := (EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)).hasFDerivAt
+    (x := (0 : EuclideanSpace ℝ (Fin 1)))
+  have h2 := (Real.hasDerivAt_sin 0).comp_hasFDerivAt_of_eq
+    (0 : EuclideanSpace ℝ (Fin 1)) h1 (by simp)
+  have h3 := (h2.const_mul (-(S.m * S.g * S.ℓ))).smul_const
+    (EuclideanSpace.single (0 : Fin 1) (1 : ℝ))
+  have hfun : S.torque = fun x : EuclideanSpace ℝ (Fin 1) =>
+      (-(S.m * S.g * S.ℓ) * (Real.sin ∘ EuclideanSpace.proj (𝕜 := ℝ) (0 : Fin 1)) x) •
+        EuclideanSpace.single (0 : Fin 1) (1 : ℝ) := by
+    funext x
+    rw [S.torque_eq x]
+    simp [Function.comp_apply, neg_smul, neg_mul]
+  rw [← hfun] at h3
+  rw [h3.fderiv, S.toHarmonicOscillator.force_eq_linear, toHarmonicOscillator_k]
+  ext i
+  fin_cases i
+  simp [smul_eq_mul, Real.cos_zero]
+
+/-- The linearized equation of motion is the equation of motion with the torque replaced by
+  its derivative at the hanging equilibrium. -/
+lemma linearizedEquationOfMotion_iff_fderiv_torque (θ : Time → EuclideanSpace ℝ (Fin 1)) :
+    S.LinearizedEquationOfMotion θ ↔
+      ∀ t, S.inertia • ∂ₜ (∂ₜ θ) t = fderiv ℝ S.torque 0 (θ t) := by
+  rw [S.linearizedEquationOfMotion_iff_newton θ]
+  exact forall_congr' fun t => by rw [S.fderiv_torque_zero_apply (θ t)]
 
 /-!
 
@@ -545,6 +597,18 @@ lemma gradLagrangian_sub_toHarmonicOscillator (θ : Time → EuclideanSpace ℝ 
   simp only [Pi.sub_apply, toHarmonicOscillator_m]
   abel
 
+/-- The normed form: along a smooth lift of the angle the variational gradients of the two
+  actions differ at every instant by at most `m g ℓ ‖θ t‖³ / 6` — the two actions have the
+  same critical-point equation to cubic accuracy in the angle. -/
+lemma norm_gradLagrangian_sub_toHarmonicOscillator_le (θ : Time → EuclideanSpace ℝ (Fin 1))
+    (hθ : ContDiff ℝ ∞ θ) (t : Time) :
+    ‖S.gradLagrangian θ t - S.toHarmonicOscillator.gradLagrangian θ t‖ ≤
+      S.m * S.g * S.ℓ * ‖θ t‖ ^ 3 / 6 := by
+  have h := congrFun (S.gradLagrangian_sub_toHarmonicOscillator θ hθ) t
+  rw [Pi.sub_apply] at h
+  rw [h]
+  exact S.norm_torque_sub_toHarmonicOscillator_force_le (θ t)
+
 /-!
 
 ### E.3. The residual of the small-angle motions
@@ -564,6 +628,26 @@ lemma norm_equationOfMotion_residual_le (θ : Time → EuclideanSpace ℝ (Fin 1
     ‖S.inertia • ∂ₜ (∂ₜ θ) t - S.torque (θ t)‖ ≤ S.m * S.g * S.ℓ * ‖θ t‖ ^ 3 / 6 := by
   rw [(S.linearizedEquationOfMotion_iff_newton θ).mp h t, ← neg_sub, norm_neg]
   exact S.norm_torque_sub_toHarmonicOscillator_force_le (θ t)
+
+
+/-- The variational form of the residual: a smooth motion of the linearized dynamics is a
+  near-critical point of the pendulum's own action — along it the variational gradient of the
+  pendulum's action is cubically small in the angle. -/
+lemma norm_gradLagrangian_le_of_linearizedEquationOfMotion
+    (θ : Time → EuclideanSpace ℝ (Fin 1)) (hθ : ContDiff ℝ ∞ θ)
+    (h : S.LinearizedEquationOfMotion θ) (t : Time) :
+    ‖S.gradLagrangian θ t‖ ≤ S.m * S.g * S.ℓ * ‖θ t‖ ^ 3 / 6 := by
+  have h0 : S.toHarmonicOscillator.gradLagrangian θ = 0 :=
+    (S.toHarmonicOscillator.equationOfMotion_iff_gradLagrangian_zero θ).mp
+      ((S.linearizedEquationOfMotion_iff θ hθ).mp h)
+  have hb := S.norm_gradLagrangian_sub_toHarmonicOscillator_le θ hθ t
+  simpa [h0] using hb
+
+TODO "Derive the small-angle trajectories from the pendulum's own dynamics: for the solution of
+  the nonlinear equation of motion with initial data scaled by `ε`, show that the motion rescaled
+  by `ε⁻¹` converges to the small-angle trajectory of the unscaled data, uniformly on compact time
+  intervals, as `ε → 0` — continuous dependence via a Grönwall bound, with the cubic residual of
+  section E as input. This requires the global solution theory of the nonlinear equation."
 
 end SimplePendulum
 
