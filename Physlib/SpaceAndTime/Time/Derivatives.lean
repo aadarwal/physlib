@@ -88,9 +88,7 @@ curve pulled back to `Time` through `toRealCLE`.
 
 /-- The canonical equivalence `toRealCLE.symm : ℝ ≃L[ℝ] Time` sends `1 : ℝ` to `1 : Time`. -/
 lemma toRealCLE_symm_one : toRealCLE.symm (1 : ℝ) = (1 : Time) := by
-  rw [ContinuousLinearEquiv.symm_apply_eq]
-  change (1 : ℝ) = (1 : Time).val
-  rw [Time.one_val]
+  simp [toRealCLE]
 
 /-- Bridge from the time derivative to `HasDerivAt`: if `w : Time → M` is differentiable at
 `toRealCLE.symm τ`, then the curve `τ ↦ w (toRealCLE.symm τ)` on `ℝ` has derivative
@@ -98,9 +96,8 @@ lemma toRealCLE_symm_one : toRealCLE.symm (1 : ℝ) = (1 : Time) := by
 lemma hasDerivAt_comp_toRealCLE_symm [NormedAddCommGroup M] [NormedSpace ℝ M]
     (w : Time → M) (τ : ℝ) (hw : DifferentiableAt ℝ w (toRealCLE.symm τ)) :
     HasDerivAt (fun τ : ℝ => w (toRealCLE.symm τ)) (∂ₜ w (toRealCLE.symm τ)) τ := by
-  simpa [Function.comp_def, Time.deriv_eq, Time.toRealCLE_symm_one] using
-    hw.hasFDerivAt.comp_hasDerivAt_of_eq τ
-      (toRealCLE.symm : ℝ →L[ℝ] Time).hasFDerivAt.hasDerivAt rfl
+  apply hw.hasFDerivAt.comp_hasDerivAt_of_eq τ _ rfl
+  exact Time.toRealCLE_symm_one ▸ toRealCLE.symm.hasFDerivAt.hasDerivAt
 
 /-- The converse of the bridge `hasDerivAt_comp_toRealCLE_symm`: if the curve `γ : ℝ → M` has
 derivative `v` at `toRealCLE t`, then the curve `t ↦ γ (toRealCLE t)` on `Time` has time
@@ -108,13 +105,10 @@ derivative `v` at `t`. -/
 lemma deriv_comp_toRealCLE_of_hasDerivAt [NormedAddCommGroup M] [NormedSpace ℝ M]
     (γ : ℝ → M) (t : Time) (v : M) (h : HasDerivAt γ v (toRealCLE t)) :
     ∂ₜ (fun s => γ (toRealCLE s)) t = v := by
-  have h' : HasFDerivAt (fun s => γ (toRealCLE s))
-      (((1 : ℝ →L[ℝ] ℝ).smulRight v).comp (toRealCLE : Time →L[ℝ] ℝ)) t :=
-    h.hasFDerivAt.comp t toRealCLE.hasFDerivAt
-  rw [Time.deriv_eq, h'.fderiv]
-  change toRealCLE 1 • v = v
-  change (1 : Time).val • v = v
-  rw [Time.one_val, one_smul]
+  rw [Time.deriv_eq, fderiv_fun_comp _ h.differentiableAt toRealCLE.differentiableAt,
+    toRealCLE.fderiv, ContinuousLinearMap.comp_apply, ContinuousLinearEquiv.coe_coe,
+    fderiv_eq_smul_deriv, h.deriv]
+  exact Eq.trans (by rfl) (Time.one_val ▸ one_smul _ v)
 
 /-!
 
@@ -267,12 +261,7 @@ lemma deriv_contDiff_of_space {n} {M : Type} [NormedAddCommGroup M] [NormedSpace
 lemma deriv_comp_neg {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Time → M) (t : Time) (hf : DifferentiableAt ℝ f (-t)) :
     ∂ₜ (fun s => f (-s)) t = -∂ₜ f (-t) := by
-  have hneg : HasFDerivAt (fun s : Time => -s) (-ContinuousLinearMap.id ℝ Time) t :=
-    (hasFDerivAt_id t).neg
-  have h : HasFDerivAt (fun s => f (-s))
-      ((fderiv ℝ f (-t)).comp (-ContinuousLinearMap.id ℝ Time)) t :=
-    hf.hasFDerivAt.comp t hneg
-  rw [Time.deriv_eq, Time.deriv_eq, h.fderiv]
+  rw [Time.deriv_eq, Time.deriv_eq, fderiv_fun_comp _ hf (by fun_prop), fderiv_fun_neg]
   simp
 
 /-- The second derivative is unchanged by the reversal of time: for a smooth curve `f`, the second
@@ -281,12 +270,10 @@ cancelling. -/
 lemma deriv_deriv_comp_neg {M : Type} [NormedAddCommGroup M] [NormedSpace ℝ M]
     (f : Time → M) (hf : ContDiff ℝ ∞ f) (t : Time) :
     ∂ₜ (∂ₜ (fun s => f (-s))) t = ∂ₜ (∂ₜ f) (-t) := by
-  have h1 : ∂ₜ (fun s => f (-s)) = fun s => -∂ₜ f (-s) := by
-    funext s
-    exact deriv_comp_neg f s (hf.differentiable (by simp) _)
-  have h2 : ∂ₜ (fun s => -∂ₜ f (-s)) t = -∂ₜ (fun s => ∂ₜ f (-s)) t :=
-    Time.deriv_neg (fun s => ∂ₜ f (-s))
-  rw [h1, h2, deriv_comp_neg (∂ₜ f) t (deriv_differentiable_of_contDiff f hf _), neg_neg]
+  rw [← neg_neg (∂ₜ (∂ₜ f) (-t)), ← deriv_comp_neg _ _ (by fun_prop), ← Time.deriv_neg]
+  congr
+  ext
+  exact deriv_comp_neg f _ (hf.differentiable (by simp) _)
 
 /-!
 
