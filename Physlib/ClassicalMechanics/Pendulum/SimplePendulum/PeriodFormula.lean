@@ -42,9 +42,8 @@ the nonlinear equation of motion released from rest at `θ₀`. That identificat
 theorem the formula is named for, and its formalization — the quarter period as a first hitting
 time, the quadrature of the energy first integral, the substitution, and their assembly, on top
 of the uniqueness of solutions and the time-reversal symmetry of the equation of motion
-(formalized in a companion module, `SimplePendulum/Solution.lean`, which is not part of this
-contribution) — is not yet carried out; the `TODO` after the definition lists the milestones.
-Until then
+(formalized in the companion module `SimplePendulum/Solution.lean`) — is not yet carried out;
+the `TODO` after the definition lists the milestones. Until then
 `periodFormula` is a definition, and the statements about it are statements about the elliptic
 integral.
 
@@ -142,7 +141,7 @@ TODO "Prove that `periodFormula θ₀` is the period of the motion of the simple
   symmetry of the equation of motion, so that the motion released from rest is even in time and
   its period is four times the time of descent to the bottom — are formalized in a companion
   module, `SimplePendulum/Solution.lean` (`SimplePendulum.equationOfMotion_unique`,
-  `SimplePendulum.releasedFromRest_even`), contributed separately; remaining here:
+  `SimplePendulum.releasedFromRest_even`); remaining here:
   (3) the quarter period as the first hitting time of `θ = 0` by the motion released from rest;
   (4) the quadrature of the energy first integral on the descent, `θ̇² = (2g/ℓ)(cos θ - cos θ₀)`,
   giving the quarter period as `√(ℓ/(2g)) ∫ θ in 0..θ₀, (cos θ - cos θ₀)^(-1/2)`;
