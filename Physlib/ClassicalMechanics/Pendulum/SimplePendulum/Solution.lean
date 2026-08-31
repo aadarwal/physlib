@@ -88,12 +88,10 @@ The reduction to a first-order system on the phase space follows
 
 @[expose] public section
 
-namespace ClassicalMechanics
-open Real
-open Time
+open Real Time
 open scoped ContDiff
 
-namespace SimplePendulum
+namespace ClassicalMechanics.SimplePendulum
 
 variable (S : SimplePendulum)
 
@@ -138,29 +136,19 @@ noncomputable def phaseVectorField (p : EuclideanSpace ℝ (Fin 1) × EuclideanS
 lemma phaseVectorField_lipschitz :
     LipschitzWith (Real.toNNReal (1 + S.ω ^ 2)) S.phaseVectorField := by
   refine LipschitzWith.of_dist_le_mul fun p q => ?_
-  have hω : (0 : ℝ) ≤ S.ω ^ 2 := sq_nonneg _
-  have hpq : (0 : ℝ) ≤ dist p q := dist_nonneg
-  have h1 : dist p.1 q.1 ≤ dist p q := by rw [Prod.dist_eq]; exact le_max_left _ _
-  have h2 : dist p.2 q.2 ≤ dist p q := by rw [Prod.dist_eq]; exact le_max_right _ _
-  have h3 : |p.1 0 - q.1 0| ≤ dist p.1 q.1 := by
+  rw [Real.coe_toNNReal _ (by positivity), Prod.dist_eq, add_mul, one_mul]
+  apply max_le _ _
+  · apply le_trans _ (le_add_of_nonneg_right (by positivity))
+    exact le_max_right _ _
+  · apply le_trans _ (le_add_of_nonneg_left (by positivity))
+    apply le_trans (dist_pair_smul _ _ _)
+    rw [dist_neg_neg, dist_eq_norm, norm_eq_abs, ← mul_sub, abs_mul, abs_of_nonneg (sq_nonneg _),
+      mul_assoc, mul_le_mul_iff_right₀ (pow_succ_pos S.ω_pos _), dist_zero_right, PiLp.norm_single,
+      norm_one, mul_one]
+    apply le_trans _ (le_max_left _ _)
+    apply le_trans (Real.abs_sin_sub_sin_le _ _)
     rw [dist_eq_norm, ← Real.norm_eq_abs, ← PiLp.sub_apply]
     exact PiLp.norm_apply_le _ _
-  have hsmul : ∀ a b : ℝ, dist (a • (EuclideanSpace.single 0 1 : EuclideanSpace ℝ (Fin 1)))
-      (b • EuclideanSpace.single 0 1) = |a - b| := by
-    intro a b
-    rw [dist_eq_norm, ← sub_smul, norm_smul, PiLp.norm_single, norm_one, mul_one,
-      Real.norm_eq_abs]
-  rw [Real.coe_toNNReal _ (by positivity), Prod.dist_eq]
-  refine max_le ?_ ?_
-  · show dist p.2 q.2 ≤ _
-    nlinarith
-  · show dist (_ • _) (_ • _) ≤ _
-    rw [hsmul, neg_sub_neg, ← mul_sub, abs_mul, abs_of_nonneg hω]
-    have hsin : |Real.sin (q.1 0) - Real.sin (p.1 0)| ≤ dist p q := by
-      refine (Real.abs_sin_sub_sin_le _ _).trans ?_
-      rw [abs_sub_comm]
-      exact h3.trans h1
-    nlinarith
 
 /-!
 
@@ -187,19 +175,17 @@ uniqueness theorem of Mathlib is stated for curves on `ℝ`.
 lemma acceleration_eq_of_equationOfMotion (θ : Time → EuclideanSpace ℝ (Fin 1))
     (h : S.EquationOfMotion θ) (t : Time) :
     ∂ₜ (∂ₜ θ) t = -(S.ω ^ 2 * Real.sin (θ t 0)) • EuclideanSpace.single 0 1 := by
-  have hs := (S.equationOfMotion_iff_scalar θ).mp h t
   ext i
   fin_cases i
-  simpa using eq_neg_of_add_eq_zero_left hs
+  simpa using eq_neg_of_add_eq_zero_left ((S.equationOfMotion_iff_scalar θ).mp h t)
 
 /-- The pointwise equation of motion in terms of the angular frequency: the moment of inertia
   times the acceleration `-ω² sin θ` is the torque. This reads the equation of motion back off
   the second component of the phase-space vector field. -/
 lemma inertia_smul_eq_torque (x : EuclideanSpace ℝ (Fin 1)) :
     S.inertia • (-(S.ω ^ 2 * Real.sin (x 0)) • EuclideanSpace.single 0 1) = S.torque x := by
-  rw [torque_eq, smul_smul, ← neg_smul]
-  congr 1
-  rw [← S.ω_sq_mul_inertia]
+  rw [torque_eq, smul_smul, ← neg_smul, ← S.ω_sq_mul_inertia]
+  congr
   ring
 
 /-!
@@ -210,14 +196,13 @@ lemma inertia_smul_eq_torque (x : EuclideanSpace ℝ (Fin 1)) :
 
 /-- The phase curve `τ ↦ (θ t, θ̇ t)` (with `t = toRealCLE.symm τ`) of a smooth solution `θ`
   solves the first-order phase-space ODE with vector field `phaseVectorField`. -/
-lemma phaseCurve_hasDerivAt (θ : Time → EuclideanSpace ℝ (Fin 1))
+lemma phaseCurve_hasDerivAt {θ : Time → EuclideanSpace ℝ (Fin 1)}
     (hθ : ContDiff ℝ ∞ θ) (h : S.EquationOfMotion θ) (τ : ℝ) :
-    HasDerivAt (fun τ : ℝ => (θ (Time.toRealCLE.symm τ), ∂ₜ θ (Time.toRealCLE.symm τ)))
-      (S.phaseVectorField (θ (Time.toRealCLE.symm τ), ∂ₜ θ (Time.toRealCLE.symm τ))) τ := by
-  simp only [phaseVectorField]
-  rw [← S.acceleration_eq_of_equationOfMotion θ h (Time.toRealCLE.symm τ)]
-  exact (Time.hasDerivAt_comp_toRealCLE_symm θ τ (hθ.differentiable (by simp) _)).prodMk
-    (Time.hasDerivAt_comp_toRealCLE_symm (∂ₜ θ) τ (deriv_differentiable_of_contDiff θ hθ _))
+    HasDerivAt (fun τ : ℝ => (θ (toRealCLE.symm τ), ∂ₜ θ (toRealCLE.symm τ)))
+      (S.phaseVectorField (θ (toRealCLE.symm τ), ∂ₜ θ (toRealCLE.symm τ))) τ := by
+  rw [phaseVectorField, ← S.acceleration_eq_of_equationOfMotion θ h (Time.toRealCLE.symm τ)]
+  exact (hasDerivAt_comp_toRealCLE_symm θ τ (hθ.differentiable (by simp) _)).prodMk
+    (hasDerivAt_comp_toRealCLE_symm (∂ₜ θ) τ (deriv_differentiable_of_contDiff θ hθ _))
 
 /-!
 
@@ -234,34 +219,27 @@ first-order reduction alone.
 
 /-- Any two smooth solutions of the equation of motion of the simple pendulum with the same
   initial angle and angular velocity are equal. -/
-lemma equationOfMotion_unique (x y : Time → EuclideanSpace ℝ (Fin 1))
+lemma equationOfMotion_unique {x y : Time → EuclideanSpace ℝ (Fin 1)}
     (hx : ContDiff ℝ ∞ x) (hy : ContDiff ℝ ∞ y)
     (hEOMx : S.EquationOfMotion x) (hEOMy : S.EquationOfMotion y)
-    (h0 : x 0 = y 0) (hv0 : ∂ₜ x 0 = ∂ₜ y 0) :
-    x = y := by
-  have hIC : (fun τ : ℝ => (x (Time.toRealCLE.symm τ), ∂ₜ x (Time.toRealCLE.symm τ))) 0 =
-      (fun τ : ℝ => (y (Time.toRealCLE.symm τ), ∂ₜ y (Time.toRealCLE.symm τ))) 0 := by
-    have h00 : Time.toRealCLE.symm (0 : ℝ) = (0 : Time) := map_zero Time.toRealCLE.symm
-    simp only [h00, h0, hv0]
-  have hEq := ODE_solution_unique_univ
-    (v := fun _ p => S.phaseVectorField p) (s := fun _ => Set.univ) (t₀ := (0 : ℝ))
+    (h0 : x 0 = y 0) (hv0 : ∂ₜ x 0 = ∂ₜ y 0) : x = y := by
+  have hEq := ODE_solution_unique_univ (t₀ := (0 : ℝ))
     (f := fun τ : ℝ => (x (Time.toRealCLE.symm τ), ∂ₜ x (Time.toRealCLE.symm τ)))
     (g := fun τ : ℝ => (y (Time.toRealCLE.symm τ), ∂ₜ y (Time.toRealCLE.symm τ)))
     (fun _ => S.phaseVectorField_lipschitz.lipschitzOnWith)
-    (fun τ => ⟨S.phaseCurve_hasDerivAt x hx hEOMx τ, Set.mem_univ _⟩)
-    (fun τ => ⟨S.phaseCurve_hasDerivAt y hy hEOMy τ, Set.mem_univ _⟩)
-    hIC
+    (fun τ => ⟨S.phaseCurve_hasDerivAt hx hEOMx τ, Set.mem_univ _⟩)
+    (fun τ => ⟨S.phaseCurve_hasDerivAt hy hEOMy τ, Set.mem_univ _⟩)
+    (by simp [h0, hv0])
   funext t
-  have h1 := congrFun hEq (Time.toRealCLE t)
-  simp only [ContinuousLinearEquiv.symm_apply_apply] at h1
-  exact (Prod.ext_iff.mp h1).1
+  rw [funext_iff] at hEq
+  exact (Prod.ext_iff.mp (hEq (toRealCLE t))).1
 
 /-- Two solutions of the simple pendulum with the same initial angle and angular velocity are
   equal. -/
 lemma IsSolution.eq_of_initial {S : SimplePendulum} {x y : Time → EuclideanSpace ℝ (Fin 1)}
     (hx : S.IsSolution x) (hy : S.IsSolution y) (h0 : x 0 = y 0) (hv0 : ∂ₜ x 0 = ∂ₜ y 0) :
     x = y :=
-  S.equationOfMotion_unique x y hx.contDiff hy.contDiff hx.equationOfMotion hy.equationOfMotion
+  S.equationOfMotion_unique hx.contDiff hy.contDiff hx.equationOfMotion hy.equationOfMotion
     h0 hv0
 
 /-!
@@ -305,10 +283,9 @@ lemma isSolution_comp_neg {S : SimplePendulum} {θ : Time → EuclideanSpace ℝ
   so the two coincide by uniqueness. -/
 lemma releasedFromRest_even {S : SimplePendulum} {θ : Time → EuclideanSpace ℝ (Fin 1)}
     (h : S.IsSolution θ) (hv : ∂ₜ θ 0 = 0) (t : Time) : θ (-t) = θ t := by
-  have h0 : (fun s => θ (-s)) 0 = θ 0 := by simp
-  have hv0 : ∂ₜ (fun s => θ (-s)) 0 = ∂ₜ θ 0 := by
-    rw [Time.deriv_comp_neg θ 0 (h.contDiff.differentiable (by simp) _), neg_zero, hv, neg_zero]
-  exact congrFun (IsSolution.eq_of_initial (isSolution_comp_neg h) h h0 hv0) t
+  apply congrFun (IsSolution.eq_of_initial (isSolution_comp_neg h) h _ _) t
+  · rw [neg_zero]
+  · rw [Time.deriv_comp_neg θ 0 (h.contDiff.differentiable (by simp) _), neg_zero, hv, neg_zero]
 
 /-!
 
@@ -408,6 +385,4 @@ lemma exists_local_solution (x₀ v₀ : EuclideanSpace ℝ (Fin 1)) :
     · rw [hd2 t (hmem t ht)]
       exact S.inertia_smul_eq_torque _
 
-end SimplePendulum
-
-end ClassicalMechanics
+end ClassicalMechanics.SimplePendulum
